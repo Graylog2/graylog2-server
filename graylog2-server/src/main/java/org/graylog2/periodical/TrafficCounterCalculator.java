@@ -99,7 +99,7 @@ public class TrafficCounterCalculator extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return false;
     }
 

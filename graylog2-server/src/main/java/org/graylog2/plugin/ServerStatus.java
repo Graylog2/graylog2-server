@@ -49,7 +49,7 @@ public class ServerStatus {
 
     public enum Capability {
         SERVER,
-        MASTER,
+        PARENT,
         LOCALMODE
     }
 

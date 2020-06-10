@@ -160,7 +160,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return false;
     }
 
@@ -231,7 +231,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
 
         // the journal needs this to provide information to rest clients
         journal.setThrottleState(throttleState);
-        
+
         // publish to interested parties
         eventBus.post(throttleState);
 

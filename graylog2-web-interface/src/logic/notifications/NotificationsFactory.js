@@ -157,7 +157,7 @@ class NotificationsFactory {
             <span>
               There were multiple Graylog server instances configured as master in your Graylog cluster. The cluster handles
               this automatically by launching new nodes as slaves if there already is a master but you should still fix this.
-              Check the graylog.conf of every node and make sure that only one instance has is_master set to true. Close this
+              Check the graylog.conf of every node and make sure that only one instance has is_parent set to true. Close this
               notification if you think you resolved the problem. It will pop back up if you start a second master node again.
             </span>
           ),
@@ -179,7 +179,7 @@ class NotificationsFactory {
           description: (
             <span>
               Certain operations of Graylog server require the presence of a master node, but no such master was started.
-              Please ensure that one of your Graylog server nodes contains the setting <code>is_master = true</code> in its
+              Please ensure that one of your Graylog server nodes contains the setting <code>is_parent = true</code> in its
               configuration and that it is running. Until this is resolved index cycling will not be able to run, which
               means that the index retention mechanism is also not running, leading to increased index sizes. Certain
               maintenance functions as well as a variety of web interface pages (e.g. Dashboards) are unavailable.

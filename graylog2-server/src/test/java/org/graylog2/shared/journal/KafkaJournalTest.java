@@ -94,7 +94,7 @@ public class KafkaJournalTest {
                 return nodeId.getAbsolutePath();
             }
         };
-        serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.MASTER), new EventBus("KafkaJournalTest"), NullAuditEventSender::new);
+        serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.PARENT), new EventBus("KafkaJournalTest"), NullAuditEventSender::new);
     }
 
     @After

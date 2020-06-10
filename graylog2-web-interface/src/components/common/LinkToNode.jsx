@@ -37,9 +37,9 @@ const LinkToNode = createReactClass({
     const node = this.state.nodes[this.props.nodeId];
 
     if (node) {
-      const iconName = node.is_master ? 'star' : 'code-fork';
-      const iconClass = node.is_master ? 'master-node' : '';
-      const iconTitle = node.is_master ? 'This is the master node in the cluster' : '';
+      const iconName = node.is_parent ? 'star' : 'code-fork';
+      const iconClass = node.is_parent ? 'master-node' : '';
+      const iconTitle = node.is_parent ? 'This is the master node in the cluster' : '';
       return (
         <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
           <Icon name={iconName} className={iconClass} title={iconTitle} />

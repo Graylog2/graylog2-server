@@ -107,7 +107,7 @@ public class ClusterResource extends RestResource {
                 clusterId.clusterId(),
                 node.getNodeId(),
                 node.getType().toString().toLowerCase(Locale.ENGLISH),
-                node.isMaster(),
+                node.isParent(),
                 node.getTransportAddress(),
                 Tools.getISO8601String(node.getLastSeen()),
                 node.getShortNodeId(),

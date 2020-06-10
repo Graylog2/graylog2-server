@@ -27,12 +27,12 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import java.io.IOException;
 
 @Priority(Priorities.AUTHORIZATION)
-public class RestrictToMasterFilter implements ContainerRequestFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(RestrictToMasterFilter.class);
+public class RestrictToParentFilter implements ContainerRequestFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(RestrictToParentFilter.class);
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        LOG.warn("Rejected request to <{}> which is only allowed against master nodes.", requestContext.getUriInfo().getPath());
-        throw new ForbiddenException("Request is only allowed against master nodes.");
+        LOG.warn("Rejected request to <{}> which is only allowed against parent nodes.", requestContext.getUriInfo().getPath());
+        throw new ForbiddenException("Request is only allowed against parent nodes.");
     }
 }

@@ -206,7 +206,7 @@ public class IndexerClusterCheckerThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return true;
     }
 

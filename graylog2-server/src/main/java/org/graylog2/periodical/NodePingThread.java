@@ -57,14 +57,14 @@ public class NodePingThread extends Periodical {
 
     @Override
     public void doRun() {
-        final boolean isMaster = serverStatus.hasCapability(ServerStatus.Capability.MASTER);
+        final boolean isParent = serverStatus.hasCapability(ServerStatus.Capability.PARENT);
         try {
             Node node = nodeService.byNodeId(serverStatus.getNodeId());
-            nodeService.markAsAlive(node, isMaster, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
+            nodeService.markAsAlive(node, isParent, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             nodeService.registerServer(serverStatus.getNodeId().toString(),
-                    isMaster,
+                    isParent,
                     httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API),
                     Tools.getLocalCanonicalHostname());
         }
@@ -72,20 +72,20 @@ public class NodePingThread extends Periodical {
             // Remove old nodes that are no longer running. (Just some housekeeping)
             nodeService.dropOutdated();
 
-            // Check that we still have a master node in the cluster, if not, warn the user.
-            if (nodeService.isAnyMasterPresent()) {
+            // Check that we still have a parent node in the cluster, if not, warn the user.
+            if (nodeService.isAnyParentPresent()) {
                 Notification notification = notificationService.build()
-                        .addType(Notification.Type.NO_MASTER);
+                        .addType(Notification.Type.NO_PARENT);
                 boolean removedNotification = notificationService.fixed(notification);
                 if (removedNotification) {
                     activityWriter.write(
-                        new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
+                        new Activity("Notification condition [" + NotificationImpl.Type.NO_PARENT + "] " +
                                              "has been fixed.", NodePingThread.class));
                 }
             } else {
                 Notification notification = notificationService.buildNow()
                         .addNode(serverStatus.getNodeId().toString())
-                        .addType(Notification.Type.NO_MASTER)
+                        .addType(Notification.Type.NO_PARENT)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
             }
@@ -111,7 +111,7 @@ public class NodePingThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return false;
     }
 

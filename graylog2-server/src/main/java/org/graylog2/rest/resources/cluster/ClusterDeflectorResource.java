@@ -59,7 +59,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Finds master node and triggers deflector cycle")
+    @ApiOperation(value = "Finds parent node and triggers deflector cycle")
     @Path("/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void cycle() throws IOException {
@@ -68,7 +68,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Finds master node and triggers deflector cycle")
+    @ApiOperation(value = "Finds parent node and triggers deflector cycle")
     @Path("/{indexSetId}/cycle")
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void cycle(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws IOException {
@@ -76,18 +76,18 @@ public class ClusterDeflectorResource extends ProxiedResource {
     }
 
     private RemoteDeflectorResource getDeflectorResource() {
-        final Node master = findMasterNode();
+        final Node parent = findParentNode();
         final Function<String, Optional<RemoteDeflectorResource>> remoteInterfaceProvider = createRemoteInterfaceProvider(RemoteDeflectorResource.class);
-        final Optional<RemoteDeflectorResource> deflectorResource = remoteInterfaceProvider.apply(master.getNodeId());
+        final Optional<RemoteDeflectorResource> deflectorResource = remoteInterfaceProvider.apply(parent.getNodeId());
 
         return deflectorResource
                 .orElseThrow(() -> new InternalServerErrorException("Unable to get remote deflector resource."));
     }
 
-    private Node findMasterNode() {
+    private Node findParentNode() {
         return nodeService.allActive().values().stream()
-                .filter(Node::isMaster)
+                .filter(Node::isParent)
                 .findFirst()
-                .orElseThrow(() -> new ServiceUnavailableException("No master present."));
+                .orElseThrow(() -> new ServiceUnavailableException("No parent present."));
     }
 }

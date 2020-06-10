@@ -152,7 +152,7 @@ public class VersionCheckThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return true;
     }
 

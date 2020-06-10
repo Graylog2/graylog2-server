@@ -85,7 +85,7 @@ public class AlertScannerThread extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return true;
     }
 

@@ -45,8 +45,8 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
-    @Parameter(value = "is_master", required = true)
-    private boolean isMaster = true;
+    @Parameter(value = "is_parent", required = true)
+    private boolean isParent = true;
 
     @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
@@ -112,8 +112,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_fault_penalty_seconds", validator = PositiveLongValidator.class)
     private long outputFaultPenaltySeconds = 30;
 
-    @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
-    private int staleMasterTimeout = 2000;
+    @Parameter(value = "stale_parent_timeout", validator = PositiveIntegerValidator.class)
+    private int staleParentTimeout = 2000;
 
     @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
@@ -164,12 +164,12 @@ public class Configuration extends BaseConfiguration {
     private Set<String> enabledTlsProtocols = ImmutableSet.of("TLSv1.2", "TLSv1.3");
 
 
-    public boolean isMaster() {
-        return isMaster;
+    public boolean isParent() {
+        return isParent;
     }
 
-    public void setIsMaster(boolean is) {
-        isMaster = is;
+    public void setIsParent(boolean is) {
+        isParent = is;
     }
 
     public String getPasswordSecret() {
@@ -253,8 +253,8 @@ public class Configuration extends BaseConfiguration {
         return outputFaultPenaltySeconds;
     }
 
-    public int getStaleMasterTimeout() {
-        return staleMasterTimeout;
+    public int getstaleParentTimeout() {
+        return staleParentTimeout;
     }
 
     public int getLdapConnectionTimeout() {

@@ -26,7 +26,7 @@ public interface Node extends Persisted {
 
     String getNodeId();
 
-    boolean isMaster();
+    boolean isParent();
 
     String getTransportAddress();
 

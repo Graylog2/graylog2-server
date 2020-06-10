@@ -45,8 +45,8 @@ public interface Notification extends Persisted {
 
     enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
-        MULTI_MASTER,
-        NO_MASTER,
+        MULTI_PARENT,
+        NO_PARENT,
         ES_OPEN_FILES,
         ES_CLUSTER_RED,
         ES_UNAVAILABLE,

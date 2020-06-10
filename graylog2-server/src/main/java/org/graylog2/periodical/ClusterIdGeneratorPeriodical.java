@@ -46,7 +46,7 @@ public class ClusterIdGeneratorPeriodical extends Periodical {
     }
 
     @Override
-    public boolean masterOnly() {
+    public boolean parentOnly() {
         return true;
     }
 

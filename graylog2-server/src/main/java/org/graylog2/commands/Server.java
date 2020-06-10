@@ -191,20 +191,20 @@ public class Server extends ServerBootstrap {
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(),
-                configuration.isMaster(),
+                configuration.isParent(),
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
-            LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
+        if (configuration.isParent() && !nodeService.isOnlyParent(serverStatus.getNodeId())) {
+            LOG.warn("Detected another parent in the cluster. Retrying in {} seconds to make sure it is not "
+                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getstaleParentTimeout()));
             try {
-                Thread.sleep(configuration.getStaleMasterTimeout());
+                Thread.sleep(configuration.getstaleParentTimeout());
             } catch (InterruptedException e) { /* nope */ }
 
-            if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
+            if (!nodeService.isOnlyParent(serverStatus.getNodeId())) {
                 // All devils here.
-                String what = "Detected other master node in the cluster! Starting as non-master! "
+                String what = "Detected other parent node in the cluster! Starting as non-parent! "
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
                 activityWriter.write(new Activity(what, Server.class));
@@ -212,13 +212,13 @@ public class Server extends ServerBootstrap {
                 // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
                 Notification notification = notificationService.buildNow()
-                        .addType(Notification.Type.MULTI_MASTER)
+                        .addType(Notification.Type.MULTI_PARENT)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
-                configuration.setIsMaster(false);
+                configuration.setIsParent(false);
             } else {
-                LOG.warn("Stale master has gone. Starting as master.");
+                LOG.warn("Stale parent has gone. Starting as parent.");
             }
         }
     }
@@ -273,8 +273,8 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isMaster()) {
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
+        if (configuration.isParent()) {
+            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.PARENT);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);
         }
