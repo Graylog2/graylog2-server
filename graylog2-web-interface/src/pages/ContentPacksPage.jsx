@@ -15,12 +15,12 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
 
-const ConfigurationBundles = styled.div`
-  font-size: 14px;
+const ConfigurationBundles = styled.div(({ theme }) => `
+  font-size: ${theme.fonts.size.body};
   font-weight: normal;
   line-height: 20px;
   margin-top: 15px;
-`;
+`);
 
 const ContentPacksPage = createReactClass({
   displayName: 'ContentPacksPage',

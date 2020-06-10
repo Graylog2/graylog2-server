@@ -14,9 +14,9 @@ const { LdapGroupsActions } = CombinedProvider.get('LdapGroups');
 const { LdapStore } = CombinedProvider.get('Ldap');
 const { RolesStore } = CombinedProvider.get('Roles');
 
-const StyledLegend = styled.legend`
-  font-size: 1.5em;
-`;
+const StyledLegend = styled.legend(({ theme }) => `
+  font-size: ${theme.fonts.size.large};
+`);
 
 class LdapGroupsComponent extends React.Component {
   static propTypes = {
@@ -25,12 +25,16 @@ class LdapGroupsComponent extends React.Component {
     onShowConfig: PropTypes.func.isRequired,
   };
 
-  state = {
-    groups: undefined,
-    roles: undefined,
-    mapping: undefined,
-    groupsErrorMessage: null,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      groups: undefined,
+      roles: undefined,
+      mapping: undefined,
+      groupsErrorMessage: null,
+    };
+  }
 
   componentDidMount() {
     LdapGroupsActions.loadMapping().then((mapping) => this.setState({ mapping: Immutable.Map(mapping) }));

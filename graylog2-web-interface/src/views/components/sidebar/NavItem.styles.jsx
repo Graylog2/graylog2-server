@@ -32,20 +32,20 @@ export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> 
   `)}
 `);
 
-export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
-  font-size: ${theme.fonts.size.body}
+export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div(({ theme }) => `
+  font-size: ${theme.fonts.size.body};
   display: inline;
   margin-left: 10px;
   overflow: hidden;
   white-space: nowrap;
-`;
+`);
 
-export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
+export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div(({ theme }) => `
   width: 25px;
   text-align: center;
-  font-size: 20px;
+  font-size: ${theme.fonts.size.large};
   cursor: pointer;
-`;
+`);
 
 export const Content: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> = styled.div(({ isSelected, expandRight, theme }) => css`
   color: ${theme.utils.readableColor(theme.colors.global.contentBackground)};

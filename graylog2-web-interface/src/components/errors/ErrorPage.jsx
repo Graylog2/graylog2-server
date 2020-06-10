@@ -15,13 +15,13 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const ErrorMessage = styled.div`
+const ErrorMessage = styled.div(({ theme }) => `
   margin-left: auto;
   margin-right: auto;
   text-align: left;
 
   dt {
-    font-size: 1.2em;
+    font-size: ${theme.fonts.size.body};
     font-weight: normal;
     overflow: auto;
   }
@@ -29,7 +29,7 @@ const ErrorMessage = styled.div`
   p {
     font-size: inherit;
   }
-`;
+`);
 
 type Props = {
   backgroundImage?: string,

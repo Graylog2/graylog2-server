@@ -53,12 +53,12 @@ export const Headline: StyledComponent<{}, void, HTMLHeadingElement> = styled.h3
   white-space: nowrap;
 `;
 
-export const ToggleIcon: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+export const ToggleIcon: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   width: 25px;
   text-align: center;
-  font-size: 20px;
+  font-size: ${theme.fonts.size.large};
   cursor: pointer;
-`;
+`);
 
 export const HorizontalRuler: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 100%;

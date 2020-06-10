@@ -22,13 +22,13 @@ const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 200px;
 `;
 
-const Separator: StyledComponent<{}, void, HTMLParagraphElement> = styled.p`
+const Separator: StyledComponent<{}, void, HTMLParagraphElement> = styled.p(({ theme }) => `
   margin: 0;
   line-height: 34px;
-  font-size: 18px;
+  font-size: ${theme.fonts.size.large};
   padding-left: 15px;
   padding-right: 15px;
-`;
+`);
 
 const _isValidDateString = (dateString: string) => {
   if (dateString === undefined) {

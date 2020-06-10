@@ -10,6 +10,7 @@ import { connect, Field, useFormikContext } from 'formik';
 import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
+import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
@@ -22,10 +23,10 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, void, *> = styled(FormControl)`
+const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => `
   min-height: 34px;
-  font-size: 14px;
-`;
+  font-size: ${theme.fonts.size.large};
+`);
 
 const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();

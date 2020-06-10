@@ -5,12 +5,13 @@ import d3 from 'd3';
 
 import { Label } from 'components/graylog';
 
-const ColorLabelWrap = styled.span(({ size }) => {
-  const fontSize = size === 'small' ? '0.75em' : '1em';
+const ColorLabelWrap = styled.span(({ size, theme }) => {
+  const { body, small, tiny } = theme.fonts.size;
+  const fontSize = size === 'small' ? small : body;
 
   return `
     vertical-align: middle;
-    font-size: ${size === 'xsmall' ? '0.5em' : fontSize};
+    font-size: ${size === 'xsmall' ? tiny : fontSize};
   `;
 });
 

@@ -14,14 +14,14 @@ const NodeRow = styled.div(({ theme }) => `
   margin-top: 0;
 
   .hostname {
-    font-size: 12px;
+    font-size: ${theme.fonts.size.small};
   }
 
   .well {
     margin-bottom: 0;
     margin-top: 3px;
     font-family: ${theme.fonts.family.monospace};
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
   }
 
   .xtrc-converters {

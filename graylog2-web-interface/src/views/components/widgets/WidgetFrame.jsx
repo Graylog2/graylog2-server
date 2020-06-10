@@ -16,7 +16,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
     position: relative;
     margin-bottom: -15px;
     top: -5px;
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
     line-height: 11px;
   }
 
@@ -42,7 +42,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 
   .widget-title {
-    font-size: 18px;
+    font-size: ${theme.fonts.size.large};
     height: 25px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -57,7 +57,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   .widget-update-info {
     text-align: left;
     float: left;
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
     position: absolute;
     bottom: 10px;
     width: 130px;
@@ -95,7 +95,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 
   .not-available {
-    font-size: 70px;
+    font-size: ${theme.fonts.size.huge};
   }
 
   .loading,

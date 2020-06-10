@@ -62,10 +62,10 @@ const EventsTable = styled(Table)(({ theme }) => `
   }
 `);
 
-const EventsIcon = styled(Icon)`
-  font-size: 1.5em;
+const EventsIcon = styled(Icon)(({ theme }) => `
+  font-size: ${theme.fonts.size.large};
   vertical-align: top;
-`;
+`);
 
 class Events extends React.Component {
   static propTypes = {

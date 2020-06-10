@@ -51,7 +51,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   > ${PanelHeading} {
     .panel-title,
     .panel-title h3 {
-      font-size: ${theme.fonts.size.body}
+      font-size: ${theme.fonts.size.large};
     }
   }
 
@@ -88,7 +88,7 @@ const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
 
       > .panel-title,
       > .panel-title > * {
-        font-size: ${theme.fonts.size.body}
+        font-size: ${theme.fonts.size.large};
       }
 
       + .panel-collapse > .panel-body {

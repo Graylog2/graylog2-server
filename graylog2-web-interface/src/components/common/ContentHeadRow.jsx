@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 import { Row } from 'components/graylog';
 
-const StyledRow = styled(Row)`
+const StyledRow = styled(Row)(({ theme }) => `
   padding-bottom: 0;
 
   p {
@@ -26,9 +26,9 @@ const StyledRow = styled(Row)`
   }
 
   .btn-lg {
-    font-size: ${theme.fonts.size.body}
+    font-size: ${theme.fonts.size.body};
   }
-`;
+`);
 
 const ContentHeadRow = ({ children, className, ...props }) => {
   return (

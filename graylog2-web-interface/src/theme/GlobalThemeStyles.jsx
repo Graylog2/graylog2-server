@@ -57,7 +57,15 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   h4 {
     font-size: ${theme.fonts.size.h4};
-    font-weight: normal;
+  }
+
+  h5 {
+    font-size: ${theme.fonts.size.h5};
+  }
+
+  h6 {
+    font-size: ${theme.fonts.size.h6};
+    font-weight: bold;
   }
 
   a {
@@ -91,7 +99,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   label {
-    font-size: ${theme.fonts.size.bodyLarge};
+    font-size: ${theme.fonts.size.large};
   }
 
   legend small {
@@ -252,7 +260,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .configuration-field-optional {
     margin-left: 5px;
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
   }
 
   .index-description {
@@ -497,7 +505,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .btn-text {
     font-family: ${theme.fonts.family.body};
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
     padding: 0;
     vertical-align: baseline;
   }
@@ -507,7 +515,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   nav.navbar-fixed-top ul.dropdown-menu li a {
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
   }
 
   nav.navbar-fixed-top ul.dropdown-menu {
@@ -571,7 +579,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .threaddump {
-    font-size: ${theme.fonts.size.bodySmall};
+    font-size: ${theme.fonts.size.small};
   }
 
   h2.extractor-title {

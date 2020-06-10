@@ -25,10 +25,10 @@ const NotificationHead = styled.h3`
   margin-bottom: 5px;
 `;
 
-const NotificationTimestamp = styled.span`
+const NotificationTimestamp = styled.span(({ theme }) => `
   margin-left: 3px;
-  font-size: 10px;
-`;
+  font-size: ${theme.fonts.size.small};
+`);
 
 class Notification extends React.Component {
   static propTypes = {
