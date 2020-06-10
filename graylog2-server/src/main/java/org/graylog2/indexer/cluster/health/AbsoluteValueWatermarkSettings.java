@@ -17,40 +17,39 @@
 package org.graylog2.indexer.cluster.health;
 
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.common.unit.ByteSizeValue;
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSizeValue> {
+public abstract class AbsoluteValueWatermarkSettings implements WatermarkSettings<ByteSize> {
 
     public abstract SettingsType type();
 
-    public abstract ByteSizeValue low();
+    public abstract ByteSize low();
 
-    public abstract ByteSizeValue high();
+    public abstract ByteSize high();
 
     @Nullable
-    public abstract ByteSizeValue floodStage();
+    public abstract ByteSize floodStage();
 
     public static class Builder {
         private SettingsType type = SettingsType.ABSOLUTE;
-        private ByteSizeValue low;
-        private ByteSizeValue high;
-        private ByteSizeValue floodStage;
+        private ByteSize low;
+        private ByteSize high;
+        private ByteSize floodStage;
 
         public Builder(){}
 
-        public Builder low(ByteSizeValue low) {
+        public Builder low(ByteSize low) {
             this.low = low;
             return this;
         }
 
-        public Builder high(ByteSizeValue high) {
+        public Builder high(ByteSize high) {
             this.high = high;
             return this;
         }
 
-        public Builder floodStage(ByteSizeValue floodStage) {
+        public Builder floodStage(ByteSize floodStage) {
             this.floodStage = floodStage;
             return this;
         }

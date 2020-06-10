@@ -16,8 +16,6 @@
  */
 package org.graylog2.indexer.cluster.health;
 
-import org.elasticsearch.common.unit.ByteSizeValue;
-
 import java.util.stream.Stream;
 
 public class ClusterAllocationDiskSettingsFactory {
@@ -34,10 +32,10 @@ public class ClusterAllocationDiskSettingsFactory {
         WatermarkSettings.SettingsType highType = getType(high);
         if (Stream.of(lowType, highType).allMatch(s -> s == WatermarkSettings.SettingsType.ABSOLUTE)) {
             AbsoluteValueWatermarkSettings.Builder builder = new AbsoluteValueWatermarkSettings.Builder()
-                .low(ByteSizeValue.parseBytesSizeValue(low, "lowWatermark"))
-                .high(ByteSizeValue.parseBytesSizeValue(high, "highWatermark"));
+                .low(SIUnitParser.parseBytesSizeValue(low))
+                .high(SIUnitParser.parseBytesSizeValue(high));
             if (!floodStage.isEmpty()) {
-                builder.floodStage(ByteSizeValue.parseBytesSizeValue(floodStage, "floodStageWatermark"));
+                builder.floodStage(SIUnitParser.parseBytesSizeValue(floodStage));
             }
             return builder.build();
         } else if (Stream.of(lowType, highType).allMatch(s -> s == WatermarkSettings.SettingsType.PERCENTAGE)) {

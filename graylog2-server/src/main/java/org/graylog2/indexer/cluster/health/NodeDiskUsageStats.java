@@ -17,7 +17,6 @@
 package org.graylog2.indexer.cluster.health;
 
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.common.unit.ByteSizeValue;
 
 import javax.annotation.Nullable;
 
@@ -32,18 +31,18 @@ public abstract class NodeDiskUsageStats {
     @Nullable
     public abstract String host();
 
-    public abstract ByteSizeValue diskTotal();
+    public abstract ByteSize diskTotal();
 
-    public abstract ByteSizeValue diskUsed();
+    public abstract ByteSize diskUsed();
 
-    public abstract ByteSizeValue diskAvailable();
+    public abstract ByteSize diskAvailable();
 
     public abstract Double diskUsedPercent();
 
     public static NodeDiskUsageStats create(String name, String ip, @Nullable String host, String diskUsedString, String diskTotalString, Double diskUsedPercent) {
-        ByteSizeValue diskTotal = ByteSizeValue.parseBytesSizeValue(diskTotalString, "diskTotal");
-        ByteSizeValue diskUsed = ByteSizeValue.parseBytesSizeValue(diskUsedString, "diskUsed");
-        ByteSizeValue diskAvailable = new ByteSizeValue(diskTotal.getBytes() - diskUsed.getBytes());
+        ByteSize diskTotal = SIUnitParser.parseBytesSizeValue(diskTotalString);
+        ByteSize diskUsed = SIUnitParser.parseBytesSizeValue(diskUsedString);
+        ByteSize diskAvailable = () -> diskTotal.getBytes() - diskUsed.getBytes();
         return new AutoValue_NodeDiskUsageStats(
                 name,
                 ip,
