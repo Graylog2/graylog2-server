@@ -78,15 +78,7 @@ public class IndexFieldTypePoller {
      * @return the polled index field type data for the given index
      */
     public Optional<IndexFieldTypesDTO> pollIndex(final String indexName, final String indexSetId) {
-        final Optional<Set<FieldTypeDTO>> optionalFields = indexFieldTypePollerAdapter.pollIndex(indexName, pollTimer)
-                .map(fieldTypes -> fieldTypes
-                    .entrySet()
-                    .stream()
-                    // The "type" value is empty if we deal with a nested data type
-                    // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
-                    .filter(field -> !field.getValue().isEmpty())
-                    .map(field -> FieldTypeDTO.create(field.getKey(), field.getValue()))
-                    .collect(Collectors.toSet()));
+        final Optional<Set<FieldTypeDTO>> optionalFields = indexFieldTypePollerAdapter.pollIndex(indexName, pollTimer);
 
         return optionalFields.map(fields -> IndexFieldTypesDTO.create(indexSetId, indexName, fields));
     }

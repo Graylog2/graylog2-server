@@ -18,9 +18,9 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.codahale.metrics.Timer;
 
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface IndexFieldTypePollerAdapter {
-    Optional<Map<String, String>> pollIndex(String indexName, Timer pollTimer);
+    Optional<Set<FieldTypeDTO>> pollIndex(String indexName, Timer pollTimer);
 }
