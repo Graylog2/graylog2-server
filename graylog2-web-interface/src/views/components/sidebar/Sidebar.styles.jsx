@@ -46,7 +46,7 @@ export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, 
   `;
 });
 
-export const Headline: StyledComponent<{}, void, HTMLHeadingElement> = styled.h3`
+export const Headline: StyledComponent<{}, void, HTMLHeadingElement> = styled.h4`
   color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
