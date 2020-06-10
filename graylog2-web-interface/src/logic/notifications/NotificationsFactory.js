@@ -156,7 +156,7 @@ class NotificationsFactory {
           description: (
             <span>
               There were multiple Graylog server instances configured as primary in your Graylog cluster. The cluster handles
-              this automatically by launching new nodes as children if there already is a primary but you should still fix this.
+              this automatically by launching new nodes as secondary if there already is a primary but you should still fix this.
               Check the graylog.conf of every node and make sure that only one instance has is_primary set to true. Close this
               notification if you think you resolved the problem. It will pop back up if you start a second primary node again.
             </span>
