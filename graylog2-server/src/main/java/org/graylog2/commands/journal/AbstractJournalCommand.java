@@ -59,7 +59,7 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        return configuration.isParent() ? Collections.singleton(ServerStatus.Capability.PARENT) : Collections.emptySet();
+        return configuration.isPrimary() ? Collections.singleton(ServerStatus.Capability.PRIMARY) : Collections.emptySet();
     }
 
     @Override

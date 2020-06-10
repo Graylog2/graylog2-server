@@ -32,8 +32,8 @@ class GettingStarted extends React.Component {
 
   static propTypes = {
     clusterId: PropTypes.string.isRequired,
-    parentOs: PropTypes.string.isRequired,
-    parentVersion: PropTypes.string.isRequired,
+    primaryOs: PropTypes.string.isRequired,
+    primaryVersion: PropTypes.string.isRequired,
     gettingStartedUrl: PropTypes.string.isRequired,
     noDismissButton: PropTypes.bool,
     onDismiss: PropTypes.func,
@@ -96,7 +96,7 @@ class GettingStarted extends React.Component {
   };
 
   render() {
-    const { noDismissButton, clusterId, parentOs, parentVersion, gettingStartedUrl } = this.props;
+    const { noDismissButton, clusterId, primaryOs, primaryVersion, gettingStartedUrl } = this.props;
     const { showStaticContent, guideLoaded, guideUrl } = this.state;
 
     let dismissButton = null;
@@ -125,8 +125,8 @@ class GettingStarted extends React.Component {
     } else {
       const query = Qs.stringify({
         c: clusterId,
-        o: parentOs,
-        v: parentVersion,
+        o: primaryOs,
+        v: primaryVersion,
         m: noDismissButton,
       });
 

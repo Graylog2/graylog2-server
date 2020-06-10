@@ -38,16 +38,16 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Inject
     public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getstaleParentTimeout());
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getstalePrimaryTimeout());
     }
 
     @Override
-    public String registerServer(String nodeId, boolean isParent, URI httpPublishUri, String hostname) {
+    public String registerServer(String nodeId, boolean isPrimary, URI httpPublishUri, String hostname) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
         fields.put("type", Node.Type.SERVER.toString());
-        fields.put("is_parent", isParent);
+        fields.put("is_primary", isPrimary);
         fields.put("transport_address", httpPublishUri.toString());
         fields.put("hostname", hostname);
 
@@ -123,13 +123,13 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      *
-     * @param isParent
+     * @param isPrimary
      * @param restTransportAddress
      */
     @Override
-    public void markAsAlive(Node node, boolean isParent, String restTransportAddress) {
+    public void markAsAlive(Node node, boolean isPrimary, String restTransportAddress) {
         node.getFields().put("last_seen", Tools.getUTCTimestamp());
-        node.getFields().put("is_parent", isParent);
+        node.getFields().put("is_primary", isPrimary);
         node.getFields().put("transport_address", restTransportAddress);
         try {
             save(node);
@@ -139,27 +139,27 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public void markAsAlive(Node node, boolean isParent, URI restTransportAddress) {
-        markAsAlive(node, isParent, restTransportAddress.toString());
+    public void markAsAlive(Node node, boolean isPrimary, URI restTransportAddress) {
+        markAsAlive(node, isPrimary, restTransportAddress.toString());
     }
 
     @Override
-    public boolean isOnlyParent(NodeId nodeId) {
+    public boolean isOnlyPrimary(NodeId nodeId) {
         BasicDBObject query = new BasicDBObject();
         query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("node_id", new BasicDBObject("$ne", nodeId.toString()));
-        query.put("is_parent", true);
+        query.put("is_primary", true);
 
         return query(NodeImpl.class, query).size() == 0;
     }
 
     @Override
-    public boolean isAnyParentPresent() {
+    public boolean isAnyPrimaryPresent() {
         BasicDBObject query = new BasicDBObject();
         query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("is_parent", true);
+        query.put("is_primary", true);
 
         return query(NodeImpl.class, query).size() > 0;
     }

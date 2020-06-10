@@ -29,22 +29,22 @@ public abstract class NodesStats {
     public abstract int total();
 
     @JsonProperty
-    public abstract int parentOnly();
+    public abstract int primaryOnly();
 
     @JsonProperty
     public abstract int dataOnly();
 
     @JsonProperty
-    public abstract int parentData();
+    public abstract int primaryData();
 
     @JsonProperty
     public abstract int client();
 
     public static NodesStats create(int total,
-                                   int parentOnly,
+                                   int primaryOnly,
                                    int dataOnly,
-                                   int parentData,
+                                   int primaryData,
                                    int client) {
-        return new AutoValue_NodesStats(total, parentOnly, dataOnly, parentData, client);
+        return new AutoValue_NodesStats(total, primaryOnly, dataOnly, primaryData, client);
     }
 }

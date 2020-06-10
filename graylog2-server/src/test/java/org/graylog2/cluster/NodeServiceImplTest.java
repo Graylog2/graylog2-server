@@ -73,7 +73,7 @@ public class NodeServiceImplTest {
         assertThat(node).isNotNull();
         assertThat(node.getHostname()).isEqualTo(LOCAL_CANONICAL_HOSTNAME);
         assertThat(node.getTransportAddress()).isEqualTo(TRANSPORT_URI.toString());
-        assertThat(node.isParent()).isTrue();
+        assertThat(node.isPrimary()).isTrue();
     }
 
     @Test
@@ -99,6 +99,6 @@ public class NodeServiceImplTest {
         assertThat(node2).isNotNull();
         assertThat(node2.getHostname()).isEqualTo(LOCAL_CANONICAL_HOSTNAME);
         assertThat(node2.getTransportAddress()).isEqualTo(TRANSPORT_URI.toString());
-        assertThat(node2.isParent()).isTrue();
+        assertThat(node2.isPrimary()).isTrue();
     }
 }

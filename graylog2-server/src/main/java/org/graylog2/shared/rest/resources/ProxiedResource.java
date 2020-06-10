@@ -120,35 +120,35 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     /**
-     * Execute the given remote interface function on the parent node.
+     * Execute the given remote interface function on the primary node.
      * <p>
-     * This is used to forward an API request to the parent node. It is useful in situations where an API call can
-     * only be executed on the parent node.
+     * This is used to forward an API request to the primary node. It is useful in situations where an API call can
+     * only be executed on the primary node.
      * <p>
-     * The returned {@link ParentResponse} object is constructed from the remote response's status code and body.
+     * The returned {@link PrimaryResponse} object is constructed from the remote response's status code and body.
      */
-    protected <RemoteInterfaceType, RemoteCallResponseType> ParentResponse<RemoteCallResponseType> requestOnParent(
+    protected <RemoteInterfaceType, RemoteCallResponseType> PrimaryResponse<RemoteCallResponseType> requestOnPrimary(
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider
     ) throws IOException {
-        final Node parentNode = nodeService.allActive().values().stream()
-                .filter(Node::isParent)
+        final Node primaryNode = nodeService.allActive().values().stream()
+                .filter(Node::isPrimary)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No active parent node found"));
+                .orElseThrow(() -> new IllegalStateException("No active primary node found"));
 
-        final RemoteInterfaceType remoteInterfaceType = remoteInterfaceProvider.apply(parentNode.getNodeId())
-                .orElseThrow(() -> new IllegalStateException("Parent node " + parentNode.getNodeId() + " not found"));
+        final RemoteInterfaceType remoteInterfaceType = remoteInterfaceProvider.apply(primaryNode.getNodeId())
+                .orElseThrow(() -> new IllegalStateException("Primary node " + primaryNode.getNodeId() + " not found"));
 
         final Call<RemoteCallResponseType> call = remoteInterfaceFunction.apply(remoteInterfaceType);
         final Response<RemoteCallResponseType> response = call.execute();
 
         final byte[] errorBody = response.errorBody() == null ? null : response.errorBody().bytes();
 
-        return ParentResponse.create(response.isSuccessful(), response.code(), response.body(), errorBody);
+        return PrimaryResponse.create(response.isSuccessful(), response.code(), response.body(), errorBody);
     }
 
     @AutoValue
-    protected static abstract class ParentResponse<ResponseType> {
+    protected static abstract class PrimaryResponse<ResponseType> {
         /**
          * Indicates whether the request has been successful or not.
          * @return {@code true} for a successful request, {@code false} otherwise
@@ -187,11 +187,11 @@ public abstract class ProxiedResource extends RestResource {
             return entity().isPresent() ? entity().get() : error().orElse(null);
         }
 
-        public static <ResponseType> ParentResponse<ResponseType> create(boolean isSuccess,
+        public static <ResponseType> PrimaryResponse<ResponseType> create(boolean isSuccess,
                                                                          int code,
                                                                          @Nullable ResponseType entity,
                                                                          @Nullable byte[] error) {
-            return new AutoValue_ProxiedResource_ParentResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
+            return new AutoValue_ProxiedResource_PrimaryResponse<>(isSuccess, code, Optional.ofNullable(entity), Optional.ofNullable(error));
         }
     }
 }

@@ -142,7 +142,7 @@ public class MongoDbGrokPatternServiceTest {
         patternSet.add(GrokPattern.create("POSTFIX_DNSBLOG", "%{POSTFIX_DNSBLOG_LISTING}|%{POSTFIX_WARNING}"));
         patternSet.add(GrokPattern.create("POSTFIX_PICKUP", "%{POSTFIX_KEYVALUE}"));
         patternSet.add(GrokPattern.create("POSTFIX_LMTP", "%{POSTFIX_SMTP}"));
-        patternSet.add(GrokPattern.create("POSTFIX_PARENT", "%{POSTFIX_PARENT_START}|%{POSTFIX_PARENT_EXIT}|%{POSTFIX_WARNING}"));
+        patternSet.add(GrokPattern.create("POSTFIX_PRIMARY", "%{POSTFIX_PRIMARY_START}|%{POSTFIX_PRIMARY_EXIT}|%{POSTFIX_WARNING}"));
         patternSet.add(GrokPattern.create("POSTFIX_TLSPROXY", "%{POSTFIX_TLSPROXY_CONN}|%{POSTFIX_WARNING}"));
         patternSet.add(GrokPattern.create("POSTFIX_SENDMAIL", "%{POSTFIX_WARNING}"));
         patternSet.add(GrokPattern.create("POSTFIX_BOUNCE", "%{POSTFIX_BOUNCE_NOTIFICATION}"));
@@ -166,8 +166,8 @@ public class MongoDbGrokPatternServiceTest {
         patternSet.add(GrokPattern.create("POSTFIX_SMTP_RELAYERR", "%{POSTFIX_QUEUEID:postfix_queueid}: host %{POSTFIX_RELAY_INFO} said: %{GREEDYDATA:postfix_smtp_response} \\(in reply to %{POSTFIX_SMTP_STAGE:postfix_smtp_stage} command\\)"));
         patternSet.add(GrokPattern.create("POSTFIX_STATUS_CODE_ENHANCED", "\\d\\.\\d\\.\\d"));
         patternSet.add(GrokPattern.create("POSTFIX_SMTP_TIMEOUT", "%{POSTFIX_QUEUEID:postfix_queueid}: conversation with %{POSTFIX_RELAY_INFO} timed out( while %{POSTFIX_LOSTCONN_REASONS:postfix_smtp_lostconn_reason})?"));
-        patternSet.add(GrokPattern.create("POSTFIX_PARENT_EXIT", "terminating on signal %{INT:postfix_termination_signal}"));
-        patternSet.add(GrokPattern.create("POSTFIX_PARENT_START", "(daemon started|reload) -- version %{DATA:postfix_version}, configuration %{PATH:postfix_config_path}"));
+        patternSet.add(GrokPattern.create("POSTFIX_PRIMARY_EXIT", "terminating on signal %{INT:postfix_termination_signal}"));
+        patternSet.add(GrokPattern.create("POSTFIX_PRIMARY_START", "(daemon started|reload) -- version %{DATA:postfix_version}, configuration %{PATH:postfix_config_path}"));
         patternSet.add(GrokPattern.create("POSTFIX_SCACHE_LOOKUPS", "statistics: (address|domain) lookup hits=%{INT:postfix_scache_hits} miss=%{INT:postfix_scache_miss} success=%{INT:postfix_scache_success}%"));
         patternSet.add(GrokPattern.create("POSTFIX_BOUNCE_NOTIFICATION", "%{POSTFIX_QUEUEID:postfix_queueid}: sender (non-delivery|delivery status|delay) notification: %{POSTFIX_QUEUEID:postfix_bounce_queueid}"));
         patternSet.add(GrokPattern.create("POSTFIX_SCACHE_TIMESTAMP", "statistics: start interval %{SYSLOGTIMESTAMP:postfix_scache_timestamp}"));

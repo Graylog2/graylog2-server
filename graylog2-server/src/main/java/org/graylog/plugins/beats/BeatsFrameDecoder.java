@@ -43,7 +43,7 @@ import java.util.zip.InflaterInputStream;
 /**
  * FrameDecoder for the Beats/Lumberjack protocol.
  *
- * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/parent/PROTOCOL.md">Lumberjack protocol</a>
+ * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md">Lumberjack protocol</a>
  */
 public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.DecodingState> {
     private static final Logger LOG = LoggerFactory.getLogger(BeatsFrameDecoder.class);

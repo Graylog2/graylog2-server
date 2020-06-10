@@ -72,7 +72,7 @@ import org.graylog2.shared.journal.JournalReaderModule;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.shared.security.RestrictToParentFeature;
+import org.graylog2.shared.security.RestrictToPrimaryFeature;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.DefaultStreamChangeHandler;
 import org.graylog2.streams.StreamRouter;
@@ -187,7 +187,7 @@ public class ServerBindings extends Graylog2Module {
     private void bindDynamicFeatures() {
         final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
-        dynamicFeatures.addBinding().toInstance(RestrictToParentFeature.class);
+        dynamicFeatures.addBinding().toInstance(RestrictToPrimaryFeature.class);
     }
 
     private void bindExceptionMappers() {

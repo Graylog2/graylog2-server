@@ -82,8 +82,8 @@ public abstract class ExposedConfiguration {
     @JsonProperty("output_module_timeout")
     public abstract long outputModuleTimeout();
 
-    @JsonProperty("stale_parent_timeout")
-    public abstract int staleParentTimeout();
+    @JsonProperty("stale_primary_timeout")
+    public abstract int stalePrimaryTimeout();
 
     @JsonProperty("gc_warning_threshold")
     public abstract String gcWarningThreshold();
@@ -106,7 +106,7 @@ public abstract class ExposedConfiguration {
                 configuration.getStreamProcessingTimeout(),
                 configuration.getStreamProcessingMaxFaults(),
                 configuration.getOutputModuleTimeout(),
-                configuration.getstaleParentTimeout(),
+                configuration.getstalePrimaryTimeout(),
                 configuration.getGcWarningThreshold().toString());
     }
 
@@ -128,7 +128,7 @@ public abstract class ExposedConfiguration {
             @JsonProperty("stream_processing_timeout") long streamProcessingTimeout,
             @JsonProperty("stream_processing_max_faults") int streamProcessingMaxFaults,
             @JsonProperty("output_module_timeout") long outputModuleTimeout,
-            @JsonProperty("stale_parent_timeout") int staleParentTimeout,
+            @JsonProperty("stale_primary_timeout") int stalePrimaryTimeout,
             @JsonProperty("gc_warning_threshold") String gcWarningThreshold) {
         return new AutoValue_ExposedConfiguration(
                 inputBufferProcessors,
@@ -147,7 +147,7 @@ public abstract class ExposedConfiguration {
                 streamProcessingTimeout,
                 streamProcessingMaxFaults,
                 outputModuleTimeout,
-                staleParentTimeout,
+                stalePrimaryTimeout,
                 gcWarningThreshold);
     }
 

@@ -78,7 +78,7 @@ public class GarbageCollectionWarningThread extends Periodical {
     }
 
     @Override
-    public boolean parentOnly() {
+    public boolean primaryOnly() {
         return false;
     }
 

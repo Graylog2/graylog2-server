@@ -102,7 +102,7 @@ public class PluginVersionConstraintCheckerTest {
 
         @Override
         public Set<ServerStatus.Capability> getRequiredCapabilities() {
-            return Collections.singleton(ServerStatus.Capability.PARENT);
+            return Collections.singleton(ServerStatus.Capability.PRIMARY);
         }
     }
 }

@@ -45,8 +45,8 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
-    @Parameter(value = "is_parent", required = true)
-    private boolean isParent = true;
+    @Parameter(value = "is_primary", required = true)
+    private boolean isPrimary = true;
 
     @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
@@ -112,8 +112,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_fault_penalty_seconds", validator = PositiveLongValidator.class)
     private long outputFaultPenaltySeconds = 30;
 
-    @Parameter(value = "stale_parent_timeout", validator = PositiveIntegerValidator.class)
-    private int staleParentTimeout = 2000;
+    @Parameter(value = "stale_primary_timeout", validator = PositiveIntegerValidator.class)
+    private int stalePrimaryTimeout = 2000;
 
     @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
@@ -164,12 +164,12 @@ public class Configuration extends BaseConfiguration {
     private Set<String> enabledTlsProtocols = ImmutableSet.of("TLSv1.2", "TLSv1.3");
 
 
-    public boolean isParent() {
-        return isParent;
+    public boolean isPrimary() {
+        return isPrimary;
     }
 
-    public void setIsParent(boolean is) {
-        isParent = is;
+    public void setIsPrimary(boolean is) {
+        isPrimary = is;
     }
 
     public String getPasswordSecret() {
@@ -253,8 +253,8 @@ public class Configuration extends BaseConfiguration {
         return outputFaultPenaltySeconds;
     }
 
-    public int getstaleParentTimeout() {
-        return staleParentTimeout;
+    public int getstalePrimaryTimeout() {
+        return stalePrimaryTimeout;
     }
 
     public int getLdapConnectionTimeout() {
@@ -357,18 +357,18 @@ public class Configuration extends BaseConfiguration {
             final StringBuilder b = new StringBuilder();
 
             if (!file.exists()) {
-                final File parent = file.getParentFile();
-                if (!parent.isDirectory()) {
-                    throw new ValidationException("Parent path " + parent + " for Node ID file at " + path + " is not a directory");
+                final File primary = file.getPrimaryFile();
+                if (!primary.isDirectory()) {
+                    throw new ValidationException("Primary path " + primary + " for Node ID file at " + path + " is not a directory");
                 } else {
-                    if (!parent.canRead()) {
-                        throw new ValidationException("Parent directory " + parent + " for Node ID file at " + path + " is not readable");
+                    if (!primary.canRead()) {
+                        throw new ValidationException("Primary directory " + primary + " for Node ID file at " + path + " is not readable");
                     }
-                    if (!parent.canWrite()) {
-                        throw new ValidationException("Parent directory " + parent + " for Node ID file at " + path + " is not writable");
+                    if (!primary.canWrite()) {
+                        throw new ValidationException("Primary directory " + primary + " for Node ID file at " + path + " is not writable");
                     }
 
-                    // parent directory exists and is readable and writable
+                    // primary directory exists and is readable and writable
                     return;
                 }
             }

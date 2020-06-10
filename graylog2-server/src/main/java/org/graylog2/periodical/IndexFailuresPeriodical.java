@@ -86,7 +86,7 @@ public class IndexFailuresPeriodical extends Periodical {
     }
 
     @Override
-    public boolean parentOnly() {
+    public boolean primaryOnly() {
         return false;
     }
 

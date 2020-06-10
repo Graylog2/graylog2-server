@@ -86,8 +86,8 @@ public class ConfigurationManagementPeriodicalTest {
     }
 
     @Test
-    public void parentOnly() throws Exception {
-        assertThat(periodical.parentOnly()).isTrue();
+    public void primaryOnly() throws Exception {
+        assertThat(periodical.primaryOnly()).isTrue();
     }
 
     @Test

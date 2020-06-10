@@ -12,7 +12,7 @@ const { SessionStore } = CombinedProvider.get('Session');
 type NodeInfo = {
   cluster_id: string,
   hostname: string,
-  is_parent: boolean,
+  is_primary: boolean,
   last_seen: string,
   node_id: string,
   short_node_id: string,

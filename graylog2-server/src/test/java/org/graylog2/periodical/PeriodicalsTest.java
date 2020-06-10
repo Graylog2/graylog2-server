@@ -206,7 +206,7 @@ public class PeriodicalsTest {
             }
 
             @Override
-            public boolean parentOnly() {
+            public boolean primaryOnly() {
                 return false;
             }
 

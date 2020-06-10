@@ -24,14 +24,14 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import java.lang.reflect.Method;
 
-public class RestrictToParentFeature implements DynamicFeature {
+public class RestrictToPrimaryFeature implements DynamicFeature {
     private final ServerStatus serverStatus;
-    private final RestrictToParentFilter restrictToParentFilter;
+    private final RestrictToPrimaryFilter restrictToPrimaryFilter;
 
     @Inject
-    public RestrictToParentFeature(ServerStatus serverStatus) {
+    public RestrictToPrimaryFeature(ServerStatus serverStatus) {
         this.serverStatus = serverStatus;
-        this.restrictToParentFilter = new RestrictToParentFilter();
+        this.restrictToPrimaryFilter = new RestrictToPrimaryFilter();
     }
 
     @Override
@@ -39,11 +39,11 @@ public class RestrictToParentFeature implements DynamicFeature {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         final Method resourceMethod = resourceInfo.getResourceMethod();
 
-        if (serverStatus.hasCapability(ServerStatus.Capability.PARENT))
+        if (serverStatus.hasCapability(ServerStatus.Capability.PRIMARY))
             return;
 
-        if (resourceMethod.isAnnotationPresent(RestrictToParent.class) || resourceClass.isAnnotationPresent(RestrictToParent.class)) {
-            context.register(restrictToParentFilter);
+        if (resourceMethod.isAnnotationPresent(RestrictToPrimary.class) || resourceClass.isAnnotationPresent(RestrictToPrimary.class)) {
+            context.register(restrictToPrimaryFilter);
         }
     }
 }

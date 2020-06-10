@@ -99,7 +99,7 @@ public class IndexRangesCleanupPeriodical extends Periodical {
     }
 
     @Override
-    public boolean parentOnly() {
+    public boolean primaryOnly() {
         return true;
     }
 

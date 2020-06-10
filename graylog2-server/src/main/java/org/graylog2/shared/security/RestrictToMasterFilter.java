@@ -27,12 +27,12 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import java.io.IOException;
 
 @Priority(Priorities.AUTHORIZATION)
-public class RestrictToParentFilter implements ContainerRequestFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(RestrictToParentFilter.class);
+public class RestrictToPrimaryFilter implements ContainerRequestFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(RestrictToPrimaryFilter.class);
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        LOG.warn("Rejected request to <{}> which is only allowed against parent nodes.", requestContext.getUriInfo().getPath());
-        throw new ForbiddenException("Request is only allowed against parent nodes.");
+        LOG.warn("Rejected request to <{}> which is only allowed against primary nodes.", requestContext.getUriInfo().getPath());
+        throw new ForbiddenException("Request is only allowed against primary nodes.");
     }
 }

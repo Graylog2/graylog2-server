@@ -58,7 +58,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
     }
 
     @Override
-    public boolean parentOnly() {
+    public boolean primaryOnly() {
         return true;
     }
 

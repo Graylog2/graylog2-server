@@ -56,8 +56,8 @@ public class PeriodicalsService extends AbstractIdleService {
             try {
                 periodical.initialize();
 
-                if (periodical.parentOnly() && !serverStatus.hasCapability(ServerStatus.Capability.PARENT)) {
-                    LOG.info("Not starting [{}] periodical. Only started on Graylog parent nodes.", periodical.getClass().getCanonicalName());
+                if (periodical.primaryOnly() && !serverStatus.hasCapability(ServerStatus.Capability.PRIMARY)) {
+                    LOG.info("Not starting [{}] periodical. Only started on Graylog primary nodes.", periodical.getClass().getCanonicalName());
                     continue;
                 }
 

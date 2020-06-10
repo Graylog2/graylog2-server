@@ -45,7 +45,7 @@ public class PurgeExpiredConfigurationUploads extends Periodical {
     }
 
     @Override
-    public boolean parentOnly() {
+    public boolean primaryOnly() {
         return true;
     }
 

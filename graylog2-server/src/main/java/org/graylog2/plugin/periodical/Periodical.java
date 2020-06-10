@@ -37,11 +37,11 @@ public abstract class Periodical implements Runnable {
     public abstract boolean stopOnGracefulShutdown();
 
     /**
-     * Only start this thread on parent nodes?
+     * Only start this thread on primary nodes?
      *
      * @return
      */
-    public abstract boolean parentOnly();
+    public abstract boolean primaryOnly();
 
     /**
      * Start on this node? Useful to decide if to start the periodical based on local configuration.

@@ -191,20 +191,20 @@ public class Server extends ServerBootstrap {
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(),
-                configuration.isParent(),
+                configuration.isPrimary(),
                 httpConfiguration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
         serverStatus.setLocalMode(isLocal());
-        if (configuration.isParent() && !nodeService.isOnlyParent(serverStatus.getNodeId())) {
-            LOG.warn("Detected another parent in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getstaleParentTimeout()));
+        if (configuration.isPrimary() && !nodeService.isOnlyPrimary(serverStatus.getNodeId())) {
+            LOG.warn("Detected another primary in the cluster. Retrying in {} seconds to make sure it is not "
+                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getstalePrimaryTimeout()));
             try {
-                Thread.sleep(configuration.getstaleParentTimeout());
+                Thread.sleep(configuration.getstalePrimaryTimeout());
             } catch (InterruptedException e) { /* nope */ }
 
-            if (!nodeService.isOnlyParent(serverStatus.getNodeId())) {
+            if (!nodeService.isOnlyPrimary(serverStatus.getNodeId())) {
                 // All devils here.
-                String what = "Detected other parent node in the cluster! Starting as non-parent! "
+                String what = "Detected other primary node in the cluster! Starting as non-primary! "
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
                 activityWriter.write(new Activity(what, Server.class));
@@ -212,13 +212,13 @@ public class Server extends ServerBootstrap {
                 // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
                 Notification notification = notificationService.buildNow()
-                        .addType(Notification.Type.MULTI_PARENT)
+                        .addType(Notification.Type.MULTI_PRIMARY)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
-                configuration.setIsParent(false);
+                configuration.setIsPrimary(false);
             } else {
-                LOG.warn("Stale parent has gone. Starting as parent.");
+                LOG.warn("Stale primary has gone. Starting as primary.");
             }
         }
     }
@@ -273,8 +273,8 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isParent()) {
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.PARENT);
+        if (configuration.isPrimary()) {
+            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.PRIMARY);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);
         }

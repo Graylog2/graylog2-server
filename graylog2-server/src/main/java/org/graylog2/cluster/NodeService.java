@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Map;
 
 public interface NodeService extends PersistedService {
-    String registerServer(String nodeId, boolean isParent, URI httpPublishUri, String hostname);
+    String registerServer(String nodeId, boolean isPrimary, URI httpPublishUri, String hostname);
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 
@@ -35,11 +35,11 @@ public interface NodeService extends PersistedService {
 
     void dropOutdated();
 
-    void markAsAlive(Node node, boolean isParent, String restTransportAddress);
+    void markAsAlive(Node node, boolean isPrimary, String restTransportAddress);
 
-    void markAsAlive(Node node, boolean isParent, URI restTransportAddress);
+    void markAsAlive(Node node, boolean isPrimary, URI restTransportAddress);
 
-    boolean isOnlyParent(NodeId nodeIde);
+    boolean isOnlyPrimary(NodeId nodeIde);
 
-    boolean isAnyParentPresent();
+    boolean isAnyPrimaryPresent();
 }

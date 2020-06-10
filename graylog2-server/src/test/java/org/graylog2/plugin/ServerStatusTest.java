@@ -64,7 +64,7 @@ public class ServerStatusTest {
 
         when(config.getNodeIdFile()).thenReturn(tempFile.getPath());
 
-        status = new ServerStatus(config, Collections.singleton(ServerStatus.Capability.PARENT), eventBus, NullAuditEventSender::new);
+        status = new ServerStatus(config, Collections.singleton(ServerStatus.Capability.PRIMARY), eventBus, NullAuditEventSender::new);
     }
 
     @Test
@@ -172,13 +172,13 @@ public class ServerStatusTest {
     @Test
     public void testAddCapability() throws Exception {
         assertEquals(status, status.addCapability(ServerStatus.Capability.SERVER));
-        assertTrue(status.hasCapabilities(ServerStatus.Capability.PARENT, ServerStatus.Capability.SERVER));
+        assertTrue(status.hasCapabilities(ServerStatus.Capability.PRIMARY, ServerStatus.Capability.SERVER));
     }
 
     @Test
     public void testAddCapabilities() throws Exception {
         assertEquals(status, status.addCapabilities(ServerStatus.Capability.LOCALMODE));
-        assertTrue(status.hasCapabilities(ServerStatus.Capability.PARENT, ServerStatus.Capability.LOCALMODE));
+        assertTrue(status.hasCapabilities(ServerStatus.Capability.PRIMARY, ServerStatus.Capability.LOCALMODE));
     }
 
     @Test

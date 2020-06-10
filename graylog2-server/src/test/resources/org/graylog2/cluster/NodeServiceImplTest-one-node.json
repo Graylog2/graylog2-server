@@ -2,7 +2,7 @@
   "nodes": [
     {
       "_id" : { "$oid": "569e0f60c83026b93fb2ecb6"},
-      "is_parent" : true,
+      "is_primary" : true,
       "last_seen" : 1453209426,
       "transport_address" : "http://10.0.0.1:12900",
       "type" : "SERVER",

@@ -85,7 +85,7 @@ const ShowNodePage = createReactClass({
               This page shows details of a Graylog server node that is active and reachable in your cluster.
             </span>
             <span>
-              {node.is_parent ? <span>This is the parent node.</span> : <span>This is <em>not</em> the parent node.</span>}
+              {node.is_primary ? <span>This is the primary node.</span> : <span>This is <em>not</em> the primary node.</span>}
             </span>
             <span><NodeMaintenanceDropdown node={node} /></span>
           </PageHeader>

@@ -46,9 +46,9 @@ public class NodeImpl extends PersistedImpl implements Node {
     }
 
     @Override
-    @JsonProperty("is_parent")
-    public boolean isParent() {
-        return (Boolean) fields.get("is_parent");
+    @JsonProperty("is_primary")
+    public boolean isPrimary() {
+        return (Boolean) fields.get("is_primary");
     }
 
     @Override

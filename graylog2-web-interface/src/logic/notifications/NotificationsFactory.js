@@ -150,15 +150,15 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'multi_parent':
+      case 'multi_primary':
         return {
-          title: 'Multiple Graylog server parents in the cluster',
+          title: 'Multiple Graylog server primarys in the cluster',
           description: (
             <span>
-              There were multiple Graylog server instances configured as parent in your Graylog cluster. The cluster handles
-              this automatically by launching new nodes as children if there already is a parent but you should still fix this.
-              Check the graylog.conf of every node and make sure that only one instance has is_parent set to true. Close this
-              notification if you think you resolved the problem. It will pop back up if you start a second parent node again.
+              There were multiple Graylog server instances configured as primary in your Graylog cluster. The cluster handles
+              this automatically by launching new nodes as children if there already is a primary but you should still fix this.
+              Check the graylog.conf of every node and make sure that only one instance has is_primary set to true. Close this
+              notification if you think you resolved the problem. It will pop back up if you start a second primary node again.
             </span>
           ),
         };
@@ -173,13 +173,13 @@ class NotificationsFactory {
             </span>
           ),
         };
-      case 'no_parent':
+      case 'no_primary':
         return {
-          title: 'There was no parent Graylog server node detected in the cluster.',
+          title: 'There was no primary Graylog server node detected in the cluster.',
           description: (
             <span>
-              Certain operations of Graylog server require the presence of a parent node, but no such parent was started.
-              Please ensure that one of your Graylog server nodes contains the setting <code>is_parent = true</code> in its
+              Certain operations of Graylog server require the presence of a primary node, but no such primary was started.
+              Please ensure that one of your Graylog server nodes contains the setting <code>is_primary = true</code> in its
               configuration and that it is running. Until this is resolved index cycling will not be able to run, which
               means that the index retention mechanism is also not running, leading to increased index sizes. Certain
               maintenance functions as well as a variety of web interface pages (e.g. Dashboards) are unavailable.
