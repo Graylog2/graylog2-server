@@ -48,5 +48,5 @@ public interface ClusterAdapter {
 
     Optional<ClusterHealth> clusterHealthStats(Collection<String> indices);
 
-    ElasticsearchStats elasticsearchStats(Collection<String> indices);
+    ElasticsearchStats statsForIndices(Collection<String> indices);
 }

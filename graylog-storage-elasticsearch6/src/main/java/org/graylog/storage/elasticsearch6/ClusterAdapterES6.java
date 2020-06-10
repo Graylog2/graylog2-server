@@ -247,7 +247,7 @@ public class ClusterAdapterES6 implements ClusterAdapter {
     }
 
     @Override
-    public ElasticsearchStats elasticsearchStats(Collection<String> indices) {
+    public ElasticsearchStats statsForIndices(Collection<String> indices) {
         final ClusterStats clusterStats = this.clusterStats();
 
         final PendingTasksStats pendingTasksStats = this.pendingTasks();

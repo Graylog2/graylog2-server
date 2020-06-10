@@ -110,7 +110,7 @@ public class ClusterStatsService {
 
     public ElasticsearchStats elasticsearchStats() {
         final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
-        return clusterAdapter.elasticsearchStats(indices);
+        return clusterAdapter.statsForIndices(indices);
     }
 
     public MongoStats mongoStats() {
