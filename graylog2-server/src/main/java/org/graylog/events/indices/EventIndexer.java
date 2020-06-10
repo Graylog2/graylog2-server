@@ -41,12 +41,12 @@ public class EventIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(EventIndexer.class);
 
     private final StreamService streamService;
-    private final MoreIndicesAdapter moreIndicesAdapter;
+    private final EventIndexerAdapter eventIndexerAdapter;
 
     @Inject
-    public EventIndexer(StreamService streamService, MoreIndicesAdapter moreIndicesAdapter) {
+    public EventIndexer(StreamService streamService, EventIndexerAdapter eventIndexerAdapter) {
         this.streamService = streamService;
-        this.moreIndicesAdapter = moreIndicesAdapter;
+        this.eventIndexerAdapter = eventIndexerAdapter;
     }
 
     public void write(List<EventWithContext> eventsWithContext) {
@@ -67,7 +67,7 @@ public class EventIndexer {
                 // multiple streams use the same index set.
                 .flatMap(event -> assignEventsToTargetIndices(event, streamIndices))
                 .collect(Collectors.toList());
-        moreIndicesAdapter.bulkIndex(requests);
+        eventIndexerAdapter.bulkIndex(requests);
     }
 
     private Stream<? extends AbstractMap.SimpleEntry<String, Event>> assignEventsToTargetIndices(Event event, Map<String, String> streamIndices) {

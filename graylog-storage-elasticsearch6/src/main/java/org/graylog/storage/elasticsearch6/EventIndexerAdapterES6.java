@@ -7,7 +7,7 @@ import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventDto;
-import org.graylog.events.indices.MoreIndicesAdapter;
+import org.graylog.events.indices.EventIndexerAdapter;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.jackson.TypeReferences;
 import org.slf4j.Logger;
@@ -22,13 +22,13 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
-public class MoreIndicesAdapterES6 implements MoreIndicesAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(MoreIndicesAdapterES6.class);
+public class EventIndexerAdapterES6 implements EventIndexerAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(EventIndexerAdapterES6.class);
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public MoreIndicesAdapterES6(JestClient jestClient, ObjectMapper objectMapper) {
+    public EventIndexerAdapterES6(JestClient jestClient, ObjectMapper objectMapper) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
     }
