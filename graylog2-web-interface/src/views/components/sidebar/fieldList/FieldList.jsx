@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual } from 'lodash';
 import { FixedSizeList as List } from 'react-window';
+import { SizeMe } from 'react-sizeme';
 
 import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
@@ -181,4 +182,13 @@ const FieldList = createReactClass({
   },
 });
 
-export default FieldList;
+
+const FullHeightFieldList = ({ ...rest }) => (
+  <SizeMe monitorHeight refreshRate={100}>
+    {({ size }) => {
+      return <FieldList {...rest} listHeight={size.height} />;
+    }}
+  </SizeMe>
+);
+
+export default FullHeightFieldList;
