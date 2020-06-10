@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class contains indices helper for the events system.
@@ -61,25 +62,31 @@ public class EventIndexer {
         final Map<String, String> streamIndices = streamService.loadByIds(streamIds).stream()
             .collect(Collectors.toMap(Persisted::getId, stream -> stream.getIndexSet().getWriteIndexAlias()));
         final List<Map.Entry<String, Event>> requests = eventsWithContext.stream()
-                .flatMap(eventWithContext -> {
-                    final Event event = eventWithContext.event();
-                    // Collect a set of indices for the event to avoid writing to the same index set twice if
-                    // multiple streams use the same index set.
-                    final Set<String> indices = event.getStreams().stream()
-                            .map(streamId -> {
-                                final String index = streamIndices.get(streamId);
-                                if (index == null) {
-                                    LOG.warn("Couldn't find index set of stream <{}> for event <{}> (definition: {}/{})", streamId,
-                                            event.getId(), event.getEventDefinitionType(), event.getEventDefinitionId());
-                                }
-                                return index;
-                            })
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toSet());
-                    return indices.stream()
-                            .map(index -> new AbstractMap.SimpleEntry<>(index, event));
-                })
+                .map(EventWithContext::event)
+                // Collect a set of indices for the event to avoid writing to the same index set twice if
+                // multiple streams use the same index set.
+                .flatMap(event -> assignEventsToTargetIndices(event, streamIndices))
                 .collect(Collectors.toList());
         moreIndicesAdapter.bulkIndex(requests);
+    }
+
+    private Stream<? extends AbstractMap.SimpleEntry<String, Event>> assignEventsToTargetIndices(Event event, Map<String, String> streamIndices) {
+        final Set<String> indices = indicesForEvent(event, streamIndices);
+        return indices.stream()
+                .map(index -> new AbstractMap.SimpleEntry<>(index, event));
+    }
+
+    private Set<String> indicesForEvent(Event event, Map<String, String> streamIndices) {
+        return event.getStreams().stream()
+                .map(streamId -> {
+                    final String index = streamIndices.get(streamId);
+                    if (index == null) {
+                        LOG.warn("Couldn't find index set of stream <{}> for event <{}> (definition: {}/{})", streamId,
+                                event.getId(), event.getEventDefinitionType(), event.getEventDefinitionId());
+                    }
+                    return index;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 }
