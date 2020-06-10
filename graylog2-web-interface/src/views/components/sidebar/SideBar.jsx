@@ -39,7 +39,7 @@ const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styl
   bottom: 0;
   left: 50px;
   right: 0;
-  background: ${chroma(theme.color.brand.tertiary).alpha(0.25).css()};
+  background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
   z-index: 2;  
 `);
 

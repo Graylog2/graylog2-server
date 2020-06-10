@@ -16,8 +16,8 @@ type Props = {
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
-  background: ${theme.color.gray[10]};
-  color: ${theme.utils.contrastingColor(theme.color.gray[10], 'AA')};
+  background: ${theme.colors.gray[10]};
+  color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
   width: 50px;
   height: 100%;

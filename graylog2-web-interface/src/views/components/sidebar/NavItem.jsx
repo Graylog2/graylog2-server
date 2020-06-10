@@ -39,17 +39,17 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
   text-align: center;
   cursor: pointer;
   font-size: 20px;
-  color: ${isSelected ? theme.color.variant.light.danger : 'inherit'};
+  color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
   cursor: pointer;
   
   :hover {
-    background: ${theme.color.gray[30]};
+    background: ${theme.colors.gray[30]};
     > * {
       display: block;
     }
   }
   :active {
-    background: ${theme.color.gray[20]};
+    background: ${theme.colors.gray[20]};
   }
 
   &::after {

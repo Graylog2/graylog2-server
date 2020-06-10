@@ -22,12 +22,12 @@ type Props = {
 };
 
 export const Container: StyledComponent<{ isPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isPinned }) => `
-  color: ${theme.utils.readableColor(theme.color.global.contentBackground)};
-  background: ${theme.color.global.contentBackground};
+  color: ${theme.utils.readableColor(theme.colors.global.contentBackground)};
+  background: ${theme.colors.global.contentBackground};
   position: ${isPinned ? 'static' : 'fixed'}
   box-shadow:
-    inset 0 13px 5px -10px ${theme.color.gray[80]},
-    inset 0 -13px 5px -10px ${theme.color.gray[80]};
+    inset 0 13px 5px -10px ${theme.colors.gray[80]},
+    inset 0 -13px 5px -10px ${theme.colors.gray[80]};
   top: ${isPinned ? 0 : '50px'};
   left: ${isPinned ? 0 : '50px'};
   padding: 5px 15px;
@@ -58,7 +58,7 @@ const PinContentButton: StyledComponent<{}, ThemeInterface, HTMLDivElement> = st
     height: 30px;
     width: 30px;
     font-size: 20px;
-    color: ${theme.color.gray[30]};
+    color: ${theme.colors.gray[30]};
   }
 `);
 
