@@ -6,6 +6,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
+import type { ThemeInterface } from 'theme';
 
 import TimerangeSelector from './TimerangeSelector';
 import DateInputWithPicker from './DateInputWithPicker';
@@ -22,7 +23,7 @@ const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 200px;
 `;
 
-const Separator: StyledComponent<{}, void, HTMLParagraphElement> = styled.p(({ theme }) => `
+const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => `
   margin: 0;
   line-height: 34px;
   font-size: ${theme.fonts.size.large};

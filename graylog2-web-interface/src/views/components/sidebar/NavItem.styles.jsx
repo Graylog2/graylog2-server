@@ -32,7 +32,7 @@ export const Title: StyledComponent<StyleProps, ThemeInterface, HTMLDivElement> 
   `)}
 `);
 
-export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div(({ theme }) => `
+export const TitleText: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   font-size: ${theme.fonts.size.large};
   display: inline;
   margin-left: 10px;
@@ -40,7 +40,7 @@ export const TitleText: StyledComponent<{}, {}, HTMLDivElement> = styled.div(({ 
   white-space: nowrap;
 `);
 
-export const TitleIcon: StyledComponent<{}, {}, HTMLDivElement> = styled.div(({ theme }) => `
+export const TitleIcon: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   width: 25px;
   text-align: center;
   font-size: ${theme.fonts.size.h3};
