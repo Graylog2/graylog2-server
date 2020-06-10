@@ -10,7 +10,6 @@ import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStor
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { IconButton } from 'components/common';
-import HorizontalRule from './HorizontalRule';
 
 import type { SidebarSection, SidebarSectionProps } from './sidebarSections';
 
@@ -63,6 +62,10 @@ const PinContentButton: StyledComponent<{}, ThemeInterface, HTMLDivElement> = st
     color: ${theme.colors.gray[30]};
   }
 `);
+
+const HorizontalRule = styled.hr`
+  margin: 5px 0 10px 0;
+`;
 
 const SectionTitle = styled.h2`
   margin-bottom: 10px;

@@ -14,6 +14,18 @@ type Props = {
   showTitleOnHover: boolean,
 };
 
+const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+  padding: 5px 10px;
+  position: absolute;
+  left: 100%;
+  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
+  z-index: 4;
+  width: max-content;
+  font-size: 14px;
+  color: white;
+  display: none;
+`);
+
 const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => `
   display: flex;
   align-items: center;
@@ -52,29 +64,23 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
     border-bottom: 10px solid transparent;
   }
 
-  :active::after {
-    display: none;
-  }
-
   ${((!isSelected && showTitleOnHover) ? `
     :hover::after {
       display: block;
       border-right-color: currentColor;
     }
+
+    :active {
+      &::after {
+        display: none;
+      }
+      > ${Title} {
+       display: none;
+      }
+    }
   ` : '')}
 `);
 
-const Title = styled.div(({ theme }) => `
-  padding: 5px 10px;
-  position: absolute;
-  left: 100%;
-  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
-  z-index: 4;
-  width: max-content;
-  font-size: 14px;
-  color: white;
-  display: none;
-`);
 
 const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
   return (

@@ -4,7 +4,6 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 
-import HorizontalRule from './HorizontalRule';
 import NavItem from './NavItem';
 
 import { type SidebarSection } from './sidebarSections';
@@ -40,8 +39,12 @@ const SectionList = styled.div`
   }
 `;
 
-const StyledHorizontalRule = styled(HorizontalRule)`
+const HorizontalRuleWrapper = styled.div`
   padding: 0 10px;
+  hr {
+    border-color: currentColor;
+    margin: 5px 0 10px 0;
+  }
 `;
 
 const SectionOverview = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
@@ -55,7 +58,7 @@ const SectionOverview = ({ sections, activeSection, setActiveSectionKey, toggleS
                  showTitleOnHover={false}
                  title={`${activeSection ? 'Close' : 'Open'} sidebar`} />
       </SidebarToggle>
-      <StyledHorizontalRule />
+      <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>
         {sections.map(({ key, icon, title }) => (
           <NavItem isSelected={activeSectionKey === key}
