@@ -13,8 +13,10 @@ export type Fonts = {
   size: {
     root: string,
     body: string,
+    huge: string,
     large: string,
     small: string,
+    tiny: string,
     h1: string,
     h2: string,
     h3: string,
@@ -33,8 +35,10 @@ const family = {
 const size = {
   root: '87.5%', /* 14px */
   body: '1em',
+  huge: '2.986em',
   large: '1.2em',
   small: '0.833em',
+  tiny: '0.694em',
   h1: '2.488em',
   h2: '2.074em',
   h3: '1.728em',
