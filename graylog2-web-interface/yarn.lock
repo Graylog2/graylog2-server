@@ -7857,7 +7857,6 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
     react-router-bootstrap "0.23.2"
     reflux "0.2.13"
     styled-components "4.4.1"
-    styled-theming "2.2.0"
     webpack "4.43.0"
     webpack-cleanup-plugin "0.5.1"
     webpack-cli "3.3.12"
@@ -15176,11 +15175,6 @@ styled-components@4.4.1:
     stylis "^3.5.0"
     stylis-rule-sheet "^0.0.10"
     supports-color "^5.5.0"
-
-styled-theming@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/styled-theming/-/styled-theming-2.2.0.tgz#3084e43d40eaab4bc11ebafd3de04e3622fee37e"
-  integrity sha1-MITkPUDqq0vBHrr9PeBONiL+434=
 
 stylelint-config-recommended@^3.0.0:
   version "3.0.0"
