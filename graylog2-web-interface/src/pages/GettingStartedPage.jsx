@@ -40,8 +40,8 @@ const GettingStartedPage = createReactClass({
       <DocumentTitle title="Getting started">
         <div>
           <GettingStarted clusterId={this.state.system.cluster_id}
-                          masterOs={this.state.system.operating_system}
-                          masterVersion={this.state.system.version}
+                          parentOs={this.state.system.operating_system}
+                          parentVersion={this.state.system.version}
                           gettingStartedUrl={GETTING_STARTED_URL}
                           noDismissButton={Boolean(this.props.location.query.menu)}
                           onDismiss={this._onDismiss} />

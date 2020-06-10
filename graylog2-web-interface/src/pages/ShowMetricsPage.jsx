@@ -34,11 +34,11 @@ const ShowMetricsPage = createReactClass({
     }
 
     let { nodeId } = this.props.params;
-    // "master" node ID is a placeholder for master node, get first master node ID
-    if (nodeId === 'master') {
+    // "parent" node ID is a placeholder for parent node, get first parent node ID
+    if (nodeId === 'parent') {
       const nodeIDs = Object.keys(this.state.nodes);
-      const masterNodes = nodeIDs.filter((nodeID) => this.state.nodes[nodeID].is_parent);
-      nodeId = masterNodes[0] || nodeIDs[0];
+      const parentNodes = nodeIDs.filter((nodeID) => this.state.nodes[nodeID].is_parent);
+      nodeId = parentNodes[0] || nodeIDs[0];
     }
 
     const node = this.state.nodes[nodeId];

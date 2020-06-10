@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
@@ -14,7 +15,7 @@ const NodesStore = StoreProvider.getStore('Nodes');
 
 /**
  * Component that creates a link to a Graylog node. The information in the link includes:
- *  - Marker indicating whether the Graylog node is master or not
+ *  - Marker indicating whether the Graylog node is parent or not
  *  - Short Graylog node ID
  *  - Graylog node hostname
  *
@@ -38,8 +39,8 @@ const LinkToNode = createReactClass({
 
     if (node) {
       const iconName = node.is_parent ? 'star' : 'code-fork';
-      const iconClass = node.is_parent ? 'master-node' : '';
-      const iconTitle = node.is_parent ? 'This is the master node in the cluster' : '';
+      const iconClass = node.is_parent ? 'parent-node' : '';
+      const iconTitle = node.is_parent ? 'This is the parent node in the cluster' : '';
       return (
         <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
           <Icon name={iconName} className={iconClass} title={iconTitle} />
