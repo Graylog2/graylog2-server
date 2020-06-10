@@ -3,20 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title><%=htmlWebpackPlugin.options.title || 'Webpack App'%></title>
-    <% if (htmlWebpackPlugin.files.favicon) { %>
-    <link rel="shortcut icon" type="image/png" href="<%=htmlWebpackPlugin.files.favicon%>">
-    <% } %>
-    <% for (var css in htmlWebpackPlugin.files.css) { %>
-    <link href="<%=htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
-    <% } %>
+    <%= htmlWebpackPlugin.tags.headTags %>
   </head>
   <body>
     <script src="/config.js"></script>
-    <% for (var vendorChunk in htmlWebpackPlugin.options.vendorModule().files.chunks) { %>
-    <script src="/<%= htmlWebpackPlugin.options.vendorModule().files.chunks[vendorChunk].entry %>"></script>
+    <% for (var vendorChunk in htmlWebpackPlugin.options.vendorModule().files.js) { %>
+    <script src="/<%= htmlWebpackPlugin.options.vendorModule().files.js[vendorChunk] %>"></script>
     <% } %>
-    <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
-    <script src="<%=htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
-    <% } %>
+    <%= htmlWebpackPlugin.tags.bodyTags %>
   </body>
 </html>

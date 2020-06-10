@@ -36,6 +36,29 @@ const getCssLoaderOptions = () => {
   return {};
 };
 
+const chunksSortMode = (c1, c2) => {
+  // Render the polyfill chunk first
+  if (c1 === 'polyfill') {
+    return -1;
+  }
+  if (c2 === 'polyfill') {
+    return 1;
+  }
+  if (c1 === 'builtins') {
+    return -1;
+  }
+  if (c2 === 'builtins') {
+    return 1;
+  }
+  if (c1 === 'app') {
+    return 1;
+  }
+  if (c2 === 'app') {
+    return -1;
+  }
+  return 0;
+};
+
 const webpackConfig = {
   name: 'app',
   dependencies: ['vendor'],
@@ -114,34 +137,14 @@ const webpackConfig = {
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
-      chunksSortMode: (c1, c2) => {
-        // Render the polyfill chunk first
-        if (c1.names[0] === 'polyfill') {
-          return -1;
-        }
-        if (c2.names[0] === 'polyfill') {
-          return 1;
-        }
-        if (c1.names[0] === 'builtins') {
-          return -1;
-        }
-        if (c2.names[0] === 'builtins') {
-          return 1;
-        }
-        if (c1.names[0] === 'app') {
-          return 1;
-        }
-        if (c2.names[0] === 'app') {
-          return -1;
-        }
-        return c2.id - c1.id;
-      },
+      chunksSortMode,
     }),
     new HtmlWebpackPlugin({
       filename: 'module.json',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/module.json.template'),
       excludeChunks: ['config'],
+      chunksSortMode,
     }),
     new webpack.DefinePlugin({
       FEATURES: JSON.stringify(process.env.FEATURES),
