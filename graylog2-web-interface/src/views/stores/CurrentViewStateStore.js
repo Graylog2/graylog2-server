@@ -4,11 +4,10 @@ import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
 import type { RefluxActions } from 'stores/StoreTypes';
-import { widgetDefinition } from 'views/logic/Widgets';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import AddNewWidgetsToPositions from 'views/logic/views/AddNewWidgetsToPositions';
 
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
@@ -86,18 +85,9 @@ export const CurrentViewStateStore = singletonStore(
 
     widgets(nextWidgets) {
       const positionsMap = Immutable.Map(this._activeState().widgetPositions);
-      const newWidgets = nextWidgets.filter((widget) => !positionsMap.get(widget.id));
       const nextWidgetIds = nextWidgets.map(({ id }) => id);
       const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId));
-
-      const newPositionMap = newWidgets.reduce((nextPositionsMap, widget) => {
-        const widgetDef = widgetDefinition(widget.type);
-        const result = nextPositionsMap.reduce((newPosMap, position, id) => {
-          const pos = position.toBuilder().row(position.row + widgetDef.defaultHeight).build();
-          return newPosMap.set(id, pos);
-        }, Immutable.Map());
-        return result.set(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
-      }, cleanedPositionsMap);
+      const newPositionMap = AddNewWidgetsToPositions(cleanedPositionsMap, nextWidgets);
 
       const newActiveState = this._activeState().toBuilder()
         .widgets(nextWidgets)

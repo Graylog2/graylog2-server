@@ -61,9 +61,9 @@ Object {
       },
       "positions": Immutable.Map {
         "dead-beef": Object {
-          "col": 0,
+          "col": 1,
           "height": 4,
-          "row": 0,
+          "row": 1,
           "width": 4,
         },
       },
@@ -133,9 +133,9 @@ Object {
       },
       "positions": Immutable.Map {
         "dead-beef": Object {
-          "col": 0,
+          "col": 1,
           "height": 4,
-          "row": 0,
+          "row": 1,
           "width": 4,
         },
       },

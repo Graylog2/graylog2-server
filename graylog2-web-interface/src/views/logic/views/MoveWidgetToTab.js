@@ -1,4 +1,5 @@
 // @flow strict
+import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
@@ -6,8 +7,8 @@ import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import Widget from '../widgets/Widget';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
+import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
 import WidgetPosition from '../widgets/WidgetPosition';
-
 
 const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: View): View => {
   const viewState = dashboard.state.get(queryId);
@@ -26,14 +27,16 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
     .build();
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetPosition: WidgetPosition): View => {
+const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, newWidgetPosition: WidgetPosition): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget.toBuilder().id(uuid()).build();
+  const newWidgets = viewState.widgets.push(newWidget);
+  const overridePositions = Immutable.Map({ [newWidget.id]: newWidgetPosition });
   const { widgetPositions } = viewState;
-  widgetPositions[newWidget.id] = widgetPosition;
+  const newWidgetPositions = AddNewWidgetsToPositions(Immutable.Map(widgetPositions), newWidgets.toArray(), overridePositions);
   const newViewState = viewState.toBuilder()
-    .widgets(viewState.widgets.push(newWidget))
-    .widgetPositions(widgetPositions)
+    .widgets(newWidgets)
+    .widgetPositions(newWidgetPositions)
     .build();
   return dashboard.toBuilder()
     .state(dashboard.state.set(targetQueryId, newViewState))
@@ -54,8 +57,8 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
   if (match) {
     const [widget, queryId] = match;
     const newWidgetPosition = _getWidgetPosition(widgetId, queryId, dashboard).toBuilder()
-      .col(0)
-      .row(0)
+      .col(1)
+      .row(1)
       .build();
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
     return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition));
