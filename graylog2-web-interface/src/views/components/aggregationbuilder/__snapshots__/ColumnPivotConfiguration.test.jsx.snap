@@ -42,10 +42,9 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                   "isStatic": false,
-                  "lastClassName": "ekazNr",
+                  "lastClassName": "gcTkZc",
                   "rules": Array [
                     [Function],
-                    ";",
                   ],
                 },
                 "displayName": "FormGroup__StyledFormGroup",
@@ -63,12 +62,12 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
           >
             <FormGroup
               bsClass="form-group"
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
               controlId="rollup"
               validationState={null}
             >
               <div
-                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
               >
                 <InputWrapper>
                   <span>

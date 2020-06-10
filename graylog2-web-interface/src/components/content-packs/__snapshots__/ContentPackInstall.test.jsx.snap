@@ -104,10 +104,9 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                           "isStatic": false,
-                          "lastClassName": "ekazNr",
+                          "lastClassName": "gcTkZc",
                           "rules": Array [
                             [Function],
-                            ";",
                           ],
                         },
                         "displayName": "FormGroup__StyledFormGroup",
@@ -125,12 +124,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                       controlId="comment"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <ControlLabel
                           className="col-sm-3"
@@ -331,10 +330,9 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                           "isStatic": false,
-                          "lastClassName": "ekazNr",
+                          "lastClassName": "gcTkZc",
                           "rules": Array [
                             [Function],
-                            ";",
                           ],
                         },
                         "displayName": "FormGroup__StyledFormGroup",
@@ -352,12 +350,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                       controlId="PARAM"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <ControlLabel
                           className="col-sm-3"
@@ -714,19 +712,16 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         }
                       >
                         <ForwardRef
-                          bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
                           type="reset"
                         >
                           <Button__StyledButton
-                            bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
                             type="reset"
                           >
                             <StyledComponent
-                              bsStyle="default"
                               className="reset-button"
                               forwardedComponent={
                                 Object {

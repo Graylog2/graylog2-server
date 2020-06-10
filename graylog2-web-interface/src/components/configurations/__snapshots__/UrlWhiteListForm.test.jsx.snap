@@ -60,10 +60,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               "componentStyle": ComponentStyle {
                 "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                 "isStatic": false,
-                "lastClassName": "ekazNr",
+                "lastClassName": "gcTkZc",
                 "rules": Array [
                   [Function],
-                  ";",
                 ],
               },
               "displayName": "FormGroup__StyledFormGroup",
@@ -81,12 +80,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
         >
           <FormGroup
             bsClass="form-group"
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
             controlId="whitelist-disabled"
             validationState={null}
           >
             <div
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
             >
               <InputWrapper>
                 <span>
@@ -170,17 +169,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
   </Input>
   <ForwardRef
     bsSize="sm"
-    bsStyle="default"
     onClick={[Function]}
   >
     <Button__StyledButton
       bsSize="sm"
-      bsStyle="default"
       onClick={[Function]}
     >
       <StyledComponent
         bsSize="sm"
-        bsStyle="default"
         forwardedComponent={
           Object {
             "$$typeof": Symbol(react.forward_ref),
@@ -357,10 +353,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -378,12 +373,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="title-input0"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -510,10 +505,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -531,12 +525,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="value-input0"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -660,10 +654,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -681,12 +674,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="url-input-type-0"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -2171,15 +2164,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </td>
               <td>
                 <ForwardRef
-                  bsStyle="default"
                   onClick={[Function]}
                 >
                   <Button__StyledButton
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <StyledComponent
-                      bsStyle="default"
                       forwardedComponent={
                         Object {
                           "$$typeof": Symbol(react.forward_ref),
@@ -2307,10 +2297,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -2328,12 +2317,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="title-input1"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -2460,10 +2449,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -2481,12 +2469,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="value-input1"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -2610,10 +2598,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -2631,12 +2618,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="url-input-type-1"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -4121,15 +4108,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </td>
               <td>
                 <ForwardRef
-                  bsStyle="default"
                   onClick={[Function]}
                 >
                   <Button__StyledButton
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <StyledComponent
-                      bsStyle="default"
                       forwardedComponent={
                         Object {
                           "$$typeof": Symbol(react.forward_ref),
@@ -4257,10 +4241,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -4278,12 +4261,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="title-input2"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -4410,10 +4393,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -4431,12 +4413,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="value-input2"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -4560,10 +4542,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -4581,12 +4562,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="url-input-type-2"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <InputWrapper>
                               <span>
@@ -6071,15 +6052,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </td>
               <td>
                 <ForwardRef
-                  bsStyle="default"
                   onClick={[Function]}
                 >
                   <Button__StyledButton
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <StyledComponent
-                      bsStyle="default"
                       forwardedComponent={
                         Object {
                           "$$typeof": Symbol(react.forward_ref),
@@ -6165,17 +6143,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
   </UrlWhiteListForm__StyledTable>
   <ForwardRef
     bsSize="sm"
-    bsStyle="default"
     onClick={[Function]}
   >
     <Button__StyledButton
       bsSize="sm"
-      bsStyle="default"
       onClick={[Function]}
     >
       <StyledComponent
         bsSize="sm"
-        bsStyle="default"
         forwardedComponent={
           Object {
             "$$typeof": Symbol(react.forward_ref),

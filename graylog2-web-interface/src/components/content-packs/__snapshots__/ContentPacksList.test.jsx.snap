@@ -327,10 +327,9 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                   "isStatic": false,
-                                  "lastClassName": "ekazNr",
+                                  "lastClassName": "gcTkZc",
                                   "rules": Array [
                                     [Function],
-                                    ";",
                                   ],
                                 },
                                 "displayName": "FormGroup__StyledFormGroup",
@@ -348,12 +347,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                               >
                                 <ControlLabel>
                                   <StyledComponent
@@ -477,7 +476,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     </Input>
                   </TypeAheadInput>
                   <ForwardRef
-                    bsStyle="default"
                     style={
                       Object {
                         "marginLeft": 5,
@@ -486,7 +484,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     type="submit"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       style={
                         Object {
                           "marginLeft": 5,
@@ -495,7 +492,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       type="submit"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -571,7 +567,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     disabled={true}
                     onClick={[Function]}
                     style={
@@ -582,7 +577,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     type="button"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -593,7 +587,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       type="button"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         disabled={true}
                         forwardedComponent={
                           Object {
@@ -970,19 +963,10 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         },
                         "displayName": "ControlledTableListHeader__StyledListGroupItem",
                         "foldedComponentIds": Array [],
-                        "propTypes": Object {
-                          "bsStyle": [Function],
-                        },
                         "render": [Function],
                         "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
                         "target": Object {
                           "$$typeof": Symbol(react.forward_ref),
-                          "defaultProps": Object {
-                            "bsStyle": undefined,
-                          },
-                          "propTypes": Object {
-                            "bsStyle": [Function],
-                          },
                           "render": [Function],
                         },
                         "toString": [Function],
@@ -1013,7 +997,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "iEzmJe",
+                                "lastClassName": "eZbLWu",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1032,11 +1016,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <StyledComponent
@@ -1096,7 +1080,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -1115,11 +1099,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -1429,21 +1413,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-1"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-1"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -1473,7 +1454,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-1"
                                           pullRight={true}
@@ -1481,13 +1461,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-1"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-1"
                                               innerRef={null}
                                               pullRight={true}
@@ -1495,7 +1473,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-1"
                                                 onToggle={[Function]}
@@ -1505,19 +1482,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-1"
                                                       key=".0"
@@ -1928,7 +1903,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -1947,11 +1922,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -2261,21 +2236,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-2"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-2"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -2305,7 +2277,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-2"
                                           pullRight={true}
@@ -2313,13 +2284,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-2"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-2"
                                               innerRef={null}
                                               pullRight={true}
@@ -2327,7 +2296,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-2"
                                                 onToggle={[Function]}
@@ -2337,19 +2305,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-2"
                                                       key=".0"
@@ -2760,7 +2726,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -2779,11 +2745,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -3029,21 +2995,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-3"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-3"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -3073,7 +3036,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-3"
                                           pullRight={true}
@@ -3081,13 +3043,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-3"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-3"
                                               innerRef={null}
                                               pullRight={true}
@@ -3095,7 +3055,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-3"
                                                 onToggle={[Function]}
@@ -3105,19 +3064,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-3"
                                                       key=".0"
@@ -3527,7 +3484,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -3546,11 +3503,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -3796,21 +3753,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-4"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-4"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -3840,7 +3794,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-4"
                                           pullRight={true}
@@ -3848,13 +3801,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-4"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-4"
                                               innerRef={null}
                                               pullRight={true}
@@ -3862,7 +3813,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-4"
                                                 onToggle={[Function]}
@@ -3872,19 +3822,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-4"
                                                       key=".0"
@@ -4295,7 +4243,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -4314,11 +4262,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -4564,21 +4512,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-5"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-5"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -4608,7 +4553,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-5"
                                           pullRight={true}
@@ -4616,13 +4560,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-5"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-5"
                                               innerRef={null}
                                               pullRight={true}
@@ -4630,7 +4572,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-5"
                                                 onToggle={[Function]}
@@ -4640,19 +4581,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-5"
                                                       key=".0"
@@ -5063,7 +5002,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -5082,11 +5021,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -5332,21 +5271,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-6"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-6"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -5376,7 +5312,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-6"
                                           pullRight={true}
@@ -5384,13 +5319,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-6"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-6"
                                               innerRef={null}
                                               pullRight={true}
@@ -5398,7 +5331,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-6"
                                                 onToggle={[Function]}
@@ -5408,19 +5340,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-6"
                                                       key=".0"
@@ -5831,7 +5761,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -5850,11 +5780,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -6100,21 +6030,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-7"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-7"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -6144,7 +6071,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-7"
                                           pullRight={true}
@@ -6152,13 +6078,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-7"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-7"
                                               innerRef={null}
                                               pullRight={true}
@@ -6166,7 +6090,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-7"
                                                 onToggle={[Function]}
@@ -6176,19 +6099,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-7"
                                                       key=".0"
@@ -6599,7 +6520,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -6618,11 +6539,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -6868,21 +6789,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-8"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-8"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -6912,7 +6830,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-8"
                                           pullRight={true}
@@ -6920,13 +6837,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-8"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-8"
                                               innerRef={null}
                                               pullRight={true}
@@ -6934,7 +6849,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-8"
                                                 onToggle={[Function]}
@@ -6944,19 +6858,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-8"
                                                       key=".0"
@@ -7366,7 +7278,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -7385,11 +7297,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -7635,21 +7547,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-9"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-9"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -7679,7 +7588,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-9"
                                           pullRight={true}
@@ -7687,13 +7595,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-9"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-9"
                                               innerRef={null}
                                               pullRight={true}
@@ -7701,7 +7607,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-9"
                                                 onToggle={[Function]}
@@ -7711,19 +7616,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-9"
                                                       key=".0"
@@ -8134,7 +8037,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "eZbLWu",
                             "rules": Array [
                               [Function],
                             ],
@@ -8153,11 +8056,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -8403,21 +8306,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-10"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-10"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -8447,7 +8347,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
                                           className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                           id="more-actions-10"
                                           pullRight={true}
@@ -8455,13 +8354,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-10"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-10"
                                               innerRef={null}
                                               pullRight={true}
@@ -8469,7 +8366,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-10"
                                                 onToggle={[Function]}
@@ -8479,19 +8375,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
                                                       className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
                                                       id="more-actions-10"
                                                       key=".0"
@@ -9263,10 +9157,9 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                   "isStatic": false,
-                                  "lastClassName": "ekazNr",
+                                  "lastClassName": "gcTkZc",
                                   "rules": Array [
                                     [Function],
-                                    ";",
                                   ],
                                 },
                                 "displayName": "FormGroup__StyledFormGroup",
@@ -9284,12 +9177,12 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                               >
                                 <ControlLabel>
                                   <StyledComponent
@@ -9413,7 +9306,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     </Input>
                   </TypeAheadInput>
                   <ForwardRef
-                    bsStyle="default"
                     style={
                       Object {
                         "marginLeft": 5,
@@ -9422,7 +9314,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     type="submit"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       style={
                         Object {
                           "marginLeft": 5,
@@ -9431,7 +9322,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       type="submit"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -9507,7 +9397,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     disabled={true}
                     onClick={[Function]}
                     style={
@@ -9518,7 +9407,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     type="button"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -9529,7 +9417,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       type="button"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         disabled={true}
                         forwardedComponent={
                           Object {

@@ -161,19 +161,16 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
             }
           >
             <ForwardRef
-              bsStyle="default"
               className="reset-button"
               onClick={[Function]}
               type="reset"
             >
               <Button__StyledButton
-                bsStyle="default"
                 className="reset-button"
                 onClick={[Function]}
                 type="reset"
               >
                 <StyledComponent
-                  bsStyle="default"
                   className="reset-button"
                   forwardedComponent={
                     Object {
@@ -530,19 +527,16 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
             }
           >
             <ForwardRef
-              bsStyle="default"
               className="reset-button"
               onClick={[Function]}
               type="reset"
             >
               <Button__StyledButton
-                bsStyle="default"
                 className="reset-button"
                 onClick={[Function]}
                 type="reset"
               >
                 <StyledComponent
-                  bsStyle="default"
                   className="reset-button"
                   forwardedComponent={
                     Object {
