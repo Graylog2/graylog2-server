@@ -17,13 +17,11 @@
 package org.graylog2.system.stats;
 
 import com.google.inject.AbstractModule;
-import org.graylog2.system.stats.elasticsearch.ElasticsearchProbe;
 import org.graylog2.system.stats.mongo.MongoProbe;
 
 public class ClusterStatsModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(ElasticsearchProbe.class).asEagerSingleton();
         bind(MongoProbe.class).asEagerSingleton();
 
         bind(ClusterStatsService.class).asEagerSingleton();

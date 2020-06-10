@@ -21,17 +21,16 @@ import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
-import org.graylog2.system.stats.elasticsearch.ClusterStats;
-import org.graylog2.system.stats.elasticsearch.ShardStats;
+import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
 public interface ClusterAdapter {
-    Optional<HealthStatus> health(List<String> asList);
+    Optional<HealthStatus> health(Collection<String> indices);
 
-    Optional<HealthStatus> deflectorHealth(List<String> indices);
+    Optional<HealthStatus> deflectorHealth(Collection<String> indices);
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 
@@ -45,13 +44,9 @@ public interface ClusterAdapter {
 
     boolean isConnected();
 
-    Optional<String> clusterName(List<String> indices);
+    Optional<String> clusterName(Collection<String> indices);
 
-    Optional<ClusterHealth> clusterHealthStats(List<String> indices);
+    Optional<ClusterHealth> clusterHealthStats(Collection<String> indices);
 
-    ShardStats shardStats(List<String> indices);
-
-    PendingTasksStats pendingTasks();
-
-    ClusterStats clusterStats();
+    ElasticsearchStats elasticsearchStats(Collection<String> indices);
 }

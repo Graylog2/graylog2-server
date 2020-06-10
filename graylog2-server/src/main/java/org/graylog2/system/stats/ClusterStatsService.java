@@ -20,6 +20,8 @@ import org.graylog.plugins.views.search.views.DashboardService;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.inputs.InputService;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -27,7 +29,6 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
-import org.graylog2.system.stats.elasticsearch.ElasticsearchProbe;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoProbe;
 import org.graylog2.system.stats.mongo.MongoStats;
@@ -35,11 +36,12 @@ import org.graylog2.users.RoleService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Singleton
 public class ClusterStatsService {
-    private final ElasticsearchProbe elasticsearchProbe;
     private final MongoProbe mongoProbe;
     private final UserService userService;
     private final InputService inputService;
@@ -51,10 +53,11 @@ public class ClusterStatsService {
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final DashboardService dashboardService;
+    private final IndexSetRegistry indexSetRegistry;
+    private final ClusterAdapter clusterAdapter;
 
     @Inject
-    public ClusterStatsService(ElasticsearchProbe elasticsearchProbe,
-                               MongoProbe mongoProbe,
+    public ClusterStatsService(MongoProbe mongoProbe,
                                UserService userService,
                                InputService inputService,
                                StreamService streamService,
@@ -64,8 +67,9 @@ public class ClusterStatsService {
                                RoleService roleService,
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                               DashboardService dashboardService) {
-        this.elasticsearchProbe = elasticsearchProbe;
+                               DashboardService dashboardService, IndexSetRegistry indexSetRegistry, ClusterAdapter clusterAdapter) {
+        this.indexSetRegistry = indexSetRegistry;
+        this.clusterAdapter = clusterAdapter;
         this.mongoProbe = mongoProbe;
         this.userService = userService;
         this.inputService = inputService;
@@ -105,7 +109,8 @@ public class ClusterStatsService {
     }
 
     public ElasticsearchStats elasticsearchStats() {
-        return elasticsearchProbe.elasticsearchStats();
+        final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
+        return clusterAdapter.elasticsearchStats(indices);
     }
 
     public MongoStats mongoStats() {
