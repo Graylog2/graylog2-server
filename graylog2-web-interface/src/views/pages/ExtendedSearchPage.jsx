@@ -50,21 +50,15 @@ import HighlightMessageInQuery from '../components/messagelist/HighlightMessageI
 const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`
     height: calc(100vh - 50px);
-    display: -ms-grid;
-    display: grid;
-    grid-template-rows: 1fr;
-    -ms-grid-rows: 1fr;
-    grid-template-columns: auto 1fr;
-    -ms-grid-columns: auto 1fr;
+    display: flex;
+    > *:nth-child(2) {
+      flex-grow: 1;
+    }
   ` : '')}
 `;
 
 const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
-  height: calc(100vh - 50px);
-  grid-column: 2;
-  -ms-grid-column: 2;
-  grid-row: 1;
-  -ms-grid-row: 1;
+  height: 100%;
   z-index: 1;
   overflow-y: auto;
 `;

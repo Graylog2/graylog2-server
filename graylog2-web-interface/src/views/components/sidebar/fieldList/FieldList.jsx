@@ -28,17 +28,10 @@ const Container = styled.div`
 const FieldList = createReactClass({
   propTypes: {
     allFields: PropTypes.object.isRequired,
-    size: PropTypes.object,
     fields: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
-
-  getDefaultProps() {
-    return {
-      size: { height: 50 },
-    };
-  },
 
   getInitialState() {
     return {
@@ -90,7 +83,6 @@ const FieldList = createReactClass({
   },
 
   _renderFieldList({ fields, allFields, showFieldsBy, height }) {
-    console.log(height);
     const {
       filter,
       viewMetadata: {
@@ -151,7 +143,7 @@ const FieldList = createReactClass({
     );
   },
   render() {
-    const { allFields, fields, size } = this.props;
+    const { allFields, fields } = this.props;
     const { filter, showFieldsBy } = this.state;
 
     return (
