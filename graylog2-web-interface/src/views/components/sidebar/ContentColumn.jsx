@@ -88,7 +88,7 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
   return viewMetadata.title || defaultTitle;
 };
 
-const SectionContent = ({ section, closeSidebar, sectionProps, searchPageLayout, viewMetadata }: Props) => {
+const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, viewMetadata }: Props) => {
   const sidebarIsInline = searchPageLayout?.config.sidebar.isInline;
   const Content = section.content;
   return (
@@ -115,4 +115,4 @@ const SectionContent = ({ section, closeSidebar, sectionProps, searchPageLayout,
   );
 };
 
-export default SectionContent;
+export default ContentColumn;

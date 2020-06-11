@@ -10,7 +10,7 @@ import { type ViewMetaData as ViewMetadata } from 'views/stores/viewMetadataStor
 import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import CustomPropTypes from '../CustomPropTypes';
 import SidebarNavigation from './SidebarNavigation';
-import SectionContent from './SectionContent';
+import ContentColumn from './ContentColumn';
 import sidebarSections, { type SidebarSection } from './sidebarSections';
 
 type Props = {
@@ -61,11 +61,11 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
                          toggleSidebar={toggleSidebar}
                          sections={sections} />
       {activeSection && (
-        <SectionContent closeSidebar={toggleSidebar}
-                        searchPageLayout={searchPageLayout}
-                        section={activeSection}
-                        sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata, sidebarIsInline }}
-                        viewMetadata={viewMetadata} />
+        <ContentColumn closeSidebar={toggleSidebar}
+                       searchPageLayout={searchPageLayout}
+                       section={activeSection}
+                       sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata, sidebarIsInline }}
+                       viewMetadata={viewMetadata} />
       )}
       {(activeSection && !sidebarIsInline) && (
         <ContentOverlay onClick={toggleSidebar} />
