@@ -42,7 +42,5 @@ public interface SearchesAdapter {
 
     FieldStatsResult fieldStats(String query, String filter, TimeRange range, Set<String> indices, String field, boolean includeCardinality, boolean includeStats, boolean includeCount);
 
-    HistogramResult histogram(String query, String filter, TimeRange range, Set<String> affectedIndices, Searches.DateHistogramInterval interval);
-
     HistogramResult fieldHistogram(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, Searches.DateHistogramInterval interval, boolean includeStats, boolean includeCardinality);
 }

@@ -286,13 +286,6 @@ const ApiRoutes = {
 
       return { url: this._buildUrl(url, queryString) };
     },
-    histogram(type, query, resolution, timerange, streamId) {
-      const url = `/search/universal/${type}/histogram`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.interval = resolution;
-
-      return { url: this._buildUrl(url, queryString) };
-    },
     fieldHistogram(type, query, field, resolution, timerange, streamId, includeCardinality) {
       const url = `/search/universal/${type}/fieldhistogram`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);

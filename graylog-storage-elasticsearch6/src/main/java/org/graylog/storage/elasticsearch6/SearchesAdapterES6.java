@@ -28,7 +28,6 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;
-import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.indexer.results.FieldHistogramResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
@@ -295,38 +294,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 query,
                 searchSourceBuilder.toString(),
                 multiSearch.tookMsFromSearchResult(searchResponse)
-        );
-    }
-
-    @Override
-    public HistogramResult histogram(String query, String filter, TimeRange range, Set<String> affectedIndices, Searches.DateHistogramInterval interval) {
-        final DateHistogramAggregationBuilder histogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                .field(Message.FIELD_TIMESTAMP)
-                .dateHistogramInterval(toESInterval(interval));
-
-        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range)
-                .aggregation(histogramBuilder);
-
-        if (affectedIndices.isEmpty()) {
-            return DateHistogramResult.empty(query, searchSourceBuilder.toString(), interval);
-        }
-
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices)
-                .ignoreUnavailable(true)
-                .allowNoIndices(true);
-        final io.searchbox.core.SearchResult searchResult = multiSearch.wrap(searchBuilder.build(), () -> "Unable to retrieve histogram");
-
-
-        final HistogramAggregation histogramAggregation = searchResult.getAggregations().getHistogramAggregation(AGG_HISTOGRAM);
-
-        return new DateHistogramResult(
-                histogramAggregation,
-                query,
-                searchSourceBuilder.toString(),
-                interval,
-                multiSearch.tookMsFromSearchResult(searchResult)
         );
     }
 

@@ -251,38 +251,6 @@ public class RelativeSearchResource extends SearchResource {
     }
 
     @GET
-    @Path("/histogram")
-    @Timed
-    @ApiOperation(value = "Datetime histogram of a query using a relative timerange.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid interval provided."),
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public HistogramResult histogramRelative(
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
-            @QueryParam("interval") @NotEmpty String interval,
-            @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
-
-        interval = interval.toUpperCase(Locale.ENGLISH);
-        validateInterval(interval);
-
-        return buildHistogramResult(
-                searches.histogram(
-                        query,
-                        Searches.DateHistogramInterval.valueOf(interval),
-                        filter,
-                        buildRelativeTimeRange(range)
-                )
-        );
-    }
-
-    @GET
     @Path("/fieldhistogram")
     @Timed
     @ApiOperation(value = "Field value histogram of a query using a relative timerange.")

@@ -168,38 +168,6 @@ public class KeywordSearchResource extends SearchResource {
     }
 
     @GET
-    @Path("/histogram")
-    @Timed
-    @ApiOperation(value = "Datetime histogram of a query using keyword timerange.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
-            @ApiResponse(code = 400, message = "Invalid interval provided.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public HistogramResult histogramKeyword(
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
-            @QueryParam("interval") @NotEmpty String interval,
-            @ApiParam(name = "keyword", value = "Range keyword", required = true)
-            @QueryParam("keyword") @NotEmpty String keyword,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
-
-        interval = interval.toUpperCase(Locale.ENGLISH);
-        validateInterval(interval);
-
-        return buildHistogramResult(
-                searches.histogram(
-                        query,
-                        Searches.DateHistogramInterval.valueOf(interval),
-                        filter,
-                        buildKeywordTimeRange(keyword)
-                )
-        );
-    }
-
-    @GET
     @Path("/terms")
     @Timed
     @ApiOperation(value = "Most common field terms of a query using a keyword timerange.")

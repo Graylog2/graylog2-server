@@ -264,17 +264,6 @@ public class Searches {
             .collect(Collectors.toSet());
     }
 
-    public HistogramResult histogram(String query, DateHistogramInterval interval, TimeRange range) {
-        return histogram(query, interval, null, range);
-    }
-
-    public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        final HistogramResult result = searchesAdapter.histogram(query, filter, range, affectedIndices, interval);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
     public HistogramResult fieldHistogram(String query,
                                           String field,
                                           DateHistogramInterval interval,
