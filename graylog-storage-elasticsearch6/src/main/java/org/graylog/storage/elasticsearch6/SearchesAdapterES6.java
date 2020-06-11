@@ -48,12 +48,9 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 public class SearchesAdapterES6 implements SearchesAdapter {
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
-    public static final String AGG_HISTOGRAM = "gl2_histogram";
     public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     public static final String AGG_FILTER = "gl2_filter";
-    public final static String AGG_STATS = "gl2_stats";
     public final static String AGG_TERMS = "gl2_terms";
-    public final static String AGG_TERMS_STATS = "gl2_termsstats";
     public static final String AGG_VALUE_COUNT = "gl2_value_count";
 
     // This is the "WORD SEPARATOR MIDDLE DOT" unicode character. It's used to join and split the term values in a
