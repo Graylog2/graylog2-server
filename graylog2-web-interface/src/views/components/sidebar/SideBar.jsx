@@ -7,9 +7,9 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/viewMetadataStore';
-import SearchPageLayoutContext, { type SearchPageLayoutType } from 'views/components/contexts/SearchPageLayoutContext';
+import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import CustomPropTypes from '../CustomPropTypes';
-import SectionOverview from './SectionOverview';
+import SidebarNavigation from './SidebarNavigation';
 import SectionContent from './SectionContent';
 import sidebarSections, { type SidebarSection } from './sidebarSections';
 
@@ -17,7 +17,7 @@ type Props = {
   children: React.Element<any>,
   queryId: string,
   results: {},
-  searchPageLayout: ?SearchPageLayoutType,
+  searchPageLayout: ?SearchPageLayout,
   sections: Array<SidebarSection>,
   viewMetadata: ViewMetadata,
 };
@@ -56,10 +56,10 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
 
   return (
     <Container>
-      <SectionOverview activeSection={activeSection}
-                       setActiveSectionKey={setActiveSectionKey}
-                       toggleSidebar={toggleSidebar}
-                       sections={sections} />
+      <SidebarNavigation activeSection={activeSection}
+                         setActiveSectionKey={setActiveSectionKey}
+                         toggleSidebar={toggleSidebar}
+                         sections={sections} />
       {activeSection && (
         <SectionContent closeSidebar={toggleSidebar}
                         searchPageLayout={searchPageLayout}

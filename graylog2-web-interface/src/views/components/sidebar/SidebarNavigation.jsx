@@ -47,7 +47,7 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
-const SectionOverview = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
+const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
   const toggleIcon = activeSection ? 'angle-left' : 'angle-right';
   const activeSectionKey = activeSection?.key;
   return (
@@ -73,4 +73,4 @@ const SectionOverview = ({ sections, activeSection, setActiveSectionKey, toggleS
 };
 
 
-export default SectionOverview;
+export default SidebarNavigation;
