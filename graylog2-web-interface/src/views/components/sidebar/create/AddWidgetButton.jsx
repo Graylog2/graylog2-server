@@ -9,7 +9,7 @@ import { Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SectionInfo from '../SectionInfo';
-import SectionSubHeadline from '../SectionSubHeadline';
+import SectionSubheadline from '../SectionSubheadline';
 
 const Group = styled.div`
   margin-bottom: 20px;
@@ -121,16 +121,16 @@ class AddWidgetButton extends React.Component<Props, State> {
           <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
         </Group>
         <Group>
-          <SectionSubHeadline>Generic</SectionSubHeadline>
+          <SectionSubheadline>Generic</SectionSubheadline>
           {generic}
         </Group>
         <Group>
-          <SectionSubHeadline>Predefined Aggregation</SectionSubHeadline>
+          <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
           {presets}
         </Group>
         {!isEmpty(components) && (
           <Group>
-            <SectionSubHeadline>Other</SectionSubHeadline>
+            <SectionSubheadline>Other</SectionSubheadline>
             {components}
           </Group>
         )}

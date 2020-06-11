@@ -11,7 +11,7 @@ import QueryResult from 'views/logic/QueryResult';
 import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import SectionInfo from '../SectionInfo';
-import SectionSubHeadline from '../SectionSubHeadline';
+import SectionSubheadline from '../SectionSubheadline';
 import SearchResultOverview from './SearchResultOverview';
 
 type Props = {
@@ -25,9 +25,9 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
   const viewTypeLabel = viewType ? <ViewTypeLabel type={viewType} /> : '';
   const resultsSection = (
     <>
-      <SectionSubHeadline>
+      <SectionSubheadline>
         Execution
-      </SectionSubHeadline>
+      </SectionSubheadline>
       <p>
 
         <SearchResultOverview results={results} />
@@ -52,9 +52,9 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
         </SectionInfo>
       )}
       {resultsSection}
-      <SectionSubHeadline>
+      <SectionSubheadline>
         Search
-      </SectionSubHeadline>
+      </SectionSubheadline>
       <p>
         {viewMetadata.summary || <>This {viewTypeLabel} has no summary.</>}
       </p>
