@@ -54,12 +54,12 @@ const Title = styled.h1`
   font-size: 24px;
 `;
 
-const PinContentButton: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const OverlayToggle: StyledComponent<{ isOverlay: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isOverlay }) => `
   > * {
-    height: 30px;
-    width: 30px;
-    font-size: 20px;
-    color: ${theme.colors.gray[30]};
+    height: 25px;
+    width: 25px;
+    font-size: 18px;
+    color: ${isOverlay ? theme.colors.variant.info : theme.colors.gray[30]};
   }
 `);
 
@@ -99,11 +99,11 @@ const SectionContent = ({ section, closeSidebar, sectionProps, isPinned, searchP
           <Container isPinned={isPinned}>
             <Header title={title}>
               <Title onClick={closeSidebar}>{title}</Title>
-              <PinContentButton>
+              <OverlayToggle isOverlay={!isPinned}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                            title={`${isPinned ? 'Unpin' : 'Pin'} sidebar`}
-                            name={isPinned ? 'layer-group' : 'columns'} />
-              </PinContentButton>
+                            title={`Display sidebar ${isPinned ? 'as overlay' : 'inline'}`}
+                            name="layer-group" />
+              </OverlayToggle>
             </Header>
             <HorizontalRule />
             <SectionTitle>{section.title}</SectionTitle>
