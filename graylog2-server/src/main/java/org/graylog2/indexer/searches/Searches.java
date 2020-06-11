@@ -31,7 +31,6 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
@@ -262,28 +261,6 @@ public class Searches {
             .filter(entry -> entry.getValue().contains(field))
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
-    }
-
-    public HistogramResult fieldHistogram(String query,
-                                          String field,
-                                          DateHistogramInterval interval,
-                                          String filter,
-                                          TimeRange range,
-                                          boolean includeCardinality) {
-        return fieldHistogram(query, field, interval, filter, range, true, includeCardinality);
-    }
-
-    public HistogramResult fieldHistogram(String query,
-                                          String field,
-                                          DateHistogramInterval interval,
-                                          String filter,
-                                          TimeRange range,
-                                          boolean includeStats,
-                                          boolean includeCardinality) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        final HistogramResult result = searchesAdapter.fieldHistogram(query, filter, range, affectedIndices, field, interval, includeStats, includeCardinality);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
     }
 
     private void recordEsMetrics(long tookMs, TimeRange range) {

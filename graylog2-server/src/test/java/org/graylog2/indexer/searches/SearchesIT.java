@@ -34,7 +34,6 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
@@ -64,7 +63,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -387,98 +385,6 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
-
-        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
-        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
-
-        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
-        assertThat(timer.getCount()).isEqualTo(1L);
-
-        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
-        assertThat(histogram.getCount()).isEqualTo(1L);
-        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testFieldHistogram() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.HOUR, null, range, false);
-
-        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.HOUR);
-        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
-        assertThat(h.getResults()).hasSize(5);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 1, 0, UTC).getMillis() / 1000L))
-                .containsEntry("total_count", 2L)
-                .containsEntry("total", 0.0);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 2, 0, UTC).getMillis() / 1000L))
-                .containsEntry("total_count", 2L)
-                .containsEntry("total", 4.0)
-                .containsEntry("mean", 2.0);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testFieldHistogramWithMonth() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MONTH, null, range, false);
-
-        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.MONTH);
-        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
-        assertThat(h.getResults()).hasSize(1);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 0, UTC).getMillis() / 1000L))
-                .containsEntry("total_count", 10L)
-                .containsEntry("total", 19.0)
-                .containsEntry("min", 1.0)
-                .containsEntry("max", 4.0);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testFieldHistogramWithQuarter() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.QUARTER, null, range, false);
-
-        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.QUARTER);
-        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
-        assertThat(h.getResults()).hasSize(1);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 0, UTC).getMillis() / 1000L))
-                .containsEntry("total_count", 10L)
-                .containsEntry("total", 19.0)
-                .containsEntry("min", 1.0)
-                .containsEntry("max", 4.0);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testFieldHistogramWithYear() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.YEAR, null, range, false);
-
-        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.YEAR);
-        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
-        assertThat(h.getResults()).hasSize(1);
-        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 0, UTC).getMillis() / 1000L))
-                .containsEntry("total_count", 10L)
-                .containsEntry("total", 19.0)
-                .containsEntry("min", 1.0)
-                .containsEntry("max", 4.0);
-    }
-
-    @Test
-    public void fieldHistogramRecordsMetrics() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
-        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
         assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);

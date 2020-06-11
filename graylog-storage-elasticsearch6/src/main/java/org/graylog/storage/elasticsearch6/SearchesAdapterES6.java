@@ -5,7 +5,6 @@ import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.FilterAggregation;
-import io.searchbox.core.search.aggregation.HistogramAggregation;
 import io.searchbox.core.search.aggregation.MissingAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
@@ -19,8 +18,6 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -28,9 +25,7 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;
-import org.graylog2.indexer.results.FieldHistogramResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
@@ -40,7 +35,6 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -297,44 +291,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         );
     }
 
-    @Override
-    public HistogramResult fieldHistogram(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, Searches.DateHistogramInterval interval, boolean includeStats, boolean includeCardinality) {
-        final DateHistogramAggregationBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                .field(Message.FIELD_TIMESTAMP)
-                .dateHistogramInterval(toESInterval(interval));
-
-        if (includeStats) {
-            dateHistogramBuilder.subAggregation(AggregationBuilders.stats(AGG_STATS).field(field));
-        } else {
-            // Stats aggregation already include count. Only calculate it explicitly when stats are disabled
-            dateHistogramBuilder.subAggregation(AggregationBuilders.count(AGG_VALUE_COUNT).field(field));
-        }
-        if (includeCardinality) {
-            dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
-        }
-
-        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range)
-                .aggregation(dateHistogramBuilder);
-
-        if (affectedIndices.isEmpty()) {
-            return FieldHistogramResult.empty(query, searchSourceBuilder.toString(), interval);
-        }
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices);
-
-        final io.searchbox.core.SearchResult searchResult = multiSearch.wrap(searchBuilder.build(), () -> "Unable to retrieve field histogram");
-
-        final HistogramAggregation histogramAggregation = searchResult.getAggregations().getHistogramAggregation(AGG_HISTOGRAM);
-
-        return new FieldHistogramResult(
-                histogramAggregation,
-                query,
-                searchSourceBuilder.toString(),
-                interval,
-                multiSearch.tookMsFromSearchResult(searchResult));
-    }
-
     private QueryBuilder standardAggregationFilters(TimeRange range, String filter) {
         final QueryBuilder filterBuilder = standardFilters(range, filter);
 
@@ -345,26 +301,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
         return filterBuilder;
     }
-
-    DateHistogramInterval toESInterval(Searches.DateHistogramInterval interval) {
-        switch (interval) {
-            case MINUTE:
-                return DateHistogramInterval.MINUTE;
-            case HOUR:
-                return DateHistogramInterval.HOUR;
-            case DAY:
-                return DateHistogramInterval.DAY;
-            case WEEK:
-                return DateHistogramInterval.WEEK;
-            case MONTH:
-                return DateHistogramInterval.MONTH;
-            case QUARTER:
-                return DateHistogramInterval.QUARTER;
-            default:
-                return DateHistogramInterval.YEAR;
-        }
-    }
-
     private SearchSourceBuilder searchRequest(SearchesConfig config) {
         final SearchSourceBuilder request;
 

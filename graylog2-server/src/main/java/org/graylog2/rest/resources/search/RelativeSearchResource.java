@@ -35,7 +35,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
-import org.graylog2.rest.models.search.responses.HistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -248,37 +247,6 @@ public class RelativeSearchResource extends SearchResource {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         return buildFieldStatsResult(fieldStats(field, query, filter, buildRelativeTimeRange(range)));
-    }
-
-    @GET
-    @Path("/fieldhistogram")
-    @Timed
-    @ApiOperation(value = "Field value histogram of a query using a relative timerange.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid interval provided."),
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
-            @ApiResponse(code = 400, message = "Field is not of numeric type.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public HistogramResult fieldHistogramRelative(
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "field", value = "Field of whose values to get the histogram of", required = true)
-            @QueryParam("field") @NotEmpty String field,
-            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
-            @QueryParam("interval") @NotEmpty String interval,
-            @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
-            @ApiParam(name = "cardinality", value = "Calculate the cardinality of the field as well", required = false) @QueryParam("cardinality") boolean includeCardinality
-    ) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
-
-        interval = interval.toUpperCase(Locale.ENGLISH);
-        validateInterval(interval);
-
-        return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildRelativeTimeRange(range),
-                                                   includeCardinality));
     }
 
     private TimeRange buildRelativeTimeRange(int range) {

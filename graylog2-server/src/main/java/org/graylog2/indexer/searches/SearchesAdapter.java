@@ -19,7 +19,6 @@ package org.graylog2.indexer.searches;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
@@ -41,6 +40,4 @@ public interface SearchesAdapter {
     TermsStatsResult termsStats(String query, String filter, TimeRange range, Set<String> affectedIndices, String keyField, String valueField, Searches.TermsStatsOrder order, int size);
 
     FieldStatsResult fieldStats(String query, String filter, TimeRange range, Set<String> indices, String field, boolean includeCardinality, boolean includeStats, boolean includeCount);
-
-    HistogramResult fieldHistogram(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, Searches.DateHistogramInterval interval, boolean includeStats, boolean includeCardinality);
 }

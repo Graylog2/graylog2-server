@@ -34,10 +34,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
-import org.graylog2.rest.models.search.responses.HistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
-import org.graylog2.rest.models.search.responses.TimeRange;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -55,7 +53,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -128,40 +125,6 @@ public abstract class SearchResource extends RestResource {
         }
     }
 
-    protected org.graylog2.indexer.results.HistogramResult fieldHistogram(String field,
-                                                                          String query,
-                                                                          String interval,
-                                                                          String filter,
-                                                                          org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange,
-                                                                          boolean includeCardinality) {
-        try {
-            return searches.fieldHistogram(
-                    query,
-                    field,
-                    Searches.DateHistogramInterval.valueOf(interval),
-                    filter,
-                    timeRange,
-                    true,
-                    includeCardinality);
-        } catch (FieldTypeException e) {
-            try {
-                LOG.debug("Field histogram query failed. Make sure that field [{}] is a numeric type. Retrying without numerical statistics.", field);
-                return searches.fieldHistogram(
-                        query,
-                        field,
-                        Searches.DateHistogramInterval.valueOf(interval),
-                        filter,
-                        timeRange,
-                        false,
-                        true);
-            } catch (FieldTypeException e1) {
-                final String msg = "Field histogram for field [" + field + "] failed while calculating its cardinality.";
-                LOG.error(msg, ExceptionUtils.getRootCauseMessage(e1));
-                throw new BadRequestException(msg, e1);
-            }
-        }
-    }
-
     protected TermsResult buildTermsResult(org.graylog2.indexer.results.TermsResult tr) {
         return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.termsMapping(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
     }
@@ -214,16 +177,6 @@ public abstract class SearchResource extends RestResource {
             sr.tookMs(), sr.getCount(), sr.getSum(), sr.getSumOfSquares(), sr.getMean(),
             sr.getMin(), sr.getMax(), sr.getVariance(), sr.getStdDeviation(), sr.getBuiltQuery(), sr.getCardinality());
 
-    }
-
-    protected HistogramResult buildHistogramResult(org.graylog2.indexer.results.HistogramResult histogram) {
-        final AbsoluteRange histogramBoundaries = histogram.getHistogramBoundaries();
-        return HistogramResult.create(
-            histogram.getInterval().toString().toLowerCase(Locale.ENGLISH),
-            histogram.getResults(),
-            histogram.tookMs(),
-            histogram.getBuiltQuery(),
-            TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
     }
 
     protected Sorting buildSorting(String sort) {
