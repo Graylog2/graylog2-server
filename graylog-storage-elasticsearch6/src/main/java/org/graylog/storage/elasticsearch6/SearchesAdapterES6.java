@@ -1,11 +1,8 @@
 package org.graylog.storage.elasticsearch6;
 
-import com.google.common.collect.ImmutableList;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
-import io.searchbox.core.search.aggregation.MissingAggregation;
-import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.common.Strings;
@@ -28,7 +25,6 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
@@ -117,39 +113,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
         return new SearchResult(hits, searchResult.getTotal(), indexRanges, config.query(), requestBuilder.toString(), multiSearch.tookMsFromSearchResult(searchResult));
 
-    }
-
-    @Override
-    public TermsResult terms(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, List<String> stackedFields, int size, Sorting.Direction sorting) {
-        final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
-        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range);
-
-        searchSourceBuilder.aggregation(createTermsBuilder(field, stackedFields, size, termsOrder));
-        searchSourceBuilder.aggregation(AggregationBuilders.missing("missing")
-                .field(field));
-
-        if (affectedIndices.isEmpty()) {
-            return TermsResult.empty(query, searchSourceBuilder.toString());
-        }
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .ignoreUnavailable(true)
-                .allowNoIndices(true)
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices);
-        final io.searchbox.core.SearchResult searchResult = multiSearch.wrap(searchBuilder.build(), () -> "Unable to perform terms query");
-        final TermsAggregation termsAggregation = searchResult.getAggregations().getFilterAggregation(AGG_FILTER).getTermsAggregation(AGG_TERMS);
-        final MissingAggregation missing = searchResult.getAggregations().getMissingAggregation("missing");
-
-        return new TermsResult(
-                termsAggregation,
-                missing.getMissing(),
-                searchResult.getTotal(),
-                query,
-                searchSourceBuilder.toString(),
-                multiSearch.tookMsFromSearchResult(searchResult),
-                // Concat field and stacked fields into one fields list
-                ImmutableList.<String>builder().add(field).addAll(stackedFields).build()
-        );
     }
 
     @Override

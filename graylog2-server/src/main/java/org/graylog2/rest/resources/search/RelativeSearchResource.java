@@ -34,7 +34,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -166,32 +165,6 @@ public class RelativeSearchResource extends SearchResource {
             .ok(searchRelativeChunked(query, range, limit, offset, batchSize, filter, fields))
             .header("Content-Disposition", "attachment; filename=" + filename)
             .build();
-    }
-
-    @GET
-    @Path("/terms")
-    @Timed
-    @ApiOperation(value = "Most common field terms of a query using a relative timerange.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public TermsResult termsRelative(
-            @ApiParam(name = "field", value = "Message field of to return terms of", required = true)
-            @QueryParam("field") @NotEmpty String field,
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "stacked_fields", value = "Fields to stack", required = false) @QueryParam("stacked_fields") String stackedFieldsParam,
-            @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
-            @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
-            @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
-
-        final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
-        final Sorting sortOrder = buildSorting(order);
-        return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildRelativeTimeRange(range), sortOrder.getDirection()));
     }
 
     private TimeRange buildRelativeTimeRange(int range) {

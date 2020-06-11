@@ -32,8 +32,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.graylog2.rest.models.search.responses.TermsResult;
-import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -97,14 +95,6 @@ public abstract class SearchResource extends RestResource {
         }
 
         return fieldList;
-    }
-
-    protected TermsResult buildTermsResult(org.graylog2.indexer.results.TermsResult tr) {
-        return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.termsMapping(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
-    }
-
-    protected TermsStatsResult buildTermsStatsResult(org.graylog2.indexer.results.TermsStatsResult tr) {
-        return TermsStatsResult.create(tr.tookMs(), tr.getResults(), tr.getBuiltQuery());
     }
 
     protected SearchResponse buildSearchResponse(SearchResult sr,

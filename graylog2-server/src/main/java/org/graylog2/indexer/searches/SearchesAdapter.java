@@ -21,7 +21,6 @@ import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
@@ -33,8 +32,6 @@ public interface SearchesAdapter {
     ScrollResult scroll(Set<String> affectedIndices, Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields);
 
     SearchResult search(Set<String> indices, Set<IndexRange> indexRanges, SearchesConfig config);
-
-    TermsResult terms(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, List<String> stackedFields, int size, Sorting.Direction sorting);
 
     FieldStatsResult fieldStats(String query, String filter, TimeRange range, Set<String> indices, String field, boolean includeCardinality, boolean includeStats, boolean includeCount);
 }

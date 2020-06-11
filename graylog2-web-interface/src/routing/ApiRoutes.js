@@ -286,15 +286,6 @@ const ApiRoutes = {
 
       return { url: this._buildUrl(url, queryString) };
     },
-    fieldTerms(type, query, field, order, size, stackedFields, timerange, streamId) {
-      const url = `/search/universal/${type}/terms`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.field = field;
-      queryString.order = `${field}:${order}`; // REST API expects <field>:<order> format for the "order" param
-      queryString.size = size;
-      queryString.stacked_fields = stackedFields;
-      return { url: this._buildUrl(url, queryString) };
-    },
   },
   UsersApiController: {
     changePassword: (username) => { return { url: `/users/${username}/password` }; },

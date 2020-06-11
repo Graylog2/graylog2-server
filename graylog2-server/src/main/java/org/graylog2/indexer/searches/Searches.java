@@ -33,7 +33,6 @@ import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -43,7 +42,6 @@ import org.joda.time.Period;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -191,25 +189,6 @@ public class Searches {
         final SearchResult result = searchesAdapter.search(indices, indexRanges, config);
         recordEsMetrics(result.tookMs(), config.range());
         return result;
-    }
-
-    public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        TermsResult result = searchesAdapter.terms(query, filter, range, affectedIndices, field, stackedFields, size, sorting);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
-        return terms(field, Collections.emptyList(), size, query, filter, range, sorting);
-    }
-
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
-        return terms(field, size, query, filter, range, Sorting.Direction.DESC);
-    }
-
-    public TermsResult terms(String field, int size, String query, TimeRange range) {
-        return terms(field, size, query, null, range, Sorting.Direction.DESC);
     }
 
     public FieldStatsResult fieldStats(String field, String query, TimeRange range) {

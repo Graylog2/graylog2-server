@@ -37,7 +37,6 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -232,93 +231,6 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
         assertThat(timer.getCount()).isEqualTo(1L);
-    }
-
-    @Test
-    public void testTerms() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
-                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
-
-        assertThat(result.getTotal()).isEqualTo(10L);
-        assertThat(result.getMissing()).isEqualTo(2L);
-        assertThat(result.getTerms())
-                .hasSize(4)
-                .containsEntry("1", 2L)
-                .containsEntry("2", 2L)
-                .containsEntry("3", 3L)
-                .containsEntry("4", 1L);
-    }
-
-    @Test
-    public void testTermsWithNonExistingIndex() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
-                .orderedBy(IndexRange.COMPARATOR)
-                .add(MongoIndexRange.create(INDEX_NAME,
-                        new DateTime(0L, UTC),
-                        new DateTime(2015, 1, 1, 0, 0, UTC),
-                        DateTime.now(UTC),
-                        0,
-                        null))
-                .add(MongoIndexRange.create("does-not-exist",
-                        new DateTime(0L, UTC),
-                        new DateTime(2015, 1, 1, 0, 0, UTC),
-                        DateTime.now(UTC),
-                        0,
-                        null))
-                .build();
-        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
-
-        TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
-                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
-
-        assertThat(result.getTotal()).isEqualTo(10L);
-        assertThat(result.getMissing()).isEqualTo(2L);
-        assertThat(result.getTerms())
-                .hasSize(4)
-                .containsEntry("1", 2L)
-                .containsEntry("2", 2L)
-                .containsEntry("3", 3L)
-                .containsEntry("4", 1L);
-    }
-
-    @Test
-    public void termsRecordsMetrics() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
-                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
-
-        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
-        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
-
-        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
-        assertThat(timer.getCount()).isEqualTo(1L);
-
-        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
-        assertThat(histogram.getCount()).isEqualTo(1L);
-        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
-    }
-
-    @Test
-    public void testTermsAscending() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
-
-        TermsResult result = searches.terms("n", 1, "*", null, AbsoluteRange.create(
-            new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-            new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)), Sorting.Direction.ASC);
-
-        assertThat(result.getTotal()).isEqualTo(10L);
-        assertThat(result.getMissing()).isEqualTo(2L);
-        assertThat(result.getTerms())
-            .hasSize(1)
-            .containsEntry("4", 1L);
     }
 
     @Test
