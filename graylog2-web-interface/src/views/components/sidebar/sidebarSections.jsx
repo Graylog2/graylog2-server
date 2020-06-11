@@ -43,7 +43,7 @@ const sidebarSections: Array<SidebarSection> = [
   {
     key: 'highlighting',
     icon: 'paragraph',
-    title: 'Formatting & Highlighting',
+    title: 'Highlighting',
     content: () => <HighlightingRules />,
   },
   {

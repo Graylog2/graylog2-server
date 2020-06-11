@@ -1,23 +1,24 @@
 // @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
-import styled from 'styled-components';
 
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
+import SectionInfo from '../SectionInfo';
+import SectionSubheadline from '../SectionSubheadline';
 
 import HighlightingRule, { HighlightingRuleGrid } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
-
-const Headline = styled.h4`
-  margin-bottom: 10px;
-`;
 
 const HighlightingRules = () => {
   const rules = useContext(HighlightingRulesContext) ?? [];
   return (
     <>
-      <Headline>Highlighting</Headline>
+      <SectionInfo>
+        Search terms and field values can be highlighted. The search term highlighting can be configured in the graylog server config.
+        A field value can be highlighted by clicking on &quot;Highlight this value&quot; in its context menu.
+      </SectionInfo>
+      <SectionSubheadline>Active highlights</SectionSubheadline>
       <HighlightingRuleGrid>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
         <div>Search terms</div>

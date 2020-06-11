@@ -11,6 +11,7 @@ import QueryResult from 'views/logic/QueryResult';
 import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import SectionInfo from '../SectionInfo';
+import SectionSubHeadline from '../SectionSubHeadline';
 import SearchResultOverview from './SearchResultOverview';
 
 type Props = {
@@ -23,35 +24,43 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
   const viewType = useContext(ViewTypeContext);
   const viewTypeLabel = viewType ? <ViewTypeLabel type={viewType} /> : '';
   const resultsSection = (
-    <p>
-      <SearchResultOverview results={results} />
-    </p>
+    <>
+      <SectionSubHeadline>
+        Execution
+      </SectionSubHeadline>
+      <p>
+
+        <SearchResultOverview results={results} />
+      </p>
+    </>
   );
 
   if (isAdHocSearch) {
     return (
       <>
-        {resultsSection}
         <SectionInfo>Save the search or export it to a dashboard to add a custom summary and description.</SectionInfo>
+        {resultsSection}
       </>
     );
   }
 
   return (
     <>
+      {(!viewMetadata.summary || !viewMetadata.description) && (
+        <SectionInfo>
+          To add a description and summary for this {viewTypeLabel} click on the <Icon name="ellipsis-h" /> icon in the search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
+        </SectionInfo>
+      )}
       {resultsSection}
+      <SectionSubHeadline>
+        Search
+      </SectionSubHeadline>
       <p>
         {viewMetadata.summary || <>This {viewTypeLabel} has no summary.</>}
       </p>
       <p>
         {viewMetadata.description || <>This {viewTypeLabel} has no description.</>}
       </p>
-
-      {(!viewMetadata.summary || !viewMetadata.description) && (
-        <SectionInfo>
-          To add a description and summary for this {viewTypeLabel} click on the <Icon name="ellipsis-h" /> icon in the search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
-        </SectionInfo>
-      )}
     </>
   );
 };
