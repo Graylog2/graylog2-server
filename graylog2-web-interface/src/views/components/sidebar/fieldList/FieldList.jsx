@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual } from 'lodash';
 import { FixedSizeList as List } from 'react-window';
-import { SizeMe } from 'react-sizeme';
+import sizeMe from 'react-sizeme';
 
 import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
@@ -15,12 +15,14 @@ import FieldTypeIcon from './FieldTypeIcon';
 
 import styles from './FieldList.css';
 
+const LIST_HEADER_HEIGHT = 250;
+
 const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
 const FieldList = createReactClass({
   propTypes: {
     allFields: PropTypes.object.isRequired,
-    listHeight: PropTypes.number,
+    size: PropTypes.object,
     fields: PropTypes.object.isRequired,
   },
 
@@ -28,7 +30,7 @@ const FieldList = createReactClass({
 
   getDefaultProps() {
     return {
-      listHeight: 50,
+      size: { height: 50 },
     };
   },
 
@@ -40,10 +42,7 @@ const FieldList = createReactClass({
   },
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { allFields, fields, listHeight } = this.props;
-    if (!isEqual(nextProps.listHeight, listHeight)) {
-      return true;
-    }
+    const { allFields, fields } = this.props;
 
     if (!isEqual(this.state, nextState)) {
       return true;
@@ -92,7 +91,7 @@ const FieldList = createReactClass({
         activeQuery: selectedQuery,
       },
     } = this.state;
-    const { listHeight } = this.props;
+    const { size: { height } } = this.props;
 
     if (!fields) {
       return <span>No field information available.</span>;
@@ -110,7 +109,7 @@ const FieldList = createReactClass({
 
     return (
       <div ref={(elem) => { this.fieldList = elem; }}>
-        <List height={listHeight}
+        <List height={height - LIST_HEADER_HEIGHT}
               itemCount={fieldList.size}
               itemSize={17}>
           {Row}
@@ -182,13 +181,4 @@ const FieldList = createReactClass({
   },
 });
 
-
-const FullHeightFieldList = ({ ...rest }) => (
-  <SizeMe monitorHeight refreshRate={100}>
-    {({ size }) => {
-      return <FieldList {...rest} listHeight={size.height} />;
-    }}
-  </SizeMe>
-);
-
-export default FullHeightFieldList;
+export default sizeMe({ monitorHeight: true })(FieldList);
