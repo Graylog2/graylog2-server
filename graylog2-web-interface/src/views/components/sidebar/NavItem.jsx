@@ -20,7 +20,6 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   left: 100%;
   background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
   z-index: 4;
-  width: max-content;
   font-size: 14px;
   color: white;
   display: none;
