@@ -88,7 +88,7 @@ const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) 
                isSelected={isSelected}
                onClick={onClick}
                showTitleOnHover={showTitleOnHover}
-               title={!showTitleOnHover && title}>
+               title={showTitleOnHover ? '' : title}>
       <Icon name={icon} />
       {(showTitleOnHover && !isSelected) && <Title>{title}</Title>}
     </Container>
