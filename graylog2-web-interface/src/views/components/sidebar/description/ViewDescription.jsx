@@ -4,16 +4,14 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
+import SectionInfo from '../SectionInfo';
 
 import SearchResultOverview from './SearchResultOverview';
-
-const Section = styled.div`
-  margin-bottom: 8px;
-`;
 
 type Props = {
   results: QueryResult,
@@ -25,18 +23,16 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
   const viewType = useContext(ViewTypeContext);
   const viewTypeLabel = viewType ? <ViewTypeLabel type={viewType} /> : '';
   const resultsSection = (
-    <Section>
+    <p>
       <SearchResultOverview results={results} />
-    </Section>
+    </p>
   );
 
   if (isAdHocSearch) {
     return (
       <>
         {resultsSection}
-        <Section>
-          <i>Save the search or export it to a dashboard to add a custom description.</i>
-        </Section>
+        <SectionInfo>Save the search or export it to a dashboard to add a custom summary and description.</SectionInfo>
       </>
     );
   }
@@ -44,12 +40,18 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
   return (
     <>
       {resultsSection}
-      <Section>
-        {viewMetadata.summary || <i>No {viewTypeLabel} summary.</i>}
-      </Section>
-      <Section>
-        {viewMetadata.description || <i>No {viewTypeLabel} description.</i>}
-      </Section>
+      <p>
+        {viewMetadata.summary || <>This {viewTypeLabel} has no summary.</>}
+      </p>
+      <p>
+        {viewMetadata.description || <>This {viewTypeLabel} has no description.</>}
+      </p>
+
+      {(!viewMetadata.summary || !viewMetadata.description) && (
+        <SectionInfo>
+          To add a description and summary for this {viewTypeLabel} click on the <Icon name="ellipsis-h" /> icon in the search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
+        </SectionInfo>
+      )}
     </>
   );
 };
