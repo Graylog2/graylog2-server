@@ -50,6 +50,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 @RequiresAuthentication
 @RequiresPermissions(RestPermissions.SOURCES_READ)
 @Api(value = "Sources", description = "Listing message sources (e.g. hosts sending logs)")
@@ -67,6 +68,7 @@ public class SourcesResource extends RestResource {
         this.searches = searches;
     }
 
+    @Deprecated
     @GET
     @Timed
     @ApiOperation(

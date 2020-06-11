@@ -293,6 +293,7 @@ public class Searches {
         return new SearchResult(hits, searchResult.getTotal(), indexRanges, config.query(), requestBuilder.toString(), tookMsFromSearchResult(searchResult));
     }
 
+    @Deprecated
     public AbstractAggregationBuilder createTermsBuilder(String field, List<String> stackedFields, int size, Terms.Order termsOrder) {
         if (stackedFields.isEmpty()) {
             // Wrap terms aggregation in a no-op filter to make sure the result structure is correct when not having
@@ -333,6 +334,7 @@ public class Searches {
                         .order(termsOrder));
     }
 
+    @Deprecated
     public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
 
@@ -370,18 +372,22 @@ public class Searches {
         );
     }
 
+    @Deprecated
     public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         return terms(field, Collections.emptyList(), size, query, filter, range, sorting);
     }
 
+    @Deprecated
     public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
         return terms(field, size, query, filter, range, Sorting.Direction.DESC);
     }
 
+    @Deprecated
     public TermsResult terms(String field, int size, String query, TimeRange range) {
         return terms(field, size, query, null, range, Sorting.Direction.DESC);
     }
 
+    @Deprecated
     public TermsHistogramResult termsHistogram(String field,
                                                List<String> stackedFields,
                                                int size,
@@ -427,6 +433,7 @@ public class Searches {
                 ImmutableList.<String>builder().add(field).addAll(stackedFields).build());
     }
 
+    @Deprecated
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
         if (size == 0) {
             size = 50;
@@ -515,6 +522,7 @@ public class Searches {
         );
     }
 
+    @Deprecated
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, TimeRange range) {
         return termsStats(keyField, valueField, order, size, query, null, range);
     }
@@ -596,10 +604,12 @@ public class Searches {
             .collect(Collectors.toSet());
     }
 
+    @Deprecated
     public HistogramResult histogram(String query, DateHistogramInterval interval, TimeRange range) {
         return histogram(query, interval, null, range);
     }
 
+    @Deprecated
     public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
         final DateHistogramAggregationBuilder histogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                 .field(Message.FIELD_TIMESTAMP)
@@ -633,6 +643,7 @@ public class Searches {
         );
     }
 
+    @Deprecated
     public HistogramResult fieldHistogram(String query,
                                           String field,
                                           DateHistogramInterval interval,
@@ -642,6 +653,7 @@ public class Searches {
         return fieldHistogram(query, field, interval, filter, range, true, includeCardinality);
     }
 
+    @Deprecated
     public HistogramResult fieldHistogram(String query,
                                           String field,
                                           DateHistogramInterval interval,

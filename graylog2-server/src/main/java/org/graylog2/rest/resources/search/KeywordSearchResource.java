@@ -172,6 +172,7 @@ public class KeywordSearchResource extends SearchResource {
             .build();
     }
 
+    @Deprecated
     @GET
     @Path("/histogram")
     @Timed
@@ -204,6 +205,7 @@ public class KeywordSearchResource extends SearchResource {
         );
     }
 
+    @Deprecated
     @GET
     @Path("/terms")
     @Timed
@@ -230,6 +232,7 @@ public class KeywordSearchResource extends SearchResource {
         return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildKeywordTimeRange(keyword), sortOrder.getDirection()));
     }
 
+    @Deprecated
     @GET
     @Path("/terms-histogram")
     @Timed
@@ -261,6 +264,7 @@ public class KeywordSearchResource extends SearchResource {
         return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, SearchUtils.buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
+    @Deprecated
     @GET
     @Path("/termsstats")
     @Timed
@@ -289,6 +293,7 @@ public class KeywordSearchResource extends SearchResource {
         );
     }
 
+    @Deprecated
     @GET
     @Path("/stats")
     @Timed
@@ -313,6 +318,7 @@ public class KeywordSearchResource extends SearchResource {
         return buildFieldStatsResult(fieldStats(field, query, filter, buildKeywordTimeRange(keyword)));
     }
 
+    @Deprecated
     @GET
     @Path("/fieldhistogram")
     @Timed
