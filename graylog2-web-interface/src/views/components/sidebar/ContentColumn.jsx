@@ -43,9 +43,8 @@ export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInter
 
 const Header: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   height: 35px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr auto;
 `;
 
 const Title = styled.h1`
@@ -54,6 +53,7 @@ const Title = styled.h1`
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 24px;
+  cursor: pointer;
 `;
 
 const OverlayToggle: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
@@ -69,6 +69,11 @@ const HorizontalRule = styled.hr`
 
 const SectionTitle = styled.h2`
   margin-bottom: 10px;
+`;
+
+const CenterVertical = styled.div`
+  display: inline-grid;
+  align-content: center;
 `;
 
 const toggleSidebarPinning = (searchPageLayout) => {
@@ -103,12 +108,16 @@ const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, 
           <Container sidebarIsInline={sidebarIsInline}>
             <div>
               <Header title={title}>
-                <Title onClick={closeSidebar}>{title}</Title>
-                <OverlayToggle sidebarIsInline={sidebarIsInline}>
-                  <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                              title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
-                              name="layer-group" />
-                </OverlayToggle>
+                <CenterVertical>
+                  <Title onClick={closeSidebar}>{title}</Title>
+                </CenterVertical>
+                <CenterVertical>
+                  <OverlayToggle sidebarIsInline={sidebarIsInline}>
+                    <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
+                                title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
+                                name="layer-group" />
+                  </OverlayToggle>
+                </CenterVertical>
               </Header>
               <HorizontalRule />
               <SectionTitle>{section.title}</SectionTitle>
