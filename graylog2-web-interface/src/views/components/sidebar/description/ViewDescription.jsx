@@ -4,13 +4,13 @@ import { useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import QueryResult from 'views/logic/QueryResult';
+
 import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
-import QueryResult from 'views/logic/QueryResult';
 import SectionInfo from '../SectionInfo';
-
 import SearchResultOverview from './SearchResultOverview';
 
 type Props = {

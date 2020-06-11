@@ -8,6 +8,7 @@ import { sortBy, isEmpty } from 'lodash';
 import { Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+import SectionInfo from '../SectionInfo';
 
 const Group = styled.div`
   margin-bottom: 20px;
@@ -17,13 +18,14 @@ const Group = styled.div`
   }
 `;
 
-const GroupHeadline = styled.h4`
+const GroupHeadline = styled.h3`
   margin-bottom: 10px;
 `;
 
 const CreateButton = styled(Button)`
   display: block;
   margin: 5px 0;
+  width: 100%;
 `;
 
 type Props = {
@@ -123,6 +125,9 @@ class AddWidgetButton extends React.Component<Props, State> {
     const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
       <>
+        <Group>
+          <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
+        </Group>
         <Group>
           <GroupHeadline>Generic</GroupHeadline>
           {generic}
