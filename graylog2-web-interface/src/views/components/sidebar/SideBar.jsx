@@ -24,6 +24,7 @@ type Props = {
 
 const Container = styled.div`
   display: flex;
+  height: 100%;
   grid-row: 1;
   -ms-grid-row: 1;
   grid-column: 1;

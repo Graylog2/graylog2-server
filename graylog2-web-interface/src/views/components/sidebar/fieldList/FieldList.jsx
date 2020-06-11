@@ -5,19 +5,25 @@ import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual } from 'lodash';
 import { FixedSizeList as List } from 'react-window';
-import sizeMe from 'react-sizeme';
+import { SizeMe } from 'react-sizeme';
 
 import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+import styled from 'styled-components';
 import FieldTypeIcon from './FieldTypeIcon';
-
 import styles from './FieldList.css';
 
-const LIST_HEADER_HEIGHT = 250;
-
 const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
+
+const Container = styled.div`
+  white-space: 'break-spaces';
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr;
+`;
 
 const FieldList = createReactClass({
   propTypes: {
@@ -83,7 +89,8 @@ const FieldList = createReactClass({
     }
   },
 
-  _renderFieldList({ fields, allFields, showFieldsBy }) {
+  _renderFieldList({ fields, allFields, showFieldsBy, height }) {
+    console.log(height);
     const {
       filter,
       viewMetadata: {
@@ -91,7 +98,6 @@ const FieldList = createReactClass({
         activeQuery: selectedQuery,
       },
     } = this.state;
-    const { size: { height } } = this.props;
 
     if (!fields) {
       return <span>No field information available.</span>;
@@ -109,7 +115,7 @@ const FieldList = createReactClass({
 
     return (
       <div ref={(elem) => { this.fieldList = elem; }}>
-        <List height={height - LIST_HEADER_HEIGHT}
+        <List height={height}
               itemCount={fieldList.size}
               itemSize={17}>
           {Row}
@@ -145,40 +151,44 @@ const FieldList = createReactClass({
     );
   },
   render() {
-    const { allFields, fields } = this.props;
+    const { allFields, fields, size } = this.props;
     const { filter, showFieldsBy } = this.state;
 
     return (
-      <div style={{ whiteSpace: 'break-spaces' }}>
-        <form className={`form-inline ${styles.filterContainer}`} onSubmit={(e) => e.preventDefault()}>
-          <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
-            <input id="common-search-form-query-input"
-                   className="query form-control"
-                   style={{ width: '100%' }}
-                   onChange={this.handleSearch}
-                   value={filter || ''}
-                   placeholder="Filter fields"
-                   type="text"
-                   autoComplete="off"
-                   spellCheck="false" />
+      <Container>
+        <div>
+          <form className={`form-inline ${styles.filterContainer}`} onSubmit={(e) => e.preventDefault()}>
+            <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
+              <input id="common-search-form-query-input"
+                     className="query form-control"
+                     style={{ width: '100%' }}
+                     onChange={this.handleSearch}
+                     value={filter || ''}
+                     placeholder="Filter fields"
+                     type="text"
+                     autoComplete="off"
+                     spellCheck="false" />
+            </div>
+            <div className="form-group">
+              <Button type="reset" className="reset-button" onClick={this.handleSearchReset}>
+                Reset
+              </Button>
+            </div>
+          </form>
+          <div style={{ marginTop: '5px', marginBottom: '0px' }}>
+            List fields of{' '}
+            {this.showFieldsByLink('current', 'current streams', 'This shows fields which are (prospectively) included in the streams you have selected.')},{' '}
+            {this.showFieldsByLink('all', 'all', 'This shows all fields, but no reserved (gl2_*) fields.')} or{' '}
+            {this.showFieldsByLink('allreserved', 'all including reserved', 'This shows all fields, including reserved (gl2_*) fields.')} fields.
           </div>
-          <div className="form-group">
-            <Button type="reset" className="reset-button" onClick={this.handleSearchReset}>
-              Reset
-            </Button>
-          </div>
-        </form>
-        <div style={{ marginTop: '5px', marginBottom: '0px' }}>
-          List fields of{' '}
-          {this.showFieldsByLink('current', 'current streams', 'This shows fields which are (prospectively) included in the streams you have selected.')},{' '}
-          {this.showFieldsByLink('all', 'all', 'This shows all fields, but no reserved (gl2_*) fields.')} or{' '}
-          {this.showFieldsByLink('allreserved', 'all including reserved', 'This shows all fields, including reserved (gl2_*) fields.')} fields.
+          <hr />
         </div>
-        <hr />
-        {this._renderFieldList({ fields, allFields, showFieldsBy })}
-      </div>
+        <SizeMe monitorHeight refreshRate={100}>
+          {({ size: { height } }) => this._renderFieldList({ fields, allFields, showFieldsBy, height })}
+        </SizeMe>
+      </Container>
     );
   },
 });
 
-export default sizeMe({ monitorHeight: true })(FieldList);
+export default FieldList;

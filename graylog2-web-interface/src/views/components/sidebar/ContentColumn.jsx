@@ -23,12 +23,15 @@ type Props = {
 
 export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   position: ${sidebarIsInline ? 'static' : 'fixed'}
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-templage-columns: 1fr;
   top: ${sidebarIsInline ? 0 : '50px'};
   left: ${sidebarIsInline ? 0 : '50px'};
 
   width: 270px;
-  height: 100%;
-  padding: 5px 15px;
+  height:  ${sidebarIsInline ? '100%' : 'calc(100% - 50px)'};;
+  padding: 5px 15px 15px 15px;
 
   color: ${theme.colors.global.textDefault};
   background: ${theme.colors.global.contentBackground};
@@ -98,17 +101,21 @@ const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, 
         const title = sidebarTitle(viewMetadata, viewType);
         return (
           <Container sidebarIsInline={sidebarIsInline}>
-            <Header title={title}>
-              <Title onClick={closeSidebar}>{title}</Title>
-              <OverlayToggle sidebarIsInline={sidebarIsInline}>
-                <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                            title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
-                            name="layer-group" />
-              </OverlayToggle>
-            </Header>
-            <HorizontalRule />
-            <SectionTitle>{section.title}</SectionTitle>
-            <Content {...sectionProps} />
+            <div>
+              <Header title={title}>
+                <Title onClick={closeSidebar}>{title}</Title>
+                <OverlayToggle sidebarIsInline={sidebarIsInline}>
+                  <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
+                              title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
+                              name="layer-group" />
+                </OverlayToggle>
+              </Header>
+              <HorizontalRule />
+              <SectionTitle>{section.title}</SectionTitle>
+            </div>
+            <div>
+              <Content {...sectionProps} />
+            </div>
           </Container>
         );
       }}
