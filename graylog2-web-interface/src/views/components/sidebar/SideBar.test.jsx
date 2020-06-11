@@ -151,12 +151,12 @@ describe('<Sidebar />', () => {
   it('should render placeholder if dashboard has no summary or description ', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <SideBar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+        <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
@@ -169,12 +169,12 @@ describe('<Sidebar />', () => {
   it('should render placeholder if saved search has no summary or description ', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <SideBar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+        <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
@@ -187,12 +187,12 @@ describe('<Sidebar />', () => {
   it('should render a summary and description, for a saved search', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <SideBar viewMetadata={viewMetaData}
+        <Sidebar viewMetadata={viewMetaData}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
@@ -204,12 +204,12 @@ describe('<Sidebar />', () => {
 
   it('should not render a summary and description, if the view is an ad hoc search', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={{ ...viewMetaData, id: undefined }}
+      <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');

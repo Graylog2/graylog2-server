@@ -68,7 +68,7 @@ const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
   overflow-y: auto;
 `;
 
-const ConnectedSideBar = connect(
+const ConnectedSidebar = connect(
   Sidebar,
   { viewMetadata: ViewMetadataStore, searches: SearchStore },
   (props) => ({
@@ -169,9 +169,9 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
             <HighlightingRulesProvider>
               <GridContainer id="main-row" interactive={interactive}>
                 <IfInteractive>
-                  <ConnectedSideBar>
+                  <ConnectedSidebar>
                     <ConnectedFieldList />
-                  </ConnectedSideBar>
+                  </ConnectedSidebar>
                 </IfInteractive>
                 <SearchArea>
                   <IfInteractive>
