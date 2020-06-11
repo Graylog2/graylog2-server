@@ -101,7 +101,7 @@ const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, 
               <Title onClick={closeSidebar}>{title}</Title>
               <OverlayToggle sidebarIsInline={sidebarIsInline}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                            title={`Display sidebar ${sidebarIsInline ? 'inline' : 'as overlay'}`}
+                            title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
                             name="layer-group" />
               </OverlayToggle>
             </Header>
