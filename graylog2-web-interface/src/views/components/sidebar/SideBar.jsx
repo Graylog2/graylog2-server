@@ -42,14 +42,6 @@ const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styl
   z-index: 2;  
 `);
 
-const handleClickOutside = (event: MouseEvent, activeSectionKey: ?string, toggleSidebar: () => void, disableAutoClose: boolean) => {
-  // $FlowFixMe: EventTarget and className work here.
-  const { className } = event.target;
-  const canMatchClass = className && isString(className);
-  if (activeSectionKey && !disableAutoClose && (canMatchClass && className.match(/background/))) {
-    toggleSidebar();
-  }
-};
 const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: ?string, setActiveSectionKey) => {
   if (activeSectionKey) {
     setActiveSectionKey(null);
@@ -58,17 +50,11 @@ const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: 
   setActiveSectionKey(sections[0].key);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, queryId, disableAutoClose, sections, viewMetadata }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
-  const isSidebarPinned = searchPageLayout?.layout.sidebar.pinned;
+  const isSidebarPinned = !!searchPageLayout?.layout.sidebar.pinned;
   const toggleSidebar = () => handleToggleSidebar(sections, activeSectionKey, setActiveSectionKey);
-  const onClickOutside = (event) => handleClickOutside(event, activeSectionKey, toggleSidebar, disableAutoClose);
-
-  useEffect(() => {
-    document.addEventListener('mousedown', onClickOutside);
-    return document.removeEventListener('mousedown', onClickOutside);
-  }, []);
 
   return (
     <Container>
@@ -81,7 +67,7 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, disableAutoClos
                         isPinned={!!isSidebarPinned}
                         searchPageLayout={searchPageLayout}
                         section={activeSection}
-                        sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata }}
+                        sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata, isSidebarPinned }}
                         viewMetadata={viewMetadata} />
       )}
       {(activeSection && !isSidebarPinned) && (
@@ -93,7 +79,6 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, disableAutoClos
 
 Sidebar.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  disableAutoClose: PropTypes.bool,
   queryId: PropTypes.string.isRequired,
   results: PropTypes.object,
   sections: PropTypes.arrayOf(PropTypes.object),
@@ -107,7 +92,6 @@ Sidebar.propTypes = {
 };
 
 Sidebar.defaultProps = {
-  disableAutoClose: false,
   results: {},
   sections: sidebarSections,
 };

@@ -30,7 +30,6 @@ const CreateButton = styled(Button)`
 
 type Props = {
   onClick: () => void,
-  toggleAutoClose: () => void,
 };
 
 type State = {
@@ -69,12 +68,11 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
-    const { onClick, toggleAutoClose } = this.props;
+    const { onClick } = this.props;
     const { view } = ViewStore.getInitialState();
     if (creator.func) {
       return () => {
         onClick();
-        toggleAutoClose();
         creator.func({ view });
       };
     }
@@ -86,7 +84,6 @@ class AddWidgetButton extends React.Component<Props, State> {
           const { overflowingComponents } = state;
           delete overflowingComponents[id];
           onClick();
-          toggleAutoClose();
           return { overflowingComponents };
         });
         const renderedComponent = <CreatorComponent key={creator.title} onClose={onClose} />;
@@ -94,8 +91,6 @@ class AddWidgetButton extends React.Component<Props, State> {
           const { overflowingComponents } = state;
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
-        }, () => {
-          toggleAutoClose();
         });
       };
     }
