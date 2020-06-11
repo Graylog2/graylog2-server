@@ -10,7 +10,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 
 export type SidebarSectionProps = {
   children: React.Node,
-  isSidebarPinned: boolean,
+  sidebarIsInline: boolean,
   queryId: string,
   results: any,
   toggleSidebar: () => void,
@@ -35,9 +35,9 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'create',
     icon: 'plus',
     title: 'Create',
-    content: ({ toggleSidebar, queryId, isSidebarPinned }: SidebarSectionProps) => (
+    content: ({ toggleSidebar, queryId, sidebarIsInline }: SidebarSectionProps) => (
       <AddWidgetButton queryId={queryId}
-                       onClick={!isSidebarPinned ? toggleSidebar : () => {}} />
+                       onClick={!sidebarIsInline ? toggleSidebar : () => {}} />
     ),
   },
   {

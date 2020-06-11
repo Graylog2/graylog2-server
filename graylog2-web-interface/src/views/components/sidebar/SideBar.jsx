@@ -1,10 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
-import { isString } from 'lodash';
 
 import { type ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/viewMetadataStore';
@@ -16,7 +15,6 @@ import sidebarSections, { type SidebarSection } from './sidebarSections';
 
 type Props = {
   children: React.Element<any>,
-  disableAutoClose: boolean,
   queryId: string,
   results: {},
   searchPageLayout: ?SearchPageLayoutType,
@@ -53,7 +51,7 @@ const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: 
 const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
-  const isSidebarPinned = !!searchPageLayout?.layout.sidebar.pinned;
+  const sidebarIsInline = !!searchPageLayout?.config.sidebar.isInline;
   const toggleSidebar = () => handleToggleSidebar(sections, activeSectionKey, setActiveSectionKey);
 
   return (
@@ -64,13 +62,12 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
                        sections={sections} />
       {activeSection && (
         <SectionContent closeSidebar={toggleSidebar}
-                        isPinned={!!isSidebarPinned}
                         searchPageLayout={searchPageLayout}
                         section={activeSection}
-                        sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata, isSidebarPinned }}
+                        sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata, sidebarIsInline }}
                         viewMetadata={viewMetadata} />
       )}
-      {(activeSection && !isSidebarPinned) && (
+      {(activeSection && !sidebarIsInline) && (
         <ContentOverlay onClick={toggleSidebar} />
       )}
     </Container>

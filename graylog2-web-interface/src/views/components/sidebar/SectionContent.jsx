@@ -4,7 +4,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import View, { type ViewType } from 'views/logic/views/View';
 import { type ThemeInterface } from 'theme';
-import { type SearchPageLayoutType } from 'views/components/contexts/SearchPageLayoutContext';
+import { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -17,20 +17,19 @@ type Props = {
   section: SidebarSection,
   closeSidebar: () => void,
   sectionProps: SidebarSectionProps,
-  searchPageLayout: ?SearchPageLayoutType,
-  isPinned: boolean,
+  searchPageLayout: ?SearchPageLayout,
   viewMetadata: ViewMetadata,
 };
 
-export const Container: StyledComponent<{ isPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isPinned }) => `
+export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   color: ${theme.colors.global.textDefault};
   background: ${theme.colors.global.contentBackground};
-  position: ${isPinned ? 'static' : 'fixed'}
+  position: ${sidebarIsInline ? 'static' : 'fixed'}
   box-shadow:
     inset 0 13px 5px -10px ${theme.colors.gray[80]},
     inset 0 -13px 5px -10px ${theme.colors.gray[80]};
-  top: ${isPinned ? 0 : '50px'};
-  left: ${isPinned ? 0 : '50px'};
+  top: ${sidebarIsInline ? 0 : '50px'};
+  left: ${sidebarIsInline ? 0 : '50px'};
   padding: 5px 15px;
   width: 270px;
   height: 100%;
@@ -54,12 +53,12 @@ const Title = styled.h1`
   font-size: 24px;
 `;
 
-const OverlayToggle: StyledComponent<{ isOverlay: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isOverlay }) => `
+const OverlayToggle: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   > * {
     height: 25px;
     width: 25px;
     font-size: 18px;
-    color: ${isOverlay ? theme.colors.variant.info : theme.colors.gray[30]};
+    color: ${sidebarIsInline ? theme.colors.gray[30] : theme.colors.variant.info};
   }
 `);
 
@@ -75,13 +74,13 @@ const toggleSidebarPinning = (searchPageLayout) => {
   if (!searchPageLayout) {
     return;
   }
-  const { setLayout, layout } = searchPageLayout;
-  const isPinned = layout?.sidebar.pinned;
-  const updatedLayout = {
-    ...layout,
-    sidebar: { pinned: !isPinned },
+  const { setConfig, config } = searchPageLayout;
+  const sidebarIsInline = config?.sidebar.isInline;
+  const newLayoutConfig = {
+    ...config,
+    sidebar: { isInline: !sidebarIsInline },
   };
-  setLayout(updatedLayout);
+  setConfig(newLayoutConfig);
 };
 
 const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
@@ -89,19 +88,20 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
   return viewMetadata.title || defaultTitle;
 };
 
-const SectionContent = ({ section, closeSidebar, sectionProps, isPinned, searchPageLayout, viewMetadata }: Props) => {
+const SectionContent = ({ section, closeSidebar, sectionProps, searchPageLayout, viewMetadata }: Props) => {
+  const sidebarIsInline = searchPageLayout?.config.sidebar.isInline;
   const Content = section.content;
   return (
     <ViewTypeContext.Consumer>
       {(viewType) => {
         const title = sidebarTitle(viewMetadata, viewType);
         return (
-          <Container isPinned={isPinned}>
+          <Container sidebarIsInline={sidebarIsInline}>
             <Header title={title}>
               <Title onClick={closeSidebar}>{title}</Title>
-              <OverlayToggle isOverlay={!isPinned}>
+              <OverlayToggle sidebarIsInline={!sidebarIsInline}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                            title={`Display sidebar ${isPinned ? 'as overlay' : 'inline'}`}
+                            title={`Display sidebar ${sidebarIsInline ? 'inline' : 'as overlay'}`}
                             name="layer-group" />
               </OverlayToggle>
             </Header>

@@ -5,16 +5,16 @@ import PropTypes from 'prop-types';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 
-const defaultLayout = {
+const defaultLayoutConfig = {
   sidebar: {
-    pinned: false,
+    isInline: false,
   },
 };
 
 const SearchPageLayoutProvider = ({ children }: { children: React.Node }) => {
-  const [layout, setLayout] = useState(defaultLayout);
+  const [config, setConfig] = useState(defaultLayoutConfig);
   return (
-    <SearchPageLayoutContext.Provider value={{ layout, setLayout }}>
+    <SearchPageLayoutContext.Provider value={{ config, setConfig }}>
       {children}
     </SearchPageLayoutContext.Provider>
   );

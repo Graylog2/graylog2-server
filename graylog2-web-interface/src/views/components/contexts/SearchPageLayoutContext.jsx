@@ -1,13 +1,15 @@
 // @flow strict
 import * as React from 'react';
 
-export type SearchPageLayoutType = {
-  layout: {
-    sidebar: { pinned: boolean },
-  },
-  setLayout: (tbd: any) => void,
+type SearchPageLayoutConfig = {
+  sidebar: { isInline: boolean },
 };
 
-const SearchPageLayoutContext = React.createContext<?SearchPageLayoutType>();
+export type SearchPageLayout = {
+  config: SearchPageLayoutConfig,
+  setConfig: SearchPageLayoutConfig => void,
+};
+
+const SearchPageLayoutContext = React.createContext<?SearchPageLayout>();
 
 export default SearchPageLayoutContext;
