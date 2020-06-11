@@ -286,12 +286,6 @@ const ApiRoutes = {
 
       return { url: this._buildUrl(url, queryString) };
     },
-    fieldStats(type, query, field, timerange, streamId) {
-      const url = `/search/universal/${type}/stats`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.field = field;
-      return { url: this._buildUrl(url, queryString) };
-    },
     fieldTerms(type, query, field, order, size, stackedFields, timerange, streamId) {
       const url = `/search/universal/${type}/terms`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);

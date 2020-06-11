@@ -34,7 +34,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -237,32 +236,6 @@ public class AbsoluteSearchResource extends SearchResource {
                         filter,
                         buildAbsoluteTimeRange(from, to)
                 ));
-    }
-
-    @GET
-    @Path("/stats")
-    @Timed
-    @ApiOperation(value = "Field statistics for a query using an absolute timerange.",
-            notes = "Returns statistics like min/max or standard deviation of numeric fields " +
-                    "over the whole query result set.")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
-            @ApiResponse(code = 400, message = "Field is not of numeric type.")
-    })
-    public FieldStatsResult statsAbsolute(
-            @ApiParam(name = "field", value = "Message field of numeric type to return statistics for", required = true)
-            @QueryParam("field") @NotEmpty String field,
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "from", value = "Timerange start. See search method description for date format", required = true)
-            @QueryParam("from") @NotEmpty String from,
-            @ApiParam(name = "to", value = "Timerange end. See search method description for date format", required = true)
-            @QueryParam("to") @NotEmpty String to,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
-
-        return buildFieldStatsResult(fieldStats(field, query, filter, buildAbsoluteTimeRange(from, to)));
     }
 
     private TimeRange buildAbsoluteTimeRange(String from, String to) {

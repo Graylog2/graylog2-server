@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.decorators.DecoratorProcessor;
-import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
@@ -33,15 +32,12 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.utilities.ExceptionUtils;
-import org.graylog2.utilities.SearchUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -76,13 +72,6 @@ public abstract class SearchResource extends RestResource {
         this.decoratorProcessor = decoratorProcessor;
     }
 
-    protected void validateInterval(String interval) {
-        if (!SearchUtils.validateInterval(interval)) {
-            LOG.warn("Invalid interval type <{}>. Returning HTTP 400.", interval);
-            throw new BadRequestException("Invalid interval type: " + interval + "\"");
-        }
-    }
-
     protected List<String> parseFields(String fields) {
         if (isNullOrEmpty(fields)) {
             LOG.warn("Missing fields parameter. Returning HTTP 400");
@@ -108,21 +97,6 @@ public abstract class SearchResource extends RestResource {
         }
 
         return fieldList;
-    }
-
-    protected org.graylog2.indexer.results.FieldStatsResult fieldStats(String field, String query, String filter,
-                                                                       org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
-        try {
-            return searches.fieldStats(field, query, filter, timeRange);
-        } catch (FieldTypeException e) {
-            try {
-                LOG.debug("Stats query failed, make sure that field [{}] is a numeric type. Retrying without numeric statistics to calculate the field's cardinality.", field);
-                return searches.fieldStats(field, query, filter, timeRange, true, false, true);
-            } catch (FieldTypeException e1) {
-                LOG.error("Retrieving field statistics for field {} failed while calculating the cardinality. Cause: {}", field, ExceptionUtils.getRootCauseMessage(e1));
-                throw new BadRequestException("Field " + field + " is not of a numeric type and the cardinality could not be calculated either.", e1);
-            }
-        }
     }
 
     protected TermsResult buildTermsResult(org.graylog2.indexer.results.TermsResult tr) {
@@ -170,13 +144,6 @@ public abstract class SearchResource extends RestResource {
             // TODO module merge: migrate to resultMessage.getMessage() instead of Map<String, Object> via getFields()
             .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
             .collect(Collectors.toList());
-    }
-
-    protected FieldStatsResult buildFieldStatsResult(org.graylog2.indexer.results.FieldStatsResult sr) {
-        return FieldStatsResult.create(
-            sr.tookMs(), sr.getCount(), sr.getSum(), sr.getSumOfSquares(), sr.getMean(),
-            sr.getMin(), sr.getMax(), sr.getVariance(), sr.getStdDeviation(), sr.getBuiltQuery(), sr.getCardinality());
-
     }
 
     protected Sorting buildSorting(String sort) {

@@ -34,7 +34,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -223,30 +222,6 @@ public class RelativeSearchResource extends SearchResource {
         return buildTermsStatsResult(
                 searches.termsStats(keyField, valueField, Searches.TermsStatsOrder.valueOf(order.toUpperCase(Locale.ENGLISH)), size, query, filter, buildRelativeTimeRange(range))
         );
-    }
-
-    @GET
-    @Path("/stats")
-    @Timed
-    @ApiOperation(value = "Field statistics for a query using a relative timerange.",
-            notes = "Returns statistics like min/max or standard deviation of numeric fields " +
-                    "over the whole query result set.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
-            @ApiResponse(code = 400, message = "Field is not of numeric type.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public FieldStatsResult statsRelative(
-            @ApiParam(name = "field", value = "Message field of numeric type to return statistics for", required = true)
-            @QueryParam("field") @NotEmpty String field,
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
-
-        return buildFieldStatsResult(fieldStats(field, query, filter, buildRelativeTimeRange(range)));
     }
 
     private TimeRange buildRelativeTimeRange(int range) {
