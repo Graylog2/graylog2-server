@@ -83,6 +83,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
 
     private final Counter errorCounter;
 
+
     // Timers exist for all request types, so that each can be troubleshot individually.
     private final Timer resolveDomainNameTimer;
     private final Timer reverseLookupTimer;
