@@ -34,7 +34,6 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
-import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -213,22 +212,6 @@ public class Searches {
         return terms(field, size, query, null, range, Sorting.Direction.DESC);
     }
 
-    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
-        if (size == 0) {
-            size = 50;
-        }
-
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-
-        final TermsStatsResult result = searchesAdapter.termsStats(query, filter, range, affectedIndices, keyField, valueField, order, size);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
-    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, TimeRange range) {
-        return termsStats(keyField, valueField, order, size, query, null, range);
-    }
-
     public FieldStatsResult fieldStats(String field, String query, TimeRange range) {
         return fieldStats(field, query, null, range);
     }
@@ -238,7 +221,6 @@ public class Searches {
         return fieldStats(field, query, filter, range, true, true, true);
     }
 
-    @SuppressWarnings("unchecked")
     public FieldStatsResult fieldStats(String field,
                                        String query,
                                        String filter,

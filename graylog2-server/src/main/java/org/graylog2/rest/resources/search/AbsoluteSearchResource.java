@@ -35,7 +35,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.search.responses.TermsResult;
-import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -52,7 +51,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @RequiresAuthentication
@@ -200,42 +198,6 @@ public class AbsoluteSearchResource extends SearchResource {
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
         return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildAbsoluteTimeRange(from, to), sortOrder.getDirection()));
-    }
-
-    @GET
-    @Path("/termsstats")
-    @Timed
-    @ApiOperation(value = "Ordered field terms of a query computed on another field using an absolute timerange.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public TermsStatsResult termsStatsAbsolute(
-            @ApiParam(name = "key_field", value = "Message field of to return terms of", required = true)
-            @QueryParam("key_field") @NotEmpty String keyField,
-            @ApiParam(name = "value_field", value = "Value field used for computation", required = true)
-            @QueryParam("value_field") @NotEmpty String valueField,
-            @ApiParam(name = "order", value = "What to order on (Allowed values: TERM, REVERSE_TERM, COUNT, REVERSE_COUNT, TOTAL, REVERSE_TOTAL, MIN, REVERSE_MIN, MAX, REVERSE_MAX, MEAN, REVERSE_MEAN)", required = true)
-            @QueryParam("order") @NotEmpty String order,
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
-            @ApiParam(name = "from", value = "Timerange start. See search method description for date format", required = true)
-            @QueryParam("from") @NotEmpty String from,
-            @ApiParam(name = "to", value = "Timerange end. See search method description for date format", required = true)
-            @QueryParam("to") @NotEmpty String to,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
-
-        return buildTermsStatsResult(
-                searches.termsStats(keyField,
-                        valueField,
-                        Searches.TermsStatsOrder.valueOf(order.toUpperCase(Locale.ENGLISH)),
-                        size,
-                        query,
-                        filter,
-                        buildAbsoluteTimeRange(from, to)
-                ));
     }
 
     private TimeRange buildAbsoluteTimeRange(String from, String to) {

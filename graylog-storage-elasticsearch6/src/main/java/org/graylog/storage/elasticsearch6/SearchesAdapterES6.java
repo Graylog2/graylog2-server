@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
-import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.MissingAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
@@ -30,8 +29,6 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
-import org.graylog2.indexer.results.TermsStatsResult;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
@@ -155,88 +152,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 multiSearch.tookMsFromSearchResult(searchResult),
                 // Concat field and stacked fields into one fields list
                 ImmutableList.<String>builder().add(field).addAll(stackedFields).build()
-        );
-    }
-
-    @Override
-    public TermsStatsResult termsStats(String query, String filter, TimeRange range, Set<String> affectedIndices, String keyField, String valueField, Searches.TermsStatsOrder order, int size) {
-        final SearchSourceBuilder searchSourceBuilder;
-        if (filter == null) {
-            searchSourceBuilder = standardSearchRequest(query, range);
-        } else {
-            searchSourceBuilder = filteredSearchRequest(query, filter, range);
-        }
-
-        Terms.Order termsOrder;
-        switch (order) {
-            case COUNT:
-                termsOrder = Terms.Order.count(true);
-                break;
-            case REVERSE_COUNT:
-                termsOrder = Terms.Order.count(false);
-                break;
-            case TERM:
-                termsOrder = Terms.Order.term(true);
-                break;
-            case REVERSE_TERM:
-                termsOrder = Terms.Order.term(false);
-                break;
-            case MIN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "min", true);
-                break;
-            case REVERSE_MIN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "min", false);
-                break;
-            case MAX:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "max", true);
-                break;
-            case REVERSE_MAX:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "max", false);
-                break;
-            case MEAN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "avg", true);
-                break;
-            case REVERSE_MEAN:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "avg", false);
-                break;
-            case TOTAL:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "sum", true);
-                break;
-            case REVERSE_TOTAL:
-                termsOrder = Terms.Order.aggregation(AGG_STATS, "sum", false);
-                break;
-            default:
-                termsOrder = Terms.Order.count(true);
-        }
-
-        final FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER, standardAggregationFilters(range, filter))
-                .subAggregation(
-                        AggregationBuilders.terms(AGG_TERMS_STATS)
-                                .field(keyField)
-                                .subAggregation(AggregationBuilders.stats(AGG_STATS).field(valueField))
-                                .order(termsOrder)
-                                .size(size)
-                );
-        searchSourceBuilder.aggregation(builder);
-
-        if (affectedIndices.isEmpty()) {
-            return TermsStatsResult.empty(query, searchSourceBuilder.toString());
-        }
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices);
-
-        final io.searchbox.core.SearchResult searchResult = multiSearch.wrap(searchBuilder.build(), () -> "Unable to retrieve terms stats");
-
-        final FilterAggregation filterAggregation = searchResult.getAggregations().getFilterAggregation(AGG_FILTER);
-        final TermsAggregation termsAggregation = filterAggregation.getTermsAggregation(AGG_TERMS_STATS);
-
-
-        return new TermsStatsResult(
-                termsAggregation,
-                query,
-                searchSourceBuilder.toString(),
-                multiSearch.tookMsFromSearchResult(searchResult)
         );
     }
 

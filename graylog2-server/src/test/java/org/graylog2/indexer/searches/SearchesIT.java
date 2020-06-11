@@ -38,7 +38,6 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
-import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -320,43 +319,6 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(result.getTerms())
             .hasSize(1)
             .containsEntry("4", 1L);
-    }
-
-    @Test
-    public void testTermsStats() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT-terms_stats.json");
-
-        TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
-                AbsoluteRange.create(
-                        new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
-        );
-
-        assertThat(r.getResults()).hasSize(2);
-        assertThat(r.getResults().get(0))
-                .hasSize(7)
-                .containsEntry("key_field", "Ho");
-    }
-
-    @Test
-    public void termsStatsRecordsMetrics() throws Exception {
-        importFixture("org/graylog2/indexer/searches/SearchesIT-terms_stats.json");
-
-        TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
-                AbsoluteRange.create(
-                        new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
-        );
-
-        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
-        assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
-
-        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
-        assertThat(timer.getCount()).isEqualTo(1L);
-
-        Histogram histogram = metricRegistry.histogram(RANGES_HISTOGRAM_NAME);
-        assertThat(histogram.getCount()).isEqualTo(1L);
-        assertThat(histogram.getSnapshot().getValues()).containsExactly(86400L);
     }
 
     @Test
