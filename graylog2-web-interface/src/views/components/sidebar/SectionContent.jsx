@@ -35,7 +35,7 @@ export const Container: StyledComponent<{ isPinned: boolean }, ThemeInterface, H
   width: 270px;
   height: 100%;
   
-  resize: horizontal;
+  overflow-y: auto;
   z-index: 3;
 `);
 
