@@ -55,8 +55,6 @@ const Title = styled.h1`
 
 const OverlayToggle: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   > * {
-    height: 25px;
-    width: 25px;
     font-size: 18px;
     color: ${sidebarIsInline ? theme.colors.gray[30] : theme.colors.variant.info};
   }
