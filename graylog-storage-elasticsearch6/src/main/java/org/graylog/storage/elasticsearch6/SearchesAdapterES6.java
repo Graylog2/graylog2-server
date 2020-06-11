@@ -3,7 +3,6 @@ package org.graylog.storage.elasticsearch6;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
-import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
@@ -36,7 +35,6 @@ import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsHistogramResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.Searches;
@@ -165,41 +163,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 // Concat field and stacked fields into one fields list
                 ImmutableList.<String>builder().add(field).addAll(stackedFields).build()
         );
-    }
-
-    @Override
-    public TermsHistogramResult termsHistogram(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, List<String> stackedFields, int size, Sorting.Direction sorting, Searches.DateHistogramInterval interval) {
-        final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
-
-        final DateHistogramAggregationBuilder histogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                .field(Message.FIELD_TIMESTAMP)
-                .dateHistogramInterval(toESInterval(interval))
-                .subAggregation(createTermsBuilder(field, stackedFields, size, termsOrder))
-                .subAggregation(AggregationBuilders.missing("missing").field(field));
-
-        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range)
-                .aggregation(histogramBuilder);
-
-        if (affectedIndices.isEmpty()) {
-            return TermsHistogramResult.empty(query, searchSourceBuilder.toString(), size, interval);
-        }
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-                .ignoreUnavailable(true)
-                .allowNoIndices(true)
-                .addType(IndexMapping.TYPE_MESSAGE)
-                .addIndex(affectedIndices);
-        final io.searchbox.core.SearchResult searchResult = multiSearch.wrap(searchBuilder.build(), () -> "Unable to perform terms query");
-        final DateHistogramAggregation dateHistogramAggregation = searchResult.getAggregations().getDateHistogramAggregation(AGG_HISTOGRAM);
-
-        return new TermsHistogramResult(
-                dateHistogramAggregation,
-                query,
-                searchSourceBuilder.toString(),
-                size,
-                multiSearch.tookMsFromSearchResult(searchResult),
-                interval,
-                // Concat field and stacked fields into one fields list
-                ImmutableList.<String>builder().add(field).addAll(stackedFields).build());
     }
 
     @Override

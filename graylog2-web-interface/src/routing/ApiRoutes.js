@@ -316,19 +316,6 @@ const ApiRoutes = {
       queryString.stacked_fields = stackedFields;
       return { url: this._buildUrl(url, queryString) };
     },
-    fieldTermsHistogram(type, query, field, order, size, stackedFields, timerange, interval, streamId) {
-      const url = `/search/universal/${type}/terms-histogram`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      // The server is using sane default interval if we don't provide one
-      if (interval && interval !== '') {
-        queryString.interval = interval.toUpperCase();
-      }
-      queryString.field = field;
-      queryString.order = `${field}:${order}`; // REST API expects <field>:<order> format for the "order" param
-      queryString.size = size;
-      queryString.stacked_fields = stackedFields;
-      return { url: this._buildUrl(url, queryString) };
-    },
   },
   UsersApiController: {
     changePassword: (username) => { return { url: `/users/${username}/password` }; },

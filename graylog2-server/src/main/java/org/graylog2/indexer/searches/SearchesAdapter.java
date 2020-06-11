@@ -22,7 +22,6 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsHistogramResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -38,8 +37,6 @@ public interface SearchesAdapter {
     SearchResult search(Set<String> indices, Set<IndexRange> indexRanges, SearchesConfig config);
 
     TermsResult terms(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, List<String> stackedFields, int size, Sorting.Direction sorting);
-
-    TermsHistogramResult termsHistogram(String query, String filter, TimeRange range, Set<String> affectedIndices, String field, List<String> stackedFields, int size, Sorting.Direction sorting, Searches.DateHistogramInterval interval);
 
     TermsStatsResult termsStats(String query, String filter, TimeRange range, Set<String> affectedIndices, String keyField, String valueField, Searches.TermsStatsOrder order, int size);
 

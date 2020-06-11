@@ -36,17 +36,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
-import org.graylog2.rest.models.search.responses.TermsHistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.utilities.SearchUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 import javax.ws.rs.BadRequestException;
@@ -60,8 +57,6 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-import static org.graylog2.utilities.SearchUtils.buildTermsHistogramResult;
 
 @RequiresAuthentication
 @Api(value = "Legacy/Search/Relative", description = "Message search")
@@ -201,37 +196,6 @@ public class RelativeSearchResource extends SearchResource {
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
         return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildRelativeTimeRange(range), sortOrder.getDirection()));
-    }
-
-    @GET
-    @Path("/terms-histogram")
-    @Timed
-    @ApiOperation(value = "Most common field terms of a query over time using a relative timerange.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
-    })
-    @Produces(MediaType.APPLICATION_JSON)
-    public TermsHistogramResult termsHistogramRelative(
-            @ApiParam(name = "field", value = "Message field of to return terms of", required = true)
-            @QueryParam("field") @NotEmpty String field,
-            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
-            @QueryParam("query") @NotEmpty String query,
-            @ApiParam(name = "stacked_fields", value = "Fields to stack", required = false) @QueryParam("stacked_fields") String stackedFieldsParam,
-            @ApiParam(name = "size", value = "Maximum number of terms to return", required = true)
-            @QueryParam("size") @Min(1) int size,
-            @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true)
-            @QueryParam("range") @PositiveOrZero int range,
-            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = false)
-            @QueryParam("interval") String interval,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
-            @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
-        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
-
-        final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
-        final Sorting sortOrder = buildSorting(order);
-        final TimeRange timeRange = buildRelativeTimeRange(range);
-
-        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, SearchUtils.buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
     @GET
