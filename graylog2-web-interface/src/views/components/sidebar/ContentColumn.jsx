@@ -82,8 +82,11 @@ const toggleSidebarPinning = (searchPageLayout) => {
 };
 
 const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
-  const defaultTitle = `Untitled ${viewType ? ViewTypeLabel({ type: viewType }) : View.Type.Search}`;
-  return viewMetadata.title || defaultTitle;
+  if (!viewMetadata.id) {
+    return 'Ad Hoc Search';
+  }
+  const defaultViewTitle = `Untitled ${viewType ? ViewTypeLabel({ type: viewType }) : View.Type.Search}`;
+  return viewMetadata.title || defaultViewTitle;
 };
 
 const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, viewMetadata }: Props) => {
