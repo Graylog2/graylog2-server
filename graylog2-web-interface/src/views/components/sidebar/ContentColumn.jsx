@@ -22,17 +22,17 @@ type Props = {
 };
 
 export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
-  color: ${theme.colors.global.textDefault};
-  background: ${theme.colors.global.contentBackground};
   position: ${sidebarIsInline ? 'static' : 'fixed'}
-  box-shadow:
-    inset 0 13px 5px -10px ${theme.colors.gray[80]},
-    inset 0 -13px 5px -10px ${theme.colors.gray[80]};
   top: ${sidebarIsInline ? 0 : '50px'};
   left: ${sidebarIsInline ? 0 : '50px'};
-  padding: 5px 15px;
+
   width: 270px;
   height: 100%;
+  padding: 5px 15px;
+
+  color: ${theme.colors.global.textDefault};
+  background: ${theme.colors.global.contentBackground};
+  border-right: 1px solid ${theme.colors.gray[80]};
   
   overflow-y: auto;
   z-index: 3;
