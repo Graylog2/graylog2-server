@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.export;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import org.elasticsearch.common.Strings;
 import org.graylog2.rest.MoreMediaTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +82,7 @@ public class SimpleMessageChunkCsvWriter implements MessageBodyWriter<SimpleMess
 
     private void writeHeaderIfFirstChunk(SimpleMessageChunk chunk, CSVWriter csvWriter) {
         if (chunk.isFirstChunk()) {
-            csvWriter.writeNext(Strings.toStringArray(chunk.fieldsInOrder()));
+            csvWriter.writeNext(chunk.fieldsInOrder().toArray(new String[0]));
         }
     }
 

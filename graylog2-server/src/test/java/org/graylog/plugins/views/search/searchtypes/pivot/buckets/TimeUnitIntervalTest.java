@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
@@ -102,8 +101,8 @@ public class TimeUnitIntervalTest {
         public void allowsPositiveQuantityAndKnownUnit() throws InvalidRangeParametersException {
             final TimeUnitInterval interval = builder().timeunit(timeunit).build();
 
-            assertThat(interval.toDateHistogramInterval(RelativeRange.create(300)))
-                    .isEqualTo(new DateHistogramInterval(expectedTimeunit));
+            assertThat(interval.toDateInterval(RelativeRange.create(300)).toString())
+                    .isEqualTo(expectedTimeunit);
         }
     }
 }

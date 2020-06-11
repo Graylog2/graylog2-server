@@ -17,8 +17,8 @@
 package org.graylog.plugins.views.search.export;
 
 import org.assertj.core.groups.Tuple;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.LegacyDecoratorProcessor;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;

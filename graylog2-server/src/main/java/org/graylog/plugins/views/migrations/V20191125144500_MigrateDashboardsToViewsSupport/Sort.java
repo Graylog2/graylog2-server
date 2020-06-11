@@ -19,10 +19,13 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.search.sort.SortOrder;
 
 @AutoValue
 abstract class Sort {
+    public enum SortOrder {
+        ASC,
+        DESC
+    }
 
     @JsonProperty
     abstract String field();

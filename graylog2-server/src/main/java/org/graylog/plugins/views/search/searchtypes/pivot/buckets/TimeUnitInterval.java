@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.regex.Matcher;
@@ -43,11 +42,11 @@ public abstract class TimeUnitInterval implements Interval {
     public abstract String timeunit();
 
     @Override
-    public DateHistogramInterval toDateHistogramInterval(TimeRange timerange) {
-        return new DateHistogramInterval(adjustUnitsLongerThanDays(timeunit()));
+    public DateInterval toDateInterval(TimeRange timerange) {
+        return adjustUnitsLongerThanDays(timeunit());
     }
 
-    private String adjustUnitsLongerThanDays(String timeunit) {
+    private DateInterval adjustUnitsLongerThanDays(String timeunit) {
         final Matcher matcher = TIMEUNIT_PATTERN.matcher(timeunit());
         checkArgument(matcher.matches(),
                 "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwM].");
@@ -58,9 +57,9 @@ public abstract class TimeUnitInterval implements Interval {
             case "s":
             case "m":
             case "h":
-            case "d": return timeunit;
-            case "w": return quantity == 1 ? timeunit : (7 * quantity) + "d";
-            case "M": return quantity == 1 ? timeunit : (30 * quantity) + "d";
+            case "d": return new DateInterval(quantity, unit);
+            case "w": return quantity == 1 ? new DateInterval(quantity, unit) : DateInterval.days(7 * quantity);
+            case "M": return quantity == 1 ? new DateInterval(quantity, unit) : DateInterval.days(30 * quantity);
             default: throw new RuntimeException("Invalid time unit: " + timeunit);
         }
     }

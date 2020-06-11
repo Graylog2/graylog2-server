@@ -19,19 +19,22 @@ package org.graylog.plugins.views.search.searchtypes;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.search.sort.SortOrder;
 
 @AutoValue
 public abstract class Sort {
+    public enum Order {
+        ASC,
+        DESC
+    }
 
     @JsonProperty
     public abstract String field();
 
     @JsonProperty
-    public abstract SortOrder order();
+    public abstract Order order();
 
     @JsonCreator
-    public static Sort create(@JsonProperty("field") String field, @JsonProperty("order") SortOrder order) {
+    public static Sort create(@JsonProperty("field") String field, @JsonProperty("order") Order order) {
         return new AutoValue_Sort(field, order);
     }
 

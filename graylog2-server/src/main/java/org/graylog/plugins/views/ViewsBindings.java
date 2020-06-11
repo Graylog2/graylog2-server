@@ -35,17 +35,12 @@ import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
-import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
-import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.LegacyChunkDecorator;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
-import org.graylog.plugins.views.search.export.es.ElasticsearchExportBackend;
-import org.graylog.plugins.views.search.export.es.RequestStrategy;
-import org.graylog.plugins.views.search.export.es.Scroll;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
@@ -143,8 +138,6 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AutoIntervalDTO.class);
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
-        bind(ExportBackend.class).to(ElasticsearchExportBackend.class);
-        bind(RequestStrategy.class).to(Scroll.class);
         bind(ChunkDecorator.class).to(LegacyChunkDecorator.class);
         bind(MessagesExporter.class).to(DecoratingMessagesExporter.class);
 
@@ -173,7 +166,6 @@ public class ViewsBindings extends ViewsModule {
 
         install(new FactoryModuleBuilder().build(ViewRequirements.Factory.class));
         install(new FactoryModuleBuilder().build(SearchRequirements.Factory.class));
-        install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
         registerViewRequirement(RequiresParameterSupport.class);
         registerSearchRequirement(SearchRequiresParameterSupport.class);

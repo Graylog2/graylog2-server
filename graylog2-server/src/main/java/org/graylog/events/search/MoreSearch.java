@@ -23,9 +23,9 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
+import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.database.NotFoundException;
@@ -58,13 +58,13 @@ public class MoreSearch {
 
     private final StreamService streamService;
     private final IndexRangeService indexRangeService;
-    private final ESQueryDecorators esQueryDecorators;
+    private final QueryStringDecorators esQueryDecorators;
     private final MoreSearchAdapter moreSearchAdapter;
 
     @Inject
     public MoreSearch(StreamService streamService,
                       IndexRangeService indexRangeService,
-                      ESQueryDecorators esQueryDecorators,
+                      QueryStringDecorators esQueryDecorators,
                       MoreSearchAdapter moreSearchAdapter) {
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;

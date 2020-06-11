@@ -20,17 +20,17 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 
 import javax.inject.Inject;
 import java.util.UUID;
 
 public class QueryStringDecorator {
 
-    private final ESQueryDecorators decorator;
+    private final QueryStringDecorators decorator;
 
     @Inject
-    public QueryStringDecorator(ESQueryDecorators decorator) {
+    public QueryStringDecorator(QueryStringDecorators decorator) {
         this.decorator = decorator;
     }
 

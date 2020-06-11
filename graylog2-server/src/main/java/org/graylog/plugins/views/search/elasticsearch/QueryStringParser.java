@@ -20,7 +20,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.QueryMetadata;
-import org.graylog.plugins.views.search.QueryMetadata;
 
 import java.util.Set;
 import java.util.regex.Matcher;
