@@ -1,7 +1,8 @@
 // @flow strict
 import teinte from './variants/teinte';
+import noire from './variants/noire';
 
-export type Colors = {
+type Colors = {
   brand: {
     primary: string,
     secondary: string,
@@ -118,11 +119,18 @@ export type Colors = {
   },
 };
 
+export type Modes = {
+  teinte: Colors,
+  noire: Colors,
+};
+
 const colors = {
-  ...teinte,
+  teinte,
+  noire,
 };
 
 export default colors;
 export {
+  noire,
   teinte,
 };
