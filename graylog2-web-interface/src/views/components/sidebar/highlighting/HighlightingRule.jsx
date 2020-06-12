@@ -16,7 +16,6 @@ export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = s
   display: -ms-grid;
   grid-template-columns: max-content 1fr max-content;
   -ms-grid-columns: max-content 1fr max-content;
-
   margin-top: 10px;
   word-break: break-word;
 
