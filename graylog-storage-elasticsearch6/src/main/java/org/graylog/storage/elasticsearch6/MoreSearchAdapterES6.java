@@ -45,14 +45,14 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
     private final MultiSearch multiSearch;
     private final Scroll scroll;
     private final Boolean allowLeadingWildcard;
-    private final SortOrderFactory sortOrderFactory;
+    private final SortOrderMapper sortOrderMapper;
 
     @Inject
-    public MoreSearchAdapterES6(@Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard, MultiSearch multiSearch, Scroll scroll, SortOrderFactory sortOrderFactory) {
+    public MoreSearchAdapterES6(@Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard, MultiSearch multiSearch, Scroll scroll, SortOrderMapper sortOrderMapper) {
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.multiSearch = multiSearch;
         this.scroll = scroll;
-        this.sortOrderFactory = sortOrderFactory;
+        this.sortOrderMapper = sortOrderMapper;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
                 .query(filter)
                 .from((page - 1) * perPage)
                 .size(perPage)
-                .sort(sorting.getField(), sortOrderFactory.fromSorting(sorting));
+                .sort(sorting.getField(), sortOrderMapper.fromSorting(sorting));
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
                 .addType(IndexMapping.TYPE_MESSAGE)

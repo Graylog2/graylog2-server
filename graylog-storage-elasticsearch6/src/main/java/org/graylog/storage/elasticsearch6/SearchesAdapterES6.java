@@ -74,14 +74,14 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
-    private final SortOrderFactory sortOrderFactory;
+    private final SortOrderMapper sortOrderMapper;
 
     @Inject
-    public SearchesAdapterES6(Configuration configuration, MultiSearch multiSearch, Scroll scroll, SortOrderFactory sortOrderFactory) {
+    public SearchesAdapterES6(Configuration configuration, MultiSearch multiSearch, Scroll scroll, SortOrderMapper sortOrderMapper) {
         this.configuration = configuration;
         this.multiSearch = multiSearch;
         this.scroll = scroll;
-        this.sortOrderFactory = sortOrderFactory;
+        this.sortOrderMapper = sortOrderMapper;
     }
 
     @Override
@@ -509,7 +509,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         }
 
         if (sort != null) {
-            searchSourceBuilder.sort(sort.getField(), sortOrderFactory.fromSorting(sort));
+            searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
         }
 
         if (highlight && configuration.isAllowHighlighting()) {

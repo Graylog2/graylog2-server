@@ -26,7 +26,7 @@ public class SearchesES6IT extends SearchesIT {
         return new SearchesAdapterES6(
                 new Configuration(),
                 new MultiSearch(jestClient()), new Scroll(scrollResultFactory, jestClient()),
-                new SortOrderFactory()
+                new SortOrderMapper()
         );
     }
     @Override
