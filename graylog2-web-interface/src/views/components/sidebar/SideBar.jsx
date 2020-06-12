@@ -51,19 +51,25 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
   const activeSection = sections.find((section) => section.key === activeSectionKey);
   const sidebarIsInline = !!searchPageLayout?.config.sidebar.isInline;
   const toggleSidebar = () => handleToggleSidebar(sections, activeSectionKey, setActiveSectionKey);
-
+  const SectionContent = activeSection?.content;
   return (
     <Container>
       <SidebarNavigation activeSection={activeSection}
                          setActiveSectionKey={setActiveSectionKey}
                          toggleSidebar={toggleSidebar}
                          sections={sections} />
-      {activeSection && (
+      {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}
-                       section={activeSection}
-                       sectionProps={{ results, children, queryId, toggleSidebar, viewMetadata, sidebarIsInline }}
-                       viewMetadata={viewMetadata} />
+                       sectionTitle={activeSection.title}
+                       viewMetadata={viewMetadata}>
+          <SectionContent results={results}
+                          queryId={queryId}
+                          toggleSidebar={toggleSidebar}
+                          viewMetadata={viewMetadata}
+                          sidebarIsInline={sidebarIsInline}
+                          sidebarChildren={children} />
+        </ContentColumn>
       )}
       {(activeSection && !sidebarIsInline) && (
         <ContentOverlay onClick={toggleSidebar} />

@@ -11,13 +11,11 @@ import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { IconButton } from 'components/common';
 
-import type { SidebarSection, SidebarSectionProps } from './sidebarSections';
-
 type Props = {
-  section: SidebarSection,
+  children: React.Node,
   closeSidebar: () => void,
-  sectionProps: SidebarSectionProps,
   searchPageLayout: ?SearchPageLayout,
+  sectionTitle: string,
   viewMetadata: ViewMetadata,
 };
 
@@ -127,9 +125,8 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
   return viewMetadata.title || defaultViewTitle;
 };
 
-const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, viewMetadata }: Props) => {
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
   const sidebarIsInline = searchPageLayout?.config.sidebar.isInline;
-  const Content = section.content;
   return (
     <ViewTypeContext.Consumer>
       {(viewType) => {
@@ -150,10 +147,10 @@ const ContentColumn = ({ section, closeSidebar, sectionProps, searchPageLayout, 
                 </CenterVertical>
               </Header>
               <HorizontalRule />
-              <SectionTitle>{section.title}</SectionTitle>
+              <SectionTitle>{sectionTitle}</SectionTitle>
             </div>
             <div>
-              <Content {...sectionProps} />
+              {children}
             </div>
           </Container>
         );

@@ -9,7 +9,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 
 
 export type SidebarSectionProps = {
-  children: React.Node,
+  sidebarChildren: React.Node,
   sidebarIsInline: boolean,
   queryId: string,
   results: any,
@@ -50,7 +50,7 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'fieldList',
     icon: 'subscript',
     title: 'Fields',
-    content: ({ children }: SidebarSectionProps) => children,
+    content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
   },
 ];
 
