@@ -1,19 +1,18 @@
 import { createGlobalStyle, css } from 'styled-components';
 
-const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
+const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
   #editor {
     height: 256px;
   }
 
   html {
-    font-size: ${theme.fonts.size.root} !important;
+    font-size: ${theme.fonts.size.root} !important; /* override Bootstrap default */
   }
 
   body {
     background-color: ${theme.colors.global.background};
     color: ${theme.colors.global.textDefault};
     font-family: ${theme.fonts.family.body};
-    font-size: ${theme.fonts.size.body};
     overflow-x: hidden;
     margin-top: 50px;
     min-height: calc(100vh - 50px);
@@ -667,6 +666,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     width: 600px !important;
     margin-top: 6px;
   }
+
+  ${additionalStyles}
 `);
 
 export default GlobalThemeStyles;

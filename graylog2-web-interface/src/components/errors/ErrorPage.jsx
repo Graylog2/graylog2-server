@@ -1,16 +1,17 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
-const GlobalStyle = createGlobalStyle`
+const errorPageStyles = (backgroundImage) => css`
   body {
-    background: url(${(props) => props.backgroundImage}) no-repeat center center fixed;
+    background: url(${backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;
@@ -40,7 +41,7 @@ type Props = {
 
 const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
   <AppContentGrid>
-    {backgroundImage && <GlobalStyle backgroundImage={backgroundImage} />}
+    {backgroundImage && <GlobalThemeStyles additionalStyles={errorPageStyles(backgroundImage)} />}
     <div className="container-fluid">
       <DocumentTitle title={title}>
         <ErrorJumbotron title={title}>
