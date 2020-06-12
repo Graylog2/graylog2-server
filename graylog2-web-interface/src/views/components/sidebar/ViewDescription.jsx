@@ -1,46 +1,55 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import QueryResult from 'views/logic/QueryResult';
 
-import IfDashboard from 'views/components/dashboard/IfDashboard';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { SearchResultOverview } from 'views/components/sidebar';
 
 const Section = styled.div`
   margin-bottom: 8px;
 `;
 
-const defaultNewDashboardSummary = 'No dashboard summary.';
-
 type Props = {
-  results: Object,
+  results: QueryResult,
   viewMetadata: ViewMetaData,
 };
 
 const ViewDescription = ({ results, viewMetadata }: Props) => {
-  const formatDashboardDescription = (view: ViewMetaData) => {
-    const { description } = view;
-    if (description) {
-      return <span>{description}</span>;
-    }
-    return <i>No dashboard description.</i>;
-  };
+  const isAdHocSearch = !viewMetadata.id;
+  const viewType = useContext(ViewTypeContext);
+  const viewTypeLabel = viewType ? <ViewTypeLabel type={viewType} /> : '';
+  const resultsSection = (
+    <Section>
+      <SearchResultOverview results={results} />
+    </Section>
+  );
+
+  if (isAdHocSearch) {
+    return (
+      <>
+        {resultsSection}
+        <Section>
+          <i>Save the search or export it to a dashboard to add a custom description.</i>
+        </Section>
+      </>
+    );
+  }
 
   return (
     <>
-      <IfDashboard>
-        <Section>
-          {viewMetadata.summary || defaultNewDashboardSummary}
-        </Section>
-      </IfDashboard>
+      {resultsSection}
       <Section>
-        <SearchResultOverview results={results} />
+        {viewMetadata.summary || <i>No {viewTypeLabel} summary.</i>}
       </Section>
-      <IfDashboard>
-        {formatDashboardDescription(viewMetadata)}
-      </IfDashboard>
+      <Section>
+        {viewMetadata.description || <i>No {viewTypeLabel} description.</i>}
+      </Section>
     </>
   );
 };

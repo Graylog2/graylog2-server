@@ -130,7 +130,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('h3').text()).toBe('Untitled Dashboard');
   });
 
-  it('should render a summary and descirption, for dashboard view', () => {
+  it('should render summary and description of a view', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <SideBar viewMetadata={viewMetaData}
@@ -148,9 +148,63 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
-  it('should not render a summary and descirption, if the view is not a dashboard', () => {
+  it('should render placeholder if dashboard has no summary or description ', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <SideBar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </SideBar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('ViewDescription').text()).toContain('No dashboard description');
+    expect(wrapper.find('ViewDescription').text()).toContain('No dashboard summary');
+  });
+
+  it('should render placeholder if saved search has no summary or description ', () => {
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <SideBar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </SideBar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('ViewDescription').text()).toContain('No search description');
+    expect(wrapper.find('ViewDescription').text()).toContain('No search summary');
+  });
+
+  it('should render a summary and description, for a saved search', () => {
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <SideBar viewMetadata={viewMetaData}
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </SideBar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
+    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
+  });
+
+  it('should not render a summary and description, if the view is an ad hoc search', () => {
+    const wrapper = mount(
+      <SideBar viewMetadata={{ ...viewMetaData, id: undefined }}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -162,6 +216,7 @@ describe('<Sidebar />', () => {
     wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
+    expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom description.');
   });
 
   it('should render widget create options', () => {
