@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ListGroup, ListGroupItem } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
@@ -31,6 +31,8 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const [keepCopy, setKeepCopy] = useState(false);
   const { id: activeQuery } = useStore(CurrentQueryStore);
   const queryIds = useStore(QueryIdsStore);
+  const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
+  const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy), [widgetId, selectedTab, keepCopy]);
 
   const list = _tabList(view, queryIds.toArray()).filter(({ id }) => id !== activeQuery);
 
@@ -49,14 +51,14 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
     <BootstrapModalForm show
                         onCancel={onCancel}
                         submitButtonDisabled={!selectedTab}
-                        onSubmitForm={() => onSubmit(widgetId, selectedTab, keepCopy)}
+                        onSubmitForm={submit}
                         title="Choose Target Page">
       {renderResult}
       <Input type="checkbox"
              id="keepCopy"
              name="keepCopy"
              label="Keep Copy on this Page"
-             onChange={(e) => setKeepCopy(e.target.checked)}
+             onChange={onKeepCopy}
              help="When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
              checked={keepCopy} />
     </BootstrapModalForm>
