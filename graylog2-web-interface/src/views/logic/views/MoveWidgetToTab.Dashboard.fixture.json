@@ -9,7 +9,11 @@
   "requires" : {},
   "state" : {
     "fa247d8f-7afa-45b7-b57e-3cdef4ee53be" : {
-      "titles" : {},
+      "titles" : {
+        "widget": {
+          "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": "Widget Title"
+        }
+      },
       "widgets" : [
         {
           "id" : "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
