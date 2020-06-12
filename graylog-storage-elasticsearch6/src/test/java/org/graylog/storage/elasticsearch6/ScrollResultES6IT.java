@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.results;
+package org.graylog.storage.elasticsearch6;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.core.Search;
@@ -24,6 +24,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
-public class ScrollResultIT extends ElasticsearchBaseTest {
+public class ScrollResultES6IT extends ElasticsearchBaseTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -58,7 +59,7 @@ public class ScrollResultIT extends ElasticsearchBaseTest {
         final SearchResult searchResult = JestUtils.execute(jestClient(), request, () -> "Exception");
 
         assertThat(jestClient()).isNotNull();
-        final ScrollResult scrollResult = new ScrollResult(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        final ScrollResult scrollResult = new ScrollResultES6(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );

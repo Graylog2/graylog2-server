@@ -14,12 +14,12 @@ public class SearchesES6IT extends SearchesIT {
         final ScrollResult.Factory scrollResultFactory = new ScrollResult.Factory() {
             @Override
             public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
+                return new ScrollResultES6(jestClient(), new ObjectMapper(), initialResult, query, fields);
             }
 
             @Override
             public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
+                return new ScrollResultES6(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
             }
         };
 
