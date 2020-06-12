@@ -60,9 +60,12 @@ type ComponentCreator = {|
 type Creator = ComponentCreator | FunctionalCreator;
 
 class AddWidgetButton extends React.Component<Props, State> {
-  state = {
-    overflowingComponents: {},
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      overflowingComponents: {},
+    };
+  }
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
     const { onClick } = this.props;
