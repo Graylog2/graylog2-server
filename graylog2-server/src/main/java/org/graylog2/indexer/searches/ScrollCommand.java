@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -33,7 +34,7 @@ public abstract class ScrollCommand {
         public abstract Builder query(String query);
         public abstract Builder indices(Set<String> indices);
         public abstract Builder sorting(Sorting sorting);
-        public abstract Builder filter(String filter);
+        public abstract Builder filter(@Nullable String filter);
         public abstract Builder range(TimeRange range);
         public abstract Builder limit(int limit);
         public abstract Builder offset(int offset);

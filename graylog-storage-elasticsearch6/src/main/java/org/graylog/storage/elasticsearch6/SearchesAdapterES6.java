@@ -4,7 +4,6 @@ import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
-import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -73,43 +72,46 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
     @Override
     public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
-        final String searchQuery;
-
-        if (filter == null) {
-            searchQuery = standardSearchRequest(query, limit, offset, range, sorting, configuration.isAllowHighlighting()).toString();
-        } else {
-            searchQuery = filteredSearchRequest(query, filter, limit, offset, range, sorting).toString();
-        }
-
-        final String scrollTime = DEFAULT_SCROLLTIME;
-        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollTime, indexWildcards);
-
-        fields.forEach(initialSearchBuilder::addSourceIncludePattern);
-
-        return scroll.scroll(initialSearchBuilder.build(), () -> "Unable to perform scroll search", query, scrollTime, fields);
+        return scroll(ScrollCommand.builder()
+                .indices(indexWildcards)
+                .sorting(sorting)
+                .filter(filter)
+                .query(query)
+                .range(range)
+                .limit(limit)
+                .offset(offset)
+                .fields(fields)
+                .build());
     }
 
     public ScrollResult scroll(ScrollCommand scrollCommand) {
         final String searchQuery = standardSearchRequest(scrollCommand).toString();
-        final String scrollTime = DEFAULT_SCROLLTIME;
-        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollTime, scrollCommand.indices());
+        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices());
         scrollCommand.fields().forEach(initialSearchBuilder::addSourceIncludePattern);
-        return scroll.scroll(initialSearchBuilder.build(), () -> "Unable to perform scroll search", searchQuery, scrollTime, scrollCommand.fields());
+        return scroll.scroll(
+                initialSearchBuilder.build(),
+                () -> "Unable to perform scroll search",
+                searchQuery,
+                DEFAULT_SCROLLTIME,
+                scrollCommand.fields()
+        );
     }
 
     @Override
-    public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize, int seconds) {
-        final String scrollTime = seconds + "s";
-        final Search.Builder scrollBuilder = scrollBuilder(query, scrollTime, indexWildcards)
-                .addSort(new Sort("_doc")) // Performance improvement
-                .setParameter(Parameters.SIZE, batchSize);
-        return scroll.scroll(scrollBuilder.build(), () -> "Unable to perform scroll search", query, scrollTime, Collections.emptyList());
+    public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize) {
+        return scroll(ScrollCommand.builder()
+                .indices(indexWildcards)
+                .sorting(sorting)
+                .filter(filter)
+                .query(query)
+                .batchSize(batchSize)
+                .build());
     }
 
-    private Search.Builder scrollBuilder(String query, String scrollTime, Set<String> indices) {
+    private Search.Builder scrollBuilder(String query, Set<String> indices) {
         return new Search.Builder(query)
                 .addType(IndexMapping.TYPE_MESSAGE)
-                .setParameter(Parameters.SCROLL, scrollTime)
+                .setParameter(Parameters.SCROLL, DEFAULT_SCROLLTIME)
                 .addIndex(indices);
     }
 
