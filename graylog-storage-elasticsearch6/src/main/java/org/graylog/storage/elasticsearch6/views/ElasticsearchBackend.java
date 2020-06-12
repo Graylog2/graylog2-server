@@ -50,7 +50,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog.storage.elasticsearch6.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;

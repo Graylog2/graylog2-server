@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.searches;
 
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.plugin.Message;
 
 import java.util.Locale;
@@ -40,10 +39,6 @@ public class Sorting {
 
     public String getField() {
         return field;
-    }
-
-    public SortOrder asElastic() {
-        return SortOrder.valueOf(direction.toString().toUpperCase(Locale.ENGLISH));
     }
 
     public Direction getDirection() { return this.direction; }

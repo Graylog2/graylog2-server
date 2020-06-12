@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesIT;
 
 import java.util.List;
 
 public class SearchesES6IT extends SearchesIT {
-    @Override
-    public Searches createSearches() {
+    private SearchesAdapter createSearchesAdapter() {
         final ScrollResult.Factory scrollResultFactory = new ScrollResult.Factory() {
             @Override
             public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
@@ -23,13 +23,21 @@ public class SearchesES6IT extends SearchesIT {
             }
         };
 
+        return new SearchesAdapterES6(
+                new Configuration(),
+                new MultiSearch(jestClient()), new Scroll(scrollResultFactory, jestClient()),
+                new SortOrderMapper()
+        );
+    }
+    @Override
+    public Searches createSearches() {
         return new Searches(
                 indexRangeService,
                 metricRegistry,
                 streamService,
                 indices,
                 indexSetRegistry,
-                new SearchesAdapterES6(new Configuration(), new MultiSearch(jestClient()), new Scroll(scrollResultFactory, jestClient()))
+                createSearchesAdapter()
         );
     }
 }

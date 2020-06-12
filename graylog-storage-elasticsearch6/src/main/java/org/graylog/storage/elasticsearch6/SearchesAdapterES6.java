@@ -26,7 +26,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.CountResult;
@@ -75,12 +74,14 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
+    private final SortOrderMapper sortOrderMapper;
 
     @Inject
-    public SearchesAdapterES6(Configuration configuration, MultiSearch multiSearch, Scroll scroll) {
+    public SearchesAdapterES6(Configuration configuration, MultiSearch multiSearch, Scroll scroll, SortOrderMapper sortOrderMapper) {
         this.configuration = configuration;
         this.multiSearch = multiSearch;
         this.scroll = scroll;
+        this.sortOrderMapper = sortOrderMapper;
     }
 
     @Override
@@ -508,7 +509,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         }
 
         if (sort != null) {
-            searchSourceBuilder.sort(sort.getField(), sort.asElastic());
+            searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
         }
 
         if (highlight && configuration.isAllowHighlighting()) {
