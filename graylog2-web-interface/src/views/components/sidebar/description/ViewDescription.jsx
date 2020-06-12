@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
