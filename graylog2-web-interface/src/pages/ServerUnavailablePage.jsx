@@ -6,6 +6,8 @@ import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import AuthThemeStyles from 'theme/styles/authStyles';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+
 import URLUtils from 'util/URLUtils';
 
 const StyledIcon = styled(Icon)`
@@ -20,7 +22,6 @@ class ServerUnavailablePage extends React.Component {
   static defaultProps = {
     server: undefined,
   };
-
 
   state = {
     showDetails: false,
@@ -54,11 +55,13 @@ class ServerUnavailablePage extends React.Component {
     const { error } = server;
 
     const errorDetails = [];
+
     if (error.message) {
       errorDetails.push(<dt key="error-title">Error message</dt>, <dd key="error-desc">{error.message}</dd>);
     }
     if (error.originalError) {
       const { originalError } = error;
+
       errorDetails.push(
         <dt key="status-original-request-title">Original Request</dt>,
         <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>,
@@ -98,6 +101,7 @@ class ServerUnavailablePage extends React.Component {
 
     return (
       <DocumentTitle title="Server unavailable">
+        <GlobalThemeStyles />
         <AuthThemeStyles />
         <Modal show>
           <Modal.Header>

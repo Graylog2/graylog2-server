@@ -6,7 +6,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   html {
-    font-size: ${theme.fonts.size.root};
+    font-size: ${theme.fonts.size.root} !important;
   }
 
   body {
@@ -106,6 +106,10 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   legend small {
     color: ${theme.colors.gray[60]};
     margin-left: 5px;
+  }
+
+  small {
+    font-size: ${theme.fonts.size.small};
   }
 
   .input-group-addon.input-group-separator {

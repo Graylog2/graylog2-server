@@ -18,7 +18,7 @@ const Modal = styled(BootstrapModal)(({ theme }) => css`
   }
 
   .modal-title {
-    font-size: ${theme.fonts.size.large};
+    font-size: ${theme.fonts.size.huge};
   }
 
   .modal-dialog {

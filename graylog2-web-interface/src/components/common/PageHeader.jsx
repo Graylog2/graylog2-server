@@ -1,10 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
+import styled from 'styled-components';
 
 import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
 import ContentHeadRow from 'components/common/ContentHeadRow';
 import SupportLink from 'components/support/SupportLink';
+
+const LifecycleIndicator = styled.span(({ theme }) => `
+  cursor: help;
+  margin-left: 5px;
+  font-size: ${theme.fonts.size.body};
+  line-height: 20px;
+  vertical-align: text-top;
+`);
 
 const LIFECYCLE_DEFAULT_MESSAGES = {
   experimental: 'This Graylog feature is new and should be considered experimental.',
@@ -55,11 +64,11 @@ class PageHeader extends React.Component {
     const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 
     return (
-      <span style={{ cursor: 'help', marginLeft: 5, fontSize: 14, lineHeight: '20px', verticalAlign: 'text-top' }}>
+      <LifecycleIndicator>
         <OverlayTrigger placement="bottom" overlay={tooltip}>
           <Label bsStyle="primary">{label}</Label>
         </OverlayTrigger>
-      </span>
+      </LifecycleIndicator>
     );
   };
 
