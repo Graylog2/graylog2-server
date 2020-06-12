@@ -9,12 +9,8 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
-import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
@@ -32,7 +28,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,12 +41,8 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
     public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     public static final String AGG_FILTER = "gl2_filter";
-    public final static String AGG_TERMS = "gl2_terms";
     public static final String AGG_VALUE_COUNT = "gl2_value_count";
 
-    // This is the "WORD SEPARATOR MIDDLE DOT" unicode character. It's used to join and split the term values in a
-    // stacked terms query.
-    public static final String STACKED_TERMS_AGG_SEPARATOR = "\u2E31";
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
@@ -191,7 +182,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
             // without a "_source" field yet. See:
             // https://github.com/searchbox-io/Jest/issues/157
             // https://github.com/searchbox-io/Jest/issues/339
-            request.fetchSource(fields.toArray(new String[fields.size()]), Strings.EMPTY_ARRAY);
+            request.fetchSource(fields.toArray(new String[0]), Strings.EMPTY_ARRAY);
         }
 
         return request;
@@ -291,45 +282,5 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         }
 
         return bfb;
-    }
-
-    public AbstractAggregationBuilder createTermsBuilder(String field, List<String> stackedFields, int size, Terms.Order termsOrder) {
-        if (stackedFields.isEmpty()) {
-            // Wrap terms aggregation in a no-op filter to make sure the result structure is correct when not having
-            // stacked fields.
-            return AggregationBuilders.filter(AGG_FILTER, QueryBuilders.matchAllQuery())
-                    .subAggregation(AggregationBuilders.terms(AGG_TERMS)
-                            .field(field)
-                            .size(size > 0 ? size : 50)
-                            .order(termsOrder));
-        }
-
-        // If the methods gets stacked fields, we have to use scripting to concatenate the fields.
-        // There is currently no other way to do this. (as of ES 5.6)
-        final StringBuilder scriptStringBuilder = new StringBuilder();
-
-        // Build a filter for the terms aggregation to make sure we only get terms for messages where all fields
-        // exist.
-        final BoolQueryBuilder filterQuery = QueryBuilders.boolQuery();
-
-        // Add the main field
-        scriptStringBuilder.append("doc['").append(field).append("'].value");
-        filterQuery.must(QueryBuilders.existsQuery(field));
-
-        // Add all other fields
-        stackedFields.forEach(f -> {
-            // There is no way to use some kind of structured value for the stacked fields in the painless script
-            // so we have to use a "special" character (that is hopefully not showing up in any value) to join the
-            // stacked field values. That allows us to split the result again later to create a field->value mapping.
-            scriptStringBuilder.append(" + \"").append(STACKED_TERMS_AGG_SEPARATOR).append("\" + ");
-            scriptStringBuilder.append("doc['").append(f).append("'].value");
-            filterQuery.must(QueryBuilders.existsQuery(f));
-        });
-
-        return AggregationBuilders.filter(AGG_FILTER, filterQuery)
-                .subAggregation(AggregationBuilders.terms(AGG_TERMS)
-                        .script(new Script(ScriptType.INLINE, "painless", scriptStringBuilder.toString(),  Collections.emptyMap()))
-                        .size(size > 0 ? size : 50)
-                        .order(termsOrder));
     }
 }

@@ -45,7 +45,6 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -241,12 +240,5 @@ public abstract class SearchResource extends RestResource {
         }
 
         return AbsoluteRange.create(from, to);
-    }
-
-    protected List<String> splitStackedFields(String stackedFieldsParam) {
-        if (stackedFieldsParam == null || stackedFieldsParam.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return Splitter.on(',').trimResults().omitEmptyStrings().splitToList(stackedFieldsParam);
     }
 }

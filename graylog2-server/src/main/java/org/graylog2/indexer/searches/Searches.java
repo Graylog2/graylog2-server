@@ -37,7 +37,6 @@ import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -58,52 +57,7 @@ import static java.util.Objects.requireNonNull;
 
 @Singleton
 public class Searches {
-    public final static String AGG_TERMS = "gl2_terms";
-    public final static String AGG_STATS = "gl2_stats";
-    public static final String AGG_FILTER = "gl2_filter";
-    public static final String AGG_CARDINALITY = "gl2_field_cardinality";
-    public static final String AGG_VALUE_COUNT = "gl2_value_count";
     private static final Pattern filterStreamIdPattern = Pattern.compile("^(.+[^\\p{Alnum}])?streams:([\\p{XDigit}]+)");
-
-    // This is the "WORD SEPARATOR MIDDLE DOT" unicode character. It's used to join and split the term values in a
-    // stacked terms query.
-    public static final String STACKED_TERMS_AGG_SEPARATOR = "\u2E31";
-
-    public enum TermsStatsOrder {
-        TERM,
-        REVERSE_TERM,
-        COUNT,
-        REVERSE_COUNT,
-        TOTAL,
-        REVERSE_TOTAL,
-        MIN,
-        REVERSE_MIN,
-        MAX,
-        REVERSE_MAX,
-        MEAN,
-        REVERSE_MEAN
-    }
-
-    public enum DateHistogramInterval {
-        YEAR(Period.years(1)),
-        QUARTER(Period.months(3)),
-        MONTH(Period.months(1)),
-        WEEK(Period.weeks(1)),
-        DAY(Period.days(1)),
-        HOUR(Period.hours(1)),
-        MINUTE(Period.minutes(1));
-
-        @SuppressWarnings("ImmutableEnumChecker")
-        private final Period period;
-
-        DateHistogramInterval(Period period) {
-            this.period = period;
-        }
-
-        public Period getPeriod() {
-            return period;
-        }
-    }
 
     private final IndexRangeService indexRangeService;
     private final Timer esRequestTimer;
@@ -181,7 +135,6 @@ public class Searches {
         return search(searchesConfig);
     }
 
-    @SuppressWarnings("unchecked")
     public SearchResult search(SearchesConfig config) {
         final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(config.range(), config.filter());
 
@@ -216,7 +169,7 @@ public class Searches {
     }
 
     private Set<String> indicesContainingField(Set<String> strings, String field) {
-        return indices.getAllMessageFieldsForIndices(strings.toArray(new String[strings.size()]))
+        return indices.getAllMessageFieldsForIndices(strings.toArray(new String[0]))
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue().contains(field))
