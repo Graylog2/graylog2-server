@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-import { type ViewMetaData as ViewMetadata } from 'views/stores/viewMetadataStore';
+import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import CustomPropTypes from '../CustomPropTypes';
 import SidebarNavigation from './SidebarNavigation';
