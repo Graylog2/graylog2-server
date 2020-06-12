@@ -22,7 +22,7 @@ jest.mock('util/AppConfig', () => ({
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
-jest.mock('./HeaderBadge', () => () => <span />);
+jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 
 describe('Navigation', () => {
   let currentUser;
