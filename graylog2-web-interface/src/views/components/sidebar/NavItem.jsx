@@ -15,14 +15,16 @@ type Props = {
 };
 
 const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
-  padding: 5px 10px;
+  display: none;
   position: absolute;
+  padding: 5px 10px;
   left: 100%;
-  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
-  z-index: 4;
+
   font-size: 14px;
   color: white;
-  display: none;
+  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
+
+  z-index: 4;
 `);
 
 const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => `
@@ -70,11 +72,8 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
     }
 
     :active {
-      &::after {
+      &::after, > div {
         display: none;
-      }
-      > ${Title} {
-       display: none;
       }
     }
   ` : '')}
