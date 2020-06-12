@@ -24,8 +24,11 @@ type Props = {
 export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   position: ${sidebarIsInline ? 'static' : 'fixed'}
   display: grid;
-  grid-template-rows: auto 1fr;
+  display: -ms-grid;
   grid-templage-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  -ms-grid-columns: 1fr;
+  -ms-grid-rows: auto 1fr;
   top: ${sidebarIsInline ? 0 : '50px'};
   left: ${sidebarIsInline ? 0 : '50px'};
 
@@ -39,12 +42,38 @@ export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInter
   
   overflow-y: auto;
   z-index: 3;
+
+  > *:nth-child(1) {
+    grid-column: 1;
+    -ms-grid-column: 1;
+    grid-row: 1;
+    -ms-grid-row: 1;
+  }
+
+  > *:nth-child(2) {
+    grid-column: 1;
+    -ms-grid-column: 1;
+    grid-row: 2;
+    -ms-grid-row: 2;
+  }
 `);
 
 const Header: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   height: 35px;
   display: grid;
+  display: -ms-grid;
   grid-template-columns: 1fr auto;
+  -ms-grid-columns: 1fr auto;
+
+  > *:nth-child(1) {
+    grid-column: 1;
+    -ms-grid-column: 1;
+  }
+
+  > *:nth-child(2) {
+    grid-column: 2;
+    -ms-grid-column: 2;
+  }
 `;
 
 const Title = styled.h1`
@@ -73,6 +102,7 @@ const SectionTitle = styled.h2`
 
 const CenterVertical = styled.div`
   display: inline-grid;
+  display: -ms-inline-grid;
   align-content: center;
 `;
 

@@ -41,6 +41,7 @@ const SectionList = styled.div`
 
 const HorizontalRuleWrapper = styled.div`
   padding: 0 10px;
+
   hr {
     border-color: currentColor;
     margin: 5px 0 10px 0;
