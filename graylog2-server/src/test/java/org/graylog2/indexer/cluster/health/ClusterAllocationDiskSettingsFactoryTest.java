@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.cluster.health;
 
-import org.elasticsearch.common.unit.ByteSizeValue;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,11 +59,11 @@ public class ClusterAllocationDiskSettingsFactoryTest {
         AbsoluteValueWatermarkSettings settings = (AbsoluteValueWatermarkSettings) clusterAllocationDiskSettings.watermarkSettings();
 
         assertThat(settings.type()).isEqualTo(WatermarkSettings.SettingsType.ABSOLUTE);
-        assertThat(settings.low()).isInstanceOf(ByteSizeValue.class);
+        assertThat(settings.low()).isInstanceOf(ByteSize.class);
         assertThat(settings.low().getBytes()).isEqualTo(21474836480L);
-        assertThat(settings.high()).isInstanceOf(ByteSizeValue.class);
+        assertThat(settings.high()).isInstanceOf(ByteSize.class);
         assertThat(settings.high().getBytes()).isEqualTo(10737418240L);
-        assertThat(settings.floodStage()).isInstanceOf(ByteSizeValue.class);
+        assertThat(settings.floodStage()).isInstanceOf(ByteSize.class);
         assertThat(settings.floodStage().getBytes()).isEqualTo(5368709120L);
     }
 
@@ -79,9 +78,9 @@ public class ClusterAllocationDiskSettingsFactoryTest {
         AbsoluteValueWatermarkSettings settings = (AbsoluteValueWatermarkSettings) clusterAllocationDiskSettings.watermarkSettings();
 
         assertThat(settings.type()).isEqualTo(WatermarkSettings.SettingsType.ABSOLUTE);
-        assertThat(settings.low()).isInstanceOf(ByteSizeValue.class);
+        assertThat(settings.low()).isInstanceOf(ByteSize.class);
         assertThat(settings.low().getBytes()).isEqualTo(10737418240L);
-        assertThat(settings.high()).isInstanceOf(ByteSizeValue.class);
+        assertThat(settings.high()).isInstanceOf(ByteSize.class);
         assertThat(settings.high().getBytes()).isEqualTo(5368709120L);
         assertThat(settings.floodStage()).isNull();
     }
