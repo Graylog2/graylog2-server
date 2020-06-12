@@ -4,7 +4,7 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
-import type { CreatorProps } from 'views/components/sidebar/AddWidgetButton';
+import type { CreatorProps } from 'views/components/sidebar/create/AddWidgetButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
 export default function ({ view }: CreatorProps) {
