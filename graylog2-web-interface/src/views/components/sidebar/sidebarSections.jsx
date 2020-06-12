@@ -8,6 +8,7 @@ import AddWidgetButton from './create/AddWidgetButton';
 import HighlightingRules from './highlighting/HighlightingRules';
 
 
+/* eslint-disable react/no-unused-prop-types */
 export type SidebarSectionProps = {
   sidebarChildren: React.Node,
   sidebarIsInline: boolean,
@@ -16,6 +17,7 @@ export type SidebarSectionProps = {
   toggleSidebar: () => void,
   viewMetadata: ViewMetadata,
 };
+/* eslint-enable react/no-unused-prop-types */
 
 export type SidebarSection = {
   key: string,
