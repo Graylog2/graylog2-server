@@ -4486,7 +4486,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "ExpandableListItem__Container-sc-10hsq3a-1",
                                                 "isStatic": false,
-                                                "lastClassName": "ciKqOs",
+                                                "lastClassName": "gvIcsL",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -4504,7 +4504,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           forwardedRef={null}
                                         >
                                           <div
-                                            className="ExpandableListItem__Container-sc-10hsq3a-1 ciKqOs"
+                                            className="ExpandableListItem__Container-sc-10hsq3a-1 gvIcsL"
                                           >
                                             <Checkbox
                                               bsClass="checkbox"
@@ -4570,7 +4570,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "ExpandableListItem__IconStack-sc-10hsq3a-3",
                                                             "isStatic": false,
-                                                            "lastClassName": "fcrGYh",
+                                                            "lastClassName": "jXmspb",
                                                             "rules": Array [
                                                               [Function],
                                                             ],
@@ -4590,7 +4590,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       tabIndex={0}
                                                     >
                                                       <div
-                                                        className="ExpandableListItem__IconStack-sc-10hsq3a-3 fcrGYh fa-stack"
+                                                        className="ExpandableListItem__IconStack-sc-10hsq3a-3 jXmspb fa-stack"
                                                         onClick={[Function]}
                                                         tabIndex={0}
                                                       >
@@ -4650,7 +4650,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     "componentStyle": ComponentStyle {
                                                       "componentId": "ExpandableListItem__HeaderWrap-sc-10hsq3a-4",
                                                       "isStatic": false,
-                                                      "lastClassName": "kHFUAj",
+                                                      "lastClassName": "kOLPYP",
                                                       "rules": Array [
                                                         [Function],
                                                       ],
@@ -4668,7 +4668,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 forwardedRef={null}
                                               >
                                                 <span
-                                                  className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 kHFUAj header"
+                                                  className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 kOLPYP header"
                                                 >
                                                   <ExpandableListItem__Header
                                                     onClick={[Function]}
