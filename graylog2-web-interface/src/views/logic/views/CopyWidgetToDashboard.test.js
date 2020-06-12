@@ -8,6 +8,9 @@ import ValueParameter from '../parameters/ValueParameter';
 import Parameter from '../parameters/Parameter';
 
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+jest.mock('bson-objectid', () => jest.fn(() => ({
+  toString: jest.fn(() => 'new-search-id'),
+})));
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),

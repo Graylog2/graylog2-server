@@ -3,25 +3,13 @@ import { List, Map } from 'immutable';
 
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import ViewState from 'views/logic/views/ViewState';
 import Query from 'views/logic/queries/Query';
 
+import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 
 type QueryId = string;
 
-const _findWidgetAndQueryIdInView = (widgetId: string, view: View): ?[Widget, QueryId] => {
-  return view.state.reduce((foundWidget: ?[Widget, QueryId], state: ViewState, queryId: QueryId): ?[Widget, QueryId] => {
-    if (foundWidget) {
-      return foundWidget;
-    }
-    const widget = state.widgets.find((w) => w.id === widgetId);
-    if (widget) {
-      return [widget, queryId];
-    }
-    return undefined;
-  }, undefined);
-};
 
 const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
@@ -40,7 +28,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
   }
 
   const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
-  const match: ?[Widget, QueryId] = _findWidgetAndQueryIdInView(widgetId, search);
+  const match: ?[Widget, QueryId] = FindWidgetAndQueryIdInView(widgetId, search);
 
   if (match) {
     const [widget, queryId] = match;

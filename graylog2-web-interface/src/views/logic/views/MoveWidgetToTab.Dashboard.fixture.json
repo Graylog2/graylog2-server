@@ -1,0 +1,71 @@
+{
+  "id" : "5ece5e1b74ff709b0b0dc69b",
+  "type" : "DASHBOARD",
+  "title" : "MoveWidgetToTab",
+  "summary" : "move widget to tab",
+  "description" : "move widget to tab",
+  "search_id" : "5ece5e0a74ff709b0b0dc69a",
+  "properties" : [],
+  "requires" : {},
+  "state" : {
+    "fa247d8f-7afa-45b7-b57e-3cdef4ee53be" : {
+      "titles" : {
+        "widget": {
+          "b34c3c6f-c49d-41d3-a65a-f746134f8f3e": "Widget Title"
+        }
+      },
+      "widgets" : [
+        {
+          "id" : "b34c3c6f-c49d-41d3-a65a-f746134f8f3e",
+          "type" : "aggregation",
+          "timerange" : null,
+          "query" : null,
+          "streams" : [],
+          "config" : {
+            "row_pivots" : [],
+            "column_pivots" : [],
+            "series" : [
+              {
+                "config" : {
+                  "name" : "Message Count"
+                },
+                "function" : "count()"
+              }
+            ],
+            "sort" : [],
+            "visualization" : "numeric",
+            "rollup" : true,
+            "event_annotation" : false
+          }
+        }
+      ],
+      "widget_mapping" : {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e" : [
+          "ab258db5-d1f2-4d0c-8508-3b0e42a1b113"
+        ]
+      },
+      "positions" : {
+        "b34c3c6f-c49d-41d3-a65a-f746134f8f3e" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 4,
+          "width" : 4
+        }
+      },
+      "display_mode_settings" : {
+        "positions" : {}
+      }
+    },
+    "5faea09b-4187-4eda-9d59-7a86d4774c73" : {
+      "titles" : {},
+      "widgets" : [],
+      "widget_mapping" : {},
+      "positions" : {},
+      "display_mode_settings" : {
+        "positions" : {}
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2020-05-27T12:32:49.786Z"
+}

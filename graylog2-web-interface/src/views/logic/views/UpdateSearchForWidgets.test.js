@@ -11,6 +11,9 @@ import ValueParameter from '../parameters/ValueParameter';
 const cwd = dirname(__filename);
 const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
+jest.mock('bson-objectid', () => jest.fn(() => ({
+  toString: jest.fn(() => 'new-search-id'),
+})));
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
 jest.mock('../Widgets', () => ({

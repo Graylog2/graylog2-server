@@ -7,7 +7,7 @@ Object {
   "id": "5d03952f7aafdc6c1cdc014c",
   "owner": "admin",
   "properties": Immutable.List [],
-  "search_id": "5d9b51d6af140aba42e87469",
+  "search_id": "new-search-id",
   "state": Immutable.Map {
     "f0a1f93c-8400-40de-83ac-94149dbf447c": Object {
       "formatting": Object {
