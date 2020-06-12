@@ -1,6 +1,7 @@
 package org.graylog2.indexer.cluster.health;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -10,6 +11,11 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SIUnitParserTest {
+    @Test
+    void returnsNullForUnparseableValue() {
+        assertThat(SIUnitParser.parseBytesSizeValue("This is not a value")).isNull();
+    }
+
     @DisplayName("Should parse SI Units properly and convert to bytes count")
     @ParameterizedTest(name = "should parse {0} as {1} bytes")
     @MethodSource("argumentsProvider")
