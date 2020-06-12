@@ -93,7 +93,7 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
   if (!viewMetadata.id) {
     return 'Ad Hoc Search';
   }
-  const defaultViewTitle = `Untitled ${viewType ? ViewTypeLabel({ type: viewType }) : View.Type.Search}`;
+  const defaultViewTitle = `Untitled ${viewType ? ViewTypeLabel({ type: viewType, capitalize: true }) : View.Type.Search}`;
   return viewMetadata.title || defaultViewTitle;
 };
 

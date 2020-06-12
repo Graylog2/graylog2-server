@@ -15,6 +15,8 @@ import styled from 'styled-components';
 import FieldTypeIcon from './FieldTypeIcon';
 import styles from './FieldList.css';
 
+const DEFAULT_HEIGHT_PX = 50;
+
 const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
 const Container = styled.div`
@@ -107,7 +109,7 @@ const FieldList = createReactClass({
 
     return (
       <div ref={(elem) => { this.fieldList = elem; }}>
-        <List height={height}
+        <List height={height || DEFAULT_HEIGHT_PX}
               itemCount={fieldList.size}
               itemSize={17}>
           {Row}
@@ -176,7 +178,7 @@ const FieldList = createReactClass({
           <hr />
         </div>
         <SizeMe monitorHeight refreshRate={100}>
-          {({ size: { height } }) => this._renderFieldList({ fields, allFields, showFieldsBy, height })}
+          {({ size: { height } }) => this._renderFieldList({ fields, allFields, showFieldsBy, height }) }
         </SizeMe>
       </Container>
     );

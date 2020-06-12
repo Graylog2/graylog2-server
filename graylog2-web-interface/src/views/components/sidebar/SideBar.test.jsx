@@ -68,7 +68,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('h1').text()).toBe(viewMetaData.title);
   });
 
-  it.only('should render with a description', () => {
+  it('should render with a description', () => {
     const emptyViewMetaData = {
       activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
       id: '5b34f4c44880a54df9616380',
@@ -84,7 +84,6 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    console.log(wrapper.debug());
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 14:39:26.');
   });
 
@@ -143,7 +142,6 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
@@ -161,9 +159,8 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('ViewDescription').text()).toContain('No dashboard description');
-    expect(wrapper.find('ViewDescription').text()).toContain('No dashboard summary');
+    expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no description');
+    expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
   });
 
   it('should render placeholder if saved search has no summary or description ', () => {
@@ -179,9 +176,8 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('ViewDescription').text()).toContain('No search description');
-    expect(wrapper.find('ViewDescription').text()).toContain('No search summary');
+    expect(wrapper.find('ViewDescription').text()).toContain('This search has no description');
+    expect(wrapper.find('ViewDescription').text()).toContain('This search has no summary');
   });
 
   it('should render a summary and description, for a saved search', () => {
@@ -197,7 +193,6 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
@@ -213,10 +208,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
-    expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom description.');
+    expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom summary and description.');
   });
 
   it('should render widget create options', () => {
@@ -260,9 +254,8 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('SearchResultOverview')).toExist();
-    wrapper.find('div[children="Description"]').simulate('click');
+    wrapper.find('h1').simulate('click');
     expect(wrapper.find('SearchResultOverview')).not.toExist();
   });
 });
