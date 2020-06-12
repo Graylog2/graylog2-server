@@ -9,7 +9,7 @@ import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
 
-import Sidebar from 'views/components/sidebar/Sidebar_tmp';
+import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
