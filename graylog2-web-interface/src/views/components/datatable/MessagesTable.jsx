@@ -18,6 +18,7 @@ const StyledTable = styled(Table)(({ theme }) => `
   border-collapse: collapse;
   padding-left: 13px;
   width: 100%;
+  word-break: break-all;
 
   thead > tr {
     color: ${theme.colors.global.textAlt};
@@ -57,6 +58,7 @@ const StyledTable = styled(Table)(({ theme }) => `
     cursor: pointer;
 
     td {
+      min-width: 50px;
       padding-top: 10px;
     }
   }
