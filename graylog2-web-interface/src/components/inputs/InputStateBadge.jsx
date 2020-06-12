@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -22,11 +23,13 @@ const InputStateBadge = createReactClass({
   comparator: new InputStateComparator(),
 
   _labelClassForState(sortedStates) {
+    const { input } = this.props;
+    const { nodes } = this.state;
     const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => {
       return numberOfNodes + state.count;
     }, 0);
 
-    if (this.props.input.global && nodesWithKnownState !== Object.keys(this.state.nodes).length) {
+    if (input.global && nodesWithKnownState !== Object.keys(nodes).length) {
       return 'warning';
     }
 
@@ -45,7 +48,9 @@ const InputStateBadge = createReactClass({
   },
 
   _textForState(sortedStates) {
-    if (this.props.input.global) {
+    const { input } = this.props;
+
+    if (input.global) {
       return sortedStates.map((state) => `${state.count} ${state.state}`).join(', ');
     }
 
@@ -53,7 +58,9 @@ const InputStateBadge = createReactClass({
   },
 
   _isLoading() {
-    return !(this.state.inputStates && this.state.nodes);
+    const { inputStates, nodes } = this.state;
+
+    return !(inputStates && nodes);
   },
 
   render() {
@@ -62,18 +69,18 @@ const InputStateBadge = createReactClass({
     }
 
     const { input } = this.props;
+    const { inputStates } = this.state;
     const inputId = input.id;
+    const sortedInputStates = {};
 
-    const inputStates = {};
+    if (inputStates[inputId]) {
+      Object.keys(inputStates[inputId]).forEach((node) => {
+        const { state } = inputStates[inputId][node];
 
-    if (this.state.inputStates[inputId]) {
-      Object.keys(this.state.inputStates[inputId]).forEach((node) => {
-        const { state } = this.state.inputStates[inputId][node];
-
-        if (!inputStates[state]) {
-          inputStates[state] = [];
+        if (!sortedInputStates[state]) {
+          sortedInputStates[state] = [];
         }
-        inputStates[state].push(node);
+        sortedInputStates[state].push(node);
       });
     }
 

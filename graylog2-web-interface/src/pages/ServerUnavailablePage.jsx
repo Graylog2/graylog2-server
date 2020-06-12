@@ -8,7 +8,7 @@ import DocumentTitle from 'components/common/DocumentTitle';
 import authStyles from 'theme/styles/authStyles';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
@@ -23,9 +23,13 @@ class ServerUnavailablePage extends React.Component {
     server: undefined,
   };
 
-  state = {
-    showDetails: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showDetails: false,
+    };
+  }
 
   _toggleDetails = () => {
     const { showDetails } = this.state;
@@ -109,7 +113,7 @@ class ServerUnavailablePage extends React.Component {
           <Modal.Body>
             <div>
               <p>
-                We are experiencing problems connecting to the Graylog server running on <i>{URLUtils.qualifyUrl('')}</i>.
+                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
                 Please verify that the server is healthy and working correctly.
               </p>
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
