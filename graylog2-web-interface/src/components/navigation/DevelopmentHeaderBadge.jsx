@@ -9,17 +9,17 @@ type Props = {
   smallScreen: boolean,
 };
 
-const HeaderBadge = ({ smallScreen }: Props) => {
+const DevelopmentHeaderBadge = ({ smallScreen }: Props) => {
   const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
   return AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
 };
 
-HeaderBadge.propTypes = {
+DevelopmentHeaderBadge.propTypes = {
   smallScreen: PropTypes.bool,
 };
 
-HeaderBadge.defaultProps = {
+DevelopmentHeaderBadge.defaultProps = {
   smallScreen: false,
 };
 
-export default HeaderBadge;
+export default DevelopmentHeaderBadge;

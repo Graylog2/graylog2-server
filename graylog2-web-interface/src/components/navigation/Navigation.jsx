@@ -19,7 +19,7 @@ import HelpMenu from './HelpMenu';
 import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
-import HeaderBadge from './HeaderBadge';
+import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import SystemMenu from './SystemMenu';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
@@ -83,7 +83,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
         </Navbar.Brand>
         <Navbar.Toggle />
-        <HeaderBadge smallScreen />
+        <DevelopmentHeaderBadge smallScreen />
         {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
 
@@ -116,7 +116,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         <Nav navbar pullRight className="header-meta-nav">
           <InactiveNavItem className="dev-badge-wrap">
-            <HeaderBadge />
+            <DevelopmentHeaderBadge />
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
 
