@@ -15,6 +15,10 @@ const LifecycleIndicator = styled.span(({ theme }) => `
   vertical-align: text-top;
 `);
 
+const H1 = styled.h1`
+  margin-bottom: 0.2em;
+`;
+
 const LIFECYCLE_DEFAULT_MESSAGES = {
   experimental: 'This Graylog feature is new and should be considered experimental.',
   legacy: 'This feature has been discontinued and will be removed in a future Graylog version.',
@@ -90,9 +94,9 @@ class PageHeader extends React.Component {
             </div>
             )}
 
-            <h1>
+            <H1>
               {title} <small>{this.renderLifecycleIndicator()}</small>
-            </h1>
+            </H1>
             {children[0]
             && (
             <p className="description">

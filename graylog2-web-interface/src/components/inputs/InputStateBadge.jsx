@@ -84,13 +84,13 @@ const InputStateBadge = createReactClass({
       });
     }
 
-    const sorted = Object.keys(inputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => {
-      return { state: state, count: inputStates[state].length };
+    const sorted = Object.keys(sortedInputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => {
+      return { state: state, count: sortedInputStates[state].length };
     });
 
     if (sorted.length > 0) {
       const popOverText = sorted.map((state) => {
-        return inputStates[state.state].map((node) => {
+        return sortedInputStates[state.state].map((node) => {
           return <small><LinkToNode nodeId={node} />: {state.state}<br /></small>;
         });
       });
