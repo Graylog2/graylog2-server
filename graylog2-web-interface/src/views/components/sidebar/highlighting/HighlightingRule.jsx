@@ -14,9 +14,10 @@ import ColorPreview from './ColorPreview';
 export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: grid;
   display: -ms-grid;
-  margin-top: 5px;
   grid-template-columns: max-content 1fr max-content;
   -ms-grid-columns: max-content 1fr max-content;
+
+  margin-top: 10px;
   word-break: break-word;
 
   > *:nth-child(1) {
