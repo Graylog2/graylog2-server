@@ -19,7 +19,7 @@ package org.graylog2.indexer.results;
 import java.util.Collections;
 import java.util.List;
 
-public class FieldStatsResult extends IndexQueryResult {
+public class FieldStatsResult {
     private final List<ResultMessage> searchHits;
 
     private final long count;
@@ -31,6 +31,9 @@ public class FieldStatsResult extends IndexQueryResult {
     private final double variance;
     private final double stdDeviation;
     private final long cardinality;
+    private final String originalQuery;
+    private final long tookMs;
+    private final String builtQuery;
 
     public static FieldStatsResult create(long count,
                                           double sum,
@@ -50,7 +53,9 @@ public class FieldStatsResult extends IndexQueryResult {
     }
 
     public FieldStatsResult(String originalQuery, String builtQuery, long tookMs, List<ResultMessage> searchHits, long count, double sum, double sumOfSquares, double mean, double min, double max, double variance, double stdDeviation, long cardinality) {
-        super(originalQuery, builtQuery, tookMs);
+        this.originalQuery = originalQuery;
+        this.builtQuery = builtQuery;
+        this.tookMs = tookMs;
         this.searchHits = searchHits;
         this.count = count;
         this.sum = sum;
@@ -106,5 +111,17 @@ public class FieldStatsResult extends IndexQueryResult {
 
     public List<ResultMessage> getSearchHits() {
         return searchHits;
+    }
+
+    public String getOriginalQuery() {
+        return originalQuery;
+    }
+
+    public String getBuiltQuery() {
+        return builtQuery;
+    }
+
+    public long tookMs() {
+        return tookMs;
     }
 }
