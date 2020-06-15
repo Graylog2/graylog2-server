@@ -42,15 +42,15 @@ class SearchesAdapterES6Test {
                 0);
 
         assertThat(result).isNotNull();
-        assertThat(result.getSum()).isEqualTo(Double.NaN);
-        assertThat(result.getSumOfSquares()).isEqualTo(Double.NaN);
-        assertThat(result.getMean()).isEqualTo(Double.NaN);
-        assertThat(result.getMin()).isEqualTo(Double.NaN);
-        assertThat(result.getMax()).isEqualTo(Double.NaN);
-        assertThat(result.getVariance()).isEqualTo(Double.NaN);
-        assertThat(result.getStdDeviation()).isEqualTo(Double.NaN);
+        assertThat(result.sum()).isEqualTo(Double.NaN);
+        assertThat(result.sumOfSquares()).isEqualTo(Double.NaN);
+        assertThat(result.mean()).isEqualTo(Double.NaN);
+        assertThat(result.min()).isEqualTo(Double.NaN);
+        assertThat(result.max()).isEqualTo(Double.NaN);
+        assertThat(result.variance()).isEqualTo(Double.NaN);
+        assertThat(result.stdDeviation()).isEqualTo(Double.NaN);
 
-        assertThat(result.getCount()).isEqualTo(Long.MIN_VALUE);
-        assertThat(result.getCardinality()).isEqualTo(Long.MIN_VALUE);
+        assertThat(result.count()).isEqualTo(Long.MIN_VALUE);
+        assertThat(result.cardinality()).isEqualTo(Long.MIN_VALUE);
     }
 }

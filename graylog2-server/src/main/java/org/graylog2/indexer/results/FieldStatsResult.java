@@ -24,6 +24,34 @@ import java.util.List;
 
 @AutoValue
 public abstract class FieldStatsResult {
+    public abstract long count();
+
+    public abstract double sum();
+
+    public abstract double sumOfSquares();
+
+    public abstract double mean();
+
+    public abstract double min();
+
+    public abstract double max();
+
+    public abstract double variance();
+
+    public abstract double stdDeviation();
+
+    public abstract long cardinality();
+
+    public abstract List<ResultMessage> searchHits();
+
+    @Nullable
+    public abstract String originalQuery();
+
+    @Nullable
+    public abstract String builtQuery();
+
+    public abstract long tookMs();
+
     public static FieldStatsResult create(long count,
                                           double sum,
                                           double sumOfSquares,
@@ -45,32 +73,4 @@ public abstract class FieldStatsResult {
         return create(Long.MIN_VALUE, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
                 Long.MIN_VALUE, Collections.emptyList(), query, builtQuery, 0);
     }
-
-    public abstract long getCount();
-
-    public abstract double getSum();
-
-    public abstract double getSumOfSquares();
-
-    public abstract double getMean();
-
-    public abstract double getMin();
-
-    public abstract double getMax();
-
-    public abstract double getVariance();
-
-    public abstract double getStdDeviation();
-
-    public abstract long getCardinality();
-
-    public abstract List<ResultMessage> getSearchHits();
-
-    @Nullable
-    public abstract String getOriginalQuery();
-
-    @Nullable
-    public abstract String getBuiltQuery();
-
-    public abstract long getTookMs();
 }

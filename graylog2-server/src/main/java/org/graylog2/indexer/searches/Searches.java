@@ -159,7 +159,7 @@ public class Searches {
 
         final FieldStatsResult result = searchesAdapter.fieldStats(query, filter, range, indices, field, includeCardinality, includeStats, includeCount);
 
-        recordEsMetrics(result.getTookMs(), range);
+        recordEsMetrics(result.tookMs(), range);
         return result;
     }
 
