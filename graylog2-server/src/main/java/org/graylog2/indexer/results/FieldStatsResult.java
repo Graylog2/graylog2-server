@@ -41,9 +41,9 @@ public abstract class FieldStatsResult {
                 hits, originalQuery, builtQuery, tookMs);
     }
 
-    public static FieldStatsResult empty(String query, String bytesReference) {
+    public static FieldStatsResult empty(String query, String builtQuery) {
         return create(Long.MIN_VALUE, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
-                Long.MIN_VALUE, Collections.emptyList(), query, bytesReference, 0);
+                Long.MIN_VALUE, Collections.emptyList(), query, builtQuery, 0);
     }
 
     public abstract long getCount();
