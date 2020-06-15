@@ -20,7 +20,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -44,12 +43,10 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
     private static final String AGG_FILTER = "message_filter";
 
     private final JestClient jestClient;
-    private final SearchesAdapter searchesAdapter;
 
     @Inject
-    public IndexToolsAdapterES6(JestClient jestClient, SearchesAdapter searchesAdapter) {
+    public IndexToolsAdapterES6(JestClient jestClient) {
         this.jestClient = jestClient;
-        this.searchesAdapter = searchesAdapter;
     }
 
     @Override
