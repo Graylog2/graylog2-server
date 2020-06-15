@@ -111,7 +111,7 @@ public class Searches {
 
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
 
-        final ScrollResult result = searchesAdapter.scroll(affectedIndices, indexWildcards, sorting, filter, query, range, limit, offset, fields);
+        final ScrollResult result = searchesAdapter.scroll(indexWildcards, sorting, filter, query, range, limit, offset, fields);
 
         recordEsMetrics(result.tookMs(), range);
 

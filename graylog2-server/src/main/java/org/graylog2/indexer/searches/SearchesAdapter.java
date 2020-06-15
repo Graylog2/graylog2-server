@@ -29,7 +29,9 @@ import java.util.Set;
 public interface SearchesAdapter {
     CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter);
 
-    ScrollResult scroll(Set<String> affectedIndices, Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields);
+    ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields);
+    ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize, int seconds);
+    ScrollResult scroll(ScrollCommand scrollCommand);
 
     SearchResult search(Set<String> indices, Set<IndexRange> indexRanges, SearchesConfig config);
 
