@@ -94,7 +94,8 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
             result.put(date, termCounts);
         }
 
-        return ImmutableMap.copyOf(result);    }
+        return ImmutableMap.copyOf(result);
+    }
 
     @Override
     public long count(Set<String> indices, Optional<Set<String>> includedStreams) {
