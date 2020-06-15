@@ -120,22 +120,45 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     this.setState(({ show }) => ({ show: !show }));
   };
 
-  render() {
-    const { children, container, element } = this.props;
-    const { show } = this.state;
+  adjustOptionOnSelectProp = (option: React.Element<*>, updateDepth: number) => {
+    if (option.props.onSelect) {
+      return {
+        onSelect: (eventKey: ?string, event: SyntheticInputEvent<HTMLButtonElement>) => {
+          option.props.onSelect();
+          this._onToggle(event);
+        },
+      };
+    }
 
-    const mappedChildren = React.Children.map(
+    if (option.props.children) {
+      return {
+        children: this.adjustOptionsProps(option.props.children, updateDepth + 1),
+      };
+    }
+
+    return {};
+  };
+
+  adjustOptionsProps = (children: React.Node, updateDepth: number) => {
+    const maxChildDepth = 2;
+
+    if (updateDepth > maxChildDepth) {
+      return children;
+    }
+
+    return React.Children.map(
       children,
       (child: React.ReactElement) => child && React.cloneElement(child, {
         ...child.props,
-        ...(child.props.onSelect ? {
-          onSelect: (eventKey, event) => {
-            child.props.onSelect();
-            this._onToggle(event);
-          },
-        } : {}),
+        ...this.adjustOptionOnSelectProp(child, updateDepth + 1),
       }),
     );
+  }
+
+  render() {
+    const { children, container, element } = this.props;
+    const { show } = this.state;
+    const mappedChildren = this.adjustOptionsProps(children, 1);
 
     return (
       <StopPropagation>
