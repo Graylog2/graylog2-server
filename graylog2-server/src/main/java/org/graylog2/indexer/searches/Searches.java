@@ -145,12 +145,7 @@ public class Searches {
     }
 
     public FieldStatsResult fieldStats(String field, String query, TimeRange range) {
-        return fieldStats(field, query, null, range);
-    }
-
-    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) {
-        // by default include the cardinality aggregation, as well.
-        return fieldStats(field, query, filter, range, true, true, true);
+        return fieldStats(field, query, null, range, true, true, true);
     }
 
     public FieldStatsResult fieldStats(String field,
