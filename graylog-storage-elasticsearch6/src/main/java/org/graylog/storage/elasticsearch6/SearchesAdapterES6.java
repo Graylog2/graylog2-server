@@ -175,7 +175,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         final ValueCountAggregation valueCountAggregation = searchResponse.getAggregations().getValueCountAggregation(AGG_VALUE_COUNT);
         final CardinalityAggregation cardinalityAggregation = searchResponse.getAggregations().getCardinalityAggregation(AGG_CARDINALITY);
 
-        return new FieldStatsResult(
+        return createFieldStatsResult(
                 valueCountAggregation,
                 extendedStatsAggregation,
                 cardinalityAggregation,
@@ -184,6 +184,55 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 searchSourceBuilder.toString(),
                 multiSearch.tookMsFromSearchResult(searchResponse)
         );
+    }
+
+    private FieldStatsResult createFieldStatsResult(ValueCountAggregation valueCountAggregation,
+                                                    ExtendedStatsAggregation extendedStatsAggregation,
+                                                    CardinalityAggregation cardinalityAggregation,
+                                                    List<ResultMessage> hits,
+                                                    String query,
+                                                    String builtQuery,
+                                                    long tookMs) {
+        final long count = valueCountFromFieldStatsResults(valueCountAggregation, extendedStatsAggregation);
+        final long cardinality = cardinalityAggregation == null || cardinalityAggregation.getCardinality() == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
+
+        final double sum;
+        final double sumOfSquares;
+        final double mean;
+        final double min;
+        final double max;
+        final double variance;
+        final double stdDeviation;
+
+        if (extendedStatsAggregation != null) {
+            sum = extendedStatsAggregation.getSum() != null ? extendedStatsAggregation.getSum() : Double.NaN;
+            sumOfSquares = extendedStatsAggregation.getSumOfSquares() != null ? extendedStatsAggregation.getSumOfSquares() : Double.NaN;
+            mean = extendedStatsAggregation.getAvg() != null ? extendedStatsAggregation.getAvg() : Double.NaN;
+            min = extendedStatsAggregation.getMin() != null ? extendedStatsAggregation.getMin() : Double.NaN;
+            max = extendedStatsAggregation.getMax() != null ? extendedStatsAggregation.getMax() : Double.NaN;
+            variance = extendedStatsAggregation.getVariance() != null ? extendedStatsAggregation.getVariance() : Double.NaN;
+            stdDeviation = extendedStatsAggregation.getStdDeviation() != null ? extendedStatsAggregation.getStdDeviation() : Double.NaN;
+        } else {
+            sum = Double.NaN;
+            sumOfSquares = Double.NaN;
+            mean = Double.NaN;
+            min = Double.NaN;
+            max = Double.NaN;
+            variance = Double.NaN;
+            stdDeviation = Double.NaN;
+        }
+
+        return FieldStatsResult.create(count, sum, sumOfSquares, mean, min, max, variance, stdDeviation, cardinality,
+                hits, query, builtQuery, tookMs);
+    }
+
+    private long valueCountFromFieldStatsResults(ValueCountAggregation valueCountAggregation, ExtendedStatsAggregation extendedStatsAggregation) {
+        if (valueCountAggregation != null && valueCountAggregation.getValueCount() != null) {
+            return valueCountAggregation.getValueCount();
+        } else if (extendedStatsAggregation != null && extendedStatsAggregation.getCount() != null) {
+            return extendedStatsAggregation.getCount();
+        }
+        return Long.MIN_VALUE;
     }
 
     private QueryBuilder standardAggregationFilters(TimeRange range, String filter) {

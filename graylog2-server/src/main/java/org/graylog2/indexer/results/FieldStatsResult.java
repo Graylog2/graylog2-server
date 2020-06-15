@@ -16,14 +16,11 @@
  */
 package org.graylog2.indexer.results;
 
-import io.searchbox.core.search.aggregation.CardinalityAggregation;
-import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
-import io.searchbox.core.search.aggregation.ValueCountAggregation;
-
+import java.util.Collections;
 import java.util.List;
 
 public class FieldStatsResult extends IndexQueryResult {
-    private List<ResultMessage> searchHits;
+    private final List<ResultMessage> searchHits;
 
     private final long count;
     private final double sum;
@@ -35,59 +32,40 @@ public class FieldStatsResult extends IndexQueryResult {
     private final double stdDeviation;
     private final long cardinality;
 
-    public FieldStatsResult(ValueCountAggregation valueCountAggregation,
-                            ExtendedStatsAggregation extendedStatsAggregation,
-                            CardinalityAggregation cardinalityAggregation,
-                            List<ResultMessage> hits,
-                            String query,
-                            String source,
-                            long tookMs) {
-        super(query, source, tookMs);
-        this.count = getValueCount(valueCountAggregation, extendedStatsAggregation);
-        this.cardinality = cardinalityAggregation == null || cardinalityAggregation.getCardinality() == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
-
-        if (extendedStatsAggregation != null) {
-            sum = extendedStatsAggregation.getSum() != null ? extendedStatsAggregation.getSum() : Double.NaN;
-            sumOfSquares = extendedStatsAggregation.getSumOfSquares() != null ? extendedStatsAggregation.getSumOfSquares() : Double.NaN;
-            mean = extendedStatsAggregation.getAvg() != null ? extendedStatsAggregation.getAvg() : Double.NaN;
-            min = extendedStatsAggregation.getMin() != null ? extendedStatsAggregation.getMin() : Double.NaN;
-            max = extendedStatsAggregation.getMax() != null ? extendedStatsAggregation.getMax() : Double.NaN;
-            variance = extendedStatsAggregation.getVariance() != null ? extendedStatsAggregation.getVariance() : Double.NaN;
-            stdDeviation = extendedStatsAggregation.getStdDeviation() != null ? extendedStatsAggregation.getStdDeviation() : Double.NaN;
-        } else {
-            sum = Double.NaN;
-            sumOfSquares = Double.NaN;
-            mean = Double.NaN;
-            min = Double.NaN;
-            max = Double.NaN;
-            variance = Double.NaN;
-            stdDeviation = Double.NaN;
-        }
-
-        this.searchHits = hits;
+    public static FieldStatsResult create(long count,
+                                          double sum,
+                                          double sumOfSquares,
+                                          double mean,
+                                          double min,
+                                          double max,
+                                          double variance,
+                                          double stdDeviation,
+                                          long cardinality,
+                                          List<ResultMessage> hits,
+                                          String originalQuery,
+                                          String builtQuery,
+                                          long tookMs) {
+        return new FieldStatsResult(originalQuery, builtQuery, tookMs, hits, count, sum, sumOfSquares, mean, min, max,
+                variance, stdDeviation, cardinality);
     }
 
-    private FieldStatsResult(String query, String bytesReference) {
-        super(query, bytesReference, 0);
-
-        this.count = Long.MIN_VALUE;
-        this.cardinality = Long.MIN_VALUE;
-        sum = Double.NaN;
-        sumOfSquares = Double.NaN;
-        mean = Double.NaN;
-        min = Double.NaN;
-        max = Double.NaN;
-        variance = Double.NaN;
-        stdDeviation = Double.NaN;
+    public FieldStatsResult(String originalQuery, String builtQuery, long tookMs, List<ResultMessage> searchHits, long count, double sum, double sumOfSquares, double mean, double min, double max, double variance, double stdDeviation, long cardinality) {
+        super(originalQuery, builtQuery, tookMs);
+        this.searchHits = searchHits;
+        this.count = count;
+        this.sum = sum;
+        this.sumOfSquares = sumOfSquares;
+        this.mean = mean;
+        this.min = min;
+        this.max = max;
+        this.variance = variance;
+        this.stdDeviation = stdDeviation;
+        this.cardinality = cardinality;
     }
 
-    private long getValueCount(ValueCountAggregation valueCountAggregation, ExtendedStatsAggregation extendedStatsAggregation) {
-        if (valueCountAggregation != null && valueCountAggregation.getValueCount() != null) {
-            return valueCountAggregation.getValueCount();
-        } else if (extendedStatsAggregation != null && extendedStatsAggregation.getCount() != null) {
-            return extendedStatsAggregation.getCount();
-        }
-        return Long.MIN_VALUE;
+    public static FieldStatsResult empty(String query, String bytesReference) {
+        return create(Long.MIN_VALUE, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
+                Long.MIN_VALUE, Collections.emptyList(), query, bytesReference, 0);
     }
 
     public long getCount() {
@@ -128,9 +106,5 @@ public class FieldStatsResult extends IndexQueryResult {
 
     public List<ResultMessage> getSearchHits() {
         return searchHits;
-    }
-
-    public static FieldStatsResult empty(String query, String bytesReference) {
-        return new FieldStatsResult(query, bytesReference);
     }
 }
