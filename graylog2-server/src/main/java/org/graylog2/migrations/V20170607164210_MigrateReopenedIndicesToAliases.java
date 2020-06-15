@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.State;
-import javax.annotation.Nonnull;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
@@ -33,7 +32,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -46,7 +45,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20170607164210_MigrateReopenedIndicesToAliases.class);
     private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
 
-    private Node node;
+    private final Node node;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Indices indices;
@@ -74,10 +73,10 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     @Override
     public void upgrade() {
         this.indexSetService.findAll()
-            .stream()
-            .map(mongoIndexSetFactory::create)
-            .flatMap(indexSet -> getReopenedIndices(indexSet).stream())
-            .map(indexName -> { LOG.debug("Marking index {} to be reopened using alias.", indexName); return indexName; })
+                .stream()
+                .map(mongoIndexSetFactory::create)
+                .flatMap(indexSet -> getReopenedIndices(indexSet).stream())
+                .peek(indexName -> LOG.debug("Marking index {} to be reopened using alias.", indexName))
             .forEach(indices::markIndexReopened);
     }
 
