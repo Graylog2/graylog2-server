@@ -231,7 +231,7 @@ class SavedSearchControls extends React.Component<Props, State> {
                 <div className="pull-right">
                   <ButtonGroup>
                     <>
-                      <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
+                      <Button title={title} ref={this.formTarget} onClick={this.toggleFormModal}>
                         <Icon style={{ color: savedSearchColor }} name={savedSearchStyle} /> Save
                       </Button>
                       {savedSearchForm}
