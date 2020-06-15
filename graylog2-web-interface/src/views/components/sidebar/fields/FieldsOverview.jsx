@@ -3,10 +3,11 @@ import * as React from 'react';
 import { useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { List as ImmutableList } from 'immutable';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { type ThemeInterface } from 'theme';
 
 import { Button } from 'components/graylog';
 import List from './List';
@@ -19,6 +20,10 @@ type Props = {
   allFields: ImmutableList<FieldTypeMapping>,
 };
 
+const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+  white-space: break-spaces;
+`;
+
 const FilterForm = styled.form`
   display: flex;
 `;
@@ -26,6 +31,15 @@ const FilterForm = styled.form`
 const FilterInputWrapper = styled.div`
   flex-grow: 1;
   margin-right: 5px;
+`;
+
+const FilterInput = styled.input`
+  width: 100%;
+`;
+
+const FieldListModes = styled.div`
+  margin-top: 5px;
+  margin-bottom: 0;
 `;
 
 const reducer = (state, action: {type: string, payload?: { mode?: string, filter?: string }}): { filter: ?string, currentMode: string } => {
@@ -48,18 +62,17 @@ const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) 
   const handleSearch = (e) => dispatch({ type: 'search', payload: { filter: e.target.value } });
   const changeMode = (mode) => dispatch({ type: 'changeMode', payload: { mode } });
   return (
-    <div style={{ whiteSpace: 'break-spaces' }}>
+    <Container>
       <FilterForm className="form-inline" onSubmit={(e) => e.preventDefault()}>
         <FilterInputWrapper className="form-group has-feedback">
-          <input id="common-search-form-query-input"
-                 className="query form-control"
-                 style={{ width: '100%' }}
-                 onChange={handleSearch}
-                 value={filter || ''}
-                 placeholder="Filter fields"
-                 type="text"
-                 autoComplete="off"
-                 spellCheck="false" />
+          <FilterInput id="common-search-form-query-input"
+                       className="query form-control"
+                       onChange={handleSearch}
+                       value={filter || ''}
+                       placeholder="Filter fields"
+                       type="text"
+                       autoComplete="off"
+                       spellCheck="false" />
         </FilterInputWrapper>
         <div className="form-group">
           <Button type="reset" className="reset-button" onClick={() => dispatch({ type: 'searchReset' })}>
@@ -67,7 +80,7 @@ const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) 
           </Button>
         </div>
       </FilterForm>
-      <div style={{ marginTop: '5px', marginBottom: '0px' }}>
+      <FieldListModes>
         List fields of{' '}
         <ChangeMode changeMode={changeMode}
                     currentMode={currentMode}
@@ -87,7 +100,7 @@ const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) 
                     text="all including reserved"
                     title="This shows all fields, including reserved (gl2_*) fields." />
         {' fields.'}
-      </div>
+      </FieldListModes>
       <hr />
       <List viewMetadata={viewMetadata}
             listHeight={listHeight}
@@ -95,7 +108,7 @@ const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) 
             fields={fields}
             allFields={allFields}
             currentMode={currentMode} />
-    </div>
+    </Container>
   );
 };
 
