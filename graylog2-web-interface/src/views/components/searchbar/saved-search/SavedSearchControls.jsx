@@ -241,9 +241,9 @@ class SavedSearchControls extends React.Component<Props, State> {
                       <Icon name="folder-o" /> Load
                     </Button>
                     {showList && (
-                    <SavedSearchList loadSavedSearch={this.loadSavedSearch}
-                                     deleteSavedSearch={this.deleteSavedSearch}
-                                     toggleModal={this.toggleListModal} />
+                      <SavedSearchList loadSavedSearch={this.loadSavedSearch}
+                                       deleteSavedSearch={this.deleteSavedSearch}
+                                       toggleModal={this.toggleListModal} />
                     )}
                     <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                       <MenuItem onSelect={this.toggleMetadataEdit} disabled={!isAllowedToEdit}>
@@ -260,17 +260,17 @@ class SavedSearchControls extends React.Component<Props, State> {
                       </MenuItem>
                     </DropdownButton>
                     {showCSVExport && (
-                    <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
+                      <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
                     )}
                     {showMetadataEdit && (
-                    <ViewPropertiesModal show
-                                         view={view}
-                                         title="Editing saved search"
-                                         onClose={this.toggleMetadataEdit}
-                                         onSave={onSaveView} />
+                      <ViewPropertiesModal show
+                                           view={view}
+                                           title="Editing saved search"
+                                           onClose={this.toggleMetadataEdit}
+                                           onSave={onSaveView} />
                     )}
                     {showShareSearch && (
-                    <ShareViewModal show view={view} onClose={this.toggleShareSearch} currentUser={currentUser} />
+                      <ShareViewModal show view={view} onClose={this.toggleShareSearch} currentUser={currentUser} />
                     )}
                   </ButtonGroup>
                 </div>
