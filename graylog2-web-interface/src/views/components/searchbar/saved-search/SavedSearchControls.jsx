@@ -224,7 +224,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     return (
       <CurrentUserContext.Consumer>
         {(currentUser) => {
-          const isAllowedToEdit = !(view && view.id) || !_isAllowedToEdit(view, currentUser);
+          const isAllowedToEdit = (view && view.id) && _isAllowedToEdit(view, currentUser);
           return (
             <NewViewLoaderContext.Consumer>
               {(loadNewView) => (
