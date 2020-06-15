@@ -21,6 +21,7 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.searches.ScrollCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
@@ -30,6 +31,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,11 +40,13 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 public class SearchesAdapterES6 implements SearchesAdapter {
-    public static final String AGG_CARDINALITY = "gl2_field_cardinality";
-    public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
-    public static final String AGG_FILTER = "gl2_filter";
-    public static final String AGG_VALUE_COUNT = "gl2_value_count";
+    private static final String DEFAULT_SCROLLTIME = "1m";
+    private static final String AGG_CARDINALITY = "gl2_field_cardinality";
+    private static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
+    private static final String AGG_FILTER = "gl2_filter";
+    private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
+    private static final Sorting DEFAULT_SORTING = new Sorting("doc", Sorting.Direction.ASC);
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
@@ -67,23 +71,48 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     }
 
     @Override
-    public ScrollResult scroll(Set<String> affectedIndices, Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
-        final String searchQuery;
+    public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
+        return scroll(ScrollCommand.builder()
+                .indices(indexWildcards)
+                .sorting(sorting)
+                .filter(filter)
+                .query(query)
+                .range(range)
+                .limit(limit)
+                .offset(offset)
+                .fields(fields)
+                .build());
+    }
 
-        if (filter == null) {
-            searchQuery = standardSearchRequest(query, limit, offset, range, sorting, configuration.isAllowHighlighting()).toString();
-        } else {
-            searchQuery = filteredSearchRequest(query, filter, limit, offset, range, sorting).toString();
-        }
+    public ScrollResult scroll(ScrollCommand scrollCommand) {
+        final String searchQuery = buildSearchRequest(scrollCommand).toString();
+        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices());
+        scrollCommand.fields().forEach(initialSearchBuilder::addSourceIncludePattern);
+        return scroll.scroll(
+                initialSearchBuilder.build(),
+                () -> "Unable to perform scroll search",
+                searchQuery,
+                DEFAULT_SCROLLTIME,
+                scrollCommand.fields()
+        );
+    }
 
-        final String scrollTime = "1m";
-        final Search.Builder initialSearchBuilder = new Search.Builder(searchQuery)
+    @Override
+    public ScrollResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize) {
+        return scroll(ScrollCommand.builder()
+                .indices(indexWildcards)
+                .sorting(sorting)
+                .filter(filter)
+                .query(query)
+                .batchSize(batchSize)
+                .build());
+    }
+
+    private Search.Builder scrollBuilder(String query, Set<String> indices) {
+        return new Search.Builder(query)
                 .addType(IndexMapping.TYPE_MESSAGE)
-                .setParameter(Parameters.SCROLL, scrollTime)
-                .addIndex(indexWildcards);
-        fields.forEach(initialSearchBuilder::addSourceIncludePattern);
-
-        return scroll.scroll(initialSearchBuilder.build(), () -> "Unable to perform scroll search", query, scrollTime, fields);
+                .setParameter(Parameters.SCROLL, DEFAULT_SCROLLTIME)
+                .addIndex(indices);
     }
 
     @Override
@@ -256,6 +285,70 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         return searchSourceBuilder;
     }
 
+
+    private SearchSourceBuilder buildSearchRequest(ScrollCommand scrollCommand) {
+        final String query = normalizeQuery(scrollCommand.query());
+
+        final QueryBuilder queryBuilder = isWildcardQuery(query)
+                ? matchAllQuery()
+                : queryStringQuery(query).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
+
+        final Optional<BoolQueryBuilder> rangeQueryBuilder = scrollCommand.range()
+                .map(range -> QueryBuilders.boolQuery()
+                        .must(IndexHelper.getTimestampRangeFilter(range)));
+        final Optional<BoolQueryBuilder> filterQueryBuilder = scrollCommand.filter()
+                .filter(filter -> !isWildcardQuery(filter))
+                .map(filter -> rangeQueryBuilder.orElse(QueryBuilders.boolQuery())
+                        .must(queryStringQuery(filter)));
+
+        final BoolQueryBuilder filteredQueryBuilder = QueryBuilders.boolQuery()
+                .must(queryBuilder);
+        filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filteredQueryBuilder);
+
+        applyPaginationIfPresent(searchSourceBuilder, scrollCommand);
+
+        applySortingIfPresent(searchSourceBuilder, scrollCommand);
+
+        applyHighlighting(searchSourceBuilder, scrollCommand);
+
+        return searchSourceBuilder;
+    }
+
+    private void applyPaginationIfPresent(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
+        scrollCommand.offset().ifPresent(searchSourceBuilder::from);
+        scrollCommand.limit().ifPresent(searchSourceBuilder::size);
+    }
+
+    private void applyHighlighting(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
+        if (scrollCommand.highlight() && configuration.isAllowHighlighting()) {
+            final HighlightBuilder highlightBuilder = new HighlightBuilder()
+                    .requireFieldMatch(false)
+                    .field("*")
+                    .fragmentSize(0)
+                    .numOfFragments(0);
+            searchSourceBuilder.highlighter(highlightBuilder);
+        }
+    }
+
+    private void applySortingIfPresent(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
+        final Sorting sort = scrollCommand.sorting().orElse(DEFAULT_SORTING);
+        searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
+    }
+
+    private boolean isWildcardQuery(String filter) {
+        return normalizeQuery(filter).equals("*");
+    }
+
+    private String normalizeQuery(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return "*";
+        }
+        return query.trim();
+    }
+
     private SearchSourceBuilder filteredSearchRequest(String query, String filter, TimeRange range) {
         return filteredSearchRequest(query, filter, 0, 0, range, null);
     }
@@ -269,8 +362,8 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         BoolQueryBuilder bfb = null;
 
         if (range != null) {
-            bfb = QueryBuilders.boolQuery();
-            bfb.must(IndexHelper.getTimestampRangeFilter(range));
+            bfb = QueryBuilders.boolQuery()
+                    .must(IndexHelper.getTimestampRangeFilter(range));
         }
 
         // Not creating a filter for a "*" value because an empty filter used to be submitted that way.
