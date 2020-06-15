@@ -53,30 +53,12 @@ exports[`CustomHighlighting renders highlighted value if rule for value exists 1
 
 exports[`CustomHighlighting renders value as is when no rule for this field exists 1`] = `
 <PossiblyHighlight
-  color="#bc98fd"
+  color="#ffec3d"
   field="foo"
-  highlightRanges={
-    Object {
-      "foo": Array [
-        Object {
-          "length": 2,
-          "start": 0,
-        },
-      ],
-    }
-  }
+  highlightRanges={Object {}}
   value={42}
 >
-  <span
-    key="highlight-0"
-    style={
-      Object {
-        "backgroundColor": "#bc98fd",
-      }
-    }
-  >
-    42
-  </span>
+  42
 </PossiblyHighlight>
 `;
 

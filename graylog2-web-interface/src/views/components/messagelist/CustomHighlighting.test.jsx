@@ -42,7 +42,7 @@ describe('CustomHighlighting', () => {
   });
   it('renders value as is when no rule for this field exists', () => {
     const rule = HighlightingRule.builder()
-      .field(field)
+      .field('bar')
       .value(String(value))
       .color('#bc98fd')
       .build();
