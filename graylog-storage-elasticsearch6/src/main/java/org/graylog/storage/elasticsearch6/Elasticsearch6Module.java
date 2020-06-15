@@ -10,7 +10,6 @@ import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.PluginModule;
@@ -30,6 +29,5 @@ public class Elasticsearch6Module extends PluginModule {
         bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
-        bind(ScrollResult.Factory.class).to(ScrollResultES6.Factory.class);
     }
 }

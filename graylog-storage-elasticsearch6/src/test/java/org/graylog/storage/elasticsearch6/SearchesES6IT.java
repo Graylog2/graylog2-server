@@ -2,26 +2,15 @@ package org.graylog.storage.elasticsearch6;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.Configuration;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesIT;
 
-import java.util.List;
-
 public class SearchesES6IT extends SearchesIT {
     private SearchesAdapter createSearchesAdapter() {
-        final ScrollResult.Factory scrollResultFactory = new ScrollResult.Factory() {
-            @Override
-            public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                return new ScrollResultES6(jestClient(), new ObjectMapper(), initialResult, query, fields);
-            }
-
-            @Override
-            public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                return new ScrollResultES6(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
-            }
-        };
+        final ScrollResultES6.Factory scrollResultFactory = (initialResult, query, scroll, fields) -> new ScrollResultES6(
+                jestClient(), new ObjectMapper(), initialResult, query, scroll, fields
+        );
 
         return new SearchesAdapterES6(
                 new Configuration(),

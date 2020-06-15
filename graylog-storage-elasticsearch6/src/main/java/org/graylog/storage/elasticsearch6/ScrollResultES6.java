@@ -53,8 +53,7 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
     private String scrollId;
     private int chunkId = 0;
 
-    interface Factory extends ScrollResult.Factory {
-        ScrollResultES6 create(io.searchbox.core.SearchResult initialResult, @Assisted("query") String query, List<String> fields);
+    public interface Factory {
         ScrollResultES6 create(SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields);
     }
 
