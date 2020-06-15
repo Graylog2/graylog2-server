@@ -85,7 +85,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     }
 
     public ScrollResult scroll(ScrollCommand scrollCommand) {
-        final String searchQuery = standardSearchRequest(scrollCommand).toString();
+        final String searchQuery = buildSearchRequest(scrollCommand).toString();
         final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices());
         scrollCommand.fields().forEach(initialSearchBuilder::addSourceIncludePattern);
         return scroll.scroll(
@@ -286,12 +286,12 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     }
 
 
-    private SearchSourceBuilder standardSearchRequest(ScrollCommand scrollCommand) {
+    private SearchSourceBuilder buildSearchRequest(ScrollCommand scrollCommand) {
         final String query = normalizeQuery(scrollCommand.query());
 
         final QueryBuilder queryBuilder = isWildcardQuery(query)
                 ? matchAllQuery()
-                : queryStringQuery(query).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());;
+                : queryStringQuery(query).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         final Optional<BoolQueryBuilder> rangeQueryBuilder = scrollCommand.range()
                 .map(range -> QueryBuilders.boolQuery()
@@ -308,12 +308,21 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filteredQueryBuilder);
 
+        applyPaginationIfPresent(searchSourceBuilder, scrollCommand);
+
+        applySortingIfPresent(searchSourceBuilder, scrollCommand);
+
+        applyHighlighting(searchSourceBuilder, scrollCommand);
+
+        return searchSourceBuilder;
+    }
+
+    private void applyPaginationIfPresent(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
         scrollCommand.offset().ifPresent(searchSourceBuilder::from);
         scrollCommand.limit().ifPresent(searchSourceBuilder::size);
+    }
 
-        final Sorting sort = scrollCommand.sorting().orElse(DEFAULT_SORTING);
-        searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
-
+    private void applyHighlighting(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
         if (scrollCommand.highlight() && configuration.isAllowHighlighting()) {
             final HighlightBuilder highlightBuilder = new HighlightBuilder()
                     .requireFieldMatch(false)
@@ -322,8 +331,11 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                     .numOfFragments(0);
             searchSourceBuilder.highlighter(highlightBuilder);
         }
+    }
 
-        return searchSourceBuilder;
+    private void applySortingIfPresent(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
+        final Sorting sort = scrollCommand.sorting().orElse(DEFAULT_SORTING);
+        searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
     }
 
     private boolean isWildcardQuery(String filter) {
