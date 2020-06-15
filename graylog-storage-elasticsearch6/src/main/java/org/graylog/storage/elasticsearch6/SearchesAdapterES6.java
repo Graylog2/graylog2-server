@@ -353,7 +353,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
         final Optional<BoolQueryBuilder> rangeQueryBuilder = scrollCommand.range()
                 .map(range -> QueryBuilders.boolQuery()
-                        .must(IndexHelper.getTimestampRangeFilter(range)));
+                        .must(TimeRangeFilterQuery.create(range)));
         final Optional<BoolQueryBuilder> filterQueryBuilder = scrollCommand.filter()
                 .filter(filter -> !isWildcardQuery(filter))
                 .map(QueryBuilders::queryStringQuery)
@@ -446,7 +446,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
         if (range != null) {
             bfb = QueryBuilders.boolQuery()
-                    .must(IndexHelper.getTimestampRangeFilter(range));
+                    .must(TimeRangeFilterQuery.create(range));
         }
 
         // Not creating a filter for a "*" value because an empty filter used to be submitted that way.

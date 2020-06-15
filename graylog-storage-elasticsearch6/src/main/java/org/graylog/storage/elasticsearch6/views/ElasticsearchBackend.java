@@ -50,7 +50,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog.storage.elasticsearch6.IndexHelper;
+import org.graylog.storage.elasticsearch6.TimeRangeFilterQuery;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.plugin.Message;
@@ -143,7 +143,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .must(searchTypeSourceBuilder.query())
                     .must(
                             Objects.requireNonNull(
-                                    IndexHelper.getTimestampRangeFilter(
+                                    TimeRangeFilterQuery.create(
                                             query.effectiveTimeRange(searchType)
                                     ),
                                     "Timerange for search type " + searchType.id() + " cannot be found in query or search type."

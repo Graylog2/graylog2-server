@@ -64,7 +64,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timerange)));
+                .filter(requireNonNull(TimeRangeFilterQuery.create(timerange)));
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -116,7 +116,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
 
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timeRange)));
+                .filter(requireNonNull(TimeRangeFilterQuery.create(timeRange)));
 
         // Filtering with an empty streams list doesn't work and would return zero results
         if (!streams.isEmpty()) {
