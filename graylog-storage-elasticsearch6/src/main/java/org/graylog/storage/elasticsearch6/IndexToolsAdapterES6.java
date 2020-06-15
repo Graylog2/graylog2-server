@@ -20,8 +20,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.results.ScrollResult;
-import org.graylog2.indexer.searches.ScrollCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -114,20 +112,6 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
         final CountResult result = JestUtils.execute(jestClient, builder.build(), () -> "Unable to count documents of index.");
 
         return result.getCount().longValue();
-    }
-
-    @Override
-    public ScrollResult scrollIndices(Set<String> indices, Optional<Set<String>> includedStreams, int batchSize) {
-        final ScrollCommand.Builder scrollCommandBuilder = ScrollCommand.builder()
-                .indices(indices)
-                .batchSize(batchSize);
-
-        final ScrollCommand scrollCommand = includedStreams
-                .map(scrollCommandBuilder::streams)
-                .orElse(scrollCommandBuilder)
-                .build();
-
-        return searchesAdapter.scroll(scrollCommand);
     }
 
     private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {
