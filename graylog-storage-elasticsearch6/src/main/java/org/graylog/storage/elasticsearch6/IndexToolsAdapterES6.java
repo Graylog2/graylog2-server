@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -54,8 +55,8 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
     }
 
     @Override
-    public Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Set<String> includedStreams, long interval) {
-        final BoolQueryBuilder queryBuilder = getQueryBuilder(includedStreams);
+    public Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams, long interval) {
+        final BoolQueryBuilder queryBuilder = buildStreamIdFilter(includedStreams);
 
         final FilterAggregationBuilder the_filter = AggregationBuilders.filter(AGG_FILTER, queryBuilder)
                 .subAggregation(AggregationBuilders.dateHistogram(AGG_DATE_HISTOGRAM)
@@ -101,8 +102,8 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
         return ImmutableMap.copyOf(result);    }
 
     @Override
-    public long count(Set<String> indices, Set<String> includedStreams) {
-        final SearchSourceBuilder queryBuilder = new SearchSourceBuilder().query(getQueryBuilder(includedStreams));
+    public long count(Set<String> indices, Optional<Set<String>> includedStreams) {
+        final SearchSourceBuilder queryBuilder = new SearchSourceBuilder().query(buildStreamIdFilter(includedStreams));
 
         final Count.Builder builder = new Count.Builder()
                 .query(queryBuilder.toString())
@@ -116,30 +117,31 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
     }
 
     @Override
-    public ScrollResult scrollIndices(Set<String> indices, Set<String> includedStreams, int batchSize) {
+    public ScrollResult scrollIndices(Set<String> indices, Optional<Set<String>> includedStreams, int batchSize) {
         return searchesAdapter.scroll(ScrollCommand.builder()
                 .indices(indices)
-                .filter(getQueryBuilder(includedStreams).toString())
+                .filter(buildStreamIdFilter(includedStreams))
                 .batchSize(batchSize)
                 .build());
     }
 
-    private BoolQueryBuilder getQueryBuilder(Set<String> includedStreams) {
+    private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {
         final BoolQueryBuilder queryBuilder = boolQuery().must(matchAllQuery());
 
         // If the included streams are not present, we do not filter on streams
-        if (!includedStreams.isEmpty()) {
+        if (includedStreams.isPresent()) {
+            final Set<String> streams = includedStreams.get();
             final BoolQueryBuilder filterBuilder = boolQuery();
 
             // If the included streams set contains the default stream, we also want all documents which do not
             // have any stream assigned. Those documents have basically been in the "default stream" which didn't
             // exist in Graylog <2.2.0.
-            if (includedStreams.contains(Stream.DEFAULT_STREAM_ID)) {
+            if (streams.contains(Stream.DEFAULT_STREAM_ID)) {
                 filterBuilder.should(boolQuery().mustNot(existsQuery(Message.FIELD_STREAMS)));
             }
 
             // Only select messages which are assigned to the given streams
-            filterBuilder.should(termsQuery(Message.FIELD_STREAMS, includedStreams));
+            filterBuilder.should(termsQuery(Message.FIELD_STREAMS, streams));
 
             queryBuilder.filter(filterBuilder);
         }

@@ -20,12 +20,13 @@ import org.graylog2.indexer.results.ScrollResult;
 import org.joda.time.DateTime;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface IndexToolsAdapter {
-    Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Set<String> includedStreams, long interval);
+    Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams, long interval);
 
-    long count(Set<String> indices, Set<String> includedStreams);
+    long count(Set<String> indices, Optional<Set<String>> includedStreams);
 
-    ScrollResult scrollIndices(Set<String> indices, Set<String> includedStreams, int batchSize);
+    ScrollResult scrollIndices(Set<String> indices, Optional<Set<String>> includedStreams, int batchSize);
 }

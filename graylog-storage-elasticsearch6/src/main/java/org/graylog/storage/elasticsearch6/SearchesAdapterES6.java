@@ -47,7 +47,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     private static final String AGG_FILTER = "gl2_filter";
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
-    private static final Sorting DEFAULT_SORTING = new Sorting("doc", Sorting.Direction.ASC);
+    private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
@@ -88,7 +88,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     @Override
     public ScrollResult scroll(ScrollCommand scrollCommand) {
         final String searchQuery = buildSearchRequest(scrollCommand).toString();
-        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices());
+        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices(), scrollCommand.batchSize().orElse(-1L));
         scrollCommand.fields().forEach(initialSearchBuilder::addSourceIncludePattern);
         return scroll.scroll(
                 initialSearchBuilder.build(),
@@ -110,10 +110,11 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 .build());
     }
 
-    private Search.Builder scrollBuilder(String query, Set<String> indices) {
+    private Search.Builder scrollBuilder(String query, Set<String> indices, long batchSize) {
         return new Search.Builder(query)
                 .addType(IndexMapping.TYPE_MESSAGE)
                 .setParameter(Parameters.SCROLL, DEFAULT_SCROLLTIME)
+                .setParameter(Parameters.SIZE, batchSize)
                 .addIndex(indices);
     }
 
@@ -349,9 +350,10 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 .map(range -> QueryBuilders.boolQuery()
                         .must(IndexHelper.getTimestampRangeFilter(range)));
         final Optional<BoolQueryBuilder> filterQueryBuilder = scrollCommand.filter()
-                .filter(filter -> !isWildcardQuery(filter))
+                .filter(filter -> !(filter instanceof String) || !isWildcardQuery((String)filter))
+                .map(filter -> filter instanceof String ? queryStringQuery((String)filter) : filter)
                 .map(filter -> rangeQueryBuilder.orElse(QueryBuilders.boolQuery())
-                        .must(queryStringQuery(filter)));
+                        .must((QueryBuilder)filter));
 
         final BoolQueryBuilder filteredQueryBuilder = QueryBuilders.boolQuery()
                 .must(queryBuilder);
