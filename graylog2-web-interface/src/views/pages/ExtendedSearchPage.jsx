@@ -143,16 +143,16 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
   useSyncWithQueryParameters(query);
 
   return (
-    <DefaultFieldTypesProvider>
-      <CurrentViewTypeProvider>
-        <IfInteractive>
-          <IfDashboard>
-            <WindowLeaveMessage route={route} />
-          </IfDashboard>
-        </IfInteractive>
-        <InteractiveContext.Consumer>
-          {(interactive) => (
-            <ViewAdditionalContextProvider>
+    <CurrentViewTypeProvider>
+      <IfInteractive>
+        <IfDashboard>
+          <WindowLeaveMessage route={route} />
+        </IfDashboard>
+      </IfInteractive>
+      <InteractiveContext.Consumer>
+        {(interactive) => (
+          <ViewAdditionalContextProvider>
+            <DefaultFieldTypesProvider>
               <HighlightingRulesProvider>
                 <GridContainer id="main-row" interactive={interactive}>
                   <IfInteractive>
@@ -183,11 +183,11 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
                   </SearchArea>
                 </GridContainer>
               </HighlightingRulesProvider>
-            </ViewAdditionalContextProvider>
-          )}
-        </InteractiveContext.Consumer>
-      </CurrentViewTypeProvider>
-    </DefaultFieldTypesProvider>
+            </DefaultFieldTypesProvider>
+          </ViewAdditionalContextProvider>
+        )}
+      </InteractiveContext.Consumer>
+    </CurrentViewTypeProvider>
   );
 };
 
