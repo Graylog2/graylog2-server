@@ -26,7 +26,9 @@ import org.graylog2.indexer.searches.ScrollCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.streams.Stream;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -37,8 +39,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class SearchesAdapterES6 implements SearchesAdapter {
     private static final String DEFAULT_SCROLLTIME = "1m";
@@ -350,14 +355,16 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 .map(range -> QueryBuilders.boolQuery()
                         .must(IndexHelper.getTimestampRangeFilter(range)));
         final Optional<BoolQueryBuilder> filterQueryBuilder = scrollCommand.filter()
-                .filter(filter -> !(filter instanceof String) || !isWildcardQuery((String)filter))
-                .map(filter -> filter instanceof String ? queryStringQuery((String)filter) : filter)
+                .filter(filter -> !isWildcardQuery(filter))
+                .map(QueryBuilders::queryStringQuery)
                 .map(filter -> rangeQueryBuilder.orElse(QueryBuilders.boolQuery())
-                        .must((QueryBuilder)filter));
+                        .must(filter));
 
         final BoolQueryBuilder filteredQueryBuilder = QueryBuilders.boolQuery()
                 .must(queryBuilder);
         filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
+
+        applyStreamsFilter(filteredQueryBuilder, scrollCommand);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filteredQueryBuilder);
@@ -369,6 +376,28 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         applyHighlighting(searchSourceBuilder, scrollCommand);
 
         return searchSourceBuilder;
+    }
+
+    private void applyStreamsFilter(BoolQueryBuilder filteredQueryBuilder, ScrollCommand scrollCommand) {
+        scrollCommand.streams()
+                .map(this::buildStreamIdFilter)
+                .ifPresent(filteredQueryBuilder::filter);
+    }
+
+    private BoolQueryBuilder buildStreamIdFilter(Set<String> streams) {
+        final BoolQueryBuilder filterBuilder = boolQuery();
+
+        // If the included streams set contains the default stream, we also want all documents which do not
+        // have any stream assigned. Those documents have basically been in the "default stream" which didn't
+        // exist in Graylog <2.2.0.
+        if (streams.contains(Stream.DEFAULT_STREAM_ID)) {
+            filterBuilder.should(boolQuery().mustNot(existsQuery(Message.FIELD_STREAMS)));
+        }
+
+        // Only select messages which are assigned to the given streams
+        filterBuilder.should(termsQuery(Message.FIELD_STREAMS, streams));
+
+        return filterBuilder;
     }
 
     private void applyPaginationIfPresent(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {

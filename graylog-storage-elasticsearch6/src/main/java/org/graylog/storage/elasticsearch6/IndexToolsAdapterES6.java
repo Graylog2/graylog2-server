@@ -118,11 +118,16 @@ public class IndexToolsAdapterES6 implements IndexToolsAdapter {
 
     @Override
     public ScrollResult scrollIndices(Set<String> indices, Optional<Set<String>> includedStreams, int batchSize) {
-        return searchesAdapter.scroll(ScrollCommand.builder()
+        final ScrollCommand.Builder scrollCommandBuilder = ScrollCommand.builder()
                 .indices(indices)
-                .filter(buildStreamIdFilter(includedStreams))
-                .batchSize(batchSize)
-                .build());
+                .batchSize(batchSize);
+
+        final ScrollCommand scrollCommand = includedStreams
+                .map(scrollCommandBuilder::streams)
+                .orElse(scrollCommandBuilder)
+                .build();
+
+        return searchesAdapter.scroll(scrollCommand);
     }
 
     private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {

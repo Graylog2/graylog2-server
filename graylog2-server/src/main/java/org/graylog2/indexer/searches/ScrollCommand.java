@@ -33,8 +33,9 @@ import java.util.Set;
 public abstract class ScrollCommand {
     public abstract String query();
     public abstract Set<String> indices();
+    public abstract Optional<Set<String>> streams();
     public abstract Optional<Sorting> sorting();
-    public abstract Optional<Object> filter();
+    public abstract Optional<String> filter();
     public abstract Optional<TimeRange> range();
     public abstract OptionalInt limit();
     public abstract OptionalInt offset();
@@ -53,8 +54,9 @@ public abstract class ScrollCommand {
     public static abstract class Builder {
         public abstract Builder query(String query);
         public abstract Builder indices(Set<String> indices);
+        public abstract Builder streams(Set<String> streams);
         public abstract Builder sorting(Sorting sorting);
-        public abstract Builder filter(@Nullable Object filter);
+        public abstract Builder filter(@Nullable String filter);
         public abstract Builder range(TimeRange range);
         public abstract Builder limit(int limit);
         public abstract Builder offset(int offset);
