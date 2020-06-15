@@ -85,6 +85,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 .build());
     }
 
+    @Override
     public ScrollResult scroll(ScrollCommand scrollCommand) {
         final String searchQuery = buildSearchRequest(scrollCommand).toString();
         final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices());
