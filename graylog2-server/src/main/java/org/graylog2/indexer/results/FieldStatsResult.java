@@ -16,25 +16,14 @@
  */
 package org.graylog2.indexer.results;
 
+import com.google.auto.value.AutoValue;
+
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class FieldStatsResult {
-    private final List<ResultMessage> searchHits;
-
-    private final long count;
-    private final double sum;
-    private final double sumOfSquares;
-    private final double mean;
-    private final double min;
-    private final double max;
-    private final double variance;
-    private final double stdDeviation;
-    private final long cardinality;
-    private final String originalQuery;
-    private final long tookMs;
-    private final String builtQuery;
-
+@AutoValue
+public abstract class FieldStatsResult {
     public static FieldStatsResult create(long count,
                                           double sum,
                                           double sumOfSquares,
@@ -48,24 +37,8 @@ public class FieldStatsResult {
                                           String originalQuery,
                                           String builtQuery,
                                           long tookMs) {
-        return new FieldStatsResult(originalQuery, builtQuery, tookMs, hits, count, sum, sumOfSquares, mean, min, max,
-                variance, stdDeviation, cardinality);
-    }
-
-    public FieldStatsResult(String originalQuery, String builtQuery, long tookMs, List<ResultMessage> searchHits, long count, double sum, double sumOfSquares, double mean, double min, double max, double variance, double stdDeviation, long cardinality) {
-        this.originalQuery = originalQuery;
-        this.builtQuery = builtQuery;
-        this.tookMs = tookMs;
-        this.searchHits = searchHits;
-        this.count = count;
-        this.sum = sum;
-        this.sumOfSquares = sumOfSquares;
-        this.mean = mean;
-        this.min = min;
-        this.max = max;
-        this.variance = variance;
-        this.stdDeviation = stdDeviation;
-        this.cardinality = cardinality;
+        return new AutoValue_FieldStatsResult(count, sum, sumOfSquares, mean, min, max, variance, stdDeviation, cardinality,
+                hits, originalQuery, builtQuery, tookMs);
     }
 
     public static FieldStatsResult empty(String query, String bytesReference) {
@@ -73,55 +46,31 @@ public class FieldStatsResult {
                 Long.MIN_VALUE, Collections.emptyList(), query, bytesReference, 0);
     }
 
-    public long getCount() {
-        return count;
-    }
+    public abstract long getCount();
 
-    public double getSum() {
-        return sum;
-    }
+    public abstract double getSum();
 
-    public double getSumOfSquares() {
-        return sumOfSquares;
-    }
+    public abstract double getSumOfSquares();
 
-    public double getMean() {
-        return mean;
-    }
+    public abstract double getMean();
 
-    public double getMin() {
-        return min;
-    }
+    public abstract double getMin();
 
-    public double getMax() {
-        return max;
-    }
+    public abstract double getMax();
 
-    public double getVariance() {
-        return variance;
-    }
+    public abstract double getVariance();
 
-    public double getStdDeviation() {
-        return stdDeviation;
-    }
+    public abstract double getStdDeviation();
 
-    public long getCardinality() {
-        return cardinality;
-    }
+    public abstract long getCardinality();
 
-    public List<ResultMessage> getSearchHits() {
-        return searchHits;
-    }
+    public abstract List<ResultMessage> getSearchHits();
 
-    public String getOriginalQuery() {
-        return originalQuery;
-    }
+    @Nullable
+    public abstract String getOriginalQuery();
 
-    public String getBuiltQuery() {
-        return builtQuery;
-    }
+    @Nullable
+    public abstract String getBuiltQuery();
 
-    public long tookMs() {
-        return tookMs;
-    }
+    public abstract long getTookMs();
 }

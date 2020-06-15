@@ -1,5 +1,6 @@
 package org.graylog.storage.elasticsearch6;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
@@ -186,7 +187,8 @@ public class SearchesAdapterES6 implements SearchesAdapter {
         );
     }
 
-    private FieldStatsResult createFieldStatsResult(ValueCountAggregation valueCountAggregation,
+    @VisibleForTesting
+    FieldStatsResult createFieldStatsResult(ValueCountAggregation valueCountAggregation,
                                                     ExtendedStatsAggregation extendedStatsAggregation,
                                                     CardinalityAggregation cardinalityAggregation,
                                                     List<ResultMessage> hits,
