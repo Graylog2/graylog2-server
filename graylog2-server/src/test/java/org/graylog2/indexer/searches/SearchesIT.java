@@ -241,15 +241,15 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
 
-        assertThat(result.getSearchHits()).hasSize(10);
-        assertThat(result.getCount()).isEqualTo(8);
-        assertThat(result.getMin()).isEqualTo(1.0);
-        assertThat(result.getMax()).isEqualTo(4.0);
-        assertThat(result.getMean()).isEqualTo(2.375);
-        assertThat(result.getSum()).isEqualTo(19.0);
-        assertThat(result.getSumOfSquares()).isEqualTo(53.0);
-        assertThat(result.getVariance()).isEqualTo(0.984375);
-        assertThat(result.getStdDeviation()).isEqualTo(0.9921567416492215);
+        assertThat(result.searchHits()).hasSize(10);
+        assertThat(result.count()).isEqualTo(8);
+        assertThat(result.min()).isEqualTo(1.0);
+        assertThat(result.max()).isEqualTo(4.0);
+        assertThat(result.mean()).isEqualTo(2.375);
+        assertThat(result.sum()).isEqualTo(19.0);
+        assertThat(result.sumOfSquares()).isEqualTo(53.0);
+        assertThat(result.variance()).isEqualTo(0.984375);
+        assertThat(result.stdDeviation()).isEqualTo(0.9921567416492215);
     }
 
     @Test
@@ -445,9 +445,9 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         final FieldStatsResult fieldStatsResult = searches.fieldStats("n", "_id:1", range);
 
         assertThat(fieldStatsResult).isNotNull();
-        assertThat(fieldStatsResult.getSearchHits()).isNotNull();
-        assertThat(fieldStatsResult.getSearchHits()).hasSize(1);
-        final ResultMessage resultMessage = fieldStatsResult.getSearchHits().get(0);
+        assertThat(fieldStatsResult.searchHits()).isNotNull();
+        assertThat(fieldStatsResult.searchHits()).hasSize(1);
+        final ResultMessage resultMessage = fieldStatsResult.searchHits().get(0);
         assertThat(resultMessage.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version");
     }
 
