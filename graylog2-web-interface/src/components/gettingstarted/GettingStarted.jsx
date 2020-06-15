@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Grid, Col, Button } from 'components/graylog';
 import { ContentHeadRow, Spinner, Icon } from 'components/common';
@@ -20,7 +20,7 @@ const Container = styled.div`
 `;
 
 const DismissButtonSection = styled.div`
-  grid-colum: 1;
+  grid-column: 1;
   -ms-grid-column: 1;
   grid-row: 1;
   -ms-grid-row: 1;
@@ -35,7 +35,7 @@ const DismissButton = styled(Button)`
 const ContentSection = styled.div`
   grid-row: 2;
   -ms-grid-row: 2;
-  grid-colum: 1;
+  grid-column: 1;
   -ms-grid-column: 1;
 `;
 
