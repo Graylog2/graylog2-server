@@ -7,7 +7,7 @@ import org.junit.Rule;
 
 public class ElasticsearchBaseTestES6 extends ElasticsearchBaseTest {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected ElasticsearchInstance elasticsearch() {

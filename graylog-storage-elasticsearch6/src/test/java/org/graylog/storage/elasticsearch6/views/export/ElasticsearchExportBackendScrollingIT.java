@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch6.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
+import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
@@ -24,7 +25,7 @@ import org.junit.Test;
 
 public class ElasticsearchExportBackendScrollingIT extends ElasticsearchExportBackendITBase {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected ElasticsearchInstance elasticsearch() {

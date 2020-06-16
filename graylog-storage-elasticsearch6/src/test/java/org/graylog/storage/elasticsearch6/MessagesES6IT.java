@@ -6,6 +6,7 @@ import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessagesES6IT extends MessagesIT {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected ElasticsearchInstance elasticsearch() {

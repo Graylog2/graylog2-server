@@ -23,13 +23,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 import io.searchbox.client.JestClient;
 import io.searchbox.cluster.State;
-import org.graylog.testing.PropertyLoader;
 import org.graylog2.bindings.providers.JestClientProvider;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.rules.ExternalResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -46,17 +43,11 @@ import static com.google.common.collect.Iterators.toArray;
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link JestClient}.
  */
-public class ElasticsearchInstance extends ExternalResource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
-
+public abstract class ElasticsearchInstance extends ExternalResource {
     private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
-
-    private static final String PROPERTIES_RESOURCE_NAME = "elasticsearch.properties";
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
     private static final String DEFAULT_IMAGE = "elasticsearch";
-    private static final String DEFAULT_VERSION = "6.8.4";
 
     private static final int ES_PORT = 9200;
     private static final String NETWORK_ALIAS = "elasticsearch";
@@ -65,27 +56,6 @@ public class ElasticsearchInstance extends ExternalResource {
     private Client client;
     private FixtureImporter fixtureImporter = new FixtureImporter();
     private final Version version;
-
-    public static ElasticsearchInstance create() {
-        return create(Network.newNetwork());
-    }
-
-    public static ElasticsearchInstance create(Network network) {
-        String version = PropertyLoader
-                .loadProperties(PROPERTIES_RESOURCE_NAME)
-                .getProperty("version", DEFAULT_VERSION);
-
-        return create(version, network);
-    }
-
-    public static ElasticsearchInstance create(String versionString, Network network) {
-        final Version version = Version.valueOf(versionString);
-        final String image = imageNameFrom(version);
-
-        LOG.debug("Creating instance {}", image);
-
-        return new ElasticsearchInstance(image, version, network);
-    }
 
     protected static String imageNameFrom(Version version) {
         final String defaultImage = version.satisfies("^6.0.0")

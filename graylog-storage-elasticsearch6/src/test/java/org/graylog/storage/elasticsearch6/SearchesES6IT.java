@@ -1,6 +1,7 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.searches.Searches;
@@ -10,7 +11,7 @@ import org.junit.Rule;
 
 public class SearchesES6IT extends SearchesIT {
     @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
 
     @Override
     protected ElasticsearchInstance elasticsearch() {

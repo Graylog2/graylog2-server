@@ -24,6 +24,6 @@ import org.testcontainers.containers.Network;
 public class ElasticsearchInstanceES6Factory implements ElasticsearchInstanceFactory {
     @Override
     public ElasticsearchInstance create(Network network) {
-        return new ElasticsearchInstanceES6(network);
+        return ElasticsearchInstanceES6.create(network);
     }
 }
