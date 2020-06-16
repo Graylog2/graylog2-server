@@ -9,6 +9,8 @@ import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesIT;
 import org.junit.Rule;
 
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
+
 public class SearchesES6IT extends SearchesIT {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
@@ -20,12 +22,12 @@ public class SearchesES6IT extends SearchesIT {
 
     private SearchesAdapter createSearchesAdapter() {
         final ScrollResultES6.Factory scrollResultFactory = (initialResult, query, scroll, fields) -> new ScrollResultES6(
-                jestClient(), new ObjectMapper(), initialResult, query, scroll, fields
+                jestClient(elasticsearch), new ObjectMapper(), initialResult, query, scroll, fields
         );
 
         return new SearchesAdapterES6(
                 new Configuration(),
-                new MultiSearch(jestClient()), new Scroll(scrollResultFactory, jestClient()),
+                new MultiSearch(jestClient(elasticsearch)), new Scroll(scrollResultFactory, jestClient(elasticsearch)),
                 new SortOrderMapper()
         );
     }

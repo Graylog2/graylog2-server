@@ -38,6 +38,7 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ScrollResultES6IT extends ElasticsearchBaseTest {
     @Rule
@@ -66,10 +67,10 @@ public class ScrollResultES6IT extends ElasticsearchBaseTest {
                 .setParameter(Parameters.SCROLL, "1m")
                 .setParameter(Parameters.SIZE, 5)
                 .build();
-        final SearchResult searchResult = JestUtils.execute(jestClient(), request, () -> "Exception");
+        final SearchResult searchResult = JestUtils.execute(jestClient(elasticsearch), request, () -> "Exception");
 
-        assertThat(jestClient()).isNotNull();
-        final ScrollResult scrollResult = new ScrollResultES6(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        assertThat(jestClient(elasticsearch)).isNotNull();
+        final ScrollResult scrollResult = new ScrollResultES6(jestClient(elasticsearch), objectMapper, searchResult, "*", Collections.singletonList("message"));
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );

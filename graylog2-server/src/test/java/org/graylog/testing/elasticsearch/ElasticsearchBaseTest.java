@@ -17,7 +17,6 @@
 package org.graylog.testing.elasticsearch;
 
 import com.github.zafarkhaja.semver.Version;
-import io.searchbox.client.JestClient;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -67,15 +66,6 @@ public abstract class ElasticsearchBaseTest {
     }
 
     protected abstract ElasticsearchInstance elasticsearch();
-
-    /**
-     * Returns the Elasticsearch client.
-     *
-     * @return the client
-     */
-    protected JestClient jestClient() {
-        return elasticsearch().jestClient();
-    }
 
     /**
      * Returns a custom Elasticsearch client with a bunch of utility methods.

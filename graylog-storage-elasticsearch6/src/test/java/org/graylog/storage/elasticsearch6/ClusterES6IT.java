@@ -12,6 +12,7 @@ import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.junit.Rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ClusterES6IT extends ClusterIT {
     @Rule
@@ -19,7 +20,7 @@ public class ClusterES6IT extends ClusterIT {
 
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {
-        return new ClusterAdapterES6(jestClient(), timeout);
+        return new ClusterAdapterES6(jestClient(elasticsearch), timeout);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class ClusterES6IT extends ClusterIT {
                 .setParameter("format", "json")
                 .setParameter("full_id", "true")
                 .build();
-        final CatResult catResult = JestUtils.execute(jestClient(), nodesInfo, () -> "Unable to retrieve current node info");
+        final CatResult catResult = JestUtils.execute(jestClient(elasticsearch), nodesInfo, () -> "Unable to retrieve current node info");
         final JsonNode result = catResult.getJsonObject().path("result");
         assertThat(result).isNotEmpty();
 

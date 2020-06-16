@@ -22,6 +22,8 @@ import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
+
 public class ElasticsearchExportBackendSearchAfterIT extends ElasticsearchExportBackendITBase {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
@@ -33,7 +35,7 @@ public class ElasticsearchExportBackendSearchAfterIT extends ElasticsearchExport
 
     @Override
     protected RequestStrategy requestStrategy() {
-        return new SearchAfter(new JestWrapper(jestClient()));
+        return new SearchAfter(new JestWrapper(jestClient(elasticsearch)));
     }
 
     @Test

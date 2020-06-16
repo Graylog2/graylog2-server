@@ -23,6 +23,8 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
+
 public class ElasticsearchExportBackendScrollingIT extends ElasticsearchExportBackendITBase {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
@@ -34,7 +36,7 @@ public class ElasticsearchExportBackendScrollingIT extends ElasticsearchExportBa
 
     @Override
     protected RequestStrategy requestStrategy() {
-        return new Scroll(new ObjectMapperProvider().get(), new JestWrapper(jestClient()));
+        return new Scroll(new ObjectMapperProvider().get(), new JestWrapper(jestClient(elasticsearch)));
     }
 
     @Test

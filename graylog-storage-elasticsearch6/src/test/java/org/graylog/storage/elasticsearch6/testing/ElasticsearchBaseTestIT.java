@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2;
+package org.graylog.storage.elasticsearch6.testing;
 
-import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.junit.Rule;
@@ -35,7 +34,7 @@ public class ElasticsearchBaseTestIT extends ElasticsearchBaseTest {
 
     @Test
     public void clientsAreConstructed() {
-        assertThat(jestClient()).isNotNull();
+        assertThat(((ElasticsearchInstanceES6)elasticsearch).jestClient()).isNotNull();
         assertThat(client()).isNotNull();
     }
 }

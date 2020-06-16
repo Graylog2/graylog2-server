@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class MessagesES6IT extends MessagesIT {
     @Rule
@@ -35,14 +36,14 @@ public class MessagesES6IT extends MessagesIT {
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES6(jestClient(), true, metricRegistry);
+        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry);
     }
 
     @Override
     protected Double messageCount(String indexName) {
         final Count count = new Count.Builder().addIndex(indexName).build();
 
-        final CountResult result = JestUtils.execute(jestClient(), count, () -> "Unable to count documents");
+        final CountResult result = JestUtils.execute(jestClient(elasticsearch), count, () -> "Unable to count documents");
         return result.getCount();
     }
 
@@ -65,7 +66,7 @@ public class MessagesES6IT extends MessagesIT {
 
     private boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id) {
         final Index indexRequest = indexingHelper.prepareIndexRequest(index, source, id);
-        final DocumentResult indexResponse = JestUtils.execute(jestClient(), indexRequest, () -> "Unable to index message");
+        final DocumentResult indexResponse = JestUtils.execute(jestClient(elasticsearch), indexRequest, () -> "Unable to index message");
 
         return indexResponse.isSucceeded();
     }
