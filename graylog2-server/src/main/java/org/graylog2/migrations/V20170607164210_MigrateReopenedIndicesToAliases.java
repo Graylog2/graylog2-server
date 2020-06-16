@@ -19,14 +19,10 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.cluster.State;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.slf4j.Logger;
@@ -49,19 +45,23 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Indices indices;
-    private final JestClient jestClient;
+    private final ClusterState clusterState;
+
+    public interface ClusterState {
+        JsonNode getForIndices(Collection<String> indices);
+    }
 
     @Inject
     public V20170607164210_MigrateReopenedIndicesToAliases(Node node,
                                                            IndexSetService indexSetService,
                                                            MongoIndexSet.Factory mongoIndexSetFactory,
                                                            Indices indices,
-                                                           JestClient jestClient) {
+                                                           ClusterState clusterState) {
         this.node = node;
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indices = indices;
-        this.jestClient = jestClient;
+        this.clusterState = clusterState;
     }
 
     @Override
@@ -82,11 +82,9 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
 
     private Set<String> getReopenedIndices(final Collection<String> indices) {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
-        final String indexList = String.join(",", indices);
-        final State request = new State.Builder().withMetadata().indices(indexList).build();
 
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for reopened indices " + indices);
-        final JsonNode clusterStateJson = jestResult.getJsonObject();
+        final JsonNode clusterStateJson = clusterState.getForIndices(indices);
+
         final JsonNode indicesJson = clusterStateJson.path("metadata").path("indices");
 
         final ImmutableSet.Builder<String> reopenedIndices = ImmutableSet.builder();
