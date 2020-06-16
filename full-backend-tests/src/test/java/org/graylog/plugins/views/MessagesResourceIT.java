@@ -18,6 +18,7 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-@ApiIntegrationTest(serverLifecycle = CLASS)
+@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
 class MessagesResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;

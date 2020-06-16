@@ -19,6 +19,7 @@ package org.graylog.elasticsearch.e2e;
 import com.google.common.collect.ImmutableMap;
 import io.restassured.specification.RequestSpecification;
 import org.glassfish.jersey.internal.util.Producer;
+import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
@@ -37,7 +38,7 @@ import static org.graylog.testing.backenddriver.SearchDriver.searchAllMessages;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.junit.Assert.fail;
 
-@ApiIntegrationTest(serverLifecycle = CLASS, extraPorts = {ElasticsearchE2E.GELF_HTTP_PORT})
+@ApiIntegrationTest(serverLifecycle = CLASS, extraPorts = {ElasticsearchE2E.GELF_HTTP_PORT}, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
 public class ElasticsearchE2E {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchE2E.class);
 
