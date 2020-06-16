@@ -455,7 +455,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                   }
                 >
                   <div
-                    className="css-5b48ez"
+                    className="css-1sqh0jz"
                   >
                     <Placeholder
                       clearValue={[Function]}
