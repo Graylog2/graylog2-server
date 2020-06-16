@@ -17,10 +17,20 @@
 package org.graylog.storage.elasticsearch6.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ElasticsearchExportBackendScrollingIT extends ElasticsearchExportBackendITBase {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     @Override
     protected RequestStrategy requestStrategy() {
         return new Scroll(new ObjectMapperProvider().get(), new JestWrapper(jestClient()));

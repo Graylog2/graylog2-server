@@ -37,11 +37,7 @@ import static org.graylog2.indexer.IndexMappingFactory.indexMappingFor;
  * <p>
  * Check the {@link #importFixture(String)} method if you need to load fixture data from JSON files.
  */
-public class ElasticsearchBaseTest {
-
-    @Rule
-    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
-
+public abstract class ElasticsearchBaseTest {
     @Rule
     public final SkipDefaultIndexTemplateWatcher skipTemplatesWatcher = new SkipDefaultIndexTemplateWatcher();
 
@@ -53,7 +49,7 @@ public class ElasticsearchBaseTest {
     }
 
     private void addGraylogDefaultIndexTemplate() {
-        addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch.version()));
+        addIndexTemplates(getGraylogDefaultMessageTemplates(elasticsearch().version()));
     }
 
     private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(Version version) {
@@ -66,9 +62,11 @@ public class ElasticsearchBaseTest {
         for (Map.Entry<String, Map<String, Object>> template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            elasticsearch.client().putTemplate(templateName, template.getValue());
+            elasticsearch().client().putTemplate(templateName, template.getValue());
         }
     }
+
+    protected abstract ElasticsearchInstance elasticsearch();
 
     /**
      * Returns the Elasticsearch client.
@@ -76,7 +74,7 @@ public class ElasticsearchBaseTest {
      * @return the client
      */
     protected JestClient jestClient() {
-        return elasticsearch.jestClient();
+        return elasticsearch().jestClient();
     }
 
     /**
@@ -85,7 +83,7 @@ public class ElasticsearchBaseTest {
      * @return the client
      */
     protected Client client() {
-        return elasticsearch.client();
+        return elasticsearch().client();
     }
 
     /**
@@ -97,10 +95,10 @@ public class ElasticsearchBaseTest {
      * @param resourcePath the fixture resource path
      */
     protected void importFixture(String resourcePath) {
-        elasticsearch.importFixtureResource(resourcePath, getClass());
+        elasticsearch().importFixtureResource(resourcePath, getClass());
     }
 
     protected Version elasticsearchVersion() {
-        return elasticsearch.version();
+        return elasticsearch().version();
     }
 }

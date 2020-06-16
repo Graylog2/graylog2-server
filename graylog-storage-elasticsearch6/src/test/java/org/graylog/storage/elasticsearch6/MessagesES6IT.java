@@ -6,11 +6,13 @@ import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -20,6 +22,14 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessagesES6IT extends MessagesIT {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     private final IndexingHelper indexingHelper = new IndexingHelper();
 
     @Override

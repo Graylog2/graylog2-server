@@ -87,7 +87,7 @@ public class ElasticsearchInstance extends ExternalResource {
         return new ElasticsearchInstance(image, version, network);
     }
 
-    private static String imageNameFrom(Version version) {
+    protected static String imageNameFrom(Version version) {
         final String defaultImage = version.satisfies("^6.0.0")
                 // The OSS image only exists for 6.0.0 and later
                 ? DEFAULT_IMAGE_OSS
@@ -96,7 +96,7 @@ public class ElasticsearchInstance extends ExternalResource {
         return defaultImage + ":" + version.toString();
     }
 
-    private ElasticsearchInstance(String image, Version version, Network network) {
+    protected ElasticsearchInstance(String image, Version version, Network network) {
         this.version = version;
 
         ElasticsearchContainer container = createContainer(image, version, network);

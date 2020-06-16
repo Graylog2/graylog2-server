@@ -17,11 +17,21 @@
 package org.graylog2;
 
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ElasticsearchBaseTestIT extends ElasticsearchBaseTest {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     @Test
     public void clientsAreConstructed() {
         assertThat(jestClient()).isNotNull();

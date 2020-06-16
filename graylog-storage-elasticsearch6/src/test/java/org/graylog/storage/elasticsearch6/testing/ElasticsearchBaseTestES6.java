@@ -1,11 +1,11 @@
-package org.graylog.storage.elasticsearch6;
+package org.graylog.storage.elasticsearch6.testing;
 
+import org.graylog.testing.elasticsearch.Client;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog2.indexer.counts.CountsAdapter;
-import org.graylog2.indexer.counts.CountsIT;
 import org.junit.Rule;
 
-public class CountsES6IT extends CountsIT {
+public class ElasticsearchBaseTestES6 extends ElasticsearchBaseTest {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
 
@@ -15,7 +15,7 @@ public class CountsES6IT extends CountsIT {
     }
 
     @Override
-    protected CountsAdapter countsAdapter() {
-        return new CountsAdapterES6(jestClient());
+    protected Client client() {
+        return null;
     }
 }

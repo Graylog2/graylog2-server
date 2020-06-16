@@ -22,6 +22,7 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.results.ScrollResult;
@@ -38,6 +39,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 public class ScrollResultES6IT extends ElasticsearchBaseTest {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 

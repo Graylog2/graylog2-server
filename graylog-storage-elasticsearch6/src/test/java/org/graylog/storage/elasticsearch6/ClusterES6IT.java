@@ -4,16 +4,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.junit.Rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClusterES6IT extends ClusterIT {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstance.create();
+
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {
         return new ClusterAdapterES6(jestClient(), timeout);
+    }
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
     }
 
     @Override
