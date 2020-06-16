@@ -67,6 +67,7 @@ const option = (base) => ({
 const valueContainer = (base) => ({
   ...base,
   minWidth: '6.5vw',
+  minHeight: '30px',
 });
 
 type Props = {
