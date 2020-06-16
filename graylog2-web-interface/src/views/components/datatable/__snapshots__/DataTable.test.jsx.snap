@@ -67,8 +67,9 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -143,8 +144,9 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
     }
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -1125,8 +1127,9 @@ exports[`DataTable should render with empty data 1`] = `
   data={Object {}}
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -1157,8 +1160,9 @@ exports[`DataTable should render with empty data 1`] = `
     data={Object {}}
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -1350,8 +1354,9 @@ exports[`DataTable should render with filled data with rollup 1`] = `
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -1435,8 +1440,9 @@ exports[`DataTable should render with filled data with rollup 1`] = `
     }
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -2721,8 +2727,9 @@ exports[`DataTable should render with filled data without rollup 1`] = `
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -2806,8 +2813,9 @@ exports[`DataTable should render with filled data without rollup 1`] = `
     }
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}

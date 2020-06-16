@@ -31,7 +31,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
 
-const defineSingleDateBarWidth = (chartDataResult, config, timerangeFrom, timerangeTo) => {
+const defineSingleDateBarWidth = (chartDataResult, config, timeRangeFrom, timeRangeTo) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
   const minXUnits = 30;
   if (config.rowPivots.length !== 1 || config.rowPivots[0].type !== DateType) {
@@ -39,8 +39,8 @@ const defineSingleDateBarWidth = (chartDataResult, config, timerangeFrom, timera
   }
   return chartDataResult.map((data) => {
     if (data?.x?.length === 1) {
-      const timerangeMS = new Date(timerangeTo) - new Date(timerangeFrom);
-      const widthXUnits = timerangeMS * barWidth;
+      const timeRangeMS = new Date(timeRangeTo) - new Date(timeRangeFrom);
+      const widthXUnits = timeRangeMS * barWidth;
       return {
         ...data,
         width: [Math.max(minXUnits, widthXUnits)],
@@ -73,7 +73,7 @@ const BarVisualization: VisualizationComponent = makeVisualization(({ config, da
 
   return (
     <XYPlot config={config}
-            chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange.from, effectiveTimerange.to)}
+            chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             height={height}
