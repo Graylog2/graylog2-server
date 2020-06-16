@@ -21,8 +21,7 @@ const SortDirectionSelect = ({ direction, disabled, onChange }: Props) => (
           ]}
           onChange={({ value }) => onChange(Direction.fromString(value))}
           placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-          key={`sort-direction-${String(direction)}`}
-          value={direction && { label: direction, value: direction }} />
+          value={(direction && { label: direction, value: direction }) ?? null} />
 );
 
 SortDirectionSelect.propTypes = {
