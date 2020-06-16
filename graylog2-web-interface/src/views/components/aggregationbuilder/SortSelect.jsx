@@ -49,12 +49,15 @@ const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
     const mappedValue = mapNewValue(fields, value);
     return onChange(mappedValue);
   };
+  const value = currentValue(sort, fields);
+  const key = `sort-${String(value)}`;
   return (
     <Select placeholder="None: click to add fields"
             onChange={_onChange}
             options={options}
             isClearable
-            value={currentValue(sort, fields)} />
+            key={key}
+            value={value} />
   );
 };
 
