@@ -2,9 +2,10 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
+import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
-import { fonts } from 'theme';
+import { themePropTypes } from 'theme';
 
 import Icon from './Icon';
 
@@ -72,28 +73,24 @@ const clearIndicator = (base) => ({
   padding: '5px',
 });
 
-const multiValue = (base) => ({
+const multiValue = ({ theme }) => (base) => ({
   ...base,
-  backgroundColor: '#ebf5ff',
-  color: '#007eff',
-  border: '1px solid rgba(0,126,255,.24)',
+  border: `1px solid ${theme.colors.variant.lighter.info}`,
 });
 
 const multiValueLabel = (base) => ({
   ...base,
-  color: 'unset',
   paddingLeft: '5px',
   paddingRight: '5px',
+  fontSize: '12px',
 });
 
-const multiValueRemove = (base) => ({
+const multiValueRemove = ({ theme }) => (base) => ({
   ...base,
-  borderLeft: '1px solid rgba(0,126,255,.24)',
+  borderLeft: `1px solid ${theme.colors.variant.lighter.info}`,
   paddingLeft: '5px',
   paddingRight: '5px',
-  ':hover': {
-    backgroundColor: 'rgba(0,113,230,.08)',
-  },
+  borderRadius: '0',
 });
 
 const controlSmall = {
@@ -108,26 +105,22 @@ const controlNormal = {
 const menu = (base) => ({
   ...base,
   zIndex: 5,
-  border: '1px solid rgba(102, 175, 233, 0.5)',
-  boxShadow: '0 0 4px rgba(102, 175, 233, 0.3)',
 });
 
-const singleValueAndPlaceholder = (base) => ({
+const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: fonts.family.body,
+  fontFamily: theme.fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
-  color: '#666',
 });
 
-const placeholder = (base) => ({
+const placeholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: fonts.family.body,
+  fontFamily: theme.fonts.family.body,
   fontSize: '14px',
   fontWeight: 400,
-  color: '#999',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
@@ -135,23 +128,19 @@ const placeholder = (base) => ({
   paddingRight: '20px',
 });
 
-const controlFocus = (props) => (base, { isFocused }) => {
-  const { size } = props;
-
-  const borderColor = isFocused ? '#66afe9' : base.borderColor;
+const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
   const borderWidth = isFocused ? 1 : base.borderWidth;
   const outline = isFocused ? 0 : base.outline;
-  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : 'inset 0 1px 1px rgba(0, 0, 0, 0.075)';
-
+  const defaultBoxShadow = `inset 0 1px 1px ${theme.colors.variant.lightest.default}`;
+  const boxShadow = isFocused ? `${defaultBoxShadow}, 0 0 8px ${theme.colors.variant.lighter.info}` : defaultBoxShadow;
   const controlSize = size === 'small' ? controlSmall : controlNormal;
 
   return {
     ...base,
     ...controlSize,
-    borderColor,
     borderWidth,
-    outline,
     boxShadow,
+    outline,
     alignItems: 'center',
   };
 };
@@ -167,16 +156,16 @@ const _components: { [string]: React.ComponentType<any> } = {
   IndicatorSeparator,
 };
 
-const _styles = (props) => ({
+const _styles = ({ size, theme }) => ({
   dropdownIndicator,
   clearIndicator,
-  multiValue,
+  multiValue: multiValue({ theme }),
   multiValueLabel,
-  multiValueRemove,
+  multiValueRemove: multiValueRemove({ theme }),
   menu,
-  singleValue: singleValueAndPlaceholder,
-  placeholder,
-  control: controlFocus(props),
+  singleValue: singleValueAndPlaceholder({ theme }),
+  placeholder: placeholder({ theme }),
+  control: controlFocus({ size, theme }),
   valueContainer,
 });
 
@@ -254,6 +243,8 @@ class Select extends React.Component<Props, State> {
     optionRenderer: PropTypes.func,
     /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
+    /** @ignore */
+    theme: themePropTypes.isRequired,
     /**
      * String containing the selected value. If `multi` is enabled, it must
      * be a string containing all values separated by the `delimiter`.
@@ -366,6 +357,35 @@ class Select extends React.Component<Props, State> {
     });
   };
 
+  _selectTheme = (defaultTheme) => {
+    const { theme } = this.props;
+
+    console.log('defaultTheme', defaultTheme);
+
+    return {
+      ...defaultTheme,
+      colors: {
+        primary: theme.colors.variant.light.info,
+        primary75: theme.colors.variant.light.default,
+        primary50: theme.colors.variant.lighter.default,
+        primary25: theme.colors.variant.lightest.default,
+        danger: theme.colors.variant.darker.info,
+        dangerLight: theme.colors.variant.lighter.info,
+        neutral0: theme.colors.gray[100],
+        neutral5: theme.colors.gray[90],
+        neutral10: theme.colors.variant.lightest.info,
+        neutral20: theme.colors.gray[80],
+        neutral30: theme.colors.gray[70],
+        neutral40: theme.colors.gray[60],
+        neutral50: theme.colors.gray[50],
+        neutral60: theme.colors.gray[40],
+        neutral70: theme.colors.gray[30],
+        neutral80: theme.colors.gray[20],
+        neutral90: theme.colors.gray[10],
+      },
+    };
+  };
+
   createCustomFilter = (stringify: (any) => string) => {
     const { matchProp, ignoreAccents } = this.props;
     const options = { ignoreAccents };
@@ -426,9 +446,10 @@ class Select extends React.Component<Props, State> {
                        styles={{
                          ..._styles(this.props),
                        }}
+                       theme={this._selectTheme}
                        value={formattedValue} />
     );
   }
 }
 
-export default Select;
+export default withTheme(Select);
