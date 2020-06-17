@@ -360,11 +360,10 @@ class Select extends React.Component<Props, State> {
   _selectTheme = (defaultTheme) => {
     const { theme } = this.props;
 
-    console.log('defaultTheme', defaultTheme);
-
     return {
       ...defaultTheme,
       colors: {
+        ...defaultTheme.colors,
         primary: theme.colors.variant.light.info,
         primary75: theme.colors.variant.light.default,
         primary50: theme.colors.variant.lighter.default,
