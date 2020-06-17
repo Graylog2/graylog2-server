@@ -442,9 +442,7 @@ class Select extends React.Component<Props, State> {
                        filterOption={customFilter}
                        components={mergedComponents}
                        isOptionDisabled={(option) => !!option.disabled}
-                       styles={{
-                         ..._styles(this.props),
-                       }}
+                       styles={_styles(this.props)}
                        theme={this._selectTheme}
                        value={formattedValue} />
     );
