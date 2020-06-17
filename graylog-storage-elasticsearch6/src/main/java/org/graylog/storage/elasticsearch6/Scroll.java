@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Scroll {
-    private final ScrollResult.Factory scrollResultFactory;
     private final JestClient jestClient;
+    private final ScrollResultES6.Factory scrollResultFactory;
 
     @Inject
-    public Scroll(ScrollResult.Factory scrollResultFactory, JestClient jestClient) {
+    public Scroll(ScrollResultES6.Factory scrollResultFactory, JestClient jestClient) {
         this.scrollResultFactory = scrollResultFactory;
         this.jestClient = jestClient;
     }
