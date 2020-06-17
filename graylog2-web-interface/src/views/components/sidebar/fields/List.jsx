@@ -10,7 +10,7 @@ import ListItem, { type ListItemStyle } from './ListItem';
 
 type Props = {
   allFields: ImmutableList<FieldTypeMapping>,
-  currentMode: string,
+  currentGroup: string,
   fields: ImmutableList<FieldTypeMapping>,
   filter: ?string,
   listHeight: number,
@@ -19,9 +19,9 @@ type Props = {
 
 const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
-const _fieldsToShow = (fields, allFields, currentMode = 'all') => {
+const _fieldsToShow = (fields, allFields, currentGroup = 'all') => {
   const isNotReservedField = (f) => !isReservedField(f.name);
-  switch (currentMode) {
+  switch (currentGroup) {
     case 'all':
       return allFields.filter(isNotReservedField);
     case 'allreserved':
@@ -32,12 +32,12 @@ const _fieldsToShow = (fields, allFields, currentMode = 'all') => {
   }
 };
 
-const List = ({ viewMetadata: { activeQuery }, listHeight, filter, fields, allFields, currentMode }: Props) => {
+const List = ({ viewMetadata: { activeQuery }, listHeight, filter, fields, allFields, currentGroup }: Props) => {
   if (!fields) {
     return <span>No field information available.</span>;
   }
   const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
-  const fieldsToShow = _fieldsToShow(fields, allFields, currentMode);
+  const fieldsToShow = _fieldsToShow(fields, allFields, currentGroup);
   const fieldList = fieldsToShow
     .filter(fieldFilter)
     .sortBy((field) => field.name.toLocaleUpperCase());

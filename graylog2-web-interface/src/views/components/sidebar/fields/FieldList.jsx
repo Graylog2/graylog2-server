@@ -11,7 +11,7 @@ import { type ThemeInterface } from 'theme';
 
 import { Button } from 'components/graylog';
 import List from './List';
-import ChangeMode from './ChangeMode';
+import FieldGroup from './FieldGroup';
 
 type Props = {
   viewMetadata: ViewMetadata,
@@ -37,30 +37,30 @@ const FilterInput = styled.input`
   width: 100%;
 `;
 
-const FieldListModes = styled.div`
+const FieldListGroups = styled.div`
   margin-top: 5px;
   margin-bottom: 0;
 `;
 
-const reducer = (state, action: {type: string, payload?: { mode?: string, filter?: string }}): { filter: ?string, currentMode: string } => {
+const reducer = (state, action: {type: string, payload?: { fieldGroup?: string, filter?: string }}): { filter: ?string, currentGroup: string } => {
   const { payload = {} } = action;
-  const { mode, filter } = payload;
+  const { fieldGroup, filter } = payload;
   switch (action.type) {
     case 'search':
       return { ...state, filter: filter };
     case 'searchReset':
       return { ...state, filter: undefined };
-    case 'changeMode':
-      return mode ? { ...state, currentMode: mode } : state;
+    case 'changeGroup':
+      return fieldGroup ? { ...state, currentGroup: fieldGroup } : state;
     default:
       return state;
   }
 };
 
 const FieldList = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
-  const [{ filter, currentMode }, dispatch] = useReducer(reducer, { filter: undefined, currentMode: 'current' });
+  const [{ filter, currentGroup }, dispatch] = useReducer(reducer, { filter: undefined, currentGroup: 'current' });
   const handleSearch = (e) => dispatch({ type: 'search', payload: { filter: e.target.value } });
-  const changeMode = (mode) => dispatch({ type: 'changeMode', payload: { mode } });
+  const changeFieldGroup = (fieldGroup) => dispatch({ type: 'changeGroup', payload: { fieldGroup } });
   return (
     <Container>
       <FilterForm className="form-inline" onSubmit={(e) => e.preventDefault()}>
@@ -80,34 +80,34 @@ const FieldList = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
           </Button>
         </div>
       </FilterForm>
-      <FieldListModes>
+      <FieldListGroups>
         List fields of{' '}
-        <ChangeMode changeMode={changeMode}
-                    currentMode={currentMode}
-                    mode="current"
+        <FieldGroup selected={currentGroup === 'current'}
+                    group="current"
                     text="current streams"
-                    title="This shows fields which are (prospectively) included in the streams you have selected." />
+                    title="This shows fields which are (prospectively) included in the streams you have selected."
+                    onSelect={changeFieldGroup} />
         {', '}
-        <ChangeMode changeMode={changeMode}
-                    currentMode={currentMode}
-                    mode="all"
+        <FieldGroup selected={currentGroup === 'all'}
+                    group="all"
                     text="all"
-                    title="This shows all fields, but no reserved (gl2_*) fields." />
+                    title="This shows all fields, but no reserved (gl2_*) fields."
+                    onSelect={changeFieldGroup} />
         {' or '}
-        <ChangeMode changeMode={changeMode}
-                    currentMode={currentMode}
-                    mode="allreserved"
+        <FieldGroup onSelect={changeFieldGroup}
+                    selected={currentGroup === 'allreserved'}
+                    group="allreserved"
                     text="all including reserved"
                     title="This shows all fields, including reserved (gl2_*) fields." />
         {' fields.'}
-      </FieldListModes>
+      </FieldListGroups>
       <hr />
       <List viewMetadata={viewMetadata}
             listHeight={listHeight}
             filter={filter}
             fields={fields}
             allFields={allFields}
-            currentMode={currentMode} />
+            currentGroup={currentGroup} />
     </Container>
   );
 };
