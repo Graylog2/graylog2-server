@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
-import { themePropTypes } from 'theme';
+import { themePropTypes, type ThemeInterface } from 'theme';
 
 import Icon from './Icon';
 
@@ -188,6 +188,7 @@ type Props = {
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
+  theme: ThemeInterface,
   value?: string,
   valueKey?: string,
   valueRenderer?: (Option) => React.Node,
@@ -357,7 +358,7 @@ class Select extends React.Component<Props, State> {
     });
   };
 
-  _selectTheme = (defaultTheme) => {
+  _selectTheme = (defaultTheme: {[string]: any}) => {
     const { theme } = this.props;
 
     return {
