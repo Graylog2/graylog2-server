@@ -57,7 +57,7 @@ const reducer = (state, action: {type: string, payload?: { mode?: string, filter
   }
 };
 
-const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
+const FieldList = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
   const [{ filter, currentMode }, dispatch] = useReducer(reducer, { filter: undefined, currentMode: 'current' });
   const handleSearch = (e) => dispatch({ type: 'search', payload: { filter: e.target.value } });
   const changeMode = (mode) => dispatch({ type: 'changeMode', payload: { mode } });
@@ -112,14 +112,14 @@ const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) 
   );
 };
 
-FieldsOverview.propTypes = {
+FieldList.propTypes = {
   allFields: PropTypes.object.isRequired,
   listHeight: PropTypes.number,
   fields: PropTypes.object.isRequired,
 };
 
-FieldsOverview.defaultProps = {
+FieldList.defaultProps = {
   listHeight: 50,
 };
 
-export default FieldsOverview;
+export default FieldList;

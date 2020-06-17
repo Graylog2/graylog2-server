@@ -31,7 +31,7 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldsOverview } from 'views/components/sidebar';
+import { FieldList } from 'views/components/sidebar';
 
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
@@ -75,7 +75,7 @@ const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, sea
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
   }));
-const ConnectedFieldsOverview = connect(FieldsOverview, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
+const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
   (props) => ({
 
     ...props,
@@ -165,7 +165,7 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
               <GridContainer id="main-row" interactive={interactive}>
                 <IfInteractive>
                   <ConnectedSideBar>
-                    <ConnectedFieldsOverview />
+                    <ConnectedFieldList />
                   </ConnectedSideBar>
                 </IfInteractive>
                 <SearchArea>
