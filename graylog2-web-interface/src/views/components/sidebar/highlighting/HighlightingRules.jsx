@@ -15,8 +15,8 @@ const HighlightingRules = () => {
   return (
     <>
       <SectionInfo>
-        Search terms and field values can be highlighted. The search term highlighting can be configured in the graylog server config.
-        A field value can be highlighted by clicking on &quot;Highlight this value&quot; in its context menu.
+        Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.
+        Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.
       </SectionInfo>
       <SectionSubheadline>Active highlights</SectionSubheadline>
       <HighlightingRuleGrid>
