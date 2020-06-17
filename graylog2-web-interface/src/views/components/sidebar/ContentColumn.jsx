@@ -86,7 +86,7 @@ const Title = styled.h1`
 const OverlayToggle: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   > * {
     font-size: 18px;
-    color: ${sidebarIsInline ? theme.colors.gray[30] : theme.colors.variant.info};
+    color: ${sidebarIsInline ? theme.colors.variant.info : theme.colors.gray[30]};
   }
 `);
 
@@ -142,7 +142,7 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout,
                   <OverlayToggle sidebarIsInline={sidebarIsInline}>
                     <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
                                 title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
-                                name="layer-group" />
+                                name="thumb-tack" />
                   </OverlayToggle>
                 </CenterVertical>
               </Header>
