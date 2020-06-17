@@ -46,7 +46,8 @@ public class FixtureImporterES6 implements FixtureImporter {
         this.jestClient = jestClient;
     }
 
-    @Override public void importResource(URL resource) {
+    @Override
+    public void importResource(URL resource) {
         LOG.debug("Importing fixture resource: {}", resource);
         try {
             final JsonNode root = OBJECT_MAPPER.readValue(resource, JsonNode.class);
