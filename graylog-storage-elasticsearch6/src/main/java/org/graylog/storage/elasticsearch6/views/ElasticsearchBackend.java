@@ -52,7 +52,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.graylog2.indexer.cluster.jest.JestUtils.checkForFailedShards;
+import static org.graylog.storage.elasticsearch6.jest.JestUtils.checkForFailedShards;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
