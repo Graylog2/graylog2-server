@@ -64,11 +64,13 @@ public class ClientES6 implements Client {
         this.client = client;
     }
 
-    @Override public void createIndex(String index) {
+    @Override
+    public void createIndex(String index) {
         createIndex(index, 1, 0);
     }
 
-    @Override public void createIndex(String index, int shards, int replicas) {
+    @Override
+    public void createIndex(String index, int shards, int replicas) {
         createIndex(index, shards, replicas, Collections.emptyMap());
     }
 
@@ -98,7 +100,8 @@ public class ClientES6 implements Client {
         executeWithExpectedSuccess(createIndex, "failed to create index " + index);
     }
 
-    @Override public String createRandomIndex(String prefix) {
+    @Override
+    public String createRandomIndex(String prefix) {
         final String indexName = prefix + System.nanoTime();
 
         createIndex(indexName);
@@ -107,7 +110,8 @@ public class ClientES6 implements Client {
         return indexName;
     }
 
-    @Override public void deleteIndices(String... indices) {
+    @Override
+    public void deleteIndices(String... indices) {
         for (String index : indices)
             if (indicesExists(index)) {
                 final DeleteIndex deleteIndex = new DeleteIndex.Builder(index).build();
@@ -115,12 +119,14 @@ public class ClientES6 implements Client {
             }
     }
 
-    @Override public void closeIndex(String index) {
+    @Override
+    public void closeIndex(String index) {
         final CloseIndex closeIndex = new CloseIndex.Builder(index).build();
         executeWithExpectedSuccess(closeIndex, "failed to close index " + index);
     }
 
-    @Override public boolean indicesExists(String... indices) {
+    @Override
+    public boolean indicesExists(String... indices) {
         final IndicesExists indicesExists = new IndicesExists.Builder(Arrays.asList(indices)).build();
         final JestResult indicesExistsResponse =
                 execute(indicesExists, "failed to check for existence of indices: " + Arrays.toString(indices));
@@ -128,14 +134,16 @@ public class ClientES6 implements Client {
         return indicesExistsResponse.isSucceeded();
     }
 
-    @Override public void addAliasMapping(String indexName, String alias) {
+    @Override
+    public void addAliasMapping(String indexName, String alias) {
         final AddAliasMapping addAliasMapping = new AddAliasMapping.Builder(indexName, alias).build();
         final ModifyAliases addAliasRequest = new ModifyAliases.Builder(addAliasMapping).build();
 
         executeWithExpectedSuccess(addAliasRequest, "failed to add alias " + alias + " for index " + indexName);
     }
 
-    @Override public JsonNode getMapping(String... indices) {
+    @Override
+    public JsonNode getMapping(String... indices) {
         final GetMapping getMapping = new GetMapping.Builder().addIndex(Arrays.asList(indices)).build();
 
         final JestResult response = executeWithExpectedSuccess(getMapping, "");
@@ -143,7 +151,8 @@ public class ClientES6 implements Client {
         return response.getJsonObject();
     }
 
-    @Override public JsonNode getTemplate(String templateName) {
+    @Override
+    public JsonNode getTemplate(String templateName) {
         final GetTemplate templateRequest = new GetTemplate.Builder(templateName).build();
         final JestResult templateResponse =
                 executeWithExpectedSuccess(templateRequest, "failed to get template " + templateName);
@@ -151,23 +160,27 @@ public class ClientES6 implements Client {
         return templateResponse.getJsonObject();
     }
 
-    @Override public JsonNode getTemplates() {
+    @Override
+    public JsonNode getTemplates() {
         return getTemplate("");
     }
 
-    @Override public void putTemplate(String templateName, Object source) {
+    @Override
+    public void putTemplate(String templateName, Object source) {
         final PutTemplate templateRequest = new PutTemplate.Builder(templateName, source).build();
         executeWithExpectedSuccess(templateRequest, "failed to put template " + templateName);
     }
 
-    @Override public void deleteTemplates(String... templates) {
+    @Override
+    public void deleteTemplates(String... templates) {
         for (String template : templates) {
             final DeleteTemplate templateRequest = new DeleteTemplate.Builder(template).build();
             executeWithExpectedSuccess(templateRequest, "failed to delete template " + template);
         }
     }
 
-    @Override public void waitForGreenStatus(String... indices) {
+    @Override
+    public void waitForGreenStatus(String... indices) {
         waitForStatus(Health.Status.GREEN, indices);
     }
 
@@ -210,11 +223,13 @@ public class ClientES6 implements Client {
                 .isTrue();
     }
 
-    @Override public void refreshNode() {
+    @Override
+    public void refreshNode() {
         executeWithExpectedSuccess(new Refresh.Builder().build(), "Couldn't refresh elasticsearch node");
     }
 
-    @Override public void bulkIndex(BulkIndexRequest bulkIndexRequest) {
+    @Override
+    public void bulkIndex(BulkIndexRequest bulkIndexRequest) {
         final Bulk.Builder bulkBuilder = new Bulk.Builder().refresh(true);
 
         bulkIndexRequest.requests()
