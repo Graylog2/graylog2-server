@@ -80,7 +80,8 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
         LOG.debug("[{}] Starting scroll request for query {}", queryHash, getOriginalQuery());
     }
 
-    @Override public ScrollChunk nextChunk() throws IOException {
+    @Override
+    public ScrollChunk nextChunk() throws IOException {
 
         final JestResult search;
         final List<ResultMessage> hits;
@@ -120,15 +121,18 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
         return jestClient.execute(searchBuilder.build());
     }
 
-    @Override public String getQueryHash() {
+    @Override
+    public String getQueryHash() {
         return queryHash;
     }
 
-    @Override public long totalHits() {
+    @Override
+    public long totalHits() {
         return totalHits;
     }
 
-    @Override public void cancel() throws IOException {
+    @Override
+    public void cancel() throws IOException {
         final ClearScroll.Builder clearScrollBuilder = new ClearScroll.Builder().addScrollId(scrollId);
         final JestResult result = jestClient.execute(clearScrollBuilder.build());
         LOG.debug("[{}] clearScroll for query successful: {}", queryHash, result.isSucceeded());
