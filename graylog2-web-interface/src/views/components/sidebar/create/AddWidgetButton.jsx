@@ -120,9 +120,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
       <>
-        <Group>
-          <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
-        </Group>
+        <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
         <Group>
           <SectionSubheadline>Generic</SectionSubheadline>
           {generic}
