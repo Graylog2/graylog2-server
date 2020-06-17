@@ -18,10 +18,10 @@ package org.graylog.schema;
 
 /**
  * Field names used in the standard Graylog Schema.
+ *
+ * @deprecated Please use the appropriate enums in this package rather than this collection of strings
  */
-
-
-
+@Deprecated
 public class GraylogSchemaFields {
 
     public static final String FIELD_USER_ID = "user_id";
@@ -50,20 +50,19 @@ public class GraylogSchemaFields {
     public static final String FIELD_EVENT_UID = "event_uid";
     public static final String FIELD_EVENT_SOURCE_PRODUCT = "event_source_product";
 
-    public static final String FIELD_APPLICATION_SSO_SIGNONMODE  = "application_sso_signonmode";
+    public static final String FIELD_APPLICATION_SSO_SIGNONMODE = "application_sso_signonmode";
     public static final String FIELD_APPLICATION_SSO_TARGET_NAME = "application_sso_target_name";
 
     public static final String FIELD_VENDOR_EVENT_ACTION = "vendor_event_action";
     public static final String FIELD_VENDOR_EVENT_DESCRIPTION = "vendor_event_description";
     public static final String FIELD_VENDOR_EVENT_SEVERITY = "vendor_event_severity";
-    public static final String FIELD_VENDOR_EVENT_OUTCOME  = "vendor_event_outcome";
+    public static final String FIELD_VENDOR_EVENT_OUTCOME = "vendor_event_outcome";
     public static final String FIELD_VENDOR_EVENT_OUTCOME_REASON = "vendor_event_outcome_reason";
     public static final String FIELD_VENDOR_SEVERITY_DESCRIPTION = "vendor_severity_description";
     public static final String FIELD_VENDOR_THREAT_SUSPECTED = "vendor_threat_suspected";
     public static final String FIELD_VENDOR_TRANSACTION_TYPE = "vendor_transaction_type";
-    public static final String FIELD_VENDOR_TRANSACTION_ID   = "vendor_transaction_id";
-    public static final String FIELD_VENDOR_USER_TYPE        = "vendor_user_type";
-
+    public static final String FIELD_VENDOR_TRANSACTION_ID = "vendor_transaction_id";
+    public static final String FIELD_VENDOR_USER_TYPE = "vendor_user_type";
 
 
 }

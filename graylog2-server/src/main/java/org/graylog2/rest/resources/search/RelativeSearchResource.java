@@ -177,6 +177,7 @@ public class RelativeSearchResource extends SearchResource {
             .build();
     }
 
+    @Deprecated
     @GET
     @Path("/terms")
     @Timed
@@ -203,6 +204,7 @@ public class RelativeSearchResource extends SearchResource {
         return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildRelativeTimeRange(range), sortOrder.getDirection()));
     }
 
+    @Deprecated
     @GET
     @Path("/terms-histogram")
     @Timed
@@ -234,6 +236,7 @@ public class RelativeSearchResource extends SearchResource {
         return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, SearchUtils.buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
+    @Deprecated
     @GET
     @Path("/termsstats")
     @Timed
@@ -262,6 +265,7 @@ public class RelativeSearchResource extends SearchResource {
         );
     }
 
+    @Deprecated
     @GET
     @Path("/stats")
     @Timed
@@ -286,6 +290,7 @@ public class RelativeSearchResource extends SearchResource {
         return buildFieldStatsResult(fieldStats(field, query, filter, buildRelativeTimeRange(range)));
     }
 
+    @Deprecated
     @GET
     @Path("/histogram")
     @Timed
@@ -318,6 +323,7 @@ public class RelativeSearchResource extends SearchResource {
         );
     }
 
+    @Deprecated
     @GET
     @Path("/fieldhistogram")
     @Timed

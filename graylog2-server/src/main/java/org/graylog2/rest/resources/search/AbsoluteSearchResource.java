@@ -181,6 +181,7 @@ public class AbsoluteSearchResource extends SearchResource {
             .build();
     }
 
+    @Deprecated
     @GET
     @Path("/terms")
     @Timed
@@ -209,6 +210,7 @@ public class AbsoluteSearchResource extends SearchResource {
         return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildAbsoluteTimeRange(from, to), sortOrder.getDirection()));
     }
 
+    @Deprecated
     @GET
     @Path("/terms-histogram")
     @Timed
@@ -241,6 +243,7 @@ public class AbsoluteSearchResource extends SearchResource {
         return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, SearchUtils.buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
+    @Deprecated
     @GET
     @Path("/termsstats")
     @Timed
@@ -277,6 +280,7 @@ public class AbsoluteSearchResource extends SearchResource {
                 ));
     }
 
+    @Deprecated
     @GET
     @Path("/stats")
     @Timed
@@ -303,6 +307,7 @@ public class AbsoluteSearchResource extends SearchResource {
         return buildFieldStatsResult(fieldStats(field, query, filter, buildAbsoluteTimeRange(from, to)));
     }
 
+    @Deprecated
     @GET
     @Path("/histogram")
     @Timed
@@ -337,6 +342,7 @@ public class AbsoluteSearchResource extends SearchResource {
         );
     }
 
+    @Deprecated
     @GET
     @Path("/fieldhistogram")
     @Timed
