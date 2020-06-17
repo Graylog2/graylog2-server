@@ -5,7 +5,7 @@ import io.searchbox.client.JestClient;
 import org.graylog.events.indices.EventIndexerAdapter;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.storage.elasticsearch6.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6;
-import org.graylog2.bindings.providers.JestClientProvider;
+import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
