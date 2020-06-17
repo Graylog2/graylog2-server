@@ -28,7 +28,7 @@ import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.storage.elasticsearch6.TimeRangeFilterQuery;
+import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
@@ -135,7 +135,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private QueryBuilder timestampFilter(ExportMessagesCommand command) {
-        return requireNonNull(TimeRangeFilterQuery.create(command.timeRange()));
+        return requireNonNull(TimeRangeQueryFactory.create(command.timeRange()));
     }
 
     private TermsQueryBuilder streamsFilter(ExportMessagesCommand command) {

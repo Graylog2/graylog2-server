@@ -24,7 +24,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 
-public class TimeRangeFilterQuery {
+public class TimeRangeQueryFactory {
     @Nullable
     public static RangeQueryBuilder create(TimeRange range) {
         if (range == null) {
