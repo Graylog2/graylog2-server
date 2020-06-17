@@ -78,7 +78,10 @@ public class NotificationGracePeriodService {
         }
         final Optional<DateTime> lastEventTime = get(definition.id(), notificationId, event.toDto().key());
         final boolean isInGracePeriod = lastEventTime.map(dateTime -> dateTime.isAfter(event.getEventTimestamp().minus(gracePeriodMs))).orElse(false);
-        put(definition.id(), notificationId, event.toDto().key(), event.getEventTimestamp());
+        // Only update the timestamp if we are not within the grace period
+        if (!isInGracePeriod) {
+            put(definition.id(), notificationId, event.toDto().key(), event.getEventTimestamp());
+        }
         return isInGracePeriod;
     }
 
