@@ -33,8 +33,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>elasticsearch5</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>
