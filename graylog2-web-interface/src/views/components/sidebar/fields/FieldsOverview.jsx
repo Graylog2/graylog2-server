@@ -42,7 +42,7 @@ const FieldListGroups = styled.div`
   margin-bottom: 0;
 `;
 
-const FieldList = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
+const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
   const [currentGroup, setCurrentGroup] = useState('current');
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
@@ -98,14 +98,14 @@ const FieldList = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
   );
 };
 
-FieldList.propTypes = {
+FieldsOverview.propTypes = {
   allFields: PropTypes.object.isRequired,
   listHeight: PropTypes.number,
   fields: PropTypes.object.isRequired,
 };
 
-FieldList.defaultProps = {
+FieldsOverview.defaultProps = {
   listHeight: 50,
 };
 
-export default FieldList;
+export default FieldsOverview;
