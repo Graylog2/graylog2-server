@@ -23,6 +23,9 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.BulkResult;
+import io.searchbox.core.Index;
 import io.searchbox.indices.CloseIndex;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
@@ -210,5 +213,29 @@ public class Client {
 
     public void refreshNode() {
         executeWithExpectedSuccess(new Refresh.Builder().build(), "Couldn't refresh elasticsearch node");
+    }
+
+    public void bulkIndex(BulkIndexRequest bulkIndexRequest) {
+        final Bulk.Builder bulkBuilder = new Bulk.Builder().refresh(true);
+
+        bulkIndexRequest.requests()
+                .entrySet()
+                .stream()
+                .flatMap(entry -> {
+                            final String indexName = entry.getKey();
+
+                            return entry.getValue().stream()
+                                    .map(request -> new Index.Builder(request)
+                                            .index(indexName)
+                                            .type("test")
+                                            .refresh(true)
+                                            .build());
+                        })
+                .forEach(bulkBuilder::addAction);
+
+        final BulkResult bulkResult = executeWithExpectedSuccess(bulkBuilder.build(), "failed to execute bulk request");
+
+        assertThat(bulkResult.getFailedItems()).isEmpty();
+
     }
 }
