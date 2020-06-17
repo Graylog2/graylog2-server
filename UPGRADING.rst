@@ -4,6 +4,25 @@ Upgrading to Graylog 3.3.x
 
 .. _upgrade-from-32-to-33:
 
+Deprecating legacy Aggregation API endpoints
+============================================
+
+This release is marking several endpoints of the legacy (pre 3.2) aggregation API as being deprecated. They will be removed in 4.0. These include:
+
+- `/search/universal/(absolute|relative|keyword)/`
+    - `terms-histogram`
+    - `histogram`
+    - `fieldhistogram`
+    - `stats`
+    - `termsstats`
+    - `terms`
+- `/sources`
+
+These endpoints are not being used by the frontend anymore. In general, we try to replace very specific endpoints with more general, flexible ones.
+Deprecating and removing these endpoints frees development time for new things, which would otherwise need to be invested in maintaining legacy code.
+All of the functionality offered by these endpoints can be implemented by the `Views` API in a better way, please consult your local Swagger instance for details.
+
+
 API Access Token Encryption
 ===========================
 

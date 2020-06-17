@@ -40,6 +40,7 @@ import IfSearch from 'views/components/search/IfSearch';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
@@ -160,34 +161,36 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       <InteractiveContext.Consumer>
         {(interactive) => (
           <ViewAdditionalContextProvider>
-            <GridContainer id="main-row" interactive={interactive}>
-              <IfInteractive>
-                <ConnectedSideBar>
-                  <ConnectedFieldList />
-                </ConnectedSideBar>
-              </IfInteractive>
-              <SearchArea>
+            <HighlightingRulesProvider>
+              <GridContainer id="main-row" interactive={interactive}>
                 <IfInteractive>
-                  <HeaderElements />
-                  <IfDashboard>
-                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfDashboard>
-                  <IfSearch>
-                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  </IfSearch>
-
-                  <QueryBarElements />
-
-                  <IfDashboard>
-                    <QueryBar />
-                  </IfDashboard>
+                  <ConnectedSideBar>
+                    <ConnectedFieldList />
+                  </ConnectedSideBar>
                 </IfInteractive>
-                <HighlightMessageInQuery query={location.query}>
-                  <SearchResult />
-                </HighlightMessageInQuery>
-                <Footer />
-              </SearchArea>
-            </GridContainer>
+                <SearchArea>
+                  <IfInteractive>
+                    <HeaderElements />
+                    <IfDashboard>
+                      <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfDashboard>
+                    <IfSearch>
+                      <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    </IfSearch>
+
+                    <QueryBarElements />
+
+                    <IfDashboard>
+                      <QueryBar />
+                    </IfDashboard>
+                  </IfInteractive>
+                  <HighlightMessageInQuery query={location.query}>
+                    <SearchResult />
+                  </HighlightMessageInQuery>
+                  <Footer />
+                </SearchArea>
+              </GridContainer>
+            </HighlightingRulesProvider>
           </ViewAdditionalContextProvider>
         )}
       </InteractiveContext.Consumer>
