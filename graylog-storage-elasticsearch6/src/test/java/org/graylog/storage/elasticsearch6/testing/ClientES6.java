@@ -47,8 +47,10 @@ import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.collect.Iterators.toArray;
@@ -218,22 +220,28 @@ public class ClientES6 implements Client {
         bulkIndexRequest.requests()
                 .entrySet()
                 .stream()
-                .flatMap(entry -> {
-                            final String indexName = entry.getKey();
-
-                            return entry.getValue().stream()
-                                    .map(request -> new Index.Builder(request)
-                                            .index(indexName)
-                                            .type("test")
-                                            .refresh(true)
-                                            .build());
-                        })
+                .flatMap(this::createBulkIndexActions)
                 .forEach(bulkBuilder::addAction);
 
         final BulkResult bulkResult = executeWithExpectedSuccess(bulkBuilder.build(), "failed to execute bulk request");
 
         assertThat(bulkResult.getFailedItems()).isEmpty();
 
+    }
+
+    private Stream<Index> createBulkIndexActions(Map.Entry<String, List<Map<String, Object>>> entry) {
+        final String indexName = entry.getKey();
+
+        return entry.getValue().stream()
+                .map(source -> this.createBulkIndexAction(indexName, source));
+    }
+
+    private Index createBulkIndexAction(String indexName, Map<String, Object> source) {
+        return new Index.Builder(source)
+                .index(indexName)
+                .type("test")
+                .refresh(true)
+                .build();
     }
 
     @Override
