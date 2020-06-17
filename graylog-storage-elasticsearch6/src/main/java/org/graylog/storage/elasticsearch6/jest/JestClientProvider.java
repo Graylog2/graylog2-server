@@ -29,7 +29,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.graylog2.indexer.cluster.jest.GraylogJestRetryHandler;
 import org.graylog2.indexer.cluster.jest.RequestResponseLogger;
 
 import javax.annotation.Nullable;
