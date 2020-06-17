@@ -103,7 +103,7 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
 
         if (hits.size() == 0) {
             // scroll exhausted
-            LOG.debug("[{}] Reached end of scroll results.", queryHash, getOriginalQuery());
+            LOG.debug("[{}] Reached end of scroll results for query {}", queryHash, getOriginalQuery());
             return null;
         }
         LOG.debug("[{}][{}] New scroll id {}, number of hits in chunk: {}", queryHash, chunkId, getScrollIdFromResult(search), hits.size());
