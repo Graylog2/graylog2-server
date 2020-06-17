@@ -17,8 +17,6 @@
 package org.graylog.testing.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
 
 public interface Client {
     void createIndex(String index);
@@ -35,8 +33,6 @@ public interface Client {
 
     void addAliasMapping(String indexName, String alias);
 
-    void removeAliasMapping(String indexName, String alias);
-
     JsonNode getMapping(String... indices);
 
     JsonNode getTemplate(String templateName);
@@ -48,12 +44,6 @@ public interface Client {
     void deleteTemplates(String... templates);
 
     void waitForGreenStatus(String... indices);
-
-    <T extends JestResult> T executeWithExpectedSuccess(Action<T> jestAction, String errorMessage);
-
-    <T extends JestResult> T execute(Action<T> jestAction, String errorMessage);
-
-    void assertSucceeded(JestResult jestResult);
 
     void refreshNode();
 

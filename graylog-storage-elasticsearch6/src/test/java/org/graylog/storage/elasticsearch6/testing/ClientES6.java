@@ -34,7 +34,6 @@ import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.Refresh;
 import io.searchbox.indices.aliases.AddAliasMapping;
 import io.searchbox.indices.aliases.ModifyAliases;
-import io.searchbox.indices.aliases.RemoveAliasMapping;
 import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
@@ -134,13 +133,6 @@ public class ClientES6 implements Client {
         executeWithExpectedSuccess(addAliasRequest, "failed to add alias " + alias + " for index " + indexName);
     }
 
-    @Override public void removeAliasMapping(String indexName, String alias) {
-        final RemoveAliasMapping removeAliasMapping = new RemoveAliasMapping.Builder(indexName, alias).build();
-        final ModifyAliases removeAliasRequest = new ModifyAliases.Builder(removeAliasMapping).build();
-
-        executeWithExpectedSuccess(removeAliasRequest, "failed to remove alias " + alias + " for index " + indexName);
-    }
-
     @Override public JsonNode getMapping(String... indices) {
         final GetMapping getMapping = new GetMapping.Builder().addIndex(Arrays.asList(indices)).build();
 
@@ -195,13 +187,13 @@ public class ClientES6 implements Client {
         Health.Status.valueOf(actualStatus.toUpperCase(Locale.ROOT));
     }
 
-    @Override public <T extends JestResult> T executeWithExpectedSuccess(Action<T> jestAction, String errorMessage) {
+    private <T extends JestResult> T executeWithExpectedSuccess(Action<T> jestAction, String errorMessage) {
         final T response = execute(jestAction, errorMessage);
         assertSucceeded(response);
         return response;
     }
 
-    @Override public <T extends JestResult> T execute(Action<T> jestAction, String errorMessage) {
+    private <T extends JestResult> T execute(Action<T> jestAction, String errorMessage) {
         try {
             return client.execute(jestAction);
         } catch (IOException e) {
@@ -209,7 +201,7 @@ public class ClientES6 implements Client {
         }
     }
 
-    @Override public void assertSucceeded(JestResult jestResult) {
+    private void assertSucceeded(JestResult jestResult) {
         final String errorMessage = nullToEmpty(jestResult.getErrorMessage());
         assertThat(jestResult.isSucceeded())
                 .overridingErrorMessage(errorMessage)
