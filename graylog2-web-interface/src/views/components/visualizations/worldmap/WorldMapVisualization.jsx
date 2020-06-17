@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 
-import { AggregationType, AggregationData } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -82,7 +82,7 @@ const WorldMapVisualization: VisualizationComponent = makeVisualization(({ confi
 
 WorldMapVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: AggregationData.isRequired,
+  data: AggregationResult.isRequired,
   onChange: PropTypes.func.isRequired,
   width: PropTypes.number.isRequired,
 };

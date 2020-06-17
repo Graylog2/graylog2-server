@@ -2,7 +2,7 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-import { AggregationType, AggregationData } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
@@ -57,7 +57,7 @@ const LineVisualization: VisualizationComponent = makeVisualization(({ config, d
 
 LineVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: AggregationData.isRequired,
+  data: AggregationResult.isRequired,
   height: PropTypes.number,
 };
 

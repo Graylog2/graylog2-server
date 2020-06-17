@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { values, merge, fill, find, isEmpty, get } from 'lodash';
 
-import { AggregationType, AggregationData } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
@@ -129,7 +129,7 @@ const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config
 
 HeatmapVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: AggregationData.isRequired,
+  data: AggregationResult.isRequired,
 };
 
 export default HeatmapVisualization;

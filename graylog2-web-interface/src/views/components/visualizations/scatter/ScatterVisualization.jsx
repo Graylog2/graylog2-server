@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
-import { AggregationType, AggregationData } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
@@ -31,7 +31,7 @@ const ScatterVisualization: VisualizationComponent = makeVisualization(({ config
 
 ScatterVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: AggregationData.isRequired,
+  data: AggregationResult.isRequired,
   height: PropTypes.number,
 };
 
