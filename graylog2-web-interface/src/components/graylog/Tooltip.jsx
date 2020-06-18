@@ -6,7 +6,9 @@ import styled, { css } from 'styled-components';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
-const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
+const StyledTooltip = styled(BootstrapTooltip)(({ theme, allowLineBreaks }) => css`
+  white-space: ${allowLineBreaks ? 'normal' : 'nowrap'};
+
   &.top .tooltip-arrow {
     bottom: 0;
   }
@@ -46,7 +48,7 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 `);
 
-const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
+const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft, allowLineBreaks }) => {
   return (
     <GraylogThemeProvider>
       <StyledTooltip className={className}
@@ -54,6 +56,7 @@ const Tooltip = ({ children, className, id, placement, positionTop, positionLeft
                      placement={placement}
                      positionTop={positionTop}
                      positionLeft={positionLeft}
+                     allowLineBreaks={allowLineBreaks}
                      arrowOffsetTop={arrowOffsetTop}
                      arrowOffsetLeft={arrowOffsetLeft}>
         {children}
@@ -94,6 +97,10 @@ Tooltip.propTypes = {
    * The "left" position value for the Tooltip arrow.
    */
   arrowOffsetLeft: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  /**
+   * Control if the tooltip text can have line breaks.
+   */
+  allowLineBreaks: PropTypes.bool,
 };
 
 Tooltip.defaultProps = {
@@ -103,6 +110,7 @@ Tooltip.defaultProps = {
   positionLeft: undefined,
   arrowOffsetTop: undefined,
   arrowOffsetLeft: undefined,
+  allowLineBreaks: true,
 };
 
 /** @component */
