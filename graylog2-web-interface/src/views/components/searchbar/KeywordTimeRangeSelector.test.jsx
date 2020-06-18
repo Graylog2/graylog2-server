@@ -140,4 +140,15 @@ describe('KeywordTimeRangeSelector', () => {
 
     expect(queryByText('Preview:')).toBeNull();
   });
+
+  it('shows error message if parsing fails after changing input', async () => {
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="last week" />);
+
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
+    const input = getByDisplayValue('last week');
+
+    await changeInput(input, 'invalid');
+
+    expect(queryByText('Unable to parse keyword.')).not.toBeNull();
+  });
 });
