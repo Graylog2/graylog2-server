@@ -17,6 +17,11 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
+    'import/order': ['error', {
+      groups: ['builtin', 'external', 'internal', ['sibling', 'index'], 'parent'],
+      'newlines-between': 'always',
+    }],
+    'sort-imports': 'off', // disabled in favor of 'import/order'
     'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
     'max-classes-per-file': 'off',
     'max-len': 'off',
