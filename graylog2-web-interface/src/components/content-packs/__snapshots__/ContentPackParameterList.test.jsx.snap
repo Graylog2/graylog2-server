@@ -1248,6 +1248,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                                 >
                                   <Icon
                                     name="times"
+                                    type="solid"
                                   >
                                     <FontAwesomeIcon
                                       icon={
@@ -1941,6 +1942,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                 >
                                   <Icon
                                     name="times"
+                                    type="solid"
                                   >
                                     <FontAwesomeIcon
                                       icon={

@@ -2801,6 +2801,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     You can select between installed entities from the server (
                     <Icon
                       name="server"
+                      type="solid"
                     >
                       <FontAwesomeIcon
                         icon={
@@ -2819,6 +2820,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     <Icon
                       className="contentPackEntity"
                       name="archive"
+                      type="solid"
                     >
                       <FontAwesomeIcon
                         className="contentPackEntity"
@@ -3273,6 +3275,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                           <Icon
                                             className="fa-stack-1x"
                                             name="circle"
+                                            type="solid"
                                           >
                                             <FontAwesomeIcon
                                               className="fa-stack-1x"
@@ -3291,6 +3294,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                           <Icon
                                             className="fa-stack-1x"
                                             name="angle-up"
+                                            type="solid"
                                           >
                                             <FontAwesomeIcon
                                               className="fa-stack-1x"

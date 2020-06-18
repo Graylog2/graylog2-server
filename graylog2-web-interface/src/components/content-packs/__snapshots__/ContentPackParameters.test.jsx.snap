@@ -763,6 +763,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             >
                                               <Icon
                                                 name="times"
+                                                type="solid"
                                               >
                                                 <FontAwesomeIcon
                                                   icon={
@@ -1703,6 +1704,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         className="contentPackEntity"
                                         name="archive"
                                         title="Content Pack"
+                                        type="solid"
                                       >
                                         <FontAwesomeIcon
                                           className="contentPackEntity"
