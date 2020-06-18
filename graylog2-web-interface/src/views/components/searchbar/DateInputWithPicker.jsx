@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { DatePicker, Icon } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button, Tooltip } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -29,28 +29,35 @@ const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}
   const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
   const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
   return (
-    <DatePicker id={`date-input-datepicker-${name}`}
-                disabled={disabled}
-                title={title}
-                date={value}
-                onChange={onDatePicked}>
-      <Input type="text"
-             id={`date-input-${name}`}
-             name={name}
-             disabled={disabled}
-             className="absolute"
-             value={value}
-             onBlur={onBlur}
-             onChange={onChange}
-             placeholder={DateTime.Formats.DATETIME}
-             buttonAfter={(
-               <Button disabled={disabled} onClick={onSetTimeToNow} title="Insert current date">
-                 <Icon name="magic" />
-               </Button>
+    <div>
+      {error && (
+        <Tooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+          {error}
+        </Tooltip>
+      )}
+      <DatePicker id={`date-input-datepicker-${name}`}
+                  disabled={disabled}
+                  title={title}
+                  date={value}
+                  onChange={onDatePicked}>
+        <Input type="text"
+               id={`date-input-${name}`}
+               name={name}
+               disabled={disabled}
+               className="absolute"
+               value={value}
+               onBlur={onBlur}
+               onChange={onChange}
+               placeholder={DateTime.Formats.DATETIME}
+               buttonAfter={(
+                 <Button disabled={disabled} onClick={onSetTimeToNow} title="Insert current date">
+                   <Icon name="magic" />
+                 </Button>
              )}
-             bsStyle={error ? 'error' : null}
-             required />
-    </DatePicker>
+               bsStyle={error ? 'error' : null}
+               required />
+      </DatePicker>
+    </div>
   );
 };
 
