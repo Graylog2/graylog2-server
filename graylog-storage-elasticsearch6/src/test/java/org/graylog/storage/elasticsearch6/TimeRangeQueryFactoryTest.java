@@ -33,7 +33,7 @@ import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IndexHelperTest {
+public class TimeRangeQueryFactoryTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -49,7 +49,7 @@ public class IndexHelperTest {
 
     @Test
     public void getTimestampRangeFilterReturnsNullIfTimeRangeIsNull() {
-        Assertions.assertThat(IndexHelper.getTimestampRangeFilter(null)).isNull();
+        Assertions.assertThat(TimeRangeQueryFactory.create(null)).isNull();
     }
 
     @Test
@@ -57,7 +57,7 @@ public class IndexHelperTest {
         final DateTime from = new DateTime(2016, 1, 15, 12, 0, DateTimeZone.UTC);
         final DateTime to = from.plusHours(1);
         final TimeRange timeRange = AbsoluteRange.create(from, to);
-        final RangeQueryBuilder queryBuilder = (RangeQueryBuilder) IndexHelper.getTimestampRangeFilter(timeRange);
+        final RangeQueryBuilder queryBuilder = (RangeQueryBuilder) TimeRangeQueryFactory.create(timeRange);
         assertThat(queryBuilder).isNotNull();
         assertThat(queryBuilder.fieldName()).isEqualTo("timestamp");
         assertThat(queryBuilder.from()).isEqualTo(Tools.buildElasticSearchTimeFormat(from));

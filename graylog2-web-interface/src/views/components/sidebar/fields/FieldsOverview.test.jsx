@@ -4,19 +4,10 @@ import { List } from 'immutable';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldList from './FieldList';
+import FieldsOverview from './FieldsOverview';
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: {
-    getInitialState: () => ({
-      activeQuery: 'aQueryId',
-      id: 'aViewId',
-    }),
-    listen: jest.fn(),
-  },
-}));
 
-describe('<FieldList />', () => {
+describe('<FieldsOverview viewMetadata={viewMetadata} />', () => {
   const properties = [{ enumerable: true }];
   const fieldType1 = new FieldType('string', properties, []);
   const fieldTypeMapping1 = new FieldTypeMapping('date', fieldType1);
@@ -27,13 +18,18 @@ describe('<FieldList />', () => {
   const allFields = new List([fieldTypeMapping1, fieldTypeMapping2]);
   const fields = new List([fieldTypeMapping2]);
 
-  it('should render a FieldList', () => {
-    const wrapper = mount(<FieldList allFields={allFields} fields={fields} maximumHeight={1000} />);
+  const viewMetadata = {
+    activeQuery: 'aQueryId',
+    id: 'aViewId',
+  };
+
+  it('should render a FieldsOverview', () => {
+    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
     expect(wrapper.find('span.field-element').text()).toBe('http_method');
   });
 
-  it('should render all fields in FieldList after click', () => {
-    const wrapper = mount(<FieldList allFields={allFields} fields={fields} maximumHeight={1000} />);
+  it('should render all fields in FieldsOverview after click', () => {
+    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
     expect(wrapper.find('span.field-element').length).toBe(1);
 
     wrapper.find('a[children="all"]').simulate('click');
@@ -48,7 +44,7 @@ describe('<FieldList />', () => {
   });
 
   it('should search in the field list', () => {
-    const wrapper = mount(<FieldList allFields={allFields} fields={fields} maximumHeight={1000} />);
+    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
     expect(wrapper.find('span.field-element').length).toBe(1);
 
     wrapper.find('a[children="all"]').simulate('click');
@@ -63,7 +59,7 @@ describe('<FieldList />', () => {
 
   it('should show hint when no fields are returned after filtering', () => {
     const hint = <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
-    const wrapper = mount(<FieldList allFields={allFields} fields={fields} maximumHeight={1000} />);
+    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
     expect(wrapper).not.toContainReact(hint);
 
     wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'non_existing_field' } });

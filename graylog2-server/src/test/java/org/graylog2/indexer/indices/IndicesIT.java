@@ -214,6 +214,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         final String indexName = "index_template_test";
         final String templateName = indexSetConfig.indexTemplateName();
 
+        // TODO: Test is coupled to response structure
         final JsonNode beforeTemplates = client().getTemplates();
         assertThat(beforeTemplates.path(templateName).isMissingNode()).isTrue();
 
@@ -246,7 +247,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         client().putTemplate(templateName, templateSource);
 
+        // TODO: Test is coupled to sresponse structure
         final JsonNode beforeTemplate = client().getTemplate(templateName);
+        // TODO: Test is based on document types, which are deprecated and will be removed
         final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
         final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, TypeReferences.MAP_STRING_OBJECT);
         assertThat(actualMapping).isEqualTo(beforeMapping);
@@ -308,6 +311,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus(testIndexName);
 
         // Check index mapping
+        // TODO: Test is coupled to response structure, should be abstracted in Client implementation
         final JsonNode indexMappings = client().getMapping(testIndexName);
         final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
 

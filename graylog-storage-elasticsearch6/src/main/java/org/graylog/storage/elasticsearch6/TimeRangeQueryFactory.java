@@ -16,17 +16,17 @@
  */
 package org.graylog.storage.elasticsearch6;
 
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 
-public class IndexHelper {
+public class TimeRangeQueryFactory {
     @Nullable
-    public static QueryBuilder getTimestampRangeFilter(TimeRange range) {
+    public static RangeQueryBuilder create(TimeRange range) {
         if (range == null) {
             return null;
         }

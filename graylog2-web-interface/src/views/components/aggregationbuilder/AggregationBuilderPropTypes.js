@@ -21,3 +21,4 @@ export const VisualizationType = PropTypes.string;
 export const VisualizationConfigType = CustomPropTypes.instanceOf(VisualizationConfig);
 
 export const AggregationType = CustomPropTypes.instanceOf(AggregationWidgetConfig);
+export const AggregationResult = PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object));

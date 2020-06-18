@@ -23,7 +23,7 @@ export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInter
   position: ${sidebarIsInline ? 'static' : 'fixed'}
   display: grid;
   display: -ms-grid;
-  grid-templage-columns: 1fr;
+  grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
   -ms-grid-columns: 1fr;
   -ms-grid-rows: auto 1fr;

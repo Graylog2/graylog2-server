@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -64,7 +64,7 @@ const BarVisualization: VisualizationComponent = makeVisualization(({ config, da
 
 BarVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.object.isRequired,
+  data: AggregationResult.isRequired,
   height: PropTypes.number,
 };
 
