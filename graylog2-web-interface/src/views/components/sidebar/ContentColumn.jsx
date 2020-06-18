@@ -119,7 +119,7 @@ const toggleSidebarPinning = (searchPageLayout) => {
 
 const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
   if (!viewMetadata.id) {
-    return 'Ad Hoc Search';
+    return 'Untitled Search';
   }
   const defaultViewTitle = `Untitled ${viewType ? ViewTypeLabel({ type: viewType, capitalize: true }) : View.Type.Search}`;
   return viewMetadata.title || defaultViewTitle;
