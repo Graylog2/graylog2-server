@@ -6,10 +6,11 @@ import deprecationNotice from 'util/deprecationNotice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { far } from '@fortawesome/free-regular-svg-icons';
 import { faApple, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
 import compareIconNames from './icon-fallback';
 
-library.add(fas, faApple, faGithub, faGithubAlt, faLinux, faWindows);
+library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows);
 
 const removeFaPrefix = (name) => name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
 
@@ -36,6 +37,8 @@ const getPrefixForType = (type) => {
   switch (type) {
     case 'brand':
       return 'fab';
+    case 'regular':
+      return 'far';
     case 'solid':
     default:
       return 'fas';
@@ -61,8 +64,12 @@ const Icon = ({ name, type, ...props }) => {
 Icon.propTypes = {
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
   name: PropTypes.string.isRequired,
-  /** Name of icon type, the brand type is needed for all brand icons */
-  type: PropTypes.oneOf(['brand', 'solid']),
+  /**
+   * Name of icon type, the brand type is needed for all brand icons.
+   * The type regular is needed to outlined icon.
+   * Not all icons can be outlined.
+   * */
+  type: PropTypes.oneOf(['brand', 'solid', 'regular']),
 };
 
 Icon.defaultProps = {

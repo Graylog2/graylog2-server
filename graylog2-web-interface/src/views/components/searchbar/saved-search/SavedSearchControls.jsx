@@ -257,13 +257,13 @@ class SavedSearchControls extends React.Component<Props, State> {
             <ButtonGroup>
               <>
                 <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-                  <Icon style={{ color: savedSearchColor }} name="star" /> Save
+                  <Icon style={{ color: savedSearchColor }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
                 </Button>
                 {savedSearchForm}
               </>
               <Button title="Load a previously saved search"
                       onClick={this.toggleListModal}>
-                <Icon name="folder" /> Load
+                <Icon name="folder" type="regular" /> Load
               </Button>
               {savedSearchList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>

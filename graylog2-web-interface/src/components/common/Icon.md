@@ -19,7 +19,7 @@ Examples:
 
 <p>
   <strong>Flipped:</strong>
-  <Icon name="hand-paper" flip="horizontal" />{' '}<Icon name="hand-paper" />
+  <Icon name="hand-paper" flip="horizontal" type="regular" />{' '}<Icon name="hand-paper" type="regular" />
 </p>
 
 ```

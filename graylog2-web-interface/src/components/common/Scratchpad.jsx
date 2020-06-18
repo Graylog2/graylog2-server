@@ -188,7 +188,7 @@ const Scratchpad = () => {
                   spellCheck={false} />
 
         <Footer>
-          <SavingMessage visible={recentlySaved}><Icon name="hdd" /> Saved!</SavingMessage>
+          <SavingMessage visible={recentlySaved}><Icon name="hdd" type="regular" /> Saved!</SavingMessage>
           <SplitButton title={CopyWithIcon}
                        bsStyle="info"
                        data-clipboard-button

@@ -80,7 +80,7 @@ const HighlightingRule = ({ rule }: Props) => {
         for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
       </div>
       <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
-        <Icon name="trash-alt" />
+        <Icon name="trash-alt" type="regular" />
       </DeleteIcon>
     </HighlightingRuleGrid>
   );
