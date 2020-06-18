@@ -18,15 +18,16 @@ package org.graylog2.storage.providers;
 
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.VersionSpecificProvider;
+import org.graylog2.storage.VersionAwareProvider;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Map;
 
-public class IndexToolsAdapterProvider extends VersionSpecificProvider<IndexToolsAdapter> {
+public class IndexToolsAdapterProvider extends VersionAwareProvider<IndexToolsAdapter> {
     @Inject
-    public IndexToolsAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, IndexToolsAdapter> pluginBindings) {
+    public IndexToolsAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<IndexToolsAdapter>> pluginBindings) {
         super(elasticsearchMajorVersion, pluginBindings);
     }
 }

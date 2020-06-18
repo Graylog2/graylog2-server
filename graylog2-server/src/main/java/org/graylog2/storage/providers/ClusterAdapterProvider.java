@@ -18,15 +18,16 @@ package org.graylog2.storage.providers;
 
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.VersionSpecificProvider;
+import org.graylog2.storage.VersionAwareProvider;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Map;
 
-public class ClusterAdapterProvider extends VersionSpecificProvider<ClusterAdapter> {
+public class ClusterAdapterProvider extends VersionAwareProvider<ClusterAdapter> {
     @Inject
-    public ClusterAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, ClusterAdapter> pluginBindings) {
+    public ClusterAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<ClusterAdapter>> pluginBindings) {
         super(elasticsearchMajorVersion, pluginBindings);
     }
 }

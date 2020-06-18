@@ -18,15 +18,16 @@ package org.graylog2.storage.providers;
 
 import org.graylog.events.indices.EventIndexerAdapter;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.VersionSpecificProvider;
+import org.graylog2.storage.VersionAwareProvider;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Map;
 
-public class EventIndexerAdapterProvider extends VersionSpecificProvider<EventIndexerAdapter> {
+public class EventIndexerAdapterProvider extends VersionAwareProvider<EventIndexerAdapter> {
     @Inject
-    public EventIndexerAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, EventIndexerAdapter> pluginBindings) {
+    public EventIndexerAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<EventIndexerAdapter>> pluginBindings) {
         super(elasticsearchMajorVersion, pluginBindings);
     }
 }

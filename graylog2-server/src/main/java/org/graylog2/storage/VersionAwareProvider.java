@@ -16,20 +16,21 @@
  */
 package org.graylog2.storage;
 
-import com.google.inject.Provider;
 import org.graylog2.plugin.Version;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Map;
 
-public class VersionSpecificProvider<T> implements Provider<T> {
-    private final T instance;
+public class VersionAwareProvider<T> implements Provider<T> {
+    private final Version elasticsearchVersion;
+    private final Map<Version, Provider<T>> pluginBindings;
 
     @Inject
-    public VersionSpecificProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, T> pluginBindings) {
-        final Version elasticsearchVersion = constructElasticsearchVersion(elasticsearchMajorVersion);
-        this.instance = pluginBindings.get(elasticsearchVersion);
+    public VersionAwareProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
+        this.elasticsearchVersion = constructElasticsearchVersion(elasticsearchMajorVersion);
+        this.pluginBindings = pluginBindings;
     }
 
     private static Version constructElasticsearchVersion(String elasticsearchVersion) {
@@ -39,6 +40,10 @@ public class VersionSpecificProvider<T> implements Provider<T> {
 
     @Override
     public T get() {
-        return this.instance;
+        final Provider<T> provider = this.pluginBindings.get(elasticsearchVersion);
+        if (provider == null) {
+            throw new IllegalStateException("Invalid Elasticsearch version specified, or implementation is incomplete!");
+        }
+        return provider.get();
     }
 }

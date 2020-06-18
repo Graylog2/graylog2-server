@@ -38,7 +38,7 @@ import org.graylog2.storage.providers.NodeAdapterProvider;
 import org.graylog2.storage.providers.SearchesAdapterProvider;
 import org.graylog2.storage.providers.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider;
 
-public class VersionSpecificStorageModule extends AbstractModule {
+public class VersionAwareStorageModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);

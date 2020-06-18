@@ -80,7 +80,7 @@ import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.storage.VersionSpecificStorageModule;
+import org.graylog2.storage.VersionAwareStorageModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
@@ -130,7 +130,7 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings() {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
-                new VersionSpecificStorageModule(),
+                new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
                 new ServerBindings(configuration),
                 new ElasticsearchModule(),
