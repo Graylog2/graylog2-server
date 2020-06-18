@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.testing.elasticsearch;
+package org.graylog.testing.completebackend;
 
-import java.net.URL;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.testcontainers.containers.Network;
 
-public interface FixtureImporter {
-    void importResource(URL resource);
+public interface ElasticsearchInstanceFactory {
+    ElasticsearchInstance create(Network network);
 }

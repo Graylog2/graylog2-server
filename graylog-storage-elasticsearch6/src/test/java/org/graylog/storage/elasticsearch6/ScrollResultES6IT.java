@@ -21,7 +21,9 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.results.ScrollResult;
@@ -36,8 +38,17 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class ScrollResultES6IT extends ElasticsearchBaseTest {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -56,10 +67,10 @@ public class ScrollResultES6IT extends ElasticsearchBaseTest {
                 .setParameter(Parameters.SCROLL, "1m")
                 .setParameter(Parameters.SIZE, 5)
                 .build();
-        final SearchResult searchResult = JestUtils.execute(jestClient(), request, () -> "Exception");
+        final SearchResult searchResult = JestUtils.execute(jestClient(elasticsearch), request, () -> "Exception");
 
-        assertThat(jestClient()).isNotNull();
-        final ScrollResult scrollResult = new ScrollResultES6(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        assertThat(jestClient(elasticsearch)).isNotNull();
+        final ScrollResult scrollResult = new ScrollResultES6(jestClient(elasticsearch), objectMapper, searchResult, "*", Collections.singletonList("message"));
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );
