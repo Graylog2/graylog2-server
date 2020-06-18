@@ -7,6 +7,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import QueryResult from 'views/logic/QueryResult';
 import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import CustomPropTypes from '../CustomPropTypes';
 import SidebarNavigation from './SidebarNavigation';
@@ -16,7 +17,7 @@ import sidebarSections, { type SidebarSection } from './sidebarSections';
 type Props = {
   children: React.Element<any>,
   queryId: string,
-  results: {},
+  results: QueryResult,
   searchPageLayout: ?SearchPageLayout,
   sections: Array<SidebarSection>,
   viewMetadata: ViewMetadata,
