@@ -14,7 +14,7 @@ const changeInput = async (input, value) => {
 describe('SearchBarForm', () => {
   afterEach(cleanup);
 
-  describe('with AbsoulteTimeRangeSelector', () => {
+  describe('with AbsoluteTimeRangeSelector', () => {
     it('validates if timerange "from" date is after "to" date', async () => {
       const initialValues = {
         timerange: { type: 'absolute', from: '2020-01-16 10:04:30.329', to: '2020-01-17 10:04:30.329' },
