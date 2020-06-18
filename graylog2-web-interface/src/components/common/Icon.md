@@ -9,7 +9,7 @@ Examples:
 <p><strong>Rotate:</strong> <Icon name="bars" rotate="90" /></p>
 
 <p>
-  <strong>Sizeable:</strong>
+  <strong>Sizeable:</strong>{' '}
   <Icon name="bolt" size="lg" />{' '}
   <Icon name="bolt" size="2x" />{' '}
   <Icon name="bolt" size="3x" />{' '}
@@ -18,8 +18,17 @@ Examples:
 </p>
 
 <p>
-  <strong>Flipped:</strong>
-  <Icon name="hand-paper" flip="horizontal" type="regular" />{' '}<Icon name="hand-paper" type="regular" />
+  <strong>Flipped:</strong>{' '}
+  <Icon name="hand-paper" flip="horizontal" />{' '}<Icon name="hand-paper" />
 </p>
 
+<p>
+  <strong>Outlined:</strong>{' '}
+  <Icon name="star" type="regular" />{' '}<Icon name="hand-paper" type="regular" />
+</p>
+
+<p>
+  <strong>Brand:</strong>{' '}
+  <Icon name="github" type="brand" />
+</p>
 ```
