@@ -10,7 +10,7 @@ const LoadingPage = ({ text }) => {
     <DocumentTitle title="Loading...">
       <AuthThemeStyles />
       <LoginBox>
-        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <legend><Icon name="users" /> Welcome to Graylog</legend>
         <p>
           <Spinner text={text} delay={0} />
         </p>

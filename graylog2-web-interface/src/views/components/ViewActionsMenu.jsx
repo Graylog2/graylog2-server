@@ -68,7 +68,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="share-alt" /> Share
         </MenuItem>
-        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download" /> Export to CSV</MenuItem>
+        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>
           <MenuItem divider />

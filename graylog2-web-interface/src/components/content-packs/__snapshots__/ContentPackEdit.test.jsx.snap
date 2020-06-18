@@ -4597,6 +4597,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                         <Icon
                                                           className="fa-stack-1x"
                                                           name="circle"
+                                                          type="solid"
                                                         >
                                                           <FontAwesomeIcon
                                                             className="fa-stack-1x"
@@ -4615,6 +4616,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                         <Icon
                                                           className="fa-stack-1x"
                                                           name="angle-up"
+                                                          type="solid"
                                                         >
                                                           <FontAwesomeIcon
                                                             className="fa-stack-1x"

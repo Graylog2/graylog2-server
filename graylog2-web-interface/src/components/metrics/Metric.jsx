@@ -22,10 +22,10 @@ const Metric = createReactClass({
   },
 
   iconMapping: {
-    timer: 'clock-o',
+    timer: 'clock',
     histogram: 'signal',
     meter: 'play-circle',
-    gauge: 'dashboard',
+    gauge: 'tachometer-alt',
     counter: 'circle',
     unknown: 'question-circle',
   },

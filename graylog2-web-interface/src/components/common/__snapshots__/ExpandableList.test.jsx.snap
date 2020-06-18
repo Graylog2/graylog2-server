@@ -168,6 +168,7 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
                               <Icon
                                 className="fa-stack-1x"
                                 name="circle"
+                                type="solid"
                               >
                                 <FontAwesomeIcon
                                   className="fa-stack-1x"
@@ -186,6 +187,7 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
                               <Icon
                                 className="fa-stack-1x"
                                 name="angle-up"
+                                type="solid"
                               >
                                 <FontAwesomeIcon
                                   className="fa-stack-1x"
@@ -495,6 +497,7 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                               <Icon
                                 className="fa-stack-1x"
                                 name="circle"
+                                type="solid"
                               >
                                 <FontAwesomeIcon
                                   className="fa-stack-1x"
@@ -513,6 +516,7 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                               <Icon
                                 className="fa-stack-1x"
                                 name="angle-down"
+                                type="solid"
                               >
                                 <FontAwesomeIcon
                                   className="fa-stack-1x"
@@ -811,6 +815,7 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                                                 <Icon
                                                   className="fa-stack-1x"
                                                   name="circle"
+                                                  type="solid"
                                                 >
                                                   <FontAwesomeIcon
                                                     className="fa-stack-1x"
@@ -829,6 +834,7 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                                                 <Icon
                                                   className="fa-stack-1x"
                                                   name="angle-up"
+                                                  type="solid"
                                                 >
                                                   <FontAwesomeIcon
                                                     className="fa-stack-1x"

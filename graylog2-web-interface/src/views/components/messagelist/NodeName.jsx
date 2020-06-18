@@ -24,7 +24,7 @@ const NodeName = ({ nodeId, nodes }: Props) => {
     const nodeURL = Routes.node(nodeId);
     return (
       <a href={nodeURL}>
-        <Icon name="code-fork" />
+        <Icon name="code-branch" />
         &nbsp;
         <span style={{ wordBreak: 'break-word' }}>
           {node.short_node_id}

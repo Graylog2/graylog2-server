@@ -42,7 +42,7 @@ const Stage = createReactClass({
         id: `invalid-${ruleIdx}`,
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
-      ruleTitle = <span><Icon name="warning" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
+      ruleTitle = <span><Icon name="exclamation-triangle" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
     } else {
       ruleTitle = (
         <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
