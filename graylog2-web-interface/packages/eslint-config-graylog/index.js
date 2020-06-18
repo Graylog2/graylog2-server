@@ -6,11 +6,13 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:import/react',
     'plugin:flowtype/recommended',
+    'plugin:jest-formatting/strict',
   ],
   plugins: [
     'import',
     'react-hooks',
     'flowtype',
+    'jest-formatting',
   ],
   rules: {
     'arrow-body-style': 'off',
@@ -49,6 +51,35 @@ module.exports = {
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
     'react/static-property-placement': 'off',
+
+    'padding-line-between-statements': [
+      'error',
+      {
+        blankLine: 'always',
+        prev: ['block', 'block-like', 'cjs-export', 'class', 'export', 'import'],
+        next: '*',
+      },
+      {
+        blankLine: 'always',
+        prev: '*',
+        next: ['block', 'block-like', 'expression'],
+      },
+      {
+        blankLine: 'always',
+        prev: '*',
+        next: 'return',
+      },
+      {
+        blankLine: 'any',
+        prev: ['export', 'import'],
+        next: ['export', 'import'],
+      },
+      {
+        blankLine: 'any',
+        prev: ['let', 'const'],
+        next: ['let', 'const'],
+      },
+    ],
 
     // eslint-plugin-flowtype configs, `recommended` is too weak in a couple of places:
     'flowtype/delimiter-dangle': [1, 'always-multiline'],
