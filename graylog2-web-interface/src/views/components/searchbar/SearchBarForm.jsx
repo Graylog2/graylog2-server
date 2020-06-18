@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik/@flow-typed';
+import DateTime from 'logic/datetimes/DateTime';
 
 import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
@@ -19,6 +20,16 @@ type Props = {
   initialValues: Values,
   onSubmit: (Values) => void | Promise<any>,
   children: ((props: FormikProps<Values>) => React$Node) | React$Node,
+};
+
+const validate = (values) => {
+  const errors = {};
+  if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
+    errors.timerange = {
+      from: 'Start date must be before end date',
+    };
+  }
+  return errors;
 };
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
@@ -39,7 +50,8 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize
-            onSubmit={_onSubmit}>
+            onSubmit={_onSubmit}
+            validate={validate}>
       {(...args) => (
         <Form>
           {isFunction(children) ? children(...args) : children}
