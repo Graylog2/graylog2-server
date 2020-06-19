@@ -43,7 +43,7 @@ class MessageDetail extends React.Component {
       const nodeURL = Routes.node(nodeId);
       nodeInformation = (
         <a href={nodeURL}>
-          <Icon name="code-fork" />
+          <Icon name="code-branch" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>

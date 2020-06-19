@@ -67,7 +67,7 @@ const LoginPage = () => {
     <DocumentTitle title="Sign in">
       <AuthThemeStyles />
       <LoginBox>
-        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <legend><Icon name="users" /> Welcome to Graylog</legend>
         {formatLastError()}
         {renderLoginForm()}
       </LoginBox>

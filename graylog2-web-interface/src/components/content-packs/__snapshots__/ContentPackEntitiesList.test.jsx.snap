@@ -824,6 +824,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                             className="contentPackEntity"
                             name="archive"
                             title="Content Pack"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               className="contentPackEntity"
@@ -1292,6 +1293,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                           <Icon
                             name="server"
                             title="Server"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               icon={

@@ -5,7 +5,7 @@ import styles from './MessageWidgets.css';
 
 const LoadingWidget = () => (
   <div className={styles.spinnerContainer}>
-    <Icon data-testid="loading-widget" name="refresh" size="3x" className="spinner" />
+    <Icon data-testid="loading-widget" name="sync" size="3x" className="spinner" />
   </div>
 );
 

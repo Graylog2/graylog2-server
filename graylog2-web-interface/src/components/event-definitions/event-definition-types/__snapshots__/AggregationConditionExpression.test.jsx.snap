@@ -1696,6 +1696,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -3431,6 +3432,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                               >
                                                                 <Icon
                                                                   name="caret-down"
+                                                                  type="solid"
                                                                 >
                                                                   <FontAwesomeIcon
                                                                     icon={
@@ -5001,6 +5003,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                 >
                                                                   <Icon
                                                                     name="caret-down"
+                                                                    type="solid"
                                                                   >
                                                                     <FontAwesomeIcon
                                                                       icon={
@@ -6774,6 +6777,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -7225,6 +7229,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     <Icon
                                       fixedWidth={true}
                                       name="minus"
+                                      type="solid"
                                     >
                                       <FontAwesomeIcon
                                         fixedWidth={true}
@@ -7316,6 +7321,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     <Icon
                                       fixedWidth={true}
                                       name="plus"
+                                      type="solid"
                                     >
                                       <FontAwesomeIcon
                                         fixedWidth={true}
@@ -8964,6 +8970,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                               >
                                                                 <Icon
                                                                   name="caret-down"
+                                                                  type="solid"
                                                                 >
                                                                   <FontAwesomeIcon
                                                                     icon={
@@ -10534,6 +10541,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                 >
                                                                   <Icon
                                                                     name="caret-down"
+                                                                    type="solid"
                                                                   >
                                                                     <FontAwesomeIcon
                                                                       icon={
@@ -12267,6 +12275,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -12676,6 +12685,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     <Icon
                                       fixedWidth={true}
                                       name="minus"
+                                      type="solid"
                                     >
                                       <FontAwesomeIcon
                                         fixedWidth={true}
@@ -12767,6 +12777,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     <Icon
                                       fixedWidth={true}
                                       name="plus"
+                                      type="solid"
                                     >
                                       <FontAwesomeIcon
                                         fixedWidth={true}
@@ -14576,6 +14587,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -16323,6 +16335,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                               >
                                                                 <Icon
                                                                   name="caret-down"
+                                                                  type="solid"
                                                                 >
                                                                   <FontAwesomeIcon
                                                                     icon={
@@ -17893,6 +17906,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 >
                                                                   <Icon
                                                                     name="caret-down"
+                                                                    type="solid"
                                                                   >
                                                                     <FontAwesomeIcon
                                                                       icon={
@@ -19666,6 +19680,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -20117,6 +20132,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     <Icon
                                       fixedWidth={true}
                                       name="minus"
+                                      type="solid"
                                     >
                                       <FontAwesomeIcon
                                         fixedWidth={true}
@@ -20208,6 +20224,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     <Icon
                                       fixedWidth={true}
                                       name="plus"
+                                      type="solid"
                                     >
                                       <FontAwesomeIcon
                                         fixedWidth={true}
@@ -22043,6 +22060,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         >
                                                           <Icon
                                                             name="caret-down"
+                                                            type="solid"
                                                           >
                                                             <FontAwesomeIcon
                                                               icon={
@@ -23694,6 +23712,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         >
                                                                           <Icon
                                                                             name="caret-down"
+                                                                            type="solid"
                                                                           >
                                                                             <FontAwesomeIcon
                                                                               icon={
@@ -25264,6 +25283,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                           >
                                                                             <Icon
                                                                               name="caret-down"
+                                                                              type="solid"
                                                                             >
                                                                               <FontAwesomeIcon
                                                                                 icon={
@@ -26997,6 +27017,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             >
                                                               <Icon
                                                                 name="caret-down"
+                                                                type="solid"
                                                               >
                                                                 <FontAwesomeIcon
                                                                   icon={
@@ -27406,6 +27427,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               <Icon
                                                 fixedWidth={true}
                                                 name="minus"
+                                                type="solid"
                                               >
                                                 <FontAwesomeIcon
                                                   fixedWidth={true}
@@ -27497,6 +27519,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               <Icon
                                                 fixedWidth={true}
                                                 name="plus"
+                                                type="solid"
                                               >
                                                 <FontAwesomeIcon
                                                   fixedWidth={true}
@@ -29279,6 +29302,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     >
                                                       <Icon
                                                         name="caret-down"
+                                                        type="solid"
                                                       >
                                                         <FontAwesomeIcon
                                                           icon={
@@ -30970,6 +30994,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                     >
                                                                       <Icon
                                                                         name="caret-down"
+                                                                        type="solid"
                                                                       >
                                                                         <FontAwesomeIcon
                                                                           icon={
@@ -32540,6 +32565,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                       >
                                                                         <Icon
                                                                           name="caret-down"
+                                                                          type="solid"
                                                                         >
                                                                           <FontAwesomeIcon
                                                                             icon={
@@ -34313,6 +34339,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         >
                                                           <Icon
                                                             name="caret-down"
+                                                            type="solid"
                                                           >
                                                             <FontAwesomeIcon
                                                               icon={
@@ -34764,6 +34791,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           <Icon
                                             fixedWidth={true}
                                             name="minus"
+                                            type="solid"
                                           >
                                             <FontAwesomeIcon
                                               fixedWidth={true}
@@ -34855,6 +34883,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           <Icon
                                             fixedWidth={true}
                                             name="plus"
+                                            type="solid"
                                           >
                                             <FontAwesomeIcon
                                               fixedWidth={true}
@@ -36643,6 +36672,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -38221,6 +38251,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                           >
                                                             <Icon
                                                               name="caret-down"
+                                                              type="solid"
                                                             >
                                                               <FontAwesomeIcon
                                                                 icon={
@@ -39596,6 +39627,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                             >
                                                               <Icon
                                                                 name="caret-down"
+                                                                type="solid"
                                                               >
                                                                 <FontAwesomeIcon
                                                                   icon={
@@ -41369,6 +41401,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                               >
                                                 <Icon
                                                   name="caret-down"
+                                                  type="solid"
                                                 >
                                                   <FontAwesomeIcon
                                                     icon={
@@ -41808,6 +41841,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 <Icon
                                   fixedWidth={true}
                                   name="minus"
+                                  type="solid"
                                 >
                                   <FontAwesomeIcon
                                     fixedWidth={true}
@@ -41899,6 +41933,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 <Icon
                                   fixedWidth={true}
                                   name="plus"
+                                  type="solid"
                                 >
                                   <FontAwesomeIcon
                                     fixedWidth={true}
@@ -43688,6 +43723,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   >
                                                     <Icon
                                                       name="caret-down"
+                                                      type="solid"
                                                     >
                                                       <FontAwesomeIcon
                                                         icon={
@@ -45285,6 +45321,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                           >
                                                             <Icon
                                                               name="caret-down"
+                                                              type="solid"
                                                             >
                                                               <FontAwesomeIcon
                                                                 icon={
@@ -46855,6 +46892,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                             >
                                                               <Icon
                                                                 name="caret-down"
+                                                                type="solid"
                                                               >
                                                                 <FontAwesomeIcon
                                                                   icon={
@@ -48663,6 +48701,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                               >
                                                 <Icon
                                                   name="caret-down"
+                                                  type="solid"
                                                 >
                                                   <FontAwesomeIcon
                                                     icon={
@@ -49114,6 +49153,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 <Icon
                                   fixedWidth={true}
                                   name="minus"
+                                  type="solid"
                                 >
                                   <FontAwesomeIcon
                                     fixedWidth={true}
@@ -49205,6 +49245,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 <Icon
                                   fixedWidth={true}
                                   name="plus"
+                                  type="solid"
                                 >
                                   <FontAwesomeIcon
                                     fixedWidth={true}
