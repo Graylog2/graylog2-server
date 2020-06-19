@@ -6,16 +6,8 @@ _Click any color block below to copy the color path._
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import { color } from 'theme';
-import ColorSwatch, {Swatch} from './Colors';
-
-const Modes = styled.div`
-  margin: 0 0 60px;
-`;
-
-const Mode = styled.h3`
-  margin: 0 0 6px;
-`;
+import { colors } from 'theme';
+import ColorSwatch, { Swatch } from './Colors';
 
 const Section = styled.h4`
   margin: 0 0 6px;
@@ -33,6 +25,7 @@ const StyledColorSwatch = styled(ColorSwatch)`
 
   ${Swatch} {
     margin-right: 6px;
+    margin-bottom: 3px;
 
     &:last-of-type {
       margin: 0;
@@ -87,19 +80,12 @@ const SectionWrap = (mode, section) => {
 const Colors = () => {
   return (
     <>
-      {getValues(color, (mode) => (
-          <Modes>
-            <Mode>{mode}</Mode>
-
-            {getValues(color[mode], (section) => (
-              <>
-                <Section>{section}</Section>
-                {SectionWrap(color[mode][section], section)}
-              </>
-            ))}
-          </Modes>
-        )
-      )}
+      {getValues(colors, (section) => (
+        <>
+          <Section>{section}</Section>
+          {SectionWrap(colors[section], section)}
+        </>
+      ))}
     </>
   );
 };
