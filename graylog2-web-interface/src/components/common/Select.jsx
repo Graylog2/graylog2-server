@@ -78,11 +78,11 @@ const multiValue = ({ theme }) => (base) => ({
   border: `1px solid ${theme.colors.variant.lighter.info}`,
 });
 
-const multiValueLabel = (base) => ({
+const multiValueLabel = ({ theme }) => (base) => ({
   ...base,
   paddingLeft: '5px',
   paddingRight: '5px',
-  fontSize: '12px',
+  fontSize: theme.fonts.size.body,
 });
 
 const multiValueRemove = ({ theme }) => (base) => ({
@@ -111,7 +111,7 @@ const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
   fontFamily: theme.fonts.family.body,
-  fontSize: '14px',
+  fontSize: theme.fonts.size.body,
   fontWeight: 400,
 });
 
@@ -119,7 +119,7 @@ const placeholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
   fontFamily: theme.fonts.family.body,
-  fontSize: '14px',
+  fontSize: theme.fonts.size.body,
   fontWeight: 400,
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
@@ -160,7 +160,7 @@ const _styles = ({ size, theme }) => ({
   dropdownIndicator,
   clearIndicator,
   multiValue: multiValue({ theme }),
-  multiValueLabel,
+  multiValueLabel: multiValueLabel({ theme }),
   multiValueRemove: multiValueRemove({ theme }),
   menu,
   singleValue: singleValueAndPlaceholder({ theme }),
