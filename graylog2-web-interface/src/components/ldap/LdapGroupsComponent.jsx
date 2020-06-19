@@ -14,9 +14,9 @@ const { LdapGroupsActions } = CombinedProvider.get('LdapGroups');
 const { LdapStore } = CombinedProvider.get('Ldap');
 const { RolesStore } = CombinedProvider.get('Roles');
 
-const StyledLegend = styled.legend`
-  font-size: 1.5em;
-`;
+const StyledLegend = styled.legend(({ theme }) => `
+  font-size: ${theme.fonts.size.large};
+`);
 
 class LdapGroupsComponent extends React.Component {
   static propTypes = {
@@ -25,12 +25,16 @@ class LdapGroupsComponent extends React.Component {
     onShowConfig: PropTypes.func.isRequired,
   };
 
-  state = {
-    groups: undefined,
-    roles: undefined,
-    mapping: undefined,
-    groupsErrorMessage: null,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      groups: undefined,
+      roles: undefined,
+      mapping: undefined,
+      groupsErrorMessage: null,
+    };
+  }
 
   componentDidMount() {
     LdapGroupsActions.loadMapping().then((mapping) => this.setState({ mapping: Immutable.Map(mapping) }));
@@ -50,22 +54,26 @@ class LdapGroupsComponent extends React.Component {
     const role = event.target.value;
     const group = event.target.getAttribute('data-group');
     const { mapping } = this.state;
+
     this.setState({ mapping: mapping.set(group, role) });
   };
 
   _saveMapping = (event) => {
     event.preventDefault();
     const { mapping } = this.state;
+
     LdapGroupsActions.saveMapping(mapping.filter((role) => role !== '').toJS());
   };
 
   _onShowConfig = () => {
     const { onShowConfig } = this.props;
+
     onShowConfig();
   };
 
   _isLoading = () => {
     const { groups, mapping, roles } = this.state;
+
     return !(mapping && groups && roles);
   };
 
@@ -94,6 +102,7 @@ class LdapGroupsComponent extends React.Component {
 
   render() {
     const { ldapSettings } = this.props;
+
     if (!ldapSettings.enabled) {
       return (
         <Panel header="LDAP is disabled" bsStyle="info">

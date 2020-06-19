@@ -39,7 +39,7 @@ const ShardRoutingWrap = styled.div(({ theme }) => `
   }
 
   .description {
-    font-size: 11px;
+    font-size: ${theme.fonts.size.small};
     margin-top: 2px;
     margin-left: 6px;
   }

@@ -5,8 +5,10 @@ import styled from 'styled-components';
 import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
-import AuthThemeStyles from 'theme/styles/authStyles';
-import URLUtils from 'util/URLUtils';
+import authStyles from 'theme/styles/authStyles';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+
+import { qualifyUrl } from 'util/URLUtils';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
@@ -21,10 +23,13 @@ class ServerUnavailablePage extends React.Component {
     server: undefined,
   };
 
+  constructor(props) {
+    super(props);
 
-  state = {
-    showDetails: false,
-  };
+    this.state = {
+      showDetails: false,
+    };
+  }
 
   _toggleDetails = () => {
     const { showDetails } = this.state;
@@ -54,11 +59,13 @@ class ServerUnavailablePage extends React.Component {
     const { error } = server;
 
     const errorDetails = [];
+
     if (error.message) {
       errorDetails.push(<dt key="error-title">Error message</dt>, <dd key="error-desc">{error.message}</dd>);
     }
     if (error.originalError) {
       const { originalError } = error;
+
       errorDetails.push(
         <dt key="status-original-request-title">Original Request</dt>,
         <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>,
@@ -98,7 +105,7 @@ class ServerUnavailablePage extends React.Component {
 
     return (
       <DocumentTitle title="Server unavailable">
-        <AuthThemeStyles />
+        <GlobalThemeStyles additionalStyles={authStyles} />
         <Modal show>
           <Modal.Header>
             <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
@@ -106,7 +113,7 @@ class ServerUnavailablePage extends React.Component {
           <Modal.Body>
             <div>
               <p>
-                We are experiencing problems connecting to the Graylog server running on <i>{URLUtils.qualifyUrl('')}</i>.
+                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
                 Please verify that the server is healthy and working correctly.
               </p>
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>

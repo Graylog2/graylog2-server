@@ -10,8 +10,8 @@ const ItemWrap = styled.li(({ padded }) => `
   padding: ${padded ? '10px 5px' : ''};
 `);
 
-const Container = styled.div`
-  font-size: 14px;
+const Container = styled.div(({ theme }) => `
+  font-size: ${theme.fonts.size.body};
   line-height: 20px;
 
   label {
@@ -23,7 +23,7 @@ const Container = styled.div`
       cursor: pointer;
     }
   }
-`;
+`);
 
 const Toggle = styled.div`
   display: inline-block;
@@ -34,7 +34,7 @@ const Toggle = styled.div`
 const IconStack = styled.div(({ theme }) => `
   &.fa-stack {
     cursor: pointer;
-    font-size: 1.4em;
+    font-size: ${theme.fonts.size.large};
     line-height: 20px;
     width: 1em;
     height: 1em;
@@ -55,9 +55,9 @@ const IconStack = styled.div(({ theme }) => `
   }
 `);
 
-const HeaderWrap = styled.span`
-  font-size: 14px;
-`;
+const HeaderWrap = styled.span(({ theme }) => `
+  font-size: ${theme.fonts.size.large};
+`);
 
 const Header = styled.button`
   border: 0;
@@ -67,7 +67,7 @@ const Header = styled.button`
 `;
 
 const Subheader = styled.span(({ theme }) => `
-  font-size: 0.95em;
+  font-size: ${theme.fonts.size.body};
   margin-left: 0.5em;
   color: ${theme.colors.gray[70]};
 `);
@@ -78,7 +78,6 @@ const ExpandableContent = styled.div(({ theme }) => `
   margin-top: 10px;
   padding-left: 5px;
 `);
-
 
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
@@ -137,7 +136,6 @@ class ExpandableListItem extends React.Component {
     };
   }
 
-
   componentDidMount() {
     const { indetermined } = this.props;
 
@@ -171,6 +169,7 @@ class ExpandableListItem extends React.Component {
 
   _filterInputProps = (props) => {
     const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
+
     return inputProps;
   };
 

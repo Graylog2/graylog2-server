@@ -4,7 +4,7 @@ exports[`<Widget /> should render with empty props 1`] = `
 <body>
   <div>
     <div
-      class="WidgetFrame__WidgetWrap-sc-1uccjgg-0 laVatb"
+      class="WidgetFrame__WidgetWrap-sc-1uccjgg-0 lKiqm"
       data-widget-id="widgetId"
       style="overflow: hidden;"
     >
@@ -18,7 +18,7 @@ exports[`<Widget /> should render with empty props 1`] = `
           class="Widget__WidgetActionsWBar-sc-1k4o2f7-0 ckMMeL"
         >
           <button
-            class="IconButton__Wrapper-sc-1q956yw-0 gTaYSZ"
+            class="IconButton__Wrapper-sc-1q956yw-0 fGaOJq"
             tabindex="0"
             title="Stretch width"
           >
@@ -34,7 +34,7 @@ exports[`<Widget /> should render with empty props 1`] = `
             >
               <span>
                 <button
-                  class="IconButton__Wrapper-sc-1q956yw-0 gTaYSZ"
+                  class="IconButton__Wrapper-sc-1q956yw-0 fGaOJq"
                   tabindex="0"
                   title="Open actions dropdown"
                 >

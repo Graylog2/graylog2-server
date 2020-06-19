@@ -25,10 +25,10 @@ const NotificationHead = styled.h3`
   margin-bottom: 5px;
 `;
 
-const NotificationTimestamp = styled.span`
+const NotificationTimestamp = styled.span(({ theme }) => `
   margin-left: 3px;
-  font-size: 10px;
-`;
+  font-size: ${theme.fonts.size.small};
+`);
 
 class Notification extends React.Component {
   static propTypes = {
@@ -38,6 +38,7 @@ class Notification extends React.Component {
   _onClose = () => {
     const { notification } = this.props;
 
+    // eslint-disable-next-line no-alert
     if (window.confirm('Really delete this notification?')) {
       NotificationsActions.delete(notification.type);
     }
@@ -46,6 +47,7 @@ class Notification extends React.Component {
   render() {
     const { notification } = this.props;
     const notificationView = NotificationsFactory.getForNotification(notification);
+
     return (
       <StyledAlert bsStyle="danger">
         <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>

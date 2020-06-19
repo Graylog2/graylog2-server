@@ -36,7 +36,7 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
     0 0 8px ${chroma(copied ? theme.colors.variant.success : theme.colors.gray[80]).alpha(0.4).css()};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
   font-family: ${theme.fonts.family.monospace};
-  font-size: 14px;
+  font-size: ${theme.fonts.size.body};
 
   :focus {
     border-color: ${theme.colors.variant.light.info};
@@ -88,6 +88,7 @@ const Scratchpad = () => {
 
   const writeData = (newData) => {
     const currentStorage = Store.get(localStorageItem);
+
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
@@ -105,6 +106,7 @@ const Scratchpad = () => {
 
   const handleChange = () => {
     const { value } = textareaRef.current;
+
     setDirty(true);
     setScratchData(value);
     writeData({ value });

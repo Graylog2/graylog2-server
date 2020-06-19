@@ -19,7 +19,7 @@ type Props = {
 
 const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.footer(({ theme }) => css`
   text-align: center;
-  font-size: 11px;
+  font-size: ${theme.fonts.size.small};
   color: ${theme.colors.gray[70]};
   margin-bottom: 15px;
   height: 20px;
@@ -31,8 +31,10 @@ const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.fo
 
 const Footer = ({ system }: Props) => {
   const [jvm, setJvm] = useState();
+
   useEffect(() => {
     let mounted = true;
+
     SystemStore.jvm().then((jvmInfo) => {
       if (mounted) {
         setJvm(jvmInfo);

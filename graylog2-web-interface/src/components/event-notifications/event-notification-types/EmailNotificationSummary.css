@@ -1,6 +1,6 @@
 :local(.bodyPreview) {
     font-family: "Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
-    font-size: 12px;
+    font-size: 1rem; /* theme.fonts.size.body */
     overflow-wrap: break-word;
     white-space: pre-wrap;
 }

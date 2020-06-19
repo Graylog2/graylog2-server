@@ -14,14 +14,14 @@ const NodeRow = styled.div(({ theme }) => `
   margin-top: 0;
 
   .hostname {
-    font-size: 12px;
+    font-size: ${theme.fonts.size.small};
   }
 
   .well {
     margin-bottom: 0;
     margin-top: 3px;
     font-family: ${theme.fonts.family.monospace};
-    font-size: 11px;
+    font-size: ${theme.fonts.size.small};
   }
 
   .xtrc-converters {
@@ -125,6 +125,7 @@ class Output extends React.Component {
 
     let alert;
     let configurationWell;
+
     if (this._typeNotAvailable()) {
       alert = (
         <Alert bsStyle="danger">
@@ -143,6 +144,7 @@ class Output extends React.Component {
 
     const { streamId } = this.props;
     let deleteFromStreamButton;
+
     if (streamId !== null && streamId !== undefined) {
       deleteFromStreamButton = (
         <IfPermitted permissions="stream_outputs:delete">

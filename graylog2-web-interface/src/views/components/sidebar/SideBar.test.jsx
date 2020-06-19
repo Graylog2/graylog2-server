@@ -10,6 +10,7 @@ import QueryResult from 'views/logic/QueryResult';
 import SideBar from './SideBar';
 
 const mockCurrentUser = { timezone: 'UTC' };
+
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
 
@@ -46,11 +47,13 @@ describe('<Sidebar />', () => {
 
     getContainerHeight() {
       const { maximumHeight } = this.props;
+
       return maximumHeight;
     }
 
     render() {
       expect(this.props).toHaveProperty('maximumHeight');
+
       return <div id="martian">Marc Watney</div>;
     }
   }
@@ -66,7 +69,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
+    expect(wrapper.find('h4').text()).toBe(viewMetaData.title);
   });
 
   it('should render with a description', () => {
@@ -107,7 +110,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    expect(wrapper.find('h3').text()).toBe('Untitled Search');
+    expect(wrapper.find('h4').text()).toBe('Untitled Search');
   });
 
   it('should render with a specific default title in the context of a new dashboard', () => {
@@ -128,7 +131,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    expect(wrapper.find('h3').text()).toBe('Untitled Dashboard');
+    expect(wrapper.find('h4').text()).toBe('Untitled Dashboard');
   });
 
   it('should render summary and description of a view', () => {
