@@ -5,7 +5,6 @@ import * as Immutable from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -13,9 +12,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-
 import { RefreshActions } from 'views/stores/RefreshStore';
-
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
@@ -136,6 +133,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
 
   th {
+    min-width: 50px;
     border: 0;
     font-size: 11px;
     font-weight: normal;
