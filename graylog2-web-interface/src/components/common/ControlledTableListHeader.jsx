@@ -41,6 +41,7 @@ const ControlledTableListHeader = createReactClass({
     const { children } = this.props;
 
     const header = typeof children === 'string' ? this.wrapStringChildren(children) : children;
+
     return <StyledListGroupItem>{header}</StyledListGroupItem>;
   },
 });

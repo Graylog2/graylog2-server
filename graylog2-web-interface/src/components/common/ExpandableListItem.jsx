@@ -79,7 +79,6 @@ const ExpandableContent = styled.div(({ theme }) => `
   padding-left: 5px;
 `);
 
-
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
  */
@@ -137,7 +136,6 @@ class ExpandableListItem extends React.Component {
     };
   }
 
-
   componentDidMount() {
     const { indetermined } = this.props;
 
@@ -171,6 +169,7 @@ class ExpandableListItem extends React.Component {
 
   _filterInputProps = (props) => {
     const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
+
     return inputProps;
   };
 

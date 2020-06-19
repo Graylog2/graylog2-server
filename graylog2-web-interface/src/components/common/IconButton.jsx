@@ -29,7 +29,6 @@ const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.b
   }
 `);
 
-
 type Props = {
   focusable?: boolean,
   title: string,

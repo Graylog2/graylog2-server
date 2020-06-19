@@ -143,6 +143,7 @@ export default class extends React.Component {
     // subtracting header, footer and padding from height & width.
     const height = widgetNode.clientHeight - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
     const width = widgetNode.clientWidth - 20;
+
     return { height: height, width: width };
   };
 
@@ -150,6 +151,7 @@ export default class extends React.Component {
     const { onSizeChange, widgetId } = this.props;
     const { width: currentWidth, height: currentHeight } = this.state;
     const { height, width } = this._calculateWidgetSize();
+
     if (height !== currentHeight || width !== currentWidth) {
       this.setState({ height: height, width: width });
       onSizeChange(widgetId, { height: height, width: width });
@@ -158,6 +160,7 @@ export default class extends React.Component {
 
   render() {
     const { children, widgetId } = this.props;
+
     return (
       <WidgetWrap ref={(elem) => { this._widgetNode = elem; }}
                   style={{ overflow: 'hidden' }}

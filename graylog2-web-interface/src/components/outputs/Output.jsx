@@ -125,6 +125,7 @@ class Output extends React.Component {
 
     let alert;
     let configurationWell;
+
     if (this._typeNotAvailable()) {
       alert = (
         <Alert bsStyle="danger">
@@ -143,6 +144,7 @@ class Output extends React.Component {
 
     const { streamId } = this.props;
     let deleteFromStreamButton;
+
     if (streamId !== null && streamId !== undefined) {
       deleteFromStreamButton = (
         <IfPermitted permissions="stream_outputs:delete">

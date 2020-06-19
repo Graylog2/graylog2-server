@@ -31,8 +31,10 @@ const StyledFooter: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.fo
 
 const Footer = ({ system }: Props) => {
   const [jvm, setJvm] = useState();
+
   useEffect(() => {
     let mounted = true;
+
     SystemStore.jvm().then((jvmInfo) => {
       if (mounted) {
         setJvm(jvmInfo);

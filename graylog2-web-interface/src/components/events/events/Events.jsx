@@ -92,6 +92,7 @@ class Events extends React.Component {
 
   handlePageSizeChange = (nextPageSize) => {
     const { onPageChange } = this.props;
+
     onPageChange(1, nextPageSize);
   };
 
@@ -99,6 +100,7 @@ class Events extends React.Component {
     return () => {
       const { expanded } = this.state;
       const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
+
       this.setState({ expanded: nextExpanded });
     };
   };
@@ -107,6 +109,7 @@ class Events extends React.Component {
     const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
     let icon;
     let style;
+
     switch (priority) {
       case EventDefinitionPriorityEnum.LOW:
         icon = 'thermometer-empty';

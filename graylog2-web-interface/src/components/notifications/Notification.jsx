@@ -47,6 +47,7 @@ class Notification extends React.Component {
   render() {
     const { notification } = this.props;
     const notificationView = NotificationsFactory.getForNotification(notification);
+
     return (
       <StyledAlert bsStyle="danger">
         <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>

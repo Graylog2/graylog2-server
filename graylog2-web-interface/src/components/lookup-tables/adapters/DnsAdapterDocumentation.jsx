@@ -86,7 +86,6 @@ const DnsAdapterDocumentation = () => {
 
   return (
 
-
     <div>
 
       <h3 style={styleMarginBottom}>Configuration</h3>

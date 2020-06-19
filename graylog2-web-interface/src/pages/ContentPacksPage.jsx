@@ -41,6 +41,7 @@ const ContentPacksPage = createReactClass({
         /* eslint-disable camelcase */
         let err_message = error.message;
         const err_body = error.additional.body;
+
         if (err_body && err_body.message) {
           err_message = error.additional.body.message;
         }

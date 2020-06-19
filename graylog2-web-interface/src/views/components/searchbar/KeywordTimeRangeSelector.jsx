@@ -31,6 +31,7 @@ const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)
 const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
   const to = DateTime.fromUTCDateTime(data.to).toString();
+
   return Immutable.Map({ from, to });
 };
 
@@ -46,6 +47,7 @@ const _validateKeyword = (
   if (keyword === undefined) {
     return undefined;
   }
+
   return trim(keyword) === ''
     ? Promise.resolve('Keyword must not be empty!')
     : ToolsStore.testNaturalDate(keyword)
@@ -60,6 +62,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
   );
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview(Immutable.Map());
+
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
@@ -72,6 +75,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
 
   useEffect(() => {
     const { values: { timerange: { keyword } } } = formik;
+
     ToolsStore.testNaturalDate(keyword)
       .then(_setSuccessfullPreview, _setFailedPreview);
 

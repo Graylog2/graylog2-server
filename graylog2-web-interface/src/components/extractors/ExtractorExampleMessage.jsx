@@ -35,6 +35,7 @@ class ExtractorExampleMessage extends React.Component {
     const { field, onExampleLoad } = this.props;
 
     const newExample = message.fields[field];
+
     onExampleLoad(newExample);
   };
 

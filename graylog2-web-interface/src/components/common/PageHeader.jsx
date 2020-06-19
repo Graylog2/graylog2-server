@@ -59,6 +59,7 @@ class PageHeader extends React.Component {
 
   renderLifecycleIndicator = () => {
     const { lifecycle, lifecycleMessage } = this.props;
+
     if (lifecycle === undefined) {
       return null;
     }
@@ -81,6 +82,7 @@ class PageHeader extends React.Component {
     const children = (childList !== undefined && childList.length !== undefined ? childList : [childList]);
 
     const topLevelClassNames = subpage ? '' : 'content';
+
     return (
       <div>
         <ContentHeadRow className={topLevelClassNames}>

@@ -88,6 +88,7 @@ const Scratchpad = () => {
 
   const writeData = (newData) => {
     const currentStorage = Store.get(localStorageItem);
+
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
@@ -105,6 +106,7 @@ const Scratchpad = () => {
 
   const handleChange = () => {
     const { value } = textareaRef.current;
+
     setDirty(true);
     setScratchData(value);
     writeData({ value });

@@ -54,22 +54,26 @@ class LdapGroupsComponent extends React.Component {
     const role = event.target.value;
     const group = event.target.getAttribute('data-group');
     const { mapping } = this.state;
+
     this.setState({ mapping: mapping.set(group, role) });
   };
 
   _saveMapping = (event) => {
     event.preventDefault();
     const { mapping } = this.state;
+
     LdapGroupsActions.saveMapping(mapping.filter((role) => role !== '').toJS());
   };
 
   _onShowConfig = () => {
     const { onShowConfig } = this.props;
+
     onShowConfig();
   };
 
   _isLoading = () => {
     const { groups, mapping, roles } = this.state;
+
     return !(mapping && groups && roles);
   };
 
@@ -98,6 +102,7 @@ class LdapGroupsComponent extends React.Component {
 
   render() {
     const { ldapSettings } = this.props;
+
     if (!ldapSettings.enabled) {
       return (
         <Panel header="LDAP is disabled" bsStyle="info">

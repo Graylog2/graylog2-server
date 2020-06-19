@@ -35,6 +35,7 @@ const _isValidDateString = (dateString: string) => {
   if (dateString === undefined) {
     return undefined;
   }
+
   return DateTime.isValidDateString(dateString)
     ? undefined
     : `Invalid date: ${dateString}`;
