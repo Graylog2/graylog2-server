@@ -3,21 +3,20 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import connect from 'stores/connect';
 import { isEmpty, get } from 'lodash';
+
+import type { MessageListResult } from 'views/components/MessageList/Types';
+import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Messages } from 'views/Constants';
-
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-
 import { PaginatedList } from 'components/common';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import MessageTable from 'views/components/widgets/MessageTable';
@@ -58,12 +57,12 @@ type State = {
 type Props = {
   config: MessagesWidgetConfig,
   currentView: ViewStoreState,
-  data: { messages: Array<Object>, total: number, id: string },
+  data: MessageListResult,
   editing: boolean,
   fields: FieldTypeMappingsList,
   onConfigChange: (MessagesWidgetConfig) => Promise<void>,
   pageSize: number,
-  searchTypes: { [searchTypeId: string]: { effectiveTimerange: TimeRange }},
+  searchTypes: { [searchTypeId: string]: { effectiveTimerange: AbsoluteTimeRange }},
   selectedFields?: Immutable.Set<string>,
   setLoadingState: (loading: boolean) => void,
 };

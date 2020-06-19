@@ -11,6 +11,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
+
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));

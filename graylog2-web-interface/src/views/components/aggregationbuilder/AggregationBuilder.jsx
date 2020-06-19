@@ -6,19 +6,22 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
+
 import type { OnVisualizationConfigChange, WidgetProps } from '../widgets/Widget';
 
 const defaultVisualizationType = 'table';
 
 type RowResult = {
+  id: string,
   type: 'pivot',
+  name: 'chart',
   total: number,
   rows: Rows,
-  effective_timerange: TimeRange,
+  effective_timerange: AbsoluteTimeRange,
 };
 
 type EventResult = {
@@ -29,9 +32,9 @@ type EventResult = {
 
 export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
-  data: { [string]: Rows, events?: Events },
+  data: { [string]: RowResult, events?: Events },
   editing?: boolean,
-  effectiveTimerange: TimeRange,
+  effectiveTimerange: AbsoluteTimeRange,
   fields: FieldTypeMappingsList,
   height: number,
   onChange: OnVisualizationConfigChange,

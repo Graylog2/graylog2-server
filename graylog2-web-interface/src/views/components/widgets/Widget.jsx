@@ -9,7 +9,6 @@ import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
 import IfSearch from 'views/components/search/IfSearch';
-
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
@@ -27,16 +26,17 @@ import Search from 'views/logic/search/Search';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { MessageListResult } from 'views/components/MessageList/Types';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import WidgetActionDropdown from './WidgetActionDropdown';
-
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import MeasureDimensions from './MeasureDimensions';
 import EditWidgetFrame from './EditWidgetFrame';
@@ -45,13 +45,14 @@ import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
-import IfInteractive from '../dashboard/IfInteractive';
-import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
-import IfDashboard from '../dashboard/IfDashboard';
 import ReplaySearchButton from './ReplaySearchButton';
+
+import IfDashboard from '../dashboard/IfDashboard';
+import InteractiveContext from '../contexts/InteractiveContext';
+import IfInteractive from '../dashboard/IfInteractive';
 
 const WidgetActionsWBar = styled.div`
   > * {
@@ -63,11 +64,19 @@ const WidgetActionsWBar = styled.div`
   }
 `;
 
+const WidgetSummary = styled.div(({ theme }) => `
+  width: 100%;
+  padding-top: 3px;
+  min-height: 15px;
+  text-align: right;
+  color: ${theme.colors.gray[60]};
+`);
+
 type Props = {
   id: string,
   view: ViewStoreState,
   widget: WidgetModel,
-  data?: Array<*>,
+  data?: $PropertyType<VisualizationComponentProps, 'data'> | MessageListResult,
   editing?: boolean,
   errors?: Array<{ description: string }>,
   fields: Immutable.List<FieldTypeMapping>,
@@ -90,7 +99,7 @@ type State = {
 export type Result = {
   total: number,
   rows: Rows,
-  effective_timerange: TimeRange,
+  effective_timerange: AbsoluteTimeRange,
 };
 
 export type OnVisualizationConfigChange = (VisualizationConfig) => void;
@@ -300,12 +309,24 @@ class Widget extends React.Component<Props, State> {
     return <LoadingWidget />;
   };
 
+  getEffectiveTimeRange = (data: ?$PropertyType<VisualizationComponentProps, 'data'> | ?MessageListResult): ?AbsoluteTimeRange => {
+    if (data?.type === 'message' && data?.effectiveTimerange) {
+      return data.effectiveTimerange;
+    }
+    // eslint-disable-next-line camelcase
+    if (data?.type !== 'message' && data?.chart?.effective_timerange) {
+      return data.chart.effective_timerange;
+    }
+    return undefined;
+  };
+
   // TODO: Clean up different code paths for normal/edit modes
   render() {
-    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view } = this.props;
+    const { id, widget, fields, onSizeChange, title, position, onPositionsChange, view, data } = this.props;
     const { editing, loading, showCopyToDashboard, showCsvExport, showMoveWidgetToTab } = this.state;
     const { config, type } = widget;
     const visualization = this.visualize();
+    const effectiveTimeRange = this.getEffectiveTimeRange(data);
     if (editing) {
       const EditComponent = _editComponentForType(widget.type);
       return (
@@ -386,6 +407,13 @@ class Widget extends React.Component<Props, State> {
           <WidgetErrorBoundary>
             {visualization}
           </WidgetErrorBoundary>
+          <WidgetSummary>
+            {effectiveTimeRange && effectiveTimeRange.from && effectiveTimeRange.to && (
+              <span>
+                <i>from</i> {effectiveTimeRange.from} <i>to</i> {effectiveTimeRange.to}
+              </span>
+            )}
+          </WidgetSummary>
         </WidgetFrame>
       </WidgetColorContext>
     );
