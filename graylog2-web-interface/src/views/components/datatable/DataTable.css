@@ -24,7 +24,7 @@
 
 @media print {
     table.messages {
-        font-size: 1em !important; /* theme.fonts.size.body */
+        font-size: 1rem !important; /* theme.fonts.size.body */
         min-width: 50%;
         padding-left: 0;
     }

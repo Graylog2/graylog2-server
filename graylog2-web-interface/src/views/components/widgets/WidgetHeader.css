@@ -3,7 +3,7 @@
     grid-row: 1;
     -ms-grid-column: 1;
     -ms-grid-row: 1;
-    font-size: 18px;
+    font-size: 1.125rem; /* theme.fonts.size.large */
     text-overflow: ellipsis;
     /* Usign paddding instead of margin / grid-gap because of IE11 grid compatibility */
     padding-bottom: 5px;

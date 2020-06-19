@@ -9,7 +9,7 @@ const Title = styled.h3(({ theme }) => `
   }
 
   .label {
-    font-size: calc(${theme.fonts.size.small} + 1.5vw);
+    font-size: calc(${theme.fonts.size.small} + 50%);
     line-height: 200%;
     margin-left: 5px;
     vertical-align: bottom;

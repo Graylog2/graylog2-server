@@ -23,15 +23,16 @@ type Props = {
   style: ListItemStyle,
 };
 
-const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = styled.li`
-  font-size: 12px;
+const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = styled.li(({ theme }) => `
+  font-size: ${theme.fonts.size.body};
   display: table-row;
   white-space: nowrap;
-`;
+`);
 
 const ListItem = ({ fields, fieldType, selectedQuery, style }: Props) => {
   const { name, type } = fieldType;
   const disabled = !fields.find((f) => f.name === name);
+
   return (
     <StyledListItem style={style}>
       <FieldTypeIcon type={type} />

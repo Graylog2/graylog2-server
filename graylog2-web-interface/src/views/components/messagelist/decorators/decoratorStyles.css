@@ -18,14 +18,14 @@
 }
 
 :local(.helpLink) {
-    font-size: 12px;
+    font-size: 1rem; /* theme.fonts.size.body */
     padding-top: 0px;
     padding-right: 0px;
     float: right;
 }
 
 :local(.helpPopover) {
-    font-size: 12px;
+    font-size: 1rem; /* theme.fonts.size.body */
 }
 
 :local(.helpLinkContainer) {
