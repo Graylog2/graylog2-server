@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import { render, cleanup } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
-import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 
+import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
