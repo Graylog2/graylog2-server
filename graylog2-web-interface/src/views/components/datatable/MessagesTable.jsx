@@ -58,6 +58,7 @@ const StyledTable = styled(Table)(({ theme }) => `
     cursor: pointer;
 
     td {
+      min-width: 50px;
       padding-top: 10px;
     }
   }
