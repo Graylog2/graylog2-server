@@ -6,7 +6,6 @@ import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
-
 import ConfigurationListContainer from 'components/sidecars/configurations/ConfigurationListContainer';
 import CollectorListContainer from 'components/sidecars/configurations/CollectorListContainer';
 

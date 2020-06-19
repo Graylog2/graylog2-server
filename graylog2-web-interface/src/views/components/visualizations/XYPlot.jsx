@@ -6,7 +6,6 @@ import { get, merge } from 'lodash';
 
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
@@ -14,8 +13,9 @@ import type { ViewType } from 'views/logic/views/View';
 
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
-import CustomPropTypes from '../CustomPropTypes';
 import type { ChartColor, ChartConfig, ColorMap } from './GenericPlot';
+
+import CustomPropTypes from '../CustomPropTypes';
 import ViewTypeContext from '../contexts/ViewTypeContext';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');

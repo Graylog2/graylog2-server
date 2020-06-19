@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import GlobalOverride from './GlobalOverride';
+
 import ParameterBinding from '../parameters/ParameterBinding';
 
 export type ParameterBindings = Immutable.Map<string, ParameterBinding>;

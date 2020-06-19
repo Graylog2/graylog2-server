@@ -6,11 +6,10 @@ import { withRouter } from 'react-router';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
-
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
+
 import EventDefinitionForm from './EventDefinitionForm';
 // Import built-in plugins
 import {} from 'components/event-definitions/event-definition-types';

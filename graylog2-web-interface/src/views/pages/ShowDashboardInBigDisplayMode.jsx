@@ -12,6 +12,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
+
 import ShowViewPage from './ShowViewPage';
 
 type BigDisplayModeQuery = {|

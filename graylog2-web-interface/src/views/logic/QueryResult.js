@@ -1,6 +1,7 @@
 import { mapValues } from 'lodash';
 
 import searchTypeDefinition from 'views/logic/SearchType';
+
 import SearchError from './SearchError';
 
 const _findMessages = (results) => {

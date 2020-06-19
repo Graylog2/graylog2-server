@@ -1,6 +1,5 @@
 // @flow strict
 import { Map } from 'immutable';
-
 import mockAction from 'helpers/mocking/MockAction';
 
 import Widget from 'views/logic/widgets/Widget';

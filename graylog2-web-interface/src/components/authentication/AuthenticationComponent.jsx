@@ -5,11 +5,11 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import PermissionsMixin from 'util/PermissionsMixin';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';

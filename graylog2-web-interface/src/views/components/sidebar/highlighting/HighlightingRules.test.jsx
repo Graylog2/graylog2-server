@@ -4,6 +4,7 @@ import { mount } from 'wrappedEnzyme';
 
 import HighlightingRuleContext from 'views/components/contexts/HighlightingRulesContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+
 import HighlightingRules from './HighlightingRules';
 
 jest.mock('stores/connect', () => (x) => x);

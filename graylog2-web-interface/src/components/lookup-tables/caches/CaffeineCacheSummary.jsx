@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { TimeUnit } from 'components/common';
 
 class CaffeineCacheSummary extends React.Component {

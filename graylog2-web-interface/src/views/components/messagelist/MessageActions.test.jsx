@@ -4,6 +4,7 @@ import { cleanup, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import type { SearchesConfig } from 'components/search/SearchConfig';
+
 import MessageActions from './MessageActions';
 
 const searchConfig: SearchesConfig = {

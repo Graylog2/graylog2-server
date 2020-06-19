@@ -6,7 +6,6 @@ import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';
 

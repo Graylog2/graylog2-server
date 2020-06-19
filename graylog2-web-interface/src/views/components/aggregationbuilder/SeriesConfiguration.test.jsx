@@ -3,6 +3,7 @@ import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+
 import SeriesConfiguration from './SeriesConfiguration';
 
 describe('SeriesConfiguration', () => {

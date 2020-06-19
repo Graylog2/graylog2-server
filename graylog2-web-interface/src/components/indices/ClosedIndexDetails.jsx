@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { Alert, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import { IndexRangeSummary } from 'components/indices';

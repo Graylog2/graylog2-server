@@ -5,7 +5,6 @@ import moment from 'moment';
 import styled from 'styled-components';
 
 import connect from 'stores/connect';
-
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
 import { Icon, Pluralize } from 'components/common';
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';

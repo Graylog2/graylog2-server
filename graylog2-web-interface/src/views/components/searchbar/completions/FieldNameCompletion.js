@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { FieldTypeMappingsList, FieldTypesStoreState } from 'views/stores/FieldTypesStore';

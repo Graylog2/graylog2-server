@@ -1,6 +1,7 @@
 // @flow strict
 import { WidgetActions } from 'views/stores/WidgetStore';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+
 import type { FieldActionHandlerCondition, FieldActionHandler } from './FieldActionHandler';
 
 const RemoveFromTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {

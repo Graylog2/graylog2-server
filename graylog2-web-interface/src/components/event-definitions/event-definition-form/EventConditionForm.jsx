@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
+import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select } from 'components/common';
 import HelpPanel from 'components/event-definitions/common/HelpPanel';
 
-import commonStyles from '../common/commonStyles.css';
 import styles from './EventConditionForm.css';
+
+import commonStyles from '../common/commonStyles.css';
 
 class EventConditionForm extends React.Component {
   static propTypes = {

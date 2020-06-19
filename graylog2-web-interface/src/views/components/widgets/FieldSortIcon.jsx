@@ -8,7 +8,6 @@ import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-
 import { Icon } from 'components/common';
 
 type Props = {

@@ -5,9 +5,7 @@ import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const InputsActions = ActionsProvider.getActions('Inputs');

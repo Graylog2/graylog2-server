@@ -2,11 +2,12 @@
 import React from 'react';
 import { render, cleanup, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-
 import suppressConsole from 'helpers/suppressConsole';
+
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import { FetchError } from 'logic/rest/FetchProvider';
+
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
 jest.unmock('logic/rest/FetchProvider');

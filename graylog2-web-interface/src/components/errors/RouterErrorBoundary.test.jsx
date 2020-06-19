@@ -1,8 +1,8 @@
 // @flow strict
 import React from 'react';
 import { render } from 'wrappedTestingLibrary';
-
 import suppressConsole from 'helpers/suppressConsole';
+
 import RouterErrorBoundary from './RouterErrorBoundary';
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));

@@ -6,7 +6,6 @@ import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import AuthThemeStyles from 'theme/styles/authStyles';
-
 import URLUtils from 'util/URLUtils';
 
 const StyledIcon = styled(Icon)`

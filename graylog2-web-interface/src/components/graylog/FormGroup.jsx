@@ -7,6 +7,7 @@ import styledTheme from 'styled-theming';
 import chroma from 'chroma-js';
 
 import { themeModes } from 'theme';
+
 import FormControl from './FormControl';
 import { StyledAddon } from './InputGroup';
 

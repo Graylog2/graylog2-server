@@ -10,7 +10,6 @@ import naturalSort from 'javascript-natural-sort';
 import { Alert, Button } from 'components/graylog';
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 

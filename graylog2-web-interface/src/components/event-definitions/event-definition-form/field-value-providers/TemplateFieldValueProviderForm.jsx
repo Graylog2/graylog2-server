@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'components/graylog';
 import lodash from 'lodash';
 
+import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ExternalLink } from 'components/common';
 import FormsUtils from 'util/FormsUtils';

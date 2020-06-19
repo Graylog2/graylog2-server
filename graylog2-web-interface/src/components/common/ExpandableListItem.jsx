@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Checkbox } from 'components/graylog';
+
 import Icon from './Icon';
 
 const ItemWrap = styled.li(({ padded }) => `

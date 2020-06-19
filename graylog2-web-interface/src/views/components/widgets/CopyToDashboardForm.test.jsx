@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 import mockAction from 'helpers/mocking/MockAction';
 
+import { DashboardsActions } from 'views/stores/DashboardsStore';
 import View from 'views/logic/views/View';
+
 import CopyToDashboardForm from './CopyToDashboardForm';
 
 describe('CopyToDashboardForm', () => {

@@ -1,12 +1,13 @@
 // @flow strict
 import moment from 'moment';
 import * as Immutable from 'immutable';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import { QueriesActions, QueriesStore } from './QueriesStore';
+import { ViewStore } from './ViewStore';
+
 import type { QueryId } from '../logic/queries/Query';
 import Query from '../logic/queries/Query';
-import { ViewStore } from './ViewStore';
 import Search from '../logic/search/Search';
 
 jest.mock('./ViewStore', () => ({

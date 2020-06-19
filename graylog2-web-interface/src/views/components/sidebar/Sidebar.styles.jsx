@@ -1,7 +1,9 @@
 // @flow strict
 import styled, { css, type StyledComponent } from 'styled-components';
 import chroma from 'chroma-js';
+
 import { type ThemeInterface } from 'theme';
+
 import { Title as NavItemTitle } from './NavItem.styles';
 
 const sidebarWidth = {

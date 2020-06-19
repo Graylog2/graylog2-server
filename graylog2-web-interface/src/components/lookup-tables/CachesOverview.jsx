@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Routes from 'routing/Routes';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
 import { PaginatedList, SearchForm, Spinner, Icon } from 'components/common';

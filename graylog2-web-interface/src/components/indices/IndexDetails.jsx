@@ -3,10 +3,8 @@ import React from 'react';
 
 import { Col, Row, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
-
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider'; // To make IndexRangesActions work.
-
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
 const IndicesActions = ActionsProvider.getActions('Indices');

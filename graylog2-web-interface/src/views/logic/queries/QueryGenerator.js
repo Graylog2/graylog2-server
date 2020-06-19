@@ -1,6 +1,8 @@
 // @flow strict
 import uuid from 'uuid/v4';
+
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+
 import Query, { createElasticsearchQueryString, filtersForQuery } from './Query';
 import type { QueryId } from './Query';
 

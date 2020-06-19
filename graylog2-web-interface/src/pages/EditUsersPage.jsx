@@ -2,11 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import { Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import UserForm from 'components/users/UserForm';
-
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const UsersStore = StoreProvider.getStore('Users');

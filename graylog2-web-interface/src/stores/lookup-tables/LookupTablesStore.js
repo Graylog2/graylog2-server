@@ -4,7 +4,6 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LookupTablesActions = ActionsProvider.getActions('LookupTables');

@@ -7,9 +7,7 @@ import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 import { JSONValueInput } from 'components/common';
-
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');

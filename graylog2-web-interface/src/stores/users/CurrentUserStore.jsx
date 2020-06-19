@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');

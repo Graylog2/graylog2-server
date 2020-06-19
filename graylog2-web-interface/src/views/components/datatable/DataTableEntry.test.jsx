@@ -2,14 +2,15 @@
 import * as React from 'react';
 import { List, OrderedSet } from 'immutable';
 import { mount } from 'wrappedEnzyme';
-
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+
 import DataTableEntry from './DataTableEntry';
+
 import EmptyValue from '../EmptyValue';
 
 jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));

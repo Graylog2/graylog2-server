@@ -3,8 +3,8 @@ import React from 'react';
 import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import ToolsStore from 'stores/tools/ToolsStore';
 
 import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';

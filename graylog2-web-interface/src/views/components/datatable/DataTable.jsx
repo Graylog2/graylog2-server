@@ -7,17 +7,17 @@ import { flatten, isEqual, uniqWith } from 'lodash';
 import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'views/logic/DefaultCompare';
-
 import { ViewStore } from 'views/stores/ViewStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
-
 import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
+
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 import type { VisualizationComponent } from '../aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from '../aggregationbuilder/AggregationBuilder';

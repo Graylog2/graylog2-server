@@ -4,7 +4,9 @@ import asMock from 'helpers/mocking/AsMock';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import Widget from 'views/logic/widgets/Widget';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
+
 import handler from './FieldStatisticsHandler';
+
 import FieldType from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';

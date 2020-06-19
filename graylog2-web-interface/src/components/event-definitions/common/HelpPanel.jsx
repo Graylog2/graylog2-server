@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 import { Panel } from 'components/graylog';
 import { Icon } from 'components/common';
 

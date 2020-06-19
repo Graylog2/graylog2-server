@@ -5,12 +5,11 @@
 import * as React from 'react';
 import { cleanup, waitForElement, render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
+
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
-
 import viewsBindings from 'views/bindings';
 
 jest.mock('views/stores/DashboardsStore', () => ({

@@ -4,6 +4,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+
 import FieldNameCompletion from './FieldNameCompletion';
 
 jest.mock('views/stores/FieldTypesStore', () => ({

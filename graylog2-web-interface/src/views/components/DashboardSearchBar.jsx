@@ -18,6 +18,7 @@ import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
+
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 

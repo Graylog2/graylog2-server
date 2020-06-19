@@ -1,4 +1,5 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import MaxmindAdapterFieldSet from 'components/maps/adapter/MaxmindAdapterFieldSet';
 import MaxmindAdapterSummary from 'components/maps/adapter/MaxmindAdapterSummary';
 import MaxmindAdapterDocumentation from 'components/maps/adapter/MaxmindAdapterDocumentation';

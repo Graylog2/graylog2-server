@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
-import { WidgetErrorsList } from './WidgetPropTypes';
 
+import { WidgetErrorsList } from './WidgetPropTypes';
 import styles from './MessageWidgets.css';
 
 type WidgetError = {

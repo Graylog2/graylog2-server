@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import mockComponent from 'helpers/mocking/MockComponent';
+
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 

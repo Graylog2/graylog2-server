@@ -2,18 +2,15 @@
 import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
-
 import { ViewActions } from 'views/stores/ViewStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import View from 'views/logic/views/View';
 import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
-
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
 

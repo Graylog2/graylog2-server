@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 

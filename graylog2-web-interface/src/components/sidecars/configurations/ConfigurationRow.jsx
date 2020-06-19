@@ -8,7 +8,6 @@ import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 
 import CopyConfigurationModal from './CopyConfigurationModal';
-
 import styles from './ConfigurationRow.css';
 
 class ConfigurationRow extends React.Component {

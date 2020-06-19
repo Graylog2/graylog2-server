@@ -2,9 +2,10 @@
 import * as React from 'react';
 import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
+
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);

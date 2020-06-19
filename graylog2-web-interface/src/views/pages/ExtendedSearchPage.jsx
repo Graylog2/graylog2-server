@@ -8,7 +8,6 @@ import { withRouter } from 'react-router';
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
-
 import SideBar from 'views/components/sidebar/SideBar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
@@ -16,7 +15,6 @@ import type {
   SearchRefreshCondition,
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
-
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -32,7 +30,6 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldsOverview } from 'views/components/sidebar';
-
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';

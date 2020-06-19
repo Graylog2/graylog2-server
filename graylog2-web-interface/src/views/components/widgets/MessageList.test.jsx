@@ -15,8 +15,10 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
 import InputsStore from 'stores/inputs/InputsStore';
+
 import MessageList from './MessageList';
 import RenderCompletionCallback from './RenderCompletionCallback';
+
 import InputsActions from '../../../actions/inputs/InputsActions';
 
 const MessageTableEntry = () => (

@@ -1,9 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import mockComponent from 'helpers/mocking/MockComponent';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
+
 import AppRouter from './AppRouter';
 
 jest.mock('pages', () => ({

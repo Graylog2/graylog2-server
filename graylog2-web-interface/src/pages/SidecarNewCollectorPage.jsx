@@ -5,7 +5,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
-
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 
 const SidecarNewCollectorPage = createReactClass({

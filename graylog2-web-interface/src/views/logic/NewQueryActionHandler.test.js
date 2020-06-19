@@ -1,7 +1,9 @@
 // @flow strict
 import asMock from 'helpers/mocking/AsMock';
+
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewStore } from 'views/stores/ViewStore';
+
 import NewQueryActionHandler from './NewQueryActionHandler';
 import View from './views/View';
 

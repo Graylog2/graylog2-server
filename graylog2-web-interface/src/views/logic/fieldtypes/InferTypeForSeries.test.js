@@ -4,9 +4,10 @@
 import each from 'jest-each';
 
 import inferTypeForSeries from './InferTypeForSeries';
-import Series from '../aggregationbuilder/Series';
 import FieldTypeMapping from './FieldTypeMapping';
 import FieldType, { FieldTypes } from './FieldType';
+
+import Series from '../aggregationbuilder/Series';
 
 describe('InferTypeForSeries', () => {
   each`

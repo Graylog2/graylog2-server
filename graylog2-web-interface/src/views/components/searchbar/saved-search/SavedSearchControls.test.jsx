@@ -1,13 +1,13 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import asMock from 'helpers/mocking/AsMock';
+import mockAction from 'helpers/mocking/MockAction';
+
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';

@@ -5,9 +5,10 @@ import { mount } from 'wrappedEnzyme';
 import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
-
 import { asMock } from 'helpers/mocking/index';
+
 import type { Store } from 'stores/StoreTypes';
+
 import {
   arrayOfMaps,
   listWithObject,
@@ -18,6 +19,7 @@ import {
   NeverEqual,
   NonValueClass,
 } from './EqualityCheck.fixtures';
+
 import connect, { useStore } from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;

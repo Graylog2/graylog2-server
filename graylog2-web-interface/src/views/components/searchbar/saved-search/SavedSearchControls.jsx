@@ -23,8 +23,8 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import * as Permissions from 'views/Permissions';
-
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
+
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
 

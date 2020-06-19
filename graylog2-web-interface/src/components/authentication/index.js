@@ -1,4 +1,5 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import MongoDbPasswordConfig from './MongoDbPasswordConfig';
 import MongoDbSessionConfig from './MongoDbSessionConfig';
 import LegacyLdapConfig from './LegacyLdapConfig';

@@ -6,7 +6,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Col, DropdownButton, MenuItem, Button } from 'components/graylog';
 import { EntityListItem, IfPermitted, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';

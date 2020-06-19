@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');

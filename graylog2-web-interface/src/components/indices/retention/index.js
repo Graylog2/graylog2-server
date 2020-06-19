@@ -1,4 +1,5 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import DeletionRetentionStrategyConfiguration from './DeletionRetentionStrategyConfiguration';
 import DeletionRetentionStrategySummary from './DeletionRetentionStrategySummary';
 import ClosingRetentionStrategyConfiguration from './ClosingRetentionStrategyConfiguration';

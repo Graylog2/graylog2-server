@@ -4,9 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 

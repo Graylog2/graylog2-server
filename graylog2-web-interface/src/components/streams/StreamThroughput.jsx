@@ -4,9 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { Spinner } from 'components/common';
 
 const MetricsStore = StoreProvider.getStore('Metrics');

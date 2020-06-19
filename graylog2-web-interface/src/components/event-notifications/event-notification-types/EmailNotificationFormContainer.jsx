@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';

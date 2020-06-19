@@ -1,5 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
+
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 

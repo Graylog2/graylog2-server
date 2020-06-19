@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
+
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const PanelHeading = styled(BootstrapPanel.Heading)``;

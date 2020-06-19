@@ -3,6 +3,7 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Widget from 'views/logic/widgets/Widget';
 import DataTable from 'views/components/datatable/DataTable';
+
 import bindings from './bindings';
 
 describe('Views bindings enterprise widgets', () => {

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button } from 'components/graylog';
 import { DataTable } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 class NotificationList extends React.Component {
   static propTypes = {

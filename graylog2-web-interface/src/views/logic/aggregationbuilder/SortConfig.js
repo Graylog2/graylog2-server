@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
+
 import type { DirectionJson } from './Direction';
 import Direction from './Direction';
 

@@ -5,10 +5,8 @@ import PropTypes from 'prop-types';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import connect from 'stores/connect';
-
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { SearchStoreState } from 'views/stores/SearchStore';
 

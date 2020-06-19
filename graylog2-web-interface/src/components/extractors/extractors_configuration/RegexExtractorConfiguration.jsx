@@ -6,10 +6,8 @@ import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const ToolsStore = StoreProvider.getStore('Tools');

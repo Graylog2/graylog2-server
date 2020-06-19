@@ -1,4 +1,5 @@
 import theme from 'styled-theming';
+
 import { colors, themeModes } from 'theme';
 
 const variantColors = () => {

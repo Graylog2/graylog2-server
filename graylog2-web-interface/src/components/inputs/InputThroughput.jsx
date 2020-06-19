@@ -9,9 +9,7 @@ import styled from 'styled-components';
 
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
 

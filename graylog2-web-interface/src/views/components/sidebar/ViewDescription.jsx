@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
-
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { SearchResultOverview } from 'views/components/sidebar';

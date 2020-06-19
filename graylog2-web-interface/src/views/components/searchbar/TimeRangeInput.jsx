@@ -8,6 +8,7 @@ import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRa
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
+
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
 
 type Props = {

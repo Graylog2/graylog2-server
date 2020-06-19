@@ -1,7 +1,9 @@
 // @flow strict
 import React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
+
 import View from 'views/logic/views/View';
+
 import ViewTypeLabel from './ViewTypeLabel';
 
 describe('ViewTypeLabel', () => {

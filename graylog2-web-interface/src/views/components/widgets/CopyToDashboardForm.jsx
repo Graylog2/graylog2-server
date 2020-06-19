@@ -1,5 +1,6 @@
 // @flow strict
 import React, { useEffect, useState, useCallback } from 'react';
+
 import { Modal, Button, ListGroup, ListGroupItem } from 'components/graylog';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import connect from 'stores/connect';

@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col } from 'components/graylog';
 import lodash from 'lodash';
 import numeral from 'numeral';
 
+import { Col } from 'components/graylog';
 import { Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 

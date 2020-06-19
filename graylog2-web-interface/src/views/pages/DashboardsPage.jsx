@@ -7,7 +7,6 @@ import { Col, Row, Button } from 'components/graylog';
 import connect from 'stores/connect';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common/index';
 import Routes from 'routing/Routes';
-
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';

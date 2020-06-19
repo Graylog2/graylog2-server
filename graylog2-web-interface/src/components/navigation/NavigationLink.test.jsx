@@ -1,6 +1,8 @@
 import React from 'react';
 import { mount, shallow } from 'wrappedEnzyme';
+
 import NavigationLink from './NavigationLink';
+
 import URLUtils from '../../util/URLUtils';
 
 jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path) }));
