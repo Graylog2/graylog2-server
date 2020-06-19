@@ -8,6 +8,7 @@ import { sortBy, isEmpty } from 'lodash';
 import { Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
 

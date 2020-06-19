@@ -1,6 +1,7 @@
 import jQuery from 'jquery';
-import registerBuiltinStores from 'injection/registerBuiltinStores';
 import sizeMe from 'react-sizeme';
+
+import registerBuiltinStores from 'injection/registerBuiltinStores';
 
 global.$ = jQuery;
 global.jQuery = jQuery;

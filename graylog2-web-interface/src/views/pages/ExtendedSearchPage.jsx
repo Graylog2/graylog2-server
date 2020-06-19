@@ -8,15 +8,25 @@ import { withRouter } from 'react-router';
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
-
 import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
-import type {
-  SearchRefreshCondition,
-  SearchRefreshConditionArguments,
-} from 'views/logic/hooks/SearchRefreshCondition';
-
+import HeaderElements from 'views/components/HeaderElements';
+import QueryBarElements from 'views/components/QueryBarElements';
+import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
+import QueryBar from 'views/components/QueryBar';
+import { FieldsOverview } from 'views/components/sidebar';
+import DashboardSearchBar from 'views/components/DashboardSearchBar';
+import SearchBar from 'views/components/SearchBar';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import IfSearch from 'views/components/search/IfSearch';
+import IfInteractive from 'views/components/dashboard/IfInteractive';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -24,28 +34,14 @@ import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfi
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import HeaderElements from 'views/components/HeaderElements';
-import QueryBarElements from 'views/components/QueryBarElements';
-import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
-import withPluginEntities from 'views/logic/withPluginEntities';
-import IfDashboard from 'views/components/dashboard/IfDashboard';
-import QueryBar from 'views/components/QueryBar';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldsOverview } from 'views/components/sidebar';
-
-import DashboardSearchBar from 'views/components/DashboardSearchBar';
-import SearchBar from 'views/components/SearchBar';
-import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
-import IfSearch from 'views/components/search/IfSearch';
-import { AdditionalContext } from 'views/logic/ActionContext';
-import IfInteractive from 'views/components/dashboard/IfInteractive';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
+import withPluginEntities from 'views/logic/withPluginEntities';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-
-import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import type {
+  SearchRefreshCondition,
+  SearchRefreshConditionArguments,
+} from 'views/logic/hooks/SearchRefreshCondition';
 
 const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`

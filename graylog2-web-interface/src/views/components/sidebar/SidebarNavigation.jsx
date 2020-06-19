@@ -5,7 +5,6 @@ import styled, { type StyledComponent } from 'styled-components';
 import { type ThemeInterface } from 'theme';
 
 import NavItem from './NavItem';
-
 import { type SidebarSection } from './sidebarSections';
 
 type Props = {

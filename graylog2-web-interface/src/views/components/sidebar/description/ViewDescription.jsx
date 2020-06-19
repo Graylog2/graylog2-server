@@ -3,15 +3,16 @@ import * as React from 'react';
 import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
+import QueryResult from 'views/logic/QueryResult';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import QueryResult from 'views/logic/QueryResult';
-
 import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
+
+import SearchResultOverview from './SearchResultOverview';
+
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
-import SearchResultOverview from './SearchResultOverview';
 
 type Props = {
   results: QueryResult,

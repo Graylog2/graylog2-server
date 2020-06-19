@@ -6,10 +6,9 @@ import View, { type ViewType } from 'views/logic/views/View';
 import { type ThemeInterface } from 'theme';
 import { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
-
+import { IconButton } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import { IconButton } from 'components/common';
 
 type Props = {
   children: React.Node,

@@ -8,8 +8,8 @@ import styled, { type StyledComponent } from 'styled-components';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { type ThemeInterface } from 'theme';
-
 import { Button } from 'components/graylog';
+
 import List from './List';
 import FieldGroup from './FieldGroup';
 
@@ -35,6 +35,7 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
     grid-row: 1;
     -ms-grid-row: 1;
   }
+
   > *:nth-child(2) {
     grid-column: 1;
     -ms-grid-column: 1;

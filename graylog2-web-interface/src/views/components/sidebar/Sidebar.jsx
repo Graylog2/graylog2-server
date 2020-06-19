@@ -9,10 +9,12 @@ import { type ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
 import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
-import CustomPropTypes from '../CustomPropTypes';
+
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
 import sidebarSections, { type SidebarSection } from './sidebarSections';
+
+import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   children: React.Element<any>,
