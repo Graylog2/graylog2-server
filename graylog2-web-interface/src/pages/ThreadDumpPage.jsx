@@ -2,12 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+
 import { Row, Col } from 'components/graylog';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import DateTime from 'logic/datetimes/DateTime';
 
 const NodesStore = StoreProvider.getStore('Nodes');

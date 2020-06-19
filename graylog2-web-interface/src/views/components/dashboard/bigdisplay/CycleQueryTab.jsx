@@ -1,5 +1,6 @@
 // @flow strict
 import { useEffect } from 'react';
+
 import View from 'views/logic/views/View';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewActions } from 'views/stores/ViewStore';

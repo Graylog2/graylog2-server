@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+
 import HighlightingRulesContext from './HighlightingRulesContext';
 import HighlightingRulesProvider from './HighlightingRulesProvider';
 

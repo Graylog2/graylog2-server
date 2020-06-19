@@ -2,10 +2,8 @@ import Reflux from 'reflux';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');

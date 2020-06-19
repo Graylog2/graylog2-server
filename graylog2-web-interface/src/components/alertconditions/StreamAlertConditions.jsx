@@ -6,7 +6,6 @@ import naturalSort from 'javascript-natural-sort';
 
 import { Button } from 'components/graylog';
 import { AlertConditionsList } from 'components/alertconditions';
-
 import Routes from 'routing/Routes';
 
 const StreamAlertConditions = createReactClass({

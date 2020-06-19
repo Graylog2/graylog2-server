@@ -4,7 +4,6 @@ import React from 'react';
 import { Col, Row } from 'components/graylog';
 import { AlertMessages, AlertTimeline } from 'components/alerts';
 import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');

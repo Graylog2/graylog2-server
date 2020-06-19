@@ -1,17 +1,19 @@
 // @flow strict
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
-import { MenuItem } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
 import { type ThemeInterface } from 'theme';
-import OverlayDropdown from '../OverlayDropdown';
-import style from '../Field.css';
+
 import { createHandlerFor } from './ActionHandler';
 import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+
+import OverlayDropdown from '../OverlayDropdown';
+import style from '../Field.css';
 
 type Props = {|
   children: React.Node,

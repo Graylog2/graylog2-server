@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import uuid from 'uuid/v4';
+
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
 import type { ActionContexts } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';

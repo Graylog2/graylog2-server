@@ -1,11 +1,12 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import PropTypes from 'prop-types';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
+
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
+
 import SideBar from './SideBar';
 
 const mockCurrentUser = { timezone: 'UTC' };

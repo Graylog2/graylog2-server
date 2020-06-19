@@ -3,9 +3,11 @@ import { mount } from 'wrappedEnzyme';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+
 import AggregationBuilder from './AggregationBuilder';
-import EmptyResultWidget from '../widgets/EmptyResultWidget';
 import EmptyAggregationContent from './EmptyAggregationContent';
+
+import EmptyResultWidget from '../widgets/EmptyResultWidget';
 
 const mockDummyVisualization = () => 'dummy-visualization';
 jest.mock('graylog-web-plugin/plugin', () => ({

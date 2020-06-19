@@ -5,10 +5,9 @@ import { DocumentTitle, Icon } from 'components/common';
 import { Alert } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
-
 import AuthThemeStyles from 'theme/styles/authStyles';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
 import LoadingPage from './LoadingPage';
 
 const { SessionActions } = CombinedProvider.get('Session');

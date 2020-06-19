@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
-
 import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';

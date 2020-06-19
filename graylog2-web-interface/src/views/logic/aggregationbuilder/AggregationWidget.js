@@ -2,7 +2,9 @@ import { Map } from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
+
 import AggregationWidgetConfig from './AggregationWidgetConfig';
+
 import Widget from '../widgets/Widget';
 
 export default class AggregationWidget extends Widget {

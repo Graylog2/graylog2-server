@@ -2,10 +2,12 @@
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
+
 
 import View from './View';
 import ViewDeserializer from './ViewDeserializer';
+
+import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
 const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
   return hooks.reduce((prev, cur: ViewHook) => prev.then(() => cur(args)), Promise.resolve());

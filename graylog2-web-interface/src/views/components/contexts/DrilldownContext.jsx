@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 

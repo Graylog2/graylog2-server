@@ -4,9 +4,7 @@ import styled from 'styled-components';
 
 import { Alert, Button } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
-
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const NotificationsActions = ActionsProvider.getActions('Notifications');

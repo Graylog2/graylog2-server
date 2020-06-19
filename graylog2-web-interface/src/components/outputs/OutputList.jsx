@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Col, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
+import { Alert, Col, Row } from 'components/graylog';
 import { Spinner } from 'components/common';
 import Output from 'components/outputs/Output';
 

@@ -1,15 +1,18 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
+
 import type { QueryId } from 'views/logic/queries/Query';
 import type { WidgetId } from 'views/logic/views/types';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { TitlesMap } from 'views/stores/TitleTypes';
+
 import View from './View';
 import FindWidgetAndQueryIdInView from './FindWidgetAndQueryIdInView';
-import Widget from '../widgets/Widget';
 import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
+
+import Widget from '../widgets/Widget';
 
 const _removeWidgetTitle = (titlesMap: TitlesMap, widgetId: WidgetId): TitlesMap => {
   const widgetTitles = titlesMap.get('widget');

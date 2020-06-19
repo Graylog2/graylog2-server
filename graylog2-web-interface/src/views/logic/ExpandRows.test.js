@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+
 import { dirname } from 'path';
 
 import expandRows from './ExpandRows';

@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import naturalSort from 'javascript-natural-sort';
+
 import { Alert, Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import naturalSort from 'javascript-natural-sort';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { StreamsStore } = CombinedProvider.get('Streams');

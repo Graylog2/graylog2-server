@@ -7,12 +7,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { ButtonToolbar, Label, Tooltip, Button } from 'components/graylog';
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
-
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
 import style from './ShowAlertPage.css';
 
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');

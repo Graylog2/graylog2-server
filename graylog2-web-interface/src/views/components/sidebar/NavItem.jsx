@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import { SizeMe } from 'react-sizeme';
 
 import { Icon } from 'components/common';
+
 import { Title, TitleText, TitleIcon, Content } from './NavItem.styles';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {

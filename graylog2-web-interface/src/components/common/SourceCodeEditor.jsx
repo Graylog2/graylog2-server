@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 

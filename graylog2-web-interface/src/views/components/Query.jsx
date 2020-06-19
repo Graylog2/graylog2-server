@@ -13,6 +13,7 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
 

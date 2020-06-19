@@ -1,16 +1,13 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
-
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import DocumentationLink from 'components/support/DocumentationLink';
-
 import CollectorsAdministrationContainer from 'components/sidecars/administration/CollectorsAdministrationContainer';
 
 const SidecarAdministrationPage = createReactClass({

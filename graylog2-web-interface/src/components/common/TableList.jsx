@@ -3,8 +3,8 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import lodash from 'lodash';
-import { Col, Row } from 'components/graylog';
 
+import { Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ControlledTableList from 'components/common/ControlledTableList';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';

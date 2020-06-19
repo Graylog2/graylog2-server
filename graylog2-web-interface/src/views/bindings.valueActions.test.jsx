@@ -1,5 +1,6 @@
 // @flow strict
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
+
 import bindings from './bindings';
 import type { ActionHandlerCondition } from './components/actions/ActionHandler';
 

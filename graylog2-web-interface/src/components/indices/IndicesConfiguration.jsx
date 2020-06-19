@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import { Row, Col } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Row, Col } from 'components/graylog';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.

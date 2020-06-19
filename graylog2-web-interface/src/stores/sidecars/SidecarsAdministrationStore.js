@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import lodash from 'lodash';
+
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';

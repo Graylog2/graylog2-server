@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import FieldHelpers from 'components/configurationforms/FieldHelpers';
 
 class TextField extends React.Component {

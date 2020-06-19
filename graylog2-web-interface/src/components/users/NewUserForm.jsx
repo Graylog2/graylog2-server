@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Row, Col, Button } from 'components/graylog';
 
+import { Alert, Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
 import { TimezoneSelect } from 'components/common';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ValidationsUtils from 'util/ValidationsUtils';
 
 const UsersStore = StoreProvider.getStore('Users');

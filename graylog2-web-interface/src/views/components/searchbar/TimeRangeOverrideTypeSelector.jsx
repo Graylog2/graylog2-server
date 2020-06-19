@@ -5,8 +5,10 @@ import { useField } from 'formik';
 
 import { MenuItem, ButtonToolbar } from 'components/graylog';
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
-import { migrateTimeRangeToNewType } from '../TimerangeForForm';
+
 import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
+
+import { migrateTimeRangeToNewType } from '../TimerangeForForm';
 
 const TimeRangeOverrideTypeSelector = () => {
   const [{ value, onChange, name }] = useField('timerange');

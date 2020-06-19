@@ -11,6 +11,7 @@ import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+
 import QueryTabs from './QueryTabs';
 import CustomPropTypes from './CustomPropTypes';
 

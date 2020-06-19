@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Input } from 'components/bootstrap';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const PreferencesStore = StoreProvider.getStore('Preferences');

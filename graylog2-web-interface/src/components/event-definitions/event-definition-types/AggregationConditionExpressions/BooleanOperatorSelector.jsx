@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Col, FormControl, FormGroup } from 'components/graylog';
 
+import { Col, FormControl, FormGroup } from 'components/graylog';
 import { Select } from 'components/common';
 
 const OperatorSelector = styled.div`

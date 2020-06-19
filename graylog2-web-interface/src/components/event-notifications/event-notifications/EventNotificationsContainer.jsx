@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import EventNotifications from './EventNotifications';
 
 // Import built-in Event Notification Types

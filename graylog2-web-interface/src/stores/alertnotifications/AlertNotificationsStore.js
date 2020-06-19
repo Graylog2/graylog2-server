@@ -1,7 +1,6 @@
 import Reflux from 'reflux';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';

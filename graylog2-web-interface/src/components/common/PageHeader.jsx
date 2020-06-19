@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
-import ContentHeadRow from 'components/common/ContentHeadRow';
 import lodash from 'lodash';
 
+import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
+import ContentHeadRow from 'components/common/ContentHeadRow';
 import SupportLink from 'components/support/SupportLink';
 
 const LIFECYCLE_DEFAULT_MESSAGES = {

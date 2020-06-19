@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 export default (props) => {

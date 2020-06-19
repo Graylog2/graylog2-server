@@ -6,14 +6,11 @@ import Reflux from 'reflux';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
-
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const ExtractorsStore = StoreProvider.getStore('Extractors');

@@ -1,6 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import URI from 'urijs';
+
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';

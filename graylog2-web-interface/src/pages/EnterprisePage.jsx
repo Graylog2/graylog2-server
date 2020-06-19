@@ -10,7 +10,6 @@ import { GraylogClusterOverview } from 'components/cluster';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { EnterpriseActions, EnterpriseStore } = CombinedProvider.get('Enterprise');
@@ -124,8 +123,7 @@ const EnterprisePage = createReactClass({
                     <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
                     <li>
                       Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature"
-                                                     text={<strong>dynamic lists</strong>} /> and <DocumentationLink
-                      page="alerts.html" text={<strong>correlation engine</strong>} /> for events
+                                                     text={<strong>dynamic lists</strong>} /> and <DocumentationLink page="alerts.html" text={<strong>correlation engine</strong>} /> for events
                       to minimize the number of alerts that you need to create and maintain
                     </li>
                     <li>

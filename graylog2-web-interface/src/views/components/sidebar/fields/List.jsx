@@ -6,6 +6,7 @@ import { List as ImmutableList } from 'immutable';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+
 import ListItem, { type ListItemStyle } from './ListItem';
 
 type Props = {

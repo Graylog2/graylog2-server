@@ -1,11 +1,10 @@
 import React from 'react';
-import { Row, Col, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
-
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 

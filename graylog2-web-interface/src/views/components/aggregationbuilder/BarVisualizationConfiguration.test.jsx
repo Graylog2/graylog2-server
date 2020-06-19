@@ -2,6 +2,7 @@ import React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import BarVisualizationConfiguration from './BarVisualizationConfiguration';
+
 import BarVisualizationConfig from '../../logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
 describe('BarVisualizationConfiguration', () => {

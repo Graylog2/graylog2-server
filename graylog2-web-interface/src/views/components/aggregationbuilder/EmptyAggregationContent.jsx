@@ -1,7 +1,9 @@
 // @flow strict
 import React, { useContext, useEffect } from 'react';
+
 import { Jumbotron, Button } from 'components/graylog';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+
 import InteractiveContext from '../contexts/InteractiveContext';
 
 type Props = {|

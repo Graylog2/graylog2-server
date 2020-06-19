@@ -3,6 +3,7 @@ import * as React from 'react';
 import { render } from '@testing-library/react';
 
 import HighlightMessageInQuery from './HighlightMessageInQuery';
+
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 describe('HighlightMessageInQuery', () => {

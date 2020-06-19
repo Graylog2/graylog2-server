@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
 import { fonts } from 'theme';
+
 import Icon from './Icon';
 
 type Option = { [string]: any };

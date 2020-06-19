@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import Select from 'views/components/Select';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+
 import HoverForHelp from './HoverForHelp';
 
 type Props = {

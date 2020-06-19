@@ -4,9 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import { Alert, Button } from 'components/graylog';
 import { PaginatedList, Spinner, Timestamp } from 'components/common';
-
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';

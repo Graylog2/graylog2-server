@@ -1,15 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import { Button, Alert, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import ObjectUtils from 'util/ObjectUtils';
 import history from 'util/History';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';
 

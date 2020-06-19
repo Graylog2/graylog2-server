@@ -2,12 +2,14 @@
 import * as React from 'react';
 import { asElement, render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+import WrappingContainer from 'WrappingContainer';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
-import WrappingContainer from 'WrappingContainer';
+
 import WidgetQueryControls from './WidgetQueryControls';
+
 import { WidgetActions } from '../stores/WidgetStore';
 
 jest.mock('views/stores/WidgetStore', () => ({

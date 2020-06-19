@@ -1,6 +1,7 @@
 // @flow strict
-import { List, Map } from 'immutable';
 import { readFileSync } from 'fs';
+
+import { List, Map } from 'immutable';
 import { dirname } from 'path';
 
 import Search from 'views/logic/search/Search';

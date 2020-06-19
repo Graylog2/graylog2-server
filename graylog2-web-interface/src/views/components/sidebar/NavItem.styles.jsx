@@ -1,5 +1,6 @@
 // @flow strict
 import styled, { type StyledComponent, css } from 'styled-components';
+
 import { type ThemeInterface } from 'theme';
 
 type StyleProps = {

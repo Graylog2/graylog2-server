@@ -13,7 +13,6 @@ import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/grayl
 import { Icon, PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
 import { type ThemeInterface } from 'theme';
-
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {

@@ -6,7 +6,6 @@ import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 // eslint-disable-next-line import/no-cycle
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
-
 import Routes from 'routing/Routes';
 import history from 'util/History';
 

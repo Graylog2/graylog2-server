@@ -4,12 +4,13 @@ import { cloneDeep } from 'lodash';
 import styled from 'styled-components';
 
 import { Clearfix } from 'components/graylog';
-
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
+
 // eslint-disable-next-line import/no-cycle
-import AggregationConditionExpression from '../AggregationConditionExpression';
 import BooleanOperatorSelector from './BooleanOperatorSelector';
+
+import AggregationConditionExpression from '../AggregationConditionExpression';
 
 const Group = styled.div`
   padding-left: 40px;

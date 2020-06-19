@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
+
 import NumberUtils from 'util/NumberUtils';
 
 class IndexSizeSummary extends React.Component {

@@ -2,7 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
+
 import DocumentationLink from './DocumentationLink';
+
 import DocsHelper from '../../util/DocsHelper';
 
 const SourcesList = styled.ul`

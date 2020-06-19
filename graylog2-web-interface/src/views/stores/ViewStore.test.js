@@ -1,14 +1,17 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import mockAction from 'helpers/mocking/MockAction';
 
 import ViewState from 'views/logic/views/ViewState';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
-import mockAction from 'helpers/mocking/MockAction';
-import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
+
 import { ViewActions, ViewStore } from './ViewStore';
+
+import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
+
 
 jest.mock('views/actions/SearchActions');
 jest.mock('views/logic/Widgets', () => ({

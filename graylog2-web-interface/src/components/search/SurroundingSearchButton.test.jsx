@@ -3,6 +3,7 @@ import * as React from 'react';
 import { asElement, cleanup, fireEvent, render } from 'wrappedTestingLibrary';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
+
 import SurroundingSearchButton from './SurroundingSearchButton';
 import type { SearchesConfig } from './SearchConfig';
 

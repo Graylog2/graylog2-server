@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { cleanup, render, wait } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
+
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
 

@@ -7,7 +7,6 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Search from 'views/logic/search/Search';
 import SearchResult from 'views/logic/SearchResult';
 

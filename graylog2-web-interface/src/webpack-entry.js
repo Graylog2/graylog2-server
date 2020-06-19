@@ -1,4 +1,5 @@
 import URI from 'urijs';
+
 import AppConfig from 'util/AppConfig';
 
 // The webpack-dev-server serves the assets from "/"

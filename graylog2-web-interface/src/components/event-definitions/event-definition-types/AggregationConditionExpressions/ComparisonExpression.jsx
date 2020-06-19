@@ -4,7 +4,6 @@ import lodash from 'lodash';
 
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
-
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 // eslint-disable-next-line import/no-cycle

@@ -5,7 +5,6 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-
 import EntityIndex from 'logic/content-packs/EntityIndex';
 
 const CatalogActions = ActionsProvider.getActions('Catalog');

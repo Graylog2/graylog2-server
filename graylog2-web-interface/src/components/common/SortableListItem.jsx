@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 
 import { ListGroupItem } from 'components/graylog';
+
 import Icon from './Icon';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax

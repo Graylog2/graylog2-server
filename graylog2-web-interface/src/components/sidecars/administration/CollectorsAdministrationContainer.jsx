@@ -3,10 +3,11 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import lodash from 'lodash';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
+
 import CollectorsAdministration from './CollectorsAdministration';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');

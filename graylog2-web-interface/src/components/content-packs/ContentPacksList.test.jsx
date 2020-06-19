@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
-
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {

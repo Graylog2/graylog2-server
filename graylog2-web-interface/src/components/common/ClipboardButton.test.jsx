@@ -1,6 +1,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import ClipboardJS from 'clipboard';
+
 import ClipboardButton from './ClipboardButton';
 
 jest.mock('clipboard');

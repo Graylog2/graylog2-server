@@ -8,6 +8,7 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+
 import WorldMapVisualization from '../WorldMapVisualization';
 
 jest.mock('../MapVisualization', () => 'map-visualization');

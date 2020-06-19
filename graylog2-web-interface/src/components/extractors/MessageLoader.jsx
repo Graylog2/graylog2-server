@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const MessagesActions = ActionsProvider.getActions('Messages');

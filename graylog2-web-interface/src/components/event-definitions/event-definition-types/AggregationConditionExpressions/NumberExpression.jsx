@@ -4,9 +4,7 @@ import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { Col } from 'components/graylog';
-
 import FormsUtils from 'util/FormsUtils';
-
 import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {

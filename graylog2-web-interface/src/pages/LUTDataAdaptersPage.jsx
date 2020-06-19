@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(

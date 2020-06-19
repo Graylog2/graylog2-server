@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { isPermitted } from 'util/PermissionsMixin';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import {} from 'components/maps/configurations';
 

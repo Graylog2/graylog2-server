@@ -17,8 +17,10 @@ import type {
   VisualizationComponentProps,
 } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
+
 import type { CurrentViewType } from '../../CustomPropTypes';
 
 const GridContainer: StyledComponent<{}, {}, HTMLDivElement> = styled.div`

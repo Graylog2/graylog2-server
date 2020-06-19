@@ -4,7 +4,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
 import { PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';

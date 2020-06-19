@@ -6,6 +6,7 @@ import styled, { css, keyframes, type StyledComponent } from 'styled-components'
 import chroma from 'chroma-js';
 
 import { type ThemeInterface } from 'theme';
+
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type ProgressBarProps = {

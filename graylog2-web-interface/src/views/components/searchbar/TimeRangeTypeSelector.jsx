@@ -5,10 +5,11 @@ import { useField } from 'formik';
 
 import TimeRangeDropdownButton from 'views/components/searchbar/TimeRangeDropdownButton';
 import { ButtonToolbar } from 'components/graylog';
-
 import PropTypes from 'views/components/CustomPropTypes';
-import { migrateTimeRangeToNewType } from '../TimerangeForForm';
+
 import timeRangeTypeMenuItems from './TimeRangeTypeMenuItems';
+
+import { migrateTimeRangeToNewType } from '../TimerangeForForm';
 
 type Props = {
   disabled: boolean,

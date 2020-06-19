@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { isEqual } from 'lodash';
+
 import { Button } from 'components/graylog';
 import TypeAheadInput from 'components/common/TypeAheadInput';
 

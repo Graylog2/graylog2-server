@@ -3,6 +3,7 @@ import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
+
 import RefreshControls from './RefreshControls';
 
 jest.useFakeTimers();

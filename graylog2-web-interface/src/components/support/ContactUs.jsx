@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Col, Row } from 'components/graylog';
 
 import SupportSources from './SupportSources';

@@ -7,7 +7,6 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
-
 import ContentPackEntitiesListStyle from './ContentPackEntitiesList.css';
 
 class ContentPackEntitiesList extends React.Component {

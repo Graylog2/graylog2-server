@@ -2,12 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
-import { Button, Col, Panel, Row } from 'components/graylog';
 
+import { Button, Col, Panel, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 

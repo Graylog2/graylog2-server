@@ -1,6 +1,7 @@
 // @flow strict
-import Widget from '../widgets/Widget';
 import DuplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
+
+import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 
 describe('DuplicateCommonWidgetSettings', () => {

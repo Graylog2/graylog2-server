@@ -7,10 +7,10 @@ import Promise from 'bluebird';
 import Reflux from 'reflux';
 
 // eslint-disable-next-line import/no-named-as-default
-import AppFacade from 'routing/AppFacade';
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import AppFacade from 'routing/AppFacade';
+import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import ViewsBindings from 'views/bindings';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));

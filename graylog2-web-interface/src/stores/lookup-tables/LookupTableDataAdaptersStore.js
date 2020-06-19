@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LookupTableDataAdaptersActions = ActionsProvider.getActions('LookupTableDataAdapters');

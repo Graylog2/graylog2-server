@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, ButtonToolbar, Col, Nav, Row } from 'components/graylog';
 import { Wizard } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';

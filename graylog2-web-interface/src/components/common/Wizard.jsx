@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import styled from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
+
 import Icon from './Icon';
 
 const SubnavigationCol = styled(Col)(({ theme }) => `

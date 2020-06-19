@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+
 import { Button } from 'components/graylog';
 
 type Props = {

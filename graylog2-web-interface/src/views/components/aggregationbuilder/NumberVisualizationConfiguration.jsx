@@ -5,6 +5,7 @@ import { capitalize } from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+
 import HoverForHelp from './HoverForHelp';
 
 type Props = {

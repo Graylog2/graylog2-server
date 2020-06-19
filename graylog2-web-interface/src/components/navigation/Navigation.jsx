@@ -1,20 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router';
-
-import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
 import AppConfig from 'util/AppConfig';
-
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import { IfPermitted } from 'components/common';
 

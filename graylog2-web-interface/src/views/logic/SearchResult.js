@@ -1,5 +1,6 @@
 import { fromJS } from 'immutable';
 import { mapValues, get, compact } from 'lodash';
+
 import QueryResult from './QueryResult';
 import SearchError from './SearchError';
 import ResultWindowLimitError from './ResultWindowLimitError';

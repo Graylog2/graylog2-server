@@ -1,4 +1,5 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+
 import { FieldContentConditionSummary } from 'components/alertconditions/fieldcontentcondition';
 import { FieldValueConditionSummary } from 'components/alertconditions/fieldvaluecondition';
 import { MessageCountConditionSummary } from 'components/alertconditions/messagecountcondition';

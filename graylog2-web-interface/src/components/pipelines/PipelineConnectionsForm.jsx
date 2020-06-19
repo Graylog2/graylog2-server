@@ -7,7 +7,6 @@ import naturalSort from 'javascript-natural-sort';
 import { ControlLabel, FormGroup, HelpBlock, Button } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-
 import Routes from 'routing/Routes';
 
 const PipelineConnectionsForm = createReactClass({

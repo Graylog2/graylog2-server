@@ -3,6 +3,7 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Search from 'views/logic/search/Search';
 import type { SearchJson } from 'views/logic/search/Search';
+
 import View from './View';
 import type { ViewJson } from './View';
 

@@ -6,12 +6,11 @@ import styled from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-
 import EntityList from 'components/common/EntityList';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
+
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
 

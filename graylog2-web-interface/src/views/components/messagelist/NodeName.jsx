@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
 import Routes from 'routing/Routes';
 import { Icon } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';

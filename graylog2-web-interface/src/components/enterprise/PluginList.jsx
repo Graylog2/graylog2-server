@@ -1,8 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Icon } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import style from './PluginList.css';
 
 const PluginList = createReactClass({

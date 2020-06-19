@@ -2,6 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
+import lodash from 'lodash';
+import moment from 'moment';
+
 import {
   ControlLabel,
   DropdownButton,
@@ -11,9 +14,6 @@ import {
   InputGroup,
   MenuItem,
 } from 'components/graylog';
-import lodash from 'lodash';
-import moment from 'moment';
-
 import { InputWrapper } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
 

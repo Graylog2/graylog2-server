@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
+
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const SingleNodeActions = ActionsProvider.getActions('SingleNode');

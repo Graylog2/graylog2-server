@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+
 import DecoratorSummary from 'views/components/messagelist/decorators/DecoratorSummary';
 import type { Decorator, DecoratorType } from 'views/components/messagelist/decorators/Types';
 

@@ -6,6 +6,7 @@ import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
+
 import Query from '../queries/Query';
 import View from '../views/View';
 import GlobalOverride from '../search/GlobalOverride';
