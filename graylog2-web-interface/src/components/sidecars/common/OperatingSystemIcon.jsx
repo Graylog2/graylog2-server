@@ -11,24 +11,24 @@ const SidecarIcon = styled(Icon)`
 
 const OperatingSystemIcon = ({ operatingSystem }) => {
   let iconName = 'question-circle';
-  let prefix = 'fas';
+  let iconType = 'solid';
 
   if (operatingSystem) {
     const os = operatingSystem.trim().toLowerCase();
     if (os.indexOf('darwin') !== -1 || os.indexOf('mac os') !== -1) {
       iconName = 'apple';
-      prefix = 'fab';
+      iconType = 'brand';
     } else if (os.indexOf('linux') !== -1) {
       iconName = 'linux';
-      prefix = 'fab';
+      iconType = 'brand';
     } else if (os.indexOf('win') !== -1) {
       iconName = 'windows';
-      prefix = 'fab';
+      iconType = 'brand';
     }
   }
 
   return (
-    <SidecarIcon name={{ prefix, iconName }} fixedWidth />
+    <SidecarIcon name={iconName} type={iconType} fixedWidth />
   );
 };
 
