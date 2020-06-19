@@ -1,13 +1,15 @@
 // @flow strict
-import type { PluginMetadata } from 'views/logic/views/View';
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import type { PluginMetadata } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
-import Search from '../logic/search/Search';
+
 
 import RequirementsProvided from './RequirementsProvided';
+
+import Search from '../logic/search/Search';
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {

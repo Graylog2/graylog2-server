@@ -2,14 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Row } from 'components/graylog';
 
+import { Col, Row } from 'components/graylog';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';
 import { EditAlertConditionForm } from 'components/alertconditions';
 import { StreamAlertNotifications } from 'components/alertnotifications';
-
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import history from 'util/History';

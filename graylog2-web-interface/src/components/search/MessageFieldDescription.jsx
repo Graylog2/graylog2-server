@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 import styled from 'styled-components';
+
+import { Alert } from 'components/graylog';
 
 const MessageTerms = styled.span(({ theme }) => `
   margin-right: 8px;

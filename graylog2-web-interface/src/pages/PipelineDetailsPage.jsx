@@ -2,13 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button, Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
-
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import ObjectUtils from 'util/ObjectUtils';
 import Routes from 'routing/Routes';

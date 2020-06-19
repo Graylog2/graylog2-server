@@ -4,12 +4,9 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-
 import history from 'util/History';
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');

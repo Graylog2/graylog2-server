@@ -1,6 +1,5 @@
 // @flow strict
 import * as Immutable from 'immutable';
-
 import asMock from 'helpers/mocking/AsMock';
 
 import Widget from 'views/logic/widgets/Widget';
@@ -8,9 +7,11 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import Series from 'views/logic/aggregationbuilder/Series';
+
+import ChartActionHandler from './ChartActionHandler';
+
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
 import FieldType from '../fieldtypes/FieldType';
-import ChartActionHandler from './ChartActionHandler';
 import { createElasticsearchQueryString } from '../queries/Query';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 

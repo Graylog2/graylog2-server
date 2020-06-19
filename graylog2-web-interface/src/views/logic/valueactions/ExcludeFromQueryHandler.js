@@ -1,6 +1,7 @@
 // @flow strict
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
+
 import QueryManipulationHandler from './QueryManipulationHandler';
 
 export default class ExcludeFromQueryHandler extends QueryManipulationHandler {

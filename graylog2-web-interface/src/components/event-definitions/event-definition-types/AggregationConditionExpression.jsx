@@ -4,9 +4,7 @@ import lodash from 'lodash';
 
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/graylog';
 import { Icon } from 'components/common';
-
 import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
-
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';

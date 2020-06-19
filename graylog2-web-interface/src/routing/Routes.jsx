@@ -1,6 +1,7 @@
-import AppConfig from 'util/AppConfig';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
+
+import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
 
 const Routes = {

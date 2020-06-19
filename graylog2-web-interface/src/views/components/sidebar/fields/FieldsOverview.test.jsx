@@ -4,6 +4,7 @@ import { List } from 'immutable';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+
 import FieldsOverview from './FieldsOverview';
 
 

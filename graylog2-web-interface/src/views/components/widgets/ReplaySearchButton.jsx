@@ -6,6 +6,7 @@ import styled, { type StyledComponent } from 'styled-components';
 import { IconButton } from 'components/common';
 import SearchLink from 'components/search/SearchLink';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+
 import DrilldownContext from '../contexts/DrilldownContext';
 
 const NeutralLink: StyledComponent<{}, {}, HTMLAnchorElement> = styled.a`

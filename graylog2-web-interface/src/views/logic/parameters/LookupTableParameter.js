@@ -1,7 +1,9 @@
 // @flow strict
 
-import Parameter from 'views/logic/parameters/Parameter';
 import * as Immutable from 'immutable';
+
+import Parameter from 'views/logic/parameters/Parameter';
+
 import type { ParameterJson } from './Parameter';
 import ParameterBinding from './ParameterBinding';
 

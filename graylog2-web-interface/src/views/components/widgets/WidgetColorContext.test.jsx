@@ -4,10 +4,12 @@ import { mount } from 'wrappedEnzyme';
 
 import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import { ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
+
+import WidgetColorContext from './WidgetColorContext';
+
 import ChartColorContext from '../visualizations/ChartColorContext';
 import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
 
-import WidgetColorContext from './WidgetColorContext';
 
 jest.mock('views/stores/ChartColorRulesStore', () => ({
   ChartColorRulesActions: {

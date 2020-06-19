@@ -1,7 +1,7 @@
 // @flow strict
 import { Map } from 'immutable';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import Widget from 'views/logic/widgets/Widget';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';

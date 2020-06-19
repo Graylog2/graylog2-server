@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 const MessageFormatter = {

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import history from 'util/History';
 import Routes from 'routing/Routes';
+
 import PipelineDetails from './PipelineDetails';
 
 

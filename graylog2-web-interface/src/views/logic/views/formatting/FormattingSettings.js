@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import HighlightingRule from './highlighting/HighlightingRule';
 import type { HighlightingRuleJSON } from './highlighting/HighlightingRule';
 

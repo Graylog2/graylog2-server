@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { Tab, Tabs, Col, Row } from 'components/graylog';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import Query from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';

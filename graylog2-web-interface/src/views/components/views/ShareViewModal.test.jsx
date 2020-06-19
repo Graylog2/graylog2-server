@@ -6,6 +6,7 @@ import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import View from 'views/logic/views/View';
+
 import ShareViewModal from './ShareViewModal';
 
 const mockLoadRoles = jest.fn(() => Promise.resolve([]));

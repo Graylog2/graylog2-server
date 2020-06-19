@@ -5,11 +5,8 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 
 import { Pluralize, Spinner } from 'components/common';
-
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const MetricsStore = StoreProvider.getStore('Metrics');

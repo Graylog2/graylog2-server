@@ -3,7 +3,6 @@ import { Set } from 'immutable';
 
 import { type ExportPayload } from 'util/MessagesExportUtils';
 import StringUtils from 'util/StringUtils';
-
 import Query from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';

@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import lodash from 'lodash';
 
 import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
-
 import {
   EmptyEntity,
   EntityList,

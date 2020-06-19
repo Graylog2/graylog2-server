@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export type MessageListOptions = {

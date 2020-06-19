@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+
 import { URLWhiteListInput } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 

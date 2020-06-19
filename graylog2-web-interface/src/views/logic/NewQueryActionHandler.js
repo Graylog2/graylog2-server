@@ -1,8 +1,10 @@
 // @flow strict
 import { ViewStore } from 'views/stores/ViewStore';
-import { QueriesActions } from '../stores/QueriesStore';
+
 import QueryGenerator from './queries/QueryGenerator';
 import ViewStateGenerator from './views/ViewStateGenerator';
+
+import { QueriesActions } from '../stores/QueriesStore';
 
 export default async () => {
   const { view } = ViewStore.getInitialState();

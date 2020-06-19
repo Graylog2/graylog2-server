@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const DeflectorActions = ActionsProvider.getActions('Deflector');

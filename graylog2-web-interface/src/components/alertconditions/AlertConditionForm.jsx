@@ -5,7 +5,6 @@ import Reflux from 'reflux';
 
 import { ControlLabel, FormControl, FormGroup } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');

@@ -7,6 +7,7 @@ import org.graylog.storage.elasticsearch6.migrations.V20170607164210_MigrateReop
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -17,6 +18,7 @@ import org.graylog2.plugin.PluginModule;
 public class Elasticsearch6Module extends PluginModule {
     @Override
     protected void configure() {
+        bind(CountsAdapter.class).to(CountsAdapterES6.class);
         bind(IndicesAdapter.class).to(IndicesAdapterES6.class);
         bind(SearchesAdapter.class).to(SearchesAdapterES6.class);
         bind(MoreSearchAdapter.class).to(MoreSearchAdapterES6.class);

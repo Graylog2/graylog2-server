@@ -1,5 +1,6 @@
 // @flow strict
 import chroma from 'chroma-js';
+
 import { teinte } from 'theme/colors';
 
 export type ColorLevel = {

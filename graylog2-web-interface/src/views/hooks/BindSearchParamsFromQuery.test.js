@@ -5,6 +5,7 @@ import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { QueriesActions } from 'views/stores/QueriesStore';
+
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
 const MOCK_VIEW_QUERY_ID = 'query-id';

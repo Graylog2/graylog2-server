@@ -1,6 +1,7 @@
 // @flow strict
 import React from 'react';
 import { fireEvent, render, cleanup } from 'wrappedTestingLibrary';
+
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 
 describe('HTTPJSONPathAdapterFieldSet', () => {

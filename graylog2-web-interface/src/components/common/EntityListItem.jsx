@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
+
 import Icon from './Icon';
 
 const StyledListItem = styled.li(({ theme }) => `

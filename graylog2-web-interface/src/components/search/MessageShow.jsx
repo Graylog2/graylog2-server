@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'components/graylog';
 import Immutable from 'immutable';
+
+import { Col, Row } from 'components/graylog';
 import StringUtils from 'util/StringUtils';
+
 import MessageDetail from './MessageDetail';
 
 class MessageShow extends React.Component {

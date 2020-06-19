@@ -1,19 +1,16 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamComponent from 'components/streams/StreamComponent';
 import DocumentationLink from 'components/support/DocumentationLink';
 import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
-
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');

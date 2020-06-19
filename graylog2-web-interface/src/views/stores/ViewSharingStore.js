@@ -4,7 +4,6 @@ import { get } from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
-
 import type { RefluxActions } from 'stores/StoreTypes';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';

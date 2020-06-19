@@ -16,7 +16,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
     position: relative;
     margin-bottom: -15px;
     top: -5px;
-    font-size: 11px;
+    font-size: ${theme.fonts.size.small};
     line-height: 11px;
   }
 
@@ -42,7 +42,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 
   .widget-title {
-    font-size: 18px;
+    font-size: ${theme.fonts.size.large};
     height: 25px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -57,7 +57,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   .widget-update-info {
     text-align: left;
     float: left;
-    font-size: 11px;
+    font-size: ${theme.fonts.size.small};
     position: absolute;
     bottom: 10px;
     width: 130px;
@@ -95,7 +95,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
   }
 
   .not-available {
-    font-size: 70px;
+    font-size: ${theme.fonts.size.huge};
   }
 
   .loading,
@@ -143,6 +143,7 @@ export default class extends React.Component {
     // subtracting header, footer and padding from height & width.
     const height = widgetNode.clientHeight - (this.WIDGET_HEADER_HEIGHT + this.WIDGET_FOOTER_HEIGHT);
     const width = widgetNode.clientWidth - 20;
+
     return { height: height, width: width };
   };
 
@@ -150,6 +151,7 @@ export default class extends React.Component {
     const { onSizeChange, widgetId } = this.props;
     const { width: currentWidth, height: currentHeight } = this.state;
     const { height, width } = this._calculateWidgetSize();
+
     if (height !== currentHeight || width !== currentWidth) {
       this.setState({ height: height, width: width });
       onSizeChange(widgetId, { height: height, width: width });
@@ -158,6 +160,7 @@ export default class extends React.Component {
 
   render() {
     const { children, widgetId } = this.props;
+
     return (
       <WidgetWrap ref={(elem) => { this._widgetNode = elem; }}
                   style={{ overflow: 'hidden' }}

@@ -2,8 +2,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import connect from 'stores/connect';
 
+import connect from 'stores/connect';
 import Spinner from 'components/common/Spinner';
 import { ViewStore } from 'views/stores/ViewStore';
 import queryTitle from 'views/logic/queries/QueryTitle';

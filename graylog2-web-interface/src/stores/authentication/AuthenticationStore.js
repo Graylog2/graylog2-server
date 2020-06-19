@@ -2,9 +2,7 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import UserNotification from 'util/UserNotification';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const AuthenticationActions = ActionsProvider.getActions('Authentication');

@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { List } from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import connect from 'stores/connect';
 
+import connect from 'stores/connect';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
@@ -12,7 +12,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
-
 import { Icon, Spinner } from 'components/common';
 import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';

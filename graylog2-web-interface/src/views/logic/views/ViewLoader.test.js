@@ -1,14 +1,16 @@
 // @flow strict
 import * as Immutable from 'immutable';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ViewActions } from 'views/stores/ViewStore';
-import Search from '../search/Search';
+
 import View from './View';
 import ViewLoader from './ViewLoader';
 import type { ViewJson } from './View';
+
+import Search from '../search/Search';
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {},

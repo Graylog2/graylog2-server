@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
+
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 export const FieldList = PropTypes.arrayOf(

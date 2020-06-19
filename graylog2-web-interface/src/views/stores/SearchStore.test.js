@@ -1,7 +1,7 @@
 // @flow strict
 import fetch from 'logic/rest/FetchProvider';
-
 import Search from 'views/logic/search/Search';
+
 import { SearchActions } from './SearchStore';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());

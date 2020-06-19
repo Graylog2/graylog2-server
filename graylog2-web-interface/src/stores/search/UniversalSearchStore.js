@@ -3,7 +3,6 @@ import jQuery from 'jquery';
 import md5 from 'md5';
 
 import MessageFormatter from 'logic/message/MessageFormatter';
-
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';

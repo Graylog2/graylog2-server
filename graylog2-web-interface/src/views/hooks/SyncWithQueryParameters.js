@@ -2,8 +2,8 @@
 import { useEffect } from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
-import history from 'util/History';
 
+import history from 'util/History';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';

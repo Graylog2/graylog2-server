@@ -5,10 +5,12 @@ import mockComponent from 'helpers/mocking/MockComponent';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
+
 import Query from './Query';
+import WidgetGrid from './WidgetGrid';
+
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
-import WidgetGrid from './WidgetGrid';
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
 jest.mock('views/logic/Widgets', () => ({ widgetDefinition: () => ({}) }));

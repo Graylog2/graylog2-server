@@ -1,6 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
+
 import isDeepEqual from 'stores/isDeepEqual';
 
 import type { SearchType } from './SearchType';

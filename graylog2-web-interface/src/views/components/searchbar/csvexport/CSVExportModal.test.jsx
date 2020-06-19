@@ -6,7 +6,6 @@ import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
 
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
-
 import type { ViewStateMap } from 'views/logic/views/View';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
@@ -21,8 +20,8 @@ import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+
 import CSVExportModal, { type Props as CSVExportModalProps } from './CSVExportModal';
 
 jest.mock('util/MessagesExportUtils', () => ({

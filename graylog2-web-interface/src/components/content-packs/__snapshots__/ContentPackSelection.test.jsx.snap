@@ -3164,9 +3164,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ExpandableListItem__Container-sc-10hsq3a-1",
                                   "isStatic": false,
-                                  "lastClassName": "fxCnlF",
+                                  "lastClassName": "gvIcsL",
                                   "rules": Array [
-                                    "font-size:14px;line-height:20px;label{min-height:20px;margin-bottom:2px;margin-right:5px;*{cursor:pointer;}}",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "ExpandableListItem__Container",
@@ -3182,7 +3182,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             forwardedRef={null}
                           >
                             <div
-                              className="ExpandableListItem__Container-sc-10hsq3a-1 fxCnlF"
+                              className="ExpandableListItem__Container-sc-10hsq3a-1 gvIcsL"
                             >
                               <Checkbox
                                 bsClass="checkbox"
@@ -3248,7 +3248,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ExpandableListItem__IconStack-sc-10hsq3a-3",
                                               "isStatic": false,
-                                              "lastClassName": "kNaqZg",
+                                              "lastClassName": "jXmspb",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3268,7 +3268,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         tabIndex={0}
                                       >
                                         <div
-                                          className="ExpandableListItem__IconStack-sc-10hsq3a-3 kNaqZg fa-stack"
+                                          className="ExpandableListItem__IconStack-sc-10hsq3a-3 jXmspb fa-stack"
                                           onClick={[Function]}
                                           tabIndex={0}
                                         >
@@ -3328,9 +3328,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ExpandableListItem__HeaderWrap-sc-10hsq3a-4",
                                         "isStatic": false,
-                                        "lastClassName": "daviui",
+                                        "lastClassName": "kOLPYP",
                                         "rules": Array [
-                                          "font-size:14px;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ExpandableListItem__HeaderWrap",
@@ -3346,7 +3346,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   forwardedRef={null}
                                 >
                                   <span
-                                    className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 daviui header"
+                                    className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 kOLPYP header"
                                   >
                                     <ExpandableListItem__Header
                                       onClick={[Function]}

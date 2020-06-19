@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Col, Panel, Row, Tab, Tabs } from 'components/graylog';
 
 import TemplatesHelper from './TemplatesHelper';

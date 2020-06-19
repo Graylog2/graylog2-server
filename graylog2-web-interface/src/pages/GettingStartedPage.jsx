@@ -5,10 +5,8 @@ import Reflux from 'reflux';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
-
 import Routes from 'routing/Routes';
 import history from 'util/History';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const SystemStore = StoreProvider.getStore('System');

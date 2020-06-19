@@ -2,7 +2,6 @@
 import moment from 'moment-timezone';
 
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 

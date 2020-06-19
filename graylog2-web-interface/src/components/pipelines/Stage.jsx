@@ -7,7 +7,6 @@ import { Link } from 'react-router';
 import { Col, Button } from 'components/graylog';
 import { DataTable, EntityListItem, Spinner, Icon } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 

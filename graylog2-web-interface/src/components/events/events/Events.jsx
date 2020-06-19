@@ -10,7 +10,7 @@ import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'compon
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import EventsSearchBar from './EventsSearchBar';
 import EventDetails from './EventDetails';
@@ -62,10 +62,10 @@ const EventsTable = styled(Table)(({ theme }) => `
   }
 `);
 
-const EventsIcon = styled(Icon)`
-  font-size: 1.5em;
+const EventsIcon = styled(Icon)(({ theme }) => `
+  font-size: ${theme.fonts.size.large};
   vertical-align: top;
-`;
+`);
 
 class Events extends React.Component {
   static propTypes = {
@@ -92,6 +92,7 @@ class Events extends React.Component {
 
   handlePageSizeChange = (nextPageSize) => {
     const { onPageChange } = this.props;
+
     onPageChange(1, nextPageSize);
   };
 
@@ -99,6 +100,7 @@ class Events extends React.Component {
     return () => {
       const { expanded } = this.state;
       const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
+
       this.setState({ expanded: nextExpanded });
     };
   };
@@ -107,6 +109,7 @@ class Events extends React.Component {
     const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
     let icon;
     let style;
+
     switch (priority) {
       case EventDefinitionPriorityEnum.LOW:
         icon = 'thermometer-empty';
@@ -139,7 +142,7 @@ class Events extends React.Component {
       return <em>{event.event_definition_id}</em>;
     }
 
-    return PermissionsMixin.isPermitted(currentUser.permissions,
+    return isPermitted(currentUser.permissions,
       `eventdefinitions:edit:${eventDefinitionContext.id}`)
       ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
       : eventDefinitionContext.title;

@@ -8,9 +8,10 @@ import { ConfigurationForm } from 'components/configurationforms';
 import { Select } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
+
+import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
 const ConfigurationFormContainer = styled.div`
   margin-bottom: 10px;

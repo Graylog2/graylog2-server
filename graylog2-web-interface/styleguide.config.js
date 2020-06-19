@@ -31,6 +31,10 @@ module.exports = {
           content: 'src/theme/docs/ThemeProvider.md',
         },
         {
+          name: 'Fonts',
+          content: 'src/theme/docs/Fonts.md',
+        },
+        {
           name: 'Colors',
           content: 'src/theme/docs/Colors.md',
         },

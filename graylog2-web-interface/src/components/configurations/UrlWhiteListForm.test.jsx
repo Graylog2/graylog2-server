@@ -1,6 +1,7 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import 'helpers/mocking/react-dom_mock';
 import UrlWhiteListForm from './UrlWhiteListForm';
 

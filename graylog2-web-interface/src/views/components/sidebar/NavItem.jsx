@@ -3,8 +3,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { Icon } from 'components/common';
 import { type ThemeInterface } from 'theme';
+import { Icon } from 'components/common';
 
 type Props = {
   isSelected: boolean,

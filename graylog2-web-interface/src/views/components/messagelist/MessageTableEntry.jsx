@@ -2,23 +2,21 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+
 import connect from 'stores/connect';
-
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageDetail from './MessageDetail';
-import TypeSpecificValue from '../TypeSpecificValue';
 import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
-
 import style from './MessageTableEntry.css';
 import type { Message } from './Types';
+
+import TypeSpecificValue from '../TypeSpecificValue';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
 

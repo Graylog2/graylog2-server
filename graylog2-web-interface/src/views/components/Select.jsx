@@ -3,7 +3,6 @@ import React, { useRef, useMemo } from 'react';
 import type { Node, ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
-
 import { Overlay } from 'react-overlays';
 import { createFilter } from 'react-select/lib/filters';
 

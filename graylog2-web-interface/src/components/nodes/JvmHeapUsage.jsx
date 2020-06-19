@@ -7,10 +7,8 @@ import styled, { css } from 'styled-components';
 
 import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import { Spinner } from 'components/common';
-
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 

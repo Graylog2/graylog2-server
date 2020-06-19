@@ -4,11 +4,12 @@ import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { cleanup, render } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
+
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+
 import AggregationControls from './AggregationControls';
 
 jest.mock('stores/connect', () => (x) => x);

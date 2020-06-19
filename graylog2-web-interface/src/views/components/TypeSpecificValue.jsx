@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-
 import { isString, trim, truncate as trunc } from 'lodash';
 
 import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';

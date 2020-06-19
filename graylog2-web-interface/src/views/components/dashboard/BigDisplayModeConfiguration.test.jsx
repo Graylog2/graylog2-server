@@ -9,6 +9,7 @@ import View, { type ViewStateMap } from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
 jest.mock('util/History', () => ({}));

@@ -7,7 +7,6 @@ import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/comm
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
-
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';

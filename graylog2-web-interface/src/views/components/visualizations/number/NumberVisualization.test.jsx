@@ -2,10 +2,13 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { List } from 'immutable';
+
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+
 import NumberVisualization from './NumberVisualization';
+
 import AggregationWidgetConfig from '../../../logic/aggregationbuilder/AggregationWidgetConfig';
 
 jest.mock('react-sizeme', () => ({

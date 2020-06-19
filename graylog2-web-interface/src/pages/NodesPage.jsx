@@ -1,13 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import URI from 'urijs';
+
 import URLUtils from 'util/URLUtils';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';
-import URI from 'urijs';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const NodesStore = StoreProvider.getStore('Nodes');

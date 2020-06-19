@@ -1,5 +1,6 @@
 // @flow strict
 import { get } from 'lodash';
+
 import View from 'views/logic/views/View';
 import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 

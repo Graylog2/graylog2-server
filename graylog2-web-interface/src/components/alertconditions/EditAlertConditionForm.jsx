@@ -6,7 +6,6 @@ import Reflux from 'reflux';
 import { EntityList } from 'components/common';
 import { AlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');

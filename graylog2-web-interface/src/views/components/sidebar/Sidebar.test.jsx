@@ -10,6 +10,7 @@ import QueryResult from 'views/logic/QueryResult';
 import Sidebar from './Sidebar';
 
 const mockCurrentUser = { timezone: 'UTC' };
+
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
 
@@ -46,11 +47,13 @@ describe('<Sidebar />', () => {
 
     getContainerHeight() {
       const { maximumHeight } = this.props;
+
       return maximumHeight;
     }
 
     render() {
       expect(this.props).toHaveProperty('maximumHeight');
+
       return <div id="martian">Marc Watney</div>;
     }
   }

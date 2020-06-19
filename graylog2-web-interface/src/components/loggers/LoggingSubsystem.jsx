@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonGroup, Col } from 'components/graylog';
 import lodash from 'lodash';
 
+import { ButtonGroup, Col } from 'components/graylog';
 import { LogLevelDropdown } from 'components/loggers';
 
 class LoggingSubsystem extends React.Component {

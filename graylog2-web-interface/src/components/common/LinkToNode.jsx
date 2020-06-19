@@ -5,8 +5,8 @@ import Reflux from 'reflux';
 import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import Routes from 'routing/Routes';
+
 import Icon from './Icon';
 import Spinner from './Spinner';
 

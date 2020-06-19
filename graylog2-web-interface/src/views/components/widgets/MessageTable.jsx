@@ -5,7 +5,6 @@ import * as Immutable from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -13,9 +12,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-
 import { RefreshActions } from 'views/stores/RefreshStore';
-
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
@@ -32,7 +29,7 @@ const TableWrapper: StyledComponent<{}, void, HTMLDivElement> = styled.div`
 
 const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.table(({ theme }) => `
   position: relative;
-  font-size: 11px;
+  font-size: ${theme.fonts.size.small};
   margin-top: 0;
   margin-bottom: 60px;
   border-collapse: collapse;
@@ -112,7 +109,7 @@ const Table: StyledComponent<{}, ThemeInterface, HTMLTableElement> = styled.tabl
   }
 
   @media print {
-    font-size: 14px;
+    font-size: ${theme.fonts.size.body};
     padding-left: 0;
     min-width: 50%;
 
@@ -137,7 +134,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
 
   th {
     border: 0;
-    font-size: 11px;
+    font-size: ${theme.fonts.size.small};
     font-weight: normal;
     white-space: nowrap;
     background-color: ${theme.colors.gray[90]};
@@ -192,9 +189,11 @@ class MessageTable extends React.Component<Props, State> {
   _columnStyle = (fieldName: string) => {
     const { fields } = this.props;
     const selectedFields = Immutable.OrderedSet<string>(fields);
+
     if (fieldName.toLowerCase() === 'source' && selectedFields.size > 1) {
       return { width: 180 };
     }
+
     return {};
   };
 
@@ -204,6 +203,7 @@ class MessageTable extends React.Component<Props, State> {
 
   _getFormattedMessages = (): Array<Message> => {
     const { messages } = this.props;
+
     return messages.map((m) => ({
       fields: m.message,
       formatted_fields: MessageFieldsFilter.filterFields(m.message),
@@ -216,12 +216,14 @@ class MessageTable extends React.Component<Props, State> {
 
   _getSelectedFields = (): Immutable.OrderedSet<string> => {
     const { selectedFields, config } = this.props;
+
     return Immutable.OrderedSet<string>(config ? config.fields : (selectedFields || Immutable.Set<string>()));
   };
 
   _toggleMessageDetail = (id: string) => {
     let newSet;
     const { expandedMessages } = this.state;
+
     if (expandedMessages.contains(id)) {
       newSet = expandedMessages.delete(id);
     } else {
@@ -236,6 +238,7 @@ class MessageTable extends React.Component<Props, State> {
     const { fields, activeQueryId, config, editing, onSortChange, setLoadingState } = this.props;
     const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
+
     return (
       <TableWrapper className="table-responsive">
         <Table className="table table-condensed">
@@ -261,6 +264,7 @@ class MessageTable extends React.Component<Props, State> {
           </TableHead>
           {formattedMessages.map((message) => {
             const messageKey = `${message.index}-${message.id}`;
+
             return (
               <AdditionalContext.Provider key={messageKey}
                                           value={{ message }}>

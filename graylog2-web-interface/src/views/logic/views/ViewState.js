@@ -7,6 +7,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
 import type { TitlesMap, TitleType } from 'views/stores/TitleTypes';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
+
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 import type { WidgetMapping } from './types';

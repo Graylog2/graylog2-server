@@ -1,9 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import { AdditionalContext } from 'views/logic/ActionContext';
 
 import SelectExtractorType from './SelectExtractorType';
+
 import FieldType from '../fieldtypes/FieldType';
 
 jest.mock('logic/datetimes/DateTime', () => ({}));

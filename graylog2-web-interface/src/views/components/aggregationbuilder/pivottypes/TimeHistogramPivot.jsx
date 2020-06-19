@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
 import { Checkbox, ControlLabel, FormGroup } from 'components/graylog';
 
 import TypeSpecificTimeHistogramConfiguration from './TypeSpecificTimeHistogramConfiguration';
-
 import styles from './TimeHistogramPivot.css';
 import type { Interval } from './Interval';
 

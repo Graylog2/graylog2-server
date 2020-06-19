@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import { Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
+
 import PipelineForm from './PipelineForm';
 
 

@@ -1,10 +1,12 @@
 // @flow strict
 import { readFileSync } from 'fs';
+
 import { dirname } from 'path';
 import md5 from 'md5';
 import { flow, merge, fill } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+
 import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 

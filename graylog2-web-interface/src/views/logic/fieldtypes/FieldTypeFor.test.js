@@ -1,6 +1,5 @@
 // @flow strict
 import fieldTypeFor from './FieldTypeFor';
-
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
 

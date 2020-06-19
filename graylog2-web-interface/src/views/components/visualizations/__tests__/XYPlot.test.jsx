@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';

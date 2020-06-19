@@ -1,5 +1,6 @@
 // @flow strict
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+
 import SearchLink from './SearchLink';
 
 const urlPrefix = '/search';

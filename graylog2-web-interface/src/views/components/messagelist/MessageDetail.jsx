@@ -8,8 +8,8 @@ import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import { Icon, Spinner, Timestamp } from 'components/common';
-
 import Routes from 'routing/Routes';
+
 import MessageActions from './MessageActions';
 import MessageMetadata from './MessageMetadata';
 import NodeName from './NodeName';

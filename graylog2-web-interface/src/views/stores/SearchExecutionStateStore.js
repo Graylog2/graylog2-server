@@ -7,6 +7,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
+
 import { ViewActions } from './ViewStore';
 
 const defaultExecutionState = SearchExecutionState.empty();

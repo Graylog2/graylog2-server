@@ -3,6 +3,7 @@ import React from 'react';
 import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
 
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+
 import PaginatedList from './PaginatedList';
 
 describe('PaginatedList', () => {

@@ -2,11 +2,12 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+import suppressConsole from 'helpers/suppressConsole';
 
 import PivotGenerator from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import suppressConsole from 'helpers/suppressConsole';
+
 import PivotSelect from './PivotSelect';
 
 jest.mock('stores/connect', () => (x) => x);

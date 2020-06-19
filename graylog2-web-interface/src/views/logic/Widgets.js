@@ -1,9 +1,9 @@
 // @flow strict
 import uuid from 'uuid/v4';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TIMESTAMP_FIELD, DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+
 import pivotForField from './searchtypes/aggregation/PivotGenerator';
 import AggregationWidget from './aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from './aggregationbuilder/AggregationWidgetConfig';

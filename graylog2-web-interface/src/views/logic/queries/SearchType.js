@@ -3,6 +3,7 @@ import type MessageSortConfig from 'views/logic/searchtypes/messages/MessageSort
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import type { Interval } from 'views/components/aggregationbuilder/pivottypes/Interval';
+
 import type { ElasticsearchQueryString, TimeRange } from './Query';
 
 type SearchTypePivot = {

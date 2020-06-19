@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Alert } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 

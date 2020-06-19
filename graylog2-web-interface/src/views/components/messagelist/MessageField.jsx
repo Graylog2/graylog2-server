@@ -10,10 +10,12 @@ import Value from 'views/components/Value';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
-import CustomPropTypes from '../CustomPropTypes';
 import DecoratedValue from './decoration/DecoratedValue';
-import InteractiveContext from '../contexts/InteractiveContext';
 import type { Message } from './Types';
+
+import CustomPropTypes from '../CustomPropTypes';
+import InteractiveContext from '../contexts/InteractiveContext';
+
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
