@@ -89,6 +89,7 @@ public class SyslogCodecTest {
         assertEquals("1011", message.getField("eventID"));
         assertEquals("3", message.getField("iut"));
         assertEquals("evntslog", message.getField("application_name"));
+        assertEquals(20, message.getField("facility_num"));
     }
 
     @Test
@@ -107,6 +108,7 @@ public class SyslogCodecTest {
         assertEquals("user@example.com", message.getField("user"));
         assertEquals("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11", message.getField("user-agent"));
         assertEquals("app", message.getField("application_name"));
+        assertEquals(23, message.getField("facility_num"));
     }
 
     @Test
@@ -128,6 +130,7 @@ public class SyslogCodecTest {
         assertEquals("user@example.com", message.getField("mdc@18060_user"));
         assertEquals("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11", message.getField("mdc@18060_user-agent"));
         assertEquals("app", message.getField("application_name"));
+        assertEquals(23, message.getField("facility_num"));
     }
 
     @Test
@@ -140,6 +143,7 @@ public class SyslogCodecTest {
         assertEquals("s000000.example.com", message.getField("source"));
         assertEquals(0, message.getField("level"));
         assertEquals("local0", message.getField("facility"));
+        assertEquals(16, message.getField("facility_num"));
     }
 
     @Test
@@ -159,6 +163,7 @@ public class SyslogCodecTest {
         assertEquals("1011", message.getField("eventID"));
         assertEquals("3", message.getField("iut"));
         assertEquals("evntslog", message.getField("application_name"));
+        assertEquals(20, message.getField("facility_num"));
     }
 
     @Test
@@ -184,6 +189,7 @@ public class SyslogCodecTest {
         assertEquals("N/A", message.getField("roles"));
         assertEquals("reth6.0", message.getField("packet-incoming-interface"));
         assertEquals("No", message.getField("encrypted"));
+        assertEquals(1, message.getField("facility_num"));
     }
 
     @Test
@@ -197,6 +203,7 @@ public class SyslogCodecTest {
         assertEquals(5, message.getField("level"));
         assertEquals("syslogd", message.getField("facility"));
         assertNull(message.getField("full_message"));
+        assertEquals(5, message.getField("facility_num"));
     }
 
     @Test
@@ -212,6 +219,7 @@ public class SyslogCodecTest {
         assertEquals(5, message.getField("level"));
         assertEquals("syslogd", message.getField("facility"));
         assertEquals(UNSTRUCTURED, message.getField("full_message"));
+        assertEquals(5, message.getField("facility_num"));
     }
 
     @Test
@@ -334,6 +342,7 @@ public class SyslogCodecTest {
         assertEquals("hostname", message.getSource());
         assertEquals(6, message.getField("level"));
         assertEquals("kernel", message.getField("facility"));
+        assertEquals(0, message.getField("facility_num"));
     }
 
     @Test
@@ -349,6 +358,7 @@ public class SyslogCodecTest {
         assertEquals(6, message.getField("level"));
         assertEquals("kernel", message.getField("facility"));
         assertEquals("test", message.getField("application_name"));
+        assertEquals(0, message.getField("facility_num"));
     }
 
     @Test
@@ -424,6 +434,7 @@ public class SyslogCodecTest {
         assertThat(message.getField("facility")).isEqualTo("syslogd");
         assertThat(message.getField("logid")).isEqualTo("0000000013");
         assertThat(message.getField("app")).isEqualTo("SSL_TLSv1.2");
+        assertThat(message.getField("facility_num")).isEqualTo(5);
     }
 
     private RawMessage buildRawMessage(String message) {
