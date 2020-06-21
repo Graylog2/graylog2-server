@@ -41,19 +41,20 @@ const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styl
   z-index: 2;  
 `);
 
-const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: ?string, setActiveSectionKey) => {
+const handleToggleSidebar = (initialSectionKey: string, activeSectionKey: ?string, setActiveSectionKey) => {
   if (activeSectionKey) {
     setActiveSectionKey(null);
     return;
   }
-  setActiveSectionKey(sections[0].key);
+  setActiveSectionKey(initialSectionKey);
 };
 
 const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
-  const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
-  const activeSection = sections.find((section) => section.key === activeSectionKey);
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
-  const toggleSidebar = () => handleToggleSidebar(sections, activeSectionKey, setActiveSectionKey);
+  const initialSectionKey = sections[0].key;
+  const [activeSectionKey, setActiveSectionKey] = useState<?string>(sidebarIsPinned ? initialSectionKey : null);
+  const activeSection = sections.find((section) => section.key === activeSectionKey);
+  const toggleSidebar = () => handleToggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
   const SectionContent = activeSection?.content;
   return (
     <Container>

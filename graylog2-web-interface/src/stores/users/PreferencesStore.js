@@ -43,18 +43,16 @@ const PreferencesStore = Reflux.createStore({
     });
     return preferencesAsMap;
   },
-  saveUserPreferences(preferences: Array<Preference>, callback: (preferences: Array<any>) => void): void {
-    if (!this._userName) {
-      throw new Error('Need to load user preferences before you can save them');
-    }
+  saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void): void {
+    console.log(userName, preferences);
     const preferencesAsMap = this.convertPreferenceArrayToMap(preferences);
-    const url = `${this.URL + this._userName}/preferences`;
+    const url = `${this.URL + userName}/preferences`;
     const promise = fetch('PUT', url, { preferences: preferencesAsMap })
       .then(() => {
         UserNotification.success('User preferences successfully saved');
         callback(preferences);
       }, (errorThrown) => {
-        UserNotification.error(`Saving of preferences for "${this._userName}" failed with status: ${errorThrown}`,
+        UserNotification.error(`Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
           'Could not save user preferences');
       });
 
@@ -63,8 +61,6 @@ const PreferencesStore = Reflux.createStore({
     return promise;
   },
   loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void): void {
-    this._userName = userName;
-
     const url = this.URL + userName;
     const successCallback = (data: PreferencesResponse) => {
       const sortedArray = this.convertPreferenceMapToArray(data.preferences);

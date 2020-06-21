@@ -1,5 +1,5 @@
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
@@ -12,34 +12,44 @@ class UserPreferencesModal extends React.Component {
     userName: PropTypes.string.isRequired,
   };
 
-  state = { preferences: [] };
+  constructor(props) {
+    super(props);
+    this.state = { preferences: [] };
+  }
 
   _onPreferenceChanged = (event) => {
     const { name } = event.target;
-    const preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
+    const { preferences } = this.state;
+    const preferenceToChange = preferences.filter((preference) => preference.name === name)[0];
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {
       preferenceToChange.value = event.target.value;
-      this.setState({ preferences: this.state.preferences });
+      this.setState({ preferences: preferences });
     }
   };
 
   _save = () => {
-    PreferencesStore.saveUserPreferences(this.state.preferences, this.modal.close);
+    const { userName } = this.props;
+    const { preferences } = this.state;
+    PreferencesStore.saveUserPreferences(userName, preferences, this.modal.close);
   };
 
   openModal = () => {
-    PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
+    const { userName } = this.props;
+    PreferencesStore.loadUserPreferences(userName, (preferences) => {
       this.setState({ preferences: preferences });
       this.modal.open();
     });
   };
 
   render() {
+    const { userName } = this.props;
+    const { preferences } = this.state;
     let shouldAutoFocus = true;
 
-    const formattedPreferences = this.state.preferences.map((preference, index) => {
+    const formattedPreferences = preferences.map((preference, index) => {
       const formattedPreference = (
+        // eslint-disable-next-line react/no-array-index-key
         <div className="form-group" key={`${preference.name}-${index}`}>
           <Input type="text"
                  id={`${preference.name}-${index}`}
@@ -60,7 +70,7 @@ class UserPreferencesModal extends React.Component {
     });
     return (
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                          title={`Preferences for user ${this.props.userName}`}
+                          title={`Preferences for user ${userName}`}
                           onSubmitForm={this._save}
                           submitButtonText="Save">
         <div>{formattedPreferences}</div>
