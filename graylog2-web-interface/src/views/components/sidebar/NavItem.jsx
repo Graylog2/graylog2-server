@@ -20,7 +20,7 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   padding: 5px 10px;
   left: 100%;
 
-  font-size: 14px;
+  font-size: ${theme.fonts.size.body};
   color: white;
   background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
 
@@ -38,7 +38,7 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
 
   text-align: center;
   cursor: pointer;
-  font-size: 20px;
+  font-size: ${theme.fonts.size.h3};
   color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
   cursor: pointer;
   

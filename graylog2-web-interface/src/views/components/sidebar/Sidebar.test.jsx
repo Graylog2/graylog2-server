@@ -68,7 +68,7 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('h1').text()).toBe(viewMetaData.title);
   });
 
@@ -87,7 +87,7 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 14:39:26.');
   });
 
@@ -108,7 +108,7 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('h1').text()).toBe('Untitled Search');
   });
 
@@ -129,7 +129,7 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('h1').text()).toBe('Untitled Dashboard');
   });
 
@@ -145,7 +145,7 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
@@ -162,7 +162,7 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no description');
     expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
   });
@@ -179,7 +179,7 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain('This search has no description');
     expect(wrapper.find('ViewDescription').text()).toContain('This search has no summary');
   });
@@ -196,7 +196,7 @@ describe('<Sidebar />', () => {
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
@@ -211,7 +211,7 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
     expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom summary and description.');
@@ -227,7 +227,7 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     wrapper.find('div[children="Create"]').simulate('click');
     expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
   });
@@ -242,7 +242,7 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
@@ -257,7 +257,7 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-    wrapper.find('SidebarNavigation__SidebarToggle NavItem').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('SearchResultOverview')).toExist();
     wrapper.find('h1').simulate('click');
     expect(wrapper.find('SearchResultOverview')).not.toExist();

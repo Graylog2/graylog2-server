@@ -78,13 +78,12 @@ const Title = styled.h1`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 24px;
   cursor: pointer;
 `;
 
 const OverlayToggle: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
   > * {
-    font-size: 18px;
+    font-size: ${theme.fonts.size.large};
     color: ${sidebarIsInline ? theme.colors.variant.info : theme.colors.gray[30]};
   }
 `);

@@ -22,12 +22,6 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
   height: 100%;
 `);
 
-const SidebarToggle: StyledComponent<{}, void, HTMLDivElement> = styled.div`
-  > * {
-    font-size: 26px;
-  }
-`;
-
 const SectionList = styled.div`
   > * {
     margin-bottom: 5px;
@@ -48,16 +42,14 @@ const HorizontalRuleWrapper = styled.div`
 `;
 
 const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
-  const toggleIcon = activeSection ? 'angle-left' : 'angle-right';
+  const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
   const activeSectionKey = activeSection?.key;
   return (
     <Container>
-      <SidebarToggle>
-        <NavItem icon={toggleIcon}
-                 onClick={() => toggleSidebar()}
-                 showTitleOnHover={false}
-                 title={`${activeSection ? 'Close' : 'Open'} sidebar`} />
-      </SidebarToggle>
+      <NavItem icon={toggleIcon}
+               onClick={toggleSidebar}
+               showTitleOnHover={false}
+               title={`${activeSection ? 'Close' : 'Open'} sidebar`} />
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>
         {sections.map(({ key, icon, title }) => (
