@@ -128,8 +128,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>assembly.xml</descriptors>
-                    <appendAssemblyId>true</appendAssemblyId>
-                    <finalName>graylog-storage-elasticsearch6-${project.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>

@@ -13,10 +13,14 @@
             <unpack>true</unpack>
             <scope>runtime</scope>
             <useProjectArtifact>true</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
                 <include>org.graylog:graylog-storage-elasticsearch6</include>
                 <include>org.elasticsearch:elasticsearch</include>
                 <include>org.graylog.jest:jest</include>
+                <include>org.graylog.jest:jest-common</include>
+                <include>org.apache.lucene:lucene-core</include>
+                <include>org.apache.httpcomponents:*</include>
             </includes>
         </dependencySet>
     </dependencySets>
