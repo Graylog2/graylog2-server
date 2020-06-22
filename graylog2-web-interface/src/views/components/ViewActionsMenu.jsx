@@ -105,7 +105,7 @@ ViewActionsMenu.propTypes = {
   metadata: PropTypes.shape({
     undeclared: ImmutablePropTypes.Set,
   }).isRequired,
-  view: PropTypes.instanceOf(View).isRequired,
+  view: PropTypes.object.isRequired,
   isNewView: PropTypes.bool.isRequired,
 };
 
