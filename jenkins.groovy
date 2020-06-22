@@ -1,3 +1,3 @@
-@Library('ci-pipeline-shared@jenkins') _
+@Library('ci-pipeline-shared@refactoring') _
 
 buildSnapshot()
