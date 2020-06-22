@@ -10,7 +10,7 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import URLUtils from 'util/URLUtils';
+import { appPrefixed } from 'util/URLUtils';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import { IfPermitted } from 'components/common';
 
@@ -28,11 +28,11 @@ import StyledNavbar from './Navigation.styles';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
+  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;

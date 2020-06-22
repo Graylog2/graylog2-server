@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import CustomizationContext from './CustomizationContext';
 
 const { CustomizationsStore } = CombinedProvider.get('Customizations');

@@ -1,5 +1,6 @@
 // @flow strict
 import * as Reflux from 'reflux';
+
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
