@@ -1631,7 +1631,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       }
                                                     >
                                                       <div
-                                                        className="css-izej10-singleValue"
+                                                        className="css-1yjw8f2-singleValue"
                                                       >
                                                         Regex
                                                       </div>
@@ -3761,7 +3761,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       }
                                                     >
                                                       <div
-                                                        className="css-izej10-singleValue"
+                                                        className="css-1yjw8f2-singleValue"
                                                       >
                                                         Regex
                                                       </div>
@@ -5891,7 +5891,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       }
                                                     >
                                                       <div
-                                                        className="css-izej10-singleValue"
+                                                        className="css-1yjw8f2-singleValue"
                                                       >
                                                         Exact match
                                                       </div>
