@@ -58,7 +58,7 @@
             <outputDirectory>.</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../graylog-storage-elasticsearch6/target/graylog-storage-elasticsearch6-${project.version}-with-dependencies.jar</source>
+            <source>${project.basedir}/../graylog-storage-elasticsearch6/target/graylog-storage-elasticsearch6-${project.version}.jar</source>
             <outputDirectory>plugin/</outputDirectory>
         </file>
     </files>
