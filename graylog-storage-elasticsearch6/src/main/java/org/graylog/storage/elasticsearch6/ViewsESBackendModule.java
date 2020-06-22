@@ -26,6 +26,7 @@ import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -75,10 +76,7 @@ public class ViewsESBackendModule extends ViewsModule {
     protected void configure() {
         install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
-        // Calling this once to set up binder, so injection does not fail.
-        esQueryDecoratorBinder();
-
-        registerQueryBackend(SUPPORTED_VERSION, ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
+        registerQueryBackend();
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
         registerESSearchTypeHandler(EventList.NAME, ESEventList.class);
@@ -99,12 +97,20 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
 
-        bindExportBackend(SUPPORTED_VERSION).to(ElasticsearchExportBackend.class);
+        bindExportBackend().to(ElasticsearchExportBackend.class);
         bindRequestStrategy().to(org.graylog.storage.elasticsearch6.views.export.Scroll.class);
     }
 
     private LinkedBindingBuilder<RequestStrategy> bindRequestStrategy() {
-        return bindForVersion(SUPPORTED_VERSION, RequestStrategy.class);
+        return bind(RequestStrategy.class);
+    }
+
+    private LinkedBindingBuilder<ExportBackend> bindExportBackend() {
+        return bindExportBackend(SUPPORTED_VERSION);
+    }
+
+    private void registerQueryBackend() {
+        registerQueryBackend(SUPPORTED_VERSION, ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
     }
 
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {

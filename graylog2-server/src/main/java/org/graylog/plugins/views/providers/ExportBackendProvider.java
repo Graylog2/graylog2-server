@@ -14,16 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin;
+package org.graylog.plugins.views.providers;
 
-import com.google.inject.multibindings.MapBinder;
+import org.graylog.plugins.views.search.export.ExportBackend;
+import org.graylog2.plugin.Version;
+import org.graylog2.storage.VersionAwareProvider;
 
-public class StorageDriverModule extends PluginModule {
-    private MapBinder<Version, PluginModule> storageModuleBinder() {
-        return MapBinder.newMapBinder(binder(), Version.class, PluginModule.class);
-    }
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import java.util.Map;
 
-    protected void registerStorageModule(Version version, PluginModule storageModule) {
-        storageModuleBinder().addBinding(version).toInstance(storageModule);
+public class ExportBackendProvider extends VersionAwareProvider<ExportBackend> {
+    @Inject
+    public ExportBackendProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<ExportBackend>> pluginBindings) {
+        super(elasticsearchMajorVersion, pluginBindings);
     }
 }
