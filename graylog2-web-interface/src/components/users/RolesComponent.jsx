@@ -7,7 +7,6 @@ import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';
 import EditRole from 'components/users/EditRole';
 import PageHeader from 'components/common/PageHeader';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
 import connect from 'stores/connect';

@@ -4,7 +4,6 @@ import React from 'react';
 import { Label } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
-
 import { IndexSizeSummary } from 'components/indices';
 
 class IndexSummary extends React.Component {

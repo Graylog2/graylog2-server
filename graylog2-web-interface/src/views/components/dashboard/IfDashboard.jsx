@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+
 import View from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 

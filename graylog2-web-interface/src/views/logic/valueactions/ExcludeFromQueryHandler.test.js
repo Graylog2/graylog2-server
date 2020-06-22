@@ -1,18 +1,19 @@
 // @flow strict
 import * as Immutable from 'immutable';
-
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
+
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStore } from 'views/stores/ViewStore';
 
+import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
+
 import FieldType from '../fieldtypes/FieldType';
 import GlobalOverride from '../search/GlobalOverride';
 import Query from '../queries/Query';
 import View from '../views/View';
-import ExcludeFromQueryHandler from './ExcludeFromQueryHandler';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesStore: {

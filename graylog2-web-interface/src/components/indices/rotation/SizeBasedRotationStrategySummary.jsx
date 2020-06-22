@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import NumberUtils from 'util/NumberUtils';
 
 class SizeBasedRotationStrategySummary extends React.Component {

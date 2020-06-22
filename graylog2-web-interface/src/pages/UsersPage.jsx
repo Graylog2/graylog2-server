@@ -1,14 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Row, Col, Button } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import UserList from 'components/users/UserList';
 

@@ -10,6 +10,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
+
 import type { OnVisualizationConfigChange, WidgetProps } from '../widgets/Widget';
 
 const defaultVisualizationType = 'table';

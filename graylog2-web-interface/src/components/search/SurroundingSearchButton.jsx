@@ -7,6 +7,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import { DropdownButton, MenuItem } from 'components/graylog';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
+
 import type { SearchesConfig } from './SearchConfig';
 import SearchLink from './SearchLink';
 

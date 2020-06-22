@@ -6,7 +6,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 

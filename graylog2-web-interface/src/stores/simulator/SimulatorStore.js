@@ -1,8 +1,8 @@
 import Reflux from 'reflux';
+
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import MessageFormatter from 'logic/message/MessageFormatter';
 import ObjectUtils from 'util/ObjectUtils';
 import CombinedProvider from 'injection/CombinedProvider';

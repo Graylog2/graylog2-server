@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
+
 import connect from 'stores/connect';
 import { Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';

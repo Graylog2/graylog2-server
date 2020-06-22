@@ -1,5 +1,6 @@
 // @flow strict
 import { Map } from 'immutable';
+
 import ViewSharing from './ViewSharing';
 
 type SpecificUsersJson = {|

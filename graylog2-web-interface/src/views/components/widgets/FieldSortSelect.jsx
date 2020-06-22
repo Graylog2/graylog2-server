@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
 import CustomPropTypes from 'views/components/CustomPropTypes';
-
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';

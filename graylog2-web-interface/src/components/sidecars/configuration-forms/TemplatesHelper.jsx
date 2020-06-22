@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Table } from 'components/graylog';
 
 class TemplatesHelper extends React.Component {

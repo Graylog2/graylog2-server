@@ -151,6 +151,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           >
                             <Icon
                               name="play"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -758,6 +759,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           >
                             <Icon
                               name="play"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -1365,6 +1367,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -2029,6 +2032,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -2693,6 +2697,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -3357,6 +3362,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -4021,6 +4027,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -4685,6 +4692,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={
@@ -5349,6 +5357,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           >
                             <Icon
                               name="pause"
+                              type="solid"
                             >
                               <FontAwesomeIcon
                                 icon={

@@ -7,7 +7,6 @@ import naturalSort from 'javascript-natural-sort';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 

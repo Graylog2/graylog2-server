@@ -8,13 +8,14 @@ import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
-
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
+
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
 import DecoratorsUpdater from './decorators/DecoratorsUpdater';
-import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
 import formatDecorator from './decorators/FormatDecorator';
+
+import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 

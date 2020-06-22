@@ -2,13 +2,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
-import { type ThemeInterface } from 'theme';
 
+import { type ThemeInterface } from 'theme';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
-
 import { ColorPickerPopover, Icon } from 'components/common';
+
 import ColorPreview from './ColorPreview';
 
 export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
@@ -80,7 +80,7 @@ const HighlightingRule = ({ rule }: Props) => {
         for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
       </div>
       <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
-        <Icon name="trash-o" />
+        <Icon name="trash-alt" type="regular" />
       </DeleteIcon>
     </HighlightingRuleGrid>
   );

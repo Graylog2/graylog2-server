@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col, Alert } from 'components/graylog';
 
+import { Row, Col, Alert } from 'components/graylog';
 import { EntityList, Pluralize } from 'components/common';
 
 import Stage from './Stage';

@@ -1,6 +1,8 @@
 import { Map } from 'immutable';
 import { findIndex } from 'lodash';
+
 import ValueRefHelper from 'util/ValueRefHelper';
+
 import Constraint from './Constraint';
 
 export default class Entity {

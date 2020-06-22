@@ -1,8 +1,11 @@
 // @flow strict
 
 import * as Immutable from 'immutable';
+
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+
 import type { ParameterBindingJsonRepresentation } from './ParameterBinding';
+
 import { singleton } from '../singleton';
 
 type InternalState = {

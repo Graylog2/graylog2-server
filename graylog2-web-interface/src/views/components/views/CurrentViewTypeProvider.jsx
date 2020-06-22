@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import connect from 'stores/connect';
 
+import connect from 'stores/connect';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';

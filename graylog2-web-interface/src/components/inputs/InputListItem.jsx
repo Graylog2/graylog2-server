@@ -11,7 +11,6 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 
 const InputTypesStore = StoreProvider.getStore('InputTypes');

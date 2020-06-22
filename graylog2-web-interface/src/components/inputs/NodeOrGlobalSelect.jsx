@@ -1,11 +1,10 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React, { useCallback, useState, useEffect } from 'react';
+
 import { useStore } from 'stores/connect';
 import { Input } from 'components/bootstrap';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Spinner } from 'components/common';
 
 const NodesStore = StoreProvider.getStore('Nodes');

@@ -8,9 +8,7 @@ import { Button, ListGroupItem } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import UserNotification from 'util/UserNotification';
 
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
@@ -58,7 +56,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
         <Button bsStyle="link"
                 bsSize="xsmall"
                 onClick={_onDelete}>
-          <Icon name="trash-o" />
+          <Icon name="trash-alt" type="regular" />
         </Button>
         <Button bsStyle="link"
                 bsSize="xsmall"

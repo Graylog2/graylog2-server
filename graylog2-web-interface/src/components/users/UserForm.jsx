@@ -2,17 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import ValidationsUtils from 'util/ValidationsUtils';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 import history from 'util/History';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Button, Row, Col, Alert, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import TimeoutInput from 'components/users/TimeoutInput';

@@ -1,11 +1,12 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import ViewState from 'views/logic/views/ViewState';
+
 import { CurrentViewStateStore } from './CurrentViewStateStore';
 import { ViewStatesActions } from './ViewStatesStore';
 

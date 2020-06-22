@@ -1,28 +1,28 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
-
 import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
-const GlobalStyle = createGlobalStyle`
+const errorPageStyles = (backgroundImage) => css`
   body {
-    background: url(${(props) => props.backgroundImage}) no-repeat center center fixed;
+    background: url(${backgroundImage}) no-repeat center center fixed;
     background-size: cover;
   }
 `;
 
-const ErrorMessage = styled.div`
+const ErrorMessage = styled.div(({ theme }) => `
   margin-left: auto;
   margin-right: auto;
   text-align: left;
 
   dt {
-    font-size: 1.2em;
+    font-size: ${theme.fonts.size.body};
     font-weight: normal;
     overflow: auto;
   }
@@ -30,7 +30,7 @@ const ErrorMessage = styled.div`
   p {
     font-size: inherit;
   }
-`;
+`);
 
 type Props = {
   backgroundImage?: string,
@@ -41,7 +41,7 @@ type Props = {
 
 const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
   <AppContentGrid>
-    {backgroundImage && <GlobalStyle backgroundImage={backgroundImage} />}
+    {backgroundImage && <GlobalThemeStyles additionalStyles={errorPageStyles(backgroundImage)} />}
     <div className="container-fluid">
       <DocumentTitle title={title}>
         <ErrorJumbotron title={title}>

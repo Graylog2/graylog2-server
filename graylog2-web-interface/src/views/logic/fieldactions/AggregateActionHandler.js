@@ -6,6 +6,7 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import DataTable from 'views/components/datatable/DataTable';
+
 import type { FieldActionHandler } from './FieldActionHandler';
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 

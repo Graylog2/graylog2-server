@@ -8,12 +8,10 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
-
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon } from 'components/common';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
-
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
 import { ViewStore } from 'views/stores/ViewStore';
@@ -21,6 +19,7 @@ import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as Permissions from 'views/Permissions';
 import View from 'views/logic/views/View';
+
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import ShareViewModal from './views/ShareViewModal';
 import IfDashboard from './dashboard/IfDashboard';
@@ -68,7 +67,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, currentUser, router }) => 
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="share-alt" /> Share
         </MenuItem>
-        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download" /> Export to CSV</MenuItem>
+        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>
           <MenuItem divider />
@@ -106,7 +105,7 @@ ViewActionsMenu.propTypes = {
   metadata: PropTypes.shape({
     undeclared: ImmutablePropTypes.Set,
   }).isRequired,
-  view: PropTypes.instanceOf(View).isRequired,
+  view: PropTypes.object.isRequired,
   isNewView: PropTypes.bool.isRequired,
 };
 

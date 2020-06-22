@@ -15,6 +15,7 @@ exports[`SavedSearchControls render the SavedSearchControls should render dirty 
         "color": "#ffd200",
       }
     }
+    type="solid"
   >
     <FontAwesomeIcon
       icon={
@@ -53,6 +54,7 @@ exports[`SavedSearchControls render the SavedSearchControls should render not di
         "color": "#0063be",
       }
     }
+    type="solid"
   >
     <FontAwesomeIcon
       icon={
@@ -85,18 +87,19 @@ exports[`SavedSearchControls render the SavedSearchControls should render not di
   type="button"
 >
   <Icon
-    name="star-o"
+    name="star"
     style={
       Object {
         "color": "",
       }
     }
+    type="regular"
   >
     <FontAwesomeIcon
       icon={
         Object {
           "iconName": "star",
-          "prefix": "fas",
+          "prefix": "far",
         }
       }
       style={

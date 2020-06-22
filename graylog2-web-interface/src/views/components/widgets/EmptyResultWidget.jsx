@@ -4,6 +4,7 @@ import { DocumentationLink } from 'components/support';
 import { Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import PortaledPopover from 'views/components/common/PortaledPopover';
+
 import styles from './MessageWidgets.css';
 
 const popover = (
@@ -15,11 +16,11 @@ const popover = (
 
     <ul>
       <li>
-        <Icon name="group" />&nbsp;
+        <Icon name="users" />&nbsp;
         <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">Community support</a>
       </li>
       <li>
-        <Icon name={{ prefix: 'fab', iconName: 'github-alt' }} />&nbsp;
+        <Icon name="github-alt" type="brand" />&nbsp;
         <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a>
       </li>
       <li>

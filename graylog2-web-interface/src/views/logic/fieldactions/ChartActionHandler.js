@@ -9,10 +9,12 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+
 import type { FieldActionHandler } from './FieldActionHandler';
+import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
+
 import FieldType from '../fieldtypes/FieldType';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
-import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
 const TIMESTAMP_FIELD = 'timestamp';
 

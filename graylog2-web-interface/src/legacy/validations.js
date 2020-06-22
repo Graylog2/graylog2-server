@@ -1,5 +1,6 @@
-import DateTime from 'logic/datetimes/DateTime';
 import $ from 'jquery';
+
+import DateTime from 'logic/datetimes/DateTime';
 
 global.jQuery = $;
 require('bootstrap/js/tooltip');

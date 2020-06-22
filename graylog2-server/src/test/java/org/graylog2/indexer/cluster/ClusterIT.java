@@ -84,7 +84,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void getClusterAllocationDiskSettings() throws Exception{
+    public void getClusterAllocationDiskSettings() {
         final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
 
         //Default Elasticsearch settings in Elasticsearch 5.6
@@ -96,7 +96,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void health() throws Exception {
+    public void health() {
         final String index = client().createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
 
@@ -144,7 +144,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         assertThat(name).isEmpty();
     }
     @Test
-    public void nodeIdToHostName() throws Exception {
+    public void nodeIdToHostName() {
         final Optional<String> hostName = cluster.nodeIdToHostName(currentNodeId());
         assertThat(hostName)
                 .isPresent()
@@ -163,7 +163,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void isHealthy() throws Exception {
+    public void isHealthy() {
         final String index = client().createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
         when(indexSetRegistry.isUp()).thenReturn(true);

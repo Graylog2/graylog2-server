@@ -1,12 +1,10 @@
 import React from 'react';
 import { act } from 'react-dom/test-utils';
-
 import { render, cleanup } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
-
 import SearchResult from 'views/components/SearchResult';
 
 jest.mock('views/stores/FieldTypesStore', () => ({

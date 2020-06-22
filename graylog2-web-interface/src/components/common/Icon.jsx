@@ -1,17 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { find, isString } from 'lodash';
-
-import deprecationNotice from 'util/deprecationNotice';
+import { find } from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { far } from '@fortawesome/free-regular-svg-icons';
 import { faApple, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
+
+import deprecationNotice from 'util/deprecationNotice';
+
 import compareIconNames from './icon-fallback';
 
-library.add(fas, faApple, faGithub, faGithubAlt, faLinux, faWindows);
+library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows);
 
-const cleanIconName = (icon) => {
+const removeFaPrefix = (name) => name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
+
+const updateLegacyName = (icon) => {
   const v4icon = find(compareIconNames, { v4: icon });
   const iconName = (v4icon && v4icon.v5) || icon;
 
@@ -19,7 +23,27 @@ const cleanIconName = (icon) => {
     deprecationNotice(`You have used a deprecated \`Icon\` name. \`${icon}\` should be \`${iconName}\``);
   }
 
-  return { prefix: 'fas', iconName };
+  return iconName;
+};
+
+const cleanIconName = (name, type) => {
+  const iconName = removeFaPrefix(name);
+  if (type !== 'brand') {
+    return updateLegacyName(iconName);
+  }
+  return iconName;
+};
+
+const getPrefixForType = (type) => {
+  switch (type) {
+    case 'brand':
+      return 'fab';
+    case 'regular':
+      return 'far';
+    case 'solid':
+    default:
+      return 'fas';
+  }
 };
 
 /**
@@ -30,26 +54,27 @@ const cleanIconName = (icon) => {
  * Visit [React FontAwesome Features](https://github.com/FortAwesome/react-fontawesome#features) for more information.
  */
 
-const Icon = ({ name, ...props }) => {
-  let icon = name;
-  if (isString(name)) {
-    icon = cleanIconName(name.replace(/^fa-/, '')); // remove "fa-" prefix if it exists
-  }
-
+const Icon = ({ name, type, ...props }) => {
+  const iconName = cleanIconName(name, type);
+  const prefix = getPrefixForType(type);
   return (
-    <FontAwesomeIcon {...props} icon={icon} />
+    <FontAwesomeIcon {...props} icon={{ prefix, iconName }} />
   );
 };
 
 Icon.propTypes = {
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
-  name: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      prefix: PropTypes.string,
-      iconName: PropTypes.string,
-    }),
-    PropTypes.arrayOf(PropTypes.string)]).isRequired,
+  name: PropTypes.string.isRequired,
+  /**
+   * Name of icon type, the brand type is needed for all brand icons.
+   * The type regular is needed to outlined icon.
+   * Not all icons can be outlined.
+   * */
+  type: PropTypes.oneOf(['brand', 'solid', 'regular']),
+};
+
+Icon.defaultProps = {
+  type: 'solid',
 };
 
 export default Icon;

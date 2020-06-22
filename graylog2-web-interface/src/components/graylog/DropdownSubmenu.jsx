@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
+
 import { Dropdown } from './bootstrap-import';
 
 type Props = {

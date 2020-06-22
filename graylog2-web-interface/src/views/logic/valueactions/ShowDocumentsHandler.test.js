@@ -1,11 +1,13 @@
 // @flow strict
-import FieldType from 'views/logic/fieldtypes/FieldType';
-
 import asMock from 'helpers/mocking/AsMock';
+
+import FieldType from 'views/logic/fieldtypes/FieldType';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import TitleTypes from 'views/stores/TitleTypes';
 import { WidgetActions } from 'views/stores/WidgetStore';
+
 import ShowDocumentsHandler from './ShowDocumentsHandler';
+
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
 import PivotGenerator from '../searchtypes/aggregation/PivotGenerator';

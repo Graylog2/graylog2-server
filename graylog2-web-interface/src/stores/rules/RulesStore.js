@@ -1,9 +1,10 @@
 import Reflux from 'reflux';
+import naturalSort from 'javascript-natural-sort';
+
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import naturalSort from 'javascript-natural-sort';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { RulesActions } = CombinedProvider.get('Rules');

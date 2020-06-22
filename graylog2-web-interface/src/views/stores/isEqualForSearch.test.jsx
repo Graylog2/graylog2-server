@@ -11,6 +11,7 @@ import {
   NeverEqual,
   NonValueClass,
 } from 'stores/__tests__/EqualityCheck.fixtures';
+
 import isEqualForSearch from './isEqualForSearch';
 
 export class AlwaysEqualForSearch {

@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
+
 import QueryTitle from './QueryTitle';
 
 jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));

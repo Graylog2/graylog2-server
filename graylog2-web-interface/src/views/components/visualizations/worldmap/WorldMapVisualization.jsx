@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -12,6 +12,7 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import MapVisualization from './MapVisualization';
+
 import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
 import transformKeys from '../TransformKeys';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
@@ -82,7 +83,7 @@ const WorldMapVisualization: VisualizationComponent = makeVisualization(({ confi
 
 WorldMapVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.any.isRequired,
+  data: AggregationResult.isRequired,
   onChange: PropTypes.func.isRequired,
   width: PropTypes.number.isRequired,
 };

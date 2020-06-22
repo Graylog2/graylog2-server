@@ -8,6 +8,7 @@ import { Spinner } from 'components/common';
 import AddDecoratorButton from './AddDecoratorButton';
 import DecoratorSummary from './DecoratorSummary';
 import DecoratorList from './DecoratorList';
+
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 

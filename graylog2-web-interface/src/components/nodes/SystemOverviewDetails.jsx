@@ -5,10 +5,8 @@ import { Row, Col, Alert, Button } from 'components/graylog';
 import { IfPermitted, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import NodeThroughput from 'components/throughput/NodeThroughput';
-
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
@@ -53,7 +51,7 @@ class SystemOverviewDetails extends React.Component {
         <Col md={4}>
           <Alert bsStyle="info">
             <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
-            <Icon name="exchange" />&nbsp;
+            <Icon name="exchange-alt" />&nbsp;
             Lifecycle state: <strong>{StringUtils.capitalizeFirstLetter(this.props.information.lifecycle)}</strong>
           </Alert>
         </Col>

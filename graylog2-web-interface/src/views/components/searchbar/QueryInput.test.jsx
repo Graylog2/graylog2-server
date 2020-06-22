@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import QueryInput from './QueryInput';
+
 import UserPreferencesContext, { defaultUserPreferences } from '../../../contexts/UserPreferencesContext';
 
 jest.mock('./SearchBarAutocompletions', () => ({}));

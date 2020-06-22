@@ -1,5 +1,6 @@
 // @flow strict
 import OperatorCompletion from './OperatorCompletion';
+
 import type { Completer } from '../SearchBarAutocompletions';
 
 const NOT = {

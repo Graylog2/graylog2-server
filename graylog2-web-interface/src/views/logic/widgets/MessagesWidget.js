@@ -3,10 +3,12 @@ import { Map } from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
+
 import Widget from './Widget';
 import MessagesWidgetConfig from './MessagesWidgetConfig';
-import type { QueryString, TimeRange } from '../queries/Query';
 import type { WidgetState } from './Widget';
+
+import type { QueryString, TimeRange } from '../queries/Query';
 
 export default class MessagesWidget extends Widget {
   constructor(id: string, config: any, filter: ?string, timerange: ?TimeRange, query: ?QueryString, streams: Array<string> = []) {

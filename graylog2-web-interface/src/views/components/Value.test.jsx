@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import each from 'jest-each';
-
 import mockComponent from 'helpers/mocking/MockComponent';
+
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import UserTimezoneTimestamp from 'views/components/common/UserTimezoneTimestamp';
 

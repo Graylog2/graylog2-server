@@ -2,22 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import uuid from 'uuid/v4';
-import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import moment from 'moment';
 
+import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { MultiSelect, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
-
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import PermissionsMixin from 'util/PermissionsMixin';
+
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
 

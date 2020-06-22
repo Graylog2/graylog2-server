@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import moment from 'moment';
 
 import { Timestamp } from 'components/common';
-
 import DateTime from 'logic/datetimes/DateTime';
 
 const SystemInformation = createReactClass({

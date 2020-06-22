@@ -1,19 +1,16 @@
-import { DocumentTitle, Spinner } from 'components/common';
-
-import PageHeader from 'components/common/PageHeader';
-import ExtractorsList from 'components/extractors/ExtractorsList';
-import DocumentationLink from 'components/support/DocumentationLink';
 import createReactClass from 'create-react-class';
-
-import ActionsProvider from 'injection/ActionsProvider';
-
-import StoreProvider from 'injection/StoreProvider';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { DropdownButton, MenuItem } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import Reflux from 'reflux';
 
+import { DocumentTitle, Spinner } from 'components/common';
+import PageHeader from 'components/common/PageHeader';
+import ExtractorsList from 'components/extractors/ExtractorsList';
+import DocumentationLink from 'components/support/DocumentationLink';
+import ActionsProvider from 'injection/ActionsProvider';
+import StoreProvider from 'injection/StoreProvider';
+import { DropdownButton, MenuItem } from 'components/graylog';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 

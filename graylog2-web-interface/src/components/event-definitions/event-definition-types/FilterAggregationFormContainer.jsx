@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-
 import connect from 'stores/connect';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 

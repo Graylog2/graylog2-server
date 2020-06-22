@@ -5,8 +5,9 @@ import { DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
 import InlineForm from './InlineForm';
+
+import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
 class DecoratorSummary extends React.Component {
   static propTypes = {

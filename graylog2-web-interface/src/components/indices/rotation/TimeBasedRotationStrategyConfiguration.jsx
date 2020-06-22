@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
 import moment from 'moment';
+
+import { Input } from 'components/bootstrap';
 
 class TimeBasedRotationStrategyConfiguration extends React.Component {
   static propTypes = {

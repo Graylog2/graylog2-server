@@ -5,9 +5,7 @@ import Reflux from 'reflux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import { Button } from 'components/graylog';
 import { DataTable } from 'components/common';
 

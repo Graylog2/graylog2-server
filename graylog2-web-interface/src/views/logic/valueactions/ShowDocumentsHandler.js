@@ -4,9 +4,10 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
 
+import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
+
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
 import View from '../views/View';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';

@@ -8,7 +8,6 @@ import { Icon, Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-
 import { SmallSupportLink, DocumentationLink } from 'components/support';
 
 const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');

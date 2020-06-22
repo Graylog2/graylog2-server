@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { TimeUnit } from 'components/common';
 
 const DnsAdapterSummary = ({ dataAdapter }) => {

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import {
   InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
 } from 'components/graylog';

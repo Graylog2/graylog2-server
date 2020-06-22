@@ -5,10 +5,8 @@ import Reflux from 'reflux';
 import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
-
 import Routes from 'routing/Routes';
 
 const NodesStore = StoreProvider.getStore('Nodes');

@@ -9,7 +9,6 @@ import { Select, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');

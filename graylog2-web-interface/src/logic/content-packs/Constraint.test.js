@@ -1,4 +1,5 @@
 import { Set } from 'immutable';
+
 import Constraint from './Constraint';
 
 describe('Constraint', () => {

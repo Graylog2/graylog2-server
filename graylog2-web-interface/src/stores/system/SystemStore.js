@@ -1,9 +1,9 @@
 import Reflux from 'reflux';
+import Promise from 'bluebird';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-import Promise from 'bluebird';
 
 const SystemStore = Reflux.createStore({
   system: undefined,

@@ -1,13 +1,11 @@
 import React from 'react';
-import { DocumentTitle, PageHeader } from 'components/common';
 
+import { DocumentTitle, PageHeader } from 'components/common';
 import { Button } from 'components/graylog';
 import LdapComponent from 'components/ldap/LdapComponent';
 import LdapGroupsComponent from 'components/ldap/LdapGroupsComponent';
-
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Routes from 'routing/Routes';
 
 const { LdapActions } = CombinedProvider.get('Ldap');

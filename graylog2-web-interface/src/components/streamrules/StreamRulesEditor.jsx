@@ -4,7 +4,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
-
 import { Button, Col, Panel, Row } from 'components/graylog';
 import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
@@ -12,7 +11,6 @@ import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import Spinner from 'components/common/Spinner';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const StreamsStore = StoreProvider.getStore('Streams');
@@ -118,7 +116,7 @@ class StreamRulesEditor extends React.Component {
       }
       return (
         <>
-          <MatchIcon name="remove" /> This message would not be routed to this stream.
+          <MatchIcon name="times" /> This message would not be routed to this stream.
         </>
       );
     }

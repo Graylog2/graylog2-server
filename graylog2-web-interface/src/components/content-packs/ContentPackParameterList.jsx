@@ -6,7 +6,6 @@ import { Button, Modal, ButtonToolbar, Badge } from 'components/graylog';
 import { DataTable, SearchForm, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
-
 import ObjectUtils from 'util/ObjectUtils';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';

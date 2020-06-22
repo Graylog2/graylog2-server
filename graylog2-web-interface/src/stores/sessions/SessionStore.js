@@ -4,7 +4,6 @@ import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const SessionActions = ActionsProvider.getActions('Session');

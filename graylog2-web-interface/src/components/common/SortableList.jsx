@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-
-import { ListGroup } from 'components/graylog';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+
+import { ListGroup } from 'components/graylog';
 
 import SortableListItem from './SortableListItem';
 

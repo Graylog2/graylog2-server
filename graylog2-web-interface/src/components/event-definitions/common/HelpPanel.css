@@ -1,5 +1,5 @@
 :local(.helpPanel) .panel-title {
-    font-size: 14px;
+    font-size: 1rem; /* theme.fonts.size.body */
 }
 
 :local(.helpPanel) .panel-title > a {

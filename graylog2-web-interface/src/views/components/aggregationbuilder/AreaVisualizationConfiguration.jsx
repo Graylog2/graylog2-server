@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { capitalize } from 'lodash';
 
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+
 import Select from '../Select';
 
 type Props = {

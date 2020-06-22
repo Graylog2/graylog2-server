@@ -11,8 +11,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
 import NotificationList from './NotificationList';
-
 import styles from './NotificationsForm.css';
+
 import commonStyles from '../common/commonStyles.css';
 
 class NotificationsForm extends React.Component {
@@ -80,7 +80,7 @@ class NotificationsForm extends React.Component {
         <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
-              <Button bsStyle="link" bsSize="small">Manage Notifications <Icon name="external-link" /></Button>
+              <Button bsStyle="link" bsSize="small">Manage Notifications <Icon name="external-link-alt" /></Button>
             </LinkContainer>
           </span>
           <h2 className={commonStyles.title}>Notifications <small>(optional)</small></h2>

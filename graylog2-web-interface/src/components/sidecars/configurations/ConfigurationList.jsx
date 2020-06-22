@@ -7,7 +7,6 @@ import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 
 import ConfigurationRow from './ConfigurationRow';
-
 import style from './ConfigurationList.css';
 
 class ConfigurationList extends React.Component {

@@ -1,7 +1,9 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
+
 import SearchTypesGenerator from './SearchTypesGenerator';
+
 import { widgetDefinition } from '../Widgets';
 import Widget from '../widgets/Widget';
 

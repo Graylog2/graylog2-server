@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { Spinner } from 'components/common';
+
 import CollectorList from './CollectorList';
 
 const { CollectorsStore, CollectorsActions } = CombinedProvider.get('Collectors');

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Row, Col, Button } from 'components/graylog';
 
+import { Row, Col, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
+
 import BufferUsage from './BufferUsage';
 import SystemOverviewDetails from './SystemOverviewDetails';
 import JvmHeapUsage from './JvmHeapUsage';

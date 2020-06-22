@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import lodash from 'lodash';
 
+import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { Select } from 'components/common';
 import { ConfigurationFormField } from 'components/configurationforms';
 

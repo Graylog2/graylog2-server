@@ -6,7 +6,6 @@ import { Input, BootstrapModalForm } from 'components/bootstrap';
 import { TypeAheadFieldInput, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
-
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import FormsUtils from 'util/FormsUtils';
@@ -104,7 +103,7 @@ class StreamRuleForm extends React.Component {
               The server will try to convert to strings or numbers based on the matcher type as well as it can.
 
               <br /><br />
-              <Icon name={{ prefix: 'fab', iconName: 'github' }} />
+              <Icon name="github" type="brand" />&nbsp;
               <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
                  target="_blank"
                  rel="noopener noreferrer"> Take a look at the matcher code on GitHub
@@ -112,7 +111,7 @@ class StreamRuleForm extends React.Component {
               <br /><br />
               Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                       title="More information"
-                                                                      text={<Icon name="lightbulb-o" />} />
+                                                                      text={<Icon name="lightbulb" type="regular" />} />
             </Well>
           </Col>
         </div>

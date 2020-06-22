@@ -12,7 +12,7 @@
 }
 
 :local(.validationSummary) h4 {
-    font-size: 16px;
+    font-size: 1.44rem; /* theme.fonts.size.body h4 */
     margin-bottom: 0.5em;
 }
 

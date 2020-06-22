@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Panel } from 'components/graylog';
 
 class CopyInputExtractorConfiguration extends React.Component {

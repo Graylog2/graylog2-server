@@ -1,5 +1,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import TimeUnitInput from './TimeUnitInput';
 
 describe('<TimeUnitInput />', () => {

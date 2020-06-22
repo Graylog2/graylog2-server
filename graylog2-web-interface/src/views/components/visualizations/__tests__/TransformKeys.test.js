@@ -2,8 +2,9 @@
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
-import transformKeys from '../TransformKeys';
 import * as fixtures from './TransformKeys.fixtures';
+
+import transformKeys from '../TransformKeys';
 
 jest.mock('stores/users/CurrentUserStore', () => ({ get: jest.fn() }));
 

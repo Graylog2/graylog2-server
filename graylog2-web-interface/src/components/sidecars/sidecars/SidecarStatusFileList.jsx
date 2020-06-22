@@ -26,7 +26,7 @@ class SidecarStatusFileList extends React.Component {
     if (file.is_dir) {
       return (<span><Icon name="folder-open" />&nbsp;&nbsp;{file.path}</span>);
     }
-    return (<span><Icon name="file-o" />&nbsp;&nbsp;{file.path}</span>);
+    return (<span><Icon name="file" type="regular" />&nbsp;&nbsp;{file.path}</span>);
   };
 
   _fileListFormatter = (file) => {

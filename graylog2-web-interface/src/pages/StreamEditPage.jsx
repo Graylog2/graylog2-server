@@ -2,11 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert } from 'components/graylog';
 
+import { Alert } from 'components/graylog';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');

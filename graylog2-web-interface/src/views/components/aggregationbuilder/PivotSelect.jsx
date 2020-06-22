@@ -4,7 +4,6 @@ import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
 import connect from 'stores/connect';
-
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -14,6 +13,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ConfigurableElement from './ConfigurableElement';
 import SortableSelect from './SortableSelect';
 import PivotConfiguration from './PivotConfiguration';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 const _onChange = (fields, newValue, onChange, fieldTypes) => {

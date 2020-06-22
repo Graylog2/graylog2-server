@@ -26,7 +26,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class BulkIndexRequest {
     private final Map<String, List<Map<String, Object>>> requests = new HashMap<>();
 
-    Map<String, List<Map<String, Object>>> requests() {
+    public Map<String, List<Map<String, Object>>> requests() {
         return requests;
     }
 

@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 import { isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
+
 import { QueriesStore } from './QueriesStore';
 
 // eslint-disable-next-line import/prefer-default-export

@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import connect from 'stores/connect';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
+import connect from 'stores/connect';
 import { Button, ButtonToolbar } from 'components/graylog';
 import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 
 const { RulesActions, RulesStore } = CombinedProvider.get('Rules');

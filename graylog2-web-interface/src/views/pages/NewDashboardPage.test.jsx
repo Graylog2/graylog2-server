@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-
 import { render, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { act } from 'react-dom/test-utils';

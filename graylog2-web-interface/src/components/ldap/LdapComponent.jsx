@@ -6,10 +6,9 @@ import { cloneDeep } from 'lodash';
 
 import { Row, Col, Panel, FormGroup, ControlLabel, Button } from 'components/graylog';
 import { Input, InputWrapper } from 'components/bootstrap';
-
 import { MultiSelect, Select, Spinner } from 'components/common';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
 import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
 import LdapComponentStyle from './LdapComponent.css';

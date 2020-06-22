@@ -4,7 +4,6 @@ import { Link } from 'react-router';
 
 import { Col, Label } from 'components/graylog';
 import { EntityListItem, Timestamp } from 'components/common';
-
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 

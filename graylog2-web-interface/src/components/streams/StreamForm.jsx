@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';

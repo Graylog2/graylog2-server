@@ -1,16 +1,14 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { values, merge, fill, find, isEmpty, get } from 'lodash';
 
-
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 
+import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
-import { chartData } from '../ChartData';
+import { chartData, type ValuesBySeries } from '../ChartData';
 
 const BG_COLOR = '#440154';
 
@@ -79,7 +77,7 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
   return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
 };
 
-const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
+const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
   // When using the hovertemplate, we need to provie a value for empty z values.
   // Otherwise plotly would throw errors when hovering over a field.
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
@@ -131,7 +129,7 @@ const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config
 
 HeatmapVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
+  data: AggregationResult.isRequired,
 };
 
 export default HeatmapVisualization;

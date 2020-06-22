@@ -1,8 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type {
   VisualizationComponent,
   VisualizationComponentProps,
@@ -69,7 +68,7 @@ const PieVisualization: VisualizationComponent = makeVisualization(({ config, da
 
 PieVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: AggregationResult.isRequired,
 };
 
 export default PieVisualization;

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+
 import Field from './Field';
 import InteractiveContext from './contexts/InteractiveContext';
 

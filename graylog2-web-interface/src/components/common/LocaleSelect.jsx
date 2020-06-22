@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import Select from 'components/common/Select';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const SystemStore = StoreProvider.getStore('System');

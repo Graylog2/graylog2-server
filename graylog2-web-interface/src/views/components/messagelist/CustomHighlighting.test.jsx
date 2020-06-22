@@ -6,6 +6,7 @@ import HighlightingRulesContext from 'views/components/contexts/HighlightingRule
 import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+
 import CustomHighlighting from './CustomHighlighting';
 
 const renderDecorators = (decorators, field, value) => decorators.map((Decorator) => (

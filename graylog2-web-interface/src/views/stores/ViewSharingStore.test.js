@@ -1,5 +1,6 @@
 // @flow strict
 import fetch from 'logic/rest/FetchProvider';
+
 import { ViewSharingStore } from './ViewSharingStore';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());

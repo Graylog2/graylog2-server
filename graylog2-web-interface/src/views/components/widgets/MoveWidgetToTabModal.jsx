@@ -1,5 +1,6 @@
 // @flow strict
 import React, { useState, useCallback } from 'react';
+
 import { ListGroup, ListGroupItem } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
@@ -7,7 +8,6 @@ import { useStore } from 'stores/connect';
 import QueryTitle from 'views/logic/queries/QueryTitle';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { QueryIdsStore } from 'views/stores/QueryIdsStore';
-
 import View from 'views/logic/views/View';
 
 type Props = {

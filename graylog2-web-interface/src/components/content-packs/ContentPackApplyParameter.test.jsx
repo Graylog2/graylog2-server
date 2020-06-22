@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import 'helpers/mocking/react-dom_mock';
 import Entity from 'logic/content-packs/Entity';
-
 import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 
 describe('<ContentPackApplyParameter />', () => {

@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import { LogLevelMetrics } from 'components/loggers';
 
 const LoggersStore = StoreProvider.getStore('Loggers');

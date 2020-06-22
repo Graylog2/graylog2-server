@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { isEqual } from 'lodash';
+
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
+
 import DataTableElement from './DataTableElement';
 
 /**

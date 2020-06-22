@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
 import { FetchError } from 'logic/rest/FetchProvider';
-
 import { Icon, ClipboardButton } from 'components/common';
 import ErrorPage from 'components/errors/ErrorPage';
 

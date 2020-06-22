@@ -1,11 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
+
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';

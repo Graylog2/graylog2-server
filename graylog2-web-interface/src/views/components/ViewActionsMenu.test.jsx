@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import Search from 'views/logic/search/Search';

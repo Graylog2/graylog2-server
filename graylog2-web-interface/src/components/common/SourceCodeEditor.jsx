@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
@@ -224,7 +223,7 @@ class SourceCodeEditor extends React.Component {
                                  disabled={this.isCopyDisabled()} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
-                    <Icon name="paste" fixedWidth />
+                    <Icon name="clipboard" fixedWidth />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
@@ -241,7 +240,7 @@ class SourceCodeEditor extends React.Component {
                         onClick={this.handleRedo}
                         title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
                         disabled={this.isRedoDisabled()}>
-                  <Icon name="repeat" fixedWidth />
+                  <Icon name="redo" fixedWidth />
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>

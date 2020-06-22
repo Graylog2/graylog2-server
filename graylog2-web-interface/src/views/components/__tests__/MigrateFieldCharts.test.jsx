@@ -2,19 +2,19 @@
 import React from 'react';
 import { render, fireEvent, wait, cleanup } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
+import asMock from 'helpers/mocking/AsMock';
 
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import asMock from 'helpers/mocking/AsMock';
-
 import Store from 'logic/local-storage/Store';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
-import MigrateFieldCharts from '../MigrateFieldCharts';
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
+
+import MigrateFieldCharts from '../MigrateFieldCharts';
 
 const mockStoreGet = (fieldChart = {}, migrated = false) => (key) => {
   switch (key) {

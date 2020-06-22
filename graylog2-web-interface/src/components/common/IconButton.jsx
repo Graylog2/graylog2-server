@@ -18,7 +18,7 @@ const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.b
   background-color: transparent;
   cursor: pointer;
   color: ${theme.colors.gray[70]};
-  font-size: 16px;
+  font-size: ${theme.fonts.size.large};
 
   :hover {
     background-color: ${theme.colors.gray[90]};
@@ -28,7 +28,6 @@ const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.b
     background-color: ${theme.colors.gray[80]};
   }
 `);
-
 
 type Props = {
   focusable?: boolean,

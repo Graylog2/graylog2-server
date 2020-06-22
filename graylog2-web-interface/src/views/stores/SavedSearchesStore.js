@@ -8,6 +8,7 @@ import UserNotification from 'util/UserNotification';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
+
 import View from '../logic/views/View';
 
 export type SavedSearchesActionsType = RefluxActions<{

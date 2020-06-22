@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Alert } from 'components/graylog';
 
 class NoopRetentionStrategyConfiguration extends React.Component {

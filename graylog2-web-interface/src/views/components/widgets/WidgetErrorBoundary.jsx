@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+
 import ErrorWidget from './ErrorWidget';
 
 type State = {

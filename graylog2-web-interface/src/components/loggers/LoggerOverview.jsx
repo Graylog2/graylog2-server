@@ -4,7 +4,6 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import { NodeLoggers } from 'components/loggers';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const LoggersStore = StoreProvider.getStore('Loggers');

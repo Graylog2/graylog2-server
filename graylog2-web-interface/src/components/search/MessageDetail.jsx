@@ -5,11 +5,9 @@ import { Link } from 'react-router';
 
 import { Button, ButtonGroup, Col, Label, MessageDetailsDefinitionList, Row } from 'components/graylog';
 import { ClipboardButton, Icon, Timestamp } from 'components/common';
-
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
-
 import Routes from 'routing/Routes';
 
 class MessageDetail extends React.Component {
@@ -43,7 +41,7 @@ class MessageDetail extends React.Component {
       const nodeURL = Routes.node(nodeId);
       nodeInformation = (
         <a href={nodeURL}>
-          <Icon name="code-fork" />
+          <Icon name="code-branch" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
