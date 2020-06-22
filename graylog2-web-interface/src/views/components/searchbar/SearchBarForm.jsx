@@ -5,8 +5,8 @@ import { useCallback } from 'react';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
 import type { FormikProps } from 'formik/@flow-typed';
-import DateTime from 'logic/datetimes/DateTime';
 
+import DateTime from 'logic/datetimes/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 
