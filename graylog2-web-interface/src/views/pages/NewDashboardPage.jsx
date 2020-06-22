@@ -1,8 +1,8 @@
 // @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Spinner from 'components/common/Spinner';
 
+import Spinner from 'components/common/Spinner';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import { processHooks } from 'views/logic/views/ViewLoader';
 import withPluginEntities from 'views/logic/withPluginEntities';

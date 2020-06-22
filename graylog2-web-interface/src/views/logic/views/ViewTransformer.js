@@ -1,5 +1,6 @@
 // @flow strict
 import { List, Map } from 'immutable';
+
 import Widget from 'views/logic/widgets/Widget';
 import type { QueryId } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';

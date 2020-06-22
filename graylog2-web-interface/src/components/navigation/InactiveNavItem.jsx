@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { NavItem } from 'components/graylog';
 
 // Don't pass active prop, since NavItem should always be inactive

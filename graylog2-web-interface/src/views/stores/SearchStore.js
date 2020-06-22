@@ -5,7 +5,6 @@ import { debounce, get, isEqual } from 'lodash';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchJobActions } from 'views/stores/SearchJobStore';

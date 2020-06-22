@@ -6,8 +6,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Col, Row, Button } from 'components/graylog';
 import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
-import CollectorRow from './CollectorRow';
 
+import CollectorRow from './CollectorRow';
 import style from './CollectorList.css';
 
 const CollectorList = createReactClass({

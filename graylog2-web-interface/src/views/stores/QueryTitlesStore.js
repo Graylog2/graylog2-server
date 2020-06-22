@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
+
 import { ViewStore } from './ViewStore';
 
 // eslint-disable-next-line import/prefer-default-export

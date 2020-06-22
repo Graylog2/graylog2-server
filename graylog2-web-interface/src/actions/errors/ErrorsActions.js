@@ -1,4 +1,5 @@
 import Reflux from 'reflux';
+
 import { singletonActions } from 'views/logic/singleton';
 
 const ErrorsActions = singletonActions(

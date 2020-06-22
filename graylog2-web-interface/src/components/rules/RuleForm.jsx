@@ -6,7 +6,6 @@ import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'componen
 import { SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-
 import history from 'util/History';
 
 import RuleFormStyle from './RuleForm.css';

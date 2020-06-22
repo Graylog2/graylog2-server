@@ -5,6 +5,7 @@ import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
+
 import type { FieldActionHandler } from './FieldActionHandler';
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 

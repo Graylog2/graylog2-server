@@ -3,6 +3,7 @@ import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import { HighlightingRulesActions, HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { ActionHandlerCondition } from 'views/components/actions/ActionHandler';
+
 import type { ValueActionHandler } from './ValueActionHandler';
 
 const randomColor = () => DEFAULT_CUSTOM_HIGHLIGHT_RANGE[

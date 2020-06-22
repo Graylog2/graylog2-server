@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
 
+import { Input } from 'components/bootstrap';
 import FormUtils from 'util/FormsUtils';
 
 class SyslogPriFacilityConverterConfiguration extends React.Component {

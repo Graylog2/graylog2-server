@@ -11,8 +11,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
 import NotificationList from './NotificationList';
-
 import styles from './NotificationsForm.css';
+
 import commonStyles from '../common/commonStyles.css';
 
 class NotificationsForm extends React.Component {

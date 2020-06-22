@@ -4,6 +4,7 @@ import { DocumentationLink } from 'components/support';
 import { Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import PortaledPopover from 'views/components/common/PortaledPopover';
+
 import styles from './MessageWidgets.css';
 
 const popover = (

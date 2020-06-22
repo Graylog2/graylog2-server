@@ -1,15 +1,17 @@
 // @flow strict
 import * as Immutable from 'immutable';
-
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
+
 import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
+
 import AddToQueryHandler from './AddToQueryHandler';
+
 import View from '../views/View';
 import GlobalOverride from '../search/GlobalOverride';
 

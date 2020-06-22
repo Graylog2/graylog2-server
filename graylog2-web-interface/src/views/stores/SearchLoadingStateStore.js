@@ -1,6 +1,8 @@
 // @flow strict
 import Reflux from 'reflux';
+
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+
 import { SearchActions } from './SearchStore';
 
 export const SearchLoadingStateActions = singletonActions(

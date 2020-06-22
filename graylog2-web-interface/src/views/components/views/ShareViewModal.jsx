@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { get } from 'lodash';
-import UserNotification from 'util/UserNotification';
 
+import UserNotification from 'util/UserNotification';
 import { FormGroup, HelpBlock, Radio } from 'components/graylog';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import Select from 'views/components/Select';
@@ -10,7 +10,6 @@ import Spinner from 'components/common/Spinner';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
-
 import View from 'views/logic/views/View';
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';

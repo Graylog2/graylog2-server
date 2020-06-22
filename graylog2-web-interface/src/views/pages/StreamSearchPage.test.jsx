@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-
 import asMock from 'helpers/mocking/AsMock';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -13,6 +12,7 @@ import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
+
 import StreamSearchPage from './StreamSearchPage';
 
 const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);

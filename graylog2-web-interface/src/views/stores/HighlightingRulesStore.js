@@ -9,6 +9,7 @@ import FormattingSettings from 'views/logic/views/formatting/FormattingSettings'
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type HighlightingRulesActionsType = RefluxActions<{

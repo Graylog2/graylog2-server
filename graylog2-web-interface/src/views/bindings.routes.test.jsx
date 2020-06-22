@@ -1,5 +1,6 @@
 // @flow strict
 import { StreamSearchPage } from 'views/pages';
+
 import bindings from './bindings';
 
 jest.mock('util/AppConfig', () => ({

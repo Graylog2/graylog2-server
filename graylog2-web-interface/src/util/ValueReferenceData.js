@@ -1,4 +1,5 @@
 import Immutable, { Map, List } from 'immutable';
+
 import ValueRefHelper from './ValueRefHelper';
 
 /**

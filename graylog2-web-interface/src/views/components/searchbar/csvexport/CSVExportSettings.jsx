@@ -5,7 +5,6 @@ import { List } from 'immutable';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-
 import { Input } from 'components/bootstrap';
 import { Row } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';

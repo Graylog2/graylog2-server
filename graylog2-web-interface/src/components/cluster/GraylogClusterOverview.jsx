@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
-import { Col, Row } from 'components/graylog';
+import _ from 'lodash';
 
+import { Col, Row } from 'components/graylog';
 import { Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
-import _ from 'lodash';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import TrafficGraph from './TrafficGraph';

@@ -1,12 +1,10 @@
 import React from 'react';
-import { Col, Row } from 'components/graylog';
 import numeral from 'numeral';
 import moment from 'moment';
 
+import { Col, Row } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
-
 import DocsHelper from 'util/DocsHelper';
-
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';

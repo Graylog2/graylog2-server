@@ -212,7 +212,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "UjHmV",
+                  "lastClassName": "eNmkew",
                   "rules": Array [
                     [Function],
                   ],
@@ -237,7 +237,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
               backdrop="static"
               bsClass="modal"
               bsSize="lg"
-              className="Modal-nuree8-0 UjHmV"
+              className="Modal-nuree8-0 eNmkew"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

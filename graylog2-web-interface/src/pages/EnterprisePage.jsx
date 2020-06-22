@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
@@ -10,7 +11,6 @@ import { GraylogClusterOverview } from 'components/cluster';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EnterpriseFreeLicenseForm from 'components/enterprise/EnterpriseFreeLicenseForm';
 import PluginList from 'components/enterprise/PluginList';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { EnterpriseActions, EnterpriseStore } = CombinedProvider.get('Enterprise');
@@ -33,16 +33,16 @@ EnterpriseProductLink.defaultProps = {
 };
 
 const EnterpriseFeatureList = styled.ul`
-list-style-type: disc;
-padding-left: 20px;
+  list-style-type: disc;
+  padding-left: 20px;
 `;
 
-const BiggerFontSize = styled.div`
-font-size: 1.2em;
-`;
+const BiggerFontSize = styled.div(({ theme }) => `
+  font-size: ${theme.fonts.size.large};
+`);
 
 const GraylogEnterpriseHeader = styled.h2`
-margin-bottom: 10px
+  margin-bottom: 10px;
 `;
 
 const EnterprisePage = createReactClass({
@@ -61,11 +61,13 @@ const EnterprisePage = createReactClass({
 
   _isLoading() {
     const { licenseStatus } = this.state;
+
     return !licenseStatus;
   },
 
   renderLicenseFormContent(licenseStatus) {
     let licenseFormContent;
+
     if (this._isLoading()) {
       licenseFormContent = <Spinner text="Loading license status" />;
     } else if (licenseStatus === 'installed') {
@@ -123,9 +125,8 @@ const EnterprisePage = createReactClass({
                     <li>Automated <DocumentationLink page="archiving.html" text={<strong>archiving</strong>} /> and retention</li>
                     <li><DocumentationLink page="auditlog.html" text={<strong>Audit logs</strong>} /> of Graylog user activity</li>
                     <li>
-                      Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature"
-                                                     text={<strong>dynamic lists</strong>} /> and <DocumentationLink
-                      page="alerts.html" text={<strong>correlation engine</strong>} /> for events
+                      Alerts with <DocumentationLink page="alerts.html#filter-with-dynamic-lists-enterprise-feature" text={<strong>dynamic lists</strong>} />
+                      and <DocumentationLink page="alerts.html" text={<strong>correlation engine</strong>} /> for events
                       to minimize the number of alerts that you need to create and maintain
                     </li>
                     <li>

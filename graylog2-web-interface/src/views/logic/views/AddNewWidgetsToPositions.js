@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+
 import Widget from '../widgets/Widget';
 
 export default (positionsMap: Immutable.Map<string, WidgetPosition>,

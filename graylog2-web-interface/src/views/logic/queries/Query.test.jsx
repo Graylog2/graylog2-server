@@ -1,5 +1,6 @@
 // @flow strict
 import { List, Map, Set } from 'immutable';
+
 import { filtersToStreamSet } from './Query';
 
 describe('Query', () => {

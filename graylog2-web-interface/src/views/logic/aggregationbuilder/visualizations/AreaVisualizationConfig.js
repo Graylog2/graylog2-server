@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
 

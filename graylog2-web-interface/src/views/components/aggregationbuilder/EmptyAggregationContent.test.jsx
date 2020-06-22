@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
+
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 describe('EmptyAggregationContext', () => {

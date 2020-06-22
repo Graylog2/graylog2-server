@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { KeyValueTable } from 'components/common';
 
 const HTTPJSONPathAdapterSummary = ({ dataAdapter }) => {

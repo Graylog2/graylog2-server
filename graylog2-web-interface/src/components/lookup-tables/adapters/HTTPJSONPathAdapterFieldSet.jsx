@@ -1,9 +1,9 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Input } from 'components/bootstrap';
 import { URLWhiteListInput, KeyValueTable } from 'components/common';
-
 import ObjectUtils from 'util/ObjectUtils';
 
 type Headers = {[string]: string };

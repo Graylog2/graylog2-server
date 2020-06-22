@@ -1,7 +1,9 @@
 // @flow strict
 import styled, { css, type StyledComponent } from 'styled-components';
 import chroma from 'chroma-js';
+
 import { type ThemeInterface } from 'theme';
+
 import { Title as NavItemTitle } from './NavItem.styles';
 
 const sidebarWidth = {
@@ -44,19 +46,19 @@ export const SidebarHeader: StyledComponent<{open: boolean, hasTitle: boolean}, 
   `;
 });
 
-export const Headline: StyledComponent<{}, void, HTMLHeadingElement> = styled.h3`
+export const Headline: StyledComponent<{}, void, HTMLHeadingElement> = styled.h4`
   color: inherit;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-export const ToggleIcon: StyledComponent<{}, void, HTMLDivElement> = styled.div`
+export const ToggleIcon: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   width: 25px;
   text-align: center;
-  font-size: 20px;
+  font-size: ${theme.fonts.size.large};
   cursor: pointer;
-`;
+`);
 
 export const HorizontalRuler: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 100%;

@@ -4,7 +4,6 @@ import React from 'react';
 import { Row, Col, Panel, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
-
 import {
   CSVConverterConfiguration,
   DateConverterConfiguration,
@@ -20,7 +19,6 @@ import {
   UppercaseConverterConfiguration,
   LookupTableConverterConfiguration,
 } from 'components/extractors/converters_configuration';
-
 import ExtractorUtils from 'util/ExtractorUtils';
 
 class EditExtractorConverters extends React.Component {

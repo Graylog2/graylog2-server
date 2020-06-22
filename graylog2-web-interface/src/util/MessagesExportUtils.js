@@ -5,7 +5,6 @@ import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-
 import { type QueryString, type TimeRange } from 'views/logic/queries/Query';
 
 export type ExportPayload = {

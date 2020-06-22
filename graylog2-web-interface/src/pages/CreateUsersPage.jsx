@@ -1,12 +1,10 @@
 import React from 'react';
+
 import { Row, Col } from 'components/graylog';
 import Routes from 'routing/Routes';
-
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import NewUserForm from 'components/users/NewUserForm';
 

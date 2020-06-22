@@ -7,10 +7,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Button, ButtonToolbar } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import { BootstrapModalConfirm } from 'components/bootstrap';
-
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
@@ -18,6 +16,7 @@ import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');

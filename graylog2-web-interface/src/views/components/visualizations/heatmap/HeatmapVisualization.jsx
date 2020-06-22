@@ -5,8 +5,8 @@ import { values, merge, fill, find, isEmpty, get } from 'lodash';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 
+import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 import { chartData, type ValuesBySeries } from '../ChartData';
 

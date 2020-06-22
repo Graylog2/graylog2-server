@@ -2,14 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col, Button } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
+import { Row, Col, Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import AddExtractorWizard from 'components/extractors/AddExtractorWizard';
 import EntityList from 'components/common/EntityList';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 

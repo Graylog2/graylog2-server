@@ -5,11 +5,9 @@ import { Link } from 'react-router';
 
 import { Button, ButtonGroup, Col, Label, MessageDetailsDefinitionList, Row } from 'components/graylog';
 import { ClipboardButton, Icon, Timestamp } from 'components/common';
-
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
-
 import Routes from 'routing/Routes';
 
 class MessageDetail extends React.Component {

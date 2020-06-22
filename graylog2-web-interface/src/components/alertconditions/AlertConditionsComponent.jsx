@@ -7,9 +7,7 @@ import naturalSort from 'javascript-natural-sort';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertConditionsList } from 'components/alertconditions';
-
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { StreamsStore } = CombinedProvider.get('Streams');

@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
+
 import HighlightingRule from './HighlightingRule';
 
 jest.mock('components/common/ColorPickerPopover', () => 'color-picker-popover');

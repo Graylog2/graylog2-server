@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
-import history from 'util/History';
 import * as Immutable from 'immutable';
-
 import asMock from 'helpers/mocking/AsMock';
+
+import history from 'util/History';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';

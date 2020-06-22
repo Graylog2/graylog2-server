@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
+import moment from 'moment';
+
 import { Button, Row, Col } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
-import moment from 'moment';
 import {} from 'moment-duration-format';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';

@@ -4,7 +4,6 @@ import $ from 'jquery';
 
 import { Button, Modal } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-
 import { validate } from 'legacy/validations.js';
 
 /**

@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, Spinner } from 'components/common';
-
 import Rule from 'components/rules/Rule';
 import CombinedProvider from 'injection/CombinedProvider';
 

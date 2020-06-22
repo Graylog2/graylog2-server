@@ -1,8 +1,8 @@
 // @flow strict
 import React, { useEffect } from 'react';
 import { cleanup, render, waitForElement } from 'wrappedTestingLibrary';
-
 import suppressConsole from 'helpers/suppressConsole';
+
 import WidgetOverrideElements from './WidgetOverrideElements';
 
 jest.mock('views/logic/withPluginEntities', () => (x) => x);

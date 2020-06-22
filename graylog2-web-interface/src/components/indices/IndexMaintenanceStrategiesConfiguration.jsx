@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 class IndexMaintenanceStrategiesConfiguration extends React.Component {

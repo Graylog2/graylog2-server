@@ -4,6 +4,7 @@ import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
 import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
+
 import styles from './SavedSearchForm.css';
 
 type Props = {

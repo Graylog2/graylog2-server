@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col } from 'components/graylog';
 
+import { Col } from 'components/graylog';
 import { EntityListItem, LinkToNode } from 'components/common';
 import NodeThroughput from 'components/throughput/NodeThroughput';
+
 import NodesActions from './NodesActions';
 import SystemOverviewSummary from './SystemOverviewSummary';
 import JvmHeapUsage from './JvmHeapUsage';

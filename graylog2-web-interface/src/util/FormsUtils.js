@@ -1,4 +1,5 @@
 import NumberUtils from 'util/NumberUtils';
+
 import createEvent from './CreateEvent';
 
 const FormUtils = {

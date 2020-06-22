@@ -6,6 +6,7 @@ import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
 import { BootstrapModalForm } from 'components/bootstrap';
+
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
 type State = {

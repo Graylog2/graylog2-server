@@ -4,10 +4,10 @@ import * as Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+
 import { QueryFiltersStore } from './QueryFiltersStore';
 
 const fieldTypesUrl = qualifyUrl('/views/fields');

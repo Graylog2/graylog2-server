@@ -8,6 +8,7 @@ import type { VisualizationComponent, VisualizationComponentProps } from 'views/
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
 import { chartData } from '../ChartData';

@@ -2,12 +2,14 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-
 import suppressConsole from 'helpers/suppressConsole';
+
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+
 import MessageTable from './MessageTable';
+
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 const messages = [

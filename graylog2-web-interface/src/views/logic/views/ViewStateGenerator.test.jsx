@@ -1,6 +1,7 @@
 // @flow strict
 import View from './View';
 import ViewStateGenerator from './ViewStateGenerator';
+
 import MessagesWidget from '../widgets/MessagesWidget';
 
 const mockList = jest.fn(() => Promise.resolve([]));

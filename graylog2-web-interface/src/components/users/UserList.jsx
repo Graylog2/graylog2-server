@@ -7,9 +7,7 @@ import styled from 'styled-components';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { DataTable, Spinner, Timestamp, Icon } from 'components/common';
 

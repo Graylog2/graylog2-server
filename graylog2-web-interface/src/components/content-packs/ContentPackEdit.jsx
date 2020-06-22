@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import { AutoAffix } from 'react-overlays';
+
 import { Spinner, Wizard, ScrollButton } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
-
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';

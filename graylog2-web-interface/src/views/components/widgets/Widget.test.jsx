@@ -3,10 +3,11 @@ import React from 'react';
 import { render, wait, fireEvent, cleanup, waitForElement } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
 import { Map } from 'immutable';
-import Routes from 'routing/Routes';
-
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
+import asMock from 'helpers/mocking/AsMock';
+
+import Routes from 'routing/Routes';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -20,7 +21,6 @@ import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
-import asMock from 'helpers/mocking/AsMock';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 

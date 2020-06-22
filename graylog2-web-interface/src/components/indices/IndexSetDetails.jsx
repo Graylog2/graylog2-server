@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
 
 const style = require('!style/useable!css!./IndexSetDetails.css');

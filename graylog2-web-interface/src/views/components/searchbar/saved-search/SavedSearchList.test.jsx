@@ -2,10 +2,11 @@
 import React from 'react';
 import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
+
 import SavedSearchList from './SavedSearchList';
 
 const createViewsResponse = (count = 1) => {

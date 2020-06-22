@@ -1,6 +1,8 @@
 // @flow strict
 import { groupBy } from 'lodash';
+
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
+
 import type { Event } from './EventHandler';
 import EventHandler from './EventHandler';
 

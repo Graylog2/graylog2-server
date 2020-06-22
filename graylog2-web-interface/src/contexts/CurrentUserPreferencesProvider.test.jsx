@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
-
 import asMock from 'helpers/mocking/AsMock';
 import { MockCombinedProvider, MockStore } from 'helpers/mocking';
+
 import CombinedProvider from 'injection/CombinedProvider';
+
 import UserPreferencesContext, { defaultUserPreferences } from './UserPreferencesContext';
 import type { UserPreferences } from './UserPreferencesContext';
-
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');

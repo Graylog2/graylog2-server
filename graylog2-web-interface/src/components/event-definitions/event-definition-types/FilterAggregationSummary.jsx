@@ -15,7 +15,6 @@ import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 import AggregationConditionSummary from './AggregationConditionSummary';
 import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
-
 import styles from './FilterAggregationSummary.css';
 
 class FilterAggregationSummary extends React.Component {

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
-
 import type { TitlesMap } from 'views/stores/TitleTypes';
 
 /**

@@ -3,12 +3,11 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import moment from 'moment';
 import lodash from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
-
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.

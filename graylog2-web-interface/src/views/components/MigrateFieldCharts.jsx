@@ -7,7 +7,6 @@ import * as Immutable from 'immutable';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 import SearchActions from 'views/actions/SearchActions';
-
 import Store from 'logic/local-storage/Store';
 import { widgetDefinition } from 'views/logic/Widgets';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
@@ -18,7 +17,6 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-
 import { Alert, Button, Row, Col } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 

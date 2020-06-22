@@ -5,7 +5,6 @@ import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Button } from 'components/graylog';
 import { ErrorPopover } from 'components/lookup-tables';
 import { ContentPackMarker } from 'components/common';

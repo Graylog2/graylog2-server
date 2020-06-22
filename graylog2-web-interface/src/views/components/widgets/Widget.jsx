@@ -9,7 +9,6 @@ import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
 import IfSearch from 'views/components/search/IfSearch';
-
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
@@ -36,7 +35,6 @@ import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
 import WidgetActionDropdown from './WidgetActionDropdown';
-
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import MeasureDimensions from './MeasureDimensions';
 import EditWidgetFrame from './EditWidgetFrame';
@@ -45,13 +43,14 @@ import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
-import IfInteractive from '../dashboard/IfInteractive';
-import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
-import IfDashboard from '../dashboard/IfDashboard';
 import ReplaySearchButton from './ReplaySearchButton';
+
+import IfDashboard from '../dashboard/IfDashboard';
+import InteractiveContext from '../contexts/InteractiveContext';
+import IfInteractive from '../dashboard/IfInteractive';
 
 const WidgetActionsWBar = styled.div`
   > * {

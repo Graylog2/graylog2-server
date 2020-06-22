@@ -1,13 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { ButtonToolbar, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import history from 'util/History';

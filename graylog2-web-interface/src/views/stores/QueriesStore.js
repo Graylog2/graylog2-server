@@ -13,6 +13,7 @@ import { singletonStore } from 'views/logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
+
 import type { QueriesList } from '../actions/QueriesActions';
 
 export { QueriesActions } from 'views/actions/QueriesActions';

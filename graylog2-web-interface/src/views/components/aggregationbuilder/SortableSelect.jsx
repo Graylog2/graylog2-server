@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { components as Components } from 'react-select';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { findIndex } from 'lodash';
 
 import Select from 'views/components/Select';
+
 import styles from './SortableSelect.css';
 
 const SortableSelectContainer = SortableContainer(Select);

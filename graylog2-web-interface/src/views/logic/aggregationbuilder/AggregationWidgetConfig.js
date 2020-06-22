@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import isDeepEqual from 'stores/isDeepEqual';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
+
 import Pivot from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
@@ -14,6 +15,7 @@ import type { VisualizationConfigJson } from './visualizations/VisualizationConf
 import type { PivotJson } from './Pivot';
 import WidgetFormattingSettings from './WidgetFormattingSettings';
 import type { WidgetFormattingSettingsJSON } from './WidgetFormattingSettings';
+
 import WidgetConfig from '../widgets/WidgetConfig';
 
 type InternalState = {

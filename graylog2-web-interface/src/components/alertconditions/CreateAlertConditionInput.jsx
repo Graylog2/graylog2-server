@@ -11,7 +11,6 @@ import { AlertConditionForm } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');

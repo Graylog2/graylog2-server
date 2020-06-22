@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import { Button, Tooltip } from 'components/graylog';
 import { OverlayElement, Icon } from 'components/common';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
-
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';

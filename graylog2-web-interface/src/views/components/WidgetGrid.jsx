@@ -14,6 +14,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetContext from 'views/components/contexts/WidgetContext';
+
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 import DrilldownContextProvider from './contexts/DrilldownContextProvider';

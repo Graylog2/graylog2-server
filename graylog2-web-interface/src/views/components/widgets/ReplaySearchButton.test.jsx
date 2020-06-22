@@ -4,8 +4,10 @@ import { asElement, cleanup, render } from 'wrappedTestingLibrary';
 
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import DrilldownContext from '../contexts/DrilldownContext';
+
 import ReplaySearchButton from './ReplaySearchButton';
+
+import DrilldownContext from '../contexts/DrilldownContext';
 
 type OptionalOverrides = {
   streams?: Array<string>,

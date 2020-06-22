@@ -15,7 +15,7 @@ const MetricListWrap = styled.ul(({ theme }) => `
     }
 
     .name {
-      font-size: 13px;
+      font-size: ${theme.fonts.size.body};
       font-family: ${theme.fonts.family.monospace};
       word-break: break-all;
 

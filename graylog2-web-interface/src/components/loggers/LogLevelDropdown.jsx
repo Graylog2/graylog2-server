@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'components/graylog';
 import lodash from 'lodash';
 
+import { DropdownButton, MenuItem } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LoggersStore, LoggersActions } = CombinedProvider.get('Loggers');

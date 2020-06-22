@@ -4,6 +4,7 @@ import React from 'react';
 import { Row, Col, Button } from 'components/graylog';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
+
 import ContentPackEntitiesList from './ContentPackEntitiesList';
 import ContentPackParameterList from './ContentPackParameterList';
 

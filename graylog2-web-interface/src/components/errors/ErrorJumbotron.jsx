@@ -5,10 +5,10 @@ import chroma from 'chroma-js';
 
 import { Col, Jumbotron, Row } from 'components/graylog';
 
-const H1 = styled.h1`
-  font-size: 52px;
+const H1 = styled.h1(({ theme }) => `
+  font-size: ${theme.fonts.size.huge};
   margin-bottom: 15px;
-`;
+`);
 
 const ContainerRow = styled(Row)`
   height: 82vh;

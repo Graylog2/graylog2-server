@@ -5,11 +5,12 @@ import { trim } from 'lodash';
 
 import Select from 'views/components/Select';
 import Series from 'views/logic/aggregationbuilder/Series';
-
 import { parameterOptionsForType } from 'views/components/aggregationbuilder/SeriesParameterOptions';
+
 import ConfigurableElement from './ConfigurableElement';
 import SeriesConfiguration from './SeriesConfiguration';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 type Option = {|

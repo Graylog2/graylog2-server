@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+
 import Widget from 'views/logic/widgets/Widget';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 export const Position = {

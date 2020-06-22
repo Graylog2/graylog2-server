@@ -6,14 +6,15 @@ import { capitalize, isString } from 'lodash';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import type { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-
 import { AddWidgetButton } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
+
 import { Container, ContentOverlay, SidebarHeader, Headline, ToggleIcon, HorizontalRuler } from './Sidebar.styles';
-import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
 import ViewDescription from './ViewDescription';
+
+import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   children: React.Element<any>,

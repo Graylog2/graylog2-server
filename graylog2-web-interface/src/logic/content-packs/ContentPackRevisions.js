@@ -1,4 +1,5 @@
 import { max } from 'lodash';
+
 import ContentPack from 'logic/content-packs/ContentPack';
 
 export default class ContentPackRevisions {

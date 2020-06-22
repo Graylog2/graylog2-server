@@ -2,16 +2,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { MenuItem } from 'components/graylog';
 
+import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
+
+import { createHandlerFor } from './ActionHandler';
+import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Value.css';
 import CustomPropTypes from '../CustomPropTypes';
-import { createHandlerFor } from './ActionHandler';
-import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
 
 type Props = {
   children: React.Node,
