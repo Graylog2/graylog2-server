@@ -54,7 +54,7 @@ const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
             onChange={_onChange}
             options={options}
             isClearable
-            value={currentValue(sort, fields) ?? ''} />
+            value={currentValue(sort, fields) ?? null} />
   );
 };
 
