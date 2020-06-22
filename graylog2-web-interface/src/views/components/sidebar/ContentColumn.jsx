@@ -18,19 +18,19 @@ type Props = {
   viewMetadata: ViewMetadata,
 };
 
-export const Container: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
-  position: ${sidebarIsInline ? 'static' : 'fixed'}
+export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => `
+  position: ${sidebarIsPinned ? 'static' : 'fixed'}
   display: grid;
   display: -ms-grid;
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
   -ms-grid-columns: 1fr;
   -ms-grid-rows: auto 1fr;
-  top: ${sidebarIsInline ? 0 : '50px'};
-  left: ${sidebarIsInline ? 0 : '50px'};
+  top: ${sidebarIsPinned ? 0 : '50px'};
+  left: ${sidebarIsPinned ? 0 : '50px'};
 
   width: 270px;
-  height:  ${sidebarIsInline ? '100%' : 'calc(100% - 50px)'};;
+  height:  ${sidebarIsPinned ? '100%' : 'calc(100% - 50px)'};;
   padding: 5px 15px 15px 15px;
 
   color: ${theme.colors.global.textDefault};
@@ -81,10 +81,10 @@ const Title = styled.h1`
   cursor: pointer;
 `;
 
-const OverlayToggle: StyledComponent<{ sidebarIsInline: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsInline }) => `
+const OverlayToggle: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => `
   > * {
     font-size: ${theme.fonts.size.large};
-    color: ${sidebarIsInline ? theme.colors.variant.info : theme.colors.gray[30]};
+    color: ${sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};
   }
 `);
 
@@ -107,10 +107,10 @@ const toggleSidebarPinning = (searchPageLayout) => {
     return;
   }
   const { setConfig, config } = searchPageLayout;
-  const sidebarIsInline = config?.sidebar.isInline;
+  const sidebarIsPinned = config?.sidebar.isPinned;
   const newLayoutConfig = {
     ...config,
-    sidebar: { isInline: !sidebarIsInline },
+    sidebar: { isPinned: !sidebarIsPinned },
   };
   setConfig(newLayoutConfig);
 };
@@ -124,22 +124,22 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
 };
 
 const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
-  const sidebarIsInline = searchPageLayout?.config.sidebar.isInline;
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
   return (
     <ViewTypeContext.Consumer>
       {(viewType) => {
         const title = sidebarTitle(viewMetadata, viewType);
         return (
-          <Container sidebarIsInline={sidebarIsInline}>
+          <Container sidebarIsPinned={sidebarIsPinned}>
             <div>
               <Header title={title}>
                 <CenterVertical>
                   <Title onClick={closeSidebar}>{title}</Title>
                 </CenterVertical>
                 <CenterVertical>
-                  <OverlayToggle sidebarIsInline={sidebarIsInline}>
+                  <OverlayToggle sidebarIsPinned={sidebarIsPinned}>
                     <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                                title={`Display sidebar ${sidebarIsInline ? 'as overlay' : 'inline'}`}
+                                title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
                                 name="thumb-tack" />
                   </OverlayToggle>
                 </CenterVertical>

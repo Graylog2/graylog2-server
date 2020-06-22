@@ -7,7 +7,7 @@ import SearchPageLayoutContext from './SearchPageLayoutContext';
 
 const defaultLayoutConfig = {
   sidebar: {
-    isInline: false,
+    isPinned: false,
   },
 };
 

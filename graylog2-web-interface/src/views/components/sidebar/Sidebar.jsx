@@ -52,7 +52,7 @@ const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: 
 const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
-  const sidebarIsInline = searchPageLayout?.config.sidebar.isInline ?? false;
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const toggleSidebar = () => handleToggleSidebar(sections, activeSectionKey, setActiveSectionKey);
   const SectionContent = activeSection?.content;
   return (
@@ -70,11 +70,11 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
                           queryId={queryId}
                           toggleSidebar={toggleSidebar}
                           viewMetadata={viewMetadata}
-                          sidebarIsInline={sidebarIsInline}
+                          sidebarIsPinned={sidebarIsPinned}
                           sidebarChildren={children} />
         </ContentColumn>
       )}
-      {(activeSection && !sidebarIsInline) && (
+      {(activeSection && !sidebarIsPinned) && (
         <ContentOverlay onClick={toggleSidebar} />
       )}
     </Container>

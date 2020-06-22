@@ -11,7 +11,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 /* eslint-disable react/no-unused-prop-types */
 export type SidebarSectionProps = {
   sidebarChildren: React.Node,
-  sidebarIsInline: boolean,
+  sidebarIsPinned: boolean,
   queryId: string,
   results: any,
   toggleSidebar: () => void,
@@ -37,9 +37,9 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'create',
     icon: 'plus',
     title: 'Create',
-    content: ({ toggleSidebar, queryId, sidebarIsInline }: SidebarSectionProps) => (
+    content: ({ toggleSidebar, queryId, sidebarIsPinned }: SidebarSectionProps) => (
       <AddWidgetButton queryId={queryId}
-                       onClick={!sidebarIsInline ? toggleSidebar : () => {}} />
+                       onClick={!sidebarIsPinned ? toggleSidebar : () => {}} />
     ),
   },
   {
