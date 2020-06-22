@@ -9,7 +9,6 @@ import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvi
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutProvider, { defaultLayoutConfig } from './SearchPageLayoutProvider';
-// import type { UserPreferences } from './UserPreferencesContext';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
