@@ -1,3 +1,3 @@
-@Library('ci-pipeline-shared') _
+@Library('my-shared-library@jenkins') _
 
 buildSnapshot()
