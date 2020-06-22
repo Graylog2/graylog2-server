@@ -44,6 +44,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await wait(() => expect(getValidationStateOfInput(fromDate)).toEqual('error'));
   });
+
   it('does not try to parse an empty date in to field', async () => {
     const { getByDisplayValue } = renderWithForm((
       <AbsoluteTimeRangeSelector />
@@ -53,5 +54,29 @@ describe('AbsoluteTimeRangeSelector', () => {
     await changeInput(toDate, '');
 
     await wait(() => expect(getValidationStateOfInput(toDate)).toEqual('error'));
+  });
+
+  it('shows error message for from date if parsing fails after changing input', async () => {
+    const { getByDisplayValue, queryByText } = renderWithForm((
+      <AbsoluteTimeRangeSelector />
+    ));
+
+    const fromDate = getByDisplayValue('2020-01-16 10:04:30.329');
+
+    await changeInput(fromDate, 'invalid');
+
+    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD HH:mm:ss.SSS')).not.toBeNull());
+  });
+
+  it('shows error message for to date if parsing fails after changing input', async () => {
+    const { getByDisplayValue, queryByText } = renderWithForm((
+      <AbsoluteTimeRangeSelector />
+    ));
+
+    const fromDate = getByDisplayValue('2020-01-16 12:04:30.329');
+
+    await changeInput(fromDate, 'invalid');
+
+    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD HH:mm:ss.SSS')).not.toBeNull());
   });
 });
