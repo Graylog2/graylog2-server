@@ -1,20 +1,17 @@
 // @flow strict
 import React from 'react';
-import Routes from 'routing/Routes';
-import * as Permissions from 'views/Permissions';
 import { get } from 'lodash';
 
+import Routes from 'routing/Routes';
+import * as Permissions from 'views/Permissions';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
-
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
 import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
 import AggregateActionHandler from 'views/logic/fieldactions/AggregateActionHandler';
 import ChartActionHandler from 'views/logic/fieldactions/ChartActionHandler';
-
 import AggregationBuilder from 'views/components/aggregationbuilder/AggregationBuilder';
-
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
@@ -24,13 +21,10 @@ import WorldMapVisualization from 'views/components/visualizations/worldmap/Worl
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
 import IfSearch from 'views/components/search/IfSearch';
-
 import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
 import PivotTransformer from 'views/logic/searchresulttransformers/PivotTransformer';
-
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
-
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
@@ -42,23 +36,19 @@ import AggregationControls from 'views/components/aggregationbuilder/Aggregation
 import EditMessageList from 'views/components/widgets/EditMessageList';
 import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
 import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
-
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
-
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
-
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
@@ -76,6 +66,7 @@ import {
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';

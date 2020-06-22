@@ -24,8 +24,8 @@ import ShareViewModal from 'views/components/views/ShareViewModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
 import type { User } from 'stores/users/UsersStore';
-
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
+
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
 
@@ -196,7 +196,6 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { viewStoreState: { view, dirty }, theme } = this.props;
 
     const loaded = (view && view.id);
-    const savedSearchStyle = loaded ? 'star' : 'star-o';
     let savedSearchColor: string = '';
     if (loaded) {
       savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
@@ -210,17 +209,6 @@ class SavedSearchControls extends React.Component<Props, State> {
       title = loaded ? 'Saved search' : 'Save search';
     }
 
-    const savedSearchForm = showForm && (
-      <SavedSearchForm onChangeTitle={this.onChangeTitle}
-                       target={this.formTarget.current}
-                       saveSearch={this.saveSearch}
-                       saveAsSearch={this.saveAsSearch}
-                       disableCreateNew={newTitle === view.title}
-                       isCreateNew={!view.id}
-                       toggleModal={this.toggleFormModal}
-                       value={newTitle} />
-    );
-
     return (
       <CurrentUserContext.Consumer>
         {(currentUser) => {
@@ -232,13 +220,22 @@ class SavedSearchControls extends React.Component<Props, State> {
                   <ButtonGroup>
                     <>
                       <Button title={title} ref={this.formTarget} onClick={this.toggleFormModal}>
-                        <Icon style={{ color: savedSearchColor }} name={savedSearchStyle} /> Save
+                        <Icon style={{ color: savedSearchColor }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
                       </Button>
-                      {savedSearchForm}
+                      {showForm && (
+                      <SavedSearchForm onChangeTitle={this.onChangeTitle}
+                                       target={this.formTarget.current}
+                                       saveSearch={this.saveSearch}
+                                       saveAsSearch={this.saveAsSearch}
+                                       disableCreateNew={newTitle === view.title}
+                                       isCreateNew={!view.id}
+                                       toggleModal={this.toggleFormModal}
+                                       value={newTitle} />
+                      )}
                     </>
                     <Button title="Load a previously saved search"
                             onClick={this.toggleListModal}>
-                      <Icon name="folder-o" /> Load
+                      <Icon name="folder" type="regular" /> Load
                     </Button>
                     {showList && (
                       <SavedSearchList loadSavedSearch={this.loadSavedSearch}

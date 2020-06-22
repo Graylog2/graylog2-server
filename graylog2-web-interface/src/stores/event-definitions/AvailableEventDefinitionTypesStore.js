@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AvailableEventDefinitionTypesActions } = CombinedProvider.get('AvailableEventDefinitionTypes');

@@ -1,8 +1,10 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import type { QueryMetadataJson } from './QueryMetadata';
-import type { ParameterJson } from '../parameters/Parameter';
 import QueryMetadata from './QueryMetadata';
+
+import type { ParameterJson } from '../parameters/Parameter';
 import Parameter from '../parameters/Parameter';
 
 type QueryMetadataMap = Immutable.Map<string, QueryMetadata>;

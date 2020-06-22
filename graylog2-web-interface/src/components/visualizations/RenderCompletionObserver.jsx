@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 class RenderCompletionObserver extends React.Component {

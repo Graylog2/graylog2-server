@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+
 import { singleton } from '../../logic/singleton';
 
 export type TRenderCompletionCallback = () => void;

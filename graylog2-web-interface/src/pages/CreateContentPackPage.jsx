@@ -1,12 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
-import { LinkContainer } from 'react-router-bootstrap';
 import history from 'util/History';
-
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';

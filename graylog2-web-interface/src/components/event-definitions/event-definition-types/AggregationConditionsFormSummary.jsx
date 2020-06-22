@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { Button, Panel } from 'components/graylog';
 import { Icon } from 'components/common';
+
 import AggregationConditionSummary from './AggregationConditionSummary';
 
 const StyledPanel = styled(Panel)`

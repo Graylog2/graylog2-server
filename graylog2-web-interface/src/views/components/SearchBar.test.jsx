@@ -2,13 +2,13 @@
 import * as React from 'react';
 import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 
 import { QueriesActions } from 'views/stores/QueriesStore';
 // eslint-disable-next-line import/no-named-default
 import { default as MockQuery } from 'views/logic/queries/Query';
+
 import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };

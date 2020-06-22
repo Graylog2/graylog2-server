@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import URI from 'urijs';
 
+import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { ExternalLink, IfPermitted } from 'components/common';
-
 import Routes from 'routing/Routes';
 
 class NodeMaintenanceDropdown extends React.Component {

@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Input } from 'components/bootstrap';
-
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
+
 import ContentPackUtils from './ContentPackUtils';
 
 class ContentPackEditParameter extends React.Component {

@@ -3,7 +3,6 @@ import moment from 'moment-timezone';
 
 import AppConfig from 'util/AppConfig';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { QueriesActions } from 'views/stores/QueriesStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';

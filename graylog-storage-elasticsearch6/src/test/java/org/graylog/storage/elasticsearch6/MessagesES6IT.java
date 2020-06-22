@@ -6,11 +6,14 @@ import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -18,20 +21,29 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 
 public class MessagesES6IT extends MessagesIT {
+    @Rule
+    public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
+
     private final IndexingHelper indexingHelper = new IndexingHelper();
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES6(jestClient(), true, metricRegistry);
+        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry);
     }
 
     @Override
     protected Double messageCount(String indexName) {
         final Count count = new Count.Builder().addIndex(indexName).build();
 
-        final CountResult result = JestUtils.execute(jestClient(), count, () -> "Unable to count documents");
+        final CountResult result = JestUtils.execute(jestClient(elasticsearch), count, () -> "Unable to count documents");
         return result.getCount();
     }
 
@@ -54,7 +66,7 @@ public class MessagesES6IT extends MessagesIT {
 
     private boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id) {
         final Index indexRequest = indexingHelper.prepareIndexRequest(index, source, id);
-        final DocumentResult indexResponse = JestUtils.execute(jestClient(), indexRequest, () -> "Unable to index message");
+        final DocumentResult indexResponse = JestUtils.execute(jestClient(elasticsearch), indexRequest, () -> "Unable to index message");
 
         return indexResponse.isSucceeded();
     }

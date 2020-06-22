@@ -10,6 +10,7 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+
 import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';

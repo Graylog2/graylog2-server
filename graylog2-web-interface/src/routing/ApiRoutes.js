@@ -286,49 +286,6 @@ const ApiRoutes = {
 
       return { url: this._buildUrl(url, queryString) };
     },
-    histogram(type, query, resolution, timerange, streamId) {
-      const url = `/search/universal/${type}/histogram`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.interval = resolution;
-
-      return { url: this._buildUrl(url, queryString) };
-    },
-    fieldHistogram(type, query, field, resolution, timerange, streamId, includeCardinality) {
-      const url = `/search/universal/${type}/fieldhistogram`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.interval = resolution;
-      queryString.field = field;
-      queryString.cardinality = includeCardinality;
-      return { url: this._buildUrl(url, queryString) };
-    },
-    fieldStats(type, query, field, timerange, streamId) {
-      const url = `/search/universal/${type}/stats`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.field = field;
-      return { url: this._buildUrl(url, queryString) };
-    },
-    fieldTerms(type, query, field, order, size, stackedFields, timerange, streamId) {
-      const url = `/search/universal/${type}/terms`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      queryString.field = field;
-      queryString.order = `${field}:${order}`; // REST API expects <field>:<order> format for the "order" param
-      queryString.size = size;
-      queryString.stacked_fields = stackedFields;
-      return { url: this._buildUrl(url, queryString) };
-    },
-    fieldTermsHistogram(type, query, field, order, size, stackedFields, timerange, interval, streamId) {
-      const url = `/search/universal/${type}/terms-histogram`;
-      const queryString = this._buildBaseQueryString(query, timerange, streamId);
-      // The server is using sane default interval if we don't provide one
-      if (interval && interval !== '') {
-        queryString.interval = interval.toUpperCase();
-      }
-      queryString.field = field;
-      queryString.order = `${field}:${order}`; // REST API expects <field>:<order> format for the "order" param
-      queryString.size = size;
-      queryString.stacked_fields = stackedFields;
-      return { url: this._buildUrl(url, queryString) };
-    },
   },
   UsersApiController: {
     changePassword: (username) => { return { url: `/users/${username}/password` }; },

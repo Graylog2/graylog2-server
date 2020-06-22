@@ -16,11 +16,8 @@
  */
 package org.graylog2.indexer.cluster;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.searchbox.core.Cat;
-import io.searchbox.core.CatResult;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
@@ -57,6 +54,10 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
 
     protected abstract ClusterAdapter clusterAdapter(Duration timeout);
 
+    protected abstract String currentNodeId();
+    protected abstract String currentNodeName();
+    protected abstract String currentHostnameOrIp();
+
     @Before
     public void setUp() throws Exception {
         client().createIndex(INDEX_NAME, 1, 0);
@@ -83,7 +84,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void getClusterAllocationDiskSettings() throws Exception{
+    public void getClusterAllocationDiskSettings() {
         final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
 
         //Default Elasticsearch settings in Elasticsearch 5.6
@@ -95,7 +96,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void health() throws Exception {
+    public void health() {
         final String index = client().createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
 
@@ -130,24 +131,11 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void nodeIdToName() throws Exception {
-        final Cat nodesInfo = new Cat.NodesBuilder()
-                .setParameter("h", "id,name")
-                .setParameter("format", "json")
-                .setParameter("full_id", "true")
-                .build();
-        final CatResult catResult = jestClient().execute(nodesInfo);
-        final JsonNode result = catResult.getJsonObject().path("result");
-        assertThat(result).isNotEmpty();
-
-        final JsonNode node = result.path(0);
-        final String nodeId = node.get("id").asText();
-        final String expectedName = node.get("name").asText();
-
-        final Optional<String> name = cluster.nodeIdToName(nodeId);
+    public void nodeIdToName() {
+        final Optional<String> name = cluster.nodeIdToName(currentNodeId());
         assertThat(name)
                 .isPresent()
-                .contains(expectedName);
+                .contains(currentNodeName());
     }
 
     @Test
@@ -155,28 +143,12 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         final Optional<String> name = cluster.nodeIdToName("invalid-node-id");
         assertThat(name).isEmpty();
     }
-
     @Test
-    public void nodeIdToHostName() throws Exception {
-        final Cat nodesInfo = new Cat.NodesBuilder()
-                .setParameter("h", "id,host,ip")
-                .setParameter("format", "json")
-                .setParameter("full_id", "true")
-                .build();
-        final CatResult catResult = jestClient().execute(nodesInfo);
-        final JsonNode result = catResult.getJsonObject().path("result");
-        assertThat(result).isNotEmpty();
-
-        final JsonNode node = result.path(0);
-        final String nodeId = node.get("id").asText();
-        // "host" only exists in Elasticsearch 2.x
-        final String ip = node.path("ip").asText();
-        final String expectedHostName = node.path("host").asText(ip);
-
-        final Optional<String> hostName = cluster.nodeIdToHostName(nodeId);
+    public void nodeIdToHostName() {
+        final Optional<String> hostName = cluster.nodeIdToHostName(currentNodeId());
         assertThat(hostName)
                 .isPresent()
-                .contains(expectedHostName);
+                .contains(currentHostnameOrIp());
     }
 
     @Test
@@ -191,7 +163,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void isHealthy() throws Exception {
+    public void isHealthy() {
         final String index = client().createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
         when(indexSetRegistry.isUp()).thenReturn(true);

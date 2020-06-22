@@ -1,9 +1,9 @@
 // @flow strict
 import Reflux from 'reflux';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const ConfigurationActions = ActionsProvider.getActions('Configuration');

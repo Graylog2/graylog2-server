@@ -20,7 +20,7 @@ class SmallSupportLink extends React.Component {
       <p className="description-tooltips">
         <IconStack className="fa-stack">
           <Icon name="circle" className="fa-stack-2x" />
-          <Icon name="lightbulb-o" className="fa-stack-1x" inverse />
+          <Icon name="lightbulb" className="fa-stack-1x" type="regular" inverse />
         </IconStack>
         <strong>
           {this.props.children}

@@ -11,7 +11,6 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import Button from 'components/graylog/Button';
 import TopRow from 'views/components/searchbar/TopRow';
-
 import Widget from 'views/logic/widgets/Widget';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
@@ -20,13 +19,15 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchActions from 'views/actions/SearchActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
-import { DEFAULT_TIMERANGE } from '../Constants';
 import SearchBarForm from './searchbar/SearchBarForm';
+
+import { DEFAULT_TIMERANGE } from '../Constants';
 
 type Props = {
   availableStreams: Array<any>,
@@ -122,7 +123,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
                   <div className="pull-right search-help">
                     <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                        title="Search query syntax documentation"
-                                       text={<Icon name="lightbulb-o" />} />
+                                       text={<Icon name="lightbulb" type="regular" />} />
                   </div>
                   <SearchButton running={isSubmitting}
                                 disabled={isGloballyOverridden || isSubmitting || !isValid}

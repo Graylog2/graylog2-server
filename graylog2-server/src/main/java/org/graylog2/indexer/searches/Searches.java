@@ -31,22 +31,16 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsHistogramResult;
-import org.graylog2.indexer.results.TermsResult;
-import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,52 +57,7 @@ import static java.util.Objects.requireNonNull;
 
 @Singleton
 public class Searches {
-    public final static String AGG_TERMS = "gl2_terms";
-    public final static String AGG_STATS = "gl2_stats";
-    public static final String AGG_FILTER = "gl2_filter";
-    public static final String AGG_CARDINALITY = "gl2_field_cardinality";
-    public static final String AGG_VALUE_COUNT = "gl2_value_count";
     private static final Pattern filterStreamIdPattern = Pattern.compile("^(.+[^\\p{Alnum}])?streams:([\\p{XDigit}]+)");
-
-    // This is the "WORD SEPARATOR MIDDLE DOT" unicode character. It's used to join and split the term values in a
-    // stacked terms query.
-    public static final String STACKED_TERMS_AGG_SEPARATOR = "\u2E31";
-
-    public enum TermsStatsOrder {
-        TERM,
-        REVERSE_TERM,
-        COUNT,
-        REVERSE_COUNT,
-        TOTAL,
-        REVERSE_TOTAL,
-        MIN,
-        REVERSE_MIN,
-        MAX,
-        REVERSE_MAX,
-        MEAN,
-        REVERSE_MEAN
-    }
-
-    public enum DateHistogramInterval {
-        YEAR(Period.years(1)),
-        QUARTER(Period.months(3)),
-        MONTH(Period.months(1)),
-        WEEK(Period.weeks(1)),
-        DAY(Period.days(1)),
-        HOUR(Period.hours(1)),
-        MINUTE(Period.minutes(1));
-
-        @SuppressWarnings("ImmutableEnumChecker")
-        private final Period period;
-
-        DateHistogramInterval(Period period) {
-            this.period = period;
-        }
-
-        public Period getPeriod() {
-            return period;
-        }
-    }
 
     private final IndexRangeService indexRangeService;
     private final Timer esRequestTimer;
@@ -162,7 +111,7 @@ public class Searches {
 
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
 
-        final ScrollResult result = searchesAdapter.scroll(affectedIndices, indexWildcards, sorting, filter, query, range, limit, offset, fields);
+        final ScrollResult result = searchesAdapter.scroll(indexWildcards, sorting, filter, query, range, limit, offset, fields);
 
         recordEsMetrics(result.tookMs(), range);
 
@@ -186,7 +135,6 @@ public class Searches {
         return search(searchesConfig);
     }
 
-    @SuppressWarnings("unchecked")
     public SearchResult search(SearchesConfig config) {
         final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(config.range(), config.filter());
 
@@ -196,67 +144,10 @@ public class Searches {
         return result;
     }
 
-    public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        TermsResult result = searchesAdapter.terms(query, filter, range, affectedIndices, field, stackedFields, size, sorting);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
-        return terms(field, Collections.emptyList(), size, query, filter, range, sorting);
-    }
-
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
-        return terms(field, size, query, filter, range, Sorting.Direction.DESC);
-    }
-
-    public TermsResult terms(String field, int size, String query, TimeRange range) {
-        return terms(field, size, query, null, range, Sorting.Direction.DESC);
-    }
-
-    public TermsHistogramResult termsHistogram(String field,
-                                               List<String> stackedFields,
-                                               int size,
-                                               String query,
-                                               String filter,
-                                               TimeRange range,
-                                               DateHistogramInterval interval,
-                                               Sorting.Direction sorting) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-
-        final TermsHistogramResult result = searchesAdapter.termsHistogram(query, filter, range, affectedIndices, field, stackedFields, size, sorting, interval);
-
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
-    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
-        if (size == 0) {
-            size = 50;
-        }
-
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-
-        final TermsStatsResult result = searchesAdapter.termsStats(query, filter, range, affectedIndices, keyField, valueField, order, size);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
-    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, TimeRange range) {
-        return termsStats(keyField, valueField, order, size, query, null, range);
-    }
-
     public FieldStatsResult fieldStats(String field, String query, TimeRange range) {
-        return fieldStats(field, query, null, range);
+        return fieldStats(field, query, null, range, true, true, true);
     }
 
-    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) {
-        // by default include the cardinality aggregation, as well.
-        return fieldStats(field, query, filter, range, true, true, true);
-    }
-
-    @SuppressWarnings("unchecked")
     public FieldStatsResult fieldStats(String field,
                                        String query,
                                        String filter,
@@ -273,45 +164,12 @@ public class Searches {
     }
 
     private Set<String> indicesContainingField(Set<String> strings, String field) {
-        return indices.getAllMessageFieldsForIndices(strings.toArray(new String[strings.size()]))
+        return indices.getAllMessageFieldsForIndices(strings.toArray(new String[0]))
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue().contains(field))
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
-    }
-
-    public HistogramResult histogram(String query, DateHistogramInterval interval, TimeRange range) {
-        return histogram(query, interval, null, range);
-    }
-
-    public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        final HistogramResult result = searchesAdapter.histogram(query, filter, range, affectedIndices, interval);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
-    }
-
-    public HistogramResult fieldHistogram(String query,
-                                          String field,
-                                          DateHistogramInterval interval,
-                                          String filter,
-                                          TimeRange range,
-                                          boolean includeCardinality) {
-        return fieldHistogram(query, field, interval, filter, range, true, includeCardinality);
-    }
-
-    public HistogramResult fieldHistogram(String query,
-                                          String field,
-                                          DateHistogramInterval interval,
-                                          String filter,
-                                          TimeRange range,
-                                          boolean includeStats,
-                                          boolean includeCardinality) {
-        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        final HistogramResult result = searchesAdapter.fieldHistogram(query, filter, range, affectedIndices, field, interval, includeStats, includeCardinality);
-        recordEsMetrics(result.tookMs(), range);
-        return result;
     }
 
     private void recordEsMetrics(long tookMs, TimeRange range) {

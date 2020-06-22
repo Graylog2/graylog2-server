@@ -9,7 +9,7 @@ import MessageLoader from './MessageLoader';
 const NewExampleWell = styled(Well)(({ theme }) => `
   margin-bottom: 5px;
   font-family: ${theme.fonts.family.monospace};
-  font-size: 14px;
+  font-size: ${theme.fonts.size.body};
   white-space: pre-wrap;
   word-wrap: break-word;
 `);
@@ -35,6 +35,7 @@ class ExtractorExampleMessage extends React.Component {
     const { field, onExampleLoad } = this.props;
 
     const newExample = message.fields[field];
+
     onExampleLoad(newExample);
   };
 

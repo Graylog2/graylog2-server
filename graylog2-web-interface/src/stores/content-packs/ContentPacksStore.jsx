@@ -4,7 +4,6 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 const ContentPacksActions = ActionsProvider.getActions('ContentPacks');

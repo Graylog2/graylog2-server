@@ -2,8 +2,9 @@
 import * as Immutable from 'immutable';
 
 import queryTitle from './QueryTitle';
-import Search from '../search/Search';
 import Query from './Query';
+
+import Search from '../search/Search';
 import View from '../views/View';
 import ViewState from '../views/ViewState';
 

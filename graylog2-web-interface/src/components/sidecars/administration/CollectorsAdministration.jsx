@@ -2,24 +2,21 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, Row } from 'components/graylog';
 import { Link } from 'react-router';
-import Routes from 'routing/Routes';
 
+import { Col, Row } from 'components/graylog';
+import Routes from 'routing/Routes';
 import { ControlledTableList, PaginatedList } from 'components/common';
 import { Input } from 'components/bootstrap';
-
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
-
 import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
 
 import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
 import FiltersSummary from './FiltersSummary';
-
 import style from './CollectorsAdministration.css';
 
 const CollectorsAdministration = createReactClass({

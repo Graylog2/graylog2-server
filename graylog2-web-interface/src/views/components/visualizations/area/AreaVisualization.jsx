@@ -5,9 +5,10 @@ import PropTypes from 'prop-types';
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
+
 import type { ChartDefinition } from '../ChartData';
 import XYPlot from '../XYPlot';
 import { chartData } from '../ChartData';
@@ -57,7 +58,7 @@ const AreaVisualization: VisualizationComponent = makeVisualization(({ config, d
 
 AreaVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
+  data: AggregationResult.isRequired,
   height: PropTypes.number,
 };
 

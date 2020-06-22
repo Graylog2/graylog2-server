@@ -36,7 +36,7 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
     0 0 8px ${chroma(copied ? theme.colors.variant.success : theme.colors.gray[80]).alpha(0.4).css()};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
   font-family: ${theme.fonts.family.monospace};
-  font-size: 14px;
+  font-size: ${theme.fonts.size.body};
 
   :focus {
     border-color: ${theme.colors.variant.light.info};
@@ -88,6 +88,7 @@ const Scratchpad = () => {
 
   const writeData = (newData) => {
     const currentStorage = Store.get(localStorageItem);
+
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
@@ -105,6 +106,7 @@ const Scratchpad = () => {
 
   const handleChange = () => {
     const { value } = textareaRef.current;
+
     setDirty(true);
     setScratchData(value);
     writeData({ value });
@@ -188,13 +190,13 @@ const Scratchpad = () => {
                   spellCheck={false} />
 
         <Footer>
-          <SavingMessage visible={recentlySaved}><Icon name="hdd-o" /> Saved!</SavingMessage>
+          <SavingMessage visible={recentlySaved}><Icon name="hdd" type="regular" /> Saved!</SavingMessage>
           <SplitButton title={CopyWithIcon}
                        bsStyle="info"
                        data-clipboard-button
                        data-clipboard-target={`#${TEXTAREA_ID}`}
                        id="scratchpad-actions">
-            <MenuItem onClick={openConfirmClear}><Icon name="trash" /> Clear</MenuItem>
+            <MenuItem onClick={openConfirmClear}><Icon name="trash-alt" /> Clear</MenuItem>
           </SplitButton>
         </Footer>
 

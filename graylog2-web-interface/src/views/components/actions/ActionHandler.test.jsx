@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+
 import { createHandlerFor } from './ActionHandler';
 import type {
   ActionComponentProps,

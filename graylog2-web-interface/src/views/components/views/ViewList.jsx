@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
 import IfPermitted from 'components/common/IfPermitted';
+
 import View from './View';
 
 const itemActionsFactory = (view, onViewDelete) => {

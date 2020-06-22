@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { List } from 'immutable';
 import { mount } from 'wrappedEnzyme';
+import mockAction from 'helpers/mocking/MockAction';
 
 import { NotFoundErrorType } from 'logic/errors/ReportedErrors';
-import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
 import View from 'views/logic/views/View';

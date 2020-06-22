@@ -2,15 +2,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';
 import { ExternalLinkButton, Select } from 'components/common';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import { InputForm } from 'components/inputs';
 
 const InputTypesActions = ActionsProvider.getActions('InputTypes');

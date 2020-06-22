@@ -12,6 +12,7 @@ import AddNewWidgetsToPositions from 'views/logic/views/AddNewWidgetsToPositions
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
+
 import ViewState from '../logic/views/ViewState';
 
 type CurrentViewStateActionsType = RefluxActions<{

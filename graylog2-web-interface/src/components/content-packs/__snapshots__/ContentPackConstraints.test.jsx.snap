@@ -229,6 +229,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                       >
                                         <Icon
                                           name="times"
+                                          type="solid"
                                         >
                                           <FontAwesomeIcon
                                             icon={
@@ -354,6 +355,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                                       >
                                         <Icon
                                           name="check"
+                                          type="solid"
                                         >
                                           <FontAwesomeIcon
                                             icon={
@@ -613,6 +615,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                                       >
                                         <Icon
                                           name="check"
+                                          type="solid"
                                         >
                                           <FontAwesomeIcon
                                             icon={
@@ -738,6 +741,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                                       >
                                         <Icon
                                           name="check"
+                                          type="solid"
                                         >
                                           <FontAwesomeIcon
                                             icon={
@@ -993,6 +997,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                                       >
                                         <Icon
                                           name="times"
+                                          type="solid"
                                         >
                                           <FontAwesomeIcon
                                             icon={
@@ -1114,6 +1119,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                                       >
                                         <Icon
                                           name="times"
+                                          type="solid"
                                         >
                                           <FontAwesomeIcon
                                             icon={

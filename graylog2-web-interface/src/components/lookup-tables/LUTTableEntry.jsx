@@ -4,9 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Routes from 'routing/Routes';
-
 import { Button } from 'components/graylog';
 import { ErrorPopover } from 'components/lookup-tables';
 import { ContentPackMarker } from 'components/common';

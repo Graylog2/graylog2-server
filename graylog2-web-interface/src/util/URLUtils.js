@@ -1,7 +1,8 @@
 import Qs from 'qs';
 import URI from 'urijs';
-import AppConfig from 'util/AppConfig';
 import UAParser from 'ua-parser-js';
+
+import AppConfig from 'util/AppConfig';
 
 const ACCEPTED_PROTOCOLS = ['http:', 'https:'];
 

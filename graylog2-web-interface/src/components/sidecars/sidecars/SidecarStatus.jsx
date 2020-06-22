@@ -75,7 +75,7 @@ const SidecarStatus = createReactClass({
         case SidecarStatusEnum.FAILING:
           statusMessage = status.message;
           statusClass = 'text-danger';
-          statusBadge = <Icon name="warning" fixedWidth />;
+          statusBadge = <Icon name="exclamation-triangle" fixedWidth />;
 
           if (status.verbose_message) {
             verboseButton = (

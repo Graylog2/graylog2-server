@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Panel } from 'components/graylog';
 
+import { Col, Panel } from 'components/graylog';
 import {
   CopyInputExtractorConfiguration,
   GrokExtractorConfiguration,
@@ -12,7 +12,6 @@ import {
   SubstringExtractorConfiguration,
   LookupTableExtractorConfiguration,
 } from 'components/extractors/extractors_configuration';
-
 import ExtractorUtils from 'util/ExtractorUtils';
 
 class EditExtractorConfiguration extends React.Component {

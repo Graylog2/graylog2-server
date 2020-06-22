@@ -3,14 +3,15 @@ import React from 'react';
 
 import { DocumentTitle, Spinner, Icon } from 'components/common';
 import LoginBox from 'components/login/LoginBox';
-import AuthThemeStyles from 'theme/styles/authStyles';
+import authStyles from 'theme/styles/authStyles';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 const LoadingPage = ({ text }) => {
   return (
     <DocumentTitle title="Loading...">
-      <AuthThemeStyles />
+      <GlobalThemeStyles additionalStyles={authStyles} />
       <LoginBox>
-        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <legend><Icon name="users" /> Welcome to Graylog</legend>
         <p>
           <Spinner text={text} delay={0} />
         </p>

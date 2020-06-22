@@ -1,8 +1,7 @@
 import React from 'react';
+
 import { Col, Pagination, Row } from 'components/graylog';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
 

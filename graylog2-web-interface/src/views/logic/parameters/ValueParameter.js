@@ -1,8 +1,9 @@
 // @flow strict
 
+import * as Immutable from 'immutable';
+
 import Parameter from 'views/logic/parameters/Parameter';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import * as Immutable from 'immutable';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
 type InternalBuilderState = Immutable.Map<string, any>;

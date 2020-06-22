@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
@@ -15,12 +16,12 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { ContentPacksActions, ContentPacksStore } = CombinedProvider.get('ContentPacks');
 
-const ConfigurationBundles = styled.div`
-  font-size: 14px;
+const ConfigurationBundles = styled.div(({ theme }) => `
+  font-size: ${theme.fonts.size.body};
   font-weight: normal;
   line-height: 20px;
   margin-top: 15px;
-`;
+`);
 
 const ContentPacksPage = createReactClass({
   displayName: 'ContentPacksPage',
@@ -40,11 +41,12 @@ const ContentPacksPage = createReactClass({
         /* eslint-disable camelcase */
         let err_message = error.message;
         const err_body = error.additional.body;
-        /* eslint-enable camlecase */
+
         if (err_body && err_body.message) {
           err_message = error.additional.body.message;
         }
         UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
+        /* eslint-enable camelcase */
       });
     }
   },

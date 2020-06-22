@@ -2134,6 +2134,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     >
                                                       <Icon
                                                         name="caret-down"
+                                                        type="solid"
                                                       >
                                                         <FontAwesomeIcon
                                                           icon={
@@ -2235,6 +2236,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         >
                           <Icon
                             name="trash-alt"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               icon={
@@ -4082,6 +4084,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     >
                                                       <Icon
                                                         name="caret-down"
+                                                        type="solid"
                                                       >
                                                         <FontAwesomeIcon
                                                           icon={
@@ -4183,6 +4186,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         >
                           <Icon
                             name="trash-alt"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               icon={
@@ -6030,6 +6034,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     >
                                                       <Icon
                                                         name="caret-down"
+                                                        type="solid"
                                                       >
                                                         <FontAwesomeIcon
                                                           icon={
@@ -6131,6 +6136,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         >
                           <Icon
                             name="trash-alt"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               icon={

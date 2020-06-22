@@ -2,11 +2,11 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { viewsManager, admin } from 'fixtures/users';
+import mockAction from 'helpers/mocking/MockAction';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext, { type ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
-import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext, { type NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';

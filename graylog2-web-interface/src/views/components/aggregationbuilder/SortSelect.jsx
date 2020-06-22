@@ -8,6 +8,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+
 import { PivotList, SeriesList, SortList } from './AggregationBuilderPropTypes';
 
 const mapFields = (fields) => fields.sort(defaultCompare)

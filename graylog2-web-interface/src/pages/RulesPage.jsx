@@ -1,15 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
-
 import Reflux from 'reflux';
 
+import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-
 import DocsHelper from 'util/DocsHelper';
-
 import RulesComponent from 'components/rules/RulesComponent';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';

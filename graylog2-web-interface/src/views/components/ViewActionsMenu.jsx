@@ -7,12 +7,10 @@ import { withRouter } from 'react-router';
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
-
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
 import { Icon } from 'components/common';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
-
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveAsView from 'views/logic/views/OnSaveAsViewAction';
 import { ViewStore } from 'views/stores/ViewStore';
@@ -21,10 +19,10 @@ import SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as Permissions from 'views/Permissions';
 import View from 'views/logic/views/View';
 import type { User } from 'stores/users/UsersStore';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import ShareViewModal from './views/ShareViewModal';
+
 import ViewPropertiesModal from './views/ViewPropertiesModal';
+import ShareViewModal from './views/ShareViewModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
@@ -69,7 +67,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
         <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="share-alt" /> Share
         </MenuItem>
-        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download" /> Export to CSV</MenuItem>
+        <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>
           <MenuItem divider />

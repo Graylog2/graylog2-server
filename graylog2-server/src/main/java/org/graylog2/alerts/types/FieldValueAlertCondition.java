@@ -177,7 +177,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter,
                 RelativeRange.create(time * 60), false, true, false);
 
-            if (fieldStatsResult.getCount() == 0) {
+            if (fieldStatsResult.count() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
                 return new NegativeCheckResult();
             }
@@ -185,19 +185,19 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             final double result;
             switch (type) {
                 case MEAN:
-                    result = fieldStatsResult.getMean();
+                    result = fieldStatsResult.mean();
                     break;
                 case MIN:
-                    result = fieldStatsResult.getMin();
+                    result = fieldStatsResult.min();
                     break;
                 case MAX:
-                    result = fieldStatsResult.getMax();
+                    result = fieldStatsResult.max();
                     break;
                 case SUM:
-                    result = fieldStatsResult.getSum();
+                    result = fieldStatsResult.sum();
                     break;
                 case STDDEV:
-                    result = fieldStatsResult.getStdDeviation();
+                    result = fieldStatsResult.stdDeviation();
                     break;
                 default:
                     LOG.error("No such field value check type: [{}]. Returning not triggered.", type);
@@ -232,7 +232,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
                 final List<MessageSummary> summaries;
                 if (getBacklog() > 0) {
-                    final List<ResultMessage> searchResult = fieldStatsResult.getSearchHits();
+                    final List<ResultMessage> searchResult = fieldStatsResult.searchHits();
                     summaries = Lists.newArrayListWithCapacity(searchResult.size());
                     for (ResultMessage resultMessage : searchResult) {
                         final Message msg = resultMessage.getMessage();

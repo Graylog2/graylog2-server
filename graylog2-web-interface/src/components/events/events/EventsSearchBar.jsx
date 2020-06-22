@@ -77,7 +77,7 @@ class EventsSearchBar extends React.Component {
                         topMargin={0}
                         useLoadingState>
               <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>
-                <Icon name="refresh" spin={isReloadingResults} />
+                <Icon name="sync" spin={isReloadingResults} />
               </Button>
             </SearchForm>
           </div>

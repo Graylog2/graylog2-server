@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
 import { Button, Table } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';

@@ -56,13 +56,26 @@ public class GraylogBackendExtension implements AfterEachCallback, BeforeAllCall
 
         Stopwatch sw = Stopwatch.createStarted();
 
-        backend = GraylogBackend.createStarted(annotation.extraPorts());
+        backend = constructBackendFrom(annotation);
 
         context.getStore(NAMESPACE).put(context.getRequiredTestClass().getName(), backend);
 
         sw.stop();
 
         LOG.info("Backend started after " + sw.elapsed(TimeUnit.SECONDS) + " seconds");
+    }
+
+    private GraylogBackend constructBackendFrom(ApiIntegrationTest annotation) {
+        final ElasticsearchInstanceFactory factory = instantiateFactory(annotation.elasticsearchFactory());
+        return GraylogBackend.createStarted(annotation.extraPorts(), factory);
+    }
+
+    private ElasticsearchInstanceFactory instantiateFactory(Class<? extends ElasticsearchInstanceFactory> factoryClass) {
+        try {
+            return factoryClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException("Unable to construct Elasticsearch factory: ", e);
+        }
     }
 
     private static ApiIntegrationTest annotationFrom(ExtensionContext context) {

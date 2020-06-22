@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { render, waitForElement } from 'wrappedTestingLibrary';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 describe('WidgetErrorBoundary', () => {

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { Col, Row } from 'components/graylog';
+
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
@@ -9,9 +11,10 @@ import naturalSort from 'javascript-natural-sort';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 
+import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
+
 import commonStyles from '../common/commonStyles.css';
 
 class EventDefinitionSummary extends React.Component {

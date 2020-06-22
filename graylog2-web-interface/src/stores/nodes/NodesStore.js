@@ -1,8 +1,8 @@
 // @flow strict
 import Reflux from 'reflux';
+
 import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
-
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import BootstrapModalForm from './BootstrapModalForm';
 
 describe('BootstrapModalForm', () => {

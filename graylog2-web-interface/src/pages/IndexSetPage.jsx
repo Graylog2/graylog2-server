@@ -10,11 +10,8 @@ import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { DocumentationLink } from 'components/support';
-
 import DocsHelper from 'util/DocsHelper';
-
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Routes from 'routing/Routes';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');

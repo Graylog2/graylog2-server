@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
 // TODO: This should be moved to a general place outside of `views`

@@ -39,7 +39,7 @@ class IndexerClusterHealthSummary extends React.Component {
   _iconNameForHealth = (health) => {
     switch (health.status) {
       case 'green': return 'check-circle';
-      case 'yellow': return 'warning';
+      case 'yellow': return 'exclamation-triangle';
       case 'red': return 'ambulance';
       default: return 'check-circle';
     }

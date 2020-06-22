@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
-
 import asMock from 'helpers/mocking/AsMock';
 import { viewsManager } from 'fixtures/users';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
+
 import CombinedProvider from 'injection/CombinedProvider';
+
 import CurrentUserContext from './CurrentUserContext';
 import CurrentUserProvider from './CurrentUserProvider';
 

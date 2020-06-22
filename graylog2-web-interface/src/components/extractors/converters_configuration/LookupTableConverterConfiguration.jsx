@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
 import { Link } from 'react-router';
 
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import FormUtils from 'util/FormsUtils';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');

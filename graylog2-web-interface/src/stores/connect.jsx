@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { isFunction } from 'lodash';
+
 import isDeepEqual from './isDeepEqual';
 
 type StoreType<State> = {

@@ -3,10 +3,9 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
+import { Scratchpad, Icon, Spinner } from 'components/common';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-
-import { Scratchpad, Icon, Spinner } from 'components/common';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';

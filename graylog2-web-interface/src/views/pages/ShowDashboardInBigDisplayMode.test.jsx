@@ -1,11 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import { render, cleanup, wait, waitForElement } from 'wrappedTestingLibrary';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
+
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
-
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 
 const mockView = View.builder()

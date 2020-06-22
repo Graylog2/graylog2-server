@@ -8,7 +8,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
-
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewList from 'views/components/views/ViewList';
 

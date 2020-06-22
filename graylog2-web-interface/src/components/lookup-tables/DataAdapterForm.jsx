@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import CombinedProvider from 'injection/CombinedProvider';
 import { TimeUnitInput } from 'components/common';
 

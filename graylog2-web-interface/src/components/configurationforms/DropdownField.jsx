@@ -1,8 +1,7 @@
 import $ from 'jquery';
-
 import PropTypes from 'prop-types';
-
 import React from 'react';
+
 import FieldHelpers from 'components/configurationforms/FieldHelpers';
 
 class DropdownField extends React.Component {

@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ContentPackMarker } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import Routes from 'routing/Routes';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import Styles from './ConfigSummary.css';

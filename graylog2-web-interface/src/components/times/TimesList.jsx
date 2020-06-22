@@ -1,12 +1,11 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Row } from 'components/graylog';
 import moment from 'moment';
+
+import { Col, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Spinner, Timestamp } from 'components/common';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');

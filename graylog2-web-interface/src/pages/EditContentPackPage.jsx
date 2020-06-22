@@ -8,13 +8,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { Button } from 'components/graylog';
 import history from 'util/History';
-
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
-
 import Entity from 'logic/content-packs/Entity';
 
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');

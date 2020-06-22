@@ -87,7 +87,7 @@ class AggregationConditionsForm extends React.Component {
         <h3 className={commonStyles.title}>Create Events for Definition</h3>
         {validation.errors.conditions && (
           <StyledAlert bsStyle="danger">
-            <h4><Icon name="warning" />&nbsp;Errors found</h4>
+            <h4><Icon name="exclamation-triangle" />&nbsp;Errors found</h4>
             <p>{get(validation, 'errors.conditions[0]')}</p>
           </StyledAlert>
         )}

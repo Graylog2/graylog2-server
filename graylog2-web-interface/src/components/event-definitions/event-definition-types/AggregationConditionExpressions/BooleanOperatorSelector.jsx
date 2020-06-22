@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Col, FormControl, FormGroup } from 'components/graylog';
 
+import { Col, FormControl, FormGroup } from 'components/graylog';
 import { Select } from 'components/common';
 
-const OperatorSelector = styled.div`
+const OperatorSelector = styled.div(({ theme }) => `
   margin-bottom: 15px;
-  font-size: 14px;
-`;
+  font-size: ${theme.fonts.size.body};
+`);
 
 const BooleanOperatorSelect = styled(({ isFirstElement, ...props }) => <FormGroup {...props} />)`
   width: 100px;

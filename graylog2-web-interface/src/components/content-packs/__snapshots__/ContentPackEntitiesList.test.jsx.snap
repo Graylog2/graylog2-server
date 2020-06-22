@@ -824,6 +824,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                             className="contentPackEntity"
                             name="archive"
                             title="Content Pack"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               className="contentPackEntity"
@@ -1042,7 +1043,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "UjHmV",
+                                  "lastClassName": "eNmkew",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1067,7 +1068,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 UjHmV"
+                              className="Modal-nuree8-0 eNmkew"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1156,7 +1157,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "UjHmV",
+                                  "lastClassName": "eNmkew",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1181,7 +1182,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 UjHmV"
+                              className="Modal-nuree8-0 eNmkew"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1292,6 +1293,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                           <Icon
                             name="server"
                             title="Server"
+                            type="solid"
                           >
                             <FontAwesomeIcon
                               icon={
@@ -1509,7 +1511,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "UjHmV",
+                                  "lastClassName": "eNmkew",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1534,7 +1536,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 UjHmV"
+                              className="Modal-nuree8-0 eNmkew"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1623,7 +1625,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "UjHmV",
+                                  "lastClassName": "eNmkew",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1648,7 +1650,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 UjHmV"
+                              className="Modal-nuree8-0 eNmkew"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}

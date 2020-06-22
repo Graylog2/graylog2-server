@@ -5,7 +5,6 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
-
 import type { RefluxActions } from 'stores/StoreTypes';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';

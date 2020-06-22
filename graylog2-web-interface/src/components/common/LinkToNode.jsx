@@ -5,8 +5,8 @@ import Reflux from 'reflux';
 import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import Routes from 'routing/Routes';
+
 import Icon from './Icon';
 import Spinner from './Spinner';
 
@@ -37,7 +37,7 @@ const LinkToNode = createReactClass({
     const node = this.state.nodes[this.props.nodeId];
 
     if (node) {
-      const iconName = node.is_master ? 'star' : 'code-fork';
+      const iconName = node.is_master ? 'star' : 'code-branch';
       const iconClass = node.is_master ? 'master-node' : '';
       const iconTitle = node.is_master ? 'This is the master node in the cluster' : '';
       return (

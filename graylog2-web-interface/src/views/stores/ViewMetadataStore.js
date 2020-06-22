@@ -4,6 +4,7 @@ import { isEqual } from 'lodash';
 
 import type { Store } from 'stores/StoreTypes';
 import { singletonStore } from 'views/logic/singleton';
+
 import { ViewStore } from './ViewStore';
 
 export type ViewMetaData = {

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import { DocumentTitle, Icon } from 'components/common';
 import { Alert } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';
 import LoginBox from 'components/login/LoginBox';
-
-import AuthThemeStyles from 'theme/styles/authStyles';
-
+import authStyles from 'theme/styles/authStyles';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import LoadingPage from './LoadingPage';
 
 const { SessionActions } = CombinedProvider.get('Session');
@@ -20,6 +20,7 @@ const LoginPage = () => {
   useEffect(() => {
     const sessionPromise = SessionActions.validate().then((response) => {
       setDidValidateSession(true);
+
       return response;
     });
 
@@ -42,6 +43,7 @@ const LoginPage = () => {
         </div>
       );
     }
+
     return null;
   };
 
@@ -65,9 +67,9 @@ const LoginPage = () => {
 
   return (
     <DocumentTitle title="Sign in">
-      <AuthThemeStyles />
+      <GlobalThemeStyles additionalStyles={authStyles} />
       <LoginBox>
-        <legend><Icon name="group" /> Welcome to Graylog</legend>
+        <legend><Icon name="users" /> Welcome to Graylog</legend>
         {formatLastError()}
         {renderLoginForm()}
       </LoginBox>

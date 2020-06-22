@@ -5,6 +5,7 @@ import { get } from 'lodash';
 
 import { useStore } from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import CurrentUserContext from './CurrentUserContext';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');

@@ -8,7 +8,6 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 
 const { CollectorsActions } = CombinedProvider.get('Collectors');

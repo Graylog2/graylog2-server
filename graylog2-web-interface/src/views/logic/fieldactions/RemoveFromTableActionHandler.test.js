@@ -1,5 +1,6 @@
-import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import RemoveFromTableActionHandler from './RemoveFromTableActionHandler';
+
+import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 

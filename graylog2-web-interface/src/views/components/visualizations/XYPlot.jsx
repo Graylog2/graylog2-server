@@ -6,17 +6,17 @@ import { merge } from 'lodash';
 
 import connect from 'stores/connect';
 import AppConfig from 'util/AppConfig';
-
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
+
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
-import CustomPropTypes from '../CustomPropTypes';
 import type { ChartColor, ChartConfig, ColorMap } from './GenericPlot';
+
+import CustomPropTypes from '../CustomPropTypes';
 import ViewTypeContext from '../contexts/ViewTypeContext';
 
 export type Props = {

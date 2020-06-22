@@ -2,12 +2,12 @@
 import React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 import { viewsManager } from 'fixtures/users';
-import type { User } from 'stores/users/UsersStore';
 
+import type { User } from 'stores/users/UsersStore';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
-
 import CurrentUserContext from 'contexts/CurrentUserContext';
+
 import ViewActionsMenu from './ViewActionsMenu';
 
 const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)

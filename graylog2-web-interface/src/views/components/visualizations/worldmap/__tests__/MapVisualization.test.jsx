@@ -1,8 +1,9 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import MapVisualization from '../MapVisualization';
 import * as fixtures from './MapVisualization.fixtures';
+
+import MapVisualization from '../MapVisualization';
 
 describe('MapVisualization', () => {
   it('renders with minimal props', () => {

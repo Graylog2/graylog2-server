@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
+import naturalSort from 'javascript-natural-sort';
 
 import { Alert, Col, Row, Table, Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -8,7 +9,6 @@ import { DocumentTitle, IfPermitted, PageHeader, SortableList } from 'components
 import Routes from 'routing/Routes';
 import ObjectUtils from 'util/ObjectUtils';
 import history from 'util/History';
-import naturalSort from 'javascript-natural-sort';
 
 const AuthProvidersConfig = createReactClass({
   displayName: 'AuthProvidersConfig',

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import createReactClass from 'create-react-class';
 
 import { MetricDetails } from 'components/metrics';
@@ -22,10 +21,10 @@ const Metric = createReactClass({
   },
 
   iconMapping: {
-    timer: 'clock-o',
+    timer: 'clock',
     histogram: 'signal',
     meter: 'play-circle',
-    gauge: 'dashboard',
+    gauge: 'tachometer-alt',
     counter: 'circle',
     unknown: 'question-circle',
   },

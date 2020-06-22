@@ -7,6 +7,7 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+
 import { SearchExecutionStateActions, SearchExecutionStateStore } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{

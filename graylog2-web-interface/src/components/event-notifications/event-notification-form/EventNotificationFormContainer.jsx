@@ -5,7 +5,6 @@ import lodash from 'lodash';
 import { ConfirmLeaveDialog } from 'components/common';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 import EventNotificationForm from './EventNotificationForm';

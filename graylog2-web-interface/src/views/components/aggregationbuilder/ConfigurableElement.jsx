@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
-import CustomPropTypes from '../CustomPropTypes';
+import { Popover } from 'components/graylog';
+
 
 import styles from './ConfigurableElement.css';
+
+import CustomPropTypes from '../CustomPropTypes';
 
 export default class ConfigurableElement extends React.Component {
   static propTypes = {

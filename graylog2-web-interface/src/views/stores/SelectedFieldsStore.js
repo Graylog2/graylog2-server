@@ -5,6 +5,7 @@ import { get, isEqual } from 'lodash';
 
 import type ViewState from 'views/logic/views/ViewState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type StateUpdate = {

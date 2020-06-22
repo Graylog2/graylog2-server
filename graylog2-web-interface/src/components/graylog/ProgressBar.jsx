@@ -6,6 +6,7 @@ import styled, { css, keyframes, type StyledComponent } from 'styled-components'
 import chroma from 'chroma-js';
 
 import { type ThemeInterface } from 'theme';
+
 import bsStyleThemeVariant from './variants/bsStyle';
 
 type ProgressBarProps = {
@@ -68,7 +69,7 @@ const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.di
 
   return css`
     height: 100%;
-    font-size: 12px;
+    font-size: ${theme.fonts.size.small};
     line-height: 20px;
     text-align: center;
     ${boxShadow('inset 0 -1px 0')};

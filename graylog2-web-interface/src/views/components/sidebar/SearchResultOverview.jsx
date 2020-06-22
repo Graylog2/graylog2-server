@@ -5,7 +5,6 @@ import numeral from 'numeral';
 import AppConfig from 'util/AppConfig';
 import { Timestamp } from 'components/common';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-
 import DateTime from 'logic/datetimes/DateTime';
 
 const SearchResultOverview = ({ results }) => {

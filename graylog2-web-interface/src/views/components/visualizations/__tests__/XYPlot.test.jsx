@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
+import { viewsManager } from 'fixtures/users';
+import asMock from 'helpers/mocking/AsMock';
 
 import type { User } from 'stores/users/UsersStore';
-import { viewsManager } from 'fixtures/users';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import asMock from 'helpers/mocking/AsMock';
 import XYPlot, { type Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
