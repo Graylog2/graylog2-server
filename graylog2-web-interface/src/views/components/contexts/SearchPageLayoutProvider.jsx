@@ -46,7 +46,7 @@ const toggleSidebarPinning = (config, setConfig, userName, userPreferences) => {
   };
 
   setConfig(newLayoutConfig);
-  PreferencesStore.saveUserPreferences(userName, createUserPreferencesArray(newUserPreferences));
+  PreferencesStore.saveUserPreferences(userName, createUserPreferencesArray(newUserPreferences), undefined, false);
 };
 
 const SearchPageLayoutProvider = ({ children, userPreferences }: Props) => {

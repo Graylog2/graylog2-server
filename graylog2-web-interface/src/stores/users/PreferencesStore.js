@@ -32,6 +32,7 @@ const PreferencesStore = Reflux.createStore({
           value: preferencesAsMap[name],
         };
       });
+
     preferences = preferences.sort((t1: Preference, t2: Preference) => t1.name.localeCompare(t2.name));
     return preferences;
   },
@@ -43,12 +44,14 @@ const PreferencesStore = Reflux.createStore({
     });
     return preferencesAsMap;
   },
-  saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void): void {
+  saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void, displaySuccessNotification: boolean = true): void {
     const preferencesAsMap = this.convertPreferenceArrayToMap(preferences);
     const url = `${this.URL + userName}/preferences`;
     const promise = fetch('PUT', url, { preferences: preferencesAsMap })
       .then(() => {
-        UserNotification.success('User preferences successfully saved');
+        if (displaySuccessNotification) {
+          UserNotification.success('User preferences successfully saved');
+        }
         callback(preferences);
       }, (errorThrown) => {
         UserNotification.error(`Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
