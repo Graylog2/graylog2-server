@@ -47,13 +47,18 @@
             <artifactId>graylog2-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-elasticsearch6</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.graylog</groupId>
@@ -150,6 +155,18 @@
             <artifactId>elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Transitive dependencies of graylog-storage-elasticsearch6 -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.jest</groupId>
+            <artifactId>jest</artifactId>
+            <version>${jest.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -174,7 +191,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 </project>
