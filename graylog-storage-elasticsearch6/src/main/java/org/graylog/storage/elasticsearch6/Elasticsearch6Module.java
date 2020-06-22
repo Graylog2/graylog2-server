@@ -1,7 +1,7 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.MapBinder;
+import com.google.inject.binder.LinkedBindingBuilder;
 import io.searchbox.client.JestClient;
 import org.graylog.events.indices.EventIndexerAdapter;
 import org.graylog.events.search.MoreSearchAdapter;
@@ -16,35 +16,31 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
-import org.graylog2.plugin.PluginModule;
-import org.graylog2.plugin.Version;
+import org.graylog2.plugin.VersionAwareModule;
 
-public class Elasticsearch6Module extends PluginModule {
-    private static final Version SUPPORTED_VERSION = Version.from(6, 0, 0);
+import static org.graylog.storage.elasticsearch6.Elasticsearch6Plugin.SUPPORTED_VERSION;
+
+public class Elasticsearch6Module extends VersionAwareModule {
     @Override
     protected void configure() {
-        bindForVersion(CountsAdapter.class, CountsAdapterES6.class);
-        bindForVersion(IndicesAdapter.class, IndicesAdapterES6.class);
-        bindForVersion(SearchesAdapter.class, SearchesAdapterES6.class);
-        bindForVersion(MoreSearchAdapter.class, MoreSearchAdapterES6.class);
-        bindForVersion(MessagesAdapter.class, MessagesAdapterES6.class);
-        bindForVersion(ClusterAdapter.class, ClusterAdapterES6.class);
-        bindForVersion(NodeAdapter.class, NodeAdapterES6.class);
-        bindForVersion(EventIndexerAdapter.class, EventIndexerAdapterES6.class);
-        bindForVersion(IndexFieldTypePollerAdapter.class, IndexFieldTypePollerAdapterES6.class);
-        bindForVersion(IndexToolsAdapter.class, IndexToolsAdapterES6.class);
-        bindForVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class, V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6.class);
+        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES6.class);
+        bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES6.class);
+        bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterES6.class);
+        bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterES6.class);
+        bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterES6.class);
+        bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES6.class);
+        bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterES6.class);
+        bindForSupportedVersion(EventIndexerAdapter.class).to(EventIndexerAdapterES6.class);
+        bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES6.class);
+        bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterES6.class);
+        bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
 
         bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
     }
 
-    private <T> void bindForVersion(Class<T> interfaceClass, Class<? extends T> implementationClass) {
-        mapBinder(interfaceClass).addBinding(SUPPORTED_VERSION).to(implementationClass);
-    }
-
-    private <T> MapBinder<Version, T> mapBinder(Class<T> interfaceClass) {
-        return MapBinder.newMapBinder(binder(), Version.class, interfaceClass);
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
+        return bindForVersion(SUPPORTED_VERSION, interfaceClass);
     }
 }

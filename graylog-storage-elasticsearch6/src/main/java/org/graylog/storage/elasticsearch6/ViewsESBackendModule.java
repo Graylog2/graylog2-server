@@ -19,13 +19,13 @@ package org.graylog.storage.elasticsearch6;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import io.searchbox.core.search.aggregation.Aggregation;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -68,6 +68,8 @@ import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESSumHa
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESVarianceHandler;
 
+import static org.graylog.storage.elasticsearch6.Elasticsearch6Plugin.SUPPORTED_VERSION;
+
 public class ViewsESBackendModule extends ViewsModule {
     @Override
     protected void configure() {
@@ -76,7 +78,7 @@ public class ViewsESBackendModule extends ViewsModule {
         // Calling this once to set up binder, so injection does not fail.
         esQueryDecoratorBinder();
 
-        registerQueryBackend(ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
+        registerQueryBackend(SUPPORTED_VERSION, ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
         registerESSearchTypeHandler(EventList.NAME, ESEventList.class);
@@ -97,8 +99,12 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
 
-        bind(ExportBackend.class).to(ElasticsearchExportBackend.class);
-        bind(RequestStrategy.class).to(org.graylog.storage.elasticsearch6.views.export.Scroll.class);
+        bindExportBackend(SUPPORTED_VERSION).to(ElasticsearchExportBackend.class);
+        bindRequestStrategy().to(org.graylog.storage.elasticsearch6.views.export.Scroll.class);
+    }
+
+    private LinkedBindingBuilder<RequestStrategy> bindRequestStrategy() {
+        return bindForVersion(SUPPORTED_VERSION, RequestStrategy.class);
     }
 
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {

@@ -17,22 +17,29 @@
 package org.graylog.plugins.views;
 
 import com.google.inject.TypeLiteral;
+import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.engine.QueryStringDecorator;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryStringDecorator;
+import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.sharing.SharingStrategy;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.Version;
+import org.graylog2.plugin.VersionAwareModule;
 
-public abstract class ViewsModule extends PluginModule {
+public abstract class ViewsModule extends VersionAwareModule {
+    protected LinkedBindingBuilder<ExportBackend> bindExportBackend(Version supportedVersion) {
+        return bindForVersion(supportedVersion, ExportBackend.class);
+    }
+
     protected void registerQueryMetadataDecorator(Class<? extends QueryMetadataDecorator> queryMetadataDecorator) {
         queryMetadataDecoratorBinder().addBinding().to(queryMetadataDecorator);
     }
@@ -89,7 +96,7 @@ public abstract class ViewsModule extends PluginModule {
 
     }
 
-    protected ScopedBindingBuilder registerQueryBackend(String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
+    protected ScopedBindingBuilder registerQueryBackend(Version version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
         return queryBackendBinder().addBinding(name).to(implementation);
     }
 
@@ -99,5 +106,9 @@ public abstract class ViewsModule extends PluginModule {
 
     protected Multibinder<QueryStringDecorator> esQueryDecoratorBinder() {
         return Multibinder.newSetBinder(binder(), QueryStringDecorator.class);
+    }
+
+    private <T> MapBinder<Version, T> versionAwareBinder(Class<T> interfaceClass) {
+        return MapBinder.newMapBinder(binder(), Version.class, interfaceClass);
     }
 }
