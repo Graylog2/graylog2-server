@@ -44,7 +44,6 @@ const PreferencesStore = Reflux.createStore({
     return preferencesAsMap;
   },
   saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void): void {
-    console.log(userName, preferences);
     const preferencesAsMap = this.convertPreferenceArrayToMap(preferences);
     const url = `${this.URL + userName}/preferences`;
     const promise = fetch('PUT', url, { preferences: preferencesAsMap })
