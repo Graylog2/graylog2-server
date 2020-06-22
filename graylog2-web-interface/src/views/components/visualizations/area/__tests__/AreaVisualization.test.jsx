@@ -18,6 +18,11 @@ jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
 }));
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  rootTimeZone: jest.fn(() => 'America/Chicago'),
+  gl2ServerUrl: jest.fn(() => undefined),
+}));
 
 describe('AreaVisualization', () => {
   it('generates correct props for plot component', () => {

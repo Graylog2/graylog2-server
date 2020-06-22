@@ -7,6 +7,7 @@ import * as fixtures from './TransformKeys.fixtures';
 import transformKeys from '../TransformKeys';
 
 jest.mock('stores/users/CurrentUserStore', () => ({ get: jest.fn() }));
+jest.mock('util/AppConfig', () => ({ rootTimeZone: jest.fn(() => 'America/Chicago') }));
 
 // eslint-disable-next-line global-require
 describe('TransformKeys', () => {
