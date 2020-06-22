@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
-
 const variantStyles = css(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
@@ -120,6 +119,5 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
 const ListGroupItem = forwardRef((props, ref) => {
   return <StyledListGroupItem {...props} ref={ref} />;
 });
-
 
 export default ListGroupItem;

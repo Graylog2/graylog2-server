@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Badge as BootstrapBadge } from 'react-bootstrap';
 
-
 const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;

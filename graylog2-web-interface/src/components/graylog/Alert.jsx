@@ -4,7 +4,6 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-
 const StyledAlert = styled(BootstrapAlert)(({ bsStyle, theme }) => {
   if (!bsStyle) {
     return undefined;
