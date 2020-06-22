@@ -19,8 +19,6 @@ const appConfig = webpackConfig[1];
 const vendorCompiler = webpack(vendorConfig);
 const appCompiler = webpack(appConfig);
 
-var don_test = "THIS IS A TEST"
-
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
 
