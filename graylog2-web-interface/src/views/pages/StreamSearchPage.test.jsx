@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, waitFor, waitForElement, fireEvent } from 'wrappedTestingLibrary';
+import { render, cleanup, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -75,20 +75,19 @@ describe('StreamSearchPage', () => {
                       {...props} />
   );
 
-  beforeEach(() => {
+  afterEach(() => {
     cleanup();
     jest.clearAllMocks();
     jest.resetModules();
   });
 
   it('shows loading spinner before rendering page', async () => {
-    const { getByText } = render(<SimpleStreamSearchPage />);
-
+    const { findByText, getByText } = render(<SimpleStreamSearchPage />);
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();
 
-    await waitForElement(() => getByText('Extended search page'));
+    await findByText('Extended search page');
   });
 
   it('should create view with streamId passed from props', async () => {
@@ -116,9 +115,8 @@ describe('StreamSearchPage', () => {
 
       const viewGetAction = asMock(ViewManagementActions.get);
 
-      const { getByText } = render(<SimpleStreamSearchPage />);
-      const viewLoadButton = await waitForElement(() => getByText('Load view'));
-
+      const { findByText } = render(<SimpleStreamSearchPage />);
+      const viewLoadButton = await findByText('Load view');
       fireEvent.click(viewLoadButton);
 
       await waitFor(() => expect(viewGetAction).toHaveBeenCalledTimes(1));
@@ -136,8 +134,8 @@ describe('StreamSearchPage', () => {
     });
 
     it('should be supported', async () => {
-      const { getByText } = render(<SimpleStreamSearchPage />);
-      const viewCreateButton = await waitForElement(() => getByText('Load new view'));
+      const { findByText } = render(<SimpleStreamSearchPage />);
+      const viewCreateButton = await findByText('Load new view');
 
       fireEvent.click(viewCreateButton);
 
@@ -147,8 +145,8 @@ describe('StreamSearchPage', () => {
 
     it('should process hooks with empty query', async () => {
       const processHooksAction = asMock(processHooks);
-      const { getByText } = render(<SimpleStreamSearchPage location={mockLocation} />);
-      const viewCreateButton = await waitForElement(() => getByText('Load new view'));
+      const { findByText } = render(<SimpleStreamSearchPage location={mockLocation} />);
+      const viewCreateButton = await findByText('Load new view');
 
       fireEvent.click(viewCreateButton);
 
@@ -157,8 +155,8 @@ describe('StreamSearchPage', () => {
     });
 
     it('should sync query params with current url', async () => {
-      const { getByText } = render(<SimpleStreamSearchPage location={mockLocation} />);
-      const viewCreateButton = await waitForElement(() => getByText('Load new view'));
+      const { findByText } = render(<SimpleStreamSearchPage location={mockLocation} />);
+      const viewCreateButton = await findByText('Load new view');
 
       fireEvent.click(viewCreateButton);
 
