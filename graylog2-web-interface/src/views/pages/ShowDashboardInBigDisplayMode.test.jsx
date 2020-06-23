@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, waitFor, waitForElement } from 'wrappedTestingLibrary';
+import { render, cleanup, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -43,6 +43,10 @@ describe('ShowDashboardInBigDisplayMode should', () => {
       interval: '30', refresh: '10',
     },
   };
+
+  beforeEach(() => {
+    RefreshActions.disable = jest.fn();
+  });
 
   afterEach(() => {
     cleanup();
@@ -102,10 +106,10 @@ describe('ShowDashboardInBigDisplayMode should', () => {
   });
 
   it('should display view title', async () => {
-    const { getByText } = render(<ShowDashboardInBigDisplayMode route={{}}
-                                                                params={{ viewId: mockView.id }}
-                                                                location={mockLocation} />);
+    const { findByText } = render(<ShowDashboardInBigDisplayMode route={{}}
+                                                                 params={{ viewId: mockView.id }}
+                                                                 location={mockLocation} />);
 
-    await waitForElement(() => getByText('view title'));
+    await findByText('view title');
   });
 });
