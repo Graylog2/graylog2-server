@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
+import { render, cleanup, waitFor, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -93,17 +93,17 @@ describe('StreamSearchPage', () => {
 
   it('should create view with streamId passed from props', async () => {
     render(<SimpleStreamSearchPage />);
-    await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
   });
 
   it('should recreate view when streamId passed from props changes', async () => {
     const { rerender } = render(<SimpleStreamSearchPage />);
 
-    await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
 
     rerender(<SimpleStreamSearchPage params={{ streamId: 'stream-id-2' }} />);
 
-    await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2'));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2'));
   });
 
   describe('loading another view', () => {
@@ -121,8 +121,8 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewLoadButton);
 
-      await wait(() => expect(viewGetAction).toHaveBeenCalledTimes(1));
-      await wait(() => expect(viewGetAction).toHaveBeenCalledWith('special-view-id'));
+      await waitFor(() => expect(viewGetAction).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(viewGetAction).toHaveBeenCalledWith('special-view-id'));
     });
   });
 
@@ -141,8 +141,8 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewCreateButton);
 
-      await wait(() => expect(ViewActions.create).toBeCalledTimes(2));
-      await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
+      await waitFor(() => expect(ViewActions.create).toBeCalledTimes(2));
+      await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1'));
     });
 
     it('should process hooks with empty query', async () => {
@@ -152,8 +152,8 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewCreateButton);
 
-      await wait(() => expect(processHooksAction).toBeCalledTimes(2));
-      await wait(() => expect(processHooksAction.mock.calls[1][3]).toStrictEqual({}));
+      await waitFor(() => expect(processHooksAction).toBeCalledTimes(2));
+      await waitFor(() => expect(processHooksAction.mock.calls[1][3]).toStrictEqual({}));
     });
 
     it('should sync query params with current url', async () => {
@@ -162,8 +162,8 @@ describe('StreamSearchPage', () => {
 
       fireEvent.click(viewCreateButton);
 
-      await wait(() => expect(syncWithQueryParameters).toBeCalledTimes(1));
-      await wait(() => expect(syncWithQueryParameters).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));
+      await waitFor(() => expect(syncWithQueryParameters).toBeCalledTimes(1));
+      await waitFor(() => expect(syncWithQueryParameters).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));
     });
   });
 });

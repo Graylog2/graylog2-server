@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, fireEvent, wait } from 'wrappedTestingLibrary';
+import { cleanup, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
@@ -153,7 +153,7 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
+    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledWith(expectedPayload, 'search-id', 'Untitled-Search-search-result'));
   });
 
   it('should show loading indicator after starting download', async () => {
@@ -168,7 +168,7 @@ describe('CSVExportModal', () => {
 
     expect(getByText('Downloading...')).not.toBeNull();
 
-    await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
   });
 
   it('should be closed after finishing download', async () => {
@@ -179,7 +179,7 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await wait(() => expect(closeModalStub).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(closeModalStub).toHaveBeenCalledTimes(1));
   });
 
   it('initial fields should not contain the message field if message list config showMessageRow is false', async () => {
@@ -201,8 +201,7 @@ describe('CSVExportModal', () => {
 
     fireEvent.click(submitButton);
 
-    await wait(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
-
+    await waitFor(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
     expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
       {
         ...payload,
@@ -241,8 +240,7 @@ describe('CSVExportModal', () => {
 
       fireEvent.click(submitButton);
 
-      await wait(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
-
+      await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
       expect(exportSearchMessagesAction).toHaveBeenCalledWith(
         {
           ...payload,
@@ -274,8 +272,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
 
       fireEvent.click(submitButton);
-      await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-
+      await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
 
@@ -309,8 +306,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
 
       fireEvent.click(submitButton);
-      await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-
+      await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
   });
@@ -382,8 +378,7 @@ describe('CSVExportModal', () => {
       const submitButton = getByTestId('csv-download-button');
 
       fireEvent.click(submitButton);
-      await wait(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
-
+      await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
   });

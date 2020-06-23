@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, wait } from 'wrappedTestingLibrary';
+import { render, cleanup, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import suppressConsole from 'helpers/suppressConsole';
 
@@ -57,8 +57,7 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
     });
 
-    await wait(() => expect(queryByText('Hello World!')).toBeNull());
-
+    await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
     expect(getByText('Something went wrong.')).not.toBeNull();
     expect(getByText('The error message')).not.toBeNull();
   });
@@ -71,8 +70,7 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createNotFoundError(new FetchError('The request error message', response)));
     });
 
-    await wait(() => expect(queryByText('Hello World!')).toBeNull());
-
+    await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
     expect(getByText('Page not found')).not.toBeNull();
     expect(getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull();
   });
@@ -85,8 +83,7 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report({ ...createNotFoundError(new FetchError('The error message', response)), type: 'UnkownReportedError' });
     });
 
-    await wait(() => expect(queryByText('Hello World!')).toBeNull());
-
+    await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
     expect(getByText('Something went wrong')).not.toBeNull();
     expect(getByText(/The error message/)).not.toBeNull();
   });
@@ -99,8 +96,7 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
-    await wait(() => expect(queryByText('Hello World!')).toBeNull());
-
+    await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
     expect(getByText('Missing Permissions')).not.toBeNull();
     expect(getByText(/The request error message/)).not.toBeNull();
   });
@@ -119,11 +115,11 @@ describe('ReportedErrorBoundary', () => {
       ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response)));
     });
 
-    await wait(() => expect(getByText('Missing Permissions')).not.toBeNull());
+    await waitFor(() => expect(getByText('Missing Permissions')).not.toBeNull());
     const listenCallback = mockRouter.listen.mock.calls[1][0];
 
     act(() => listenCallback());
 
-    await wait(() => expect(getByText('Hello World!')).not.toBeNull());
+    await waitFor(() => expect(getByText('Hello World!')).not.toBeNull());
   });
 });

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import moment from 'moment-timezone';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -31,7 +31,7 @@ describe('DateInputWithPicker', () => {
 
     fireEvent.click(input);
 
-    await wait(() => getByText('Pick start date'));
+    await waitFor(() => getByText('Pick start date'));
   });
 
   it('calls onChange upon changing the input', () => {

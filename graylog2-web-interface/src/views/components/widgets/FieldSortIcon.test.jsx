@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, cleanup, wait } from 'wrappedTestingLibrary';
+import { render, fireEvent, cleanup, waitFor } from 'wrappedTestingLibrary';
 
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -71,8 +71,7 @@ describe('FieldSortIcon', () => {
     expect(setLoadingStateStub).toHaveBeenCalledTimes(1);
     expect(setLoadingStateStub).toHaveBeenCalledWith(true);
 
-    await wait(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
-
+    await waitFor(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
     expect(setLoadingStateStub).toHaveBeenCalledTimes(2);
   });
 });

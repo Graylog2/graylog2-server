@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
@@ -83,7 +83,7 @@ describe('KeywordTimeRangeSelector', () => {
   it('sets validation state to error if initial value is empty', async () => {
     const { container } = render(<KeywordTimeRangeSelector value="" />);
 
-    await wait(() => expect(findValidationState(container)).toEqual('error'));
+    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
   });
 
   it('sets validation state to error if parsing fails initially', async () => {
@@ -91,7 +91,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     const { container } = render(<KeywordTimeRangeSelector value="invalid" />);
 
-    await wait(() => expect(findValidationState(container)).toEqual('error'));
+    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
   });
 
   it('sets validation state to error if parsing fails after changing input', async () => {
@@ -102,7 +102,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     await changeInput(input, 'invalid');
 
-    await wait(() => expect(findValidationState(container)).toEqual('error'));
+    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
   });
 
   it('resets validation state if parsing succeeds after changing input', async () => {
@@ -111,13 +111,13 @@ describe('KeywordTimeRangeSelector', () => {
 
     await changeInput(input, 'last hour');
 
-    await wait(() => expect(findValidationState(container)).toEqual(null));
+    await waitFor(() => expect(findValidationState(container)).toEqual(null));
   });
 
   it('shows keyword preview if parsing succeeded', async () => {
     const { queryByText } = render(<KeywordTimeRangeSelector value="last five minutes" />);
 
-    await wait(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
+    await waitFor(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
   it('does not show keyword preview if parsing fails', () => {
@@ -133,7 +133,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     await changeInput(input, 'last hour');
 
-    await wait(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
+    await waitFor(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
   it('does not show keyword preview if parsing fails after changing input', async () => {

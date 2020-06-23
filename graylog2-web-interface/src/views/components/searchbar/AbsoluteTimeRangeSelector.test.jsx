@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 
@@ -44,7 +44,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, '');
 
-    await wait(() => expect(getValidationStateOfInput(fromDate)).toEqual('error'));
+    await waitFor(() => expect(getValidationStateOfInput(fromDate)).toEqual('error'));
   });
 
   it('does not try to parse an empty date in to field', async () => {
@@ -55,7 +55,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(toDate, '');
 
-    await wait(() => expect(getValidationStateOfInput(toDate)).toEqual('error'));
+    await waitFor(() => expect(getValidationStateOfInput(toDate)).toEqual('error'));
   });
 
   it('shows error message for from date if parsing fails after changing input', async () => {

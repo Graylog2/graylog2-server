@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
+import { render, cleanup, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 
@@ -63,7 +63,7 @@ describe('QueryTitleEditModal', () => {
     expect(onTitleChangeFn).toHaveBeenCalledWith('NewTitle');
 
     // Modal should not be visible anymore
-    await wait(() => {
+    await waitFor(() => {
       expect(queryByText(modalHeadline)).toBeNull();
     });
   });
@@ -86,7 +86,7 @@ describe('QueryTitleEditModal', () => {
 
     fireEvent.click(cancelButton);
 
-    await wait(() => {
+    await waitFor(() => {
       expect(queryByText(modalHeadline)).toBeNull();
     });
   });

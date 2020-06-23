@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
+import { render, cleanup, waitForElement, waitFor } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { act } from 'react-dom/test-utils';
 
@@ -50,8 +50,8 @@ describe('NewDashboardPage', () => {
   it('should create new view with type dashboard on mount', async () => {
     render(<SimpleNewDashboardPage />);
 
-    await wait(() => expect(ViewActions.create).toBeCalledTimes(1));
-    await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
+    await waitFor(() => expect(ViewActions.create).toBeCalledTimes(1));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
   });
 
   it('should render transform search view to dashboard view, if view is defined in location state', async () => {
