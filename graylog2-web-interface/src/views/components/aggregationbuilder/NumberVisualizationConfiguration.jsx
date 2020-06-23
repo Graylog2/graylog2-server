@@ -1,9 +1,9 @@
 // @flow strict
 import React, { useCallback } from 'react';
-import Select from 'react-select';
 import { capitalize } from 'lodash';
 
 import { Input } from 'components/bootstrap';
+import Select from 'views/components/Select';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
 import HoverForHelp from './HoverForHelp';

@@ -2,21 +2,25 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { List as ImmutableList } from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
+import { List as ImmutableList } from 'immutable';
 
+import connect from 'stores/connect';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { type ThemeInterface } from 'theme';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/graylog';
 
 import List from './List';
 import FieldGroup from './FieldGroup';
 
 type Props = {
-  viewMetadata: ViewMetadata,
-  fields: ImmutableList<FieldTypeMapping>,
+  activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
+  viewMetadata: ViewMetadata,
+  viewMetadata: ViewMetadata,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
@@ -61,7 +65,7 @@ const FieldGroups = styled.div`
   margin-bottom: 0;
 `;
 
-const FieldsOverview = ({ allFields, fields, viewMetadata }: Props) => {
+const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) => {
   const [currentGroup, setCurrentGroup] = useState('current');
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
@@ -111,17 +115,27 @@ const FieldsOverview = ({ allFields, fields, viewMetadata }: Props) => {
       </div>
       <List viewMetadata={viewMetadata}
             filter={filter}
-            fields={fields}
+            activeQueryFields={activeQueryFields}
             allFields={allFields}
             currentGroup={currentGroup} />
     </Container>
   );
 };
 
-FieldsOverview.propTypes = {
-  allFields: PropTypes.object.isRequired,
-  fields: PropTypes.object.isRequired,
+const FieldsOverviewWithContext = (props) => (
+  <FieldTypesContext.Consumer>
+    {(fieldTypes) => {
+      const { viewMetadata: { activeQuery } } = props;
+      const allFields = fieldTypes?.all;
+      const queryFields = fieldTypes?.queryFields;
+      const activeQueryFields = queryFields?.get(activeQuery, allFields);
+      return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
+    }}
+  </FieldTypesContext.Consumer>
+);
+
+FieldsOverviewWithContext.propTypes = {
+  viewMetadata: PropTypes.object.isRequired,
 };
 
-
-export default FieldsOverview;
+export default connect(FieldsOverviewWithContext, { viewMetadata: ViewMetadataStore });

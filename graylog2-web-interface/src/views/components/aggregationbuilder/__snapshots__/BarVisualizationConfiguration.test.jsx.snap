@@ -649,7 +649,7 @@ exports[`BarVisualizationConfiguration should render with props 1`] = `
                   }
                 >
                   <div
-                    className="css-5b48ez"
+                    className="css-1sqh0jz"
                   >
                     <SingleValue
                       clearValue={[Function]}
@@ -2133,7 +2133,7 @@ exports[`BarVisualizationConfiguration should render without props 1`] = `
                   }
                 >
                   <div
-                    className="css-5b48ez"
+                    className="css-1sqh0jz"
                   >
                     <SingleValue
                       clearValue={[Function]}

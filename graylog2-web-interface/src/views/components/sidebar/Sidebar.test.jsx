@@ -7,12 +7,22 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 
+<<<<<<< HEAD:graylog2-web-interface/src/views/components/sidebar/Sidebar.test.jsx
 import Sidebar from './Sidebar';
+=======
+
+import SideBar from './SideBar';
+>>>>>>> master:graylog2-web-interface/src/views/components/sidebar/SideBar.test.jsx
 
 const mockCurrentUser = { timezone: 'UTC' };
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  rootTimeZone: jest.fn(() => 'America/Chicago'),
+  gl2ServerUrl: jest.fn(() => undefined),
+}));
 
 describe('<Sidebar />', () => {
   const viewMetaData = {
@@ -89,8 +99,14 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
+<<<<<<< HEAD:graylog2-web-interface/src/views/components/sidebar/Sidebar.test.jsx
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 14:39:26.');
+=======
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
+>>>>>>> master:graylog2-web-interface/src/views/components/sidebar/SideBar.test.jsx
   });
 
   it('should render with a specific default title in the context of a new search', () => {

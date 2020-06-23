@@ -26,7 +26,7 @@ import Search from 'views/logic/search/Search';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
@@ -89,7 +89,7 @@ type State = {
 export type Result = {
   total: number,
   rows: Rows,
-  effective_timerange: TimeRange,
+  effective_timerange: AbsoluteTimeRange,
 };
 
 export type OnVisualizationConfigChange = (VisualizationConfig) => void;
