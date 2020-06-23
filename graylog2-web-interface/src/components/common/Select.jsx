@@ -80,9 +80,8 @@ const multiValue = ({ theme }) => (base) => ({
 
 const multiValueLabel = ({ theme }) => (base) => ({
   ...base,
-  paddingLeft: '5px',
-  paddingRight: '5px',
-  fontSize: theme.fonts.size.body,
+  padding: '2px 5px',
+  fontSize: theme.fonts.size.small,
 });
 
 const multiValueRemove = ({ theme }) => (base) => ({
