@@ -120,9 +120,9 @@ describe('KeywordTimeRangeSelector', () => {
     await waitFor(() => expect(queryByText('2018-11-14 13:52:38 to 2018-11-14 13:57:38')).not.toBeNull());
   });
 
-  it('does not show keyword preview if parsing fails', () => {
+  it('does not show keyword preview if parsing fails', async () => {
     ToolsStore.testNaturalDate = () => Promise.reject();
-    const { queryByText } = render(<KeywordTimeRangeSelector value="invalid" />);
+    const { queryByText } = await asyncRender(<KeywordTimeRangeSelector value="invalid" />);
 
     expect(queryByText('Preview:')).toBeNull();
   });
