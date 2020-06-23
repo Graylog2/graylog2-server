@@ -3,7 +3,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { cleanup, waitForElement, render, fireEvent } from 'wrappedTestingLibrary';
+import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
@@ -76,21 +76,20 @@ describe('Create a new dashboard', () => {
   );
 
   it('using Dashboards Page', async () => {
-    const { getByText, getAllByText } = render(<SimpleAppRouter />);
-
+    const { findByText, findAllByText } = render(<SimpleAppRouter />);
     history.push(Routes.DASHBOARDS);
 
-    const button = await waitForElement(() => getAllByText('Create new dashboard')[0], { timeout: 15000 });
+    const buttons = await findAllByText('Create new dashboard', { timeout: 15000 });
 
-    fireEvent.click(button);
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
+    fireEvent.click(buttons[0]);
+    await findByText(/This dashboard has no widgets yet/, { timeout: 15000 });
   });
 
   it('by going to the new dashboards endpoint', async () => {
-    const { getByText } = render(<SimpleAppRouter />);
+    const { findByText } = render(<SimpleAppRouter />);
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
+    await findByText(/This dashboard has no widgets yet/, { timeout: 15000 });
   });
 });
