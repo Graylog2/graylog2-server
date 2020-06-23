@@ -1,9 +1,10 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import connect from 'stores/connect';
 
 import { DocumentTitle, Spinner } from 'components/common';
+import { Row } from 'components/graylog';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -12,41 +13,49 @@ import StoreProvider from 'injection/StoreProvider';
 const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
-const GettingStartedPage = createReactClass({
-  displayName: 'GettingStartedPage',
 
-  propTypes: {
-    location: PropTypes.object.isRequired,
+type Props = {
+  system: {
+    cluster_id: string,
+    operating_system: string,
+    version: string,
   },
-
-  mixins: [Reflux.connect(SystemStore)],
-
-  _isLoading() {
-    return !this.state.system;
+  location: {
+    query: { [string]: any },
   },
+};
 
-  _onDismiss() {
-    history.push(Routes.STARTPAGE);
-  },
+const GettingStartedPage = ({ system, location }: Props) => {
+  if (!system) {
+    return <Spinner />;
+  }
+  const { cluster_id: clusterId, operating_system: operatingSystem, version } = system;
+  const _onDismiss = () => history.push(Routes.STARTPAGE);
+  return (
+    <DocumentTitle title="Getting started">
+      <Row>
+        <GettingStarted clusterId={clusterId}
+                        masterOs={operatingSystem}
+                        masterVersion={version}
+                        gettingStartedUrl={GETTING_STARTED_URL}
+                        noDismissButton={Boolean(location.query.menu)}
+                        onDismiss={_onDismiss} />
+      </Row>
+    </DocumentTitle>
+  );
+};
 
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
+GettingStartedPage.displayName = 'GettingStartedPage';
 
-    return (
-      <DocumentTitle title="Getting started">
-        <div>
-          <GettingStarted clusterId={this.state.system.cluster_id}
-                          masterOs={this.state.system.operating_system}
-                          masterVersion={this.state.system.version}
-                          gettingStartedUrl={GETTING_STARTED_URL}
-                          noDismissButton={Boolean(this.props.location.query.menu)}
-                          onDismiss={this._onDismiss} />
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
+GettingStartedPage.propTypes = {
+  location: PropTypes.object.isRequired,
+};
 
-export default GettingStartedPage;
+export default connect(
+  GettingStartedPage,
+  { systemStore: SystemStore },
+  (props) => ({
+    ...props,
+    system: props.systemStore.system,
+  }),
+);
