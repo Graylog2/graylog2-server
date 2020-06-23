@@ -1,8 +1,9 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 import * as Immutable from 'immutable';
+
+import Select from 'views/components/Select';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
