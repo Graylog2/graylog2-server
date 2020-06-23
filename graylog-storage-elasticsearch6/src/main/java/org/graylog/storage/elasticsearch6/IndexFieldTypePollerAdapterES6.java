@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.mapping.GetMapping;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.shared.utilities.ExceptionUtils;

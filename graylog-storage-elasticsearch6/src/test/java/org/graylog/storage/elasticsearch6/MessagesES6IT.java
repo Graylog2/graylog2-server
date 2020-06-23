@@ -8,7 +8,7 @@ import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.indexer.results.ResultMessage;

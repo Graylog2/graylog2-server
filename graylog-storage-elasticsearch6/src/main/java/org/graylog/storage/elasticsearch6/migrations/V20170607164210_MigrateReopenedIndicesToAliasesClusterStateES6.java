@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.State;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 
 import javax.inject.Inject;

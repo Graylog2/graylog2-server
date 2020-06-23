@@ -6,7 +6,7 @@ import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.counts.CountsAdapter;
 
 import javax.inject.Inject;

@@ -19,7 +19,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexToolsAdapter;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;

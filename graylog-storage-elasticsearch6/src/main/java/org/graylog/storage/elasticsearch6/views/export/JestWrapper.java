@@ -21,13 +21,13 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 
 import javax.inject.Inject;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.graylog2.indexer.cluster.jest.JestUtils.checkForFailedShards;
+import static org.graylog.storage.elasticsearch6.jest.JestUtils.checkForFailedShards;
 
 public class JestWrapper {
     private final JestClient jestClient;

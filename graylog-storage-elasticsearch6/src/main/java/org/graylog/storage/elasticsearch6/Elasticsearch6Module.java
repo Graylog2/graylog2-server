@@ -1,9 +1,11 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import io.searchbox.client.JestClient;
 import org.graylog.events.indices.EventIndexerAdapter;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.storage.elasticsearch6.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6;
+import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -31,5 +33,7 @@ public class Elasticsearch6Module extends PluginModule {
         bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
+
+        bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
     }
 }
