@@ -6,7 +6,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
-import type { TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
@@ -19,7 +19,7 @@ type RowResult = {
   type: 'pivot',
   total: number,
   rows: Rows,
-  effective_timerange: TimeRange,
+  effective_timerange: AbsoluteTimeRange,
 };
 
 type EventResult = {
@@ -32,7 +32,7 @@ export type VisualizationComponentProps = {
   config: AggregationWidgetConfig,
   data: { [string]: Rows, events?: Events },
   editing?: boolean,
-  effectiveTimerange: TimeRange,
+  effectiveTimerange: AbsoluteTimeRange,
   fields: FieldTypeMappingsList,
   height: number,
   onChange: OnVisualizationConfigChange,

@@ -58,8 +58,9 @@ describe('NumberVisualization', () => {
                          onChange={() => {}}
                          toggleEdit={() => {}}
                          effectiveTimerange={{
-                           type: 'relative',
-                           range: 300,
+                           from: '2020-01-10T13:23:42.000Z',
+                           to: '2020-01-10T14:23:42.000Z',
+                           type: 'absolute',
                          }}
                          config={AggregationWidgetConfig.builder().build()}
                          {...props} />

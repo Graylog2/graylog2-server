@@ -2,6 +2,9 @@
 
 type ConfigType = { [string]: mixed };
 
+export const DateType = 'time';
+export const ValuesType = 'values';
+
 export type PivotJson = {
   field: string,
   type: string,
