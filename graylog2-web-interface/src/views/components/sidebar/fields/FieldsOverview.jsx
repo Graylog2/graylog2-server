@@ -2,22 +2,25 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { List as ImmutableList } from 'immutable';
 import styled, { type StyledComponent } from 'styled-components';
+import { List as ImmutableList } from 'immutable';
 
+import connect from 'stores/connect';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { type ThemeInterface } from 'theme';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/graylog';
 
 import List from './List';
 import FieldGroup from './FieldGroup';
 
 type Props = {
-  viewMetadata: ViewMetadata,
-  listHeight: number,
-  fields: ImmutableList<FieldTypeMapping>,
+  activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
+  listHeight: number,
+  viewMetadata: ViewMetadata,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
@@ -42,7 +45,7 @@ const FieldListGroups = styled.div`
   margin-bottom: 0;
 `;
 
-const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) => {
+const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata, listHeight }: Props) => {
   const [currentGroup, setCurrentGroup] = useState('current');
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
@@ -88,24 +91,35 @@ const FieldsOverview = ({ allFields, fields, viewMetadata, listHeight }: Props) 
         {' fields.'}
       </FieldListGroups>
       <hr />
-      <List viewMetadata={viewMetadata}
-            listHeight={listHeight}
-            filter={filter}
-            fields={fields}
+      <List activeQueryFields={activeQueryFields}
             allFields={allFields}
-            currentGroup={currentGroup} />
+            currentGroup={currentGroup}
+            filter={filter}
+            listHeight={listHeight}
+            viewMetadata={viewMetadata} />
     </Container>
   );
 };
 
-FieldsOverview.propTypes = {
-  allFields: PropTypes.object.isRequired,
+const FieldListWithContext = (props) => (
+  <FieldTypesContext.Consumer>
+    {(fieldTypes) => {
+      const { viewMetadata: { activeQuery } } = props;
+      const allFields = fieldTypes?.all;
+      const queryFields = fieldTypes?.queryFields;
+      const activeQueryFields = queryFields?.get(activeQuery, allFields);
+      return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
+    }}
+  </FieldTypesContext.Consumer>
+);
+
+FieldListWithContext.propTypes = {
+  viewMetadata: PropTypes.object.isRequired,
   listHeight: PropTypes.number,
-  fields: PropTypes.object.isRequired,
 };
 
-FieldsOverview.defaultProps = {
+FieldListWithContext.defaultProps = {
   listHeight: 50,
 };
 
-export default FieldsOverview;
+export default connect(FieldListWithContext, { viewMetadata: ViewMetadataStore });

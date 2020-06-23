@@ -1,10 +1,10 @@
 // @flow strict
 import * as React from 'react';
+import { useContext } from 'react';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
 import connect from 'stores/connect';
-import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
@@ -13,10 +13,9 @@ import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import TSearchResult from 'views/logic/SearchResult';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/graylog';
-
-import type { FieldTypesStoreState } from '../stores/FieldTypesStore';
 
 const SearchLoadingIndicator = connect(
   ({ searchLoadingState }) => (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />),
@@ -26,7 +25,6 @@ const SearchLoadingIndicator = connect(
 const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
 
 type Props = {
-  fieldTypes: FieldTypesStoreState,
   queryId: QueryId,
   searches: TSearchResult,
   viewState: {
@@ -35,7 +33,9 @@ type Props = {
   },
 };
 
-const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: Props) => {
+const SearchResult = React.memo(({ queryId, searches, viewState }: Props) => {
+  const fieldTypes = useContext(FieldTypesContext);
+
   if (!fieldTypes) {
     return <Spinner />;
   }
@@ -47,7 +47,6 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
   const allFields = fieldTypes.all;
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
   const positions = viewState.state && viewState.state.widgetPositions;
-
   const content = currentResults ? (
     <QueryWithWidgets allFields={allFields}
                       fields={queryFields}
@@ -68,12 +67,10 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
 });
 
 export default connect(SearchResult, {
-  fieldTypes: FieldTypesStore,
   searches: SearchStore,
   viewMetadata: ViewMetadataStore,
   viewState: CurrentViewStateStore,
 }, (props) => ({
-
   ...props,
   searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
   queryId: props.viewMetadata.activeQuery,

@@ -1,36 +1,36 @@
-import React from 'react';
+import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { List } from 'immutable';
+import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 
-import FieldType from 'views/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import FieldsOverview from './FieldsOverview';
 
+jest.mock('views/stores/ViewMetadataStore', () => ({
+  ViewMetadataStore: {
+    getInitialState: () => ({
+      activeQuery: 'aQueryId',
+      id: 'aViewId',
+    }),
+    listen: jest.fn(),
+  },
+}));
 
-describe('<FieldsOverview viewMetadata={viewMetadata} />', () => {
-  const properties = [{ enumerable: true }];
-  const fieldType1 = new FieldType('string', properties, []);
-  const fieldTypeMapping1 = new FieldTypeMapping('date', fieldType1);
-
-  const fieldType2 = new FieldType('string', properties, []);
-  const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType2);
-
-  const allFields = new List([fieldTypeMapping1, fieldTypeMapping2]);
-  const fields = new List([fieldTypeMapping2]);
-
-  const viewMetadata = {
-    activeQuery: 'aQueryId',
-    id: 'aViewId',
-  };
+describe('<FieldsOverview />', () => {
+  const fieldTypesStoreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
+  const SimpleFieldsOverview = () => (
+    <FieldTypesContext.Provider value={fieldTypesStoreState}>
+      <FieldsOverview listHeight={1000} />
+    </FieldTypesContext.Provider>
+  );
 
   it('should render a FieldsOverview', () => {
-    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
+    const wrapper = mount(<SimpleFieldsOverview />);
     expect(wrapper.find('span.field-element').text()).toBe('http_method');
   });
 
   it('should render all fields in FieldsOverview after click', () => {
-    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
+    const wrapper = mount(<SimpleFieldsOverview />);
     expect(wrapper.find('span.field-element').length).toBe(1);
 
     wrapper.find('a[children="all"]').simulate('click');
@@ -45,7 +45,7 @@ describe('<FieldsOverview viewMetadata={viewMetadata} />', () => {
   });
 
   it('should search in the field list', () => {
-    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
+    const wrapper = mount(<SimpleFieldsOverview />);
     expect(wrapper.find('span.field-element').length).toBe(1);
 
     wrapper.find('a[children="all"]').simulate('click');
@@ -58,9 +58,16 @@ describe('<FieldsOverview viewMetadata={viewMetadata} />', () => {
     expect(wrapper.find('span.field-element').text()).toBe('http_method');
   });
 
+  it('should show hint when field types are `undefined`', () => {
+    const hint = <span>No field information available.</span>;
+    const wrapper = mount(<FieldsOverview />);
+
+    expect(wrapper).toContainReact(hint);
+  });
+
   it('should show hint when no fields are returned after filtering', () => {
     const hint = <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
-    const wrapper = mount(<FieldsOverview viewMetadata={viewMetadata} allFields={allFields} fields={fields} maximumHeight={1000} />);
+    const wrapper = mount(<SimpleFieldsOverview />);
     expect(wrapper).not.toContainReact(hint);
 
     wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'non_existing_field' } });

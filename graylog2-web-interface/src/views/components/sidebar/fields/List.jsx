@@ -10,9 +10,9 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ListItem, { type ListItemStyle } from './ListItem';
 
 type Props = {
+  activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
   currentGroup: string,
-  fields: ImmutableList<FieldTypeMapping>,
   filter: ?string,
   listHeight: number,
   viewMetadata: ViewMetadata,
@@ -33,12 +33,12 @@ const _fieldsToShow = (fields, allFields, currentGroup = 'all') => {
   }
 };
 
-const List = ({ viewMetadata: { activeQuery }, listHeight, filter, fields, allFields, currentGroup }: Props) => {
-  if (!fields) {
+const List = ({ viewMetadata: { activeQuery }, listHeight, filter, activeQueryFields, allFields, currentGroup }: Props) => {
+  if (!activeQueryFields) {
     return <span>No field information available.</span>;
   }
   const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
-  const fieldsToShow = _fieldsToShow(fields, allFields, currentGroup);
+  const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
   const fieldList = fieldsToShow
     .filter(fieldFilter)
     .sortBy((field) => field.name.toLocaleUpperCase());
@@ -50,7 +50,7 @@ const List = ({ viewMetadata: { activeQuery }, listHeight, filter, fields, allFi
   const Row = ({ index, style }: { index: number, style: ListItemStyle }) => (
     <ListItem fieldType={fieldList.get(index)}
               selectedQuery={activeQuery}
-              fields={fields}
+              activeQueryFields={activeQueryFields}
               style={style} />
   );
 
