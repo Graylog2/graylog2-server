@@ -69,7 +69,7 @@ import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESSumHa
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESSumOfSquaresHandler;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.series.ESVarianceHandler;
 
-import static org.graylog.storage.elasticsearch6.Elasticsearch6Plugin.SUPPORTED_VERSION;
+import static org.graylog.storage.elasticsearch6.Elasticsearch6Plugin.SUPPORTED_ES_VERSION;
 
 public class ViewsESBackendModule extends ViewsModule {
     @Override
@@ -106,11 +106,11 @@ public class ViewsESBackendModule extends ViewsModule {
     }
 
     private LinkedBindingBuilder<ExportBackend> bindExportBackend() {
-        return bindExportBackend(SUPPORTED_VERSION);
+        return bindExportBackend(SUPPORTED_ES_VERSION);
     }
 
     private void registerQueryBackend() {
-        registerQueryBackend(SUPPORTED_VERSION, ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
+        registerQueryBackend(SUPPORTED_ES_VERSION, ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
     }
 
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
