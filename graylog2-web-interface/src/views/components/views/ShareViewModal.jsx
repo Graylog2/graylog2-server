@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { get } from 'lodash';
+import PropTypes from 'prop-types';
 
 import UserNotification from 'util/UserNotification';
 import { FormGroup, HelpBlock, Radio } from 'components/graylog';
@@ -9,7 +10,6 @@ import Select from 'views/components/Select';
 import Spinner from 'components/common/Spinner';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import StoreProvider from 'injection/StoreProvider';
-import connect from 'stores/connect';
 import View from 'views/logic/views/View';
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
@@ -17,24 +17,15 @@ import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
+import type { User } from 'stores/users/UsersStore';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const RolesStore = StoreProvider.getStore('Roles');
 
 type Props = {
-  currentUser: {
-    username: string,
-    roles: Array<string>,
-    permissions: Array<string>,
-  },
+  currentUser: ?User,
   onClose: (?ViewSharing) => void,
   view: View,
   show: boolean,
-};
-
-type User = {
-  roles: Array<string>,
-  permissions: Array<string>,
 };
 
 type State = {
@@ -55,7 +46,18 @@ const Additional = ({ children }: { children: React.Node }) => <div style={{ pad
 const extractValue = ({ value }) => value;
 
 class ShareViewModal extends React.Component<Props, State> {
-  constructor(props) {
+  static propTypes = {
+    currentUser: PropTypes.object,
+    onClose: PropTypes.func.isRequired,
+    view: PropTypes.instanceOf(View).isRequired,
+    show: PropTypes.bool.isRequired,
+  }
+
+  static defaultProps = {
+    currentUser: undefined,
+  };
+
+  constructor(props: Props) {
     super(props);
     this.state = {
       viewSharing: null,
@@ -70,7 +72,7 @@ class ShareViewModal extends React.Component<Props, State> {
     Promise.all([
       ViewSharingActions.get(view.id),
       ViewSharingActions.users(view.id),
-      this._isAdmin(currentUser) ? RolesStore.loadRoles().then((roles) => roles.map(({ name }) => name)) : Promise.resolve(currentUser.roles),
+      this._isAdmin(currentUser) ? RolesStore.loadRoles().then((roles) => roles.map(({ name }) => name)) : Promise.resolve(currentUser?.roles),
     ]).then(([viewSharing, users, roles]) => {
       this.setState({ viewSharing, users, roles, loaded: true });
     });
@@ -105,7 +107,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing });
   };
 
-  _onRolesChange = (newRoles) => {
+  _onRolesChange = (newRoles: Array<{value: string, label: string}>) => {
     const { viewSharing } = this.state;
     if (viewSharing === null || viewSharing.type !== SpecificRoles.Type) {
       return;
@@ -116,7 +118,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing: specificRoles.toBuilder().roles(roles).build() });
   };
 
-  _onUsersChange = (newUsers) => {
+  _onUsersChange = (newUsers: Array<{value: string, label: string}>) => {
     const { viewSharing } = this.state;
     if (viewSharing === null || viewSharing.type !== SpecificUsers.Type) {
       return;
@@ -127,7 +129,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing: specificUsers.toBuilder().users(users).build() });
   };
 
-  _isAdmin = (user: User) => (user.roles.includes('Admin') || user.permissions.includes('*'));
+  _isAdmin = (user: ?User) => (user?.roles.includes('Admin') || user?.permissions.includes('*'));
 
   render() {
     const { show, view } = this.props;
@@ -197,4 +199,4 @@ class ShareViewModal extends React.Component<Props, State> {
   }
 }
 
-export default connect(ShareViewModal, { currentUser: CurrentUserStore }, ({ currentUser, ...rest }) => ({ ...rest, currentUser: currentUser.currentUser }));
+export default ShareViewModal;

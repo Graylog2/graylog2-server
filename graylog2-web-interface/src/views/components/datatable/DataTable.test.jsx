@@ -2,7 +2,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -13,8 +12,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-
-jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };

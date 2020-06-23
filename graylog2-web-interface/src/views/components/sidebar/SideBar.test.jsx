@@ -7,12 +7,18 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 
+
 import SideBar from './SideBar';
 
 const mockCurrentUser = { timezone: 'UTC' };
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  rootTimeZone: jest.fn(() => 'America/Chicago'),
+  gl2ServerUrl: jest.fn(() => undefined),
+}));
 
 describe('<Sidebar />', () => {
   const viewMetaData = {
@@ -89,7 +95,7 @@ describe('<Sidebar />', () => {
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 14:39:26.');
+    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
   });
 
   it('should render with a specific default title in the context of a new search', () => {
