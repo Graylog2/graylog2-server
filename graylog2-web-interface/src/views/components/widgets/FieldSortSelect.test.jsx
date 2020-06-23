@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent, waitForElement } from 'wrappedTestingLibrary';
+import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -28,9 +28,8 @@ describe('FieldSortSelect', () => {
   });
 
   it('should open menu when focused', async () => {
-    const { getByText, container } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
-
+    const { findByText, container } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
     fireEvent.focus(container.getElementsByTagName('input')[0]);
-    await waitForElement(() => getByText(/2 results available./));
+    await findByText(/2 results available./);
   });
 });
