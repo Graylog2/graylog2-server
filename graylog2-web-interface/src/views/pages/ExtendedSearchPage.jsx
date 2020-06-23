@@ -61,9 +61,10 @@ const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
 
 const ConnectedSidebar = connect(
   Sidebar,
-  { viewMetadata: ViewMetadataStore, searches: SearchStore },
+  { viewMetadata: ViewMetadataStore, searches: SearchStore, view: ViewStore },
   (props) => ({
     ...props,
+    viewIsNew: props.view.isNew,
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
   }),

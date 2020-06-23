@@ -61,6 +61,7 @@ describe('<Sidebar />', () => {
   it('should render and open when clicking on header', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -80,6 +81,7 @@ describe('<Sidebar />', () => {
 
     const wrapper = mount(
       <Sidebar viewMetadata={emptyViewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -100,6 +102,7 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
@@ -121,6 +124,7 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
@@ -133,10 +137,56 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('h1').text()).toBe('Untitled Dashboard');
   });
 
+  it('should render with a specific title for unsaved dashboards', () => {
+    const emptyViewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      id: '5b34f4c44880a54df9616380',
+    };
+
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </Sidebar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    expect(wrapper.find('h1').text()).toBe('Unsaved Dashboard');
+  });
+
+  it('should render with a specific title for unsaved searches', () => {
+    const emptyViewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      id: '5b34f4c44880a54df9616380',
+    };
+
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </Sidebar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+    expect(wrapper.find('h1').text()).toBe('Unsaved Search');
+  });
+
+
   it('should render summary and description of a view', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={viewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
@@ -154,6 +204,7 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
@@ -171,6 +222,7 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
@@ -188,6 +240,7 @@ describe('<Sidebar />', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <Sidebar viewMetadata={viewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
@@ -204,6 +257,7 @@ describe('<Sidebar />', () => {
   it('should not render a summary and description, if the view is an ad hoc search', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -220,6 +274,7 @@ describe('<Sidebar />', () => {
   it('should render widget create options', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -235,6 +290,7 @@ describe('<Sidebar />', () => {
   it('should render passed children', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -250,6 +306,7 @@ describe('<Sidebar />', () => {
   it('should close a section when clicking on its title', () => {
     const wrapper = mount(
       <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>

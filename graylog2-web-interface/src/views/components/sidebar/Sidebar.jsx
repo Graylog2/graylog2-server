@@ -22,6 +22,7 @@ type Props = {
   results: QueryResult,
   searchPageLayout: ?SearchPageLayout,
   sections: Array<SidebarSection>,
+  viewIsNew: boolean,
   viewMetadata: ViewMetadata,
 };
 
@@ -49,7 +50,7 @@ const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: 
   setActiveSectionKey(sections[0].key);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata, viewIsNew }: Props) => {
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
@@ -65,13 +66,14 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}
                        sectionTitle={activeSection.title}
+                       viewIsNew={viewIsNew}
                        viewMetadata={viewMetadata}>
           <SectionContent results={results}
                           queryId={queryId}
-                          toggleSidebar={toggleSidebar}
-                          viewMetadata={viewMetadata}
+                          sidebarChildren={children}
                           sidebarIsPinned={sidebarIsPinned}
-                          sidebarChildren={children} />
+                          toggleSidebar={toggleSidebar}
+                          viewMetadata={viewMetadata} />
         </ContentColumn>
       )}
       {(activeSection && !sidebarIsPinned) && (
@@ -86,6 +88,7 @@ Sidebar.propTypes = {
   queryId: PropTypes.string.isRequired,
   results: PropTypes.object,
   sections: PropTypes.arrayOf(PropTypes.object),
+  viewIsNew: PropTypes.bool.isRequired,
   viewMetadata: PropTypes.shape({
     activeQuery: PropTypes.string,
     description: PropTypes.string,

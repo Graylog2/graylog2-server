@@ -15,6 +15,7 @@ type Props = {
   closeSidebar: () => void,
   searchPageLayout: ?SearchPageLayout,
   sectionTitle: string,
+  viewIsNew: boolean,
   viewMetadata: ViewMetadata,
 };
 
@@ -115,20 +116,22 @@ const toggleSidebarPinning = (searchPageLayout) => {
   setConfig(newLayoutConfig);
 };
 
-const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType) => {
-  if (!viewMetadata.id) {
-    return 'Untitled Search';
+const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew: boolean) => {
+  const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType, capitalize: true }) : View.Type.Search;
+  const unsavedViewTitle = `Unsaved ${viewTypeLabel}`;
+  const savedViewTitle = viewMetadata.title ?? `Untitled ${viewTypeLabel}`;
+  if (viewIsNew) {
+    return unsavedViewTitle;
   }
-  const defaultViewTitle = `Untitled ${viewType ? ViewTypeLabel({ type: viewType, capitalize: true }) : View.Type.Search}`;
-  return viewMetadata.title || defaultViewTitle;
+  return savedViewTitle;
 };
 
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
   return (
     <ViewTypeContext.Consumer>
       {(viewType) => {
-        const title = sidebarTitle(viewMetadata, viewType);
+        const title = sidebarTitle(viewMetadata, viewType, viewIsNew);
         return (
           <Container sidebarIsPinned={sidebarIsPinned}>
             <div>
