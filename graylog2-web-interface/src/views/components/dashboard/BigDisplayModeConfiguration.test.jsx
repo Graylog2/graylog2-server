@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, waitForElement } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import history from 'util/History';
@@ -63,12 +63,12 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('opens modal when menu item is clicked', async () => {
-    const { getByText } = render(<BigDisplayModeConfiguration view={view} />);
+    const { findByText, getByText } = render(<BigDisplayModeConfiguration view={view} />);
     const menuItem = getByText('Full Screen');
 
     fireEvent.click(menuItem);
 
-    await waitForElement(() => getByText('Configuring Full Screen'));
+    await findByText('Configuring Full Screen');
   });
 
   it('shows open modal per default if `open` prop is `true`', () => {
