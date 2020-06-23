@@ -9,6 +9,9 @@ import View from 'views/logic/views/View';
 import CopyToDashboardForm from './CopyToDashboardForm';
 
 describe('CopyToDashboardForm', () => {
+  beforeEach(() => {
+    DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
+  });
   afterEach(cleanup);
 
   const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
@@ -85,7 +88,6 @@ describe('CopyToDashboardForm', () => {
   });
 
   it('should query for all dashboards & specific dashboards', () => {
-    DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
     const { getByPlaceholderText, getByText } = render(
       <CopyToDashboardForm dashboards={dashboardState}
                            widgetId="widget-id"
