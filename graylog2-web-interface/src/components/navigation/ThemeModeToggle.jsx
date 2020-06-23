@@ -1,15 +1,18 @@
 // @flow strict
 /* eslint-disable camelcase */
-import React, { useContext, useEffect, useState } from 'react';
-// import PropTypes from 'prop-types';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled, { withTheme, type StyledComponent } from 'styled-components';
 
 import CombinedProvider from 'injection/CombinedProvider';
-import CustomizationContext from 'contexts/CustomizationContext';
 import { Icon } from 'components/common';
-import type { ThemeInterface } from 'theme';
+import { themePropTypes, type ThemeInterface } from 'theme';
+import {
+  CUSTOMIZATION_THEME_MODE,
+  THEME_MODE_LIGHT,
+  THEME_MODE_DARK,
+} from 'theme/constants';
 
-const CUSTOMIZATION_THEME_MODE = 'org.graylog.plugins.customization.ThemeMode';
 const { CustomizationsActions } = CombinedProvider.get('Customizations');
 
 const ThemeModeToggleWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
@@ -85,31 +88,26 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
   }
 `);
 
+const updateThemeMode = (theme_mode) => CustomizationsActions.update(CUSTOMIZATION_THEME_MODE, { theme_mode });
+
+const toggleThemeMode = (event) => {
+  const nextMode = event.target.checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+
+  updateThemeMode(nextMode);
+};
 
 const ThemeModeToggle = ({ theme }) => {
-  const themeMode = useContext(CustomizationContext)[CUSTOMIZATION_THEME_MODE];
-  const [currentMode, setCurrentMode] = useState(themeMode?.theme_mode || 'teinte');
-  useEffect(() => {
-    CustomizationsActions.get(CUSTOMIZATION_THEME_MODE);
-  }, []);
-
-  const toggleThemeMode = (event) => {
-    const nextMode = event.target.checked ? 'noire' : 'teinte';
-
-    setCurrentMode(nextMode);
-    theme.updateThemeMode(nextMode);
-  };
-
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name="sun" currentMode={currentMode === 'teinte'} />
+      <ModeIcon name="sun" currentMode={theme.mode === THEME_MODE_LIGHT} />
       <Toggle>
-        <input value="noire"
+        <input value={THEME_MODE_DARK}
                type="checkbox"
-               onChange={toggleThemeMode} />
+               onChange={toggleThemeMode}
+               defaultChecked={theme.mode === THEME_MODE_DARK} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name="moon" currentMode={currentMode === 'noire'} />
+      <ModeIcon name="moon" currentMode={theme.mode === THEME_MODE_DARK} />
     </ThemeModeToggleWrap>
   );
 };
