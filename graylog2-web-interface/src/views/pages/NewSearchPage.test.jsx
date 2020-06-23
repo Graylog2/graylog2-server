@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { act } from 'react-dom/test-utils';
-import { render, cleanup, waitFor, waitForElement, fireEvent } from 'wrappedTestingLibrary';
+import { render, cleanup, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -74,9 +74,9 @@ describe('NewSearchPage', () => {
   });
 
   it('should render minimal', async () => {
-    const { getByText } = render(<SimpleNewSearchPage />);
+    const { findByText } = render(<SimpleNewSearchPage />);
 
-    await waitForElement(() => getByText('Extended search page'));
+    await findByText('Extended search page');
   });
 
   it('should show spinner while loading view', () => {
@@ -113,9 +113,8 @@ describe('NewSearchPage', () => {
         </ViewLoaderContext.Consumer>
       ));
 
-      const { getByText } = render(<SimpleNewSearchPage />);
-      const viewLoadButton = await waitForElement(() => getByText('Load view'));
-
+      const { findByText } = render(<SimpleNewSearchPage />);
+      const viewLoadButton = await findByText('Load view');
       fireEvent.click(viewLoadButton);
 
       await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
@@ -133,9 +132,8 @@ describe('NewSearchPage', () => {
     });
 
     it('should be supported', async () => {
-      const { getByText } = render(<SimpleNewSearchPage />);
-      const viewCreateButton = await waitForElement(() => getByText('Load new view'));
-
+      const { findByText } = render(<SimpleNewSearchPage />);
+      const viewCreateButton = await findByText('Load new view');
       fireEvent.click(viewCreateButton);
 
       await waitFor(() => expect(ViewActions.create).toBeCalledTimes(2));
@@ -144,9 +142,8 @@ describe('NewSearchPage', () => {
 
     it('should process hooks with empty query', async () => {
       const processHooksAction = asMock(processHooks);
-      const { getByText } = render(<SimpleNewSearchPage location={mockLocation} />);
-      const viewCreateButton = await waitForElement(() => getByText('Load new view'));
-
+      const { findByText } = render(<SimpleNewSearchPage location={mockLocation} />);
+      const viewCreateButton = await findByText('Load new view');
       fireEvent.click(viewCreateButton);
 
       await waitFor(() => expect(processHooksAction).toBeCalledTimes(2));
@@ -154,12 +151,11 @@ describe('NewSearchPage', () => {
     });
 
     it('should sync query params with current url', async () => {
-      const { getByText } = render(<SimpleNewSearchPage location={mockLocation} />);
-      const viewCreateButton = await waitForElement(() => getByText('Load new view'));
-
+      const { findByText } = render(<SimpleNewSearchPage location={mockLocation} />);
+      const viewCreateButton = await findByText('Load new view');
       fireEvent.click(viewCreateButton);
 
-      await waitFor(() => expect(syncWithQueryParameters).toBeCalledTimes(1));
+      await waitFor(() => expect(syncWithQueryParameters).toHaveBeenCalled());
       await waitFor(() => expect(syncWithQueryParameters).toHaveBeenCalledWith('/search?q=&rangetype=relative&relative=300'));
     });
   });
