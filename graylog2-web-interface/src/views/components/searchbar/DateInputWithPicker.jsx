@@ -43,6 +43,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}
         <Input type="text"
                id={`date-input-${name}`}
                name={name}
+               autoComplete="off"
                disabled={disabled}
                className="absolute"
                value={value}
