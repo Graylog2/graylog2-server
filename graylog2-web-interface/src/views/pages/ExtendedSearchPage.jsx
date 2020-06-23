@@ -11,6 +11,17 @@ import AppContentGrid from 'components/layout/AppContentGrid';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
+import type {
+  SearchRefreshCondition,
+  SearchRefreshConditionArguments,
+} from 'views/logic/hooks/SearchRefreshCondition';
+import { FieldTypesActions } from 'views/stores/FieldTypesStore';
+import { SearchStore, SearchActions } from 'views/stores/SearchStore';
+import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
+import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
+import { StreamsActions } from 'views/stores/StreamsStore';
+import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -22,26 +33,16 @@ import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
+import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
+import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
+import withPluginEntities from 'views/logic/withPluginEntities';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
-import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
-import { SearchStore, SearchActions } from 'views/stores/SearchStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import { StreamsActions } from 'views/stores/StreamsStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
-import withPluginEntities from 'views/logic/withPluginEntities';
-import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-import { AdditionalContext } from 'views/logic/ActionContext';
-import type {
-  SearchRefreshCondition,
-  SearchRefreshConditionArguments,
-} from 'views/logic/hooks/SearchRefreshCondition';
 
 const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`
@@ -61,21 +62,12 @@ const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
 
 const ConnectedSidebar = connect(
   Sidebar,
-  { viewMetadata: ViewMetadataStore, searches: SearchStore },
+  { viewMetadata: ViewMetadataStore, searches: SearchStore, view: ViewStore },
   (props) => ({
     ...props,
+    viewIsNew: props.view.isNew,
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
-  }),
-);
-
-const ConnectedFieldsOverview = connect(
-  FieldsOverview,
-  { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
-  (props) => ({
-    ...props,
-    allFields: props.fieldTypes.all,
-    fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
   }),
 );
 
@@ -157,38 +149,40 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       <InteractiveContext.Consumer>
         {(interactive) => (
           <SearchPageLayoutProvider>
-            <ViewAdditionalContextProvider>
-              <HighlightingRulesProvider>
-                <GridContainer id="main-row" interactive={interactive}>
-                  <IfInteractive>
-                    <ConnectedSidebar>
-                      <ConnectedFieldsOverview />
-                    </ConnectedSidebar>
-                  </IfInteractive>
-                  <SearchArea>
+            <DefaultFieldTypesProvider>
+              <ViewAdditionalContextProvider>
+                <HighlightingRulesProvider>
+                  <GridContainer id="main-row" interactive={interactive}>
                     <IfInteractive>
-                      <HeaderElements />
-                      <IfDashboard>
-                        <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                      </IfDashboard>
-                      <IfSearch>
-                        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                      </IfSearch>
-
-                      <QueryBarElements />
-
-                      <IfDashboard>
-                        <QueryBar />
-                      </IfDashboard>
+                      <ConnectedSidebar>
+                        <FieldsOverview />
+                      </ConnectedSidebar>
                     </IfInteractive>
-                    <HighlightMessageInQuery query={location.query}>
-                      <SearchResult />
-                    </HighlightMessageInQuery>
-                    <Footer />
-                  </SearchArea>
-                </GridContainer>
-              </HighlightingRulesProvider>
-            </ViewAdditionalContextProvider>
+                    <SearchArea>
+                      <IfInteractive>
+                        <HeaderElements />
+                        <IfDashboard>
+                          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                        </IfDashboard>
+                        <IfSearch>
+                          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                        </IfSearch>
+
+                        <QueryBarElements />
+
+                        <IfDashboard>
+                          <QueryBar />
+                        </IfDashboard>
+                      </IfInteractive>
+                      <HighlightMessageInQuery query={location.query}>
+                        <SearchResult />
+                      </HighlightMessageInQuery>
+                      <Footer />
+                    </SearchArea>
+                  </GridContainer>
+                </HighlightingRulesProvider>
+              </ViewAdditionalContextProvider>
+            </DefaultFieldTypesProvider>
           </SearchPageLayoutProvider>
         )}
       </InteractiveContext.Consumer>

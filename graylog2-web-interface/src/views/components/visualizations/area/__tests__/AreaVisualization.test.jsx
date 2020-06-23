@@ -18,6 +18,11 @@ jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
 }));
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  rootTimeZone: jest.fn(() => 'America/Chicago'),
+  gl2ServerUrl: jest.fn(() => undefined),
+}));
 
 describe('AreaVisualization', () => {
   it('generates correct props for plot component', () => {
@@ -40,7 +45,7 @@ describe('AreaVisualization', () => {
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
-      xaxis: { range: ['2019-11-28T15:21:00Z', '2019-11-28T15:25:57Z'], type: 'date' },
+      xaxis: { range: ['2019-11-28T09:21:00-06:00', '2019-11-28T09:25:57-06:00'], type: 'date' },
       legend: { y: -0.14 },
     });
     expect(genericPlot).toHaveProp('chartData', [
@@ -48,11 +53,11 @@ describe('AreaVisualization', () => {
         type: 'scatter',
         name: 'avg(nf_bytes)',
         x: [
-          '2019-11-28T15:21:00.000+00:00',
-          '2019-11-28T15:22:00.000+00:00',
-          '2019-11-28T15:23:00.000+00:00',
-          '2019-11-28T15:24:00.000+00:00',
-          '2019-11-28T15:25:00.000+00:00',
+          '2019-11-28T09:21:00.000-06:00',
+          '2019-11-28T09:22:00.000-06:00',
+          '2019-11-28T09:23:00.000-06:00',
+          '2019-11-28T09:24:00.000-06:00',
+          '2019-11-28T09:25:00.000-06:00',
         ],
         y: [24558.239393939395, 3660.5666666666666, 49989.69, 2475.225, 10034.822222222223],
         fill: 'tozeroy',
@@ -62,11 +67,11 @@ describe('AreaVisualization', () => {
         type: 'scatter',
         name: 'sum(nf_pkts)',
         x: [
-          '2019-11-28T15:21:00.000+00:00',
-          '2019-11-28T15:22:00.000+00:00',
-          '2019-11-28T15:23:00.000+00:00',
-          '2019-11-28T15:24:00.000+00:00',
-          '2019-11-28T15:25:00.000+00:00',
+          '2019-11-28T09:21:00.000-06:00',
+          '2019-11-28T09:22:00.000-06:00',
+          '2019-11-28T09:23:00.000-06:00',
+          '2019-11-28T09:24:00.000-06:00',
+          '2019-11-28T09:25:00.000-06:00',
         ],
         y: [14967, 1239, 20776, 1285, 4377],
         fill: 'tozeroy',

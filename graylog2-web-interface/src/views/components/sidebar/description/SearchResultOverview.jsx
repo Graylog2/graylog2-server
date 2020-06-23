@@ -1,20 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import numeral from 'numeral';
-import { get } from 'lodash';
 
+import AppConfig from 'util/AppConfig';
 import { Timestamp } from 'components/common';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import DateTime from 'logic/datetimes/DateTime';
-import CurrentUserStore from 'stores/users/CurrentUserStore';
-import connect from 'stores/connect';
-
-const UserTimestamp = connect(Timestamp, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ tz: get(currentUser, 'currentUser.timezone', 'UTC') }));
 
 const SearchResultOverview = ({ results }) => {
   const { timestamp } = results;
+  const currentUser = useContext(CurrentUserContext);
+  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
   return (
     <span>
-      Query executed in {numeral(results.duration).format('0,0')}ms at <UserTimestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} />.
+      Query executed in {numeral(results.duration).format('0,0')}ms at <Timestamp dateTime={timestamp} format={DateTime.Formats.DATETIME} tz={timezone} />.
     </span>
   );
 };

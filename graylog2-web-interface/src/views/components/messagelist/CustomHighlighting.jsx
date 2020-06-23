@@ -20,7 +20,7 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: P
   const highlightingRules = useContext(HighlightingRulesContext) ?? [];
 
   const highlightingRulesMap = highlightingRules.reduce((prev, cur) => ({ ...prev, [cur.field]: prev[cur.field] ? [...prev[cur.field], cur] : [cur] }), {});
-  const rules = highlightingRulesMap[fieldName] || [];
+  const rules = highlightingRulesMap[fieldName] ?? [];
   rules.forEach((rule) => {
     const ranges = [];
     if (String(fieldValue) === String(rule.value)) {

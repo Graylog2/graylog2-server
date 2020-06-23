@@ -3,8 +3,8 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
-import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import DecoratorContext from 'views/components/messagelist/decoration/DecoratorContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import CustomHighlighting from './CustomHighlighting';

@@ -1,25 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
 
-import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
+import AppConfig from 'util/AppConfig';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import Timestamp from 'components/common/Timestamp';
 import DateTime from 'logic/datetimes/DateTime';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
-const UserTimezoneTimestamp = ({ timezone, ...rest }) => <Timestamp tz={timezone} format={DateTime.Formats.DATETIME_TZ} {...rest} />;
-
-UserTimezoneTimestamp.propTypes = {
-  timezone: PropTypes.string,
+const UserTimezoneTimestamp = ({ ...rest }) => {
+  const currentUser = useContext(CurrentUserContext);
+  const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
+  return <Timestamp tz={timezone} format={DateTime.Formats.DATETIME_TZ} {...rest} />;
 };
 
-UserTimezoneTimestamp.defaultProps = {
-  timezone: null,
-};
-
-export default connect(
-  UserTimezoneTimestamp,
-  { currentUser: CurrentUserStore },
-  ({ currentUser = { timezone: 'UTC' } }) => ({ timezone: currentUser.timezone }),
-);
+export default UserTimezoneTimestamp;
