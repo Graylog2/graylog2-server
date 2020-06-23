@@ -26,15 +26,16 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.rest.models.count.responses.MessageCountResponse;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexSizeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexerClusterOverview;
 import org.graylog2.rest.models.system.indexer.responses.IndexerOverview;
-import org.graylog2.rest.resources.count.CountResource;
 import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.IndexRangesResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -60,7 +61,7 @@ public class IndexerOverviewResource extends RestResource {
     private final DeflectorResource deflectorResource;
     private final IndexerClusterResource indexerClusterResource;
     private final IndexRangesResource indexRangesResource;
-    private final CountResource countResource;
+    private final Counts counts;
     private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
     private final Cluster cluster;
@@ -69,14 +70,14 @@ public class IndexerOverviewResource extends RestResource {
     public IndexerOverviewResource(DeflectorResource deflectorResource,
                                    IndexerClusterResource indexerClusterResource,
                                    IndexRangesResource indexRangesResource,
-                                   CountResource countResource,
+                                   Counts counts,
                                    IndexSetRegistry indexSetRegistry,
                                    Indices indices,
                                    Cluster cluster) {
         this.deflectorResource = deflectorResource;
         this.indexerClusterResource = indexerClusterResource;
         this.indexRangesResource = indexRangesResource;
-        this.countResource = countResource;
+        this.counts = counts;
         this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
         this.cluster = cluster;
@@ -127,7 +128,8 @@ public class IndexerOverviewResource extends RestResource {
 
         return IndexerOverview.create(deflectorSummary,
                 IndexerClusterOverview.create(indexerClusterResource.clusterHealth(), indexerClusterResource.clusterName().name()),
-                countResource.total(indexSetId), indicesSummaries);
+                MessageCountResponse.create(counts.total(indexSet)),
+                indicesSummaries);
     }
 
     private Map<String, IndexSummary> buildIndexSummaries(DeflectorSummary deflectorSummary, IndexSet indexSet, List<IndexRangeSummary> indexRanges, JsonNode indexStats, Map<String, Boolean> areReopened) {
