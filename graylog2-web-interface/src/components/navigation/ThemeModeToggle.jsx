@@ -104,7 +104,7 @@ const ThemeModeToggle = ({ theme }) => {
         <input value={THEME_MODE_DARK}
                type="checkbox"
                onChange={toggleThemeMode}
-               defaultChecked={theme.mode === THEME_MODE_DARK} />
+               checked={theme.mode === THEME_MODE_DARK} />
         <span className="slider" />
       </Toggle>
       <ModeIcon name="moon" currentMode={theme.mode === THEME_MODE_DARK} />
