@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'wrappedEnzyme';
+import { mount } from 'wrappedEnzyme';
 import SelectComponent, { components as Components } from 'react-select';
 
 import Select from './Select';
@@ -10,27 +10,27 @@ describe('Select', () => {
     const onChange = () => { };
 
     it('should convert multi to isMulti', () => {
-      const multiWrapper = shallow(<Select multi options={options} onChange={onChange} />);
-      expect(multiWrapper.props().isMulti).toBeTruthy();
+      const multiWrapper = mount(<Select multi options={options} onChange={onChange} />);
+      expect(multiWrapper.find('Select').last().props().isMulti).toBeTruthy();
 
-      const nonMultiWrapper = shallow(<Select options={options} onChange={onChange} />);
-      expect(nonMultiWrapper.props().isMulti).toBeFalsy();
+      const nonMultiWrapper = mount(<Select options={options} onChange={onChange} />);
+      expect(nonMultiWrapper.find('Select').last().props().isMulti).toBeFalsy();
     });
 
     it('should convert disabled to isDisabled', () => {
-      const disabledWrapper = shallow(<Select disabled options={options} onChange={onChange} />);
-      expect(disabledWrapper.props().isDisabled).toBeTruthy();
+      const disabledWrapper = mount(<Select disabled options={options} onChange={onChange} />);
+      expect(disabledWrapper.find('Select').last().props().isDisabled).toBeTruthy();
 
-      const enabledWrapper = shallow(<Select options={options} onChange={onChange} />);
-      expect(enabledWrapper.props().isDisabled).toBeFalsy();
+      const enabledWrapper = mount(<Select options={options} onChange={onChange} />);
+      expect(enabledWrapper.find('Select').last().props().isDisabled).toBeFalsy();
     });
 
     it('should convert clearable to isClearable', () => {
-      const clearableWrapper = shallow(<Select options={options} onChange={onChange} />);
-      expect(clearableWrapper.props().isClearable).toBeTruthy();
+      const clearableWrapper = mount(<Select options={options} onChange={onChange} />);
+      expect(clearableWrapper.find('Select').last().props().isClearable).toBeTruthy();
 
-      const nonClearableWrapper = shallow(<Select clearable={false} options={options} onChange={onChange} />);
-      expect(nonClearableWrapper.props().isClearable).toBeFalsy();
+      const nonClearableWrapper = mount(<Select clearable={false} options={options} onChange={onChange} />);
+      expect(nonClearableWrapper.find('Select').last().props().isClearable).toBeFalsy();
     });
 
     it('should use displayKey to select the option label', () => {
@@ -46,17 +46,17 @@ describe('Select', () => {
     });
 
     it('should use matchProp to configure how options are filtered', () => {
-      const matchAnyWrapper = shallow(<Select options={options} onChange={onChange} />);
+      const matchAnyWrapper = mount(<Select options={options} onChange={onChange} />);
       const matchAnyFilter = matchAnyWrapper.find(SelectComponent).props().filterOption;
       expect(matchAnyFilter(options[0], 'label')).toBeTruthy();
       expect(matchAnyFilter(options[0], 'value')).toBeTruthy();
 
-      const matchLabelWrapper = shallow(<Select options={options} onChange={onChange} matchProp="label" />);
+      const matchLabelWrapper = mount(<Select options={options} onChange={onChange} matchProp="label" />);
       const matchLabelFilter = matchLabelWrapper.find(SelectComponent).props().filterOption;
       expect(matchLabelFilter(options[0], 'label')).toBeTruthy();
       expect(matchLabelFilter(options[0], 'value')).toBeFalsy();
 
-      const matchValueWrapper = shallow(<Select options={options} onChange={onChange} matchProp="value" />);
+      const matchValueWrapper = mount(<Select options={options} onChange={onChange} matchProp="value" />);
       const matchValueFilter = matchValueWrapper.find(SelectComponent).props().filterOption;
       expect(matchValueFilter(options[0], 'label')).toBeFalsy();
       expect(matchValueFilter(options[0], 'value')).toBeTruthy();
