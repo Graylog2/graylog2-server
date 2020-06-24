@@ -1,6 +1,6 @@
 // @flow strict
 
-type GRN = string;
+export type GRN = string;
 
 export type Role = {|
   id: GRN,
