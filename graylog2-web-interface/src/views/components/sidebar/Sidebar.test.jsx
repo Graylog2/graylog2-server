@@ -7,12 +7,7 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 
-<<<<<<< HEAD:graylog2-web-interface/src/views/components/sidebar/Sidebar.test.jsx
 import Sidebar from './Sidebar';
-=======
-
-import SideBar from './SideBar';
->>>>>>> master:graylog2-web-interface/src/views/components/sidebar/SideBar.test.jsx
 
 const mockCurrentUser = { timezone: 'UTC' };
 
@@ -83,14 +78,9 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('h1').text()).toBe(viewMetaData.title);
   });
 
-  it('should render with a description', () => {
-    const emptyViewMetaData = {
-      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      id: '5b34f4c44880a54df9616380',
-    };
-
+  it('should render with a description about the query results', () => {
     const wrapper = mount(
-      <Sidebar viewMetadata={emptyViewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
                viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
@@ -99,14 +89,8 @@ describe('<Sidebar />', () => {
       </Sidebar>,
     );
 
-<<<<<<< HEAD:graylog2-web-interface/src/views/components/sidebar/Sidebar.test.jsx
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
-    expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 14:39:26.');
-=======
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
->>>>>>> master:graylog2-web-interface/src/views/components/sidebar/SideBar.test.jsx
   });
 
   it('should render with a specific default title in the context of a new search', () => {
