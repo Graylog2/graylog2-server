@@ -4,7 +4,6 @@ import { DropdownButton as BootstrapDropdownButton } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
-import { propTypes, defaultProps } from './props/button';
 
 const StyledDropdownButton = styled(BootstrapDropdownButton)(({ theme }) => css`
   ${theme.components.button};
@@ -15,9 +14,6 @@ const StyledDropdownButton = styled(BootstrapDropdownButton)(({ theme }) => css`
 `);
 
 const DropdownButton = forwardRef((props, ref) => <StyledDropdownButton {...props} ref={ref} />);
-
-DropdownButton.propTypes = propTypes;
-DropdownButton.defaultProps = defaultProps;
 
 /** @component */
 export default DropdownButton;

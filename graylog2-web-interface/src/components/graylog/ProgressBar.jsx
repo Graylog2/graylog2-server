@@ -7,8 +7,6 @@ import chroma from 'chroma-js';
 
 import { type ThemeInterface } from 'theme';
 
-import bsStyleThemeVariant from './variants/bsStyle';
-
 type ProgressBarProps = {
   bars: Array<{
     animated: boolean,
@@ -48,10 +46,16 @@ const animatedStripes = keyframes`
   }
 `;
 
-const progressBarVariants = (color) => css(({ theme }) => `
-  background-color: ${color};
-  color: ${theme.utils.readableColor(color)};
-`);
+const progressBarVariants = css(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
+
+  return `
+    background-color: ${theme.colors.variant[bsStyle]};
+    color: ${theme.utils.readableColor(theme.colors.variant[bsStyle])};
+  `;
+});
 
 const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   height: 20px;
@@ -93,7 +97,7 @@ const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.di
     ${animated && css`
       animation: ${animatedStripes} 2s linear infinite;
     `}
-    ${bsStyleThemeVariant(progressBarVariants)}
+    ${progressBarVariants}
   `;
 });
 
