@@ -83,6 +83,10 @@ const ApiRoutes = {
     cycle: (indexSetId) => { return { url: `/cluster/deflector/${indexSetId}/cycle` }; },
     list: (indexSetId) => { return { url: `/system/deflector/${indexSetId}` }; },
   },
+  EntityShareController: {
+    prepare: (entityGRN) => { return { url: `/shares/entities/${entityGRN}/prepare` }; },
+    update: (entityGRN) => { return { url: `/shares/entities/${entityGRN}` }; },
+  },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },
     name: () => { return { url: '/system/indexer/cluster/name' }; },
