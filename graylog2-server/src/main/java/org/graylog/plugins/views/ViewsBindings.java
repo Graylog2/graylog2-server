@@ -29,6 +29,7 @@ import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearches
 import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPermissions;
 import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
 import org.graylog.plugins.views.migrations.V20200409083200_RemoveRootQueriesFromMigratedDashboards;
+import org.graylog.plugins.views.providers.ExportBackendProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.ValueParameter;
@@ -38,6 +39,7 @@ import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.export.ChunkDecorator;
 import org.graylog.plugins.views.search.export.DecoratingMessagesExporter;
+import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.LegacyChunkDecorator;
 import org.graylog.plugins.views.search.export.MessagesExporter;
 import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
@@ -100,9 +102,14 @@ public class ViewsBindings extends ViewsModule {
 
     @Override
     protected void configure() {
+        registerExportBackendProvider();
+
         registerRestControllerPackage(getClass().getPackage().getName());
 
         addPermissions(ViewsRestPermissions.class);
+
+        // Calling this once to set up binder, so injection does not fail.
+        esQueryDecoratorBinder();
 
         // filter
         registerJacksonSubtype(AndFilter.class);
@@ -177,6 +184,10 @@ public class ViewsBindings extends ViewsModule {
         registerExceptionMappers();
 
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SimpleMessageChunkCsvWriter.class);
+    }
+
+    private void registerExportBackendProvider() {
+        binder().bind(ExportBackend.class).toProvider(ExportBackendProvider.class);
     }
 
     private void registerSortConfigSubclasses() {
