@@ -6,16 +6,16 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { EntityShareRequest, GRN } from 'logic/permissions/types';
-import EntityShareState from 'logic/permissions/EntityShareState';
+import type { EntityShareUpdateRequest, EntitySharePrepareRequest, GRN } from 'logic/permissions/types';
+import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
 
 type EntityShareStoreState = {
   entityShareState: EntityShareState,
 };
 
 type EntityShareActionsType = RefluxActions<{
-  prepare: (EntityShareRequest) => Promise<EntityShareState>,
-  update: (EntityShareRequest) => Promise<EntityShareState>,
+  prepare: (GRN, EntitySharePrepareRequest) => Promise<EntityShareState>,
+  update: (GRN, EntityShareUpdateRequest) => Promise<EntityShareState>,
 }>;
 
 type EntityShareStoreType = Store<EntityShareStoreState>;
@@ -37,21 +37,32 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       return this._state();
     },
 
-    prepare(entityGRN: GRN, entityShareRequest: EntityShareRequest): Promise<EntityShareState> {
+    prepare(entityGRN: GRN, entityShareRequest: EntitySharePrepareRequest): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN));
-      const promise = fetch('POST', url, JSON.stringify(entityShareRequest))
-        .then(EntityShareState.fromJSON)
-        .then((entityShareState) => {
-          this.entityShareState = entityShareState;
-
-          this._trigger();
-
-          return this.entityShareState;
-        });
+      const promise = fetch('POST', url, JSON.stringify(entityShareRequest)).then(this._handleResponse);
 
       EntityShareActions.prepare.promise(promise);
 
       return promise;
+    },
+
+    update(entityGRN: GRN, entityShareRequest: EntityShareUpdateRequest): Promise<EntityShareState> {
+      const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN));
+      const promise = fetch('POST', url, JSON.stringify(entityShareRequest)).then(this._handleResponse);
+
+      EntityShareActions.prepare.promise(promise);
+
+      return promise;
+    },
+
+    _handleResponse(entityShareStateJSON: EntityShareStateJson): EntityShareState {
+      const entityShareState = EntityShareState.fromJSON(entityShareStateJSON);
+
+      this.entityShareState = entityShareState;
+
+      this._trigger();
+
+      return this.entityShareState;
     },
 
     _state(): EntityShareStoreState {
