@@ -20,9 +20,10 @@ import * as Permissions from 'views/Permissions';
 import View from 'views/logic/views/View';
 import type { User } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import EntityShareModal from 'components/permissions/EntityShareModal';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
 
 import ViewPropertiesModal from './views/ViewPropertiesModal';
-import ShareViewModal from './views/ShareViewModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
@@ -40,6 +41,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
   const [csvExportOpen, setCsvExportOpen] = useState(false);
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
+  const viewTypeLabel = ViewTypeLabel({ type: view.type });
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
       <MenuItem divider />
@@ -90,7 +92,8 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
                              onClose={() => setEditViewOpen(false)}
                              onSave={onSaveView} />
       )}
-      {shareViewOpen && <ShareViewModal show view={view} currentUser={currentUser} onClose={() => setShareViewOpen(false)} />}
+
+      {shareViewOpen && <EntityShareModal entityId={view.id} entityType="dashboard" title={`Sharing ${viewTypeLabel}: ${view.title}`} />}
       {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
     </ButtonGroup>
   );
