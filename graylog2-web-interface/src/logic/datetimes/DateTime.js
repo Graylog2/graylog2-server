@@ -6,6 +6,7 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 let currentUser = CurrentUserStore.get();
+
 CurrentUserStore.listen((state) => { currentUser = state.currentUser; });
 
 class DateTime {
@@ -35,6 +36,7 @@ class DateTime {
     if (dateTimeString instanceof String) {
       return dateTimeString.trim();
     }
+
     return dateTimeString;
   }
 
@@ -54,6 +56,7 @@ class DateTime {
   // Tries to parse the given string using `.getAcceptedFormats`
   static parseFromString(dateTimeString) {
     const parsedDateTime = moment.tz(DateTime._cleanDateTimeString(dateTimeString), DateTime.getAcceptedFormats(), true, DateTime.getUserTimezone());
+
     if (!parsedDateTime.isValid()) {
       throw new Error(`Date time ${dateTimeString} is not valid`);
     }
@@ -63,6 +66,7 @@ class DateTime {
 
   static isValidDateString(dateTimeString) {
     const parsedDateTime = moment.tz(DateTime._cleanDateTimeString(dateTimeString), DateTime.getAcceptedFormats(), true, DateTime.getUserTimezone());
+
     return parsedDateTime.isValid();
   }
 
@@ -70,6 +74,7 @@ class DateTime {
     if (currentUser && currentUser.timezone) {
       return currentUser.timezone;
     }
+
     return this.getBrowserTimezone() || AppConfig.rootTimeZone() || 'UTC';
   }
 
@@ -80,8 +85,10 @@ class DateTime {
   constructor(dateTime) {
     if (!dateTime) {
       this.dateTime = DateTime.now();
+
       return;
     }
+
     // Always use user's local time
     this.dateTime = moment.tz(dateTime, DateTime.getUserTimezone());
   }
@@ -93,13 +100,16 @@ class DateTime {
   // Converts the DateTime to the user's browser local time
   toBrowserLocalTime() {
     const localOffset = (new Date()).getTimezoneOffset();
+
     this.dateTime.utcOffset(-localOffset);
+
     return this;
   }
 
   // Changes the timezone of the DateTime
   toTimeZone(tz) {
     this.dateTime.tz(tz);
+
     return this;
   }
 
@@ -124,6 +134,7 @@ class DateTime {
 
   toString(format) {
     let effectiveFormat = format;
+
     if (format === undefined || format === null) {
       if (this.dateTime.milliseconds() === 0) {
         effectiveFormat = DateTime.Formats.DATETIME;
@@ -131,6 +142,7 @@ class DateTime {
         effectiveFormat = DateTime.Formats.TIMESTAMP;
       }
     }
+
     return this.dateTime.format(effectiveFormat);
   }
 }

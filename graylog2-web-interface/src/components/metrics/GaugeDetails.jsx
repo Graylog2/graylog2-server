@@ -9,6 +9,7 @@ class GaugeDetails extends React.Component {
 
   render() {
     const gauge = this.props.metric.metric;
+
     return (
       <dl className="metric-def metric-gauge">
         <dt>Value:</dt>

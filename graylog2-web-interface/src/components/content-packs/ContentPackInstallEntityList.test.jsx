@@ -13,21 +13,25 @@ describe('<ContentPackInstallEntityList />', () => {
 
   it('should render without entities', () => {
     const wrapper = mount(<ContentPackInstallEntityList />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with entities', () => {
     const wrapper = mount(<ContentPackInstallEntityList entities={entities} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with empty entities', () => {
     const wrapper = mount(<ContentPackInstallEntityList entities={[]} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with uninstall and entities', () => {
     const wrapper = mount(<ContentPackInstallEntityList uninstall entities={entities} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 });

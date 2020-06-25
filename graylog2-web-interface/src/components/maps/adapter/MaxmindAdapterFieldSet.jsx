@@ -16,6 +16,7 @@ class MaxmindAdapterFieldSet extends React.Component {
 
   _update = (value, unit, enabled, name) => {
     const config = ObjectUtils.clone(this.props.config);
+
     config[name] = enabled ? value : 0;
     config[`${name}_unit`] = unit;
     this.props.updateConfig(config);
@@ -27,6 +28,7 @@ class MaxmindAdapterFieldSet extends React.Component {
 
   _onDbTypeSelect = (id) => {
     const config = ObjectUtils.clone(this.props.config);
+
     config.database_type = id;
     this.props.updateConfig(config);
   };
@@ -38,6 +40,7 @@ class MaxmindAdapterFieldSet extends React.Component {
       { label: 'City database', value: 'MAXMIND_CITY' },
       { label: 'Country database', value: 'MAXMIND_COUNTRY' },
     ];
+
     return (
       <fieldset>
         <Input type="text"

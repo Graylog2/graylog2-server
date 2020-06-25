@@ -36,11 +36,13 @@ const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
     const widgetDef = widgetDefinition(type);
+
     return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
   }
 
   static _defaultTitle(widget) {
     const widgetDef = widgetDefinition(widget.type);
+
     return (widgetDef.titleGenerator || defaultTitleGenerator)(widget);
   }
 
@@ -84,8 +86,10 @@ class WidgetGrid extends React.Component {
     const onPositionsChange = (newPosition) => {
       const newPositions = Object.keys(positions).map((id) => {
         const { col, row, height, width } = positions[id]._value;
+
         return { id: id, col: col, row: row, height: height, width: width };
       });
+
       newPositions.push(newPosition);
       // eslint-disable-next-line react/destructuring-assignment
       this.props.onPositionsChange(newPositions);

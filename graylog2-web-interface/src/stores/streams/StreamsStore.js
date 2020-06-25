@@ -51,6 +51,7 @@ const StreamsStore = Reflux.createStore({
 
   searchPaginated(page, perPage, query) {
     const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, page, perPage, query);
+
     return fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
         const pagination = {
@@ -60,6 +61,7 @@ const StreamsStore = Reflux.createStore({
           perPage: response.pagination.per_page,
           query: response.pagination.query,
         };
+
         return {
           streams: response.streams,
           pagination,
@@ -72,6 +74,7 @@ const StreamsStore = Reflux.createStore({
   },
   listStreams() {
     const url = '/streams';
+
     return fetch('GET', qualifyUrl(url))
       .then((result: StreamSummaryResponse) => result.streams)
       .catch((errorThrown) => {
@@ -92,6 +95,7 @@ const StreamsStore = Reflux.createStore({
     };
 
     const { url } = ApiRoutes.StreamsApiController.get(streamId);
+
     fetch('GET', qualifyUrl(url))
       .then(callback, failCallback);
   },
@@ -102,6 +106,7 @@ const StreamsStore = Reflux.createStore({
     };
 
     const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
+
     fetch('DELETE', url)
       .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
@@ -114,10 +119,12 @@ const StreamsStore = Reflux.createStore({
     };
 
     const url = qualifyUrl(ApiRoutes.StreamsApiController.pause(streamId).url);
+
     return fetch('POST', url)
       .then(callback, failCallback)
       .then((response) => {
         this._emitChange();
+
         return response;
       });
   },
@@ -128,10 +135,12 @@ const StreamsStore = Reflux.createStore({
     };
 
     const url = qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url);
+
     return fetch('POST', url)
       .then(callback, failCallback)
       .then((response) => {
         this._emitChange();
+
         return response;
       });
   },
@@ -142,6 +151,7 @@ const StreamsStore = Reflux.createStore({
     };
 
     const url = qualifyUrl(ApiRoutes.StreamsApiController.create().url);
+
     fetch('POST', url, stream)
       .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
@@ -154,6 +164,7 @@ const StreamsStore = Reflux.createStore({
     };
 
     const url = qualifyUrl(ApiRoutes.StreamsApiController.update(streamId).url);
+
     fetch('PUT', url, data)
       .then(callback, failCallback)
       .then(this._emitChange.bind(this));
@@ -165,6 +176,7 @@ const StreamsStore = Reflux.createStore({
     };
 
     const url = qualifyUrl(ApiRoutes.StreamsApiController.cloneStream(streamId).url);
+
     fetch('POST', url, data)
       .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
@@ -182,6 +194,7 @@ const StreamsStore = Reflux.createStore({
   },
   addOutput(streamId: string, outputId: string, callback: (response: any) => void) {
     const url = qualifyUrl(ApiRoutes.StreamOutputsApiController.add(streamId, outputId).url);
+
     fetch('POST', url, { outputs: [outputId] })
       .then(callback, (errorThrown) => {
         UserNotification.error(`Adding output to stream failed with status: ${errorThrown}`,
@@ -191,6 +204,7 @@ const StreamsStore = Reflux.createStore({
   },
   testMatch(streamId: string, message: any, callback: (response: TestMatchResponse) => void) {
     const url = qualifyUrl(ApiRoutes.StreamsApiController.testMatch(streamId).url);
+
     fetch('POST', url, message)
       .then(callback, (error) => {
         UserNotification.error(`Testing stream rules of stream failed with status: ${error.message}`,

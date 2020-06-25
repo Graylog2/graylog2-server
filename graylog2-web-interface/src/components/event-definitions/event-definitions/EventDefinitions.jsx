@@ -39,6 +39,7 @@ class EventDefinitions extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
@@ -77,9 +78,11 @@ class EventDefinitions extends React.Component {
       const isScheduled = lodash.get(context, `scheduler.${definition.id}.is_scheduled`, true);
 
       let toggle = <MenuItem onClick={onDisable(definition)}>Disable</MenuItem>;
+
       if (!isScheduled) {
         toggle = <MenuItem onClick={onEnable(definition)}>Enable</MenuItem>;
       }
+
       const actions = (
         <React.Fragment key={`actions-${definition.id}`}>
           <IfPermitted permissions={`eventdefinitions:edit:${definition.id}`}>

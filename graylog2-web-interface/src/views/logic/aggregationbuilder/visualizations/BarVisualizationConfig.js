@@ -27,6 +27,7 @@ export default class BarVisualizationConfig extends VisualizationConfig {
 
   toBuilder() {
     const { barmode } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ barmode }));
   }
@@ -45,6 +46,7 @@ export default class BarVisualizationConfig extends VisualizationConfig {
 
   static fromJSON(type: string, value: BarVisualizationConfigType) {
     const { barmode } = value;
+
     return BarVisualizationConfig.create(barmode);
   }
 }
@@ -63,6 +65,7 @@ class Builder {
 
   build() {
     const { barmode } = this.value.toObject();
+
     return new BarVisualizationConfig(barmode);
   }
 }

@@ -19,11 +19,14 @@ class ContentPackEntityConfig extends React.Component {
 
   _getParameterForConfigKey = (configKey) => {
     const paramMapIndex = this.props.appliedParameter.findIndex((paramMap) => paramMap.configKey === configKey);
+
     if (paramMapIndex < 0) {
       return undefined;
     }
+
     const paramMap = this.props.appliedParameter[paramMapIndex];
     const paramIndex = this.props.parameters.findIndex((parameter) => parameter.name === paramMap.paramName);
+
     return this.props.parameters[paramIndex];
   };
 
@@ -33,6 +36,7 @@ class ContentPackEntityConfig extends React.Component {
       const parameter = this._getParameterForConfigKey(configKey);
       const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : path.getValueType();
       const value = parameter ? (<b>{parameter.name}</b>) : path.getValue();
+
       return (
         <tr key={configKey}>
           <td>{configKey}</td>

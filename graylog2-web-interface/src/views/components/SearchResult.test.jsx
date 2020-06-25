@@ -23,6 +23,7 @@ jest.mock('views/stores/SearchStore', () => ({
     }),
   },
 }));
+
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: {
     getInitialState: () => ({
@@ -32,6 +33,7 @@ jest.mock('views/stores/ViewMetadataStore', () => ({
     listen: () => jest.fn(),
   },
 }));
+
 jest.mock('views/stores/SearchLoadingStateStore', () => ({
   SearchLoadingStateStore: {
     getInitialState: jest.fn(() => ({ isLoading: false })),
@@ -43,6 +45,7 @@ describe('SearchResult', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
+
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -54,31 +57,42 @@ describe('SearchResult', () => {
       <SearchResult />
     </FieldTypesContext.Provider>
   );
+
   SimpleSearchResult.propTypes = {
     fieldTypes: PropTypes.object,
   };
+
   SimpleSearchResult.defaultProps = {
     fieldTypes: initialFieldTypes,
   };
 
   it('should show spinner with undefined fields', () => {
     const { getByText } = render(<SearchResult />);
+
     act(() => jest.advanceTimersByTime(200));
+
     expect(getByText('Loading...')).not.toBeNull();
   });
+
   it('should display loading indicator, when search is loading ', () => {
     asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
     const { getByText } = render(<SimpleSearchResult />);
+
     act(() => jest.advanceTimersByTime(500));
+
     expect(getByText('Updating search results...')).not.toBeNull();
   });
+
   it('should hide loading indicator, when search is not loading', () => {
     asMock(SearchLoadingStateStore.getInitialState).mockReturnValueOnce({ isLoading: false });
     const { queryByText } = render(<SimpleSearchResult />);
+
     expect(queryByText('Updating search results...')).toBeNull();
   });
+
   it('should display info message when field types and search results exists, but no widgets are defined', () => {
     const { getByText } = render(<SimpleSearchResult />);
+
     expect(getByText('Create a new widget by selecting a widget type in the left sidebar section "Create".')).not.toBeNull();
   });
 });

@@ -38,6 +38,7 @@ class DescriptionBox extends React.Component {
 
   onToggleConfig = () => {
     const { configOpen } = this.state;
+
     this.setState({ configOpen: !configOpen });
   };
 
@@ -68,6 +69,7 @@ class DescriptionBox extends React.Component {
 
   configCaret = () => {
     const { configurableOptions } = this.props;
+
     if (configurableOptions) {
       return (
         <ConfigButton ref={(node) => { this.target = node; }}
@@ -76,11 +78,13 @@ class DescriptionBox extends React.Component {
         </ConfigButton>
       );
     }
+
     return null;
   };
 
   render() {
     const { description, children, help, style: inlineStyle } = this.props;
+
     return (
       <StyledDescriptionBox style={inlineStyle}>
         <div className="description">

@@ -63,6 +63,7 @@ class AddDecoratorButton extends React.Component {
       config: data.configuration,
       order: nextOrder,
     };
+
     onCreate(request);
     this.setState({ typeName: this.PLACEHOLDER });
   };
@@ -73,6 +74,7 @@ class AddDecoratorButton extends React.Component {
     const { decoratorTypes } = this.props;
 
     this.setState({ typeName: decoratorType });
+
     if (decoratorTypes[decoratorType]) {
       this.setState({ typeDefinition: decoratorTypes[decoratorType] });
     } else {
@@ -98,6 +100,7 @@ class AddDecoratorButton extends React.Component {
                            submitAction={this._handleSubmit}
                            cancelAction={this._handleCancel} />
       ) : null);
+
     return (
       <>
         <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>

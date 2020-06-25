@@ -23,6 +23,7 @@ type Props = {
 const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
   const widgetOption = (widget) => ({ label: view.getWidgetTitleByWidget(widget), value: widget });
   const widgetOptions = sortOptions(widgets.map((widget) => (widgetOption(widget))).toArray());
+
   return (
     <>
       <Row>
@@ -51,6 +52,5 @@ const WidgetSelection = ({ selectWidget, widgets, view }: Props) => {
     </>
   );
 };
-
 
 export default WidgetSelection;

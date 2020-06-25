@@ -33,6 +33,7 @@ const LoginForm = ({ onErrorChange }) => {
     const username = usernameInput.getValue();
     const password = passwordInput.getValue();
     const location = document.location.host;
+
     promise = SessionActions.login(username, password, location);
     promise.catch((error) => {
       if (error.additional.status === 401) {
@@ -41,6 +42,7 @@ const LoginForm = ({ onErrorChange }) => {
         onErrorChange(`Error - the server returned: ${error.additional.status} - ${error.message}`);
       }
     });
+
     promise.finally(() => {
       if (!promise.isCancelled()) {
         setIsLoading(false);

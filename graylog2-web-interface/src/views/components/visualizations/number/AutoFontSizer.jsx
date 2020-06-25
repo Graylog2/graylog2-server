@@ -49,11 +49,13 @@ const useAutoFontSize = (target, _container, height, width) => {
 
     const contentElement = containerChildren[0];
     const multiplier = _multiplierForElement(contentElement, width, height);
+
     if (Math.abs(1 - multiplier) <= TOLERANCE) {
       return;
     }
 
     const newFontSize = Math.floor(fontSize * multiplier);
+
     if (newFontSize !== fontSize && isValidFontSize(newFontSize)) {
       setFontSize(newFontSize);
     }

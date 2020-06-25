@@ -59,9 +59,11 @@ describe('SavedSearchControls', () => {
     it('should clear a view', (done) => {
       const loadNewView = jest.fn(() => {
         done();
+
         return Promise.resolve();
       });
       const wrapper = mount(<SimpleSavedSearchControls loadNewView={loadNewView} />);
+
       wrapper.find('a[data-testid="reset-search"]').simulate('click');
     });
 
@@ -71,11 +73,13 @@ describe('SavedSearchControls', () => {
         return new Promise(() => view);
       });
       const wrapper = mount(<SimpleSavedSearchControls onLoadView={onLoadView} viewStoreState={createViewStoreState(false)} />);
+
       wrapper.find('button[title="Save search"]').simulate('click');
       wrapper.find('input[value="title"]').simulate('change', { target: { value: 'Test' } });
       wrapper.find('button[children="Create new"]').simulate('click');
       setImmediate(() => {
         expect(onLoadView).toHaveBeenCalledTimes(1);
+
         done();
       });
     });
@@ -106,6 +110,7 @@ describe('SavedSearchControls', () => {
 
         expect(shareSearch).not.toBeDisabled();
       });
+
       it('which should be enabled if current user is permitted to edit search', () => {
         const owningUser = {
           ...viewsManager,
@@ -119,6 +124,7 @@ describe('SavedSearchControls', () => {
 
         expect(shareSearch).not.toBeDisabled();
       });
+
       it('which should be enabled if current user is admin', () => {
         const wrapper = mount(<SimpleSavedSearchControls currentUser={admin} viewStoreState={createViewStoreState(false, admin.id)} />);
 
@@ -126,6 +132,7 @@ describe('SavedSearchControls', () => {
 
         expect(shareSearch).not.toBeDisabled();
       });
+
       it('which should be disabled if search is unsaved', () => {
         const wrapper = mount(<SimpleSavedSearchControls />);
 
@@ -141,6 +148,7 @@ describe('SavedSearchControls', () => {
       const wrapper = mount(<SimpleSavedSearchControls viewStoreState={createViewStoreState(false)} />);
 
       const saveButton = wrapper.find('button[title="Save search"]');
+
       expect(saveButton).toMatchSnapshot();
     });
 
@@ -158,6 +166,7 @@ describe('SavedSearchControls', () => {
       };
       const wrapper = mount(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
       const saveButton = wrapper.find('button[title="Saved search"]');
+
       expect(saveButton).toMatchSnapshot();
     });
 
@@ -176,6 +185,7 @@ describe('SavedSearchControls', () => {
       };
       const wrapper = mount(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
       const saveButton = wrapper.find('button[title="Unsaved changes"]');
+
       expect(saveButton).toMatchSnapshot();
     });
   });

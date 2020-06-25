@@ -62,6 +62,7 @@ const DashboardsStore = singletonStore(
             page: response.page,
             perPage: response.per_page,
           };
+
           this.trigger({
             list: this.dashboards,
             pagination: this.pagination,

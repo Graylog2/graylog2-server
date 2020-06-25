@@ -52,10 +52,13 @@ const ChartColorRulesStore = singletonStore(
       const newRules = newState.valueSeq().map((widget) => {
         const { config } = widget;
         const widgetId = widget.id;
+
         if (config.formattingSettings) {
           const { chartColors = {} } = config.formattingSettings;
+
           return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value }));
         }
+
         return null;
       }).reduce((prev, cur) => (cur === null ? prev : [...prev, ...cur]), []);
 
@@ -83,7 +86,9 @@ const ChartColorRulesStore = singletonStore(
             .build()).build()).build();
 
       const promise = WidgetActions.update(widgetId, newWidget);
+
       ChartColorRulesActions.set.promise(promise);
+
       return promise;
     },
     _trigger() {

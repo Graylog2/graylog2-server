@@ -31,6 +31,7 @@ export default class SpecificUsers extends ViewSharing {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { viewId, users } = this;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({ viewId, users }));
   }
@@ -50,6 +51,7 @@ export default class SpecificUsers extends ViewSharing {
   static fromJSON(value: SpecificUsersJson) {
     // eslint-disable-next-line camelcase
     const { view_id, users } = value;
+
     return SpecificUsers.create(view_id, users);
   }
 }
@@ -63,11 +65,13 @@ class Builder {
 
   users(value: Array<string>) {
     this.value = this.value.set('users', value);
+
     return this;
   }
 
   build(): SpecificUsers {
     const { viewId, users } = this.value.toObject();
+
     return SpecificUsers.create(viewId, users);
   }
 }

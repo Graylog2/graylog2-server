@@ -21,8 +21,10 @@ type Props = {
 
 const NodeName = ({ nodeId, nodes }: Props) => {
   const node = nodes[nodeId];
+
   if (node) {
     const nodeURL = Routes.node(nodeId);
+
     return (
       <a href={nodeURL}>
         <Icon name="code-branch" />
@@ -36,6 +38,7 @@ const NodeName = ({ nodeId, nodes }: Props) => {
       </a>
     );
   }
+
   return <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
 };
 

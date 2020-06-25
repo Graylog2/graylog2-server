@@ -45,6 +45,7 @@ const ContentPacksPage = createReactClass({
         if (err_body && err_body.message) {
           err_message = error.additional.body.message;
         }
+
         UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
         /* eslint-enable camelcase */
       });

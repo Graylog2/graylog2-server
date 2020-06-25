@@ -40,9 +40,12 @@ describe('RemoveFromAllTablesActionHandler', () => {
     WidgetStore.getInitialState = jest.fn(() => widgets);
     WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
       expect(newWidgets).toEqual(expectedWidgets);
+
       return Promise.resolve();
     }));
+
     RemoveFromAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
+
     expect(WidgetActions.updateWidgets).toBeCalled();
   });
 });

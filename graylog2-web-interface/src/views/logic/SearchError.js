@@ -2,6 +2,7 @@ export default class SearchError {
   constructor(error) {
     // eslint-disable-next-line camelcase
     const { backtrace, description, query_id, search_type_id, type } = error;
+
     this._state = {
       backtrace,
       description,

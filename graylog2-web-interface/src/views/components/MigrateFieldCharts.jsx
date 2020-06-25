@@ -55,6 +55,7 @@ const mapSeriesFunction = (legacySeries: LegacySeries) => {
 
 const mapSeries = (legacySeries: LegacySeries, field: string) => {
   const seriesFunction = mapSeriesFunction(legacySeries);
+
   return `${seriesFunction}(${field})`;
 };
 
@@ -110,10 +111,13 @@ const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, vis
 
 const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
   const updatedWidgetPos = { ...existingPositions };
+
   Object.keys(updatedWidgetPos).forEach((widgetId) => {
     const widgetPos = updatedWidgetPos[widgetId];
+
     updatedWidgetPos[widgetId] = widgetPos.toBuilder().row(widgetPos.row + rowOffset).build();
   });
+
   return updatedWidgetPos;
 };
 
@@ -148,7 +152,9 @@ const _migrateWidgets = (legacyCharts) => {
         .build();
       // create widget position for new widget
       const widgetRowPos = (defaultHeight * index) + 1;
+
       newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos, defaultHeight, Infinity);
+
       return newWidget;
     });
 
@@ -188,6 +194,7 @@ const MigrateFieldCharts = () => {
   const [migrationFinished, setMigrationFinished] = useState(!!Store.get(FIELD_CHARTS_MIGRATED_KEY));
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));
   const chartAmount = legacyCharts.length;
+
   if (migrationFinished || isEmpty(legacyCharts)) {
     return null;
   }

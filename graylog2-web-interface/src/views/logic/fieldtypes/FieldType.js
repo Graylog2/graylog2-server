@@ -58,6 +58,7 @@ class FieldType {
   static fromJSON(value: FieldTypeJSON) {
     // eslint-disable-next-line camelcase
     const { type, properties, index_names } = value;
+
     return new FieldType(type, properties, index_names);
   }
 

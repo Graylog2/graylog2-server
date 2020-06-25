@@ -40,6 +40,7 @@ const AlarmCallbackHistoryOverview = createReactClass({
     const histories = this.state.histories
       .sort((h1, h2) => sortByDate(h1.created_at, h2.created_at))
       .map(this._formatHistory);
+
     return (
       <Row>
         <Col md={12}>

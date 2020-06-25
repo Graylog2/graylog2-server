@@ -17,6 +17,7 @@ const NotificationsList = createReactClass({
     if (count === 0) {
       return 'is no notification';
     }
+
     if (count === 1) {
       return 'is one notification';
     }

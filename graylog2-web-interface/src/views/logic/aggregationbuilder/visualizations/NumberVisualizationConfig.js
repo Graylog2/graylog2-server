@@ -62,6 +62,7 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
 
   static fromJSON(type: string, value: NumberVisualizationConfigJSON) {
     const { trend, trend_preference: trendPreference } = value;
+
     return NumberVisualizationConfig.create(trend, trendPreference);
   }
 }
@@ -85,6 +86,7 @@ class Builder {
 
   build() {
     const { trend, trendPreference } = this.value.toObject();
+
     return new NumberVisualizationConfig(trend, trendPreference);
   }
 }

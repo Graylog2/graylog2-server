@@ -72,6 +72,7 @@ class ShowViewPage extends React.Component<Props, State> {
 
   componentDidUpdate({ params: { viewId: lastViewId } }) {
     const { params: { viewId } } = this.props;
+
     if (viewId !== lastViewId) {
       this.loadView(viewId);
     }
@@ -97,21 +98,26 @@ class ShowViewPage extends React.Component<Props, State> {
         if (e instanceof Error) {
           throw e;
         }
+
         this.setState({ hookComponent: e });
       },
     ).then((results) => {
       this.setState({ loaded: true });
+
       return results;
     }).then((results) => {
       SearchActions.executeWithCurrentState();
+
       return results;
     }).catch((e) => e);
   };
 
   render() {
     const { hookComponent, loaded } = this.state;
+
     if (hookComponent) {
       const HookComponent = hookComponent;
+
       return <HookComponent />;
     }
 

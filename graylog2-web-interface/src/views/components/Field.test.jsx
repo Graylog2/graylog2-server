@@ -14,6 +14,7 @@ describe('Field', () => {
         <Field {...props} />
       </InteractiveContext.Provider>
     );
+
     it('does not show value actions for field if interactive context is `false`', () => {
       const NoninteractiveComponent = component(false);
       const wrapper = mount(
@@ -24,9 +25,11 @@ describe('Field', () => {
         </NoninteractiveComponent>,
       );
       const fieldActions = wrapper.find('FieldActions');
+
       expect(fieldActions).not.toExist();
       expect(wrapper).toHaveText('Field name Field options like sorting');
     });
+
     it('shows value actions for field if interactive context is `true`', () => {
       const InteractiveComponent = component(true);
       const wrapper = mount(
@@ -35,6 +38,7 @@ describe('Field', () => {
                               type={FieldType.Unknown} />,
       );
       const fieldActions = wrapper.find('FieldActions');
+
       expect(fieldActions).toExist();
       expect(wrapper).toHaveText('Field name');
     });

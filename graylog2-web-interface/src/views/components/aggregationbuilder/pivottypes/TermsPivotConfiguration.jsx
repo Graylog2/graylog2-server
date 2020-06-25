@@ -16,20 +16,24 @@ export default class TermsPivotConfiguration extends React.Component {
     super(props, context);
 
     const { limit } = props.value;
+
     this.state = { limit };
   }
 
   _changeLimit = (event) => {
     const input = FormsUtils.getValueFromInput(event.target);
     const limit = Math.max(input, 1);
+
     this._propagateChange(limit);
   };
 
   _propagateChange = (limit) => this.setState((state) => {
     const newState = { limit };
+
     if (state.limit && !isNaN(state.limit)) {
       newState.oldLimit = state.limit;
     }
+
     return newState;
   }, () => this.props.onChange({ limit }));
 

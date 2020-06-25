@@ -31,6 +31,7 @@ const MeasureDimensions = createReactClass({
     if (this.container) {
       return this.container.offsetHeight;
     }
+
     return undefined;
   },
 

@@ -84,6 +84,7 @@ class Parameter {
     if (implementingClass) {
       return implementingClass.fromJSON(value);
     }
+
     throw new Error(`No class found for type <${type}>`);
   }
 
@@ -91,6 +92,7 @@ class Parameter {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 }
+
 export default singleton('views.logic.parameters.Parameter', () => Parameter);
 
 export type ParameterMap = Immutable.Map<string, Parameter>;

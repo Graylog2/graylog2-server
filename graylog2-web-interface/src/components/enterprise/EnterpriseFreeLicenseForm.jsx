@@ -27,6 +27,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
 
   clearValues = (callback) => {
     const clearedFields = FORM_FIELDS.reduce((acc, key) => Object.assign(acc, { [key]: '' }), {});
+
     this.setState({ formFields: clearedFields }, callback);
   };
 
@@ -34,6 +35,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
     return (event) => {
       const { formFields } = this.state;
       const newFormFields = Object.assign(formFields, { [key]: event.target.value });
+
       this.setState({ formFields: newFormFields });
     };
   };

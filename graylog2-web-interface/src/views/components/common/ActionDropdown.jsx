@@ -114,6 +114,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
         } : {}),
       }),
     );
+
     return (
       <StopPropagation>
         <ActionToggle bsRole="toggle" onClick={this._onToggle}>
@@ -137,7 +138,6 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     );
   }
 }
-
 
 ActionDropdown.propTypes = {
   children: PropTypes.node.isRequired,

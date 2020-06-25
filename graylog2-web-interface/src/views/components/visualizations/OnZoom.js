@@ -27,6 +27,7 @@ const onZoom = (currentQuery: Query, from: string, to: string, viewType: ?ViewTy
     : (timerange) => QueriesActions.timerange(currentQuery.id, timerange);
 
   action(newTimerange);
+
   return false;
 };
 

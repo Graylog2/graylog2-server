@@ -59,12 +59,14 @@ export default class Search {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, queries, parameters } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, queries, parameters }));
   }
 
   toJSON(): SearchJson {
     const { id, queries, parameters } = this._value;
+
     return {
       id,
       queries: queries.toJS(),
@@ -76,6 +78,7 @@ export default class Search {
     const { id, parameters } = value;
 
     const queries = value.queries.map((q) => Query.fromJSON(q));
+
     return new Search(id, queries, parameters.map((p) => Parameter.fromJSON(p)));
   }
 
@@ -111,6 +114,7 @@ class Builder {
 
   build(): Search {
     const { id, queries, parameters } = this.value.toObject();
+
     return new Search(id, queries, parameters);
   }
 }

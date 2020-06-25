@@ -19,6 +19,7 @@ export default class EntityIndex {
 
   toBuilder() {
     const { id, title, type } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, title, type }));
   }
@@ -46,11 +47,13 @@ export default class EntityIndex {
     if (obj.isEntityIndex) {
       return true;
     }
+
     return false;
   }
 
   static fromJSON(value) {
     const { id, title, type } = value;
+
     return EntityIndex.create(id, title, type);
   }
 }
@@ -74,6 +77,7 @@ class Builder {
 
   build() {
     const { id, title, type } = this.value.toObject();
+
     return new EntityIndex(id, title, type);
   }
 }

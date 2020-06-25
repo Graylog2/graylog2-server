@@ -67,6 +67,7 @@ class ValueActions extends React.Component<Props, State> {
     const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
       .filter((action: ActionDefinition) => {
         const { isHidden = (() => false: ActionHandlerCondition) } = action;
+
         return !isHidden(handlerArgs);
       })
       .map((action: ActionDefinition) => {
@@ -79,6 +80,7 @@ class ValueActions extends React.Component<Props, State> {
 
         const { isEnabled = (() => true: ActionHandlerCondition) } = action;
         const actionDisabled = !isEnabled(handlerArgs);
+
         return (
           <MenuItem key={`value-action-${field}-${action.type}`}
                     disabled={actionDisabled}

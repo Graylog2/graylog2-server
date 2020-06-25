@@ -27,6 +27,7 @@ describe('<ContentPackApplyParameter />', () => {
     const wrapper = mount(<ContentPackApplyParameter entity={entity}
                                                      parameters={[parameter]}
                                                      appliedParameter={[appliedParameter]} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -34,11 +35,13 @@ describe('<ContentPackApplyParameter />', () => {
     const wrapper = mount(<ContentPackApplyParameter entity={entity}
                                                      parameters={[parameter]}
                                                      appliedParameter={[appliedParameterReadOnly]} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with minimal props', () => {
     const wrapper = mount(<ContentPackApplyParameter entity={entity} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -56,6 +59,7 @@ describe('<ContentPackApplyParameter />', () => {
     wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
     wrapper.find('form').simulate('submit');
+
     expect(applyFn.mock.calls.length).toBe(1);
   });
 
@@ -73,6 +77,7 @@ describe('<ContentPackApplyParameter />', () => {
     wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
     wrapper.find('form').simulate('submit');
+
     expect(applyFn.mock.calls.length).toBe(0);
   });
 
@@ -87,6 +92,7 @@ describe('<ContentPackApplyParameter />', () => {
                                                      onParameterClear={clearFn} />);
 
     wrapper.find('button[children="Clear"]').simulate('click');
+
     expect(clearFn.mock.calls.length).toBe(1);
   });
 });

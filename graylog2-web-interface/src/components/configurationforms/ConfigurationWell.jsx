@@ -20,6 +20,7 @@ class ConfigurationWell extends React.Component {
   _formatRegularField = (value, key) => {
     const { id } = this.props;
     let finalValue;
+
     if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
       finalValue = <i>{'<empty>'}</i>;
     } else {
@@ -48,9 +49,11 @@ class ConfigurationWell extends React.Component {
     const formattedItems = Object.keys(config).sort().map((key) => {
       const value = config[key];
       const requestedConfiguration = (typeDefinition && typeDefinition.requested_configuration ? typeDefinition.requested_configuration[key] : undefined);
+
       if (requestedConfiguration && requestedConfiguration.attributes.indexOf('is_password') > -1) {
         return this._formatPasswordField(value, key);
       }
+
       return this._formatRegularField(value, key);
     });
 

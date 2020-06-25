@@ -33,6 +33,7 @@ const PipelineForm = createReactClass({
 
   getInitialState() {
     const pipeline = ObjectUtils.clone(this.props.pipeline);
+
     return {
       // when editing, take the pipeline that's been passed in
       pipeline: {
@@ -50,6 +51,7 @@ const PipelineForm = createReactClass({
 
   _onChange(event) {
     const pipeline = ObjectUtils.clone(this.state.pipeline);
+
     pipeline[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState({ pipeline });
   },
@@ -78,6 +80,7 @@ const PipelineForm = createReactClass({
 
   render() {
     let triggerButtonContent;
+
     if (this.props.create) {
       triggerButtonContent = 'Add new pipeline';
     } else {

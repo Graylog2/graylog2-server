@@ -12,6 +12,7 @@ const _setDateTimeToNow = () => new DateTime();
 
 const _onDateSelected = (date) => {
   const midnightDate = date.setHours(0);
+
   return DateTime.ignoreTZ(midnightDate);
 };
 
@@ -28,6 +29,7 @@ const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}
   const _onChange = useCallback((newValue) => onChange({ target: { name, value: newValue } }), [onChange]);
   const onDatePicked = useCallback((date) => _onChange(_onDateSelected(date).toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
   const onSetTimeToNow = useCallback(() => _onChange(_setDateTimeToNow().toString(DateTime.Formats.TIMESTAMP)), [_onChange]);
+
   return (
     <DatePicker id={`date-input-datepicker-${name}`}
                 disabled={disabled}

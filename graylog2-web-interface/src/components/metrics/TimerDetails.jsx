@@ -9,6 +9,7 @@ class TimerDetails extends React.Component {
 
   render() {
     const timing = this.props.metric.metric.time;
+
     return (
       <dl className="metric-def metric-timer">
         <dt>95th percentile:</dt>

@@ -68,11 +68,13 @@ const SidecarConfig = createReactClass({
   _onUpdate(field) {
     return (value) => {
       const update = ObjectUtils.clone(this.state.config);
+
       if (typeof value === 'object') {
         update[field] = FormUtils.getValueFromInput(value.target);
       } else {
         update[field] = value;
       }
+
       this.setState({ config: update });
     };
   },
@@ -88,6 +90,7 @@ const SidecarConfig = createReactClass({
   _updateIntervalValidator(milliseconds) {
     const inactiveMilliseconds = this._durationMilliseconds(this.state.config.sidecar_inactive_threshold);
     const expirationMilliseconds = this._durationMilliseconds(this.state.config.sidecar_expiration_threshold);
+
     return milliseconds >= 1000 && milliseconds < inactiveMilliseconds && milliseconds < expirationMilliseconds;
   },
 

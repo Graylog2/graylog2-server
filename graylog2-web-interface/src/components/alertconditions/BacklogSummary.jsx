@@ -20,6 +20,7 @@ class BacklogSummary extends React.Component {
 
   render() {
     const { backlog } = this.props.alertCondition.parameters;
+
     return (
       <span>{this._formatMessageCount(backlog)} in alert notification.</span>
     );

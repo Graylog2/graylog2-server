@@ -30,11 +30,13 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
     if (editor.completer && editor.completer.popup) {
       editor.completer.popup.hide();
     }
+
     onExecute(value);
   }, [onExecute]);
 
   const editorRef = useCallback((node) => {
     const editor = node && node.editor;
+
     if (editor) {
       editor.commands.addCommand({
         name: 'Execute',

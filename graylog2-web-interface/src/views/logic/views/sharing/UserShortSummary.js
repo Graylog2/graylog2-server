@@ -27,6 +27,7 @@ export default class UserShortSummary {
 
   static fromJSON(value: UserShortSummaryJson) {
     const { username, full_name: fullname } = value;
+
     return new UserShortSummary(username, fullname);
   }
 }

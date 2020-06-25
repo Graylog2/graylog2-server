@@ -27,6 +27,7 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
                                    validationMessage={() => {
                                    }} />,
     );
+
     expect(container).toMatchSnapshot();
   });
 
@@ -57,6 +58,7 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
         'new Key': 'new Value',
       },
     };
+
     expect(updateConfig).toBeCalledWith(newConfig);
   });
 });

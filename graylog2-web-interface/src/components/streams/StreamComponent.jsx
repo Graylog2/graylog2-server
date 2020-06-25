@@ -33,12 +33,12 @@ class StreamComponent extends React.Component {
     };
   }
 
-
   componentDidMount() {
     this.loadData();
     StreamRulesStore.types().then((types) => {
       this.setState({ streamRuleTypes: types });
     });
+
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
   }
@@ -51,6 +51,7 @@ class StreamComponent extends React.Component {
   loadData = (callback) => {
     const { state } = this;
     const { page, perPage, query } = state.pagination;
+
     StreamsStore.searchPaginated(page, perPage, query)
       .then(({ streams, pagination }) => {
         this.setState({
@@ -67,6 +68,7 @@ class StreamComponent extends React.Component {
 
   _isLoading = () => {
     const { state } = this;
+
     return !(state.streams && state.streamRuleTypes);
   };
 
@@ -76,18 +78,21 @@ class StreamComponent extends React.Component {
       page: newPage,
       perPage: newPerPage,
     });
+
     this.setState({ pagination: newPagination }, this.loadData);
   };
 
   _onSearch = (query, resetLoadingCallback) => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: query });
+
     this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
   };
 
   _onReset = () => {
     const { pagination } = this.state;
     const newPagination = Object.assign(pagination, { query: '' });
+
     this.setState({ pagination: newPagination }, this.loadData);
   };
 

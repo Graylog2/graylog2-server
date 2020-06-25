@@ -80,12 +80,14 @@ class ExtractorsListItem extends React.Component {
         Details
       </Button>,
     );
+
     actions.push(
       <LinkContainer key={`edit-extractor-${extractor.id}`}
                      to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
         <Button bsStyle="info">Edit</Button>
       </LinkContainer>,
     );
+
     actions.push(<Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
 
     return actions;
@@ -95,6 +97,7 @@ class ExtractorsListItem extends React.Component {
     const { extractor } = this.props;
 
     const attributes = Object.keys(options);
+
     return attributes.map((attribute) => {
       return <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>;
     });
@@ -102,6 +105,7 @@ class ExtractorsListItem extends React.Component {
 
   _formatConfiguration = (extractorConfig) => {
     let formattedOptions = this._formatOptions(extractorConfig);
+
     if (formattedOptions.length === 0) {
       formattedOptions = <li>No configuration options</li>;
     }
@@ -128,6 +132,7 @@ class ExtractorsListItem extends React.Component {
   _formatConverters = (converters) => {
     const converterKeys = Object.keys(converters);
     const formattedConverters = converterKeys.map((converterKey) => this._formatConverter(converterKey, converters[converterKey]));
+
     if (formattedConverters.length === 0) {
       return <div />;
     }
@@ -171,6 +176,7 @@ class ExtractorsListItem extends React.Component {
 
   _formatMetrics = (metrics) => {
     let totalRate;
+
     if (metrics.total.rate) {
       totalRate = (
         <div className="meter" style={{ marginBottom: 10 }}>
@@ -191,6 +197,7 @@ class ExtractorsListItem extends React.Component {
     );
 
     let totalTime;
+
     if (metrics.total.time) {
       totalTime = this._formatTimingMetrics(metrics.total.time);
     } else {
@@ -198,6 +205,7 @@ class ExtractorsListItem extends React.Component {
     }
 
     let conditionTime;
+
     if (metrics.condition.time) {
       conditionTime = this._formatTimingMetrics(metrics.condition.time);
     } else {
@@ -205,6 +213,7 @@ class ExtractorsListItem extends React.Component {
     }
 
     let executionTime;
+
     if (metrics.execution.time) {
       executionTime = this._formatTimingMetrics(metrics.execution.time);
     } else {
@@ -212,6 +221,7 @@ class ExtractorsListItem extends React.Component {
     }
 
     let convertersTime;
+
     if (metrics.converters.time) {
       convertersTime = this._formatTimingMetrics(metrics.converters.time);
     } else {

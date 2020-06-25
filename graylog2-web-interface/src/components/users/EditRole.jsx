@@ -11,6 +11,7 @@ class EditRole extends React.Component {
     super(props);
     const { initialRole } = this.props;
     const role = initialRole;
+
     this.state = {
       role,
       initialName: this._safeRoleName(role),
@@ -21,11 +22,13 @@ class EditRole extends React.Component {
     if (prevState.role) {
       return {};
     }
+
     const role = {
       name: null,
       description: null,
       permissions: [],
     };
+
     return { role: role };
   }
 
@@ -35,22 +38,26 @@ class EditRole extends React.Component {
 
   _setName = (ev) => {
     const { role } = this.state;
+
     role.name = ev.target.value;
     this.setState({ role });
   }
 
   _setDescription = (ev) => {
     const { role } = this.state;
+
     role.description = ev.target.value;
     this.setState({ role });
   }
 
   _updatePermissions = (addedPerms, deletedPerms) => {
     const { role } = this.state;
+
     role.permissions = Immutable.Set(role.permissions)
       .subtract(deletedPerms)
       .union(addedPerms)
       .toJS();
+
     this.setState({ role });
   }
 
@@ -72,6 +79,7 @@ class EditRole extends React.Component {
     const { streams, dashboards, cancelEdit } = this.props;
 
     let titleText;
+
     if (initialName === null) {
       titleText = 'Create a new role';
     } else {
@@ -80,6 +88,7 @@ class EditRole extends React.Component {
 
     const saveDisabled = this._saveDisabled();
     let saveDisabledAlert = null;
+
     if (saveDisabled) {
       saveDisabledAlert = (
         <Alert bsStyle="warning" style={{ marginBottom: 10 }}>
@@ -133,6 +142,7 @@ EditRole.propTypes = {
   streams: PropTypes.object.isRequired,
   dashboards: PropTypes.object.isRequired,
 };
+
 EditRole.defaultProps = {
   initialRole: {
     name: null,

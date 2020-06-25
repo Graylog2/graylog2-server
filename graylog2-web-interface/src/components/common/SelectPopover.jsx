@@ -92,6 +92,7 @@ class SelectPopover extends React.Component {
     if (!lodash.isEqual(selectedItems, nextProps.selectedItems)) {
       this.setState({ selectedItems: nextProps.selectedItems });
     }
+
     if (items !== nextProps.items) {
       this.filterData(filterText, nextProps.items);
     }
@@ -99,6 +100,7 @@ class SelectPopover extends React.Component {
 
   handleSelectionChange = (nextSelection) => {
     const { onItemSelect } = this.props;
+
     this.setState({ selectedItems: nextSelection });
     onItemSelect(nextSelection, () => this.overlay.hide());
   };
@@ -126,12 +128,14 @@ class SelectPopover extends React.Component {
 
   filterData = (filterText, items) => {
     const newFilteredItems = items.filter((item) => item.match(new RegExp(filterText, 'i')));
+
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
   };
 
   handleFilterChange = (items) => {
     return (event) => {
       const filterText = event.target.value.trim();
+
       this.filterData(filterText, items);
     };
   };

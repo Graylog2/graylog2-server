@@ -45,12 +45,14 @@ class EventNotificationsContainer extends React.Component {
 
   handlePageChange = (nextPage, nextPageSize) => {
     const { notifications } = this.props;
+
     this.fetchData({ page: nextPage, pageSize: nextPageSize, query: notifications.query });
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { notifications } = this.props;
     const promise = this.fetchData({ query: nextQuery, pageSize: notifications.pagination.pageSize });
+
     promise.finally(callback);
   };
 
@@ -70,6 +72,7 @@ class EventNotificationsContainer extends React.Component {
       if (this.testPromise) {
         this.testPromise.cancel();
       }
+
       this.testPromise = EventNotificationsActions.testPersisted(definition);
       this.testPromise
         .then(
@@ -80,13 +83,16 @@ class EventNotificationsContainer extends React.Component {
               error: false,
               message: 'Notification was executed successfully.',
             };
+
             return response;
           },
           (errorResponse) => {
             testResult = { isLoading: false, id: definition.id, error: true };
+
             if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
               testResult.message = errorResponse.responseMessage || 'Unknown errorResponse, please check your Graylog server logs.';
             }
+
             return errorResponse;
           },
         )

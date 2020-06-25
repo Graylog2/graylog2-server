@@ -32,6 +32,7 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
     const overflowRight = dropdownOffsetLeft + dropdownWidth >= document.body.clientWidth;
     const overflowLeft = dropdownOffsetLeft < 0;
     const trimmedDropdown = (overflowLeft && currentPlacement === 'left') || (overflowRight && currentPlacement === 'right');
+
     if (trimmedDropdown) {
       setCurrentPlacement(oppositePlacement[currentPlacement]);
     }

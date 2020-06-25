@@ -48,6 +48,7 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
       </MenuItem>
     </>
   );
+
   return (
     <ButtonGroup>
       <Button onClick={() => onSaveView(view)}

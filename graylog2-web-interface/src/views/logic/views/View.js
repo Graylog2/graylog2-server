@@ -146,22 +146,27 @@ export default class View {
   getSearchTypeByWidgetId(widgetId: string): ?QuerySearchType {
     const widgetMapping = this.state.map((state) => state.widgetMapping).flatten(true);
     const searchTypeId = widgetMapping.get(widgetId).first();
+
     if (!searchTypeId) {
       throw new Error(`Search type for widget with id ${widgetId} does not exist`);
     }
+
     const searchTypes = flatten(this.search.queries.map((query) => query.searchTypes).toArray());
+
     return searchTypes.find((entry) => entry && entry.id && entry.id === searchTypeId);
   }
 
   getWidgetTitleByWidget(widget: Widget) {
     const widgetTitles = this.state.flatMap((state) => state.titles.get('widget'));
     const defaultTitle = widget.type === MessagesWidget.type ? MessagesWidget.defaultTitle : AggregationWidget.defaultTitle;
+
     return widgetTitles.get(widget.id) || defaultTitle;
   }
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({
       id,
@@ -199,6 +204,7 @@ export default class View {
     // eslint-disable-next-line camelcase
     const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON);
+
     return View.create()
       .toBuilder()
       .id(id)
@@ -283,6 +289,7 @@ class Builder {
 
   build(): View {
     const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires } = this.value.toObject();
+
     return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires);
   }
 }

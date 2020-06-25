@@ -18,6 +18,7 @@ const CollectorsAdministrationActions = createReactClass({
 
   render() {
     const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = this.props;
+
     return (
       <ButtonToolbar>
         <CollectorConfigurationSelector collectors={collectors}

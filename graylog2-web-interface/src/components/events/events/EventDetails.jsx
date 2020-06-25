@@ -21,11 +21,13 @@ class EventDetails extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   renderEventFields = (eventFields) => {
     const fieldNames = Object.keys(eventFields);
+
     return (
       <ul>
         {fieldNames.map((fieldName) => {

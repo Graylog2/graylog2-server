@@ -17,6 +17,7 @@ class MessageCountRotationStrategyConfiguration extends React.Component {
   _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
+
       update[field] = e.target.value;
 
       this.setState(update);

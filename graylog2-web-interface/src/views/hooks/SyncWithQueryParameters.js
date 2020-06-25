@@ -13,6 +13,7 @@ import { filtersToStreamSet } from 'views/logic/queries/Query';
 const useActionListeners = (actions, callback, dependencies) => {
   useEffect(() => {
     const unsubscribes = actions.map((action) => action.listen(callback));
+
     return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
   }, dependencies);
 };
@@ -31,12 +32,16 @@ const extractTimerangeParams = (timerange: TimeRange) => {
 
 export const syncWithQueryParameters = (query: string, action: (string) => mixed = history.push) => {
   const { view } = ViewStore.getInitialState() || {};
+
   if (view && view.type === View.Type.Search) {
     const { queries } = view.search;
+
     if (queries.size !== 1) {
       throw new Error('Searches must only have a single query!');
     }
+
     const firstQuery = queries.first();
+
     if (firstQuery) {
       const { query: { query_string: queryString }, timerange, filter = Immutable.Map() } = firstQuery;
       const baseUri = new URI(query).setSearch('q', queryString)
@@ -50,6 +55,7 @@ export const syncWithQueryParameters = (query: string, action: (string) => mixed
       const uri = currentStreams.isEmpty()
         ? uriWithTimerange.removeSearch('streams').toString()
         : uriWithTimerange.setSearch('streams', currentStreams.join(',')).toString();
+
       if (query !== uri) {
         action(uri);
       }

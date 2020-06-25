@@ -5,6 +5,7 @@ const ObjectUtils = {
 
   isEmpty(object) {
     const keys = Object.keys(object);
+
     return keys && keys.length === 0;
   },
 };

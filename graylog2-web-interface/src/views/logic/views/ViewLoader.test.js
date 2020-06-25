@@ -15,9 +15,11 @@ import Search from '../search/Search';
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {},
 }));
+
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {},
 }));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {},
 }));
@@ -42,8 +44,10 @@ describe('ViewLoader', () => {
     // $FlowFixMe: Return type ignored in test.
     ViewActions.load = jest.fn(() => Promise.resolve());
   });
+
   it('deserializes a view', () => {
     SearchActions.get = mockAction(jest.fn((id) => Promise.resolve({ id, queries: [], parameters: [] })));
+
     return ViewLoader('foo').then((result) => {
       expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
       expect(result).toEqual(

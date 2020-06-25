@@ -30,7 +30,9 @@ class ExtractorSortModal extends React.Component {
     if (!this.sortedExtractors) {
       this.close();
     }
+
     const promise = ExtractorsActions.order.triggerPromise(this.props.input.id, this.sortedExtractors);
+
     promise.then(() => this.close());
   };
 

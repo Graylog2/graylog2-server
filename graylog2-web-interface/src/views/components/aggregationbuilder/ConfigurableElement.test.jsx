@@ -14,6 +14,7 @@ describe('ConfigurableElement', () => {
         Hello World!
       </ConfigurableElement>,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -27,8 +28,10 @@ describe('ConfigurableElement', () => {
         42
       </ConfigurableElement>,
     );
+
     expect(wrapper).toIncludeText('42');
   });
+
   it('value is rendered as a link', () => {
     const onChange = jest.fn();
     const wrapper = mount(
@@ -40,6 +43,7 @@ describe('ConfigurableElement', () => {
       </ConfigurableElement>,
     );
     const link = wrapper.find('.labelAsLink');
+
     expect(link).toIncludeText('42');
   });
 
@@ -54,20 +58,23 @@ describe('ConfigurableElement', () => {
       </ConfigurableElement>
     );
     const wrapper = shallow(element, { attachTo: document.body });
+
     expect(wrapper).not.toContain('Popover');
     expect(wrapper).not.toContainReact(<span>A configuration dialog</span>);
 
     const link = wrapper.find('.labelAsLink');
+
     link.simulate('click');
 
     const popover = wrapper.find('Popover');
+
     expect(popover).toHaveLength(1);
     expect(popover).toHaveProp('title', 'Configuring Something');
 
     link.simulate('click');
+
     expect(wrapper.find('Popover')).toHaveLength(0);
   });
-
 
   it('submitting configuration dialog calls onChange', () => {
     const onChange = jest.fn();
@@ -80,14 +87,18 @@ describe('ConfigurableElement', () => {
       </ConfigurableElement>
     );
     const wrapper = shallow(element, { attachTo: document.body });
+
     expect(wrapper).not.toContain('Popover');
     expect(wrapper).not.toContainReact(<span>A configuration dialog</span>);
 
     const link = wrapper.find('.labelAsLink');
+
     link.simulate('click');
 
     const configuration = wrapper.find('configuration');
+
     expect(configuration).toHaveLength(1);
+
     configuration.prop('onClose')({ value: 42 });
 
     expect(onChange).toHaveBeenCalledTimes(1);

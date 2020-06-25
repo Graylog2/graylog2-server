@@ -22,6 +22,7 @@ class CSVConverterConfiguration extends React.Component {
 
   _toggleConverter = (event) => {
     let converter;
+
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
@@ -32,6 +33,7 @@ class CSVConverterConfiguration extends React.Component {
   _onChange = (key) => {
     return (event) => {
       const newConfig = this.props.configuration;
+
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(this.props.type, this._getConverterObject(newConfig));
     };

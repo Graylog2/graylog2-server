@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import { DocumentTitle, Icon } from 'components/common';
 import { Alert } from 'components/graylog';
 import LoginForm from 'components/login/LoginForm';

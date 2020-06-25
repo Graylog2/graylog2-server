@@ -24,6 +24,7 @@ type Props = {
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimerange = onSubmittingTimerange(timerange);
+
     return onSubmit({
       timerange: newTimerange,
       streams,
@@ -36,6 +37,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
     streams,
     timerange: onInitializingTimerange(timerange),
   };
+
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize

@@ -12,6 +12,7 @@ const queryTitle = (view: View, queryId: QueryId): ?string => (view && view.sear
           ? view.state.getIn([q.id], ViewState.create()).titles.getIn(['tab', 'title'], `Page#${idx + 1}`)
           : `Page#${idx + 1}`;
       }
+
       return undefined;
     }).filter((title) => title !== undefined)
     .first()

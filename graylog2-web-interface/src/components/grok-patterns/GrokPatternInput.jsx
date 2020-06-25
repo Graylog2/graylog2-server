@@ -25,6 +25,7 @@ class GrokPatternInput extends React.Component {
 
   _onPatternChange = (e) => {
     const { onPatternChange } = this.props;
+
     onPatternChange(e.target.value);
   };
 
@@ -32,11 +33,13 @@ class GrokPatternInput extends React.Component {
     const { pattern, onPatternChange } = this.props;
     const index = this.patternInput.getInputDOMNode().selectionStart || pattern.length;
     const newPattern = `${pattern.slice(0, index)}%{${name}}${pattern.slice(index)}`;
+
     onPatternChange(newPattern);
   };
 
   render() {
     const { className, patterns, pattern } = this.props;
+
     this.shownListItems = [];
 
     return (

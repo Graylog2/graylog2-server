@@ -28,26 +28,31 @@ jest.mock('injection/CombinedProvider', () => ({
 
 describe('ShowMessagePage', () => {
   afterEach(cleanup);
+
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
     render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
     await wait(() => expect(mockListNodes).toHaveBeenCalled());
   });
+
   it('renders for generic message', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
 
     await wait(() => expect(queryByTestId('spinner')).toBeNull());
+
     expect(container).toMatchSnapshot();
   });
+
   it('renders for generic event', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'gl-events_0', messageId: '01DFZQ64CMGV30NT7DW2P7HQX2' }} />);
 
     await wait(() => expect(queryByTestId('spinner')).toBeNull());
+
     expect(container).toMatchSnapshot();
   });
 });

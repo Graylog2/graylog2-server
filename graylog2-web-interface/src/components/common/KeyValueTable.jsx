@@ -51,12 +51,14 @@ class KeyValueTable extends React.Component {
 
   _bindValue = (event) => {
     const newState = {};
+
     newState[event.target.name] = event.target.value;
     this.setState(newState);
   };
 
   _addRow = () => {
     const newPairs = ObjectUtils.clone(this.props.pairs);
+
     newPairs[this.state.newKey] = this.state.newValue;
     this._onPairsChange(newPairs);
 
@@ -67,6 +69,7 @@ class KeyValueTable extends React.Component {
     return () => {
       if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
         const newPairs = ObjectUtils.clone(this.props.pairs);
+
         delete newPairs[key];
         this._onPairsChange(newPairs);
       }
@@ -97,8 +100,10 @@ class KeyValueTable extends React.Component {
   _formattedRows = (pairs) => {
     return Object.keys(pairs).sort().map((key) => {
       let actionsColumn;
+
       if (this.props.editable) {
         const actions = [];
+
         actions.push(
           <Button key={`delete-${key}`} bsStyle="danger" bsSize={this.props.actionsSize} onClick={this._deleteRow(key)}>
             Delete
@@ -124,6 +129,7 @@ class KeyValueTable extends React.Component {
     }
 
     const addRowDisabled = !this.state.newKey || !this.state.newValue;
+
     return (
       <tr>
         <td>

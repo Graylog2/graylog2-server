@@ -56,6 +56,7 @@ const NodeThroughput = createReactClass({
         </span>
       );
     }
+
     return (
       <span>
         In {numeral(metrics.totalIn).format('0,0')} / Out {numeral(metrics.totalOut).format('0,0')} msg/s.

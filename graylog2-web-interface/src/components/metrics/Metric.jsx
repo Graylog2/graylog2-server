@@ -31,6 +31,7 @@ const Metric = createReactClass({
 
   _formatIcon(type) {
     const icon = this.iconMapping[type];
+
     if (icon) {
       return icon;
     }
@@ -42,6 +43,7 @@ const Metric = createReactClass({
     const { namespace } = this.props;
     const split = metricName.split(namespace);
     const unqualifiedMetricName = split.slice(1).join(namespace);
+
     return (
       <span>
         <span className="prefix">{namespace}</span>
@@ -58,6 +60,7 @@ const Metric = createReactClass({
   render() {
     const { metric } = this.props;
     const details = this.state.expanded ? <MetricDetails nodeId={this.props.nodeId} metric={this.props.metric} /> : null;
+
     return (
       <span>
         <div className="name">

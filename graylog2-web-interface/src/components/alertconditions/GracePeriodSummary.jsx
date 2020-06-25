@@ -16,6 +16,7 @@ class GracePeriodSummary extends React.Component {
 
   render() {
     const time = this.props.alertCondition.parameters.grace;
+
     return <span>Grace period: {this._formatTime(time)}.</span>;
   }
 }

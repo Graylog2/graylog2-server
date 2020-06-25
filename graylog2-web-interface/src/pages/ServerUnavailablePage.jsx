@@ -7,7 +7,6 @@ import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import authStyles from 'theme/styles/authStyles';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
-
 import { qualifyUrl } from 'util/URLUtils';
 
 const StyledIcon = styled(Icon)`
@@ -63,6 +62,7 @@ class ServerUnavailablePage extends React.Component {
     if (error.message) {
       errorDetails.push(<dt key="error-title">Error message</dt>, <dd key="error-desc">{error.message}</dd>);
     }
+
     if (error.originalError) {
       const { originalError } = error;
 
@@ -70,6 +70,7 @@ class ServerUnavailablePage extends React.Component {
         <dt key="status-original-request-title">Original Request</dt>,
         <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>,
       );
+
       errorDetails.push(
         <dt key="status-code-title">Status code</dt>,
         <dd key="status-code-desc">{String(originalError.status)}</dd>,

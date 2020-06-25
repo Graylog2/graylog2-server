@@ -19,12 +19,15 @@ const extractSeriesReferences = (expression, acc = []) => {
   if (expression.expr === 'number-ref') {
     acc.push(expression.ref);
   }
+
   if (expression.left && expression.right) {
     return extractSeriesReferences(expression.left).concat(extractSeriesReferences(expression.right));
   }
+
   if (expression.child) {
     return extractSeriesReferences(expression.child);
   }
+
   return acc;
 };
 
@@ -47,6 +50,7 @@ class AggregationConditionsForm extends React.Component {
 
   toggleShowInlineValidation = () => {
     const { showInlineValidation } = this.state;
+
     this.setState({ showInlineValidation: !showInlineValidation });
   };
 
@@ -55,15 +59,18 @@ class AggregationConditionsForm extends React.Component {
 
     if (!Object.keys(changes).includes('conditions')) {
       onChange(changes);
+
       return;
     }
 
     const nextConditions = changes.conditions;
 
     let nextSeries;
+
     if (nextConditions) {
       // Keep series up-to-date with changes in conditions
       const seriesReferences = extractSeriesReferences(nextConditions);
+
       nextSeries = (changes.series || eventDefinition.config.series).filter((s) => seriesReferences.includes(s.id));
     } else {
       nextSeries = [];

@@ -74,6 +74,7 @@ class ScrollButton extends React.Component {
     if (window.pageYOffset === 0) {
       clearInterval(intervalId);
     }
+
     window.scroll(0, window.pageYOffset - scrollSteps);
   };
 

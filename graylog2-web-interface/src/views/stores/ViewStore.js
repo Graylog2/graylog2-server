@@ -79,9 +79,12 @@ export const ViewStore: ViewStoreType = singletonStore(
       return ViewGenerator(type, streamId)
         .then((newView) => {
           const [view] = this._updateSearch(newView);
+
           this.view = view;
           const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
+
           this.activeQuery = queries.first().id;
+
           return view;
         }).then((view) => {
           const promise = ViewActions.search(view.search)
@@ -92,6 +95,7 @@ export const ViewStore: ViewStoreType = singletonStore(
             .then(() => this._trigger());
 
           ViewActions.create.promise(promise.then(() => this._state()));
+
           return promise;
         });
     },
@@ -106,11 +110,13 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       const newSearch = search.toBuilder().queries(newQueries).build();
       const newState = this.view.state.set(query.id, viewState);
+
       this.dirty = true;
       const [view, isModified] = this._updateSearch(this.view.toBuilder()
         .state(newState)
         .search(newSearch)
         .build());
+
       this.view = view;
       this.activeQuery = query.id;
 
@@ -123,7 +129,9 @@ export const ViewStore: ViewStoreType = singletonStore(
       this.view = view;
       this._trigger();
       const promise = Promise.resolve(this._state());
+
       ViewActions.update.promise(promise);
+
       return promise;
     },
     load(view: View, isNew: ?boolean = false): Promise<ViewStoreState> {
@@ -135,11 +143,14 @@ export const ViewStore: ViewStoreType = singletonStore(
       const queries = get(view, 'search.queries', Immutable.List());
       const firstQueryId = get(queries.first(), 'id');
       const selectedQuery = this.activeQuery && queries.find((q) => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
+
       this.selectQuery(selectedQuery);
       this.isNew = isNew;
 
       const promise = Promise.resolve(this._state());
+
       ViewActions.load.promise(promise);
+
       return promise;
     },
     properties(newProperties: Properties) {
@@ -152,34 +163,45 @@ export const ViewStore: ViewStoreType = singletonStore(
         this.dirty = true;
         this.view = this.view.toBuilder().search(search).build();
         this._trigger();
+
         return this.view;
       });
+
       ViewActions.search.promise(promise);
+
       return promise;
     },
     selectQuery(queryId) {
       this.activeQuery = queryId;
       this._trigger();
       const promise = Promise.resolve(this.view);
+
       ViewActions.selectQuery.promise(promise);
+
       return promise;
     },
     state(newState: ViewState) {
       this.dirty = true;
       const [view, isModified] = this._updateSearch(this.view.toBuilder().state(newState).build());
+
       this.view = view;
       const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
+
       ViewActions.state.promise(promise);
+
       return promise;
     },
     _updateSearch(view: View): [View, boolean] {
       if (!view.search) {
         return [view, false];
       }
+
       const oldWidgets = get(this.view, 'state') && this.view.state.map((s) => s.widgets);
       const newWidgets = get(view, 'state') && view.state.map((s) => s.widgets);
+
       if (!isEqualForSearch(oldWidgets, newWidgets)) {
         const newView = UpdateSearchForWidgets(view);
+
         return [newView, true];
       }
 

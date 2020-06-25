@@ -27,18 +27,21 @@ class AddNotificationForm extends React.Component {
 
   handleNewNotificationSubmit = (promise) => {
     const { onChange } = this.props;
+
     promise.then((notification) => onChange(notification.id));
   };
 
   handleSubmit = () => {
     const { onChange } = this.props;
     const { selectedNotification } = this.state;
+
     onChange(selectedNotification);
   };
 
   handleSelectNotificationChange = (nextNotificationId) => {
     if (nextNotificationId === 'create') {
       this.setState({ displayNewNotificationForm: true });
+
       return;
     }
 
@@ -48,12 +51,14 @@ class AddNotificationForm extends React.Component {
   formatNotifications = (notifications) => {
     const { hasCreationPermissions } = this.props;
     const formattedNotifications = notifications.map((n) => ({ label: n.title, value: n.id }));
+
     if (hasCreationPermissions) {
       formattedNotifications.unshift({
         label: 'Create New Notification...',
         value: 'create',
       });
     }
+
     return formattedNotifications;
   };
 
