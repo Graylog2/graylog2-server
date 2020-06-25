@@ -18,6 +18,8 @@
 
     <properties>
         <it.es.version>5.6.12</it.es.version>
+        <elasticsearch.version>5.6.12</elasticsearch.version>
+        <jest.version>2.4.15+jackson</jest.version>
     </properties>
 
     <dependencies>
@@ -33,14 +35,25 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>elasticsearch5</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>
             <groupId>org.graylog.jest</groupId>
             <artifactId>jest</artifactId>
             <version>${jest.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
 
         <dependency>
