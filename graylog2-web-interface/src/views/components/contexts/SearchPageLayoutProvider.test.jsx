@@ -4,6 +4,7 @@ import { cleanup, render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 
+import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 
@@ -19,15 +20,19 @@ describe('CurrentUserPreferencesProvider', () => {
 
   const renderSUT = () => {
     const consume = jest.fn();
+
     render(
-      <CurrentUserPreferencesProvider>
-        <SearchPageLayoutProvider>
-          <SearchPageLayoutContext.Consumer>
-            {consume}
-          </SearchPageLayoutContext.Consumer>
-        </SearchPageLayoutProvider>
-      </CurrentUserPreferencesProvider>,
+      <CurrentUserProvider>
+        <CurrentUserPreferencesProvider>
+          <SearchPageLayoutProvider>
+            <SearchPageLayoutContext.Consumer>
+              {consume}
+            </SearchPageLayoutContext.Consumer>
+          </SearchPageLayoutProvider>
+        </CurrentUserPreferencesProvider>
+      </CurrentUserProvider>,
     );
+
     return consume;
   };
 

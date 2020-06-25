@@ -2,19 +2,17 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { get } from 'lodash';
 
-import { useStore } from 'stores/connect';
+import type { User } from 'stores/users/UsersStore';
 import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
-import CombinedProvider from 'injection/CombinedProvider';
 import PreferencesStore from 'stores/users/PreferencesStore';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-
 type Props = {
   children: React.Node,
+  currentUser: ?User,
   userPreferences: UserPreferences,
 };
 
@@ -50,10 +48,9 @@ const toggleSidebarPinning = (config, setConfig, userName, userPreferences) => {
   PreferencesStore.saveUserPreferences(userName, createUserPreferencesArray(newUserPreferences), undefined, false);
 };
 
-const SearchPageLayoutProvider = ({ children, userPreferences }: Props) => {
+const SearchPageLayoutProvider = ({ children, currentUser, userPreferences }: Props) => {
   const [config, setConfig] = useState(defaultLayoutConfig(userPreferences));
-  const currentUser = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
-  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser.username, userPreferences) };
+  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser?.username, userPreferences) };
 
   return (
     <SearchPageLayoutContext.Provider value={{ config, actions }}>
@@ -72,11 +69,15 @@ SearchPageLayoutProvider.defaultProps = {
 };
 
 const SearchPageLayoutProviderWithContext = ({ ...rest }: { children: React.Node }) => (
-  <UserPreferencesContext.Consumer>
-    {(userPreferences) => (
-      <SearchPageLayoutProvider {...rest} userPreferences={userPreferences} />
+  <CurrentUserContext.Consumer>
+    {(currentUser) => (
+      <UserPreferencesContext.Consumer>
+        {(userPreferences) => (
+          <SearchPageLayoutProvider {...rest} userPreferences={userPreferences} currentUser={currentUser} />
+        )}
+      </UserPreferencesContext.Consumer>
     )}
-  </UserPreferencesContext.Consumer>
+  </CurrentUserContext.Consumer>
 );
 
 export default SearchPageLayoutProviderWithContext;
