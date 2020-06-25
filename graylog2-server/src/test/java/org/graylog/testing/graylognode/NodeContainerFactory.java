@@ -82,6 +82,7 @@ public class NodeContainerFactory {
                 .withNetwork(config.network)
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
+                .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion)
                 .withEnv("GRAYLOG_PASSWORD_SECRET", "M4lteserKreuzHerrStrack?")
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
                 .withEnv("GRAYLOG_HTTP_BIND_ADDRESS", "0.0.0.0:" + API_PORT)
