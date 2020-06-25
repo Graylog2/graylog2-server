@@ -34,14 +34,17 @@ const PreferencesStore = Reflux.createStore({
       });
 
     preferences = preferences.sort((t1: Preference, t2: Preference) => t1.name.localeCompare(t2.name));
+
     return preferences;
   },
   convertPreferenceArrayToMap(preferences: Array<Preference>): PreferencesMap {
     const preferencesAsMap = {};
+
     preferences.forEach((element) => {
       // TODO: Converting all preferences to booleans for now, we should change this when we support more types
       preferencesAsMap[element.name] = element.value === true || element.value === 'true';
     });
+
     return preferencesAsMap;
   },
   saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void, displaySuccessNotification: boolean = true): void {
@@ -52,6 +55,7 @@ const PreferencesStore = Reflux.createStore({
         if (displaySuccessNotification) {
           UserNotification.success('User preferences successfully saved');
         }
+
         callback(preferences);
       }, (errorThrown) => {
         UserNotification.error(`Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
@@ -66,6 +70,7 @@ const PreferencesStore = Reflux.createStore({
     const url = this.URL + userName;
     const successCallback = (data: PreferencesResponse) => {
       const sortedArray = this.convertPreferenceMapToArray(data.preferences);
+
       callback(sortedArray);
     };
     const failCallback = (errorThrown) => {

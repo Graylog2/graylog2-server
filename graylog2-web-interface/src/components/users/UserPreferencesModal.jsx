@@ -14,6 +14,7 @@ class UserPreferencesModal extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = { preferences: [] };
   }
 
@@ -21,9 +22,11 @@ class UserPreferencesModal extends React.Component {
     const { name } = event.target;
     const { preferences } = this.state;
     const preferenceToChange = preferences.filter((preference) => preference.name === name)[0];
+
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {
       preferenceToChange.value = event.target.value;
+
       this.setState({ preferences: preferences });
     }
   };
@@ -31,13 +34,16 @@ class UserPreferencesModal extends React.Component {
   _save = () => {
     const { userName } = this.props;
     const { preferences } = this.state;
+
     PreferencesStore.saveUserPreferences(userName, preferences, this.modal.close);
   };
 
   openModal = () => {
     const { userName } = this.props;
+
     PreferencesStore.loadUserPreferences(userName, (preferences) => {
       this.setState({ preferences: preferences });
+
       this.modal.open();
     });
   };
@@ -68,6 +74,7 @@ class UserPreferencesModal extends React.Component {
 
       return formattedPreference;
     });
+
     return (
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title={`Preferences for user ${userName}`}
