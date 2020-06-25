@@ -12,6 +12,10 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     margin: 0 10px;
   }
 
+  .navbar-header {
+    color: ${theme.colors.variant.dark.default};
+  }
+
   @media (max-width: 991px) {
     .small-scrn-badge {
       float: right;

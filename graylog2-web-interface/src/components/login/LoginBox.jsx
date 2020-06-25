@@ -11,6 +11,10 @@ const LoginCol = styled(Col)(({ theme }) => css`
   border-radius: 4px;
   box-shadow: 0 0 21px rgba(0, 0, 0, 0.75);
   margin-top: 120px;
+
+  > legend {
+    color: ${theme.colors.global.textDefault};
+  }
 `);
 
 const LoginBox = ({ children }) => {
