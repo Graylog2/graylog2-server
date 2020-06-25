@@ -44,7 +44,9 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
         .then((entityShareResponse: EntityShareResponse) => {
           this.entityShareState = entityShareResponse;
         });
+
       EntityShareActions.prepare.promise(promise);
+
       return promise;
     },
 

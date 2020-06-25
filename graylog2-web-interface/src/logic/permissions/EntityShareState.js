@@ -88,6 +88,7 @@ export default class EntityShareState {
       selectedGranteeRoles,
       missingDependencies,
     } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({
       entity,
@@ -108,6 +109,7 @@ export default class EntityShareState {
       selectedGranteeRoles,
       missingDependencies,
     } = this._value;
+
     return {
       entity,
       availableGrantees,
@@ -128,6 +130,7 @@ export default class EntityShareState {
       selected_grantee_roles,
       missing_dependencies,
     } = value;
+
     /* eslint-enable camelcase */
     return new EntityShareState(
       entity,
@@ -188,6 +191,7 @@ class Builder {
       selectedGranteeRoles,
       missingDependencies,
     } = this.value.toObject();
+
     return new EntityShareState(
       entity,
       availableGrantees,
