@@ -1,6 +1,6 @@
 // @flow strict
 import React, { useEffect } from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
 
 import WidgetOverrideElements from './WidgetOverrideElements';
@@ -8,8 +8,6 @@ import WidgetOverrideElements from './WidgetOverrideElements';
 jest.mock('views/logic/withPluginEntities', () => (x) => x);
 
 describe('WidgetOverrideElements', () => {
-  afterEach(cleanup);
-
   it('renders original children if no elements are present', async () => {
     const { findByText } = render((
       <WidgetOverrideElements widgetOverrideElements={[]}>

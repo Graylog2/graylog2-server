@@ -1,13 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, cleanup, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 
 describe('QueryTitleEditModal', () => {
-  afterEach(cleanup);
-
   const modalHeadline = 'Editing dashboard page title';
 
   const openModal = (modalRef, currentTitle = 'CurrentTitle') => {

@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { act } from 'react-dom/test-utils';
-import { render, cleanup, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -69,7 +69,6 @@ describe('NewSearchPage', () => {
   });
 
   afterEach(() => {
-    cleanup();
     jest.clearAllMocks();
   });
 

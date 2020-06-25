@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, render, cleanup, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { asElement, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import WrappingContainer from 'WrappingContainer';
 
@@ -40,8 +40,6 @@ jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Input
 
 describe('WidgetQueryControls', () => {
   beforeEach(() => { jest.clearAllMocks(); });
-
-  afterEach(cleanup);
 
   const config = {
     relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },

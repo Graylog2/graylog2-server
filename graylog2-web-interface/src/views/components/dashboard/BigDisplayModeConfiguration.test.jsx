@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import history from 'util/History';
@@ -45,8 +45,6 @@ const createViewWithQueries = () => {
 };
 
 describe('BigDisplayModeConfiguration', () => {
-  afterEach(cleanup);
-
   it('generates markup that matches snapshot', () => {
     const { container } = render(<BigDisplayModeConfiguration view={view} />);
 

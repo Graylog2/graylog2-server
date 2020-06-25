@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import selectEvent from 'react-select-event';
@@ -103,7 +103,6 @@ describe('CSVExportModal', () => {
   };
 
   afterEach(() => {
-    cleanup();
     jest.clearAllMocks();
   });
 

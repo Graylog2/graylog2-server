@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
@@ -16,8 +16,6 @@ const getOption = (optionText, getByText) => {
 };
 
 describe('SurroundingSearchButton', () => {
-  afterEach(cleanup);
-
   const searchConfig: SearchesConfig = {
     analysis_disabled_fields: [],
     query_time_range_limit: 'PT0S',

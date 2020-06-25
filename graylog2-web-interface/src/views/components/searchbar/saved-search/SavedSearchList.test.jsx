@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
 
 import Routes from 'routing/Routes';
@@ -37,10 +37,6 @@ const createViewsResponse = (count = 1) => {
 
 describe('SavedSearchList', () => {
   describe('render the SavedSearchList', () => {
-    afterEach(() => {
-      cleanup();
-    });
-
     it('should render empty', () => {
       const views = createViewsResponse(0);
       const { baseElement } = render(<SavedSearchList toggleModal={() => {}}
@@ -116,10 +112,6 @@ describe('SavedSearchList', () => {
   });
 
   describe('load new saved search', () => {
-    afterEach(() => {
-      cleanup();
-    });
-
     it('should change url after load', async () => {
       const onLoad = jest.fn(() => Promise.resolve());
 

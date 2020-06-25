@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 
@@ -34,8 +34,6 @@ const changeInput = async (input, value) => {
 };
 
 describe('AbsoluteTimeRangeSelector', () => {
-  afterEach(cleanup);
-
   it('does not try to parse an empty date in from field', async () => {
     const { getByDisplayValue } = renderWithForm((
       <AbsoluteTimeRangeSelector />

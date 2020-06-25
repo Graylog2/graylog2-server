@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import Footer from './Footer';
 
@@ -15,8 +15,6 @@ jest.mock('injection/StoreProvider', () => ({
 }));
 
 describe('Footer', () => {
-  afterEach(cleanup);
-
   it('includes Graylog version', async () => {
     const { findByText } = render(<Footer />);
 

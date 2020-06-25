@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, waitFor, fireEvent, cleanup } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
 import { Map } from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -77,7 +77,6 @@ jest.mock('./WidgetColorContext', () => ({ children }) => children);
 
 describe('<Widget />', () => {
   afterEach(() => {
-    cleanup();
     jest.clearAllMocks();
     jest.resetModules();
   });
@@ -335,11 +334,6 @@ describe('<Widget />', () => {
         .id('new-id').type(View.Type.Dashboard)
         .build());
     });
-
-    afterEach(() => {
-      cleanup();
-    });
-
     const renderAndClick = () => {
       const { getByText, getByTestId } = render(<DummyWidget />);
       const actionToggle = getByTestId('widgetActionDropDown');

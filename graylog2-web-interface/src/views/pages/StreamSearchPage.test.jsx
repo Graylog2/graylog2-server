@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -76,7 +76,6 @@ describe('StreamSearchPage', () => {
   );
 
   afterEach(() => {
-    cleanup();
     jest.clearAllMocks();
     jest.resetModules();
   });

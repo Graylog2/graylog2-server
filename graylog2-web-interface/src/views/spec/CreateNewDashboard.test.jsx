@@ -3,7 +3,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
@@ -66,8 +66,6 @@ describe('Create a new dashboard', () => {
   beforeEach(() => {
     jest.setTimeout(30000);
   });
-
-  afterEach(cleanup);
 
   const SimpleAppRouter = () => (
     <CurrentUserProvider>

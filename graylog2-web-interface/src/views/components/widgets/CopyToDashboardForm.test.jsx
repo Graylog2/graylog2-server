@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 
 import { DashboardsActions } from 'views/stores/DashboardsStore';
@@ -12,7 +12,6 @@ describe('CopyToDashboardForm', () => {
   beforeEach(() => {
     DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
   });
-  afterEach(cleanup);
 
   const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
     .build();

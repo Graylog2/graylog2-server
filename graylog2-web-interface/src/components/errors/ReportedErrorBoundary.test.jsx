@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import suppressConsole from 'helpers/suppressConsole';
 
@@ -18,10 +18,6 @@ const router = {
 };
 
 describe('ReportedErrorBoundary', () => {
-  afterEach(() => {
-    cleanup();
-  });
-
   it('registers to router upon mount', () => {
     const mockRouter = {
       listen: jest.fn(() => jest.fn()),

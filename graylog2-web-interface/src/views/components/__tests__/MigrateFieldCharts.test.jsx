@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, waitFor, cleanup } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -83,7 +83,6 @@ const renderAndMigrate = () => {
 
 describe('MigrateFieldCharts', () => {
   afterEach(() => {
-    cleanup();
     jest.clearAllMocks();
   });
 

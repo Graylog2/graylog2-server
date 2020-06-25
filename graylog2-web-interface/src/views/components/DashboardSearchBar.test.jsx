@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
@@ -29,8 +29,6 @@ describe('DashboardSearchBar', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
-  afterEach(cleanup);
 
   const onExecute = jest.fn();
 

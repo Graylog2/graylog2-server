@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
@@ -30,8 +30,6 @@ describe('KeywordTimeRangeSelector', () => {
       to: '2018-11-14 13:57:38',
     }));
   });
-
-  afterEach(cleanup);
 
   const findValidationState = (container) => {
     const formGroup = container.querySelector('.form-group');

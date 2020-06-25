@@ -1,12 +1,10 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import RuntimeErrorPage from './RuntimeErrorPage';
 
 describe('RuntimeErrorPage', () => {
-  afterEach(cleanup);
-
   const SimpleRuntimeErrorPage = () => <RuntimeErrorPage error={new Error('The error message')} componentStack="The component stack" />;
 
   it('displays runtime error', () => {

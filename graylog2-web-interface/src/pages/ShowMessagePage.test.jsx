@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import ShowMessagePage from './ShowMessagePage';
@@ -27,8 +27,6 @@ jest.mock('injection/CombinedProvider', () => ({
 }));
 
 describe('ShowMessagePage', () => {
-  afterEach(cleanup);
-
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));

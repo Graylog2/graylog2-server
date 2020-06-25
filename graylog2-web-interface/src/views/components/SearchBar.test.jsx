@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
@@ -46,8 +46,6 @@ describe('SearchBar', () => {
   beforeEach(() => {
     QueriesActions.update = mockAction(jest.fn());
   });
-
-  afterEach(cleanup);
 
   it('should render the SearchBar', () => {
     const { getByText } = render(<SearchBar config={config} onExecute={() => {}} />);
