@@ -9,8 +9,8 @@ export type Role = {|
 
 export type Grantee = {|
   id: GRN,
-  type: 'global' | 'team' | 'user',
   title: string,
+  type: 'global' | 'team' | 'user',
 |};
 
 export type ActiveShare = {|
@@ -21,8 +21,8 @@ export type ActiveShare = {|
 
 export type MissingDependency = {|
   id: GRN,
-  title: String,
   owners: Array<$PropertyType<Grantee, 'id'>>,
+  title: String,
 |};
 
 export type SelectedGranteeRoles = {|
@@ -30,12 +30,12 @@ export type SelectedGranteeRoles = {|
 |};
 
 export type EntityShareResponse = {|
-  entity: GRN,
+  active_shares: Array<ActiveShare>,
   available_grantees: Array<Grantee>,
   available_roles: Array<Role>,
-  active_shares: Array<ActiveShare>,
-  selected_grantee_roles: SelectedGranteeRoles,
+  entity: GRN,
   missing_dependencies: Array<MissingDependency>,
+  selected_grantee_roles: SelectedGranteeRoles,
 |};
 
 export type EntityShareRequest = {|
