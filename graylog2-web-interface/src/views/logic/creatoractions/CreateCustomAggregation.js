@@ -7,7 +7,7 @@ import DataTable from 'views/components/datatable/DataTable';
 import type { CreatorProps } from 'views/components/sidebar/create/AddWidgetButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
-export default function ({ view }: CreatorProps) {
+export default function CreateCustomAggregation({ view }: CreatorProps) {
   const newWidget = AggregationWidget.builder()
     .newId()
     .timerange(view.type === View.Type.Dashboard ? DEFAULT_TIMERANGE : undefined)
