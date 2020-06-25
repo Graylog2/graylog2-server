@@ -55,11 +55,13 @@ type Props = {
 
 const updateColor = (rule, newColor, hidePopover) => {
   const newRule = rule.toBuilder().color(newColor).build();
+
   return HighlightingRulesActions.update(newRule).then(hidePopover);
 };
 
 const onDelete = (e, rule) => {
   e.preventDefault();
+
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
@@ -68,6 +70,7 @@ const onDelete = (e, rule) => {
 
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color } = rule;
+
   return (
     <HighlightingRuleGrid>
       <ColorPickerPopover id="formatting-rule-color"

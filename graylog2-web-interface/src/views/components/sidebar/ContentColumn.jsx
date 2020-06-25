@@ -107,12 +107,14 @@ const toggleSidebarPinning = (searchPageLayout) => {
   if (!searchPageLayout) {
     return;
   }
+
   const { setConfig, config } = searchPageLayout;
   const sidebarIsPinned = config?.sidebar.isPinned;
   const newLayoutConfig = {
     ...config,
     sidebar: { isPinned: !sidebarIsPinned },
   };
+
   setConfig(newLayoutConfig);
 };
 
@@ -120,18 +122,22 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew
   const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType, capitalize: true }) : View.Type.Search;
   const unsavedViewTitle = `Unsaved ${viewTypeLabel}`;
   const savedViewTitle = viewMetadata.title ?? `Untitled ${viewTypeLabel}`;
+
   if (viewIsNew) {
     return unsavedViewTitle;
   }
+
   return savedViewTitle;
 };
 
 const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
+
   return (
     <ViewTypeContext.Consumer>
       {(viewType) => {
         const title = sidebarTitle(viewMetadata, viewType, viewIsNew);
+
         return (
           <Container sidebarIsPinned={sidebarIsPinned}>
             <div>

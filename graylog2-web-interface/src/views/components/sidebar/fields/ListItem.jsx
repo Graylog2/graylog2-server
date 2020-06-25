@@ -33,6 +33,7 @@ const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = style
 const ListItem = ({ activeQueryFields, fieldType, selectedQuery, style }: Props) => {
   const { name, type } = fieldType;
   const disabled = !activeQueryFields.find((f) => f.name === name);
+
   return (
     <StyledListItem style={style}>
       <FieldTypeIcon type={type} />

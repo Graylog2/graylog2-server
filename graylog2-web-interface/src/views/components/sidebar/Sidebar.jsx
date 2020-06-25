@@ -45,8 +45,10 @@ const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styl
 const handleToggleSidebar = (sections: Array<SidebarSection>, activeSectionKey: ?string, setActiveSectionKey) => {
   if (activeSectionKey) {
     setActiveSectionKey(null);
+
     return;
   }
+
   setActiveSectionKey(sections[0].key);
 };
 
@@ -56,6 +58,7 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const toggleSidebar = () => handleToggleSidebar(sections, activeSectionKey, setActiveSectionKey);
   const SectionContent = activeSection?.content;
+
   return (
     <Container>
       <SidebarNavigation activeSection={activeSection}

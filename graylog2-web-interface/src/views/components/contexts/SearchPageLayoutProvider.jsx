@@ -13,6 +13,7 @@ const defaultLayoutConfig = {
 
 const SearchPageLayoutProvider = ({ children }: { children: React.Node }) => {
   const [config, setConfig] = useState(defaultLayoutConfig);
+
   return (
     <SearchPageLayoutContext.Provider value={{ config, setConfig }}>
       {children}
