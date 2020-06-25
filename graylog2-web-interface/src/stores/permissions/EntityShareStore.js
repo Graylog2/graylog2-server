@@ -10,7 +10,7 @@ import type { GRN, SelectedGranteeRoles } from 'logic/permissions/types';
 import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
 
 type EntityShareStoreState = {
-  entityShareState: EntityShareState,
+  state: EntityShareState,
 };
 
 type EntitySharePreparePayload = {|
@@ -39,26 +39,26 @@ export const EntityShareActions: EntityShareActionsType = singletonActions(
 export const EntityShareStore: EntityShareStoreType = singletonStore(
   'permissions.EntityShare',
   () => Reflux.createStore({
-    entityShareState: undefined,
+    state: undefined,
 
     getInitialState(): EntityShareStoreState {
       return this._state();
     },
 
-    prepare(entityGRN: GRN, entityShareRequest: EntitySharePreparePayload): Promise<EntityShareState> {
+    prepare(entityGRN: GRN, payload: EntitySharePreparePayload): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN));
-      const promise = fetch('POST', url, JSON.stringify(entityShareRequest)).then(this._handleResponse);
+      const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
       EntityShareActions.prepare.promise(promise);
 
       return promise;
     },
 
-    update(entityGRN: GRN, entityShareRequest: EntityShareUpdatePayload): Promise<EntityShareState> {
+    update(entityGRN: GRN, payload: EntityShareUpdatePayload): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN));
-      const promise = fetch('POST', url, JSON.stringify(entityShareRequest)).then(this._handleResponse);
+      const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
-      EntityShareActions.prepare.promise(promise);
+      EntityShareActions.update.promise(promise);
 
       return promise;
     },
@@ -66,16 +66,16 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
     _handleResponse(entityShareStateJSON: EntityShareStateJson): EntityShareState {
       const entityShareState = EntityShareState.fromJSON(entityShareStateJSON);
 
-      this.entityShareState = entityShareState;
+      this.state = entityShareState;
 
       this._trigger();
 
-      return this.entityShareState;
+      return this.state;
     },
 
     _state(): EntityShareStoreState {
       return {
-        entityShareState: this.entityShareState,
+        state: this.state,
       };
     },
 
