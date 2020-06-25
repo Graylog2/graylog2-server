@@ -39,7 +39,7 @@
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "html-webpack-plugin": "^4.2.0",
     "javascript-natural-sort": "0.7.1",
-    "jquery": "3.4.1",
+    "jquery": "3.5.1",
     "moment": "2.27.0",
     "moment-timezone": "0.5.31",
     "prop-types": "15.7.2",
