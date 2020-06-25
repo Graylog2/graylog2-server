@@ -27,4 +27,4 @@ export type MissingDependency = {|
 
 export type SelectedGranteeRoles = {|
   [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Role, 'id'>,
-|};
+|} | {||};
