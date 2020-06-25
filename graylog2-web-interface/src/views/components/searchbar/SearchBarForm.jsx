@@ -24,17 +24,20 @@ type Props = {
 
 const validate = (values) => {
   const errors = {};
+
   if (values.timerange.type === 'absolute' && DateTime.isValidDateString(values.timerange.from) && values.timerange.from > values.timerange.to) {
     errors.timerange = {
       from: 'Start date must be before end date',
     };
   }
+
   return errors;
 };
 
 const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
   const _onSubmit = useCallback(({ timerange, streams, queryString }) => {
     const newTimerange = onSubmittingTimerange(timerange);
+
     return onSubmit({
       timerange: newTimerange,
       streams,
@@ -47,6 +50,7 @@ const SearchBarForm = ({ initialValues, onSubmit, children }: Props) => {
     streams,
     timerange: onInitializingTimerange(timerange),
   };
+
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize

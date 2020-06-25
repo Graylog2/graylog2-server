@@ -17,6 +17,7 @@ const renderWithForm = (element) => render((
 
 const _findValidationState = (container) => {
   const formGroup = container?.matches('.form-group') ? container : container?.querySelector('.form-group');
+
   return formGroup && formGroup.className.includes('has-error')
     ? 'error'
     : null;
@@ -28,6 +29,7 @@ const getValidationStateOfInput = (input) => _findValidationState(_findFormGroup
 
 const changeInput = async (input, value) => {
   const { name } = asElement(input, HTMLInputElement);
+
   await act(async () => { fireEvent.change(input, { target: { value, name } }); });
 };
 
@@ -65,7 +67,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, 'invalid');
 
-    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD HH:mm:ss.SSS')).not.toBeNull());
+    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
   });
 
   it('shows error message for to date if parsing fails after changing input', async () => {
@@ -77,6 +79,6 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, 'invalid');
 
-    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD HH:mm:ss.SSS')).not.toBeNull());
+    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
   });
 });

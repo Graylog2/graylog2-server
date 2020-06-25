@@ -8,6 +8,7 @@ import AbsoluteTimeRangeSelector from './AbsoluteTimeRangeSelector';
 
 const changeInput = async (input, value) => {
   const { name } = asElement(input, HTMLInputElement);
+
   await act(async () => { fireEvent.change(input, { target: { value, name } }); });
 };
 

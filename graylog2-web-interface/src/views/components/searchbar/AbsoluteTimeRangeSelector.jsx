@@ -38,7 +38,7 @@ const _isValidDateString = (dateString: string) => {
 
   return DateTime.isValidDateString(dateString)
     ? undefined
-    : `Format must be: ${DateTime.Formats.TIMESTAMP}`;
+    : 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]';
 };
 
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {
