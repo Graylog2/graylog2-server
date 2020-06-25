@@ -1,10 +1,10 @@
 package org.graylog2.utilities;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
@@ -24,7 +24,6 @@ import java.util.StringJoiner;
  */
 @AutoValue
 @JsonSerialize(using = ToStringSerializer.class)
-@JsonDeserialize(using = GRNDeserializer.class)
 public abstract class GRN {
     private static final Splitter SPLITTER = Splitter.on(":").trimResults();
 

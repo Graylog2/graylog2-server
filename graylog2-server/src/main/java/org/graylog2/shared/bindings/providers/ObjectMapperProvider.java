@@ -44,6 +44,10 @@ import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
+import org.graylog2.utilities.GRN;
+import org.graylog2.utilities.GRNDeserializer;
+import org.graylog2.utilities.GRNKeyDeserializer;
+import org.graylog2.utilities.GRNRegistry;
 import org.joda.time.Period;
 
 import javax.inject.Inject;
@@ -67,6 +71,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
+        final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -82,6 +87,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
                 .registerModule(new SimpleModule("Graylog")
                         .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
+                        .addKeyDeserializer(GRN.class, new GRNKeyDeserializer(grnRegistry))
                         .addSerializer(new RangeJsonSerializer())
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer())
@@ -91,6 +97,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(Version.class, new VersionDeserializer())
                         .addDeserializer(Semver.class, new SemverDeserializer())
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
+                        .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                 );
 
         if (subtypes != null) {

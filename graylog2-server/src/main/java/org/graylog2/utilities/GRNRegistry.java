@@ -17,6 +17,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class GRNRegistry {
     public static final String GLOBAL_USER_GRN = "grn::::builtin-team:everyone"; // TODO: Find a better name for the "everyone" grantee GRN type
 
+    // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
+    // TODO find a way to unify these
     private static final ImmutableSet<GRNType> BUILTIN_TYPES = ImmutableSet.<GRNType>builder()
             .add(GRNType.create("collection", "collections:"))
             .add(GRNType.create("dashboard", "dashboards:"))

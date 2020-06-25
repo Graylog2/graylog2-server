@@ -14,10 +14,9 @@ import java.io.IOException;
 public class GRNDeserializer extends StdDeserializer<GRN> {
     private final GRNRegistry grnRegistry;
 
-    public GRNDeserializer() {
+    public GRNDeserializer(GRNRegistry grnRegistry) {
         super(GRN.class);
-        // TODO set this up in the ObjectMapperProvider once we move this into server
-        grnRegistry = GRNRegistry.createWithBuiltinTypes();
+        this.grnRegistry = grnRegistry;
     }
 
     @Override

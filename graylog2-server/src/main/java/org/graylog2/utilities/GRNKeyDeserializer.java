@@ -10,10 +10,9 @@ import java.io.IOException;
 public class GRNKeyDeserializer extends KeyDeserializer {
     private final GRNRegistry grnRegistry;
 
-    public GRNKeyDeserializer() {
+    public GRNKeyDeserializer(GRNRegistry grnRegistry) {
         super();
-        // TODO set this up in the ObjectMapperProvider once we move this into server
-        grnRegistry = GRNRegistry.createWithBuiltinTypes();
+        this.grnRegistry = grnRegistry;
     }
 
     @Override
