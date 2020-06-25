@@ -21,7 +21,6 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>../graylog2-server</module>
-        <module>../integration-tests</module>
         <module>../full-backend-tests</module>
     </modules>
 
