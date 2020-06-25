@@ -6,6 +6,7 @@ import Icon from 'components/common/Icon';
 
 const IconStack = styled.span(({ small, theme }) => css`
   font-size: ${small ? theme.fonts.size.body : theme.fonts.size.large};
+  color: ${theme.colors.variant.default};
 `);
 
 const SupportLink = ({ small, children }) => {

@@ -29,7 +29,7 @@ grayScale.forEach((tint, index) => {
 
 const variant = {
   danger: '#E74C3C',
-  default: '#adb5bd',
+  default: '#595959',
   info: '#3498DB',
   primary: '#375a7f',
   success: '#00bc8c',
