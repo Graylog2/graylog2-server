@@ -26,17 +26,20 @@ export default class Role {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, title } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, title }));
   }
 
   toJSON() {
     const { id, title } = this._value;
+
     return { id, title };
   }
 
   static fromJSON(value: InternalState): Role {
     const { id, title } = value;
+
     return Role
       .builder()
       .id(id)
@@ -70,6 +73,7 @@ class Builder {
 
   build(): Role {
     const { id, title } = this.value.toObject();
+
     return new Role(id, title);
   }
 }

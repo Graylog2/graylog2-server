@@ -31,17 +31,20 @@ export default class MissingDependency {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, owners, title } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, owners, title }));
   }
 
   toJSON() {
     const { id, owners, title } = this._value;
+
     return { id, owners, title };
   }
 
   static fromJSON(value: MissingDependencyType): MissingDependency {
     const { id, owners, title } = value;
+
     return MissingDependency
       .builder()
       .id(id)
@@ -80,6 +83,7 @@ class Builder {
 
   build(): MissingDependency {
     const { id, owners, title } = this.value.toObject();
+
     return new MissingDependency(id, owners, title);
   }
 }

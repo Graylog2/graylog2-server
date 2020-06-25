@@ -31,17 +31,20 @@ export default class Grantee {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, title, type } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ id, title, type }));
   }
 
   toJSON() {
     const { id, title, type } = this._value;
+
     return { id, title, type };
   }
 
   static fromJSON(value: GranteeType): Grantee {
     const { id, title, type } = value;
+
     return Grantee
       .builder()
       .id(id)
@@ -80,6 +83,7 @@ class Builder {
 
   build(): Grantee {
     const { id, title, type } = this.value.toObject();
+
     return new Grantee(id, title, type);
   }
 }
