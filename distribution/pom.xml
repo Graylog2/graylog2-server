@@ -45,4 +45,16 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-elasticsearch6</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-elasticsearch7</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
