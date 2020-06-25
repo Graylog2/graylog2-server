@@ -18,6 +18,7 @@ package org.graylog2.utilities;
 
 import com.google.common.collect.ImmutableSet;
 
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 /**
  * The global {@link GRN} registry.
  */
+@Singleton
 public class GRNRegistry {
     public static final String GLOBAL_USER_GRN = "grn::::builtin-team:everyone"; // TODO: Find a better name for the "everyone" grantee GRN type
 

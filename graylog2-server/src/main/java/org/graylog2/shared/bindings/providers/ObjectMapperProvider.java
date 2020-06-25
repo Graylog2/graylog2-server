@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -62,16 +63,20 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     protected final ObjectMapper objectMapper;
 
     public ObjectMapperProvider() {
-        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet());
+        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet(), GRNRegistry.createWithBuiltinTypes());
+    }
+
+    public ObjectMapperProvider(ClassLoader classLoader, Set<NamedType> subtypes) {
+        this(classLoader, subtypes, GRNRegistry.createWithBuiltinTypes());
     }
 
     @Inject
     public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
-                                @JacksonSubTypes Set<NamedType> subtypes) {
+                                @JacksonSubTypes Set<NamedType> subtypes,
+                                GRNRegistry grnRegistry) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
-        final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -94,6 +99,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new VersionSerializer())
                         .addSerializer(new SemverSerializer())
                         .addSerializer(new SemverRequirementSerializer())
+                        .addSerializer(GRN.class, new ToStringSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())
                         .addDeserializer(Semver.class, new SemverDeserializer())
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
