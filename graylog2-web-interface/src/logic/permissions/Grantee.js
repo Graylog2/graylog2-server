@@ -9,22 +9,22 @@ export default class Grantee {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<GranteeType, 'id'>,
-    title: $PropertyType<GranteeType, 'title'>,
-    type: $PropertyType<GranteeType, 'type'>,
+    id: $PropertyType<InternalState, 'id'>,
+    title: $PropertyType<InternalState, 'title'>,
+    type: $PropertyType<InternalState, 'type'>,
   ) {
     this._value = { id, title, type };
   }
 
-  get id(): $PropertyType<GranteeType, 'id'> {
+  get id(): $PropertyType<InternalState, 'id'> {
     return this._value.id;
   }
 
-  get title(): $PropertyType<GranteeType, 'title'> {
+  get title(): $PropertyType<InternalState, 'title'> {
     return this._value.title;
   }
 
-  get type(): $PropertyType<GranteeType, 'type'> {
+  get type(): $PropertyType<InternalState, 'type'> {
     return this._value.type;
   }
 
@@ -66,15 +66,15 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<GranteeType, 'id'>): Builder {
+  id(value: $PropertyType<InternalState, 'id'>): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value: $PropertyType<GranteeType, 'title'>): Builder {
+  title(value: $PropertyType<InternalState, 'title'>): Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  type(value: $PropertyType<GranteeType, 'type'>): Builder {
+  type(value: $PropertyType<InternalState, 'type'>): Builder {
     return new Builder(this.value.set('type', value));
   }
 

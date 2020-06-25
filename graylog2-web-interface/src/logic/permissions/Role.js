@@ -9,17 +9,17 @@ export default class Role {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<RoleType, 'id'>,
-    title: $PropertyType<RoleType, 'title'>,
+    id: $PropertyType<InternalState, 'id'>,
+    title: $PropertyType<InternalState, 'title'>,
   ) {
     this._value = { id, title };
   }
 
-  get id(): $PropertyType<RoleType, 'id'> {
+  get id(): $PropertyType<InternalState, 'id'> {
     return this._value.id;
   }
 
-  get title(): $PropertyType<RoleType, 'title'> {
+  get title(): $PropertyType<InternalState, 'title'> {
     return this._value.title;
   }
 
@@ -35,7 +35,7 @@ export default class Role {
     return { id, title };
   }
 
-  static fromJSON(value: RoleType): Role {
+  static fromJSON(value: InternalState): Role {
     const { id, title } = value;
     return Role
       .builder()
@@ -60,11 +60,11 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<RoleType, 'id'>): Builder {
+  id(value: $PropertyType<InternalState, 'id'>): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value: $PropertyType<RoleType, 'title'>): Builder {
+  title(value: $PropertyType<InternalState, 'title'>): Builder {
     return new Builder(this.value.set('title', value));
   }
 
