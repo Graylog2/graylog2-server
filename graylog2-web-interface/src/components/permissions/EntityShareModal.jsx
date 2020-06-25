@@ -4,8 +4,11 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { useStore } from 'stores/connect';
+import { Spinner } from 'components/common';
 import EntityShareStore, { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
+
+import GranteesSelect from './GranteesSelect';
 
 const generateGRN = (id, type) => `grn::::${type}:${id}`;
 
@@ -30,10 +33,14 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
                            confirmButtonText="Save"
                            showModal>
       <>
-        Content
-        <textarea>
-          {entityShareState && JSON.stringify(entityShareState, null, 2)}
-        </textarea>
+        {!entityShareState && <Spinner />}
+        {entityShareState && (
+        <>
+          <GranteesSelect availableGrantees={entityShareState.availableGrantees} />
+          {/* collaborators list */}
+          {/* sharable url box */}
+        </>
+        )}
       </>
     </BootstrapModalConfirm>
   );
