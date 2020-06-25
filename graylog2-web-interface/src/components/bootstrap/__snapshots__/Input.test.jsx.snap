@@ -32,10 +32,9 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
               "isStatic": false,
-              "lastClassName": "ekazNr",
+              "lastClassName": "gcTkZc",
               "rules": Array [
                 [Function],
-                ";",
               ],
             },
             "displayName": "FormGroup__StyledFormGroup",
@@ -53,12 +52,12 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
       >
         <FormGroup
           bsClass="form-group"
-          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
           controlId="inputWithAddon"
           validationState={null}
         >
           <div
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
           >
             <InputWrapper>
               <span>
@@ -202,11 +201,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
 <Input
   addonAfter={null}
   bsStyle={null}
-  buttonAfter={
-    <ForwardRef
-      bsStyle="default"
-    />
-  }
+  buttonAfter={<ForwardRef />}
   help=""
   id="inputWithButton"
   label=""
@@ -234,10 +229,9 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
               "isStatic": false,
-              "lastClassName": "ekazNr",
+              "lastClassName": "gcTkZc",
               "rules": Array [
                 [Function],
-                ";",
               ],
             },
             "displayName": "FormGroup__StyledFormGroup",
@@ -255,12 +249,12 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
       >
         <FormGroup
           bsClass="form-group"
-          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
           controlId="inputWithButton"
           validationState={null}
         >
           <div
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
           >
             <InputWrapper>
               <span>
@@ -348,14 +342,9 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                           <span
                             className="input-group-btn"
                           >
-                            <ForwardRef
-                              bsStyle="default"
-                            >
-                              <Button__StyledButton
-                                bsStyle="default"
-                              >
+                            <ForwardRef>
+                              <Button__StyledButton>
                                 <StyledComponent
-                                  bsStyle="default"
                                   forwardedComponent={
                                     Object {
                                       "$$typeof": Symbol(react.forward_ref),
@@ -465,10 +454,9 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
             "componentStyle": ComponentStyle {
               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
               "isStatic": false,
-              "lastClassName": "ekazNr",
+              "lastClassName": "gcTkZc",
               "rules": Array [
                 [Function],
-                ";",
               ],
             },
             "displayName": "FormGroup__StyledFormGroup",
@@ -486,12 +474,12 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
       >
         <FormGroup
           bsClass="form-group"
-          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
           controlId="inputWithCheckboxAddon"
           validationState={null}
         >
           <div
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
           >
             <InputWrapper>
               <span>
@@ -668,10 +656,9 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
               "isStatic": false,
-              "lastClassName": "ekazNr",
+              "lastClassName": "gcTkZc",
               "rules": Array [
                 [Function],
-                ";",
               ],
             },
             "displayName": "FormGroup__StyledFormGroup",
@@ -689,12 +676,12 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
       >
         <FormGroup
           bsClass="form-group"
-          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
           controlId="inputWithoutNameProp"
           validationState={null}
         >
           <div
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
           >
             <InputWrapper>
               <span>
@@ -806,10 +793,9 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
             "componentStyle": ComponentStyle {
               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
               "isStatic": false,
-              "lastClassName": "ekazNr",
+              "lastClassName": "gcTkZc",
               "rules": Array [
                 [Function],
-                ";",
               ],
             },
             "displayName": "FormGroup__StyledFormGroup",
@@ -827,12 +813,12 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
       >
         <FormGroup
           bsClass="form-group"
-          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
           controlId="inputWithoutNameProp"
           validationState={null}
         >
           <div
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
           >
             <InputWrapper>
               <span>

@@ -44,6 +44,7 @@ const HorizontalRuleWrapper = styled.div`
 const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
   const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
   const activeSectionKey = activeSection?.key;
+
   return (
     <Container>
       <NavItem icon={toggleIcon}
@@ -63,6 +64,5 @@ const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggl
     </Container>
   );
 };
-
 
 export default SidebarNavigation;

@@ -13,6 +13,7 @@ import SectionSubheadline from '../SectionSubheadline';
 
 const HighlightingRules = () => {
   const rules = useContext(HighlightingRulesContext) ?? [];
+
   return (
     <>
       <SectionInfo>

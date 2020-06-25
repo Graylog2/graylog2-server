@@ -274,10 +274,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                         "isStatic": false,
-                                        "lastClassName": "ekazNr",
+                                        "lastClassName": "gcTkZc",
                                         "rules": Array [
                                           [Function],
-                                          ";",
                                         ],
                                       },
                                       "displayName": "FormGroup__StyledFormGroup",
@@ -295,11 +294,11 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                 >
                                   <FormGroup
                                     bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                     validationState={null}
                                   >
                                     <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                     >
                                       <ControlLabel>
                                         <StyledComponent
@@ -486,17 +485,14 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                               </Button__StyledButton>
                             </ForwardRef>
                             <ForwardRef
-                              bsStyle="default"
                               className="button"
                               onClick={[Function]}
                             >
                               <Button__StyledButton
-                                bsStyle="default"
                                 className="button"
                                 onClick={[Function]}
                               >
                                 <StyledComponent
-                                  bsStyle="default"
                                   className="button"
                                   forwardedComponent={
                                     Object {
@@ -848,10 +844,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                         "isStatic": false,
-                                        "lastClassName": "ekazNr",
+                                        "lastClassName": "gcTkZc",
                                         "rules": Array [
                                           [Function],
-                                          ";",
                                         ],
                                       },
                                       "displayName": "FormGroup__StyledFormGroup",
@@ -869,11 +864,11 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                 >
                                   <FormGroup
                                     bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                     validationState={null}
                                   >
                                     <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                     >
                                       <ControlLabel>
                                         <StyledComponent
@@ -1137,17 +1132,14 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                               </Button__StyledButton>
                             </ForwardRef>
                             <ForwardRef
-                              bsStyle="default"
                               className="button"
                               onClick={[Function]}
                             >
                               <Button__StyledButton
-                                bsStyle="default"
                                 className="button"
                                 onClick={[Function]}
                               >
                                 <StyledComponent
-                                  bsStyle="default"
                                   className="button"
                                   forwardedComponent={
                                     Object {
@@ -1499,10 +1491,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                         "isStatic": false,
-                                        "lastClassName": "ekazNr",
+                                        "lastClassName": "gcTkZc",
                                         "rules": Array [
                                           [Function],
-                                          ";",
                                         ],
                                       },
                                       "displayName": "FormGroup__StyledFormGroup",
@@ -1520,11 +1511,11 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                 >
                                   <FormGroup
                                     bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                     validationState={null}
                                   >
                                     <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                     >
                                       <ControlLabel>
                                         <StyledComponent
@@ -1788,17 +1779,14 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                               </Button__StyledButton>
                             </ForwardRef>
                             <ForwardRef
-                              bsStyle="default"
                               className="button"
                               onClick={[Function]}
                             >
                               <Button__StyledButton
-                                bsStyle="default"
                                 className="button"
                                 onClick={[Function]}
                               >
                                 <StyledComponent
-                                  bsStyle="default"
                                   className="button"
                                   forwardedComponent={
                                     Object {

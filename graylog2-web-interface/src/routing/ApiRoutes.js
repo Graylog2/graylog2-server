@@ -53,6 +53,9 @@ const ApiRoutes = {
     node: () => { return { url: '/system/cluster/node' }; },
     elasticsearchStats: () => { return { url: '/system/cluster/stats/elasticsearch' }; },
   },
+  ClusterConfigResource: {
+    config: () => { return { url: '/system/cluster_config' }; },
+  },
   GrokPatternsController: {
     test: () => { return { url: '/system/grok/test' }; },
   },

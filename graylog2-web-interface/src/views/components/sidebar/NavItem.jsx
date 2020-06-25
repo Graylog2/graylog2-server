@@ -79,7 +79,6 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
   ` : '')}
 `);
 
-
 const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
   return (
     <Container aria-label={title}

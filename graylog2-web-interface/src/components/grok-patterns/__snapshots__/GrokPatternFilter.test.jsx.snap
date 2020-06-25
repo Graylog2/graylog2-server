@@ -59,10 +59,9 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
               "componentStyle": ComponentStyle {
                 "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                 "isStatic": false,
-                "lastClassName": "ekazNr",
+                "lastClassName": "gcTkZc",
                 "rules": Array [
                   [Function],
-                  ";",
                 ],
               },
               "displayName": "FormGroup__StyledFormGroup",
@@ -80,12 +79,12 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
         >
           <FormGroup
             bsClass="filterFormGroup"
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
             controlId="pattern-selector"
             validationState={null}
           >
             <div
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc filterFormGroup"
             >
               <ControlLabel>
                 <StyledComponent
@@ -253,7 +252,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   "componentStyle": ComponentStyle {
                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                     "isStatic": false,
-                    "lastClassName": "iEzmJe",
+                    "lastClassName": "eZbLWu",
                     "rules": Array [
                       [Function],
                     ],
@@ -275,14 +274,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
             >
               <ListGroupItem
                 bsClass="list-group-item"
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                 header="COMMONMAC"
                 id="list-item-0"
                 listItem={false}
                 onKeyDown={[Function]}
               >
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                   id="list-item-0"
                   onKeyDown={[Function]}
                 >
@@ -408,7 +407,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   "componentStyle": ComponentStyle {
                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                     "isStatic": false,
-                    "lastClassName": "iEzmJe",
+                    "lastClassName": "eZbLWu",
                     "rules": Array [
                       [Function],
                     ],
@@ -430,14 +429,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
             >
               <ListGroupItem
                 bsClass="list-group-item"
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                 header="DATA"
                 id="list-item-1"
                 listItem={false}
                 onKeyDown={[Function]}
               >
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                   id="list-item-1"
                   onKeyDown={[Function]}
                 >
@@ -563,7 +562,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   "componentStyle": ComponentStyle {
                     "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                     "isStatic": false,
-                    "lastClassName": "iEzmJe",
+                    "lastClassName": "eZbLWu",
                     "rules": Array [
                       [Function],
                     ],
@@ -585,14 +584,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
             >
               <ListGroupItem
                 bsClass="list-group-item"
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
                 header="DATE"
                 id="list-item-2"
                 listItem={false}
                 onKeyDown={[Function]}
               >
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
                   id="list-item-2"
                   onKeyDown={[Function]}
                 >
@@ -743,10 +742,9 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
               "componentStyle": ComponentStyle {
                 "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                 "isStatic": false,
-                "lastClassName": "ekazNr",
+                "lastClassName": "gcTkZc",
                 "rules": Array [
                   [Function],
-                  ";",
                 ],
               },
               "displayName": "FormGroup__StyledFormGroup",
@@ -764,12 +762,12 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
         >
           <FormGroup
             bsClass="filterFormGroup"
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
             controlId="pattern-selector"
             validationState={null}
           >
             <div
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc filterFormGroup"
             >
               <ControlLabel>
                 <StyledComponent

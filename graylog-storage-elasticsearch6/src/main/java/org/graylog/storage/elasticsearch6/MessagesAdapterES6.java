@@ -27,7 +27,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.IndexBlockRetryAttempt;
 import org.graylog2.indexer.messages.IndexingRequest;

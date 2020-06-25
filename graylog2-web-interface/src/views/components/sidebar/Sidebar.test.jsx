@@ -12,7 +12,9 @@ import Sidebar from './Sidebar';
 const mockCurrentUser = { timezone: 'UTC' };
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
+
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
+
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
@@ -75,6 +77,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('h1').text()).toBe(viewMetaData.title);
   });
 
@@ -90,6 +93,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
   });
 
@@ -112,6 +116,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('h1').text()).toBe('Untitled Search');
   });
 
@@ -134,6 +139,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('h1').text()).toBe('Untitled Dashboard');
   });
 
@@ -156,6 +162,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('h1').text()).toBe('Unsaved Dashboard');
   });
 
@@ -178,9 +185,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('h1').text()).toBe('Unsaved Search');
   });
-
 
   it('should render summary and description of a view', () => {
     const wrapper = mount(
@@ -196,7 +203,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
@@ -214,7 +223,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no description');
+
     expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
   });
 
@@ -232,7 +243,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).toContain('This search has no description');
+
     expect(wrapper.find('ViewDescription').text()).toContain('This search has no summary');
   });
 
@@ -250,7 +263,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
@@ -266,8 +281,11 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
+
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
+
     expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom summary and description.');
   });
 
@@ -283,7 +301,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     wrapper.find('div[children="Create"]').simulate('click');
+
     expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
   });
 
@@ -299,7 +319,9 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     wrapper.find('div[children="Fields"]').simulate('click');
+
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
 
@@ -315,8 +337,11 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('SearchResultOverview')).toExist();
+
     wrapper.find('h1').simulate('click');
+
     expect(wrapper.find('SearchResultOverview')).not.toExist();
   });
 });

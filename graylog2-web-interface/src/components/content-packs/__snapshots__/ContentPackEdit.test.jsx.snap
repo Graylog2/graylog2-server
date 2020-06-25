@@ -615,10 +615,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -636,12 +635,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="name"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -849,10 +848,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -870,12 +868,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="summary"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -1082,10 +1080,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -1103,12 +1100,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="description"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -1312,10 +1309,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -1333,12 +1329,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="vendor"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -1545,10 +1541,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -1566,12 +1561,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="url"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -1929,19 +1924,16 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                   }
                                 >
                                   <ForwardRef
-                                    bsStyle="default"
                                     className="reset-button"
                                     onClick={[Function]}
                                     type="reset"
                                   >
                                     <Button__StyledButton
-                                      bsStyle="default"
                                       className="reset-button"
                                       onClick={[Function]}
                                       type="reset"
                                     >
                                       <StyledComponent
-                                        bsStyle="default"
                                         className="reset-button"
                                         forwardedComponent={
                                           Object {
@@ -3014,10 +3006,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -3035,12 +3026,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="name"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -3248,10 +3239,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -3269,12 +3259,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="summary"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -3481,10 +3471,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -3502,12 +3491,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="description"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -3711,10 +3700,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -3732,12 +3720,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="vendor"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -3944,10 +3932,9 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                             "isStatic": false,
-                                            "lastClassName": "ekazNr",
+                                            "lastClassName": "gcTkZc",
                                             "rules": Array [
                                               [Function],
-                                              ";",
                                             ],
                                           },
                                           "displayName": "FormGroup__StyledFormGroup",
@@ -3965,12 +3952,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <FormGroup
                                         bsClass="form-group"
-                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                                         controlId="url"
                                         validationState={null}
                                       >
                                         <div
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                         >
                                           <ControlLabel>
                                             <StyledComponent
@@ -4328,19 +4315,16 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                   }
                                 >
                                   <ForwardRef
-                                    bsStyle="default"
                                     className="reset-button"
                                     onClick={[Function]}
                                     type="reset"
                                   >
                                     <Button__StyledButton
-                                      bsStyle="default"
                                       className="reset-button"
                                       onClick={[Function]}
                                       type="reset"
                                     >
                                       <StyledComponent
-                                        bsStyle="default"
                                         className="reset-button"
                                         forwardedComponent={
                                           Object {

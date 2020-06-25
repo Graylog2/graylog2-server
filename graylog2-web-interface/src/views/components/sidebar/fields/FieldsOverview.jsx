@@ -70,6 +70,7 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) =
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
   const handleSearchReset = () => setFilter(undefined);
+
   return (
     <Container>
       <div>
@@ -129,6 +130,7 @@ const FieldsOverviewWithContext = (props) => (
       const allFields = fieldTypes?.all;
       const queryFields = fieldTypes?.queryFields;
       const activeQueryFields = queryFields?.get(activeQuery, allFields);
+
       return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
     }}
   </FieldTypesContext.Consumer>
