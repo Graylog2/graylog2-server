@@ -6,9 +6,8 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { EntityShareRequest, EntityShareResponse, GRN } from 'logic/permissions/types';
-
-type EntityShareState = {};
+import type { EntityShareRequest, GRN } from 'logic/permissions/types';
+import EntityShareState from 'logic/permissions/EntityShareState';
 
 type EntityShareStoreState = {
   entityShareState: EntityShareState,
@@ -41,8 +40,13 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
     prepare(entityGRN: GRN, entityShareRequest: EntityShareRequest): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN));
       const promise = fetch('POST', url, JSON.stringify(entityShareRequest))
-        .then((entityShareResponse: EntityShareResponse) => {
-          this.entityShareState = entityShareResponse;
+        .then(EntityShareState.fromJSON)
+        .then((entityShareState) => {
+          this.entityShareState = entityShareState;
+
+          this._trigger();
+
+          return this.entityShareState;
         });
 
       EntityShareActions.prepare.promise(promise);
@@ -54,6 +58,10 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       return {
         entityShareState: this.entityShareState,
       };
+    },
+
+    _trigger() {
+      this.trigger(this.entityShareState);
     },
   }),
 );
