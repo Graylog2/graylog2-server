@@ -1,17 +1,18 @@
 import React, { forwardRef } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
-import bsStyleThemeVariant from './variants/bsStyle';
+const variantStyles = css(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
 
-const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = theme.utils.colorLevel(theme.colors.variant.light[variant], -5);
+  const backgroundColor = theme.colors.variant.lighter[bsStyle];
   const textColor = theme.utils.readableColor(backgroundColor);
 
   return css`
-    &.list-group-item-${variant} {
+    &.list-group-item-${bsStyle} {
       color: ${textColor};
       background-color: ${backgroundColor};
 
@@ -27,15 +28,15 @@ const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
         &:hover,
         &:focus {
           color: ${textColor};
-          background-color: ${theme.colors.variant.light[variant]};
+          background-color: ${theme.colors.variant.light[bsStyle]};
         }
 
         &.active,
         &.active:hover,
         &.active:focus {
-          color: ${theme.utils.readableColor(theme.colors.variant.light[variant])};
-          background-color: ${theme.colors.variant.light[variant]};
-          border-color: ${theme.colors.variant.light[variant]};
+          color: ${theme.utils.readableColor(theme.colors.variant.light[bsStyle])};
+          background-color: ${theme.colors.variant.light[bsStyle]};
+          border-color: ${theme.colors.variant.light[bsStyle]};
         }
       }
     }
@@ -112,19 +113,11 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     }
   }
 
-  ${bsStyleThemeVariant(listGroupItemStyles)}
+  ${variantStyles};
 `);
 
-const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
-  return <StyledListGroupItem bsStyle={bsStyle} ref={ref} {...props} />;
+const ListGroupItem = forwardRef((props, ref) => {
+  return <StyledListGroupItem {...props} ref={ref} />;
 });
-
-ListGroupItem.propTypes = {
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
-};
-
-ListGroupItem.defaultProps = {
-  bsStyle: undefined,
-};
 
 export default ListGroupItem;

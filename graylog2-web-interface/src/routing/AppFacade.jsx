@@ -20,7 +20,7 @@ const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" 
 
 const SERVER_PING_TIMEOUT = 20000;
 
-export const AppFacade = ({ currentUser, server, sessionId }) => {
+const AppFacade = ({ currentUser, server, sessionId }) => {
   let Page;
 
   useEffect(() => {

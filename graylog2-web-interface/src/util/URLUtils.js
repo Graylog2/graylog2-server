@@ -12,7 +12,7 @@ const URLUtils = {
     return new URI(AppConfig.gl2ServerUrl() + url).normalizePathname().toString();
   },
   appPrefixed(url) {
-    return this.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
+    return URLUtils.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
   },
   getParsedSearch(location) {
     let search = {};

@@ -133,6 +133,7 @@ const TableHead: StyledComponent<{}, ThemeInterface, HTMLTableSectionElement> = 
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
 
   th {
+    min-width: 50px;
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;

@@ -3,21 +3,21 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import styledTheme from 'styled-theming';
 import chroma from 'chroma-js';
-
-import { themeModes } from 'theme';
 
 import FormControl from './FormControl';
 import { StyledAddon } from './InputGroup';
 
-const VALID_STATES = ['error', 'warning', 'success'];
-
-const createCss = (validationState) => css(({ theme }) => {
+const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) => {
   const variant = validationState === 'error' ? 'danger' : validationState;
-  const text = theme.utils.colorLevel(theme.colors.variant[variant], 6);
+
+  if (!variant) {
+    return undefined;
+  }
+
+  const text = theme.colors.variant.dark[variant];
   const border = theme.colors.variant[variant];
-  const background = theme.utils.colorLevel(theme.colors.variant[variant], -6);
+  const background = theme.colors.variant.light[variant];
 
   return css`
     &.has-${validationState} {
@@ -56,23 +56,6 @@ const createCss = (validationState) => css(({ theme }) => {
   `;
 });
 
-const validationStates = {};
-VALID_STATES.forEach((validState) => {
-  const colorModes = {};
-
-  themeModes.forEach((mode) => {
-    colorModes[mode] = createCss(validState);
-  });
-
-  validationStates[validState] = colorModes;
-});
-
-const validationStyleVariants = styledTheme.variants('mode', 'validationState', validationStates);
-
-const StyledFormGroup = styled(BootstrapFormGroup)`
-  ${validationStyleVariants};
-`;
-
 const FormGroup = memo(({ children, validationState, ...props }) => {
   return (
     <StyledFormGroup validationState={validationState} {...props}>
@@ -83,7 +66,7 @@ const FormGroup = memo(({ children, validationState, ...props }) => {
 
 FormGroup.propTypes = {
   children: PropTypes.node.isRequired,
-  validationState: PropTypes.oneOf([null, ...VALID_STATES]),
+  validationState: PropTypes.oneOf([null, 'error', 'success', 'warning']),
 };
 
 FormGroup.defaultProps = {

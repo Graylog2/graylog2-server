@@ -14,19 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.cluster.jest;
+package org.graylog.storage.elasticsearch6.jest;
 
 import com.google.common.base.Preconditions;
 import io.searchbox.client.JestRetryHandler;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collection;
-import javax.net.ssl.SSLException;
 import org.apache.http.ConnectionClosedException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class GraylogJestRetryHandler implements JestRetryHandler<HttpUriRequest> {
     private static final Logger log = LoggerFactory.getLogger(GraylogJestRetryHandler.class);

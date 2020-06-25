@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
 import Select from 'views/components/Select';
-
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -54,7 +53,7 @@ const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
             onChange={_onChange}
             options={options}
             isClearable
-            value={currentValue(sort, fields)} />
+            value={currentValue(sort, fields) ?? null} />
   );
 };
 

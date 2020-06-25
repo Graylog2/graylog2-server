@@ -20,7 +20,7 @@ Negative numbers render a lighter color, positive numbers get darker. Check out 
 import { colors, utils } from 'theme';
 import ColorSwatch from './Colors';
 
-const { info, primary } = colors.teinte.variant;
+const { info, primary } = colors.variant;
 
 <>
   <p>
@@ -51,8 +51,8 @@ Accepts a color and [WCAG](https://www.w3.org/TR/WCAG21/#distinguishable) level,
 import { colors, utils } from 'theme';
 import ColorSwatch from './Colors';
 
-const { info, primary } = colors.teinte.variant;
-const { textDefault } = colors.teinte.global;
+const { info, primary } = colors.variant;
+const { textDefault } = colors.global;
 
 <>
   <p>
@@ -82,17 +82,17 @@ Generating a readable color following [W3C specs for readability](https://www.w3
   - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")
 
 **`darkColor`**
-  - defaults: Currently `color.teinte.global.textDefault`
+  - defaults: Currently `color.global.textDefault`
 
 **`lightColor`**
-  - defaults: Currently `color.teinte.global.textAlt`
+  - defaults: Currently `color.global.textAlt`
 
 ```js
 import { colors, utils } from 'theme';
 import ColorSwatch from './Colors';
 
-const { info, primary } = colors.teinte.variant;
-const { textDefault } = colors.teinte.global;
+const { info, primary } = colors.variant;
+const { textDefault } = colors.global;
 
 <>
   <p>

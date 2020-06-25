@@ -3,7 +3,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import Select from 'views/components/Select';
-
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
@@ -22,7 +21,7 @@ const SortDirectionSelect = ({ direction, disabled, onChange }: Props) => (
           ]}
           onChange={({ value }) => onChange(Direction.fromString(value))}
           placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-          value={direction && { label: direction, value: direction }} />
+          value={(direction && { label: direction, value: direction }) ?? null} />
 );
 
 SortDirectionSelect.propTypes = {

@@ -30,7 +30,17 @@ const Field = ({ children, disabled = false, menuContainer, name, queryId, type 
           {name} = {type.type}
         </FieldActions>
       )
-      : <span>{children}</span>)}
+      : (
+        <span>
+          {name}
+          {children && (
+            <>
+              {' '}
+              {children}
+            </>
+          )}
+        </span>
+      ))}
   </InteractiveContext.Consumer>
 );
 
