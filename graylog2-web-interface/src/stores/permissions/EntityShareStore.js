@@ -22,11 +22,15 @@ type EntityShareUpdatePayload = {|
 |};
 
 type EntityShareActionsType = RefluxActions<{
-  prepare: (GRN, EntitySharePreparePayload) => Promise<EntityShareState>,
+  prepare: (GRN, ?EntitySharePreparePayload) => Promise<EntityShareState>,
   update: (GRN, EntityShareUpdatePayload) => Promise<EntityShareState>,
 }>;
 
 type EntityShareStoreType = Store<EntityShareStoreState>;
+
+const defaultPreparePayload = {
+  selected_grantee_roles: {},
+};
 
 export const EntityShareActions: EntityShareActionsType = singletonActions(
   'permissions.EntityShare',
@@ -36,17 +40,19 @@ export const EntityShareActions: EntityShareActionsType = singletonActions(
   }),
 );
 
-export const EntityShareStore: EntityShareStoreType = singletonStore(
+const EntityShareStore: EntityShareStoreType = singletonStore(
   'permissions.EntityShare',
   () => Reflux.createStore({
+    listenables: [EntityShareActions],
+
     state: undefined,
 
     getInitialState(): EntityShareStoreState {
       return this._state();
     },
 
-    prepare(entityGRN: GRN, payload: EntitySharePreparePayload): Promise<EntityShareState> {
-      const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN));
+    prepare(entityGRN: GRN, payload: EntitySharePreparePayload = defaultPreparePayload): Promise<EntityShareState> {
+      const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
       EntityShareActions.prepare.promise(promise);
@@ -80,7 +86,9 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
     },
 
     _trigger() {
-      this.trigger(this.entityShareState);
+      this.trigger(this._state());
     },
   }),
 );
+
+export default EntityShareStore;
