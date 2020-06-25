@@ -46,11 +46,11 @@ export default class EntityShareState {
   ) {
     this._value = {
       entity,
-      availableGrantees: Immutable.fromJS(availableGrantees),
-      availableRoles: Immutable.fromJS(availableRoles),
-      activeShares: Immutable.fromJS(activeShares),
+      availableGrantees,
+      availableRoles,
+      activeShares,
       selectedGranteeRoles,
-      missingDependencies: Immutable.fromJS(missingDependencies),
+      missingDependencies,
     };
   }
 
@@ -112,11 +112,11 @@ export default class EntityShareState {
 
     return {
       entity,
-      availableGrantees,
-      availableRoles,
-      activeShares,
-      selectedGranteeRoles,
-      missingDependencies,
+      available_grantees: availableGrantees,
+      available_roles: availableRoles,
+      active_shares: activeShares,
+      selected_grantee_roles: selectedGranteeRoles,
+      missing_dependencies: missingDependencies,
     };
   }
 
