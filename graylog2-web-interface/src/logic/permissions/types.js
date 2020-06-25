@@ -38,6 +38,10 @@ export type EntityShareResponse = {|
   selected_grantee_roles: SelectedGranteeRoles,
 |};
 
-export type EntityShareRequest = {|
+export type EntitySharePrepareRequest = {|
   selected_grantee_roles?: SelectedGranteeRoles,
+|};
+
+export type EntityShareUpdateRequest = {|
+  grantee_roles?: SelectedGranteeRoles,
 |};

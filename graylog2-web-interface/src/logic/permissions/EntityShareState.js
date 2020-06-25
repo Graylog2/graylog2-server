@@ -24,7 +24,7 @@ type InternalState = {|
   missingDependencies: Immutable.List<MissingDependency>,
 |};
 
-type EntityShareStateJson = {|
+export type EntityShareStateJson = {|
   entity: $PropertyType<InternalState, 'entity'>,
   available_grantees: Immutable.List<GranteeType>,
   available_roles: Immutable.List<RoleType>,
