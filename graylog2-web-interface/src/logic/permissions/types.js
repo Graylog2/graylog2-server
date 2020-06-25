@@ -28,20 +28,3 @@ export type MissingDependency = {|
 export type SelectedGranteeRoles = {|
   [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Role, 'id'>,
 |};
-
-export type EntityShareResponse = {|
-  active_shares: Array<ActiveShare>,
-  available_grantees: Array<Grantee>,
-  available_roles: Array<Role>,
-  entity: GRN,
-  missing_dependencies: Array<MissingDependency>,
-  selected_grantee_roles: SelectedGranteeRoles,
-|};
-
-export type EntitySharePrepareRequest = {|
-  selected_grantee_roles?: SelectedGranteeRoles,
-|};
-
-export type EntityShareUpdateRequest = {|
-  grantee_roles?: SelectedGranteeRoles,
-|};

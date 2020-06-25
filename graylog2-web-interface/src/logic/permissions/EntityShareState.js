@@ -20,17 +20,17 @@ type InternalState = {|
   availableGrantees: Immutable.List<Grantee>,
   availableRoles: Immutable.List<Role>,
   activeShares: Immutable.List<ActiveShare>,
-  selectedGranteeRoles: SelectedGranteeRoles,
+  selectedGranteeRoles: Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>,
   missingDependencies: Immutable.List<MissingDependency>,
 |};
 
 export type EntityShareStateJson = {|
   entity: $PropertyType<InternalState, 'entity'>,
-  available_grantees: Immutable.List<GranteeType>,
-  available_roles: Immutable.List<RoleType>,
-  active_shares: Immutable.List<ActiveShareType>,
-  selected_grantee_roles: $PropertyType<InternalState, 'selectedGranteeRoles'>,
-  missing_dependencies: Immutable.List<MissingDependencyType>,
+  available_grantees: Array<GranteeType>,
+  available_roles: Array<RoleType>,
+  active_shares: Array<ActiveShareType>,
+  selected_grantee_roles: SelectedGranteeRoles,
+  missing_dependencies: Array<MissingDependencyType>,
 |};
 
 export default class EntityShareState {
@@ -131,14 +131,20 @@ export default class EntityShareState {
       missing_dependencies,
     } = value;
 
+    const availableGrantees = Immutable.fromJS(available_grantees.map((ag) => Grantee.fromJSON(ag)));
+    const availableRoles = Immutable.fromJS(available_roles.map((ar) => Role.fromJSON(ar)));
+    const activeShares = Immutable.fromJS(active_shares.map((as) => ActiveShare.fromJSON(as)));
+    const selectedGranteeRoles = Immutable.fromJS(selected_grantee_roles);
+    const missingDependencies = Immutable.fromJS(missing_dependencies.map((md) => MissingDependency.fromJSON(md)));
+
     /* eslint-enable camelcase */
     return new EntityShareState(
       entity,
-      available_grantees.map((ag) => Grantee.fromJSON(ag)),
-      available_roles.map((ar) => Role.fromJSON(ar)),
-      active_shares.map((as) => ActiveShare.fromJSON(as)),
-      selected_grantee_roles,
-      missing_dependencies.map((md) => MissingDependency.fromJSON(md)),
+      availableGrantees,
+      availableRoles,
+      activeShares,
+      selectedGranteeRoles,
+      missingDependencies,
     );
   }
 
