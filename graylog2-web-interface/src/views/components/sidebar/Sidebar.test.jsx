@@ -181,7 +181,6 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('h1').text()).toBe('Unsaved Search');
   });
 
-
   it('should render summary and description of a view', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>

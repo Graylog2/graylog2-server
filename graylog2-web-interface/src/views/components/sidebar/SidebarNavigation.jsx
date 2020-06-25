@@ -64,5 +64,4 @@ const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggl
   );
 };
 
-
 export default SidebarNavigation;
