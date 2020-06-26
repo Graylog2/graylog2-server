@@ -63,7 +63,13 @@ const _rolesOptions = (roles: AvailableRoles) => (
   )).toJS()
 );
 
-const isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
+const _initialRoleId = (roles: AvailableRoles) => {
+  const initialRoleTitle = 'Viewer';
+
+  return roles.find((role) => role.title === initialRoleTitle)?.id;
+};
+
+const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
 const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, granteeType: $PropertyType<Grantee, 'type'> }) => (
   <GranteesSelectOption>
@@ -86,13 +92,14 @@ type Props = {
 const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const rolesOptions = _rolesOptions(availableRoles);
+  const initialRoleId = _initialRoleId(availableRoles);
 
   return (
-    <Formik onSubmit={onSubmit} initialValues={{ granteeId: undefined, roleId: undefined }}>
+    <Formik onSubmit={onSubmit} initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
       {({ isSubmitting, isValid, errors }) => (
         <Form>
           <FormElements>
-            <Field name="granteeId" validate={isRequired('grantee')}>
+            <Field name="granteeId" validate={_isRequired('grantee')}>
               {({ field: { name, value, onChange } }) => (
                 <GranteesSelect placeholder="Search for users and teams"
                                 options={granteesOptions}
@@ -101,10 +108,11 @@ const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props
                                 value={value} />
               )}
             </Field>
-            <Field name="roleId" validate={isRequired('role')}>
+            <Field name="roleId" validate={_isRequired('role')}>
               {({ field: { name, value, onChange } }) => (
                 <RolesSelect placeholder="Select a role"
                              options={rolesOptions}
+                             clearable={false}
                              onChange={(roleId) => onChange({ target: { value: roleId, name } })}
                              value={value} />
               )}
