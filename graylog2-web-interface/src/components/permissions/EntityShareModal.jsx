@@ -35,7 +35,9 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
         {!entityShareState && <Spinner />}
         {entityShareState && (
           <>
-            <GranteesSelect availableGrantees={entityShareState.availableGrantees} />
+            <GranteesSelect availableGrantees={entityShareState.availableGrantees}
+                            availableRoles={entityShareState.availableRoles}
+                            onSubmit={() => {}} />
             {/* collaborators list */}
             {/* sharable url box */}
           </>
