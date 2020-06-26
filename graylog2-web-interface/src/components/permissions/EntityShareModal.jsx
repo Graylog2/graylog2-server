@@ -29,17 +29,16 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
     <BootstrapModalConfirm onCancel={() => {}}
                            onConfirm={() => {}}
                            title={title}
-                           key={entityShareState?.entity}
                            confirmButtonText="Save"
                            showModal>
       <>
         {!entityShareState && <Spinner />}
         {entityShareState && (
-        <>
-          <GranteesSelect availableGrantees={entityShareState.availableGrantees} />
-          {/* collaborators list */}
-          {/* sharable url box */}
-        </>
+          <>
+            <GranteesSelect availableGrantees={entityShareState.availableGrantees} />
+            {/* collaborators list */}
+            {/* sharable url box */}
+          </>
         )}
       </>
     </BootstrapModalConfirm>
