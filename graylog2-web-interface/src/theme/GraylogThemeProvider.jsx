@@ -13,7 +13,7 @@ import { CUSTOMIZATION_THEME_MODE, THEME_MODE_LIGHT } from './constants';
 
 const { CustomizationsActions } = CombinedProvider.get('Customizations');
 
-const loadTheme = (mode) => (/* eslint-disable */
+const loadTheme = (mode) => (
   import(`theme/variants/${mode}.js`)
     .then((modeColors) => {
       return modeColors.default;
@@ -21,7 +21,7 @@ const loadTheme = (mode) => (/* eslint-disable */
     .catch((error) => {
       console.error('loading colors failed: ', error);
     })
-/* eslint-enable */);
+);
 
 const GraylogThemeProvider = ({ children }) => {
   useEffect(() => {

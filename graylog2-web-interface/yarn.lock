@@ -8150,6 +8150,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "4.0.0-SNAPSHOT"
   dependencies:
+    "@babel/parser" "7.10.4"
     "@babel/preset-env" "7.10.4"
     babel-eslint "9.0.0"
     eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.0.0-SNAPSHOT-e342a9b6-8020-4688-9d84-dab38b2bded7-1595425276987/node_modules/eslint-config-graylog"
