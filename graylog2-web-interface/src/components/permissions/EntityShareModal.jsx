@@ -12,6 +12,14 @@ import GranteesSelect from './GranteesSelect';
 
 const generateGRN = (id, type) => `grn::::${type}:${id}`;
 
+const _addCollborator = ({ granteeId, roleId }, entityGRN) => {
+  EntityShareActions.prepare(entityGRN, {
+    selected_grantee_roles: {
+      [granteeId]: roleId,
+    },
+  });
+};
+
 type Props = {
   entityId: string,
   entityType: string,
@@ -20,9 +28,10 @@ type Props = {
 
 const EntityShareModal = ({ title, entityId, entityType }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
+  const entityGRN = generateGRN(entityId, entityType);
 
   useEffect(() => {
-    EntityShareActions.prepare(generateGRN(entityId, entityType));
+    EntityShareActions.prepare(entityGRN);
   }, []);
 
   return (
@@ -37,7 +46,7 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
           <>
             <GranteesSelect availableGrantees={entityShareState.availableGrantees}
                             availableRoles={entityShareState.availableRoles}
-                            onSubmit={() => {}} />
+                            onSubmit={(formData) => _addCollborator(formData, entityGRN)} />
             {/* collaborators list */}
             {/* sharable url box */}
           </>
