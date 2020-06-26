@@ -16,11 +16,12 @@ import ActiveShare from './ActiveShare';
 import MissingDependency from './MissingDependency';
 
 export type AvailableGrantees = Immutable.List<Grantee>;
+export type AvailableRoles = Immutable.List<Role>;
 
 type InternalState = {|
   entity: GRN,
   availableGrantees: AvailableGrantees,
-  availableRoles: Immutable.List<Role>,
+  availableRoles: AvailableRoles,
   activeShares: Immutable.List<ActiveShare>,
   selectedGranteeRoles: Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>,
   missingDependencies: Immutable.List<MissingDependency>,
