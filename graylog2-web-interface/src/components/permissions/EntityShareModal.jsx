@@ -8,7 +8,7 @@ import { Spinner } from 'components/common';
 import EntityShareStore, { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
-import GranteesSelect from './GranteesSelect';
+import GranteesSelector from './GranteesSelector';
 
 const generateGRN = (id, type) => `grn::::${type}:${id}`;
 
@@ -44,9 +44,9 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
         {!entityShareState && <Spinner />}
         {entityShareState && (
           <>
-            <GranteesSelect availableGrantees={entityShareState.availableGrantees}
-                            availableRoles={entityShareState.availableRoles}
-                            onSubmit={(formData) => _addCollborator(formData, entityGRN)} />
+            <GranteesSelector availableGrantees={entityShareState.availableGrantees}
+                              availableRoles={entityShareState.availableRoles}
+                              onSubmit={(formData) => _addCollborator(formData, entityGRN)} />
             {/* collaborators list */}
             {/* sharable url box */}
           </>

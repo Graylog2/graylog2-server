@@ -1,20 +1,34 @@
 // @flow strict
 import * as React from 'react';
-import { useCallback } from 'react';
 import { Formik, Form, Field } from 'formik';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import type { AvailableGrantees, AvailableRoles } from 'logic/permissions/EntityShareState';
 import Role from 'logic/permissions/Role';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
 import Select from 'components/common/Select';
 
-const Container = styled.div`
+const FormElements = styled.div`
   display: flex;
 `;
 
-const StyledGranteesSelect = styled(Select)`
+const Errors: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+  width: 100%;
+  margin-top: 3px;
+  color: ${theme.colors.variant.danger};
+
+  > * {
+    margin-right: 5px;
+
+    :last-child {
+      margin-right: 0;
+    }
+  }
+`);
+
+const GranteesSelect = styled(Select)`
   flex: 1;
 `;
 
@@ -38,6 +52,8 @@ const _rolesOptions = (roles: AvailableRoles) => (
   )).toJS()
 );
 
+const isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
+
 type FormData = {
   granteeId: $PropertyType<Grantee, 'id'>,
   roleId: $PropertyType<Role, 'id'>,
@@ -49,25 +65,24 @@ type Props = {
   onSubmit: (FormData) => void,
 };
 
-const GranteesSelect = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
-  const _onSubmit = useCallback(({ granteeId, roleId }) => onSubmit({ granteeId, roleId }), [onSubmit]);
+const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const rolesOptions = _rolesOptions(availableRoles);
 
   return (
-    <Formik onSubmit={_onSubmit} initialValues={{ granteeId: undefined, roleId: undefined }}>
-      {({ isSubmitting, isValid }) => (
+    <Formik onSubmit={onSubmit} initialValues={{ granteeId: undefined, roleId: undefined }}>
+      {({ isSubmitting, isValid, errors }) => (
         <Form>
-          <Container>
-            <Field name="granteeId">
+          <FormElements>
+            <Field name="granteeId" validate={isRequired('grantee')}>
               {({ field: { name, value, onChange } }) => (
-                <StyledGranteesSelect placeholder="Search for users and teams"
-                                      options={granteesOptions}
-                                      onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-                                      value={value} />
+                <GranteesSelect placeholder="Search for users and teams"
+                                options={granteesOptions}
+                                onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+                                value={value} />
               )}
             </Field>
-            <Field name="roleId">
+            <Field name="roleId" validate={isRequired('role')}>
               {({ field: { name, value, onChange } }) => (
                 <RolesSelect placeholder="Select a role"
                              options={rolesOptions}
@@ -80,11 +95,20 @@ const GranteesSelect = ({ availableGrantees, availableRoles, onSubmit }: Props) 
                           disabled={isSubmitting || !isValid}>
               Add Collaborator
             </SubmitButton>
-          </Container>
+          </FormElements>
+          {errors
+            && (
+            <Errors>
+              {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => {
+                return <span key={fieldKey}>{String(value)}.</span>;
+              })}
+            </Errors>
+            )}
+
         </Form>
       )}
     </Formik>
   );
 };
 
-export default GranteesSelect;
+export default GranteesSelector;
