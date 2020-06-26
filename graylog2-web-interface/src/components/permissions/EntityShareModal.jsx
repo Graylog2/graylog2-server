@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
@@ -9,6 +10,12 @@ import EntityShareStore, { EntityShareActions } from 'stores/permissions/EntityS
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import GranteesSelector from './GranteesSelector';
+import GranteesList from './GranteesList';
+
+const StyledGranteesList = styled(GranteesList)`
+  width: calc(100% - 153px);
+  margin-top: 20px;
+`;
 
 const generateGRN = (id, type) => `grn::::${type}:${id}`;
 
@@ -47,7 +54,10 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
             <GranteesSelector availableGrantees={entityShareState.availableGrantees}
                               availableRoles={entityShareState.availableRoles}
                               onSubmit={(formData) => _addCollborator(formData, entityGRN)} />
-            {/* collaborators list */}
+            <StyledGranteesList activeShares={entityShareState.activeShares}
+                                availableRoles={entityShareState.availableRoles}
+                                availableGrantees={entityShareState.availableGrantees}
+                                selectedGranteeRoles={entityShareState.selectedGranteeRoles} />
             {/* sharable url box */}
           </>
         )}

@@ -6,7 +6,6 @@ import type {
   Role as RoleType,
   MissingDependency as MissingDependencyType,
   ActiveShare as ActiveShareType,
-  SelectedGranteeRoles,
   GRN,
 } from 'logic/permissions/types';
 
@@ -17,13 +16,15 @@ import MissingDependency from './MissingDependency';
 
 export type AvailableGrantees = Immutable.List<Grantee>;
 export type AvailableRoles = Immutable.List<Role>;
+export type ActiveShares = Immutable.List<ActiveShare>;
+export type SelectedGranteeRoles = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>;
 
 type InternalState = {|
   entity: GRN,
   availableGrantees: AvailableGrantees,
   availableRoles: AvailableRoles,
-  activeShares: Immutable.List<ActiveShare>,
-  selectedGranteeRoles: Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>,
+  activeShares: ActiveShares,
+  selectedGranteeRoles: SelectedGranteeRoles,
   missingDependencies: Immutable.List<MissingDependency>,
 |};
 
@@ -32,7 +33,9 @@ export type EntityShareStateJson = {|
   available_grantees: Array<GranteeType>,
   available_roles: Array<RoleType>,
   active_shares: Array<ActiveShareType>,
-  selected_grantee_roles: SelectedGranteeRoles,
+  selected_grantee_roles: {|
+    [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Role, 'id'>,
+  |} | {||},
   missing_dependencies: Array<MissingDependencyType>,
 |};
 

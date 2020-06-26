@@ -8,9 +8,10 @@ import type { AvailableGrantees, AvailableRoles } from 'logic/permissions/Entity
 import Role from 'logic/permissions/Role';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
-import Select from 'components/common/Select';
+import { Select } from 'components/common';
 
 import GranteeIcon from './GranteeIcon';
+import RolesSelect from './RolesSelect';
 
 const FormElements = styled.div`
   display: flex;
@@ -43,7 +44,7 @@ const StyledGranteeIcon = styled(GranteeIcon)`
   margin-right: 5px;
 `;
 
-const RolesSelect = styled(Select)`
+const StyledRolesSelect = styled(RolesSelect)`
   flex: 0.5;
 `;
 
@@ -54,12 +55,6 @@ const SubmitButton = styled(Button)`
 const _granteesOptions = (grantees: AvailableGrantees) => (
   grantees.map((grantee) => (
     { label: grantee.title, value: grantee.id, granteeType: grantee.type }
-  )).toJS()
-);
-
-const _rolesOptions = (roles: AvailableRoles) => (
-  roles.map((role) => (
-    { label: role.title, value: role.id }
   )).toJS()
 );
 
@@ -91,7 +86,6 @@ type Props = {
 
 const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
-  const rolesOptions = _rolesOptions(availableRoles);
   const initialRoleId = _initialRoleId(availableRoles);
 
   return (
@@ -108,30 +102,20 @@ const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props
                                 value={value} />
               )}
             </Field>
-            <Field name="roleId" validate={_isRequired('role')}>
-              {({ field: { name, value, onChange } }) => (
-                <RolesSelect placeholder="Select a role"
-                             options={rolesOptions}
-                             clearable={false}
-                             onChange={(roleId) => onChange({ target: { value: roleId, name } })}
-                             value={value} />
-              )}
-            </Field>
+            <StyledRolesSelect roles={availableRoles} />
             <SubmitButton type="submit"
                           bsStyle="success"
                           disabled={isSubmitting || !isValid}>
               Add Collaborator
             </SubmitButton>
           </FormElements>
-          {errors
-            && (
+          {errors && (
             <Errors>
               {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => {
                 return <span key={fieldKey}>{String(value)}.</span>;
               })}
             </Errors>
-            )}
-
+          )}
         </Form>
       )}
     </Formik>
