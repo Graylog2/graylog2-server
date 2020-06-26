@@ -24,7 +24,3 @@ export type MissingDependency = {|
   owners: Array<$PropertyType<Grantee, 'id'>>,
   title: String,
 |};
-
-export type SelectedGranteeRoles = {|
-  [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Role, 'id'>,
-|} | {||};
