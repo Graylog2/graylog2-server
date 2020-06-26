@@ -10,6 +10,8 @@ import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
 import Select from 'components/common/Select';
 
+import GranteeIcon from './GranteeIcon';
+
 const FormElements = styled.div`
   display: flex;
 `;
@@ -32,6 +34,15 @@ const GranteesSelect = styled(Select)`
   flex: 1;
 `;
 
+const GranteesSelectOption = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledGranteeIcon = styled(GranteeIcon)`
+  margin-right: 5px;
+`;
+
 const RolesSelect = styled(Select)`
   flex: 0.5;
 `;
@@ -42,7 +53,7 @@ const SubmitButton = styled(Button)`
 
 const _granteesOptions = (grantees: AvailableGrantees) => (
   grantees.map((grantee) => (
-    { label: `${grantee.type} : ${grantee.title}`, value: grantee.id }
+    { label: grantee.title, value: grantee.id, granteeType: grantee.type }
   )).toJS()
 );
 
@@ -53,6 +64,13 @@ const _rolesOptions = (roles: AvailableRoles) => (
 );
 
 const isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
+
+const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, granteeType: $PropertyType<Grantee, 'type'> }) => (
+  <GranteesSelectOption>
+    <StyledGranteeIcon type={granteeType} />
+    {label}
+  </GranteesSelectOption>
+);
 
 type FormData = {
   granteeId: $PropertyType<Grantee, 'id'>,
@@ -79,6 +97,7 @@ const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props
                 <GranteesSelect placeholder="Search for users and teams"
                                 options={granteesOptions}
                                 onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+                                optionRenderer={_renderGranteesSelectOption}
                                 value={value} />
               )}
             </Field>
