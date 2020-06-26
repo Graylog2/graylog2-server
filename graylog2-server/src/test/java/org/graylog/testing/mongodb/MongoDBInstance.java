@@ -16,24 +16,16 @@
  */
 package org.graylog.testing.mongodb;
 
-import com.github.dockerjava.api.command.InspectContainerResponse;
-import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoConnectionImpl;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.Wait;
 
-import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * This rule starts a MongoDB instance and provides a configured {@link org.graylog2.database.MongoConnection}.
@@ -49,27 +41,19 @@ import static java.util.Objects.requireNonNull;
  */
 public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public enum Lifecycle {
-        METHOD, CLASS;
-
+        METHOD, CLASS
     }
+
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBInstance.class);
 
-    private static final String DEFAULT_IMAGE = "mongo";
-    private static final String DEFAULT_VERSION = "3.6";
-    private static final String DEFAULT_DATABASE_NAME = "graylog";
     private static final String DEFAULT_INSTANCE_NAME = "default";
-    private static final int MONGODB_PORT = 27017;
-
-    private static final String NETWORK_ALIAS = "mongodb";
-    private static final ConcurrentMap<String, GenericContainer> CACHED_CONTAINER = new ConcurrentHashMap<>();
-
-    private final String instanceName;
+    private static final ConcurrentMap<String, MongoDBTestService> CACHED_SERVICE = new ConcurrentHashMap<>();
 
     private final Lifecycle lifecycle;
-    private final GenericContainer container;
-    private MongoConnection mongoConnection;
+    private final MongoDBTestService service;
 
     private MongoDBFixtureImporter fixtureImporter;
+
     /**
      * Creates a new MongoDB instance for every test method.
      *
@@ -89,41 +73,32 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle) {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, DEFAULT_VERSION, network);
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBContainer.DEFAULT_VERSION, network);
     }
 
     public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle) {
         MongoDBInstance mongoDb = createWithDefaults(network, lifecycle);
-        mongoDb.startContainer();
+        mongoDb.start();
         return mongoDb;
     }
 
     private MongoDBInstance(String instanceName, Lifecycle lifecycle, String version, Network network) {
-        this.instanceName = instanceName;
         this.lifecycle = lifecycle;
 
         switch (lifecycle) {
             case CLASS:
-                this.container = CACHED_CONTAINER.computeIfAbsent(instanceName, k -> createContainer(version, network));
+                this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
                 break;
             case METHOD:
-                this.container = createContainer(version, network);
+                this.service = createContainer(version, network);
                 break;
             default:
                 throw new IllegalArgumentException("Support for lifecycle " + lifecycle.toString() + " not implemented yet");
         }
     }
 
-    private GenericContainer createContainer(String version, Network network) {
-        return new GenericContainer<>(String.format(Locale.US, "%s:%s", DEFAULT_IMAGE, version))
-                .withExposedPorts(MONGODB_PORT)
-                .withNetwork(network)
-                .withNetworkAliases(NETWORK_ALIAS)
-                .waitingFor(Wait.forListeningPort());
-    }
-
-    public String instanceName() {
-        return instanceName;
+    private MongoDBTestService createContainer(String version, Network network) {
+        return MongoDBTestService.create(version, network);
     }
 
     /**
@@ -132,68 +107,30 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
      * @return the connection object
      */
     public MongoConnection mongoConnection() {
-        return requireNonNull(mongoConnection, "mongoConnection not initialized yet");
-    }
-
-    /**
-     * Returns the IP address of the database instance.
-     *
-     * @return the IP address
-     */
-    public String ipAddress() {
-        return container.getContainerIpAddress();
-    }
-
-    /**
-     * Returns the port of the database instance.
-     *
-     * @return the port
-     */
-    public int port() {
-        return container.getFirstMappedPort();
+        return service.mongoConnection();
     }
 
     /**
      * Drops the configured database.
      */
     public void dropDatabase() {
-        LOG.debug("Dropping database {}", DEFAULT_DATABASE_NAME);
-        mongoConnection().getMongoDatabase().drop();
+        service.dropDatabase();
+    }
+
+    public void start() {
+        service.start();
+        if (fixtureImporter != null) {
+            fixtureImporter.importResources(service.mongoConnection().getMongoDatabase());
+        }
     }
 
     @Override
     protected void before() {
-        startContainer();
-    }
-
-    public void startContainer() {
-        LOG.debug("Attempting to start container for image: {}", container.getDockerImageName());
-
-        container.start();
-        LOG.debug("Started container: {}", containerInfoString());
-
-        final MongoDbConfiguration mongoConfiguration = new MongoDbConfiguration();
-        mongoConfiguration.setUri(uri());
-
-        this.mongoConnection = new MongoConnectionImpl(mongoConfiguration);
-        this.mongoConnection.connect();
-        this.mongoConnection.getMongoDatabase().drop();
-
-        if (fixtureImporter != null) {
-            fixtureImporter.importResources(mongoConnection().getMongoDatabase());
-        }
-    }
-
-    private String uri() {
-        return uriWithHostAndPort(ipAddress(), port());
+        start();
     }
 
     public static String internalUri() {
-        return uriWithHostAndPort(NETWORK_ALIAS, MONGODB_PORT);
-    }
-
-    private static String uriWithHostAndPort(String hostname, int port) {
-        return String.format(Locale.US, "mongodb://%s:%d/%s", hostname, port, DEFAULT_DATABASE_NAME);
+        return MongoDBTestService.internalUri();
     }
 
     @Override
@@ -225,14 +162,10 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
      */
     @Override
     public void close() {
-        if (container != null) {
-            LOG.debug("Stopping container: {}", containerInfoString());
-            container.close();
+        try {
+            service.close();
+        } catch (Exception e) {
+            LOG.error("Error closing service", e);
         }
-    }
-
-    private String containerInfoString() {
-        final InspectContainerResponse containerInfo = container.getContainerInfo();
-        return String.format(Locale.US, "%s%s/%s", containerInfo.getId(), containerInfo.getName(), containerInfo.getConfig().getImage());
     }
 }
