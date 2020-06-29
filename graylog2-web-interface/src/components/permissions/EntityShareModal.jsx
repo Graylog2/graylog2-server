@@ -9,7 +9,7 @@ import { Spinner } from 'components/common';
 import EntityShareStore, { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
-import GranteesSelector from './GranteesSelector';
+import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 
 const StyledGranteesList = styled(GranteesList)`
@@ -49,6 +49,12 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
     }).then(onClose);
   };
 
+  const _handleSelection = ({ granteeId, roleId }: SelectionRequest) => {
+    return EntityShareActions.prepare(entityGRN, {
+      selected_grantee_roles: entityShareState.selectedGranteeRoles.merge({ [granteeId]: roleId }),
+    });
+  };
+
   return (
     <BootstrapModalConfirm onCancel={onClose}
                            onConfirm={handleSave}
@@ -62,9 +68,8 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
           <>
             <GranteesSelector availableGrantees={filteredGrantees}
                               availableRoles={entityShareState.availableRoles}
-                              entityGRN={entityGRN} />
-            <StyledGranteesList activeShares={entityShareState.activeShares}
-                                availableRoles={entityShareState.availableRoles}
+                              onSubmit={_handleSelection} />
+            <StyledGranteesList availableRoles={entityShareState.availableRoles}
                                 entityGRN={entityGRN}
                                 availableGrantees={entityShareState.availableGrantees}
                                 selectedGranteeRoles={entityShareState.selectedGranteeRoles} />
