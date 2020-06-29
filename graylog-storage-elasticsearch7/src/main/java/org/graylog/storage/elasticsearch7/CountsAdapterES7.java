@@ -1,9 +1,7 @@
 package org.graylog.storage.elasticsearch7;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
 import org.graylog2.indexer.counts.CountsAdapter;
 
 import javax.inject.Inject;
@@ -19,14 +17,10 @@ public class CountsAdapterES7 implements CountsAdapter {
 
     @Override
     public long totalCount(List<String> indices) {
-        final SearchSourceBuilder query = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery())
-                .size(0);
-        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]));
-        searchRequest.source(query);
+        final CountRequest request = new CountRequest(indices.toArray(new String[0]));
 
-        final SearchResponse result = this.client.search(searchRequest);
+        final CountResponse result = this.client.execute((c, requestOptions) -> c.count(request, requestOptions));
 
-        return result.getHits().getTotalHits().value;
+        return result.getCount();
     }
 }

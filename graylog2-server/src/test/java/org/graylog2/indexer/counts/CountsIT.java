@@ -173,7 +173,7 @@ public abstract class CountsIT extends ElasticsearchBaseTest {
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
 
         try {
-            counts.total(indexSet);
+             counts.total(indexSet);
             fail("Expected IndexNotFoundException");
         } catch (IndexNotFoundException e) {
             final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";

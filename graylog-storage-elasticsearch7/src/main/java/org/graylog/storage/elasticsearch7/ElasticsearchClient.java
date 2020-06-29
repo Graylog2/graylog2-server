@@ -3,8 +3,6 @@ package org.graylog.storage.elasticsearch7;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.shaded.elasticsearch7.org.apache.http.HttpHost;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
@@ -41,10 +39,6 @@ public class ElasticsearchClient {
                 .setMaxConnTotal(elasticsearchMaxTotalConnections)
                 .setMaxConnPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
         ));
-    }
-
-    public SearchResponse search(SearchRequest searchRequest) {
-        return execute((client, requestOptions) -> client.search(searchRequest, requestOptions));
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {
