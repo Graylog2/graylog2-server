@@ -87,6 +87,7 @@ describe('DataTableEntry', () => {
     ));
 
     const fieldTypeFor = (fieldName) => wrapper.find(`Value[field="${fieldName}"]`).first().props().type;
+
     expect(fieldTypeFor('nf_dst_address')).toEqual(FieldTypes.STRING());
     expect(fieldTypeFor('count()')).toEqual(FieldTypes.LONG());
     expect(fieldTypeFor('max(timestamp)')).toEqual(FieldTypes.DATE());
@@ -106,6 +107,7 @@ describe('DataTableEntry', () => {
                         valuePath={valuePath} />
       </table>
     ));
+
     expect(wrapper.find('Provider')
       .map((p) => p.props().value))
       .toMatchSnapshot();
@@ -128,11 +130,13 @@ describe('DataTableEntry', () => {
                         valuePath={valuePath} />
       </table>
     ));
+
     expect(wrapper).not.toContainReact(<EmptyValue />);
   });
 
   describe('resolves field types', () => {
     const timestampTypeMapping = FieldTypeMapping.create('timestamp', FieldTypes.DATE());
+
     it('for non-renamed functions', () => {
       const wrapper = mount((
         <table>
@@ -147,8 +151,10 @@ describe('DataTableEntry', () => {
         </table>
       ));
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
+
       valueFields.forEach((field) => expect(field).toHaveProp('type', timestampTypeMapping.type));
     });
+
     it('for simple row with renamed function', () => {
       const renamedSeries = [seriesWithName('max(timestamp)', 'Last Timestamp')];
       const itemWithRenamedSeries = {
@@ -169,9 +175,12 @@ describe('DataTableEntry', () => {
         </table>
       ));
       const valueFields = wrapper.find('Value[field="Last Timestamp"]');
+
       expect(valueFields).toHaveLength(1);
+
       valueFields.forEach((field) => expect(field).toHaveProp('type', timestampTypeMapping.type));
     });
+
     it('for renamed functions', () => {
       const renamedSeries = [
         Series.forFunction('count()'),
@@ -203,7 +212,9 @@ describe('DataTableEntry', () => {
         </table>
       ));
       const valueFields = wrapper.find('Value[field="Last Timestamp"]');
+
       expect(valueFields).toHaveLength(3);
+
       valueFields.forEach((field) => expect(field).toHaveProp('type', timestampTypeMapping.type));
     });
   });

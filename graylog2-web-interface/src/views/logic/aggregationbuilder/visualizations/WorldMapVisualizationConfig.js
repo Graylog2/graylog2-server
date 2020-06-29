@@ -27,6 +27,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
 
   toBuilder() {
     const { viewport } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ viewport }));
   }
@@ -45,6 +46,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
 
   static fromJSON(type: string, value: WorldMapVisualizationConfigJson) {
     const { viewport } = value;
+
     return WorldMapVisualizationConfig.builder()
       .viewport(Viewport.fromJSON(viewport))
       .build();
@@ -71,6 +73,7 @@ class Builder {
 
   build() {
     const { viewport } = this.value.toObject();
+
     return new WorldMapVisualizationConfig(viewport);
   }
 }

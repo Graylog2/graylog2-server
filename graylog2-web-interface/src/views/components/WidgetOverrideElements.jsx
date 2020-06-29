@@ -26,11 +26,14 @@ class WidgetOverrideElements extends React.Component<Props, State> {
 
   render() {
     const { thrownComponent: OverrideComponent } = this.state;
+
     if (OverrideComponent) {
       if (OverrideComponent instanceof Error) {
         throw OverrideComponent;
       }
+
       const retry = () => this.setState({ thrownComponent: undefined });
+
       return <OverrideComponent retry={retry} />;
     }
 

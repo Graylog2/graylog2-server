@@ -17,6 +17,7 @@ class UserPreferencesModal extends React.Component {
   _onPreferenceChanged = (event) => {
     const { name } = event.target;
     const preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
+
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {
       preferenceToChange.value = event.target.value;
@@ -58,6 +59,7 @@ class UserPreferencesModal extends React.Component {
 
       return formattedPreference;
     });
+
     return (
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title={`Preferences for user ${this.props.userName}`}

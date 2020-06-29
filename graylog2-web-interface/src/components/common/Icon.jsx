@@ -28,9 +28,11 @@ const updateLegacyName = (icon) => {
 
 const cleanIconName = (name, type) => {
   const iconName = removeFaPrefix(name);
+
   if (type !== 'brand') {
     return updateLegacyName(iconName);
   }
+
   return iconName;
 };
 
@@ -57,6 +59,7 @@ const getPrefixForType = (type) => {
 const Icon = ({ name, type, ...props }) => {
   const iconName = cleanIconName(name, type);
   const prefix = getPrefixForType(type);
+
   return (
     <FontAwesomeIcon {...props} icon={{ prefix, iconName }} />
   );

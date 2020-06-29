@@ -24,6 +24,7 @@ class AddExtractorWizard extends React.Component {
     if (this.state.showExtractorForm) {
       // Components using this component, will give it a proper fieldName and message
       const extractorFieldActions = <MessageFieldExtractorActions fieldName="" message={{}} />;
+
       extractorForm = (
         <div className="stream-loader">
           <LoaderTabs selectedInputId={this.props.inputId} customFieldActions={extractorFieldActions} />

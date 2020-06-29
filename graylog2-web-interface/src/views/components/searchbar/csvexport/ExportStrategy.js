@@ -22,9 +22,11 @@ const _initialSearchWidget = (widgets, directExportWidgetId) => {
   if (directExportWidgetId) {
     return _getWidgetById(widgets, directExportWidgetId);
   }
+
   if (widgets.size === 1) {
     return widgets.first();
   }
+
   return null;
 };
 
@@ -32,6 +34,7 @@ const _exportOnDashboard = (payload: ExportPayload, searchType: ?SearchType, sea
   if (!searchType) {
     throw new Error('CSV exports on a dashboard require a selected widget!');
   }
+
   return exportSearchTypeMessages(payload, searchId, searchType.id, filename);
 };
 
@@ -39,9 +42,11 @@ const _exportOnSearchPage = (payload: ExportPayload, searchQueries: Set<Query>, 
   if (searchQueries.size !== 1) {
     throw new Error('Searches must only have a single query!');
   }
+
   if (searchType) {
     return exportSearchTypeMessages(payload, searchId, searchType.id, filename);
   }
+
   return exportSearchMessages(payload, searchId, filename);
 };
 

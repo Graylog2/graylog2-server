@@ -27,6 +27,7 @@ const ViewTransformer = (searchView: View): View => {
         .streams(streams)
         .build();
     });
+
     return viewState.toBuilder()
       .widgets(widgets)
       .build();

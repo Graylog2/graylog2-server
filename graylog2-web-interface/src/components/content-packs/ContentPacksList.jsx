@@ -161,6 +161,7 @@ class ContentPacksList extends React.Component {
   _onChangePage(eventKey, event) {
     event.preventDefault();
     const pageNo = Number(eventKey);
+
     this.setState({ currentPage: pageNo });
   }
 

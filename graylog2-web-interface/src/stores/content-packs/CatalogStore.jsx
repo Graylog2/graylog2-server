@@ -17,6 +17,7 @@ const CatalogStore = Reflux.createStore({
     const promise = fetch('GET', url)
       .then((result) => {
         const entityIndex = lodash.groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
+
         this.trigger({ entityIndex: entityIndex });
 
         return result;
@@ -33,6 +34,7 @@ const CatalogStore = Reflux.createStore({
     }, []);
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
     const promise = fetch('POST', url, { entities: payload });
+
     CatalogActions.getSelectedEntities.promise(promise);
   },
 });

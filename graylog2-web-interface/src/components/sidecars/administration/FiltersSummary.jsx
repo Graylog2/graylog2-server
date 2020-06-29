@@ -22,11 +22,16 @@ class FiltersSummary extends React.Component {
     if (type === 'collector') {
       // Get collector name
       const collector = collectors.find((c) => c.id === value);
+
       return `${collector.name} on ${collector.node_operating_system}`;
-    } if (type === 'configuration') {
+    }
+
+    if (type === 'configuration') {
       // Get configuration name
       return configurations.find((c) => c.id === value).name;
-    } if (type === 'status') {
+    }
+
+    if (type === 'status') {
       // Convert status code to string
       return SidecarStatusEnum.toString(value);
     }

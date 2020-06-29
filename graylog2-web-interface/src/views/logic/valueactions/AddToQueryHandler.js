@@ -10,6 +10,7 @@ import QueryManipulationHandler from './QueryManipulationHandler';
 export default class AddToQueryHandler extends QueryManipulationHandler {
   formatTimestampForES = (value: string) => {
     const utc = moment(value).tz('UTC');
+
     return `"${utc.format('YYYY-MM-DD hh:mm:ss.SSS')}"`;
   };
 

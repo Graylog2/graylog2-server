@@ -10,5 +10,6 @@ export default async () => {
   const { view } = ViewStore.getInitialState();
   const query = QueryGenerator();
   const state = await ViewStateGenerator(view.type);
+
   return QueriesActions.create(query, state).then(() => query);
 };

@@ -19,6 +19,7 @@ export default class Constraint {
 
   toBuilder() {
     const { type, plugin, version } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ type, plugin, version }));
   }
@@ -56,6 +57,7 @@ export default class Constraint {
 
   static fromJSON(value) {
     const { type, version, plugin } = value;
+
     return Constraint.create(type, version, plugin);
   }
 
@@ -85,6 +87,7 @@ class Builder {
 
   build() {
     const { type, plugin, version } = this.value.toObject();
+
     return new Constraint(type, version, plugin);
   }
 }

@@ -4,6 +4,7 @@ class Version {
   constructor() {
     this.full = pjson.version;
     const splitVersion = this.full.split('.');
+
     this.major = splitVersion[0];
     this.minor = splitVersion[1];
   }

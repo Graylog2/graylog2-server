@@ -31,39 +31,46 @@ describe('FieldNameCompletion', () => {
     jest.clearAllMocks();
     asMock(FieldTypesStore.getInitialState).mockReturnValue(_createFieldTypesStoreState(dummyFields));
   });
+
   it('returns empty list if inputs are empty', () => {
     asMock(FieldTypesStore.getInitialState).mockReturnValue(_createFieldTypesStoreState([]));
 
     const completer = new FieldNameCompletion([]);
+
     expect(completer.getCompletions(null, null, '')).toEqual([]);
   });
 
   it('returns matching fields if prefix is present in one field name', () => {
     const completer = new FieldNameCompletion();
+
     expect(completer.getCompletions(null, null, 'mess').map((result) => result.name))
       .toEqual(['message']);
   });
 
   it('returns matching fields if prefix is present in at least one field name', () => {
     const completer = new FieldNameCompletion([]);
+
     expect(completer.getCompletions(null, null, 'e').map((result) => result.name))
       .toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
     const completer = new FieldNameCompletion([]);
+
     expect(completer.getCompletions(null, null, 'e').map((result) => result.value))
       .toEqual(['source:', 'message:', 'timestamp:']);
   });
 
   it('returns _exist_-operator if matching prefix', () => {
     const completer = new FieldNameCompletion();
+
     expect(completer.getCompletions(null, null, '_e').map((result) => result.value))
       .toEqual(['_exists_:']);
   });
 
   it('returns matching fields after _exists_-operator', () => {
     const completer = new FieldNameCompletion();
+
     expect(completer.getCompletions(null, { type: 'keyword', value: '_exists_:' }, 'e')
       .map((result) => result.name))
       .toEqual(['source', 'message', 'timestamp']);
@@ -71,6 +78,7 @@ describe('FieldNameCompletion', () => {
 
   it('returns exists operator together with matching fields', () => {
     const completer = new FieldNameCompletion();
+
     expect(completer.getCompletions(null, null, 'e').map((result) => result.name))
       .toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
@@ -108,6 +116,7 @@ describe('FieldNameCompletion', () => {
       const completions = completer.getCompletions(null, null, '');
 
       const completion = (fieldName) => completionByName(fieldName, completions);
+
       expect(completion('foo')?.score).toEqual(12);
       expect(completion('foo')?.meta).not.toMatch('(not in streams)');
 
@@ -123,6 +132,7 @@ describe('FieldNameCompletion', () => {
 
       const completions = completer.getCompletions(null, null, '');
       const completion = (fieldName) => completionByName(fieldName, completions);
+
       expect(completion('foo')?.score).toEqual(3);
       expect(completion('foo')?.meta).toMatch('(not in streams)');
 

@@ -46,9 +46,11 @@ const SidecarListContainer = createReactClass({
         && options.onlyActive === this.state.onlyActive
         && options.query === this.state.query; // Only keep page number when other parameters don't change
       let effectivePage = 1;
+
       if (shouldKeepPage) {
         effectivePage = page || this.state.pagination.page;
       }
+
       options.page = effectivePage;
     }
 
@@ -80,6 +82,7 @@ const SidecarListContainer = createReactClass({
     const { sidecars, onlyActive, pagination, query, sort } = this.state;
 
     const isLoading = !sidecars;
+
     if (isLoading) {
       return <Spinner />;
     }

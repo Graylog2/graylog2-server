@@ -39,17 +39,22 @@ const onOptionChange = (options: Immutable.List<Option>, onChange, newValue, rea
   if (reason.action === 'clear') {
     return onChange([]);
   }
+
   const { value } = newValue;
   const option = findOptionByValue(options, value);
+
   if (!option) {
     return undefined;
   }
+
   const sortConfig = new SortConfig(SortConfig.PIVOT_TYPE, option.label, Direction.Ascending);
+
   return onChange([sortConfig]);
 };
 
 const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
   const options: Immutable.List<Option> = sortedOptions(fields);
+
   return (
     <Select placeholder="None: click to add fields"
             onChange={(newValue, reason) => onOptionChange(options, onChange, newValue, reason)}

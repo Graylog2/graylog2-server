@@ -39,14 +39,19 @@ const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): ?Tok
 class OperatorCompletion implements Completer {
   getCompletions = (currentToken: ?Token, lastToken: ?Token, prefix: string, tokens: Array<Token>, currentTokenIdx: number): Array<CompletionResult> => {
     const lastNonEmptyToken = _lastNonEmptyToken(tokens, currentTokenIdx);
+
     if (!lastNonEmptyToken || (lastNonEmptyToken && (lastNonEmptyToken.type === 'keyword.operator'))) {
       const matchesFieldName = _matchesFieldName(prefix);
+
       return operators.filter(matchesFieldName);
     }
+
     if (lastToken && (lastToken.type === 'string' || lastToken.type === 'text')) {
       const matchesFieldName = _matchesFieldName(prefix);
+
       return [...combiningOperators, ...operators].filter(matchesFieldName);
     }
+
     return [];
   }
 }

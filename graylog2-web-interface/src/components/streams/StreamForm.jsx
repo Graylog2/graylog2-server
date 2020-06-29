@@ -33,8 +33,10 @@ class StreamForm extends React.Component {
 
   _getValuesFromProps = (props) => {
     let defaultIndexSetId = props.stream.index_set_id;
+
     if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
       const defaultIndexSet = props.indexSets.find((indexSet) => indexSet.default);
+
       if (defaultIndexSet) {
         defaultIndexSetId = defaultIndexSet.id;
       }
@@ -56,6 +58,7 @@ class StreamForm extends React.Component {
         remove_matches_from_default_stream: this.state.removeMatchesFromDefaultStream,
         index_set_id: this.state.indexSetId,
       });
+
     this.modal.close();
   };
 
@@ -81,6 +84,7 @@ class StreamForm extends React.Component {
 
   handleChange = (event) => {
     const change = {};
+
     change[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState(change);
   };
@@ -91,6 +95,7 @@ class StreamForm extends React.Component {
     const { title, description, removeMatchesFromDefaultStream, indexSetId } = this.state;
 
     let indexSetSelect;
+
     if (this.props.indexSets) {
       indexSetSelect = (
         <Input id="index-set-selector"

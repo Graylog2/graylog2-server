@@ -9,6 +9,7 @@ import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/
 
 const IndicesActions = ActionsProvider.getActions('Indices');
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+
 StoreProvider.getStore('IndexRanges');
 
 class IndexDetails extends React.Component {
@@ -75,7 +76,9 @@ class IndexDetails extends React.Component {
     if (!this.props.index || !this.props.index.all_shards) {
       return <Spinner />;
     }
+
     const { index, indexRange, indexName } = this.props;
+
     return (
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />{' '}

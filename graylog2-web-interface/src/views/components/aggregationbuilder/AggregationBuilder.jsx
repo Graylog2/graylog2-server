@@ -47,16 +47,20 @@ export type VisualizationComponent =
 export const makeVisualization = (component: React.ComponentType<VisualizationComponentProps>, type: string): VisualizationComponent => {
   // $FlowFixMe: Casting by force
   const visualizationComponent: VisualizationComponent = component;
+
   visualizationComponent.type = type;
+
   return visualizationComponent;
 };
 
 const _visualizationForType = (type: string): VisualizationComponent => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
   const visualization = visualizationTypes.filter((viz) => viz.type === type)[0];
+
   if (!visualization) {
     throw new Error(`Unable to find visualization component for type: ${type}`);
   }
+
   return visualization.component;
 };
 
@@ -64,6 +68,7 @@ const getResult = (value: RowResult | EventResult): Rows | Events => {
   if (value.type === 'events') {
     return value.events;
   }
+
   return value.rows;
 };
 
@@ -83,6 +88,7 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
       ],
     )
     .reduce((prev, [key, value]: [string, Rows | Events]) => ({ ...prev, [key]: value }), {});
+
   return (
     <FullSizeContainer>
       {({ height, width }) => (

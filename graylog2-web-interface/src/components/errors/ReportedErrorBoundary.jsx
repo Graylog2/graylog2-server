@@ -42,6 +42,7 @@ const ReportedErrorBoundary = ({ children, router }) => {
 
   useEffect(() => {
     const unlistenErrorsReport = ErrorsActions.report.listen(report);
+
     return () => {
       unlistenErrorsReport();
     };
@@ -49,6 +50,7 @@ const ReportedErrorBoundary = ({ children, router }) => {
 
   useEffect(() => {
     const unlistenRouter = router.listen(() => reportedError && setReportedError(null));
+
     return () => {
       unlistenRouter();
     };
@@ -60,6 +62,5 @@ const ReportedErrorBoundary = ({ children, router }) => {
 
   return children;
 };
-
 
 export default withRouter(ReportedErrorBoundary);

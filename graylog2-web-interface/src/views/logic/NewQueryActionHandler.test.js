@@ -25,6 +25,7 @@ describe('NewQueryActionHandler', () => {
       view: View.create().toBuilder().type(View.Type.Dashboard).build(),
     });
   });
+
   it('creates a new query', () => NewQueryActionHandler()
     .then(() => expect(QueriesActions.create).toHaveBeenCalled()));
 });

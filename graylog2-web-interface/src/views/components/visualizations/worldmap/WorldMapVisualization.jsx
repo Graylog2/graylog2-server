@@ -23,9 +23,11 @@ const _mergeObject = (prev, last) => ({ ...prev, ...last });
 const _createSeriesWithoutMetric = (rows: Rows) => {
   const leafs = getLeafsFromRows(rows);
   const xLabels = getXLabelsFromLeafs(leafs);
+
   if (!isEmpty(xLabels)) {
     return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
   }
+
   return {};
 };
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
@@ -36,6 +38,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
     const newX = x.map(_lastKey);
     // eslint-disable-next-line no-unused-vars
     const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
+
     return { keys, name, values };
   });
 };
@@ -64,6 +67,7 @@ const WorldMapVisualization: VisualizationComponent = makeVisualization(({ confi
     const visualizationConfig = (config.visualizationConfig ? config.visualizationConfig.toBuilder() : WorldMapVisualizationConfig.builder())
       .viewport(Viewport.create(newViewport.center, newViewport.zoom))
       .build();
+
     if (editing) {
       onChange(visualizationConfig);
     }

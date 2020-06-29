@@ -17,7 +17,6 @@ import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
 
-
 type DialogProps = {
   bsClass: string,
   className: string,
@@ -56,6 +55,7 @@ export default class EditWidgetFrame extends React.Component<Props> {
 
   render() {
     const { children } = this.props;
+
     return (
       <Modal show
              animation={false}

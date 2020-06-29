@@ -32,9 +32,11 @@ const OneOrMoreChildren = PropTypes.oneOfType([
 const prototypesOf = (target) => {
   let i = target;
   const result = [];
+
   while (i) {
     try {
       const prototype = Object.getPrototypeOf(i);
+
       result.push(prototype);
       i = prototype;
     } catch {
@@ -47,18 +49,22 @@ const prototypesOf = (target) => {
 
 const createInstanceOf = (expectedClass, required = false) => {
   const expectedConstructorName = get(expectedClass, 'name');
+
   // eslint-disable-next-line consistent-return
   return (props, propName, componentName) => {
     const value = props[propName];
+
     if (!value) {
       return required
         ? new Error(`Invalid prop ${propName} supplied to ${componentName}: expected to be instance of ${expectedConstructorName} but found ${value} instead`)
         : undefined;
     }
+
     const valueConstructorName = get(prototypesOf(value)[0], ['constructor', 'name']);
     const constructorNames = prototypesOf(value)
       .map((proto) => get(proto, ['constructor', 'name']))
       .filter((name) => name !== undefined);
+
     if (!constructorNames.includes(expectedConstructorName)) {
       return new Error(`Invalid prop ${propName} supplied to ${componentName}: ${valueConstructorName} expected to be instance of ${expectedConstructorName}`);
     }

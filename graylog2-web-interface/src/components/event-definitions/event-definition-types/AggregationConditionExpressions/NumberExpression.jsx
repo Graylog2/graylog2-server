@@ -10,6 +10,7 @@ import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpression
 const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {
   const handleChange = (event) => {
     const nextExpression = lodash.cloneDeep(expression);
+
     nextExpression.value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
     onChange({ conditions: nextExpression });
   };

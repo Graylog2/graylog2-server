@@ -19,6 +19,7 @@ class HumanReadableStreamRule extends React.Component {
         return String(streamRuleType.id) === String(type);
       })[0];
     }
+
     return undefined;
   };
 
@@ -27,6 +28,7 @@ class HumanReadableStreamRule extends React.Component {
       if (streamRule.value) {
         return streamRule.value;
       }
+
       return this.EMPTY_TAG;
     }
 
@@ -37,6 +39,7 @@ class HumanReadableStreamRule extends React.Component {
     if (streamRule.field) {
       return streamRule.field;
     }
+
     return this.EMPTY_TAG;
   };
 
@@ -45,11 +48,13 @@ class HumanReadableStreamRule extends React.Component {
     const streamRuleType = this._getTypeForInteger(streamRule.type, streamRuleTypes);
     const negation = (streamRule.inverted ? 'not ' : null);
     const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
+
     if (String(streamRule.type) === String(this.ALWAYS_MATCH_RULE_TYPE)) {
       return (
         <span>Rule always matches</span>
       );
     }
+
     return (
       <span>
         <em>{this._formatRuleField(streamRule)}</em> <strong>must {negation}</strong>{longDesc} <em>{this._formatRuleValue(streamRule)}</em>

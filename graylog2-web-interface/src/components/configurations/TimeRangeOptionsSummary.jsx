@@ -8,6 +8,7 @@ class TimeRangeOptionsSummary extends React.Component {
 
   render() {
     let timerangeOptionsSummary = null;
+
     if (this.props.options) {
       timerangeOptionsSummary = Object.keys(this.props.options).map((key, idx) => {
         return (

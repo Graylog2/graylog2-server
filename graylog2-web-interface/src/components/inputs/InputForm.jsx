@@ -21,12 +21,14 @@ class InputForm extends React.Component {
 
   _handleChange = (field, value) => {
     const state = {};
+
     state[field] = value;
     this.setState(state);
   };
 
   _onSubmit = (data) => {
     const newData = jQuery.extend(data, { global: this.state.global, node: this.state.node });
+
     this.props.submitAction(newData);
   };
 
@@ -39,6 +41,7 @@ class InputForm extends React.Component {
       : (this.configurationForm ? this.configurationForm.getValue().configuration : {});
     const titleValue = this.props.titleValue ? this.props.titleValue
       : (this.configurationForm ? this.configurationForm.getValue().titleValue : '');
+
     return (
       <ConfigurationForm {...this.props}
                          ref={(configurationForm) => { this.configurationForm = configurationForm; }}

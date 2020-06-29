@@ -36,6 +36,7 @@ const EditExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get.triggerPromise(params.inputId);
     ExtractorsActions.get.triggerPromise(params.inputId, params.extractorId);
     UniversalSearchstore.search('relative', `gl2_source_input:${params.inputId} OR gl2_source_radio_input:${params.inputId}`, { relative: 3600 }, undefined, 1)
@@ -57,6 +58,7 @@ const EditExtractorsPage = createReactClass({
     let url;
     const { input } = this.state;
     const { params } = this.props;
+
     if (input.global) {
       url = Routes.global_input_extractors(params.inputId);
     } else {
@@ -75,6 +77,7 @@ const EditExtractorsPage = createReactClass({
     }
 
     const { extractor, exampleMessage, input } = this.state;
+
     return (
       <DocumentTitle title={`Edit extractor ${extractor.title}`}>
         <div>

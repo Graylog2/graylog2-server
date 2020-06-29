@@ -171,6 +171,7 @@ const SearchesConfig = createReactClass({
 
     let filterFields;
     let filterFieldsString;
+
     if (this.state.config.surrounding_filter_fields) {
       filterFields = this.state.config.surrounding_filter_fields.map((f, idx) => <li key={idx}>{f}</li>);
       filterFieldsString = this.state.config.surrounding_filter_fields.join(', ');
@@ -178,6 +179,7 @@ const SearchesConfig = createReactClass({
 
     let analysisDisabledFields;
     let analysisDisabledFieldsString;
+
     if (this.state.config.analysis_disabled_fields) {
       analysisDisabledFields = this.state.config.analysis_disabled_fields.map((f, idx) => <li key={idx}>{f}</li>);
       analysisDisabledFieldsString = this.state.config.analysis_disabled_fields.join(', ');

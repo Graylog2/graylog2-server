@@ -38,6 +38,7 @@ export const SelectedFieldsStore = singletonStore(
 
     onViewStoreChange(newState: StateUpdate) {
       const selectedFields = Set(get(newState, 'state.fields'));
+
       if (!isEqual(this.selectedFields, selectedFields)) {
         this.selectedFields = selectedFields;
         this._trigger();

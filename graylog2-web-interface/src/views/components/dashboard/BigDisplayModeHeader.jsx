@@ -25,7 +25,9 @@ const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
   if (!view || !activeQuery) {
     return <Spinner />;
   }
+
   const currentQueryTitle = queryTitle(view, activeQuery);
+
   return (
     <PositioningWrapper>
       <h1>{view.title}</h1>

@@ -12,11 +12,13 @@ const InputStaticFieldsStore = Reflux.createStore({
   create(input, name, value) {
     const url = URLUtils.qualifyUrl(this.sourceUrl(input.id));
     const promise = fetch('POST', url, { key: name, value: value });
+
     promise
       .then(
         (response) => {
           this.trigger({});
           UserNotification.success(`Static field '${name}' added to '${input.title}' successfully`);
+
           return response;
         },
         (error) => {
@@ -31,11 +33,13 @@ const InputStaticFieldsStore = Reflux.createStore({
   destroy(input, name) {
     const url = URLUtils.qualifyUrl(`${this.sourceUrl(input.id)}/${name}`);
     const promise = fetch('DELETE', url);
+
     promise
       .then(
         (response) => {
           this.trigger({});
           UserNotification.success(`Static field '${name}' removed from '${input.title}' successfully`);
+
           return response;
         },
         (error) => {

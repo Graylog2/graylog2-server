@@ -30,12 +30,15 @@ class MetricsComponent extends React.Component {
     const { filter } = this.state;
 
     let filteredNames;
+
     try {
       const filterRegex = new RegExp(filter, 'i');
+
       filteredNames = this.props.names.filter((metric) => String(metric.full_name).match(filterRegex));
     } catch (e) {
       filteredNames = [];
     }
+
     return (
       <Row className="content">
         <Col md={12}>

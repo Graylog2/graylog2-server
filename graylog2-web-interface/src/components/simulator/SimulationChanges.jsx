@@ -151,11 +151,13 @@ const SimulationChanges = createReactClass({
       if (processedFields.indexOf(field) === -1) {
         return;
       }
+
       const originalValue = originalMessage.fields[field];
       const processedValue = processedMessage.fields[field];
 
       if (typeof originalValue !== typeof processedValue) {
         mutatedFields.push(field);
+
         return;
       }
 

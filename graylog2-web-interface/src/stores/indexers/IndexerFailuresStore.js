@@ -11,6 +11,7 @@ const IndexerFailuresStore = Reflux.createStore({
 
   list(limit, offset) {
     const url = URLUtils.qualifyUrl(ApiRoutes.IndexerFailuresApiController.list(limit, offset).url);
+
     return fetch('GET', url);
   },
 

@@ -23,6 +23,7 @@ const AlarmCallbackHistoryStore = Reflux.createStore({
         (response) => {
           this.histories = response.histories;
           this.trigger({ histories: this.histories });
+
           return this.histories;
         },
         (error) => {

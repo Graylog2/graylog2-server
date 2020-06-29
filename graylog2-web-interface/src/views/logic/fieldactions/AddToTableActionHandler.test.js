@@ -12,8 +12,10 @@ describe('AddToTableActionHandler.condition', () => {
     const contexts = { widget };
 
     const result = AddToTableActionHandler.isEnabled({ contexts, field: 'foo' });
+
     expect(result).toEqual(false);
   });
+
   it('enables action if field is presented in message table', () => {
     const widget = MessagesWidget.builder()
       .config(MessagesWidgetConfig.builder().build())
@@ -21,13 +23,16 @@ describe('AddToTableActionHandler.condition', () => {
     const contexts = { widget };
 
     const result = AddToTableActionHandler.isEnabled({ contexts, field: 'foo' });
+
     expect(result).toEqual(true);
   });
+
   it('checks properly for non message tables', () => {
     const widget = AggregationWidget.builder().build();
     const contexts = { widget };
 
     const result = AddToTableActionHandler.isEnabled({ contexts, field: 'foo' });
+
     expect(result).toEqual(false);
   });
 });

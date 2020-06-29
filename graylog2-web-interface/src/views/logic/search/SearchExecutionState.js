@@ -35,6 +35,7 @@ export default class SearchExecutionState {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { globalOverride, parameterBindings } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ globalOverride, parameterBindings }));
   }
@@ -59,6 +60,7 @@ export default class SearchExecutionState {
   static fromJSON(value: JsonRepresentation): SearchExecutionState {
     // eslint-disable-next-line camelcase
     const { global_override, parameter_bindings } = value;
+
     return SearchExecutionState.create(parameter_bindings, global_override);
   }
 }
@@ -82,6 +84,7 @@ class Builder {
 
   build(): SearchExecutionState {
     const { globalOverride, parameterBindings } = this.value.toObject();
+
     return new SearchExecutionState(parameterBindings, globalOverride);
   }
 }

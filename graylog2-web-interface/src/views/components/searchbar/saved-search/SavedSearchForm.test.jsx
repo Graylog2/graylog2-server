@@ -20,6 +20,7 @@ describe('SavedSearchForm', () => {
                                              isCreateNew
                                              target={() => {}}
                                              saveSearch={() => {}} />);
+
       expect(wrapper).toMatchSnapshot();
     });
 
@@ -32,6 +33,7 @@ describe('SavedSearchForm', () => {
                                              isCreateNew={false}
                                              target={() => {}}
                                              saveSearch={() => {}} />);
+
       expect(wrapper).toMatchSnapshot();
     });
 
@@ -44,6 +46,7 @@ describe('SavedSearchForm', () => {
                                              isCreateNew={false}
                                              target={() => {}}
                                              saveSearch={() => {}} />);
+
       expect(wrapper).toMatchSnapshot();
     });
   });
@@ -59,7 +62,9 @@ describe('SavedSearchForm', () => {
                                              isCreateNew={false}
                                              target={() => {}}
                                              saveSearch={() => {}} />);
+
       wrapper.find('button[children="Cancel"]').simulate('click');
+
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
 
@@ -73,7 +78,9 @@ describe('SavedSearchForm', () => {
                                              isCreateNew={false}
                                              target={() => {}}
                                              saveSearch={onSave} />);
+
       wrapper.find('button[children="Save"]').simulate('click');
+
       expect(onSave).toHaveBeenCalledTimes(1);
     });
   });
@@ -88,7 +95,9 @@ describe('SavedSearchForm', () => {
                                            isCreateNew={false}
                                            target={() => {}}
                                            saveSearch={() => {}} />);
+
     wrapper.find('button[children="Save as"]').simulate('click');
+
     expect(onSaveAs).toHaveBeenCalledTimes(1);
   });
 
@@ -102,7 +111,9 @@ describe('SavedSearchForm', () => {
                                            isCreateNew={false}
                                            target={() => {}}
                                            saveSearch={() => {}} />);
+
     wrapper.find('button[children="Save as"]').simulate('click');
+
     expect(onSaveAs).toHaveBeenCalledTimes(0);
   });
 
@@ -116,7 +127,9 @@ describe('SavedSearchForm', () => {
                                            isCreateNew
                                            target={() => {}}
                                            saveSearch={() => {}} />);
+
     wrapper.find('button[children="Create new"]').simulate('click');
+
     expect(onSaveAs).toHaveBeenCalledTimes(1);
   });
 });

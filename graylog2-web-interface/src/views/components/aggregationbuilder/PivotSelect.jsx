@@ -20,6 +20,7 @@ const _onChange = (fields, newValue, onChange, fieldTypes) => {
   return onChange(newFields.map((field) => {
     const existingField = fields.find((f) => f.field === field);
     const mapping = fieldTypes?.find((fieldType) => fieldType.name === field) || new FieldTypeMapping(field, FieldType.Unknown);
+
     return existingField || pivotForField(field, mapping.type);
   }));
 };
@@ -31,8 +32,10 @@ const newPivotConfigChange = (values, value, newPivotConfig, onChange) => {
     if (pivot.field === value.value) {
       return new Pivot(pivot.field, pivot.type, newPivotConfig.config);
     }
+
     return pivot;
   });
+
   return onChange(newValues);
 };
 
@@ -52,6 +55,7 @@ const PivotSelect = ({ onChange, value, ...props }: Props) => {
     const fieldType = fields.isEmpty() ? FieldType.Unknown : fields.first().type;
     // eslint-disable-next-line react/prop-types
     const { className } = innerProps;
+
     return (
       <span className={className}>
         <ConfigurableElement {...rest}

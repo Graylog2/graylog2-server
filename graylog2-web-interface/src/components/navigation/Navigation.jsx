@@ -46,6 +46,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+
     if (isEmpty) {
       return null;
     }
@@ -62,6 +63,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginExports = PluginStore.exports('navigation');
+
   if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
@@ -69,6 +71,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
       description: 'Enterprise',
     });
   }
+
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));

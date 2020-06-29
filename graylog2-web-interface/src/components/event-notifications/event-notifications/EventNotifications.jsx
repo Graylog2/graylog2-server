@@ -58,6 +58,7 @@ class EventNotifications extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
@@ -94,6 +95,7 @@ class EventNotifications extends React.Component {
 
   formatActions(notification, isTestLoading) {
     const { onDelete, onTest } = this.props;
+
     return (
       <>
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>

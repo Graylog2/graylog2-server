@@ -24,12 +24,14 @@ describe('DecoratorsUpdater', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
+
   it('works for empty arrays', () => DecoratorsUpdater([], [])
     .then(() => {
       expect(mockCreate).not.toHaveBeenCalled();
       expect(mockUpdate).not.toHaveBeenCalled();
       expect(mockRemove).not.toHaveBeenCalled();
     }));
+
   it('finds a created decorator', () => DecoratorsUpdater(
     [decorator('decorator1'), decorator('new1', 'a new decorator'), decorator('decorator3')],
     [decorator('decorator1'), decorator('decorator3')],
@@ -39,6 +41,7 @@ describe('DecoratorsUpdater', () => {
       expect(mockUpdate).not.toHaveBeenCalled();
       expect(mockRemove).not.toHaveBeenCalled();
     }));
+
   it('finds an updated decorator', () => DecoratorsUpdater(
     [decorator('decorator1'), decorator('decorator2', 'other'), decorator('decorator3')],
     [decorator('decorator1'), decorator('decorator2'), decorator('decorator3')],
@@ -48,6 +51,7 @@ describe('DecoratorsUpdater', () => {
       expect(mockUpdate).toHaveBeenCalledWith('decorator2', decorator('decorator2', 'other'));
       expect(mockRemove).not.toHaveBeenCalled();
     }));
+
   it('finds a removed decorator', () => DecoratorsUpdater(
     [decorator('decorator1'), decorator('decorator3')],
     [decorator('decorator1'), decorator('decorator2'), decorator('decorator3')],

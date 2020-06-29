@@ -11,6 +11,7 @@ class IndexSizeSummary extends React.Component {
 
   render() {
     const { index } = this.props;
+
     if (index.size) {
       return (
         <span>({NumberUtils.formatBytes(index.size.bytes)}{' '}

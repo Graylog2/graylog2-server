@@ -5,10 +5,12 @@ const StringUtils = {
   },
   escapeHTML(text) {
     this.tempDocument.textContent = text;
+
     return this.tempDocument.innerHTML;
   },
   unescapeHTML(text) {
     this.tempDocument.innerHTML = text;
+
     return this.tempDocument.textContent;
   },
   pluralize(number, singular, plural) {

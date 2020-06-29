@@ -13,12 +13,18 @@ describe('ActionDropdown', () => {
         <MenuItem>Foo</MenuItem>
       </ActionDropdown>
     ));
+
     expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
+
     const trigger = wrapper.find('ActionToggle');
+
     expect(trigger).toContainMatchingElement('div.my-trigger-element');
+
     trigger.simulate('click');
+
     expect(wrapper).toContainMatchingElement('ul.dropdown-menu');
   });
+
   it('stops event when trigger element is clicked', () => {
     const onClick = jest.fn();
     const wrapper = mount((
@@ -29,10 +35,12 @@ describe('ActionDropdown', () => {
       </button>
     ));
     const trigger = wrapper.find('ActionToggle');
+
     trigger.simulate('click');
 
     expect(onClick).not.toHaveBeenCalled();
   });
+
   it('closes menu when MenuItem is clicked', () => {
     const onSelect = jest.fn();
     const wrapper = mount((
@@ -41,14 +49,17 @@ describe('ActionDropdown', () => {
       </ActionDropdown>
     ));
     const trigger = wrapper.find('ActionToggle');
+
     trigger.simulate('click');
 
     const menuItem = wrapper.find('a[children="Foo"]');
+
     menuItem.simulate('click');
 
     expect(onSelect).toHaveBeenCalled();
     expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
   });
+
   it('stops click event when MenuItem is clicked', () => {
     const onClick = jest.fn();
     const onSelect = jest.fn();
@@ -60,9 +71,11 @@ describe('ActionDropdown', () => {
       </button>
     ));
     const trigger = wrapper.find('ActionToggle');
+
     trigger.simulate('click');
 
     const menuItem = wrapper.find('a[children="Foo"]');
+
     menuItem.simulate('click');
 
     expect(onClick).not.toHaveBeenCalled();

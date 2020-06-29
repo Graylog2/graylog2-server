@@ -76,6 +76,7 @@ const JournalDetails = createReactClass({
         utilizationRatio: 'org.graylog2.journal.utilization-ratio',
         oldestSegment: 'org.graylog2.journal.oldest-segment',
       };
+
       Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
     }
   },
@@ -116,6 +117,7 @@ const JournalDetails = createReactClass({
 
     const oldestSegment = moment(metrics.oldestSegment);
     let overcommittedWarning;
+
     if (metrics.utilizationRatio >= 1) {
       overcommittedWarning = (
         <span>

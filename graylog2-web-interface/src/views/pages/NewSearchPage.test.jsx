@@ -28,16 +28,20 @@ jest.mock('views/stores/SearchStore', () => {});
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: { create: jest.fn(() => Promise.resolve({ view: mockView })) },
 }));
+
 jest.mock('views/hooks/SyncWithQueryParameters', () => ({
   syncWithQueryParameters: jest.fn(),
 }));
+
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.resolve()),
   },
 }));
+
 jest.mock('views/logic/views/ViewLoader', () => {
   const originalModule = jest.requireActual('views/logic/views/ViewLoader');
+
   return {
     __esModule: true,
     ...originalModule,
@@ -62,6 +66,7 @@ describe('NewSearchPage', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
+
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -69,12 +74,15 @@ describe('NewSearchPage', () => {
 
   it('should render minimal', async () => {
     const { getByText } = render(<SimpleNewSearchPage />);
+
     await waitForElement(() => getByText('Extended search page'));
   });
 
   it('should show spinner while loading view', () => {
     const { getByText } = render(<SimpleNewSearchPage />);
+
     act(() => jest.advanceTimersByTime(200));
+
     expect(getByText('Loading...')).not.toBeNull();
   });
 
@@ -88,6 +96,7 @@ describe('NewSearchPage', () => {
 
     it('should process hooks with provided location query', async () => {
       const processHooksAction = asMock(processHooks);
+
       render(<SimpleNewSearchPage location={mockLocation} />);
 
       await wait(() => expect(processHooksAction).toBeCalledTimes(1));
@@ -105,6 +114,7 @@ describe('NewSearchPage', () => {
 
       const { getByText } = render(<SimpleNewSearchPage />);
       const viewLoadButton = await waitForElement(() => getByText('Load view'));
+
       fireEvent.click(viewLoadButton);
 
       await wait(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
@@ -124,6 +134,7 @@ describe('NewSearchPage', () => {
     it('should be supported', async () => {
       const { getByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
+
       fireEvent.click(viewCreateButton);
 
       await wait(() => expect(ViewActions.create).toBeCalledTimes(2));
@@ -134,6 +145,7 @@ describe('NewSearchPage', () => {
       const processHooksAction = asMock(processHooks);
       const { getByText } = render(<SimpleNewSearchPage location={mockLocation} />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
+
       fireEvent.click(viewCreateButton);
 
       await wait(() => expect(processHooksAction).toBeCalledTimes(2));
@@ -143,6 +155,7 @@ describe('NewSearchPage', () => {
     it('should sync query params with current url', async () => {
       const { getByText } = render(<SimpleNewSearchPage location={mockLocation} />);
       const viewCreateButton = await waitForElement(() => getByText('Load new view'));
+
       fireEvent.click(viewCreateButton);
 
       await wait(() => expect(syncWithQueryParameters).toBeCalledTimes(1));

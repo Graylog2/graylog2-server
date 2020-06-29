@@ -17,5 +17,6 @@ export default function ({ view }: CreatorProps) {
       .visualization(DataTable.type)
       .build())
     .build();
+
   return WidgetActions.create(newWidget);
 }

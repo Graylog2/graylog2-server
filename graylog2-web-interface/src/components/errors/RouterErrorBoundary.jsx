@@ -24,9 +24,11 @@ class RouterErrorBoundary extends React.Component {
   render() {
     const { error, info } = this.state;
     const { children } = this.props;
+
     if (error) {
       return <RuntimeErrorPage error={error} componentStack={info.componentStack} />;
     }
+
     return children;
   }
 }

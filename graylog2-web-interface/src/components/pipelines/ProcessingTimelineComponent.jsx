@@ -76,6 +76,7 @@ const ProcessingTimelineComponent = createReactClass({
 
   _headerCellFormatter(header) {
     let className;
+
     if (header === 'Actions') {
       className = 'actions';
     }
@@ -183,6 +184,7 @@ const ProcessingTimelineComponent = createReactClass({
     this.usedStages = this._calculateUsedStages(pipelines);
 
     const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
+
     return (
       <div>
         {addNewPipelineButton}

@@ -31,6 +31,7 @@ const ConnectedMessageDetail = connect(
     const { streams = [] } = availableStreams;
     const { inputs = [] } = availableInputs;
     const { searchesClusterConfig } = configurations;
+
     return ({
       ...rest,
       allStreams: Immutable.List(streams),
@@ -79,23 +80,28 @@ const MessageTableEntry = ({
     if (strong) {
       return <strong>{children}</strong>;
     }
+
     return children;
   };
 
   const colSpanFixup = selectedFields.size + 1;
 
   let classes = 'message-group';
+
   if (expanded) {
     classes += ' message-group-toggled';
   }
+
   if (message.id === highlightMessage) {
     classes += ' message-highlight';
   }
+
   return (
     <tbody className={classes}>
       <tr className="fields-row" onClick={_toggleDetail}>
         { selectedFields.toArray().map((selectedFieldName, idx) => {
           const type = fieldType(selectedFieldName, message, fields);
+
           return (
             <td className={style.fieldsRowField} key={selectedFieldName}>
               {_renderStrong(

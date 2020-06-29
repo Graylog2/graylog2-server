@@ -8,6 +8,7 @@ class RepeatNotificationsSummary extends React.Component {
 
   render() {
     const repeatNotifications = this.props.alertCondition.parameters.repeat_notifications || false;
+
     return (
       <span>Configured to {!repeatNotifications && <b>not</b>} repeat notifications.</span>
     );

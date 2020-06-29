@@ -5,6 +5,7 @@ const UIUtils = {
   scrollToHint(element) {
     if (!this.isElementVisible(element)) {
       const $scrollHint = $('#scroll-to-hint');
+
       $scrollHint
         .fadeIn('fast')
         .delay(1500)
@@ -12,6 +13,7 @@ const UIUtils = {
         .on('click', (event) => {
           event.preventDefault();
           const top = window.pageYOffset - this.NAVBAR_HEIGHT + element.getBoundingClientRect().top;
+
           $('html, body').animate({ scrollTop: top }, 'fast');
           $scrollHint.off('click');
         });

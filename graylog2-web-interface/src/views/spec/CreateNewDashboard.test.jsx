@@ -29,6 +29,7 @@ jest.mock('views/stores/DashboardsStore', () => ({
     })],
   ),
 }));
+
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   ['listen', () => jest.fn()],
   'get',
@@ -47,10 +48,12 @@ jest.mock('util/AppConfig', () => ({
   gl2DevMode: jest.fn(() => false),
   isFeatureEnabled: jest.fn(() => true),
 }));
+
 jest.mock('stores/sessions/SessionStore', () => ({
   isLoggedIn: jest.fn(() => true),
   getSessionId: jest.fn(() => 'foobar'),
 }));
+
 jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Editor</span>);
 
 jest.unmock('logic/rest/FetchProvider');
@@ -74,9 +77,11 @@ describe('Create a new dashboard', () => {
 
   it('using Dashboards Page', async () => {
     const { getByText, getAllByText } = render(<SimpleAppRouter />);
+
     history.push(Routes.DASHBOARDS);
 
     const button = await waitForElement(() => getAllByText('Create new dashboard')[0], { timeout: 15000 });
+
     fireEvent.click(button);
     await waitForElement(() => getByText(/This dashboard has no widgets yet/), { timeout: 15000 });
   });

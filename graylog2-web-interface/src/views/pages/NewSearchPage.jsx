@@ -60,14 +60,17 @@ class NewSearchPage extends React.Component<Props, State> {
 
   loadViewFromParams = (): Promise<?View> => {
     const { location: { query } } = this.props;
+
     return this.loadNewView({ ...query });
   }
 
   loadEmptyView = (): Promise<?View> => {
     const { router } = this.props;
+
     return this.loadNewView({}).then(() => {
       const { pathname, search } = router.getCurrentLocation();
       const query = `${pathname}${search}`;
+
       // running syncWithQueryParameters with the "old" query, will replace the url query with the new view settings
       syncWithQueryParameters(query);
     });
@@ -75,6 +78,7 @@ class NewSearchPage extends React.Component<Props, State> {
 
   loadNewView = (currentURLQuery: URLQuery): Promise<?View> => {
     const { loadingViewHooks, executingViewHooks } = this.props;
+
     return processHooks(
       ViewActions.create(View.Type.Search).then(({ view }) => view),
       loadingViewHooks,
@@ -102,10 +106,12 @@ class NewSearchPage extends React.Component<Props, State> {
         if (e instanceof Error) {
           throw e;
         }
+
         this.setState({ hookComponent: e });
       },
     ).then((view) => {
       this.setState({ loaded: true });
+
       return view;
     }).then(() => {
       SearchActions.executeWithCurrentState();
@@ -117,11 +123,13 @@ class NewSearchPage extends React.Component<Props, State> {
 
     if (hookComponent) {
       const HookComponent = hookComponent;
+
       return <HookComponent />;
     }
 
     if (loaded) {
       const { location, route } = this.props;
+
       return (
         <ViewLoaderContext.Provider value={this.loadView}>
           <NewViewLoaderContext.Provider value={this.loadEmptyView}>
@@ -130,6 +138,7 @@ class NewSearchPage extends React.Component<Props, State> {
         </ViewLoaderContext.Provider>
       );
     }
+
     return <Spinner />;
   }
 }

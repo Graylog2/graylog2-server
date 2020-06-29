@@ -40,7 +40,6 @@ describe('copyWidgetToDashboard', () => {
       .search(searchSearchFixture)
       .build();
 
-
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
     const dashboardView = dashboardViewFixture.toBuilder()
@@ -50,6 +49,7 @@ describe('copyWidgetToDashboard', () => {
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 
     const newDashboard = copyWidgetToDashboard(widgetId, searchView, dashboardView);
+
     expect(newDashboard).toMatchSnapshot();
   });
 });

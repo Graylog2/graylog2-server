@@ -50,6 +50,7 @@ const MetricDetails = createReactClass({
       ? this.state.metrics[nodeId][metricName] : this.props.metric;
     const type = lodash.capitalize(metric.type);
     const details = this._formatDetailsForType(type, metric);
+
     return (
       <div className="metric">
         <h3>{type}</h3>

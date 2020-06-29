@@ -22,11 +22,13 @@ class EventDetailsForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     const { onChange } = this.props;
+
     onChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
   handlePriorityChange = (nextPriority) => {
     const { onChange } = this.props;
+
     onChange('priority', lodash.toNumber(nextPriority));
   };
 

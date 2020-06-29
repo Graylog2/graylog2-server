@@ -11,12 +11,15 @@ describe('ExpandRows', () => {
   it('normalizes empty array', () => {
     const data = [];
     const result = expandRows(['controller'], [], data);
+
     expect(result).toHaveLength(0);
     expect(result).toEqual([]);
   });
+
   it('does not throw exception when data is undefined', () => {
     const data = undefined;
     const result = expandRows(['controller'], [], data);
+
     expect(result).toHaveLength(0);
     expect(result).toEqual([]);
   });
@@ -24,6 +27,7 @@ describe('ExpandRows', () => {
   it('properly expands a simple result from a pivot search type', () => {
     const pivotResult = readFixture('ExpandRows.test.simple.json');
     const result = expandRows(['timestamp', 'controller'], ['action'], pivotResult);
+
     expect(result).toHaveLength(2);
     expect(result).toEqual([
       {
@@ -48,23 +52,29 @@ describe('ExpandRows', () => {
       },
     ]);
   });
+
   it('properly expands a given result from a pivot search type', () => {
     const pivotResult = readFixture('ExpandRows.test.fixture1.json');
     const result = expandRows(['timestamp', 'controller'], ['action'], pivotResult);
     const expectedResult = readFixture('ExpandRows.test.fixture1.result.json');
+
     expect(result).toHaveLength(25);
     expect(result).toEqual(expectedResult);
   });
+
   it('properly expands a result with two column pivots', () => {
     const pivotResult = readFixture('ExpandRows.test.twoColumnPivots.json');
     const result = expandRows(['timestamp'], ['action', 'controller'], pivotResult);
     const expectedResult = readFixture('ExpandRows.test.twoColumnPivots.result.json');
+
     expect(result).toHaveLength(7);
     expect(result).toEqual(expectedResult);
   });
+
   it('properly expands a result with no pivots but series', () => {
     const pivotResult = readFixture('ExpandRows.test.noPivots.json');
     const result = expandRows([], [], pivotResult);
+
     expect(result).toHaveLength(1);
     expect(result).toEqual([{
       'avg(took_ms)': 80.65076335877863,

@@ -69,6 +69,7 @@ class SelectableList extends React.Component {
     }
 
     const newSelectedOptions = this.props.selectedOptions.slice();
+
     if (this.props.selectedOptionsType === 'string') {
       newSelectedOptions.push(option);
     } else {
@@ -83,6 +84,7 @@ class SelectableList extends React.Component {
   _onRemoveOption = (optionIndex) => {
     return () => {
       const newSelectedOptions = this.props.selectedOptions.filter((_, idx) => idx !== optionIndex);
+
       if (typeof this.props.onChange === 'function') {
         this.props.onChange(newSelectedOptions);
       }
@@ -100,6 +102,7 @@ class SelectableList extends React.Component {
         </ListGroupItem>
       );
     });
+
     return (
       <div>
         <Select ref={(select) => { this.select = select; }} autoFocus={this.props.autoFocus} options={this.props.options} onChange={this._onAddOption} clearable={false} />

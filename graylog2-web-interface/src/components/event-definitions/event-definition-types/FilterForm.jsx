@@ -42,6 +42,7 @@ class FilterForm extends React.Component {
         .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
         .map((streamOrId) => {
           const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
+
           return {
             label: stream.title,
             value: stream.id,
@@ -54,6 +55,7 @@ class FilterForm extends React.Component {
 
   _parseQuery = lodash.debounce((queryString) => {
     const { currentUser } = this.props;
+
     if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
       return;
     }
@@ -111,6 +113,7 @@ class FilterForm extends React.Component {
 
   componentDidMount() {
     const { currentUser } = this.props;
+
     if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }
@@ -121,6 +124,7 @@ class FilterForm extends React.Component {
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
+
     config[key] = value;
     onChange('config', config);
   };
@@ -131,6 +135,7 @@ class FilterForm extends React.Component {
     const queryParameters = config.query_parameters;
     const keptParameters = [];
     const staleParameters = {};
+
     queryParameters.forEach((p) => {
       if (paramsInQuery.has(p.name)) {
         keptParameters.push(p);
@@ -141,6 +146,7 @@ class FilterForm extends React.Component {
 
     const { queryParameterStash } = this.state;
     const newParameters = [];
+
     paramsInQuery.forEach((np) => {
       if (!keptParameters.find((p) => p.name === np)) {
         if (queryParameterStash[np]) {
@@ -175,6 +181,7 @@ class FilterForm extends React.Component {
 
   handleConfigChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
@@ -185,9 +192,11 @@ class FilterForm extends React.Component {
   handleTimeRangeChange = (fieldName) => {
     return (nextValue, nextUnit) => {
       const durationInMs = moment.duration(lodash.max([nextValue, 1]), nextUnit).asMilliseconds();
+
       this.propagateChange(fieldName, durationInMs);
 
       const stateFieldName = lodash.camelCase(fieldName);
+
       this.setState({
         [`${stateFieldName}Duration`]: nextValue,
         [`${stateFieldName}Unit`]: nextUnit,
@@ -212,7 +221,9 @@ class FilterForm extends React.Component {
     if (lodash.isEmpty(parameterButtons)) {
       return null;
     }
+
     const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter((param) => (param.embryonic)));
+
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
         <ControlLabel>Query Parameters</ControlLabel>

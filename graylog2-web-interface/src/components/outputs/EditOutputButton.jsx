@@ -38,6 +38,7 @@ class EditOutputButton extends React.Component {
 
   _handleSubmit = (data) => {
     const { onUpdate, output } = this.props;
+
     onUpdate(output, data);
   };
 
