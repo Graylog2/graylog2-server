@@ -19,14 +19,6 @@ const StyledGranteesList = styled(GranteesList)`
 
 const generateGRN = (id, type) => `grn::::${type}:${id}`;
 
-const _addCollborator = ({ granteeId, roleId }, entityGRN) => {
-  return EntityShareActions.prepare(entityGRN, {
-    selected_grantee_roles: {
-      [granteeId]: roleId,
-    },
-  });
-};
-
 type Props = {
   entityId: string,
   entityType: string,
@@ -55,7 +47,7 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
           <>
             <GranteesSelector availableGrantees={entityShareState.availableGrantees}
                               availableRoles={entityShareState.availableRoles}
-                              onSubmit={(formData) => _addCollborator(formData, entityGRN)} />
+                              entityGRN={entityGRN} />
             <StyledGranteesList activeShares={entityShareState.activeShares}
                                 availableRoles={entityShareState.availableRoles}
                                 entityGRN={entityGRN}
