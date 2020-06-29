@@ -16,34 +16,19 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 
-import java.util.List;
 import java.util.Map;
 
-/**
- * Representing the message type mapping in Elasticsearch. This is giving ES more
- * information about what the fields look like and how it should analyze them.
- */
-public abstract class IndexMapping implements IndexMappingTemplate {
-    public static final String TYPE_MESSAGE = "message";
-
-    @Override
-    public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
-        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
-    }
-
+public class IndexMapping7 extends IndexMapping {
     public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
         final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
                 "tokenizer", "keyword",
                 "filter", "lowercase"));
         final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
         final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
-        final Map<String, Object> mappings = ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
+        final Map<String, Object> mappings = messageMapping(analyzer);
 
         return ImmutableMap.of(
                 "template", template,
@@ -53,32 +38,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    protected Map<String, Object> messageMapping(final String analyzer) {
-        return ImmutableMap.of(
-                "properties", fieldProperties(analyzer),
-                "dynamic_templates", dynamicTemplate(),
-                "_source", enabled());
-    }
-
-    private Map<String, Map<String, Object>> internalFieldsMapping() {
-        return ImmutableMap.of("internal_fields",
-                ImmutableMap.of(
-                        "match", "gl2_*",
-                        "match_mapping_type", "string",
-                        "mapping", notAnalyzedString())
-        );
-    }
-
-    private List<Map<String, Map<String, Object>>> dynamicTemplate() {
-        final Map<String, Map<String, Object>> templateInternal = internalFieldsMapping();
-
-        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", dynamicStrings());
-
-        return ImmutableList.of(templateInternal, templateAll);
-    }
-
-    abstract Map<String, Object> dynamicStrings();
-
+    @Override
     protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
@@ -95,9 +55,15 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .build();
     }
 
-    Map<String, Object> notAnalyzedString() {
-        return ImmutableMap.of("type", "keyword");
+    @Override
+    Map<String, Object> dynamicStrings() {
+        return ImmutableMap.of(
+                "match_mapping_type", "string",
+                "mapping", notAnalyzedString()
+        );
     }
+
+    @Override
     Map<String, Object> analyzedString(String analyzer, boolean fieldData) {
         return ImmutableMap.of(
                 "type", "text",
@@ -105,17 +71,8 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "fielddata", fieldData);
     }
 
-    protected Map<String, Object> typeTimeWithMillis() {
-        return ImmutableMap.of(
-                "type", "date",
-                "format", Tools.ES_DATE_FORMAT);
-    }
-
-    protected Map<String, Object> typeLong() {
-        return ImmutableMap.of("type", "long");
-    }
-
-    private Map<String, Boolean> enabled() {
-        return ImmutableMap.of("enabled", true);
+    @Override
+    protected Map<String, Object> notAnalyzedString() {
+        return ImmutableMap.of("type", "keyword");
     }
 }
