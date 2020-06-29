@@ -4,7 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-import type { AvailableGrantees, AvailableRoles } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
 import Role from 'logic/permissions/Role';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
@@ -81,7 +81,7 @@ type FormData = {
 type Props = {
   availableGrantees: AvailableGrantees,
   availableRoles: AvailableRoles,
-  onSubmit: (FormData) => void,
+  onSubmit: (FormData) => Promise<EntityShareState>,
 };
 
 const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
