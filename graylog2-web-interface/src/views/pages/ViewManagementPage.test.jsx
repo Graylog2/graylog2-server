@@ -7,6 +7,7 @@ jest.mock('routing/Routes', () => ({
   VIEWS: '/views',
   EXTENDEDSEARCH: '/extendedsearch',
 }));
+
 jest.mock('views/components/views/ViewList', () => 'view-list');
 jest.mock('components/common', () => ({
   DocumentTitle: mockComponent('DocumentTitle'),
@@ -15,6 +16,7 @@ jest.mock('components/common', () => ({
 
 const mockViewManagementStore = StoreMock('listen', 'getInitialState');
 const mockViewManagementActions = { search: jest.fn(), delete: jest.fn() };
+
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementStore: mockViewManagementStore,
   ViewManagementActions: mockViewManagementActions,
@@ -29,19 +31,23 @@ describe('ViewManagementPage', () => {
       perPage: 1,
     },
   };
+
   beforeEach(() => {
     mockViewManagementStore.getInitialState.mockImplementationOnce(() => viewsResult);
   });
+
   it('passes retrieved views to list component', () => {
     // eslint-disable-next-line global-require
     const ViewManagementPage = require('./ViewManagementPage');
     const wrapper = shallow(<ViewManagementPage />);
 
     const viewList = wrapper.find('view-list');
+
     expect(viewList).toHaveLength(1);
     expect(viewList.at(0)).toHaveProp('views', viewsResult.list);
     expect(viewList.at(0)).toHaveProp('pagination', viewsResult.pagination);
   });
+
   it('asks for confirmation when deleting view', () => {
     // eslint-disable-next-line global-require
     const ViewManagementPage = require('./ViewManagementPage');

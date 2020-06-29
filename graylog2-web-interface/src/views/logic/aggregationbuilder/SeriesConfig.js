@@ -28,6 +28,7 @@ export default class SeriesConfig {
 
   static fromJSON(value: SeriesConfigJson) {
     const { name } = value;
+
     return new SeriesConfig(name);
   }
 
@@ -55,6 +56,7 @@ class Builder {
 
   build() {
     const { name } = this.value.toObject();
+
     return new SeriesConfig(name);
   }
 }

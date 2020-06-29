@@ -75,6 +75,7 @@ class GettingStarted extends React.Component {
     if (window.addEventListener) {
       window.addEventListener('message', this._onMessage);
     }
+
     this.timeoutId = window.setTimeout(this._displayFallbackContent, 3000);
   }
 
@@ -82,6 +83,7 @@ class GettingStarted extends React.Component {
     if (window.removeEventListener) {
       window.removeEventListener('message', this._onMessage);
     }
+
     if (this.timeoutId !== null) {
       window.clearTimeout(Number(this.timeoutId));
       this.timeoutId = null;
@@ -90,12 +92,14 @@ class GettingStarted extends React.Component {
 
   _onMessage = (messageEvent) => {
     const { gettingStartedUrl } = this.props;
+
     // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
     if (gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
       if (this.timeoutId !== null) {
         window.clearTimeout(Number(this.timeoutId));
         this.timeoutId = null;
       }
+
       this.setState({
         guideLoaded: messageEvent.data.guideLoaded,
         guideUrl: messageEvent.data.guideUrl,
@@ -109,6 +113,7 @@ class GettingStarted extends React.Component {
 
   _dismissGuide = () => {
     const { onDismiss } = this.props;
+
     GettingStartedActions.dismiss.triggerPromise().then(() => {
       if (onDismiss) {
         onDismiss();
@@ -121,6 +126,7 @@ class GettingStarted extends React.Component {
     const { showStaticContent, guideLoaded, guideUrl } = this.state;
 
     let dismissButton = null;
+
     if (!noDismissButton) {
       dismissButton = (
         <DismissButton bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
@@ -128,7 +134,9 @@ class GettingStarted extends React.Component {
         </DismissButton>
       );
     }
+
     let gettingStartedContent = null;
+
     if (showStaticContent) {
       gettingStartedContent = (
         <Grid>
@@ -153,6 +161,7 @@ class GettingStarted extends React.Component {
 
       const url = guideUrl === '' ? (`${gettingStartedUrl}?${query}`) : guideUrl;
       let spinner = null;
+
       if (!guideLoaded) {
         spinner = (
           <Grid>
@@ -179,6 +188,7 @@ class GettingStarted extends React.Component {
         </>
       );
     }
+
     return (
       <Container>
         <DismissButtonSection>

@@ -10,7 +10,6 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import DelegatedSearchPage from 'pages/DelegatedSearchPage';
 /* eslint-enable import/first */
 
-
 test('Renders other component if registered', () => {
   const SimpleComponent = () => <div>Hello!</div>;
 

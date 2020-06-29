@@ -41,6 +41,7 @@ class LookupTableExtractorConfiguration extends React.Component {
   _updateConfigValue = (key, value) => {
     this.props.onExtractorPreviewLoad(undefined);
     const newConfig = this.props.configuration;
+
     newConfig[key] = value;
     this.props.onChange(newConfig);
   };
@@ -57,9 +58,11 @@ class LookupTableExtractorConfiguration extends React.Component {
     this.setState({ trying: true });
 
     const promise = ToolsStore.testLookupTable(this.props.configuration.lookup_table_name, this.props.exampleMessage);
+
     promise.then((result) => {
       if (result.error) {
         UserNotification.warning(`We were not able to run the lookup: ${result.error_message}`);
+
         return;
       }
 

@@ -41,8 +41,10 @@ const _generateSeriesTitles = (config, x, y) => {
     if (seriesTitles.length > 1) {
       return seriesTitles.find((title) => xLabel.endsWith(title));
     }
+
     return seriesTitles.toString();
   });
+
   return y.map(() => columnSeriesTitles);
 };
 
@@ -51,6 +53,7 @@ const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefiniti
   const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
   const zSeriesTitles = _generateSeriesTitles(config, y, x);
   const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
+
   return {
     type,
     name,
@@ -66,14 +69,17 @@ const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefiniti
 
 const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>) => {
   const defaultValue = 'None';
+
   return z.map((series) => {
     const newSeries = fill(Array(xLabels.length), defaultValue);
+
     return merge(newSeries, series);
   });
 };
 
 const _transposeMatrix = (z: Array<Array<any>> = []) => {
   if (!z[0]) { return z; }
+
   return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
 };
 
@@ -83,6 +89,7 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: ValuesBySer
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
   const z = _transposeMatrix(_fillUpMatrix(values(valuesBySeries), xLabels));
   const yLabels = Object.keys(valuesBySeries);
+
   return [[
     'Heatmap Chart',
     xLabels,
@@ -96,16 +103,19 @@ const _axisConfg = (chartHasContent) => {
     type: undefined,
     fixedrange: true,
   };
+
   // Adding the axis type, without provided z data, would hide the empty grid
   if (chartHasContent) {
     axisConfig.type = 'category';
   }
+
   return axisConfig;
 };
 
 const _chartLayout = (heatmapData) => {
   const hasContent = find(heatmapData, (series) => !isEmpty(series.z));
   const axisConfig = _axisConfg(hasContent);
+
   return {
     yaxis: axisConfig,
     xaxis: axisConfig,
@@ -122,6 +132,7 @@ const HeatmapVisualization: VisualizationComponent = makeVisualization(({ config
   const rows = data.chart || Object.values(data)[0];
   const heatmapData = chartData(config, rows, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
   const layout = _chartLayout(heatmapData);
+
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />
   );

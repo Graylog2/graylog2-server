@@ -21,6 +21,7 @@ describe('HighlightingRulesProvider', () => {
 
   const renderSUT = () => {
     const consume = jest.fn();
+
     render(
       <HighlightingRulesProvider>
         <HighlightingRulesContext.Consumer>
@@ -28,6 +29,7 @@ describe('HighlightingRulesProvider', () => {
         </HighlightingRulesContext.Consumer>
       </HighlightingRulesProvider>,
     );
+
     return consume;
   };
 
@@ -37,13 +39,13 @@ describe('HighlightingRulesProvider', () => {
     expect(consume).toHaveBeenCalledWith(undefined);
   });
 
-
   it('provides highlighting rules', () => {
     const rule = HighlightingRule.builder()
       .field('field-name')
       .value(String(42))
       .color('#bc98fd')
       .build();
+
     asMock(HighlightingRulesStore.getInitialState).mockReturnValue([rule]);
 
     const consume = renderSUT();

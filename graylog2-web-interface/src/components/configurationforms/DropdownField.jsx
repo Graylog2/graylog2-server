@@ -45,10 +45,13 @@ class DropdownField extends React.Component {
   render() {
     const { field } = this.state;
     const options = $.map(field.additional_info.values, this._formatOption);
+
     if (this.props.addPlaceholder) {
       options.unshift(this._formatOption(`Select ${field.human_name || this.state.title}`, '', true));
     }
+
     const { typeName } = this.state;
+
     return (
       <div className="form-group">
         <label htmlFor={`${typeName}-${field.title}`}>

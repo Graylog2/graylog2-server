@@ -15,9 +15,11 @@ class ImportExtractors extends React.Component {
 
   _onSubmit = (event) => {
     event.preventDefault();
+
     try {
       const parsedExtractors = JSON.parse(this.extractorsInput.getValue());
       const { extractors } = parsedExtractors;
+
       ExtractorsActions.import(this.props.input.id, extractors);
     } catch (error) {
       UserNotification.error(`There was an error while parsing extractors. Are they in JSON format? ${error}`,

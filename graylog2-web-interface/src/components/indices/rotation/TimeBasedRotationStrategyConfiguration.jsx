@@ -39,6 +39,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
   _isValidPeriod = (duration) => {
     const check = duration || this.state.rotation_period;
+
     return moment.duration(check).asMilliseconds() >= 3600000;
   };
 
@@ -46,6 +47,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     if (this._isValidPeriod()) {
       return undefined;
     }
+
     return 'error';
   };
 

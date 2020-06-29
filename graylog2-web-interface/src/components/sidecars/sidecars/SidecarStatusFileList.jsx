@@ -3,7 +3,6 @@ import React from 'react';
 
 import { DataTable, Timestamp, Icon } from 'components/common';
 
-
 class SidecarStatusFileList extends React.Component {
   static propTypes = {
     files: PropTypes.array.isRequired,
@@ -16,9 +15,11 @@ class SidecarStatusFileList extends React.Component {
   _activityFormatter = (time) => {
     const now = new Date().getTime();
     const modDate = new Date(time).getTime();
+
     if (modDate > (now - 60000)) {
       return ('info');
     }
+
     return ('');
   };
 
@@ -26,6 +27,7 @@ class SidecarStatusFileList extends React.Component {
     if (file.is_dir) {
       return (<span><Icon name="folder-open" />&nbsp;&nbsp;{file.path}</span>);
     }
+
     return (<span><Icon name="file" type="regular" />&nbsp;&nbsp;{file.path}</span>);
   };
 

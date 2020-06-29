@@ -15,6 +15,7 @@ const OperatingSystemIcon = ({ operatingSystem }) => {
 
   if (operatingSystem) {
     const os = operatingSystem.trim().toLowerCase();
+
     if (os.indexOf('darwin') !== -1 || os.indexOf('mac os') !== -1) {
       iconName = 'apple';
       iconType = 'brand';

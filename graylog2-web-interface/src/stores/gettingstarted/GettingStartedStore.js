@@ -26,11 +26,13 @@ const GettingStartedStore = Reflux.createStore({
 
   getStatus() {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+
     promise
       .then(
         (response) => {
           this.status = response;
           this.trigger({ status: this.status });
+
           return response;
         },
         (error) => console.error(error),
@@ -41,10 +43,12 @@ const GettingStartedStore = Reflux.createStore({
 
   dismiss() {
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/dismiss`), '{}');
+
     promise
       .then(
         (response) => {
           this.getStatus();
+
           return response;
         },
         (error) => {

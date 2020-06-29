@@ -15,11 +15,14 @@ const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels
 const ScatterVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', seriesGenerator);
   const layout = {};
+
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;
   }
+
   return (
     <XYPlot config={config}
             chartData={chartDataResult}

@@ -64,6 +64,7 @@ const ExportExtractors = createReactClass({
     };
 
     const formattedJSON = JSON.stringify(extractorsExportObject, null, 2);
+
     return (
       <Row className="content">
         <Col md={12}>

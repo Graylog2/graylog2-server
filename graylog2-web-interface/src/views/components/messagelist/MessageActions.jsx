@@ -31,6 +31,7 @@ const _getTestAgainstStreamButton = (streams, index, id) => {
     if (stream.is_default) {
       return <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>;
     }
+
     return (
       <LinkContainer key={stream.id}
                      to={Routes.stream_edit_example(stream.id, index, id)}>
@@ -48,7 +49,6 @@ const _getTestAgainstStreamButton = (streams, index, id) => {
     </DropdownButton>
   );
 };
-
 
 const MessageActions = ({ index, id, fields, decorationStats, disabled, disableSurroundingSearch, disableTestAgainstStream, showOriginal, toggleShowOriginal, streams, searchConfig }: Props) => {
   if (disabled) {

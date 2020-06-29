@@ -24,21 +24,25 @@ const FullHeightCol = styled(Col)`
 const _onFieldSelectionChanged = (fields, config, onChange) => {
   const newFields = fields.map(({ value }) => value);
   const newConfig = config.toBuilder().fields(newFields).build();
+
   return onChange(newConfig);
 };
 
 const _onShowMessageRowChanged = (config, onChange) => {
   const newConfig = config.toBuilder().showMessageRow(!config.showMessageRow).build();
+
   return onChange(newConfig);
 };
 
 const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, config, onChange) => {
   const newConfig = config.toBuilder().sort(sort).build();
+
   return onChange(newConfig);
 };
 
 const _onSortDirectionChange = (direction: $PropertyType<AggregationWidgetConfig, 'direction'>, config, onChange) => {
   const newConfig = config.toBuilder().sort(config.sort.map((sort) => sort.toBuilder().direction(direction).build())).build();
+
   return onChange(newConfig);
 };
 

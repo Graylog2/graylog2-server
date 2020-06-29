@@ -23,6 +23,7 @@ describe('RuntimeErrorPage', () => {
     expect(queryByText('The component stack')).toBeNull();
 
     const showMoreButton = getByText('Show more');
+
     fireEvent.click(showMoreButton);
 
     wait(() => expect(getByText('The component stack')).not.toBeNull());

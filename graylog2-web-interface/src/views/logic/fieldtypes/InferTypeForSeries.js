@@ -14,6 +14,7 @@ const constantTypeFunctions = {
 const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Array<FieldTypeMapping>)): FieldTypeMapping => {
   const definition = parseSeries(series.function);
   const newMapping = (type) => FieldTypeMapping.create(series.function, type);
+
   if (definition === null) {
     return newMapping(FieldType.Unknown);
   }
@@ -32,6 +33,7 @@ const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Arra
     if (!mapping) {
       return newMapping(FieldType.Unknown);
     }
+
     return newMapping(mapping.type);
   }
 

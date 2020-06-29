@@ -11,15 +11,18 @@ const StartpageStore = Reflux.createStore({
   set(username, type, id) {
     const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(username).url);
     const payload = {};
+
     if (type && id) {
       payload.type = type;
       payload.id = id;
     }
+
     return fetch('PUT', url, { startpage: payload })
       .then(
         (response) => {
           this.trigger();
           UserNotification.success('Your start page was changed successfully');
+
           return response;
         },
         (error) => UserNotification.error(`Changing your start page failed with error: ${error}`, 'Could not change your start page'),

@@ -25,6 +25,7 @@ const InputTypesStore = Reflux.createStore({
     const promiseTypes = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
     const promiseDescriptions = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/all`));
     const promise = Promise.all([promiseTypes, promiseDescriptions]);
+
     promise
       .then(
         (responses) => {

@@ -12,14 +12,17 @@ describe('MapVisualization', () => {
                                             data={[]}
                                             height={1600}
                                             width={900} />);
+
     expect(wrapper.find('Map')).toExist();
   });
+
   it('does not render circle markers for invalid data', () => {
     const wrapper = mount(<MapVisualization id="somemap"
                                             onChange={() => {}}
                                             data={fixtures.invalidData}
                                             height={1600}
                                             width={900} />);
+
     expect(wrapper.find('Map')).toExist();
     expect(wrapper.find('CircleMarker')).not.toExist();
   });

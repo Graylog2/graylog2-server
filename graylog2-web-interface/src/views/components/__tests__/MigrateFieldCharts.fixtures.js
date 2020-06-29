@@ -42,6 +42,7 @@ const viewState = () => {
     widget1: new WidgetPosition(1, 1, 2, Infinity),
     widget2: new WidgetPosition(1, 3, 6, Infinity),
   };
+
   return ViewState.create()
     .toBuilder()
     .widgets(widgets)

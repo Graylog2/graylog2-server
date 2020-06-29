@@ -45,6 +45,7 @@ export default class LineVisualizationConfig extends VisualizationConfig {
 
   static fromJSON(type: string, value: LineVisualizationConfigJSON = { interpolation: 'linear' }) {
     const { interpolation = 'linear' } = value;
+
     return LineVisualizationConfig.create(interpolation);
   }
 }
@@ -64,6 +65,7 @@ class Builder {
 
   build() {
     const { interpolation } = this.value.toObject();
+
     return new LineVisualizationConfig(interpolation);
   }
 }

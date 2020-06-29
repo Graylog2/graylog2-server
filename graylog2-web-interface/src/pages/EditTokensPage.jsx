@@ -55,6 +55,7 @@ const EditTokensPage = createReactClass({
 
   _deleteToken(tokenId, tokenName) {
     const promise = UsersStore.deleteToken(this.props.params.username, tokenId, tokenName);
+
     this.setState({ deletingToken: tokenId });
     promise.then(() => {
       this._loadTokens(this.props.params.username);
@@ -64,6 +65,7 @@ const EditTokensPage = createReactClass({
 
   _createToken(tokenName) {
     const promise = UsersStore.createToken(this.props.params.username, tokenName);
+
     this.setState({ creatingToken: true });
     promise.then(() => {
       this._loadTokens(this.props.params.username);

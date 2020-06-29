@@ -30,17 +30,20 @@ class AlertMessages extends React.Component {
 
   _getFrom = () => {
     const momentFrom = DateTime.parseFromString(this.props.alert.triggered_at).toMoment();
+
     return momentFrom.subtract(1, 'minute').toISOString();
   };
 
   _getTo = () => {
     const { alert } = this.props;
     let momentTo;
+
     if (alert.is_interval) {
       momentTo = (alert.resolved_at ? DateTime.parseFromString(alert.resolved_at).toMoment().add(1, 'minute') : DateTime.now());
     } else {
       momentTo = DateTime.parseFromString(alert.triggered_at).toMoment().add(1, 'minute');
     }
+
     return momentTo.toISOString();
   };
 
@@ -51,6 +54,7 @@ class AlertMessages extends React.Component {
     };
     const promise = UniversalSearchStore.search('absolute', '*', searchParams, this.props.stream.id, this.PAGE_SIZE,
       page || 1, 'timestamp', 'asc', undefined, false);
+
     promise.then(
       (response) => {
         if (response.total_results > 0) {

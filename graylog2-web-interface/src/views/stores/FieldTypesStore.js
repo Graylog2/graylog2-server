@@ -62,9 +62,11 @@ export const FieldTypesStore: FieldTypesStoreType = singletonStore(
 
       Promise.all(promises).then((results) => {
         const combinedResult = {};
+
         results.forEach(({ queryId, response }) => {
           combinedResult[queryId] = response;
         });
+
         this._queryFields = Immutable.fromJS(combinedResult);
         this._trigger();
       });

@@ -22,6 +22,7 @@ const ImportExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get.triggerPromise(params.inputId).then((input) => this.setState({ input: input }));
   },
 
@@ -36,6 +37,7 @@ const ImportExtractorsPage = createReactClass({
     }
 
     const { input } = this.state;
+
     return (
       <DocumentTitle title={`Import extractors to ${input.title}`}>
         <div>

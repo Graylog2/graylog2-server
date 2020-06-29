@@ -9,6 +9,7 @@ class MeterDetails extends React.Component {
 
   render() {
     const meter = this.props.metric.metric;
+
     return (
       <dl className="metric-def metric-meter">
         <dt>Total:</dt>

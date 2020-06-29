@@ -22,9 +22,11 @@ const SystemJobsComponent = ({ jobs }) => {
   if (!jobs) {
     return <Spinner />;
   }
+
   const jobList = Object.keys(jobs)
     .map((nodeId) => (jobs[nodeId] ? jobs[nodeId].jobs : []))
     .reduce((a, b) => a.concat(b), []);
+
   return (
     <Row className="content">
       <Col md={12}>

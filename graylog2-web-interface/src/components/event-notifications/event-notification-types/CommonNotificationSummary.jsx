@@ -20,12 +20,14 @@ class CommonNotificationSummary extends React.Component {
 
   toggleDisplayDetails = () => {
     const { displayDetails } = this.state;
+
     this.setState({ displayDetails: !displayDetails });
   };
 
   render() {
     const { type, notification, definitionNotification, children } = this.props;
     const { displayDetails } = this.state;
+
     return (
       <>
         <h4>{notification.title || definitionNotification.notification_id}</h4>

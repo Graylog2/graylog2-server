@@ -19,6 +19,7 @@ describe('CurrentUserProvider', () => {
 
   const renderSUT = () => {
     const consume = jest.fn();
+
     render(
       <CurrentUserProvider>
         <CurrentUserContext.Consumer>
@@ -26,6 +27,7 @@ describe('CurrentUserProvider', () => {
         </CurrentUserContext.Consumer>
       </CurrentUserProvider>,
     );
+
     return consume;
   };
 

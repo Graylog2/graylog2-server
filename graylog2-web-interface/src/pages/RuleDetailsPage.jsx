@@ -32,11 +32,13 @@ const RuleDetailsPage = createReactClass({
 
   _save(rule, callback) {
     let promise;
+
     if (rule.id) {
       promise = RulesActions.update.triggerPromise(rule);
     } else {
       promise = RulesActions.save.triggerPromise(rule);
     }
+
     promise.then(() => callback());
   },
 

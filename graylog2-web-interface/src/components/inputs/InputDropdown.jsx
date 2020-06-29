@@ -46,6 +46,7 @@ class InputDropdown extends React.Component {
 
   render() {
     const { selectedInput } = this.state;
+
     // When an input is pre-selected, show a static dropdown
     if (this.props.inputs && this.props.preselectedInputId) {
       return (
@@ -63,6 +64,7 @@ class InputDropdown extends React.Component {
 
     if (this.props.inputs) {
       const inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
+
       return (
         <div>
           <Input id="placeholder-select"

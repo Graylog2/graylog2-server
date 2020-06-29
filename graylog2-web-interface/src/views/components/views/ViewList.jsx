@@ -22,6 +22,7 @@ const itemActionsFactory = (view, onViewDelete) => {
 const reducer = (state, action) => {
   const { payload = {} } = action;
   const { newQuery, newPage, newPerPage } = payload;
+
   switch (action.type) {
     case 'search':
       return { ...state, query: newQuery, page: 1 };

@@ -14,6 +14,7 @@ const ConfirmLeaveDialog = ({ question, router, route }) => {
     }
 
     e.returnValue = question;
+
     return question;
   };
 

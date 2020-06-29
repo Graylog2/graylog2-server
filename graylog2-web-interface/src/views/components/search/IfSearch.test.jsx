@@ -17,6 +17,7 @@ describe('IfSearch', () => {
         </IfSearch>
       </ViewTypeContext.Provider>,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
 

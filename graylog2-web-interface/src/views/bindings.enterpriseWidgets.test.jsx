@@ -16,17 +16,21 @@ describe('Views bindings enterprise widgets', () => {
   describe('Aggregations', () => {
     // $FlowFixMe: We are assuming here it is generally present
     const aggregationConfig: WidgetCondig = findWidgetConfig('AGGREGATION');
+
     it('is present', () => {
       expect(aggregationConfig).toBeDefined();
     });
+
     it('need a controlled height by default', () => {
       expect(aggregationConfig.needsControlledHeight()).toBe(true);
     });
+
     it('do not need controlled height when visualization has type data table', () => {
       const widget = AggregationWidget.builder()
         .id('widget1')
         .config(AggregationWidgetConfig.builder().visualization(DataTable.type).build())
         .build();
+
       expect(aggregationConfig.needsControlledHeight(widget)).toBe(false);
     });
   });

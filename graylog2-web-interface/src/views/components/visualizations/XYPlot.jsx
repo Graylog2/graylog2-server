@@ -38,9 +38,11 @@ const yLegendPosition = (containerHeight: number) => {
   if (containerHeight < 150) {
     return -0.6;
   }
+
   if (containerHeight < 400) {
     return -0.2;
   }
+
   return -0.14;
 };
 
@@ -62,9 +64,11 @@ const XYPlot = ({
     yaxis: { fixedrange?: boolean},
     legend?: {y?: number},
   } = { yaxis };
+
   if (height) {
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
+
   const layout = merge({}, defaultLayout, plotLayout);
   const viewType = useContext(ViewTypeContext);
   const _onZoom = useCallback(config.isTimeline
@@ -74,6 +78,7 @@ const XYPlot = ({
   if (config.isTimeline && effectiveTimerange) {
     const normalizedFrom = moment.tz(effectiveTimerange.from, timezone).format();
     const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();
+
     layout.xaxis = {
       range: [normalizedFrom, normalizedTo],
       type: 'date',

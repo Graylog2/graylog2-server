@@ -15,6 +15,7 @@ class MetricsFilterInput extends React.Component {
 
   render() {
     const { filter } = this.props;
+
     return (
       <FormControl type="text"
                    className="metrics-filter"

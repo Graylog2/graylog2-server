@@ -53,6 +53,7 @@ const JSONExtractorConfiguration = createReactClass({
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
       const newConfig = this.state.configuration;
+
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(newConfig);
     };
@@ -68,6 +69,7 @@ const JSONExtractorConfiguration = createReactClass({
 
     promise.then((result) => {
       const matches = [];
+
       for (const match in result.matches) {
         if (result.matches.hasOwnProperty(match)) {
           matches.push(<dt key={`${match}-name`}>{match}</dt>);
@@ -76,6 +78,7 @@ const JSONExtractorConfiguration = createReactClass({
       }
 
       const preview = (matches.length === 0 ? '' : <dl>{matches}</dl>);
+
       this.props.onExtractorPreviewLoad(preview);
     });
 

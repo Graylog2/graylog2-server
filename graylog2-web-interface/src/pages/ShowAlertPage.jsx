@@ -52,6 +52,7 @@ const ShowAlertPage = createReactClass({
     StreamsStore.get(alert.stream_id, (stream) => {
       this.setState({ stream: stream });
     });
+
     AlertConditionsActions.get(alert.stream_id, alert.condition_id, (error) => {
       if (error.additional && error.additional.status === 404) {
         this.setState({ alertCondition: {} });
@@ -79,9 +80,11 @@ const ShowAlertPage = createReactClass({
 
     let statusLabel;
     let resolvedState;
+
     if (!alert.is_interval || alert.resolved_at) {
       statusLabel = <Label bsStyle="success">Resolved</Label>;
       const resolvedAtTime = alert.resolved_at || alert.triggered_at;
+
       if (resolvedAtTime) {
         resolvedState = (
           <span>

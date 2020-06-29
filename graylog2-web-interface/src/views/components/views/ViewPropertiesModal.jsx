@@ -28,6 +28,7 @@ export default class ViewPropertiesModal extends React.Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { title } = this.props;
     const { view } = this.state;
+
     if (title !== nextProps.title || !isEqual(view, nextProps.view)) {
       this.setState({ view: nextProps.view, title: nextProps.title });
     }
@@ -38,6 +39,7 @@ export default class ViewPropertiesModal extends React.Component {
     const { name } = event.target;
     let value = FormsUtils.getValueFromInput(event.target);
     const trimmedValue = value.trim();
+
     if (trimmedValue === '') {
       value = trimmedValue;
     }
@@ -53,6 +55,7 @@ export default class ViewPropertiesModal extends React.Component {
   _onSave = () => {
     const { onClose, onSave } = this.props;
     const { view } = this.state;
+
     onSave(view);
     onClose();
   };
@@ -61,6 +64,7 @@ export default class ViewPropertiesModal extends React.Component {
     const { view: { title = '', summary = '', description = '' }, title: modalTitle } = this.state;
     const { onClose, show, view } = this.props;
     const viewType = ViewTypeLabel({ type: view.type });
+
     return (
       <BootstrapModalForm show={show}
                           title={modalTitle}

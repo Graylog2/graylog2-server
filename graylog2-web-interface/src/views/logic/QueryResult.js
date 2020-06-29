@@ -12,11 +12,13 @@ const _findMessages = (results) => {
 
 const _searchTypePlugin = (type) => {
   const typeDefinition = searchTypeDefinition(type);
+
   return typeDefinition && typeDefinition.handler ? searchTypeDefinition(type).handler
     : {
       convert: (result) => {
         // eslint-disable-next-line no-console
         console.log(`No search type handler for type '${type}' result:`, result);
+
         return result;
       },
     };
@@ -26,6 +28,7 @@ export default class QueryResult {
   constructor(queryResult) {
     // eslint-disable-next-line camelcase
     const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
+
     this._state = {
       query: queryResult.query,
       errors: queryResult.errors.map((error) => new SearchError(error)),
@@ -41,6 +44,7 @@ export default class QueryResult {
 
   get documentCount() {
     const messages = _findMessages(this);
+
     return messages ? messages.total : 0;
   }
 

@@ -43,6 +43,7 @@ const LogLevelDropdown = createReactClass({
           </MenuItem>
         );
       });
+
     return (
       <DropdownButton id="loglevel" bsSize="xsmall" title={lodash.capitalize(subsystem.level)}>
         {loglevels}

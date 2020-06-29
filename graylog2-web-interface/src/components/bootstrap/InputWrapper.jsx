@@ -19,6 +19,7 @@ class InputWrapper extends React.Component {
     if (this.props.className) {
       return <div className={this.props.className}>{this.props.children}</div>;
     }
+
     return <span>{this.props.children}</span>;
   }
 }

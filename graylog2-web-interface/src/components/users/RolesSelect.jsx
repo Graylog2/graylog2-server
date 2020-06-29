@@ -23,6 +23,7 @@ class RolesSelect extends React.Component {
     const rolesOptions = this.props.availableRoles.map((role) => {
       return { value: role.name, label: role.name };
     });
+
     return (
       <MultiSelect ref={(select) => { this.select = select; }}
                    options={rolesOptions}

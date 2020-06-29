@@ -27,6 +27,7 @@ class EmptyEntity extends React.Component {
 
   render() {
     const { children, title } = this.props;
+
     return (
       <div className={style.component}>
         <h3>{title}</h3>

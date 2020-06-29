@@ -23,17 +23,20 @@ class FieldsList extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('fieldValueProviders').find((p) => p.type === type) || {};
   };
 
   handleAddFieldClick = () => {
     const { onAddFieldClick } = this.props;
+
     onAddFieldClick();
   };
 
   handleEditClick = (fieldName) => {
     return () => {
       const { onEditFieldClick } = this.props;
+
       onEditFieldClick(fieldName);
     };
   };
@@ -41,12 +44,14 @@ class FieldsList extends React.Component {
   handleRemoveClick = (fieldName) => {
     return () => {
       const { onRemoveFieldClick } = this.props;
+
       onRemoveFieldClick(fieldName);
     };
   };
 
   providerFormatter = (config) => {
     const configKeys = Object.keys(config).filter((key) => key !== 'type');
+
     return (
       <p>
         {configKeys.map((key) => {
@@ -106,6 +111,7 @@ class FieldsList extends React.Component {
         </>
       );
     }
+
     return (
       <>
         <DataTable id="event-definition-fields"

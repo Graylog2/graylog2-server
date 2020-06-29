@@ -16,6 +16,7 @@ describe('PivotConfigGenerator', () => {
   it('should generate a chart config', () => {
     const widgetConfig = widgetConfigBuilder.build();
     const result = PivotConfigGenerator({ config: widgetConfig });
+
     expect(result[0].config).toMatchSnapshot({
       id: expect.any(String),
     });
@@ -27,34 +28,42 @@ describe('PivotConfigGenerator', () => {
         NumberVisualizationConfig.create(true),
       ).build();
     const result = PivotConfigGenerator({ config: widgetConfig });
+
     expect(result).toHaveLength(2);
     expect(result[0]).toMatchSnapshot({
       id: expect.any(String),
     });
+
     expect(result[1]).toMatchSnapshot({
       id: expect.any(String),
       timerange: {
         id: expect.any(String),
       },
     });
+
     const [{ id }, { timerange }] = result;
+
     if (!timerange) {
       throw new Error('Expected `timerange` on generated config, but not present!');
     }
+
     expect(timerange.id).toEqual(id);
   });
 
   it('should add a event annotation config when configured', () => {
     const widgetConfig = widgetConfigBuilder.eventAnnotation(true).build();
     const result = PivotConfigGenerator({ config: widgetConfig });
+
     expect(result).toHaveLength(2);
     expect(result[0]).toMatchSnapshot({
       id: expect.any(String),
     });
+
     expect(result[1]).toMatchSnapshot({
       id: expect.any(String),
     });
   });
+
   describe('maps time units for time pivots with timeunit intervals', () => {
     const createWidgetConfigWithPivot = (pivot) => AggregationWidgetConfig.builder()
       .rollup(true)
@@ -70,13 +79,17 @@ describe('PivotConfigGenerator', () => {
       ));
       const result = PivotConfigGenerator({ config });
       const [{ config: pivotConfig }] = result;
+
       if (!pivotConfig) {
         throw new Error('Expected `config` in first element of result is missing!');
       }
+
       const { row_groups: [pivot] } = pivotConfig;
       const { interval: { timeunit } } = pivot;
+
       expect(timeunit).toEqual(expectedMappedTimeUnit);
     };
+
     it.each`
     timeUnit      | expectedMappedTimeUnit
     ${'seconds'}  | ${'1s'}

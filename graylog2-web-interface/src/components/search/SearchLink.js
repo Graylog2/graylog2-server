@@ -152,6 +152,7 @@ class Builder {
       highlightedMessage,
       filterFields,
     } = this.value.toObject();
+
     return new SearchLink(id, timerange, query, streams, highlightedMessage, filterFields);
   }
 }

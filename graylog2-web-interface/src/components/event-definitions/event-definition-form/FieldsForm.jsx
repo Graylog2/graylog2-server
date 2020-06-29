@@ -30,11 +30,13 @@ class FieldsForm extends React.Component {
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
+
     onChange('field_spec', nextFieldSpec);
 
     // Filter out all non-existing field names from key_spec
     const fieldNames = Object.keys(nextFieldSpec);
     const nextKeySpec = eventDefinition.key_spec.filter((key) => fieldNames.includes(key));
+
     onChange('key_spec', nextKeySpec);
   };
 
@@ -43,16 +45,19 @@ class FieldsForm extends React.Component {
     const nextFieldSpec = (prevFieldName === fieldName
       ? lodash.cloneDeep(eventDefinition.field_spec)
       : lodash.omit(eventDefinition.field_spec, prevFieldName));
+
     nextFieldSpec[fieldName] = config;
     onChange('field_spec', nextFieldSpec);
 
     // Filter out all non-existing field names from key_spec and the current field name
     const fieldNames = Object.keys(nextFieldSpec);
     let nextKeySpec = eventDefinition.key_spec.filter((key) => fieldNames.includes(key) && key !== fieldName);
+
     if (isKey) {
       // Add key to its new position
       nextKeySpec = [...nextKeySpec.slice(0, keyPosition), fieldName, ...nextKeySpec.slice(keyPosition)];
     }
+
     onChange('key_spec', nextKeySpec);
 
     this.toggleFieldForm();
@@ -60,6 +65,7 @@ class FieldsForm extends React.Component {
 
   toggleFieldForm = (fieldName) => {
     const { showFieldForm } = this.state;
+
     this.setState({ showFieldForm: !showFieldForm, editField: showFieldForm ? undefined : fieldName });
   };
 

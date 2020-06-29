@@ -18,15 +18,19 @@ const SidecarStatusEnum = {
 
   toStatusCode(stringStatus) {
     const status = lodash.lowerCase(stringStatus);
+
     if (status === this.properties[this.RUNNING].name) {
       return this.RUNNING;
     }
+
     if (status === this.properties[this.FAILING].name) {
       return this.FAILING;
     }
+
     if (status === this.properties[this.STOPPED].name) {
       return this.STOPPED;
     }
+
     return this.UNKNOWN;
   },
 

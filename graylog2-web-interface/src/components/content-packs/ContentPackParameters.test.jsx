@@ -14,6 +14,7 @@ describe('<ContentPackParameters />', () => {
       entities: [],
     };
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -47,6 +48,7 @@ describe('<ContentPackParameters />', () => {
       .entities([entity])
       .build();
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 });

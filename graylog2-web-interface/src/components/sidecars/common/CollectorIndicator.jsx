@@ -19,6 +19,7 @@ const CollectorIndicator = createReactClass({
 
   render() {
     const { collector, operatingSystem } = this.props;
+
     return (
       <span>
         <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}

@@ -9,6 +9,7 @@ const CurrentUserPreferencesProvider = ({ children }: { children: React.Node }) 
   <CurrentUserContext.Consumer>
     {(currentUser) => {
       const preferences = currentUser?.preferences;
+
       return preferences
         ? (
           <UserPreferencesContext.Provider value={preferences}>

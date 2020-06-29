@@ -80,6 +80,7 @@ const InputStateBadge = createReactClass({
         if (!sortedInputStates[state]) {
           sortedInputStates[state] = [];
         }
+
         sortedInputStates[state].push(node);
       });
     }
@@ -110,6 +111,7 @@ const InputStateBadge = createReactClass({
         </OverlayTrigger>
       );
     }
+
     const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
     return (

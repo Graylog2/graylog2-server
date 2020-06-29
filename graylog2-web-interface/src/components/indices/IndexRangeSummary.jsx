@@ -10,9 +10,11 @@ class IndexRangeSummary extends React.Component {
 
   render() {
     const { indexRange } = this.props;
+
     if (!indexRange) {
       return <span><i>No index range available.</i></span>;
     }
+
     return (
       <span>Range re-calculated{' '}
         <span title={indexRange.calculated_at}><Timestamp dateTime={indexRange.calculated_at} relative /></span>{' '}

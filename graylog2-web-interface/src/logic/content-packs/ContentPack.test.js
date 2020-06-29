@@ -18,6 +18,7 @@ describe('ContentPack', () => {
     };
     const oldContentPack = ContentPack.builder().parameters([parameterToRemove, parameterToKeep]).build();
     const newContentPack = oldContentPack.toBuilder().removeParameter(parameterToRemove).build();
+
     expect(newContentPack.parameters).toEqual([parameterToKeep]);
     expect(oldContentPack.parameters).toEqual([parameterToRemove, parameterToKeep]);
   });
@@ -39,6 +40,7 @@ describe('ContentPack', () => {
     };
     const oldContentPack = ContentPack.builder().parameters([parameterToKeep]).build();
     const newContentPack = oldContentPack.toBuilder().addParameter(parameterToAdd).build();
+
     expect(newContentPack.parameters).toEqual([parameterToKeep, parameterToAdd]);
     expect(oldContentPack.parameters).toEqual([parameterToKeep]);
   });

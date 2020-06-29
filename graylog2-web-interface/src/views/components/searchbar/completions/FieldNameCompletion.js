@@ -17,6 +17,7 @@ type Suggestion = $ReadOnly<{
 
 const _fieldResult = (field: Suggestion, score: number = 1, valuePosition: boolean = false): CompletionResult => {
   const { name, type } = field;
+
   return {
     name,
     value: `${name}${valuePosition ? '' : ':'}`,
@@ -35,9 +36,11 @@ export const existsOperator: Suggestion = {
 const _matchesFieldName = (prefix) => {
   return (field) => {
     const result = field.name.indexOf(prefix);
+
     if (result < 0) {
       return 0;
     }
+
     // If substring occurs at start, return boost
     return result === 0 ? 2 : 1;
   };
@@ -64,8 +67,10 @@ class FieldNameCompletion implements Completer {
   _newFields = (fields: FieldTypesStoreState) => {
     this.fields = fields;
     const { queryFields } = this.fields;
+
     if (this.activeQuery) {
       const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
+
       this.currentQueryFieldNames = currentQueryFields.map((fieldMapping) => fieldMapping.name)
         .reduce((prev, cur) => ({ ...prev, [cur]: cur }), {});
     }
@@ -73,7 +78,9 @@ class FieldNameCompletion implements Completer {
 
   onViewMetadataStoreUpdate = (newState: { activeQuery: string }) => {
     const { activeQuery } = newState;
+
     this.activeQuery = activeQuery;
+
     if (this.fields) {
       this._newFields(this.fields);
     }
@@ -87,9 +94,11 @@ class FieldNameCompletion implements Completer {
     if (this._isFollowingFieldName(lastToken) && !this._isFollowingExistsOperator(lastToken)) {
       return [];
     }
+
     if (currentToken && currentToken.type === 'string') {
       return [];
     }
+
     const matchesFieldName = _matchesFieldName(prefix);
     const { all, queryFields } = this.fields;
     const currentQueryFields: FieldTypeMappingsList = queryFields.get(this.activeQuery, Immutable.List());
@@ -105,6 +114,7 @@ class FieldNameCompletion implements Completer {
     const allFields = allButInCurrent.filter(matchesFieldName)
       .map((field) => _fieldResult(field, 1 + matchesFieldName(field), valuePosition))
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
+
     return [...currentQuery, ...allFields];
   }
 }

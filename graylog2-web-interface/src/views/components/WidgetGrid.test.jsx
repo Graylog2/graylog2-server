@@ -40,6 +40,7 @@ describe('<WidgetGrid />', () => {
                   widgets={{}}
                   fields={Immutable.List()} />
     ));
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -67,6 +68,7 @@ describe('<WidgetGrid />', () => {
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
+
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 
@@ -93,6 +95,7 @@ describe('<WidgetGrid />', () => {
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
+
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 });

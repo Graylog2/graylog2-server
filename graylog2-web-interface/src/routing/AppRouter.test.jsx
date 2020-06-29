@@ -11,6 +11,7 @@ import AppRouter from './AppRouter';
 jest.mock('pages', () => ({
   StartPage: mockComponent('StartPage'),
 }));
+
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 
 jest.mock('injection/CombinedProvider', () => {
@@ -21,6 +22,7 @@ jest.mock('injection/CombinedProvider', () => {
       permissions: ['*'],
     },
   })]);
+
   return new MockCombinedProvider({
     CurrentUser: { CurrentUserStore: mockCurrentUserStoretore },
     Notifications: { NotificationsActions: { list: jest.fn() }, NotificationsStore: MockStore() },
@@ -37,6 +39,7 @@ describe('AppRouter', () => {
         <AppRouter />
       </CurrentUserProvider>,
     );
+
     expect(wrapper.find('StartPage')).toExist();
   });
 });

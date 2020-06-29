@@ -21,6 +21,7 @@ const GroupExpression = (props) => {
 
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
+
     nextExpression.operator = nextOperator;
     nextExpression.child = replaceBooleanExpressionOperatorInGroup(nextOperator, nextExpression.child);
     onChange({ conditions: nextExpression });

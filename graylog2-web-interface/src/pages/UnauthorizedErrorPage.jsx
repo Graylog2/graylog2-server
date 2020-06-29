@@ -9,9 +9,11 @@ import ErrorPage from 'components/errors/ErrorPage';
 
 const createErrorMessageString = (errorDetails: ?string, pageDetails: string, errorMessage: string) => {
   const defaultText = `${pageDetails}\n${errorMessage}`;
+
   if (errorDetails) {
     return `${errorDetails}\n${defaultText}`;
   }
+
   return defaultText;
 };
 
@@ -35,6 +37,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
     </>
   );
   const errorMessageString = createErrorMessageString(errorDetails, pageDetails, errorMessage);
+
   return (
     <ErrorPage title={title} description={description ?? defaultDescription}>
       <dl>

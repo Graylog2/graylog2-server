@@ -16,7 +16,6 @@ import type { Message } from './Types';
 import CustomPropTypes from '../CustomPropTypes';
 import InteractiveContext from '../contexts/InteractiveContext';
 
-
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
 type Props = {

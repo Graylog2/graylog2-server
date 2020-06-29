@@ -75,6 +75,7 @@ class ClipboardButton extends React.Component {
 
   _onSuccess = (event) => {
     const { onSuccess } = this.props;
+
     this.setState({ tooltipMessage: 'Copied!' });
 
     onSuccess(event);
@@ -84,6 +85,7 @@ class ClipboardButton extends React.Component {
 
   _onError = (event) => {
     const key = event.action === 'cut' ? 'K' : 'C';
+
     this.setState({ tooltipMessage: <span>Press Ctrl+{key}&thinsp;/&thinsp;&#8984;{key} to {event.action}</span> });
   };
 

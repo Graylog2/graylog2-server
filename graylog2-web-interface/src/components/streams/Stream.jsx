@@ -81,12 +81,12 @@ class Stream extends React.Component {
     };
   }
 
-
   _onDelete = (stream) => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
       StreamsStore.remove(stream.id, (response) => {
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
+
         return response;
       });
     }
@@ -103,6 +103,7 @@ class Stream extends React.Component {
   _onUpdate = (streamId, stream) => {
     StreamsStore.update(streamId, stream, (response) => {
       UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
+
       return response;
     });
   }
@@ -110,6 +111,7 @@ class Stream extends React.Component {
   _onClone = (streamId, stream) => {
     StreamsStore.cloneStream(streamId, stream, (response) => {
       UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
+
       return response;
     });
   }
@@ -131,6 +133,7 @@ class Stream extends React.Component {
 
   _onSaveStreamRule = (streamRuleId, streamRule) => {
     const { stream } = this.props;
+
     StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success'));
   }
 
@@ -145,6 +148,7 @@ class Stream extends React.Component {
     let editRulesLink;
     let manageOutputsLink;
     let manageAlertsLink;
+
     if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
         <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
@@ -170,6 +174,7 @@ class Stream extends React.Component {
     }
 
     let toggleStreamLink;
+
     if (isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
       if (stream.disabled) {
         toggleStreamLink = (

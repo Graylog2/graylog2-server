@@ -7,7 +7,6 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 import styled from 'styled-components';
 
-
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import NumberUtils from 'util/NumberUtils';
@@ -83,6 +82,7 @@ const InputThroughput = createReactClass({
 
   _prefix(metric) {
     const { input } = this.props;
+
     return `${input.type}.${input.id}.${metric}`;
   },
 
@@ -105,15 +105,19 @@ const InputThroughput = createReactClass({
 
   _calculateMetrics(metrics) {
     const result = {};
+
     this._metricNames().forEach((metricName) => {
       result[metricName] = Object.keys(metrics).reduce((previous, nodeId) => {
         if (!metrics[nodeId][metricName]) {
           return previous;
         }
+
         const value = this._getValueFromMetric(metrics[nodeId][metricName]);
+
         if (value !== undefined) {
           return isNaN(previous) ? value : previous + value;
         }
+
         return previous;
       }, NaN);
     });
@@ -209,6 +213,7 @@ const InputThroughput = createReactClass({
     if (!metrics) {
       return <Spinner />;
     }
+
     const calculatedMetrics = this._calculateMetrics(metrics);
     const incomingMessages = calculatedMetrics[this._prefix('incomingMessages')];
     const emptyMessages = calculatedMetrics[this._prefix('emptyMessages')];
@@ -218,6 +223,7 @@ const InputThroughput = createReactClass({
     const writtenBytesTotal = calculatedMetrics[this._prefix('written_bytes_total')];
     const readBytes1Sec = calculatedMetrics[this._prefix('read_bytes_1sec')];
     const readBytesTotal = calculatedMetrics[this._prefix('read_bytes_total')];
+
     return (
       <div className="graylog-input-metrics">
         <h3>Throughput / Metrics</h3>

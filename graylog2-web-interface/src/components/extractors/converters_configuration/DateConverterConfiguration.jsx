@@ -25,6 +25,7 @@ class DateConverterConfiguration extends React.Component {
 
   _toggleConverter = (event) => {
     let converter;
+
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
@@ -35,6 +36,7 @@ class DateConverterConfiguration extends React.Component {
   _onChange = (key) => {
     return (data) => {
       const newConfig = this.props.configuration;
+
       // data can be an event or a value, we need to check its type :sick:
       newConfig[key] = typeof data === 'object' ? FormUtils.getValueFromInput(data.target) : data;
       this.props.onChange(this.props.type, this._getConverterObject(newConfig));

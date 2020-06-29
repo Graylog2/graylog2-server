@@ -44,6 +44,7 @@ const AlertTimeline = createReactClass({
         const configuration = history.alarmcallbackconfiguration;
         const type = this.state.availableNotifications[configuration.type];
         let title;
+
         if (type) {
           title = <span><em>{configuration.title || 'Untitled notification'}</em> ({type.name})</span>;
         } else {

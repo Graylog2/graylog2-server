@@ -56,9 +56,11 @@ class Timestamp extends React.Component {
 
   _formatDateTime = () => {
     const dateTime = new DateTime(this.props.dateTime);
+
     if (this.props.relative) {
       return dateTime.toRelativeString();
     }
+
     switch (this.props.tz) {
       case null:
       case undefined:

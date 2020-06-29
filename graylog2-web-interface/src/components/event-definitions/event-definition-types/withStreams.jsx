@@ -15,9 +15,11 @@ export default function withStreams(WrappedComponent, hiddenStreams = []) {
     componentDidMount() {
       StreamsStore.load((streams) => {
         let filteredStreams = streams;
+
         if (hiddenStreams.length !== 0) {
           filteredStreams = streams.filter((s) => !hiddenStreams.includes(s.id));
         }
+
         this.setState({ streams: filteredStreams });
       });
     }

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -44,6 +45,10 @@ import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
+import org.graylog2.utilities.GRN;
+import org.graylog2.utilities.GRNDeserializer;
+import org.graylog2.utilities.GRNKeyDeserializer;
+import org.graylog2.utilities.GRNRegistry;
 import org.joda.time.Period;
 
 import javax.inject.Inject;
@@ -58,12 +63,17 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
     protected final ObjectMapper objectMapper;
 
     public ObjectMapperProvider() {
-        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet());
+        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet(), GRNRegistry.createWithBuiltinTypes());
+    }
+
+    public ObjectMapperProvider(ClassLoader classLoader, Set<NamedType> subtypes) {
+        this(classLoader, subtypes, GRNRegistry.createWithBuiltinTypes());
     }
 
     @Inject
     public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
-                                @JacksonSubTypes Set<NamedType> subtypes) {
+                                @JacksonSubTypes Set<NamedType> subtypes,
+                                GRNRegistry grnRegistry) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
@@ -82,15 +92,18 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
                 .registerModule(new SimpleModule("Graylog")
                         .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
+                        .addKeyDeserializer(GRN.class, new GRNKeyDeserializer(grnRegistry))
                         .addSerializer(new RangeJsonSerializer())
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer())
                         .addSerializer(new VersionSerializer())
                         .addSerializer(new SemverSerializer())
                         .addSerializer(new SemverRequirementSerializer())
+                        .addSerializer(GRN.class, new ToStringSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())
                         .addDeserializer(Semver.class, new SemverDeserializer())
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
+                        .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                 );
 
         if (subtypes != null) {

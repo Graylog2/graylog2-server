@@ -77,6 +77,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
     Object.values(configurationVariables).forEach((configVar) => {
       const escapedName = `\${user.${configVar.name}}`;
+
       variableRows.push(
         <tr key={configVar.id}>
           <td><code>{escapedName}</code></td>
@@ -96,6 +97,7 @@ class ConfigurationVariablesHelper extends React.Component {
         </tr>,
       );
     });
+
     return variableRows;
   };
 
@@ -119,6 +121,7 @@ class ConfigurationVariablesHelper extends React.Component {
     if (typeof callback === 'function') {
       callback();
     }
+
     this._reloadVariables();
   };
 

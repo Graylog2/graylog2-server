@@ -16,9 +16,11 @@ const formatTitle = (title, id, disabled = false) => (disabled
 
 const OwnerTag = ({ owner }) => {
   const currentUser = useContext(CurrentUserContext);
+
   if (!owner || owner === currentUser?.username) {
     return <span>Last saved</span>;
   }
+
   return <span>Shared by {owner}, last saved</span>;
 };
 
@@ -62,6 +64,7 @@ const MissingRequirement = ({ plugin }: MissingRequirementProps) => (
 
 const Requirements = ({ requires, requirementsProvided }: RequirementsProps) => {
   const missing = missingRequirements(requires, requirementsProvided);
+
   return Object.keys(missing).length > 0
     ? (
       <h5>

@@ -34,6 +34,7 @@ class DocsHelper {
 
   toString(path) {
     const baseUrl = this.DOCS_URL + Version.getMajorAndMinorVersion();
+
     return path === '' ? baseUrl : `${baseUrl}/pages/${path}`;
   }
 

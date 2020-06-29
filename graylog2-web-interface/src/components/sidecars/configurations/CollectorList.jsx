@@ -25,11 +25,13 @@ const CollectorList = createReactClass({
 
   headerCellFormatter(header) {
     const className = (header === 'Actions' ? style.actionsColumn : '');
+
     return <th className={className}>{header}</th>;
   },
 
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
+
     return (
       <CollectorRow collector={collector}
                     onClone={onClone}

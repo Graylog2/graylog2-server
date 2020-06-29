@@ -15,6 +15,7 @@ class MaxmindAdapterSummary extends React.Component {
       MAXMIND_CITY: 'City database',
       MAXMIND_COUNTRY: 'Country database',
     };
+
     return (
       <dl>
         <dt>Database file path</dt>

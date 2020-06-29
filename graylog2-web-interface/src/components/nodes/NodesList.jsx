@@ -24,6 +24,7 @@ const NodesList = createReactClass({
   _isLoading() {
     const { nodes } = this.props;
     const { clusterOverview } = this.state;
+
     return !(nodes && clusterOverview);
   },
 

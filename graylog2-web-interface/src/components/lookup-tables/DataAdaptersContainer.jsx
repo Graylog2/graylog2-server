@@ -37,9 +37,11 @@ const DataAdaptersContainer = createReactClass({
     if (!this.state.dataAdapters) {
       return <Spinner />;
     }
+
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => React.cloneElement(child,
         { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }));
+
     return <div>{childrenWithProps}</div>;
   },
 });

@@ -19,6 +19,7 @@ const NodesPage = createReactClass({
 
   _isLoading() {
     const { nodes } = this.state;
+
     return !(nodes);
   },
 
@@ -26,6 +27,7 @@ const NodesPage = createReactClass({
     if (this._isLoading()) {
       return <Spinner />;
     }
+
     if (this._hasExternalURI()) {
       return (
         <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl(GLOBAL_API_BROWSER_URL)}>
@@ -33,6 +35,7 @@ const NodesPage = createReactClass({
         </ExternalLinkButton>
       );
     }
+
     return null;
   },
 
@@ -40,11 +43,13 @@ const NodesPage = createReactClass({
     const { nodes } = this.state;
     const nodeVals = Object.values(nodes);
     const publishURI = URLUtils.qualifyUrl('/');
+
     return (nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
   },
 
   render() {
     const { nodes, currentUser } = this.state;
+
     return (
       <DocumentTitle title="Nodes">
         <div>
