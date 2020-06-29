@@ -1,11 +1,16 @@
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import Promise from 'bluebird';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 
 import style from './SearchForm.css';
+
+const StyledInput = styled.input(({ theme }) => `
+  background-color: ${theme.colors.global.inputBackground};
+`);
 
 /**
  * Component that renders a customizable search form. The component
@@ -148,6 +153,7 @@ class SearchForm extends React.Component {
     const { query } = this.state;
 
     e.preventDefault();
+
     e.stopPropagation();
 
     if (useLoadingState) {
@@ -164,7 +170,9 @@ class SearchForm extends React.Component {
     const { query, onQueryChange, onReset } = this.props;
 
     this.setState({ query: query });
+
     onQueryChange(query);
+
     onReset();
   };
 
@@ -173,6 +181,7 @@ class SearchForm extends React.Component {
     const query = e.target.value;
 
     this.setState({ query: query });
+
     onQueryChange(query);
   };
 
@@ -200,17 +209,16 @@ class SearchForm extends React.Component {
         <form className="form-inline" onSubmit={this._onSearch}>
           <div className="form-group has-feedback">
             {label && <label htmlFor="common-search-form-query-input" className="control-label">{label}</label>}
-            <input id="common-search-form-query-input"
-                   /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                   autoFocus={focusAfterMount}
-                   onChange={this.handleQueryChange}
-                   value={query}
-                   placeholder={placeholder}
-                   type="text"
-                   style={{ width: queryWidth }}
-                   className="query form-control"
-                   autoComplete="off"
-                   spellCheck="false" />
+            <StyledInput id="common-search-form-query-input"
+                         autoFocus={focusAfterMount} /* eslint-disable-line jsx-a11y/no-autofocus */
+                         onChange={this.handleQueryChange}
+                         value={query}
+                         placeholder={placeholder}
+                         type="text"
+                         style={{ width: queryWidth }}
+                         className="query form-control"
+                         autoComplete="off"
+                         spellCheck="false" />
             {queryHelpComponent
               && <span className={`form-control-feedback ${style.helpFeedback}`}>{queryHelpComponent}</span>}
           </div>

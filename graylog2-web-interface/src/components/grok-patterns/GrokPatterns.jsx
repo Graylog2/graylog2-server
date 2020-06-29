@@ -102,7 +102,7 @@ const GrokPatterns = createReactClass({
         <td>
           <IfPermitted permissions="inputs:edit">
             <Button style={{ marginRight: 5 }}
-                    bsStyle="primary"
+                    bsStyle="danger"
                     bsSize="xs"
                     onClick={() => this.confirmedRemove(pattern)}>
               Delete
@@ -133,7 +133,7 @@ const GrokPatterns = createReactClass({
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add
             your own manually or import a whole list of patterns from a so called pattern file.
           </span>
-          {null}
+
           <IfPermitted permissions="inputs:edit">
             <span>
               <BulkLoadPatternModal onSuccess={this.loadData} />

@@ -45,24 +45,19 @@ const variant = {
 Object.keys(variant).forEach((name) => {
   if (typeof variant[name] === 'string') {
     variant.light[name] = darken(variant[name], 0.15);
-
     variant.lighter[name] = darken(variant[name], 0.5);
-
     variant.lightest[name] = darken(variant[name], 0.85);
-
     variant.dark[name] = lighten(variant[name], 0.15);
-
     variant.darker[name] = lighten(variant[name], 0.5);
-
     variant.darkest[name] = lighten(variant[name], 0.85);
   }
 });
 
 /* eslint-disable prefer-destructuring */
-global.tableBackground = gray[100];
-
-global.tableBackgroundAlt = gray[80];
-
+// global.tableBackground = gray[100];
+global.tableBackground = variant.light.default;
+// global.tableBackgroundAlt = gray[80];
+global.tableBackgroundAlt = variant.lighter.default;
 global.inputBackground = global.contentBackground;
 /* eslint-enable prefer-destructuring */
 
