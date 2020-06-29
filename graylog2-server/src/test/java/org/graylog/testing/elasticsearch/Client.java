@@ -19,11 +19,20 @@ package org.graylog.testing.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public interface Client {
-    void createIndex(String index);
+    default void createIndex(String index) {
+        createIndex(index, 1, 0);
+    }
 
     void createIndex(String index, int shards, int replicas);
 
-    String createRandomIndex(String prefix);
+    default String createRandomIndex(String prefix) {
+        final String indexName = prefix + System.nanoTime();
+
+        createIndex(indexName);
+        waitForGreenStatus(indexName);
+
+        return indexName;
+    }
 
     void deleteIndices(String... indices);
 
@@ -37,7 +46,9 @@ public interface Client {
 
     JsonNode getTemplate(String templateName);
 
-    JsonNode getTemplates();
+    default JsonNode getTemplates() {
+        return getTemplate("");
+    }
 
     void putTemplate(String templateName, Object source);
 

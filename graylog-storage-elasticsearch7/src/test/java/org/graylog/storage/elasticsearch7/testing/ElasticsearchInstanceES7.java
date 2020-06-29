@@ -25,8 +25,8 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     protected ElasticsearchInstanceES7(String image, Version version, Network network) {
         super(image, version, network);
         this.elasticsearchClient = elasticsearchClientFrom(this.container);
-        this.client = new ElasticsearchClientES7();
-        this.fixtureImporter = new FixtureImporterES7();
+        this.client = new ClientES7(this.elasticsearchClient);
+        this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
     }
 
     private ElasticsearchClient elasticsearchClientFrom(ElasticsearchContainer container) {

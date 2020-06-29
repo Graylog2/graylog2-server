@@ -44,10 +44,22 @@ public class ElasticsearchClient {
     }
 
     public SearchResponse search(SearchRequest searchRequest) {
+        return execute((client, requestOptions) -> client.search(searchRequest, requestOptions));
+    }
+
+    public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {
         try {
-            return this.client.search(searchRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
-            throw new ElasticsearchException(e);
+            return fn.apply(client, requestOptions());
+        } catch (Exception e) {
+            throw exceptionFrom(e);
         }
+    }
+
+    private RequestOptions requestOptions() {
+        return RequestOptions.DEFAULT;
+    }
+
+    private ElasticsearchException exceptionFrom(Exception e) {
+        return new ElasticsearchException(e);
     }
 }

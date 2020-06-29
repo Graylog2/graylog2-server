@@ -38,15 +38,14 @@ import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -65,49 +64,20 @@ public class  ClientES6 implements Client {
     }
 
     @Override
-    public void createIndex(String index) {
-        createIndex(index, 1, 0);
-    }
-
-    @Override
     public void createIndex(String index, int shards, int replicas) {
-        createIndex(index, shards, replicas, Collections.emptyMap());
-    }
-
-    private void createIndex(String index, int shards, int replicas, Map<String, Object> indexSettings) {
-        final Map<String, Object> settings = new HashMap<>();
-        settings.put("number_of_shards", shards);
-        settings.put("number_of_replicas", replicas);
-
-        if (indexSettings.containsKey("settings")) {
-            @SuppressWarnings("unchecked") final Map<String, Object> customSettings = (Map<String, Object>) indexSettings.get("settings");
-            settings.putAll(customSettings);
-        }
-
-        final Map<String, Object> mappings = new HashMap<>();
-        if (indexSettings.containsKey("mappings")) {
-            @SuppressWarnings("unchecked") final Map<String, Object> customMappings = (Map<String, Object>) indexSettings.get("mappings");
-            mappings.putAll(customMappings);
-        }
+        final Map<String, Object> settings = ImmutableMap.of(
+                "number_of_shards", shards,
+                "number_of_replicas", replicas
+        );
 
         final ImmutableMap<String, Map<String, Object>> finalSettings = ImmutableMap.of(
                 "settings", settings,
-                "mappings", mappings);
+                "mappings", Collections.emptyMap());
         final CreateIndex createIndex = new CreateIndex.Builder(index)
                 .settings(finalSettings)
                 .build();
 
         executeWithExpectedSuccess(createIndex, "failed to create index " + index);
-    }
-
-    @Override
-    public String createRandomIndex(String prefix) {
-        final String indexName = prefix + System.nanoTime();
-
-        createIndex(indexName);
-        waitForGreenStatus(indexName);
-
-        return indexName;
     }
 
     @Override
@@ -158,11 +128,6 @@ public class  ClientES6 implements Client {
                 executeWithExpectedSuccess(templateRequest, "failed to get template " + templateName);
 
         return templateResponse.getJsonObject();
-    }
-
-    @Override
-    public JsonNode getTemplates() {
-        return getTemplate("");
     }
 
     @Override
