@@ -25,11 +25,13 @@ import java.util.Map;
 
 public class VersionAwareProvider<T> implements Provider<T> {
     private final Version elasticsearchVersion;
+    private final String elasticsearchMajorVersion;
     private final Map<Version, Provider<T>> pluginBindings;
 
     @Inject
     public VersionAwareProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
         this.elasticsearchVersion = constructElasticsearchVersion(elasticsearchMajorVersion);
+        this.elasticsearchMajorVersion = elasticsearchMajorVersion;
         this.pluginBindings = pluginBindings;
     }
 
@@ -42,7 +44,7 @@ public class VersionAwareProvider<T> implements Provider<T> {
     public T get() {
         final Provider<T> provider = this.pluginBindings.get(elasticsearchVersion);
         if (provider == null) {
-            throw new IllegalStateException("Invalid Elasticsearch version specified, or implementation is incomplete!");
+            throw new IllegalStateException("Incomplete Elasticsearch implementation for version \"" + elasticsearchMajorVersion + "\".");
         }
         return provider.get();
     }

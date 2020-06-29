@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.configuration.converters.URIListConverter;
+import org.graylog2.configuration.validators.ElasticsearchVersionValidator;
 import org.graylog2.configuration.validators.HttpOrHttpsSchemeValidator;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
 import org.graylog2.configuration.validators.NonEmptyListValidator;
@@ -30,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class ElasticsearchClientConfiguration {
-    @Parameter(value = "elasticsearch_version")
-    String elasticsearchVersion = "6";
+    @Parameter(value = "elasticsearch_version", validators = ElasticsearchVersionValidator.class)
+    String elasticsearchVersion = "7";
 
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));
