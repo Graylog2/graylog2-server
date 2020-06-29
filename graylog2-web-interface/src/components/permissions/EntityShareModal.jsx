@@ -31,9 +31,10 @@ type Props = {
   entityId: string,
   entityType: string,
   title: string,
+  onClose: () => void,
 };
 
-const EntityShareModal = ({ title, entityId, entityType }: Props) => {
+const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = generateGRN(entityId, entityType);
 
@@ -44,6 +45,7 @@ const EntityShareModal = ({ title, entityId, entityType }: Props) => {
   return (
     <BootstrapModalConfirm onCancel={() => {}}
                            onConfirm={() => {}}
+                           onModalClose={onClose}
                            title={title}
                            confirmButtonText="Save"
                            showModal>
