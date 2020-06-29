@@ -7,7 +7,7 @@ import styled, { type StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
 import { connect, Field, useFormikContext } from 'formik';
 
-import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 import type { ThemeInterface } from 'theme';
@@ -27,6 +27,10 @@ const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
+
+const StyledTooltip = styled(Tooltip)`
+  white-space: nowrap;
+`;
 
 const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
@@ -99,6 +103,11 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
               <InputGroup>
+                {error && (
+                  <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+                    {error}
+                  </StyledTooltip>
+                )}
                 <KeywordInput type="text"
                               className="input-sm"
                               name={name}
