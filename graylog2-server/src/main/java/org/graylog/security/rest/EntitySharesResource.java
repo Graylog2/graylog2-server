@@ -27,6 +27,9 @@ import org.graylog.security.shares.EntitySharePrepareRequest;
 import org.graylog.security.shares.EntitySharePrepareResponse;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.utilities.GRN;
 import org.graylog2.utilities.GRNRegistry;
 
@@ -74,6 +77,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @POST
     @ApiOperation(value = "Prepare shares for an entity or collection")
     @Path("entities/{entityGRN}/prepare")
+    @NoAuditEvent("This does not change any data")
     public EntitySharePrepareResponse prepareShare(@ApiParam(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
                                                    @ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntitySharePrepareRequest request) {
         final GRN grn = grnRegistry.parse(entityGRN);
@@ -89,6 +93,8 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @POST
     @ApiOperation(value = "Create / update shares for an entity or collection")
     @Path("entities/{entityGRN}")
+    // TODO add description to GraylogServerEventFormatter
+    @AuditEvent(type = AuditEventTypes.GRANTS_UPDATE)
     public EntitySharePrepareResponse updateEntityShares(@ApiParam(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
                                                          @ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
         final GRN entity = grnRegistry.parse(entityGRN);
