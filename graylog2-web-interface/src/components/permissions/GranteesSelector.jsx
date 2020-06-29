@@ -6,9 +6,7 @@ import * as Immutable from 'immutable';
 
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import { type ThemeInterface } from 'theme';
-import { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
-import type { GRN } from 'logic/permissions/types';
+import EntityShareState, { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
 import Role from 'logic/permissions/Role';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
@@ -86,7 +84,7 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-type FormData = {
+export type SelectionRequest = {
   granteeId: $PropertyType<Grantee, 'id'>,
   roleId: $PropertyType<Role, 'id'>,
 };
@@ -94,22 +92,15 @@ type FormData = {
 type Props = {
   availableGrantees: AvailableGrantees,
   availableRoles: AvailableRoles,
-  entityGRN: GRN,
+  onSubmit: SelectionRequest => Promise<EntityShareState>,
 };
 
-const GranteesSelector = ({ entityGRN, availableGrantees, availableRoles }: Props) => {
+const GranteesSelector = ({ onSubmit, availableGrantees, availableRoles }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialRoleId = _initialRoleId(availableRoles);
-  const handleSubmit = (formData: FormData) => {
-    const { granteeId, roleId } = formData;
-
-    return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_roles: Immutable.Map({ [granteeId]: roleId }),
-    });
-  };
 
   return (
-    <Formik onSubmit={handleSubmit} initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
+    <Formik onSubmit={onSubmit} initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
       {({ isSubmitting, isValid, errors }) => (
         <Form>
           <FormElements>
