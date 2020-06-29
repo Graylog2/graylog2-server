@@ -20,7 +20,7 @@ const StyledGranteesList = styled(GranteesList)`
 const generateGRN = (id, type) => `grn::::${type}:${id}`;
 
 const _addCollborator = ({ granteeId, roleId }, entityGRN) => {
-  EntityShareActions.prepare(entityGRN, {
+  return EntityShareActions.prepare(entityGRN, {
     selected_grantee_roles: {
       [granteeId]: roleId,
     },

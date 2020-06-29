@@ -93,7 +93,12 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
                              onSave={onSaveView} />
       )}
 
-      {shareViewOpen && <EntityShareModal entityId={view.id} entityType="dashboard" title={`Sharing ${viewTypeLabel}: ${view.title}`} />}
+      {shareViewOpen && (
+      <EntityShareModal entityId={view.id}
+                        entityType="dashboard"
+                        title={`Sharing ${viewTypeLabel}: ${view.title}`}
+                        onClose={() => setShareViewOpen(false)} />
+      )}
       {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
     </ButtonGroup>
   );

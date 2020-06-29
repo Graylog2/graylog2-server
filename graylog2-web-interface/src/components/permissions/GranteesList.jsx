@@ -23,12 +23,22 @@ const GranteesList = ({ activeShares, availableRoles, availableGrantees, selecte
       {activeShares.map(({ grantee: granteeId, role: roleId }) => {
         const grantee = _userLookup(granteeId, availableGrantees);
 
-        return grantee && <GranteesListItem availableRoles={availableRoles} grantee={grantee} granteeRoleId={roleId} />;
+        return grantee && (
+          <GranteesListItem availableRoles={availableRoles}
+                            key={grantee.id}
+                            grantee={grantee}
+                            granteeRoleId={roleId} />
+        );
       })}
       {selectedGranteeRoles.entrySeq().map(([granteeId, roleId]) => {
         const grantee = _userLookup(granteeId, availableGrantees);
 
-        return grantee && <GranteesListItem availableRoles={availableRoles} grantee={grantee} granteeRoleId={roleId} />;
+        return grantee && (
+          <GranteesListItem availableRoles={availableRoles}
+                            grantee={grantee}
+                            key={grantee.id}
+                            granteeRoleId={roleId} />
+        );
       })}
     </div>
   );
