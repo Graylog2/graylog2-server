@@ -4,12 +4,15 @@ const flattenValidationTree = (validationTree, errors = []) => {
   if (validationTree.message) {
     return union(errors, [validationTree.message]);
   }
+
   if (validationTree.left) {
     return union(errors, flattenValidationTree(validationTree.left), flattenValidationTree(validationTree.right));
   }
+
   if (validationTree.child) {
     return union(errors, flattenValidationTree(validationTree.child));
   }
+
   return errors;
 };
 
@@ -20,10 +23,13 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
     case 'number-ref':
       /* eslint-disable no-case-declarations */
       const error = { message: 'Function must be set' };
+
       if (!expression.ref) {
         return error;
       }
+
       const selectedSeries = series.find((s) => s.id === expression.ref);
+
       return (selectedSeries && selectedSeries.function ? {} : error);
       /* eslint-enable no-case-declarations */
     case '&&':
@@ -49,6 +55,7 @@ const validateExpression = (expression, series) => {
 
   if (!expression) {
     validationResults.isValid = true;
+
     return validationResults;
   }
 

@@ -71,6 +71,7 @@ class SideBar extends React.Component<Props, State> {
     // $FlowFixMe: EventTarget and className work here.
     const { className } = event.target;
     const canMatchClass = className && isString(className);
+
     if (open && !disabledAutoClose && (canMatchClass && className.match(/background/))) {
       this.toggleOpen();
     }
@@ -78,6 +79,7 @@ class SideBar extends React.Component<Props, State> {
 
   toggleOpen = () => {
     const { open, selectedKey } = this.state;
+
     this.setState({
       open: !open,
       selectedKey: open ? undefined : selectedKey,
@@ -86,12 +88,14 @@ class SideBar extends React.Component<Props, State> {
 
   toggleAutoClose = () => {
     const { disabledAutoClose } = this.state;
+
     this.setState({ disabledAutoClose: !disabledAutoClose });
   };
 
   onNavItemClick = (key: string) => () => {
     const { open, selectedKey } = this.state;
     const nextKey = key === selectedKey ? undefined : key;
+
     this.setState(
       { selectedKey: nextKey },
       () => !open && this.toggleOpen(),
@@ -101,15 +105,18 @@ class SideBar extends React.Component<Props, State> {
   navItemChildren = (navItemChildren: React.Element<any>): React.Element<any> => {
     const { results } = this.props;
     const resultsEmpty = !results || Object.keys(results).length <= 0;
+
     if (resultsEmpty) {
       return <Spinner />;
     }
+
     return navItemChildren;
   }
 
   sidebarTitle = (viewType: ?ViewType) => {
     const { viewMetadata } = this.props;
     const defaultTitle = `Untitled ${capitalize(viewType)}`;
+
     return viewMetadata.title || defaultTitle;
   }
 
@@ -120,10 +127,12 @@ class SideBar extends React.Component<Props, State> {
     const toggleIcon = open
       ? 'times'
       : 'chevron-right';
+
     return (
       <ViewTypeContext.Consumer>
         {(viewType) => {
           const title = this.sidebarTitle(viewType);
+
           return (
             <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
               {open && <ContentOverlay onClick={this.toggleOpen} />}

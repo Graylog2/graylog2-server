@@ -21,6 +21,7 @@ const UniversalSearchStore = Reflux.createStore({
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
+
       result.fields = response.fields.map((field) => {
         return {
           hash: md5(field),

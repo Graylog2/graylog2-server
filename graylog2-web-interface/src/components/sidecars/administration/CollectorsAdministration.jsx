@@ -36,6 +36,7 @@ const CollectorsAdministration = createReactClass({
 
   getInitialState() {
     const { sidecarCollectorPairs } = this.props;
+
     return {
       enabledCollectors: this.getEnabledCollectors(sidecarCollectorPairs),
       selected: [],
@@ -62,9 +63,11 @@ const CollectorsAdministration = createReactClass({
 
   setSelectAllCheckboxState(selectAllInput, collectors, selected) {
     const selectAllCheckbox = selectAllInput ? selectAllInput.getInputDOMNode() : undefined;
+
     if (!selectAllCheckbox) {
       return;
     }
+
     // Set the select all checkbox as indeterminate if some but not all items are selected.
     selectAllCheckbox.indeterminate = selected.length > 0 && !this.isAllSelected(collectors, selected);
   },
@@ -75,6 +78,7 @@ const CollectorsAdministration = createReactClass({
 
   filterSelectedCollectors(collectors) {
     const filteredSidecarCollectorIds = collectors.map(({ collector, sidecar }) => this.sidecarCollectorId(sidecar, collector));
+
     return this.state.selected.filter((sidecarCollectorId) => filteredSidecarCollectorIds.includes(sidecarCollectorId));
   },
 
@@ -89,6 +93,7 @@ const CollectorsAdministration = createReactClass({
 
   handleProcessAction(action, selectedSidecarCollectorPairs, doneCallback) {
     const selectedCollectors = {};
+
     selectedSidecarCollectorPairs.forEach(({ sidecar, collector }) => {
       if (selectedCollectors[sidecar.node_id]) {
         selectedCollectors[sidecar.node_id].push(collector.id);
@@ -96,6 +101,7 @@ const CollectorsAdministration = createReactClass({
         selectedCollectors[sidecar.node_id] = [collector.id];
       }
     });
+
     this.props.onProcessAction(action, selectedCollectors, doneCallback);
   },
 
@@ -109,6 +115,7 @@ const CollectorsAdministration = createReactClass({
     });
 
     let headerMenu;
+
     if (selectedItems === 0) {
       headerMenu = (
         <CollectorsAdministrationFilters collectors={collectors} configurations={configurations} filters={this.props.filters} filter={this.props.onFilter} />
@@ -144,6 +151,7 @@ const CollectorsAdministration = createReactClass({
       const newSelection = (event.target.checked
         ? lodash.union(this.state.selected, [sidecarCollectorId])
         : lodash.without(this.state.selected, sidecarCollectorId));
+
       this.setState({ selected: newSelection });
     };
   },
@@ -156,6 +164,7 @@ const CollectorsAdministration = createReactClass({
     const newSelection = (event.target.checked
       ? this.state.enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector))
       : []);
+
     this.setState({ selected: newSelection });
   },
 
@@ -188,8 +197,10 @@ const CollectorsAdministration = createReactClass({
     const configAssignment = sidecar.assignments.find((assignment) => assignment.collector_id === collector.id) || {};
     const configuration = configurations.find((config) => config.id === configAssignment.configuration_id);
     let collectorStatus = { status: null, message: null, id: null };
+
     try {
       const result = sidecar.node_details.status.collectors.find((c) => c.collector_id === collector.id);
+
       if (result) {
         collectorStatus = {
           status: result.status,
@@ -267,6 +278,7 @@ const CollectorsAdministration = createReactClass({
     const { configurations, collectors, onPageChange, pagination, query, sidecarCollectorPairs, filters } = this.props;
 
     let formattedCollectors;
+
     if (sidecarCollectorPairs.length === 0) {
       formattedCollectors = (
         <ControlledTableList.Item>
@@ -275,11 +287,13 @@ const CollectorsAdministration = createReactClass({
       );
     } else {
       const sidecars = lodash.uniq(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
+
       formattedCollectors = sidecars.map((sidecarToMap) => {
         const sidecarCollectors = sidecarCollectorPairs
           .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
           .map(({ collector }) => collector)
           .filter((collector) => !lodash.isEmpty(collector));
+
         return this.formatSidecar(sidecarToMap, sidecarCollectors, configurations);
       });
     }

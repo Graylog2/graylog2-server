@@ -14,6 +14,7 @@ import DecoratorValue from './DecoratorValue';
 const _formatValue = (field, value, truncate, render, type) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
   const Component = render;
+
   return trim(stringified) === ''
     ? <EmptyValue />
     : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} type={type} />;
@@ -33,9 +34,11 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
   if (value === undefined) {
     return null;
   }
+
   if (type.isDecorated()) {
     return <DecoratorValue value={value} field={field} render={render} type={type} truncate={truncate} />;
   }
+
   switch (type.type) {
     case 'date': return <UserTimezoneTimestamp dateTime={value} />;
     case 'boolean': return String(value);

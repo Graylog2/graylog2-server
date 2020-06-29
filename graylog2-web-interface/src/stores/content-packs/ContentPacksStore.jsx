@@ -22,6 +22,7 @@ const ContentPacksStore = Reflux.createStore({
           selectedVersion: contentPackRevision.latestRevision,
           constraints: constraints,
         };
+
         this.trigger(result);
 
         return result;
@@ -35,6 +36,7 @@ const ContentPacksStore = Reflux.createStore({
     const promise = fetch('GET', url)
       .then((result) => {
         this.trigger({ contentPack: result.content_pack });
+
         return result;
       });
 
@@ -61,11 +63,13 @@ const ContentPacksStore = Reflux.createStore({
 
   delete(contentPackId) {
     const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.delete(contentPackId).url));
+
     ContentPacksActions.delete.promise(promise);
   },
 
   deleteRev(contentPackId, revision) {
     const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.deleteRev(contentPackId, revision).url));
+
     ContentPacksActions.deleteRev.promise(promise);
   },
 
@@ -87,6 +91,7 @@ const ContentPacksStore = Reflux.createStore({
   },
   uninstall(contentPackId, installId) {
     const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstall(contentPackId, installId).url));
+
     ContentPacksActions.uninstall.promise(promise);
   },
   uninstallDetails(contentPackId, installId) {

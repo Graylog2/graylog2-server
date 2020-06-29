@@ -44,6 +44,7 @@ export default class HighlightingRule {
 
   toBuilder() {
     const { field, value, condition, color } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ field, value, condition, color }));
   }
@@ -71,6 +72,7 @@ export default class HighlightingRule {
 
   static fromJSON(json: HighlightingRuleJSON) {
     const { field, value, condition, color } = json;
+
     return HighlightingRule.create(field, value, condition, color);
   }
 }
@@ -100,6 +102,7 @@ class Builder {
 
   build() {
     const { field, value, condition, color } = this._value.toObject();
+
     return new HighlightingRule(field, value, condition, color);
   }
 }

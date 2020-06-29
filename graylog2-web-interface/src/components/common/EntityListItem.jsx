@@ -77,7 +77,6 @@ const EntityListItem = ({ actions, contentRow, createdFromContentPack, descripti
   );
 };
 
-
 EntityListItem.propTypes = {
   /** Entity's title. */
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,

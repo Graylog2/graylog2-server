@@ -30,6 +30,7 @@ const CurrentUserStore = Reflux.createStore({
   sessionUpdate(sessionInfo) {
     if (sessionInfo.sessionId && sessionInfo.username) {
       const { username } = sessionInfo;
+
       this.update(username);
     } else {
       this.currentUser = undefined;
@@ -41,6 +42,7 @@ const CurrentUserStore = Reflux.createStore({
     if (this.currentUser !== undefined) {
       return this.update(this.currentUser.username);
     }
+
     return Promise.resolve();
   },
 

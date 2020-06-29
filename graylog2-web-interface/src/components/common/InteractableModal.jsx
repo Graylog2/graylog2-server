@@ -107,6 +107,7 @@ const InteractableModal = ({
           x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
           y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
         };
+
         break;
 
       case 'bottomLeft':
@@ -114,6 +115,7 @@ const InteractableModal = ({
           x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
           y: dragPosition.y,
         };
+
         break;
 
       case 'topRight':
@@ -121,6 +123,7 @@ const InteractableModal = ({
           x: dragPosition.x,
           y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
         };
+
         break;
 
       default:
@@ -147,9 +150,11 @@ const InteractableModal = ({
     const newCoords = {};
 
     const modalXWithNewWidth = innerWidth - boundingBox.right;
+
     newCoords.x = Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left);
 
     const modalYWithNewHeight = innerHeight - boundingBox.bottom;
+
     newCoords.y = Math.max(Math.min(modalYWithNewHeight, currentY), boundingBox.top);
 
     handleDragStop(null, newCoords);

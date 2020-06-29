@@ -18,6 +18,7 @@ const formatDecorator = (
     ? (deletedDecoratorId) => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
     : () => {};
   const { id, order } = decorator;
+
   return ({
     id,
     order,

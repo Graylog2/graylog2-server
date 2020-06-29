@@ -20,6 +20,7 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set([])}
                                               dashboards={dashboards}
                                               onChange={() => {}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -33,6 +34,7 @@ describe('<PermissionSelector />', () => {
                                               permissions={permissions}
                                               dashboards={dashboards}
                                               onChange={() => {}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -44,7 +46,9 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set([])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('button[children="Allow reading"]').at(0).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 
@@ -56,7 +60,9 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set([])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('button[children="Allow editing"]').at(0).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 
@@ -68,7 +74,9 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set(['streams:read:01'])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('button[children="Allow reading"]').at(0).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 
@@ -81,9 +89,13 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set(['streams:read:01'])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
+
     expect(wrapper.find('button').at(2).text()).toEqual('Set read permissions');
+
     wrapper.find('button').at(2).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 
@@ -96,9 +108,13 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set(['streams:read:01', 'stream:edit:01'])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
+
     expect(wrapper.find('button').at(3).text()).toEqual('Set edit permissions');
+
     wrapper.find('button').at(3).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 
@@ -111,9 +127,13 @@ describe('<PermissionSelector />', () => {
                                               permissions={Immutable.Set(['streams:read:01', 'streams:read:02'])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
+
     expect(wrapper.find('button').at(2).text()).toEqual('Clear read permissions');
+
     wrapper.find('button').at(2).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 
@@ -121,15 +141,20 @@ describe('<PermissionSelector />', () => {
     const onButtonClick = jest.fn((added, deleted) => {
       expect(added).toEqual(Immutable.Set(['streams:read:01', 'streams:edit:01',
         'streams:read:02', 'streams:edit:02']));
+
       expect(deleted).toEqual(Immutable.Set([]));
     });
     const wrapper = mount(<PermissionSelector streams={streams}
                                               permissions={Immutable.Set(['streams:read:01', 'streams:edit:01'])}
                                               dashboards={dashboards}
                                               onChange={onButtonClick} />);
+
     wrapper.find('input[label="Select all"]').at(0).simulate('change', { target: { checked: true } });
+
     expect(wrapper.find('button').at(3).text()).toEqual('Set edit permissions');
+
     wrapper.find('button').at(3).simulate('click');
+
     expect(onButtonClick.mock.calls.length).toBe(1);
   });
 });

@@ -14,6 +14,7 @@ class ConfigurationHelper extends React.Component {
 
   _getId = (idName, index) => {
     const idIndex = index !== undefined ? `. ${index}` : '';
+
     return idName + idIndex;
   };
 

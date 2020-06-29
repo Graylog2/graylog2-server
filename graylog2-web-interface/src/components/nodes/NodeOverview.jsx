@@ -14,7 +14,6 @@ import RestApiOverview from './RestApiOverview';
 import PluginsDataTable from './PluginsDataTable';
 import InputTypesDataTable from './InputTypesDataTable';
 
-
 class NodeOverview extends React.Component {
   static propTypes = {
     node: PropTypes.object.isRequired,
@@ -30,13 +29,16 @@ class NodeOverview extends React.Component {
     const { systemOverview } = this.props;
 
     let pluginCount;
+
     if (this.props.plugins) {
       pluginCount = `${this.props.plugins.length} plugins installed`;
     }
 
     let inputCount;
+
     if (this.props.inputStates) {
       const runningInputs = this.props.inputStates.filter((inputState) => inputState.state.toUpperCase() === 'RUNNING');
+
       inputCount = `${runningInputs.length} inputs running on this node`;
     }
 

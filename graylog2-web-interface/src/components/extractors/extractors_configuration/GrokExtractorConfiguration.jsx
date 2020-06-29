@@ -54,9 +54,11 @@ class GrokExtractorConfiguration extends React.Component {
 
   _onChange = (key) => {
     const { onChange, onExtractorPreviewLoad, configuration } = this.props;
+
     return (event) => {
       onExtractorPreviewLoad(undefined);
       const newConfig = configuration;
+
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       onChange(newConfig);
     };
@@ -64,35 +66,43 @@ class GrokExtractorConfiguration extends React.Component {
 
   _onPatternChange = (newPattern) => {
     const { onChange, onExtractorPreviewLoad, configuration } = this.props;
+
     onExtractorPreviewLoad(undefined);
     const newConfig = configuration;
+
     newConfig.grok_pattern = newPattern;
     onChange(newConfig);
   };
 
   _onTryClick = () => {
     const { exampleMessage, configuration, onExtractorPreviewLoad } = this.props;
+
     this.setState({ trying: true });
 
     const promise = ToolsStore.testGrok(configuration.grok_pattern, configuration.named_captures_only, exampleMessage);
+
     promise.then((result) => {
       if (result.error_message != null) {
         UserNotification.error(`We were not able to run the grok extraction because of the following error: ${result.error_message}`);
+
         return;
       }
 
       if (!result.matched) {
         UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
+
         return;
       }
 
       const matches = [];
+
       result.matches.forEach((match) => {
         matches.push(<dt key={`${match.name}-name`}>{match.name}</dt>);
         matches.push(<dd key={`${match.name}-value`}><samp>{match.match}</samp></dd>);
       });
 
       const preview = (matches.length === 0 ? '' : <dl>{matches}</dl>);
+
       onExtractorPreviewLoad(preview);
     });
 

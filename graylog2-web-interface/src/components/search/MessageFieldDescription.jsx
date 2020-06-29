@@ -32,16 +32,19 @@ class MessageFieldDescription extends React.Component {
 
   _shouldShowTerms = () => {
     const { messageTerms } = this.state;
+
     return messageTerms.size !== 0;
   };
 
   _getFormattedTerms = () => {
     const { messageTerms } = this.state;
+
     return messageTerms.map((term) => <MessageTerms key={term}>{term}</MessageTerms>);
   };
 
   _getFormattedFieldActions = () => {
     const { customFieldActions, fieldName, message } = this.props;
+
     return customFieldActions ? React.cloneElement(customFieldActions, { fieldName, message }) : null;
   };
 

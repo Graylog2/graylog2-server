@@ -52,11 +52,13 @@ class BarVisualizationConfiguration extends React.Component<Props> {
   _onChange: (barmode: BarModeOption) => void = (barmode: BarModeOption) => {
     const { onChange, config } = this.props;
     const newConfig = config.toBuilder().barmode(barmode.value).build();
+
     onChange(newConfig);
   };
 
   _wrapOption: (value: BarMode) => BarModeOption = (value) => {
     const option = BarVisualizationConfiguration.options[value];
+
     return { label: option.label, value: value };
   };
 

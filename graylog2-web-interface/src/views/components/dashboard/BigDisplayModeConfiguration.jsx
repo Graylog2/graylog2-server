@@ -112,6 +112,7 @@ const createQueryFromConfiguration = (
     refresh: Number(refreshInterval).toString(),
   };
   const allQueryIndices = view.search.queries.toIndexedSeq().map((_, v) => v).toJS();
+
   return !queryTabs || allQueryIndices.join(',') === queryTabs.join(',')
     ? basicConfiguration
     : { ...basicConfiguration, tabs: queryTabs.join(',') };

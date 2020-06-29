@@ -32,6 +32,7 @@ export default class QueryManipulationHandler {
 
   _queryStringFromActiveQuery = (queryId: QueryId): string => {
     const query = this.queries.get(queryId);
+
     return query.query.query_string;
   };
 

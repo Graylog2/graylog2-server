@@ -21,12 +21,14 @@ const PipelinesStore = Reflux.createStore({
       this.pipelines = [pipeline];
     } else {
       const doesPipelineExist = this.pipelines.some((p) => p.id === pipeline.id);
+
       if (doesPipelineExist) {
         this.pipelines = this.pipelines.map((p) => (p.id === pipeline.id ? pipeline : p));
       } else {
         this.pipelines.push(pipeline);
       }
     }
+
     this.trigger({ pipelines: this.pipelines });
   },
 
@@ -37,6 +39,7 @@ const PipelinesStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.list().url);
+
     return fetch('GET', url).then((response) => {
       this.pipelines = response;
       this.trigger({ pipelines: response });
@@ -51,6 +54,7 @@ const PipelinesStore = Reflux.createStore({
 
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.get(pipelineId).url);
     const promise = fetch('GET', url);
+
     promise.then(this._updatePipelinesState, failCallback);
   },
 
@@ -66,6 +70,7 @@ const PipelinesStore = Reflux.createStore({
       source: pipelineSource.source,
     };
     const promise = fetch('POST', url, pipeline);
+
     promise.then(
       (response) => {
         this._updatePipelinesState(response);
@@ -90,6 +95,7 @@ const PipelinesStore = Reflux.createStore({
       source: pipelineSource.source,
     };
     const promise = fetch('PUT', url, pipeline);
+
     promise.then(
       (response) => {
         this._updatePipelinesState(response);
@@ -106,8 +112,10 @@ const PipelinesStore = Reflux.createStore({
         `Could not delete processing pipeline "${pipelineId}"`);
     };
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
+
     return fetch('DELETE', url).then(() => {
       const updatedPipelines = this.pipelines || [];
+
       this.pipelines = updatedPipelines.filter((el) => el.id !== pipelineId);
       this.trigger({ pipelines: this.pipelines });
       UserNotification.success(`Pipeline "${pipelineId}" deleted successfully`);
@@ -120,6 +128,7 @@ const PipelinesStore = Reflux.createStore({
       description: pipelineSource.description,
       source: pipelineSource.source,
     };
+
     return fetch('POST', url, pipeline).then(
       () => {
         // call to clear the errors, the parsing was successful
@@ -128,6 +137,7 @@ const PipelinesStore = Reflux.createStore({
       (error) => {
         // a Bad Request indicates a parse error, set all the returned errors in the editor
         const response = error.additional.res;
+
         if (response.status === 400) {
           callback(response.body);
         }

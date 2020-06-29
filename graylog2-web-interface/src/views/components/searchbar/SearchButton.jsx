@@ -35,6 +35,7 @@ type Props = {
 const SearchButton = ({ disabled, glyph, dirty }: Props) => {
   const ButtonComponent = dirty ? DirtyButton : StyledButton;
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform search';
+
   return (
     <ButtonComponent type="submit"
                      bsStyle="success"

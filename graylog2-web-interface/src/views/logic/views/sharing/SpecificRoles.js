@@ -31,6 +31,7 @@ export default class SpecificRoles extends ViewSharing {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { viewId, roles } = this;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({ viewId, roles }));
   }
@@ -50,6 +51,7 @@ export default class SpecificRoles extends ViewSharing {
   static fromJSON(value: SpecificRolesJson) {
     // eslint-disable-next-line camelcase
     const { view_id, roles } = value;
+
     return SpecificRoles.create(view_id, roles);
   }
 }
@@ -63,11 +65,13 @@ class Builder {
 
   roles(value: Array<string>) {
     this.value = this.value.set('roles', value);
+
     return this;
   }
 
   build() {
     const { viewId, roles } = this.value.toObject();
+
     return SpecificRoles.create(viewId, roles);
   }
 }

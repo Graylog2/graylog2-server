@@ -28,24 +28,29 @@ const testSeriesRegex = /^(\w+)\((\w*)(,(\w+))*\)$/;
 const definitionFor = (type: string, parameters: Array<string>): Definition => {
   // eslint-disable-next-line no-unused-vars
   const [field, parameter] = parameters;
+
   if (type === 'percentile') {
     return { type, field, percentile: parameter };
   }
+
   return { type, field };
 };
 
 export const isFunction = (s: string) => testSeriesRegex.test(s);
 export const parseSeries = (s: string) => {
   const funcNameResult = funcNameRegex.exec(s);
+
   if (!funcNameResult) {
     return null;
   }
+
   const type = funcNameResult[1];
   const definition: Definition = {
     type,
   };
 
   const parameterResult = parametersRegex.exec(s);
+
   if (!parameterResult) {
     return definition;
   }
@@ -70,6 +75,7 @@ export default class Series {
 
   get effectiveName(): string {
     const overridenName = get(this, 'config.name');
+
     return overridenName || this.function;
   }
 
@@ -125,6 +131,7 @@ class Builder {
   build() {
     const { config } = this.value.toObject();
     const func = this.value.get('function');
+
     return new Series(func, config);
   }
 }

@@ -56,6 +56,7 @@ const StreamList = createReactClass({
         </StreamsList>
       );
     }
+
     return (
       <Alert bsStyle="info">
         <Icon name="info-circle" />&nbsp;No streams match your search filter.

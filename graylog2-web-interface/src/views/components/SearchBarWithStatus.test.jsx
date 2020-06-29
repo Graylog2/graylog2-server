@@ -17,8 +17,10 @@ jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 
 describe('SearchBarWithStatus', () => {
   const configurations = { searchesClusterConfig: {} };
+
   it('enables search button per default', () => {
     const wrapper = mount(<SearchBarWithStatus configurations={configurations} searchMetadata={SearchMetadata.empty()} executionState={SearchExecutionState.empty()} />);
+
     expect(wrapper.find('SearchBar')).toHaveProp('disableSearch', false);
   });
 });

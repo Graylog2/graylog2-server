@@ -32,6 +32,7 @@ const ExtractorUtils = {
 
   getNewExtractorRoutes(sourceNodeId, sourceInputId, fieldName, messageIndex, messageId) {
     const routes = {};
+
     this.EXTRACTOR_TYPES.forEach((extractorType) => {
       routes[extractorType] = Routes.new_extractor(sourceNodeId, sourceInputId, extractorType, fieldName, messageIndex, messageId);
     });

@@ -17,6 +17,7 @@ describe('IfDashboard', () => {
         </IfDashboard>
       </ViewTypeContext.Provider>,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -32,7 +33,6 @@ describe('IfDashboard', () => {
 
     expect(wrapper).toMatchSnapshot();
   });
-
 
   it('should not render children without context', () => {
     const wrapper = mount(

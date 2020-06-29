@@ -8,6 +8,7 @@ import ExpandableListItem from 'components/common/ExpandableListItem';
 describe('<ExpandableList />', () => {
   it('should render with no children', () => {
     const wrapper = mount(<ExpandableList />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -21,6 +22,7 @@ describe('<ExpandableList />', () => {
         </ExpandableListItem>
       </ExpandableList>,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -36,9 +38,9 @@ describe('<ExpandableList />', () => {
         </ExpandableListItem>
       </ExpandableList>,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
-
 
   it('should expand a expandable list item', () => {
     const wrapper = mount(
@@ -50,8 +52,11 @@ describe('<ExpandableList />', () => {
         </ExpandableListItem>
       </ExpandableList>,
     );
+
     expect(wrapper.find('span.header').length).toBe(1);
+
     wrapper.find('div.fa-stack').simulate('click');
+
     expect(wrapper.find('span.header').length).toBe(2);
   });
 
@@ -66,7 +71,9 @@ describe('<ExpandableList />', () => {
         </ExpandableListItem>
       </ExpandableList>,
     );
+
     wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: true } });
+
     expect(checkFn.mock.calls.length).toBe(1);
   });
 });

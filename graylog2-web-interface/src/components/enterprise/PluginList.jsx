@@ -15,6 +15,7 @@ const PluginList = createReactClass({
 
   _formatPlugin(pluginName) {
     const plugin = PluginStore.get().filter((p) => p.metadata.name === pluginName)[0];
+
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
         <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;

@@ -17,12 +17,14 @@ const UpdateSearchForWidgets = (view: View): View => {
   searchTypes.map(({ widgetMapping }) => widgetMapping)
     .forEach((widgetMapping, queryId) => {
       const newStates = newView.state;
+
       if (states.has(queryId)) {
         newView = newView.toBuilder()
           .state(newStates.update(queryId, (state) => state.toBuilder().widgetMapping(widgetMapping).build()))
           .build();
       }
     });
+
   return newView;
 };
 

@@ -45,6 +45,7 @@ class InputStaticFields extends React.Component {
 
   render() {
     const staticFieldNames = Object.keys(this.props.input.static_fields);
+
     if (staticFieldNames.length === 0) {
       return <div />;
     }

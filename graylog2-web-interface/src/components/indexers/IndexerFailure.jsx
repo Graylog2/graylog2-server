@@ -10,6 +10,7 @@ class IndexerFailure extends React.Component {
 
   render() {
     const { failure } = this.props;
+
     return (
       <tr>
         <td title={failure.timestamp}><Timestamp dateTime={failure.timestamp} relative /></td>

@@ -10,6 +10,7 @@ class CaffeineCacheSummary extends React.Component {
 
   render() {
     const { config } = this.props.cache;
+
     return (
       <dl>
         <dt>Maximum entries</dt>

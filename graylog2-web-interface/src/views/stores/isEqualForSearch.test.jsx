@@ -26,9 +26,9 @@ export class NeverEqualForSearch {
   };
 }
 
-
 describe('isEqualForSearch', () => {
   const verifyIsEqualForSearch = ({ initial, next, result }) => expect(isEqualForSearch(initial, next)).toBe(result);
+
   it.each`
     initial                  | next                     | result    | description
     ${undefined}             | ${undefined}             | ${true}   | ${'equal undefined values'}

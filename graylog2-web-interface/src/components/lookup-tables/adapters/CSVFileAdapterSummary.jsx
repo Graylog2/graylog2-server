@@ -8,6 +8,7 @@ class CSVFileAdapterSummary extends React.Component {
 
   render() {
     const { config } = this.props.dataAdapter;
+
     return (
       <dl>
         <dt>File path</dt>
@@ -28,6 +29,5 @@ class CSVFileAdapterSummary extends React.Component {
     );
   }
 }
-
 
 export default CSVFileAdapterSummary;

@@ -24,6 +24,7 @@ describe('MessageTableEntry', () => {
                            expanded={false} />
       </table>
     ));
+
     expect(wrapper).toIncludeText('Something happened!');
   });
 });

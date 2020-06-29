@@ -42,6 +42,7 @@ export default class PortaledPopover extends React.Component {
         </Position>
       </Portal>
     );
+
     return (
       <span>
         <a role="link"

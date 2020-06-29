@@ -30,6 +30,7 @@ class DatePicker extends React.Component {
 
   render() {
     let selectedDate;
+
     if (this.props.date) {
       try {
         selectedDate = DateTime.parseFromString(this.props.date);
@@ -43,7 +44,9 @@ class DatePicker extends React.Component {
         if (!selectedDate) {
           return false;
         }
+
         const dateTime = DateTime.ignoreTZ(date);
+
         return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
       },
     };

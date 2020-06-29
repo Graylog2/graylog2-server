@@ -12,6 +12,7 @@ describe('HighlightMessageInQuery', () => {
       {(messageId) => <span>{messageId}</span>}
     </HighlightMessageContext.Consumer>
   );
+
   it('should render component for empty query', () => {
     const { container } = render((
       // $FlowFixMe: Passing `undefined` on purpose
@@ -19,22 +20,27 @@ describe('HighlightMessageInQuery', () => {
         <TestComponent />
       </HighlightMessageInQuery>
     ));
+
     expect(container).not.toBeNull();
   });
+
   it('should render component for query without message id', () => {
     const { container } = render((
       <HighlightMessageInQuery query={{}}>
         <TestComponent />
       </HighlightMessageInQuery>
     ));
+
     expect(container).not.toBeNull();
   });
+
   it('should pass message id from query to children', () => {
     const { getByText } = render((
       <HighlightMessageInQuery query={{ highlightMessage: 'foobar' }}>
         <TestComponent />
       </HighlightMessageInQuery>
     ));
+
     expect(getByText('foobar')).not.toBeNull();
   });
 });

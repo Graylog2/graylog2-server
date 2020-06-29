@@ -28,6 +28,7 @@ class UnknownAlertCondition extends React.Component {
         </Alert>
       </Col>
     );
+
     return (
       <EntityListItem key={`entry-list-${condition.id}`}
                       title="Unknown condition"

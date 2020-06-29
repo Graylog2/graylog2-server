@@ -31,11 +31,13 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
           // eslint-disable-next-line no-console
           console.warn('Exception thrown in completer: ', e);
         }
+
         return [];
       })
       .reduce((acc, cur) => [...acc, ...cur], []);
 
     const uniqResults = uniqBy(sortBy(results, ['score', 'name']), 'name');
+
     callback(null, uniqResults);
   }
 }

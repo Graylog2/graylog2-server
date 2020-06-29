@@ -54,9 +54,11 @@ class CopyCollectorModal extends React.Component {
   _changeName = (event) => {
     const { collector, validateCollector } = this.props;
     const name = event.target.value;
+
     this.setState({ name, errorMessage: undefined });
 
     const nextCollector = lodash.cloneDeep(collector);
+
     nextCollector.name = name;
     nextCollector.id = '';
 

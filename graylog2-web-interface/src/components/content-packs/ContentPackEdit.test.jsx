@@ -10,7 +10,6 @@ jest.mock('react-overlays', () => ({
   AutoAffix: ({ children }) => <div>{children}</div>,
 }));
 
-
 describe('<ContentPackEdit />', () => {
   const emptyContentPack = ContentPack.builder()
     .id('9950ba5a-0887-40a9-2b8f-8b50292cc7fb')
@@ -50,6 +49,7 @@ describe('<ContentPackEdit />', () => {
 
   it('should render spinner with no content pack', () => {
     const wrapper = mount(<ContentPackEdit />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -58,6 +58,7 @@ describe('<ContentPackEdit />', () => {
                                            selectedEntities={{}}
                                            appliedParameter={{}}
                                            entityIndex={{}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -68,6 +69,7 @@ describe('<ContentPackEdit />', () => {
                        entityIndex={serverEntities}
                        selectedEntities={selectedEntities} />,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -80,11 +82,17 @@ describe('<ContentPackEdit />', () => {
                        onSave={saveFn}
                        selectedEntities={selectedEntities} />,
     );
+
     wrapper.find('button[children="Next"]').simulate('click');
+
     expect(wrapper.find('h2[children="Parameters list"]').exists()).toBe(true);
+
     wrapper.find('button[children="Next"]').simulate('click');
+
     expect(wrapper.find('button[children="Create"]').exists()).toBe(true);
+
     wrapper.find('button[children="Create"]').simulate('click');
+
     expect(saveFn.mock.calls.length).toBe(1);
   });
 });

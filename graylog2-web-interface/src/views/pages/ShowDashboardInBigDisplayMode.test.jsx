@@ -13,7 +13,6 @@ const mockView = View.builder()
   .title('view title')
   .build();
 
-
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
@@ -22,12 +21,14 @@ jest.mock('views/stores/RefreshStore', () => ({
     disable: jest.fn(),
   },
 }));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
     ['listen', () => jest.fn()],
     ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
   ),
 }));
+
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateStore: MockStore(
     ['listen', () => jest.fn()],
@@ -51,6 +52,7 @@ describe('ShowDashboardInBigDisplayMode should', () => {
     render(<ShowDashboardInBigDisplayMode route={{}}
                                           params={{ viewId: mockView.id }}
                                           location={mockLocation} />);
+
     await wait(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(1));
     await wait(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(10000));
   });
@@ -59,6 +61,7 @@ describe('ShowDashboardInBigDisplayMode should', () => {
     render(<ShowDashboardInBigDisplayMode route={{}}
                                           params={{ viewId: mockView.id }}
                                           location={mockLocation} />);
+
     await wait(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
   });
 
@@ -66,6 +69,7 @@ describe('ShowDashboardInBigDisplayMode should', () => {
     const { rerender } = render(<ShowDashboardInBigDisplayMode route={{}}
                                                                params={{ viewId: mockView.id }}
                                                                location={mockLocation} />);
+
     rerender(<ShowDashboardInBigDisplayMode route={{}}
                                             params={{ viewId: mockView.id }}
                                             location={{ query: { ...mockLocation.query, refresh: '20' } }} />);
@@ -78,6 +82,7 @@ describe('ShowDashboardInBigDisplayMode should', () => {
     const { rerender } = render(<ShowDashboardInBigDisplayMode route={{}}
                                                                params={{ viewId: mockView.id }}
                                                                location={mockLocation} />);
+
     rerender(<ShowDashboardInBigDisplayMode route={{}}
                                             params={{ viewId: mockView.id }}
                                             location={mockLocation} />);
@@ -90,6 +95,7 @@ describe('ShowDashboardInBigDisplayMode should', () => {
     const { unmount } = render(<ShowDashboardInBigDisplayMode route={{}}
                                                               params={{ viewId: mockView.id }}
                                                               location={mockLocation} />);
+
     unmount();
     await wait(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });

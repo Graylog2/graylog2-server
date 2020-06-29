@@ -22,6 +22,7 @@ const isReservedField = (fieldName) => MessageFieldsFilter.FILTERED_FIELDS.inclu
 
 const _fieldsToShow = (fields, allFields, currentGroup = 'all') => {
   const isNotReservedField = (f) => !isReservedField(f.name);
+
   switch (currentGroup) {
     case 'all':
       return allFields.filter(isNotReservedField);
@@ -37,6 +38,7 @@ const List = ({ viewMetadata: { activeQuery }, listHeight, filter, activeQueryFi
   if (!activeQueryFields) {
     return <span>No field information available.</span>;
   }
+
   const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
   const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
   const fieldList = fieldsToShow

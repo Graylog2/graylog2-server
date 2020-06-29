@@ -1,6 +1,7 @@
 import chroma from 'chroma-js';
 
 function lighten(color, ratio) { return chroma.mix(color, '#fff', ratio).hex(); }
+
 function darken(color, ratio) { return chroma.mix(color, '#000', ratio).hex(); }
 
 const brand = {
@@ -21,8 +22,10 @@ global.linkHover = chroma(global.link).darken(1).hex();
 
 const grayScale = chroma.scale([global.textDefault, global.textAlt]).colors(10);
 const gray = {};
+
 grayScale.forEach((tint, index) => {
   const key = (index + 1) * 10;
+
   gray[key] = tint;
 });
 

@@ -36,6 +36,7 @@ class RolesComponent extends React.Component {
 
   loadRoles = () => {
     const promise = RolesStore.loadRoles();
+
     promise.then((roles) => {
       this.setState({ roles: Immutable.Set(roles), rolesLoaded: true });
     });
@@ -77,10 +78,12 @@ class RolesComponent extends React.Component {
   render() {
     let content = null;
     const { rolesLoaded, showEditRole, editRole, streams, roles } = this.state;
+
     if (!rolesLoaded) {
       content = <span>Loading roles...</span>;
     } else if (showEditRole) {
       const { dashboards } = this.props;
+
       content = (
         <EditRole initialRole={editRole}
                   streams={streams}
@@ -97,9 +100,11 @@ class RolesComponent extends React.Component {
     }
 
     let actionButton;
+
     if (!showEditRole) {
       actionButton = <Button bsStyle="success" onClick={this._showCreateRole}>Add new role</Button>;
     }
+
     return (
       <Row>
         <Col md={12}>

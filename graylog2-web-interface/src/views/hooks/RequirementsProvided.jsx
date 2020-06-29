@@ -17,6 +17,7 @@ const RequirementsProvided: ViewHook = ({ view }) => {
 
     if (Object.keys(missingRequirements).length > 0) {
       const Component = () => <MissingRequirements view={view} missingRequirements={missingRequirements} />;
+
       return reject(Component);
     }
 

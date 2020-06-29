@@ -35,16 +35,19 @@ describe('<ContentPackInstallations />', () => {
 
   it('should render without installations', () => {
     const wrapper = mount(<ContentPackInstallations />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with empty installations', () => {
     const wrapper = mount(<ContentPackInstallations installations={[]} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with a installation', () => {
     const wrapper = mount(<ContentPackInstallations installations={installations} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -54,7 +57,9 @@ describe('<ContentPackInstallations />', () => {
       expect(installId).toEqual(installations[0]._id);
     });
     const wrapper = mount(<ContentPackInstallations installations={installations} onUninstall={uninstallFn} />);
+
     wrapper.find('button[children="Uninstall"]').simulate('click');
+
     expect(uninstallFn.mock.calls.length).toBe(1);
   });
 });

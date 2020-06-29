@@ -109,6 +109,7 @@ class Input extends React.Component {
     button,
   ) => {
     let input;
+
     if (addon || button) {
       input = (
         <InputGroup>

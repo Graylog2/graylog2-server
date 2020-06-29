@@ -7,7 +7,6 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const AuthenticationActions = ActionsProvider.getActions('Authentication');
 
-
 const AuthenticationStore = Reflux.createStore({
   listenables: [AuthenticationActions],
   sourceUrl: '/system/authentication/config',
@@ -24,6 +23,7 @@ const AuthenticationStore = Reflux.createStore({
       .then(
         (response) => {
           this.trigger({ authenticators: response });
+
           return response;
         },
         (error) => UserNotification.error(`Unable to load authentication configuration: ${error}`, 'Could not load authenticators'),
@@ -34,16 +34,19 @@ const AuthenticationStore = Reflux.createStore({
 
   update(type, config) {
     const url = URLUtils.qualifyUrl(this.sourceUrl);
+
     if (type === 'providers') {
       const promise = fetch('PUT', url, config)
         .then(
           (response) => {
             this.trigger({ authenticators: response });
             UserNotification.success('Configuration updated successfully');
+
             return response;
           },
           (error) => UserNotification.error(`Unable to save authentication provider configuration: ${error}`, 'Could not save configuration'),
         );
+
       AuthenticationActions.update.promise(promise);
     }
   },

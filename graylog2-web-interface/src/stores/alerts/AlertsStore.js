@@ -14,6 +14,7 @@ const AlertsStore = Reflux.createStore({
   list(stream, since) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.list(stream.id, since).url);
     const promise = fetch('GET', url);
+
     promise
       .then(
         (response) => this.trigger({ alerts: response }),
@@ -29,6 +30,7 @@ const AlertsStore = Reflux.createStore({
   listPaginated(streamId, skip, limit, state = 'any') {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listPaginated(streamId, skip, limit, state).url);
     const promise = fetch('GET', url);
+
     promise
       .then(
         (response) => this.trigger({ alerts: response }),
@@ -43,6 +45,7 @@ const AlertsStore = Reflux.createStore({
   listAllPaginated(skip, limit, state) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit, state).url);
     const promise = fetch('GET', url);
+
     promise.then(
       (response) => this.trigger({ alerts: response }),
       (error) => {
@@ -56,6 +59,7 @@ const AlertsStore = Reflux.createStore({
   listAllStreams(since) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllStreams(since).url);
     const promise = fetch('GET', url);
+
     promise
       .then(
         (response) => this.trigger({ alerts: response }),
@@ -70,9 +74,11 @@ const AlertsStore = Reflux.createStore({
   get(alertId) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.get(alertId).url);
     const promise = fetch('GET', url);
+
     promise.then(
       (response) => {
         this.trigger({ alert: response });
+
         return response;
       },
       (error) => {

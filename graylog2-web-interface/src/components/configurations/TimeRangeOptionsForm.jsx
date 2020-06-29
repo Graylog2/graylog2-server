@@ -59,6 +59,7 @@ class TimeRangeOptionsForm extends React.Component {
 
           if (field === 'period') {
             value = value.toUpperCase();
+
             if (!value.startsWith('P')) {
               value = `P${value}`;
             }

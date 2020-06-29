@@ -100,6 +100,7 @@ const MessageProcessorsConfig = createReactClass({
   _summary() {
     return this.state.config.processor_order.map((processor, idx) => {
       const status = this.state.config.disabled_processors.filter((p) => p === processor.class_name).length > 0 ? 'disabled' : 'active';
+
       return (
         <tr key={idx}>
           <td>{idx + 1}</td>

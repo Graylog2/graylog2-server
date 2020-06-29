@@ -35,7 +35,6 @@ class GrokPatternFilter extends React.Component {
     return true;
   }
 
-
   _onPatternFilterChange = (e) => {
     this.setState({ patternFilter: e.target.value, activeListItem: -1 });
   };
@@ -52,12 +51,15 @@ class GrokPatternFilter extends React.Component {
     const firstElement = document.getElementById('list-item-0');
     let domElement;
     let list;
+
     switch (e.keyCode) {
       case ARROW_DOWN:
         newActiveListItem = activeListItem + 1;
+
         if (activeListItem >= this.shownListItems.length) {
           return;
         }
+
         domElement = document.getElementById(`list-item-${newActiveListItem}`);
         list = domElement.parentElement;
         list.scrollTop = domElement.offsetTop - firstElement.offsetTop;
@@ -66,9 +68,11 @@ class GrokPatternFilter extends React.Component {
         break;
       case ARROW_UP:
         newActiveListItem = activeListItem - 1;
+
         if (newActiveListItem < 0) {
           return;
         }
+
         domElement = document.getElementById(`list-item-${newActiveListItem}`);
         list = domElement.parentElement;
         list.scrollTop = domElement.offsetTop - firstElement.offsetTop;
@@ -79,6 +83,7 @@ class GrokPatternFilter extends React.Component {
         if (listItem) {
           addToPattern(listItem);
         }
+
         e.preventDefault();
         break;
       default:
@@ -90,11 +95,14 @@ class GrokPatternFilter extends React.Component {
     const { activeListItem, patternFilter } = this.state;
     const { addToPattern, patterns } = this.props;
     const regExp = RegExp(patternFilter, 'i');
+
     this.shownListItems = [];
     const patternsToDisplay = patterns.filter((displayedPattern) => regExp.test(displayedPattern.name))
       .map((displayedPattern, index) => {
         const active = index === activeListItem;
+
         this.shownListItems.push(displayedPattern.name);
+
         return (
           <ListGroupItem id={`list-item-${index}`}
                          header={displayedPattern.name}
@@ -110,6 +118,7 @@ class GrokPatternFilter extends React.Component {
           </ListGroupItem>
         );
       });
+
     return (
       <>
         <Input type="text"

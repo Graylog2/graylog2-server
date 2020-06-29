@@ -11,6 +11,7 @@ const _wrapOption = (series) => ({ label: series.effectiveName, value: series })
 
 const _defaultFunctions = (functions) => {
   const funcOptions = Object.keys(functions).map(_makeIncompleteFunction);
+
   return [].concat(
     [_wrapOption(Series.forFunction('count()'))],
     funcOptions,
@@ -21,6 +22,7 @@ const combineFunctionsWithFields = (functions, fields, parameter) => flatten(fie
   if (parameter) {
     return `${f}(${name},${parameter})`;
   }
+
   return `${f}(${name})`;
 })));
 

@@ -5,6 +5,7 @@ const singleton = <R>(key: string, supplier: () => R): R => {
   if (!window.singletons[key]) {
     window.singletons[key] = supplier();
   }
+
   return window.singletons[key];
 };
 

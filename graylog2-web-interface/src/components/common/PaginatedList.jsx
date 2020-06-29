@@ -57,6 +57,7 @@ const PaginatedList = ({
   useEffect(() => {
     setCurrentPage(activePage);
   }, [activePage]);
+
   useEffect(() => {
     setPageSize(propsPageSize);
   }, [propsPageSize]);
@@ -64,6 +65,7 @@ const PaginatedList = ({
   const _onChangePageSize = (event: SyntheticInputEvent<HTMLLinkElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
+
     setCurrentPage(INITIAL_PAGE);
     setPageSize(newPageSize);
     onChange(INITIAL_PAGE, newPageSize);

@@ -7,7 +7,6 @@ import connect from 'stores/connect';
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import { ViewStore } from 'views/stores/ViewStore';
 
-
 type Props = {
   dirty: boolean,
   route: any,

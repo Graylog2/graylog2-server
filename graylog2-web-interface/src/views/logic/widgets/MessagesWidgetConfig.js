@@ -65,6 +65,7 @@ export default class MessagesWidgetConfig extends WidgetConfig {
 
   toJSON() {
     const { decorators, fields, showMessageRow, sort } = this._value;
+
     return {
       decorators,
       fields,
@@ -130,6 +131,7 @@ class Builder {
 
   build() {
     const { decorators, fields, showMessageRow, sort } = this.value.toObject();
+
     return new MessagesWidgetConfig(fields, showMessageRow, decorators, sort);
   }
 }

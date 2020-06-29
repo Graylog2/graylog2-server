@@ -47,6 +47,7 @@ const SplitAndIndexExtractorConfiguration = createReactClass({
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
       const newConfig = this.state.configuration;
+
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(newConfig);
     };
@@ -61,10 +62,12 @@ const SplitAndIndexExtractorConfiguration = createReactClass({
     promise.then((result) => {
       if (!result.successful) {
         UserNotification.warning('We were not able to run the split and index extraction. Please check your parameters.');
+
         return;
       }
 
       const preview = (result.cut ? <samp>{result.cut}</samp> : '');
+
       this.props.onExtractorPreviewLoad(preview);
     });
 
@@ -73,6 +76,7 @@ const SplitAndIndexExtractorConfiguration = createReactClass({
 
   _isTryButtonDisabled() {
     const { configuration } = this.state;
+
     return this.state.trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1 || !this.props.exampleMessage;
   },
 

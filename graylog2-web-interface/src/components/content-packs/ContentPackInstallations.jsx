@@ -76,6 +76,7 @@ class ContentPackInstallations extends React.Component {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
     }
+
     return (<th>{header}</th>);
   };
 
@@ -87,6 +88,7 @@ class ContentPackInstallations extends React.Component {
     }
 
     const headers = ['Comment', 'Version', 'Action'];
+
     return (
       <DataTable id="content-packs-versions"
                  headers={headers}

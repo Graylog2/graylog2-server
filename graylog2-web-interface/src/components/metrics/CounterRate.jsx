@@ -44,6 +44,7 @@ class CounterRate extends React.Component {
     if (this.props.hideOnZero) {
       return null;
     }
+
     return (<span>{this._prefix()}Calculating...</span>);
   };
 
@@ -51,6 +52,7 @@ class CounterRate extends React.Component {
     if (this.props.prefix) {
       return `${this.props.prefix} `;
     }
+
     return null;
   };
 
@@ -58,6 +60,7 @@ class CounterRate extends React.Component {
     if (this.props.suffix) {
       return ` ${this.props.suffix}`;
     }
+
     return null;
   };
 
@@ -66,15 +69,19 @@ class CounterRate extends React.Component {
       if (this.props.hideOnMissing) {
         return null;
       }
+
       if (!this._checkPrevMetric()) {
         return this._placeholder();
       }
     }
+
     const { count } = this.props.metric;
 
     let rate = null;
+
     if (this._checkPrevMetric()) {
       const rateNum = (count - this.state.prevMetric.count) / (this.state.nowTs - this.state.prevTs);
+
       rate = (<span key="rate" className="number-format">{this._prefix()}{numeral(rateNum).format('0,0')}{this._suffix()}</span>);
     } else {
       return this._placeholder();

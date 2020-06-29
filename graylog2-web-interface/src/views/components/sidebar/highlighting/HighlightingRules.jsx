@@ -15,6 +15,7 @@ const Headline = styled.h4`
 
 const HighlightingRules = () => {
   const rules = useContext(HighlightingRulesContext) ?? [];
+
   return (
     <>
       <Headline>Highlighting</Headline>

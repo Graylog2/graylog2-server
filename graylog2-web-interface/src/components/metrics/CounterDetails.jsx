@@ -9,6 +9,7 @@ class CounterDetails extends React.Component {
 
   render() {
     const { metric } = this.props.metric;
+
     return (
       <dl className="metric-def metric-counter">
         <dt>Value:</dt>

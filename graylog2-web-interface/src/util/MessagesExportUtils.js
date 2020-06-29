@@ -20,6 +20,7 @@ const downloadCSV = (fileContent: string, filename: string = 'search-result') =>
 
 export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, filename?: string) => {
   const { url } = ApiRoutes.MessagesController.exportSearch(searchId);
+
   return fetchFile('POST', qualifyUrl(url), exportPayload)
     .then((result: string) => downloadCSV(result, filename))
     .catch(() => {
@@ -29,6 +30,7 @@ export const exportSearchMessages = (exportPayload: ExportPayload, searchId: str
 
 export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, filename?: string) => {
   const { url } = ApiRoutes.MessagesController.exportSearchType(searchId, searchTypeId, filename);
+
   return fetchFile('POST', qualifyUrl(url), exportPayload)
     .then((result: string) => downloadCSV(result, filename))
     .catch(() => {

@@ -30,15 +30,18 @@ class NotificationsForm extends React.Component {
 
   toggleAddNotificationForm = () => {
     const { showAddNotificationForm } = this.state;
+
     this.setState({ showAddNotificationForm: !showAddNotificationForm });
   };
 
   handleAssignNotification = (nextNotification) => {
     const { onChange, eventDefinition } = this.props;
     const nextNotifications = lodash.cloneDeep(eventDefinition.notifications);
+
     nextNotifications.push({
       notification_id: nextNotification,
     });
+
     onChange('notifications', nextNotifications);
     this.toggleAddNotificationForm();
   };
@@ -47,6 +50,7 @@ class NotificationsForm extends React.Component {
     const { onChange, eventDefinition } = this.props;
     const notification = eventDefinition.notifications.find((n) => n.notification_id === notificationId);
     const nextNotifications = lodash.without(eventDefinition.notifications, notification);
+
     onChange('notifications', nextNotifications);
   };
 
