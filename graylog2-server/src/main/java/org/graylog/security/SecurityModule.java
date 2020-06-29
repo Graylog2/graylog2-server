@@ -17,6 +17,8 @@
 package org.graylog.security;
 
 import com.google.inject.multibindings.OptionalBinder;
+import org.graylog.security.shares.DefaultGranteeService;
+import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
 
 public class SecurityModule extends PluginModule {
@@ -27,6 +29,9 @@ public class SecurityModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), GrantPermissionResolver.class)
                 .setDefault().to(DefaultGrantPermissionResolver.class);
+
+        OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
+                .setDefault().to(DefaultGranteeService.class);
 
         // Add all rest resources in this package
         // TODO: Check if we need to use addRestResource() here for the final version to make sure
