@@ -105,7 +105,7 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => {
   return (
     <ProgressWrap className={className}>
       {bars.map((bar, index) => {
-        const { label, animated, bsStyle, striped, value } = bar;
+        const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
 
         return (
           <Bar role="progressbar"
