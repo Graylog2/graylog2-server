@@ -6,13 +6,24 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.WriteRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetaData;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
+
+import java.util.Map;
 
 public class ClientES7 implements Client {
     private final ElasticsearchClient client;
@@ -82,7 +93,10 @@ public class ClientES7 implements Client {
 
     @Override
     public void deleteTemplates(String... templates) {
-
+        for (String template : templates) {
+            final DeleteIndexTemplateRequest deleteIndexTemplateRequest = new DeleteIndexTemplateRequest(template);
+            client.execute((c, requestOptions) -> c.indices().deleteTemplate(deleteIndexTemplateRequest, requestOptions));
+        }
     }
 
     @Override
@@ -101,11 +115,37 @@ public class ClientES7 implements Client {
 
     @Override
     public void bulkIndex(BulkIndexRequest bulkIndexRequest) {
+        final BulkRequest bulkRequest = new BulkRequest();
+        bulkRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+        bulkIndexRequest.requests()
+                .forEach((indexName, documents) -> documents
+                        .forEach(doc -> bulkRequest.add(createIndexRequest(indexName, doc))));
+        client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions));
+    }
 
+    private IndexRequest createIndexRequest(String indexName, Map<String, Object> source) {
+        return new IndexRequest(indexName)
+                .source(source);
     }
 
     @Override
     public void cleanUp() {
+        deleteIndices(existingIndices());
+        deleteTemplates(existingTemplates());
+    }
 
+    private String[] existingTemplates() {
+        final GetIndexTemplatesRequest getIndexTemplatesRequest = new GetIndexTemplatesRequest("*");
+        final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(getIndexTemplatesRequest, requestOptions));
+        return result.getIndexTemplates().stream()
+                .map(IndexTemplateMetaData::name)
+                .toArray(String[]::new);
+    }
+
+    private String[] existingIndices() {
+        final GetIndexRequest getIndexRequest = new GetIndexRequest("*");
+        getIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
+        final GetIndexResponse result = client.execute((c, requestOptions) -> c.indices().get(getIndexRequest, requestOptions));
+        return result.getIndices();
     }
 }

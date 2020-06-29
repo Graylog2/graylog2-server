@@ -74,6 +74,6 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     }
 
     public ElasticsearchClient elasticsearchClient() {
-        return null;
+        return this.elasticsearchClient;
     }
 }
