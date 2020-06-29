@@ -58,6 +58,7 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
                               onSubmit={(formData) => _addCollborator(formData, entityGRN)} />
             <StyledGranteesList activeShares={entityShareState.activeShares}
                                 availableRoles={entityShareState.availableRoles}
+                                entityGRN={entityGRN}
                                 availableGrantees={entityShareState.availableGrantees}
                                 selectedGranteeRoles={entityShareState.selectedGranteeRoles} />
             {/* sharable url box */}

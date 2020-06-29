@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import type { AvailableGrantees, ActiveShares, AvailableRoles, SelectedGranteeRoles } from 'logic/permissions/EntityShareState';
@@ -13,11 +12,12 @@ type Props = {
   activeShares: ActiveShares,
   availableRoles: AvailableRoles,
   availableGrantees: AvailableGrantees,
+  entityGRN: GRN,
   selectedGranteeRoles: SelectedGranteeRoles,
   className?: string,
 };
 
-const GranteesList = ({ activeShares, availableRoles, availableGrantees, selectedGranteeRoles, className }: Props) => {
+const GranteesList = ({ entityGRN, activeShares, availableRoles, availableGrantees, selectedGranteeRoles, className }: Props) => {
   return (
     <div className={className}>
       {activeShares.map(({ grantee: granteeId, role: roleId }) => {
@@ -27,6 +27,7 @@ const GranteesList = ({ activeShares, availableRoles, availableGrantees, selecte
           <GranteesListItem availableRoles={availableRoles}
                             key={grantee.id}
                             grantee={grantee}
+                            entityGRN={entityGRN}
                             granteeRoleId={roleId} />
         );
       })}
@@ -36,6 +37,7 @@ const GranteesList = ({ activeShares, availableRoles, availableGrantees, selecte
         return grantee && (
           <GranteesListItem availableRoles={availableRoles}
                             grantee={grantee}
+                            entityGRN={entityGRN}
                             key={grantee.id}
                             granteeRoleId={roleId} />
         );
