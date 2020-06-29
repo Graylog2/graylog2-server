@@ -10,10 +10,13 @@ const RemoveFromAllTablesActionHandler: FieldActionHandler = ({ field }) => {
       const newConfig = widget.config.toBuilder()
         .fields(newFields)
         .build();
+
       return widget.toBuilder().config(newConfig).build();
     }
+
     return widget;
   });
+
   return WidgetActions.updateWidgets(newWidgets);
 };
 

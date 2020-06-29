@@ -7,7 +7,6 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 
 import PipelineForm from './PipelineForm';
 
-
 class PipelineDetails extends React.Component {
   static propTypes = {
     pipeline: PropTypes.object,
@@ -22,6 +21,7 @@ class PipelineDetails extends React.Component {
     }
 
     const { pipeline } = this.props;
+
     return (
       <div>
         <Row>

@@ -24,6 +24,7 @@ class RuntimeErrorBoundary extends React.Component<Props> {
 
   render() {
     const { children } = this.props;
+
     return children;
   }
 }

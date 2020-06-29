@@ -44,14 +44,17 @@ jest.mock('views/stores/ViewStore', () => ({
     ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
   ),
 }));
+
 jest.mock('stores/inputs/InputsStore', () => MockStore('listen', 'getInitialState'));
 jest.mock('actions/inputs/InputsActions', () => ({ list: jest.fn(() => Promise.resolve()) }));
 jest.mock('views/stores/SelectedFieldsStore', () => ({
   SelectedFieldsStore: MockStore('listen', 'selectedFields'),
 }));
+
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
 }));
+
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
     'listen',
@@ -74,11 +77,13 @@ jest.mock('views/stores/SearchStore', () => ({
     execute: { completed: { listen: jest.fn() } },
   },
 }));
+
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
     disable: jest.fn(),
   },
 }));
+
 jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {
@@ -98,6 +103,7 @@ describe('MessageList', () => {
     ],
     total: 1,
   };
+
   beforeEach(() => {
     // eslint-disable-next-line import/namespace
     messageList.MessageTableEntry = MessageTableEntry;
@@ -109,6 +115,7 @@ describe('MessageList', () => {
 
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
+
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
     const wrapper1 = mount(<MessageList editing
@@ -120,12 +127,14 @@ describe('MessageList', () => {
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
+
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(<MessageList editing
                                         data={data}
                                         config={emptyConfig}
                                         fields={Immutable.List(fields)}
                                         setLoadingState={() => {}} />);
+
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
 
@@ -139,12 +148,14 @@ describe('MessageList', () => {
                                        setLoadingState={() => {}} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
+
     expect(td.props().children).toMatchSnapshot();
   });
 
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
+
     mount(<MessageList editing
                        data={data}
                        fields={Immutable.List([])}
@@ -161,7 +172,9 @@ describe('MessageList', () => {
                    config={config}
                    setLoadingState={() => {}} />
     );
+
     mount(<Component />);
+
     expect(InputsActions.list).toHaveBeenCalled();
   });
 
@@ -174,7 +187,9 @@ describe('MessageList', () => {
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
+
     wrapper.find('[aria-label="Next"]').simulate('click');
+
     expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange);
   });
 
@@ -186,7 +201,9 @@ describe('MessageList', () => {
                                        fields={Immutable.List([])}
                                        config={config}
                                        setLoadingState={() => {}} />);
+
     wrapper.find('[aria-label="Next"]').simulate('click');
+
     expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
   });
 
@@ -220,8 +237,10 @@ describe('MessageList', () => {
                    onSortChange={() => {}}
                    setLoadingState={() => {}} />
     );
+
     return new Promise((resolve) => {
       const onRenderComplete = jest.fn(resolve);
+
       mount((
         <RenderCompletionCallback.Provider value={onRenderComplete}>
           <Component />

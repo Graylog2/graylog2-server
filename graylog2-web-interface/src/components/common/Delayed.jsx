@@ -10,6 +10,7 @@ type Props = {
 
 const Delayed = ({ children, delay }: Props) => {
   const [delayFinished, setDelayFinished] = useState(delay <= 0);
+
   useEffect(() => {
     if (delay <= 0) {
       return () => {};

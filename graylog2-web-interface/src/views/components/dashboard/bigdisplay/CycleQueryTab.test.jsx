@@ -26,12 +26,15 @@ describe('CycleQueryTab', () => {
   const view = View.create().toBuilder().search(search).build();
 
   beforeEach(() => { jest.clearAllMocks(); });
+
   afterEach(cleanup);
 
   it('does not return markup', () => {
     const { container } = render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
+
     expect(container.firstChild).toEqual(null);
   });
+
   it('should not switch to anything before interval', () => {
     render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
 
@@ -39,6 +42,7 @@ describe('CycleQueryTab', () => {
 
     expect(ViewActions.selectQuery).not.toHaveBeenCalled();
   });
+
   it('should switch to next tab after interval', () => {
     render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
 
@@ -46,6 +50,7 @@ describe('CycleQueryTab', () => {
 
     expect(ViewActions.selectQuery).toHaveBeenCalledWith('baz');
   });
+
   it('should switch to first tab if current one is the last', () => {
     render(<CycleQueryTab view={view} activeQuery="baz" interval={1} tabs={[0, 1, 2]} />);
 
@@ -53,6 +58,7 @@ describe('CycleQueryTab', () => {
 
     expect(ViewActions.selectQuery).toHaveBeenCalledWith('foo');
   });
+
   it('should switch to next tab skipping gaps after interval', () => {
     render(<CycleQueryTab view={view} activeQuery="foo" interval={1} tabs={[0, 2]} />);
 
@@ -60,6 +66,7 @@ describe('CycleQueryTab', () => {
 
     expect(ViewActions.selectQuery).toHaveBeenCalledWith('baz');
   });
+
   it('should switch to next tab defaulting to all tabs if `tabs` prop` is left out', () => {
     render(<CycleQueryTab view={view} activeQuery="foo" tabs={[1]} interval={1} />);
 
@@ -67,6 +74,7 @@ describe('CycleQueryTab', () => {
 
     expect(ViewActions.selectQuery).toHaveBeenCalledWith('bar');
   });
+
   it('triggers tab change after the correct interval has passed', async () => {
     render(<CycleQueryTab view={view} activeQuery="foo" interval={42} />);
 
@@ -74,8 +82,10 @@ describe('CycleQueryTab', () => {
 
     expect(ViewActions.selectQuery).toHaveBeenCalledTimes(1);
   });
+
   it('does not trigger after unmounting', () => {
     const { unmount } = render(<CycleQueryTab view={view} activeQuery="foo" interval={42} />);
+
     unmount();
 
     jest.advanceTimersByTime(42000);

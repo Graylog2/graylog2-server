@@ -24,6 +24,7 @@ const PipelineConnectionsStore = Reflux.createStore({
 
     const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.list().url);
     const promise = fetch('GET', url);
+
     promise.then((response) => {
       this.connections = response;
       this.trigger({ connections: response });
@@ -37,6 +38,7 @@ const PipelineConnectionsStore = Reflux.createStore({
       pipeline_ids: connection.pipelines,
     };
     const promise = fetch('POST', url, updatedConnection);
+
     promise.then(
       (response) => {
         if (this.connections.filter((c) => c.stream_id === response.stream_id)[0]) {
@@ -59,6 +61,7 @@ const PipelineConnectionsStore = Reflux.createStore({
       stream_ids: reverseConnection.streams,
     };
     const promise = fetch('POST', url, updatedConnection);
+
     promise.then(
       (response) => {
         response.forEach((connection) => {

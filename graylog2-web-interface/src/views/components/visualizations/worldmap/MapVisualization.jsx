@@ -65,11 +65,14 @@ class MapVisualization extends React.Component {
   _formatMarker = (coordinates, value, min, max, radiusSize, increment, color, name, keys) => {
     // eslint-disable-next-line no-restricted-globals
     const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
+
     if (formattedCoordinates.length !== 2) {
       return null;
     }
+
     const radius = this._getBucket(value, radiusSize, min, max, increment);
     const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
+
     return (
       <CircleMarker key={`${name}-${coordinates}`}
                     center={formattedCoordinates}
@@ -110,6 +113,7 @@ class MapVisualization extends React.Component {
   _handleRenderComplete = () => {
     if (this._areTilesReady && this._isMapReady) {
       const { onRenderComplete } = this.props;
+
       onRenderComplete();
     }
   }
@@ -130,11 +134,13 @@ class MapVisualization extends React.Component {
     const noOfKeys = data.length;
     const chromaScale = chroma.scale('Spectral');
     const markers = [];
+
     data.forEach(({ keys, name, values }, idx) => {
       const y = Object.values(values);
       const min = Math.min(...y);
       const max = Math.max(...y);
       const color = chromaScale(idx * (1 / noOfKeys));
+
       Object.entries(values)
         .forEach(([coord, value], valueIdx) => markers
           .push(this._formatMarker(coord, value, min, max, markerRadiusSize, markerRadiusIncrementSize, color, name, keys[valueIdx])));
@@ -163,6 +169,5 @@ class MapVisualization extends React.Component {
     );
   }
 }
-
 
 export default MapVisualization;

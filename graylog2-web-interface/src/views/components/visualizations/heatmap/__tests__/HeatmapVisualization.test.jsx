@@ -12,7 +12,6 @@ import * as fixtures from './HeatmapVisualization.fixtures';
 
 import HeatmapVisualization from '../HeatmapVisualization';
 
-
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
 describe('HeatmapVisualization', () => {
@@ -50,6 +49,7 @@ describe('HeatmapVisualization', () => {
                                                 toggleEdit={() => {}}
                                                 width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', plotLayout);
     expect(genericPlot).toHaveProp('chartData', plotChartData);
   });

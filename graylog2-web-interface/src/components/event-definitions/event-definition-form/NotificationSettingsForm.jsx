@@ -39,12 +39,14 @@ class NotificationSettingsForm extends React.Component {
   propagateChanges = (key, value) => {
     const { eventDefinition, onSettingsChange } = this.props;
     const nextNotificationSettings = lodash.cloneDeep(eventDefinition.notification_settings);
+
     nextNotificationSettings[key] = value;
     onSettingsChange('notification_settings', nextNotificationSettings);
   };
 
   handleGracePeriodChange = (nextValue, nextUnit, enabled) => {
     const durationInMs = enabled ? moment.duration(lodash.max([nextValue, 0]), nextUnit).asMilliseconds() : 0;
+
     this.propagateChanges('grace_period_ms', durationInMs);
     this.setState({ gracePeriodDuration: nextValue, gracePeriodUnit: nextUnit });
   };
@@ -52,12 +54,14 @@ class NotificationSettingsForm extends React.Component {
   handleBacklogSizeChange = (event) => {
     const { name } = event.target;
     const value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
+
     this.setState({ [lodash.camelCase(name)]: value });
     this.propagateChanges(name, lodash.max([Number(value), 0]));
   };
 
   toggleBacklogSize = () => {
     const { isBacklogSizeEnabled, backlogSize } = this.state;
+
     this.setState({ isBacklogSizeEnabled: !isBacklogSizeEnabled });
     this.propagateChanges('backlog_size', (isBacklogSizeEnabled ? 0 : backlogSize));
   };

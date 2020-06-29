@@ -46,6 +46,7 @@ class StreamRuleList extends React.Component {
                     streamRuleTypes={streamRuleTypes} />
       ));
     }
+
     return <ListGroupItem>No rules defined.</ListGroupItem>;
   };
 

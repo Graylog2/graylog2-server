@@ -45,14 +45,17 @@ const CreateExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get.triggerPromise(params.inputId);
     const { exampleIndex, exampleId } = this.state;
+
     MessagesActions.loadMessage.triggerPromise(exampleIndex, exampleId)
       .then((message) => this.setState({ exampleMessage: message }));
   },
 
   _isLoading() {
     const { exampleMessage, input } = this.state;
+
     return !(input && exampleMessage);
   },
 
@@ -60,6 +63,7 @@ const CreateExtractorsPage = createReactClass({
     let url;
     const { params } = this.props;
     const { input } = this.state;
+
     if (input.global) {
       url = Routes.global_input_extractors(params.inputId);
     } else {

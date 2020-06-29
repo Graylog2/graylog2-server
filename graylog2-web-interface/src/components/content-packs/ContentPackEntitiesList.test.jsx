@@ -54,6 +54,7 @@ describe('<ContentPackEntitiesList />', () => {
   it('should render with empty entities', () => {
     const emptyContentPack = { entities: [] };
     const wrapper = mount(<ContentPackEntitiesList contentPack={emptyContentPack} readOnly />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -62,16 +63,22 @@ describe('<ContentPackEntitiesList />', () => {
 
     const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack}
                                                    appliedParameter={appliedParameter} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should filter entities', () => {
     const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack} />);
+
     expect(wrapper.find("td[children='test']").exists()).toBe(true);
+
     wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
     wrapper.find('form').simulate('submit');
+
     expect(wrapper.find("td[children='test']").exists()).toBe(false);
+
     wrapper.find("button[children='Reset']").simulate('click');
+
     expect(wrapper.find("td[children='test']").exists()).toBe(true);
   });
 });

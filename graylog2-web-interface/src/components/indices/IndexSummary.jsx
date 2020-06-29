@@ -19,6 +19,7 @@ class IndexSummary extends React.Component {
 
   _formatLabels = (index) => {
     const labels = [];
+
     if (index.is_deflector) {
       labels.push(<Label key={`${this.props.name}-deflector-label`} bsStyle="primary">active write index</Label>);
     }
@@ -40,9 +41,11 @@ class IndexSummary extends React.Component {
     }
 
     const sizes = this.props.index.size;
+
     if (sizes) {
       const count = sizes.events;
       const { deleted } = sizes;
+
       if (count === 0 || count - deleted === 0) {
         return 'Index does not contain any messages.';
       }
@@ -68,6 +71,7 @@ class IndexSummary extends React.Component {
     if (this.state.showDetails) {
       return <span className="index-more-actions"><Icon name="caret-down" /> Hide Details / Actions</span>;
     }
+
     return <span className="index-more-actions"><Icon name="caret-right" /> Show Details / Actions</span>;
   };
 
@@ -78,6 +82,7 @@ class IndexSummary extends React.Component {
 
   render() {
     const { index } = this.props;
+
     return (
       <span>
         <h2>

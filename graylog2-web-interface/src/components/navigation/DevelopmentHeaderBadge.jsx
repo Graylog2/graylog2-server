@@ -11,6 +11,7 @@ type Props = {
 
 const DevelopmentHeaderBadge = ({ smallScreen }: Props) => {
   const smallScreenClass = smallScreen ? 'small-scrn-badge' : '';
+
   return AppConfig.gl2DevMode() ? <Badge className={`${smallScreenClass} dev-badge`} bsStyle="danger">DEV</Badge> : null;
 };
 

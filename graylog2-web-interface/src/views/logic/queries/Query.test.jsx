@@ -39,11 +39,13 @@ describe('Query', () => {
     it('returns empty set of stream ids from empty filter', () => {
       expect(filtersToStreamSet(null)).toEqual(Set());
     });
+
     it('returns set of stream ids from simple filter', () => {
       expect(filtersToStreamSet(singleFilter)).toEqual(Set([
         '000000000000000000000001',
       ]));
     });
+
     it('returns set of stream ids from two-level filter', () => {
       expect(filtersToStreamSet(filter)).toEqual(Set([
         '000000000000000000000001',

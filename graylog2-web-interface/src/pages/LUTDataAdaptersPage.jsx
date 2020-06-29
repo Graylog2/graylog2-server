@@ -27,6 +27,7 @@ class LUTDataAdaptersPage extends React.Component {
   componentDidUpdate(prevProps) {
     const { location: { pathname } } = this.props;
     const { location: { pathname: prevPathname } } = prevProps;
+
     if (pathname !== prevPathname) {
       this._loadData(this.props);
     }
@@ -42,9 +43,11 @@ class LUTDataAdaptersPage extends React.Component {
     this.errorStatesTimer = setInterval(() => {
       const { dataAdapters } = this.props;
       let names = null;
+
       if (dataAdapters) {
         names = dataAdapters.map((t) => t.name);
       }
+
       if (names) {
         LookupTablesActions.getErrors(null, null, names || null);
       }
@@ -60,7 +63,9 @@ class LUTDataAdaptersPage extends React.Component {
 
   _loadData = (props) => {
     const { pagination } = props;
+
     this._stopErrorStatesTimer();
+
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
     } else if (this._isCreating(props)) {

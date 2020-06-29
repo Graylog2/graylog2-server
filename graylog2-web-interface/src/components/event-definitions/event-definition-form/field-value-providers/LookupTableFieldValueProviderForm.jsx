@@ -46,6 +46,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
     const { config, onChange } = this.props;
     const nextProviders = lodash.cloneDeep(config.providers);
     const lookupProvider = nextProviders.find((provider) => provider.type === LookupTableFieldValueProviderForm.type);
+
     lookupProvider[key] = value;
     onChange({ ...config, providers: nextProviders });
   };
@@ -53,6 +54,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
+
     this.propagateChanges(name, value);
   };
 

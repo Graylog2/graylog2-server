@@ -31,10 +31,12 @@ const TimesList = createReactClass({
     if (!this.state.system) {
       return <Spinner />;
     }
+
     const { time } = this.state;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const { currentUser } = this.state;
     const serverTimezone = this.state.system.timezone;
+
     return (
       <Row className="content">
         <Col md={12}>

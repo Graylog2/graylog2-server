@@ -91,6 +91,7 @@ const InputListItem = createReactClass({
     }
 
     let showMetricsMenuItem;
+
     if (!this.props.input.global) {
       showMetricsMenuItem = (
         <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>

@@ -7,5 +7,6 @@ export default (props) => {
     .map((c) => c.component)
     .filter((c) => c) || [];
   const Component = components[0];
+
   return <Component {...props} />;
 };

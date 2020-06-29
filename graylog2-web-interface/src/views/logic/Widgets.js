@@ -20,10 +20,13 @@ const _findWidgetDefinition = (type) => PluginStore.exports(widgetsKey)
 
 export function widgetDefinition(type: string) {
   const typeDefinition = _findWidgetDefinition(type);
+
   if (typeDefinition) {
     return typeDefinition;
   }
+
   const defaultType = _findWidgetDefinition('default');
+
   if (defaultType) {
     return defaultType;
   }

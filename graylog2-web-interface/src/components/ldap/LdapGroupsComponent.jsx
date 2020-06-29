@@ -47,6 +47,7 @@ class LdapGroupsComponent extends React.Component {
           }
         },
       );
+
     RolesStore.loadRoles().then((roles) => this.setState({ roles: Immutable.Set(roles) }));
   }
 
@@ -115,6 +116,7 @@ class LdapGroupsComponent extends React.Component {
     if (this._isLoading()) {
       return <Spinner />;
     }
+
     const { groups, groupsErrorMessage, mapping, roles } = this.state;
     const { onCancel } = this.props;
 

@@ -19,6 +19,7 @@ describe('TransformKeys', () => {
       rollup: false,
     }];
     const result = transformKeys([], [])(rows);
+
     expect(result).toEqual(rows);
   });
 
@@ -30,6 +31,7 @@ describe('TransformKeys', () => {
       rollup: false,
     }];
     const result = transformKeys([Pivot.create('foo', 'value')], [Pivot.create('bar', 'value')])(rows);
+
     expect(result).toEqual(rows);
   });
 

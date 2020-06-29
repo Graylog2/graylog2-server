@@ -70,6 +70,7 @@ const AlertCondition = createReactClass({
     }
 
     let actions = [];
+
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
         <Button key="test-button" bsStyle="info" onClick={this._openTestModal}>Test</Button>,

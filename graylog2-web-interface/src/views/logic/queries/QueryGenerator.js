@@ -13,5 +13,6 @@ export default (streamId: ?string, id: QueryId = uuid()): Query => {
     .id(id)
     .query(createElasticsearchQueryString())
     .timerange(DEFAULT_TIMERANGE);
+
   return streamFilter ? builder.filter(streamFilter).build() : builder.build();
 };

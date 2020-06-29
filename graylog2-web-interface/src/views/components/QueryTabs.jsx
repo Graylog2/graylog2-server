@@ -89,6 +89,7 @@ class QueryTabs extends React.Component<Props> {
                     openEditModal={this.openTitleEditModal}
                     title={title} />
       );
+
       return (
         <Tab eventKey={id}
              key={id}

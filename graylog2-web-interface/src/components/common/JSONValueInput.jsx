@@ -28,17 +28,21 @@ class JSONValueInput extends React.Component {
       // Check that allowedTypes is an array of type values
       const values = OPTIONS.map((option) => option.value);
       const errors = [];
+
       if (!(props[propName] instanceof Array)) {
         return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`);
       }
+
       props[propName].forEach((p) => {
         if (values.indexOf(p) < 0) {
           errors.push(p);
         }
       });
+
       if (errors.length > 0) {
         return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected array of ${values} but got invalid ${errors}`);
       }
+
       return null;
     },
     labelClassName: PropTypes.string,
@@ -74,6 +78,7 @@ class JSONValueInput extends React.Component {
 
   _onUpdate = (e) => {
     const { value } = e.target;
+
     this.setState({ value: value }, this._propagateState);
   };
 

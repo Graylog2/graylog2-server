@@ -9,6 +9,7 @@ describe('Delayed', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
+
   afterEach(cleanup);
 
   const HelloWorld = () => <span>Hello World!</span>;
@@ -19,6 +20,7 @@ describe('Delayed', () => {
         <HelloWorld />
       </Delayed>
     ));
+
     expect(getByText('Hello World!')).not.toBeNull();
   });
 
@@ -28,6 +30,7 @@ describe('Delayed', () => {
         <HelloWorld />
       </Delayed>
     ));
+
     expect(queryByText('Hello World!')).toBeNull();
 
     act(() => jest.advanceTimersByTime(200));

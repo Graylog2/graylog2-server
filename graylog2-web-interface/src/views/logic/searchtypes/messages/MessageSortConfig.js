@@ -20,6 +20,7 @@ export default class MessageSortConfig {
 
   toJSON(): MessageSortConfigJson {
     const { field, direction } = this._value;
+
     return {
       field,
       order: direction === Direction.Ascending ? 'ASC' : 'DESC',
@@ -28,6 +29,7 @@ export default class MessageSortConfig {
 
   static fromJSON({ field, order }: MessageSortConfigJson) {
     const direction = Direction.fromJSON(order === 'ASC' ? 'Ascending' : 'Descending');
+
     return new MessageSortConfig(field, direction);
   }
 }

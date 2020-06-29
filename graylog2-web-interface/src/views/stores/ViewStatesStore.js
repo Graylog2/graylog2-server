@@ -41,6 +41,7 @@ export const ViewStatesStore = singletonStore(
     },
     onViewStoreChange({ view }) {
       const states = get(view, 'state', Immutable.Map());
+
       if (!isEqualWith(states, this.states, Immutable.is)) {
         this.states = states;
         this._trigger();
@@ -51,29 +52,38 @@ export const ViewStatesStore = singletonStore(
         if (value !== undefined) {
           throw new Error(`Unable to add view state for id <${queryId}>, it is already present.`);
         }
+
         return viewState;
       });
       const promise = ViewActions.state(newState).then(() => viewState);
+
       ViewStatesActions.add.promise(promise);
+
       return promise;
     },
     duplicate(oldQueryId: QueryId) {
       const newViewState = this.states.get(oldQueryId).duplicate();
       const promise = Promise.resolve(newViewState);
+
       ViewStatesActions.duplicate.promise(promise);
+
       return promise;
     },
     remove(queryId: QueryId) {
       const oldState = this.states.get(queryId);
       const newState = this.states.remove(queryId);
       const promise = ViewActions.state(newState).then(() => oldState);
+
       ViewStatesActions.remove.promise(promise);
+
       return promise;
     },
     update(queryId: QueryId, viewState: ViewState) {
       const newState = this.states.set(queryId, viewState);
       const promise = ViewActions.state(newState).then(() => viewState);
+
       ViewStatesActions.update.promise(promise);
+
       return promise;
     },
     _state() {

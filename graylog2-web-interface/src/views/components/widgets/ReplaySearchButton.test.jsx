@@ -17,10 +17,13 @@ type OptionalOverrides = {
 
 describe('ReplaySearchButton', () => {
   afterEach(cleanup);
+
   it('renders play button', () => {
     const { getByTitle } = render(<ReplaySearchButton />);
+
     expect(getByTitle('Replay search')).not.toBeNull();
   });
+
   describe('generates link', () => {
     const renderWithContext = ({ query, timerange, streams }: OptionalOverrides = {}) => {
       const { getByTitle } = render((
@@ -36,8 +39,10 @@ describe('ReplaySearchButton', () => {
           )}
         </DrilldownContext.Consumer>
       ));
+
       return asElement(getByTitle('Replay search'), HTMLAnchorElement);
     };
+
     it('from default drilldown context', () => {
       const { getByTitle } = render(<ReplaySearchButton />);
       const button = asElement(getByTitle('Replay search'), HTMLAnchorElement);

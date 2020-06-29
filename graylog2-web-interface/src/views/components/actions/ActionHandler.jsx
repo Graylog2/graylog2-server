@@ -51,8 +51,10 @@ export function createHandlerFor(action: ActionDefinition, setActionComponents: 
   if (action.handler) {
     return action.handler;
   }
+
   if (action.component) {
     const ActionComponent = action.component;
+
     // eslint-disable-next-line no-unused-vars
     return ({ queryId, field, value, type }) => {
       const id = uuid();
@@ -65,9 +67,12 @@ export function createHandlerFor(action: ActionDefinition, setActionComponents: 
                          value={value}
                          type={type} />
       );
+
       setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents }));
+
       return Promise.resolve();
     };
   }
+
   throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component'.`);
 }

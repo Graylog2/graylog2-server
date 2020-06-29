@@ -40,6 +40,7 @@ const EventsConfig = createReactClass({
 
   getInitialState() {
     const { config } = this.props;
+
     return {
       config: config,
     };
@@ -65,6 +66,7 @@ const EventsConfig = createReactClass({
   _saveConfig() {
     const { updateConfig } = this.props;
     const { config } = this.state;
+
     updateConfig(config).then(() => {
       this._closeModal();
     });
@@ -73,12 +75,14 @@ const EventsConfig = createReactClass({
   _propagateChanges(key, value) {
     const { config } = this.state;
     const nextConfig = lodash.cloneDeep(config);
+
     nextConfig[key] = value;
     this.setState({ config: nextConfig });
   },
 
   _onSearchTimeoutUpdate(nextValue, nextUnit, enabled) {
     const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+
     if (this._searchTimeoutValidator(durationInMs)) {
       this._propagateChanges('events_search_timeout', durationInMs);
     }
@@ -86,6 +90,7 @@ const EventsConfig = createReactClass({
 
   _onRetryPeriodUpdate(nextValue, nextUnit, enabled) {
     const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+
     if (this._notificationsRetryValidator(durationInMs)) {
       this._propagateChanges('events_notification_retry_period', durationInMs);
     }
@@ -101,16 +106,21 @@ const EventsConfig = createReactClass({
 
   _onBacklogUpdate(event) {
     const value = FormUtils.getValueFromInput(event.target);
+
     this._propagateChanges('events_notification_default_backlog', value);
   },
 
   _onCatchUpWindowUpdate(nextValue, nextUnit, nextEnabled) {
     const { config } = this.state;
+
     if (config.events_catchup_window === 0 && nextEnabled) {
       this._propagateChanges('events_catchup_window', DEFAULT_CATCH_UP_WINDOW);
+
       return;
     }
+
     const catchupWindowinMs = nextEnabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+
     this._propagateChanges('events_catchup_window', catchupWindowinMs);
   },
 
@@ -124,6 +134,7 @@ const EventsConfig = createReactClass({
     const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
     const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
     const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
+
     return (
       <div>
         <h2>Events System</h2>

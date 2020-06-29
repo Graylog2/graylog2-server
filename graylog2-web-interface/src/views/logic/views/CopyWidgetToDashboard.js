@@ -10,13 +10,13 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 
 type QueryId = string;
 
-
 const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
   const viewState = dashboard.state.get(dashboardQueryId);
   const newViewState = viewState.toBuilder()
     .widgets(viewState.widgets.push(widget))
     .build();
+
   return dashboard.toBuilder()
     .state(dashboard.state.set(dashboardQueryId, newViewState))
     .build();

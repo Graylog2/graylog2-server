@@ -66,6 +66,7 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -80,6 +81,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={data} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -95,6 +97,7 @@ describe('DataTable', () => {
 
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }} />);
+
     expect(wrapper).toIncludeText('hulud.net');
   });
 
@@ -109,6 +112,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={data} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -138,6 +142,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={protocolData} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -221,11 +226,13 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
     const onRenderComplete = jest.fn();
+
     mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedDataTable config={config} />
       </RenderCompletionCallback.Provider>
     ));
+
     expect(onRenderComplete).toHaveBeenCalled();
   });
 });

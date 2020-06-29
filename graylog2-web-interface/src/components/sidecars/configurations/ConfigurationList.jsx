@@ -25,12 +25,14 @@ class ConfigurationList extends React.Component {
 
   _headerCellFormatter = (header) => {
     const className = (header === 'Actions' ? style.actionsColumn : '');
+
     return <th className={className}>{header}</th>;
   };
 
   _collectorConfigurationFormatter = (configuration) => {
     const { collectors, onClone, onDelete, validateConfiguration } = this.props;
     const configurationCollector = collectors.find((collector) => collector.id === configuration.collector_id);
+
     return (
       <ConfigurationRow key={configuration.id}
                         configuration={configuration}

@@ -27,29 +27,35 @@ const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
   const [inputs, setInputs] = useState(Immutable.Map);
   const [streams, setStreams] = useState();
   const [allStreams, setAllStreams] = useState();
+
   useEffect(() => { NodesActions.list(); }, []);
   useEffect(() => {
     MessagesActions.loadMessage(index, messageId)
       .then((_message) => {
         setMessage(_message);
+
         return _message.source_input_id ? InputsActions.get(_message.source_input_id) : Promise.resolve();
       })
       .then((input) => {
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
+
           setInputs(newInputs);
         }
       });
   }, [index, messageId, setMessage, setInputs]);
+
   useEffect(() => {
     StreamsStore.listStreams().then((newStreams) => {
       if (newStreams) {
         const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
+
         setStreams(Immutable.Map(streamsMap));
         setAllStreams(Immutable.List(newStreams));
       }
     });
   }, [setStreams, setAllStreams]);
+
   const isLoaded = useMemo(() => (message !== undefined
     && streams !== undefined
     && inputs !== undefined
@@ -74,6 +80,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
       </DocumentTitle>
     );
   }
+
   return <Spinner data-testid="spinner" />;
 };
 

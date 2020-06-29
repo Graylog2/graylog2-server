@@ -16,6 +16,7 @@ describe('HighlightingRule', () => {
 
   it('should display field and value of rule', () => {
     const wrapper = mount(<HighlightingRule rule={rule} />);
+
     expect(wrapper).toIncludeText('response_time');
     expect(wrapper).toIncludeText('250');
   });
@@ -51,6 +52,7 @@ describe('HighlightingRule', () => {
   describe('rule removal:', () => {
     let oldConfirm = null;
     let deleteIcon;
+
     beforeEach(() => {
       oldConfirm = window.confirm;
       window.confirm = jest.fn(() => false);
@@ -60,20 +62,27 @@ describe('HighlightingRule', () => {
 
       deleteIcon = wrapper.find('span[title="Remove this Highlighting Rule"]');
     });
+
     afterEach(() => {
       window.confirm = oldConfirm;
     });
+
     it('asks for confirmation before rule is removed', () => {
       deleteIcon.simulate('click');
+
       expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove this highlighting?');
     });
+
     it('does not remove rule if confirmation was cancelled', () => {
       deleteIcon.simulate('click');
+
       expect(HighlightingRulesActions.remove).not.toHaveBeenCalled();
     });
+
     it('removes rule rule if confirmation was acknowledged', () => {
       window.confirm = jest.fn(() => true);
       deleteIcon.simulate('click');
+
       expect(HighlightingRulesActions.remove).toHaveBeenCalledWith(rule);
     });
   });

@@ -41,14 +41,17 @@ const _getInitialWidgetFields = (selectedWidget) => {
   if (selectedWidget.config.showMessageRow) {
     return [...new Set([...selectedWidget.config.fields, 'message'])];
   }
+
   return selectedWidget.config.fields;
 };
 
 const _getInitialFields = (selectedWidget) => {
   let initialFields = DEFAULT_FIELDS;
+
   if (selectedWidget) {
     initialFields = _getInitialWidgetFields(selectedWidget);
   }
+
   return initialFields.map((field) => ({ field }));
 };
 

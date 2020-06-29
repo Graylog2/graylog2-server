@@ -50,6 +50,7 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata, listHeight
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
   const handleSearchReset = () => setFilter(undefined);
+
   return (
     <Container>
       <FilterForm className="form-inline" onSubmit={(e) => e.preventDefault()}>
@@ -108,6 +109,7 @@ const FieldListWithContext = (props) => (
       const allFields = fieldTypes?.all;
       const queryFields = fieldTypes?.queryFields;
       const activeQueryFields = queryFields?.get(activeQuery, allFields);
+
       return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
     }}
   </FieldTypesContext.Consumer>

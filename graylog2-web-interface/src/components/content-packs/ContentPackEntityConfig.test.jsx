@@ -17,6 +17,7 @@ describe('<ContentPackEntityConfig />', () => {
     const wrapper = mount(<ContentPackEntityConfig entity={entity}
                                                    appliedParameter={appliedParameter}
                                                    parameters={parameter} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 });

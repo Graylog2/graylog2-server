@@ -6,8 +6,10 @@ export default class ContentPackRevisions {
   constructor(contentPackRevision) {
     this._value = Object.keys(contentPackRevision).reduce((acc, rev) => {
       const contentPack = contentPackRevision[rev];
+
       /* eslint-disable-next-line no-return-assign */
       acc[parseInt(rev, 10)] = ContentPack.fromJSON(contentPack);
+
       return acc;
     }, {});
   }

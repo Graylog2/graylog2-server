@@ -40,6 +40,7 @@ class ConfigurationForm extends React.Component {
   componentWillReceiveProps(props) {
     const { values = {} } = this.state || {};
     const newState = this._copyStateFromProps(props);
+
     newState.values = $.extend(newState.values, values);
     this.setState(newState);
   }
@@ -49,9 +50,11 @@ class ConfigurationForm extends React.Component {
     const { values } = this.state;
     const { includeTitleField, typeName } = this.props;
     const { configFields, titleValue } = this.state;
+
     if (includeTitleField) {
       data.title = titleValue;
     }
+
     data.type = typeName;
     data.configuration = {};
 
@@ -88,6 +91,7 @@ class ConfigurationForm extends React.Component {
     const x2pos = configFields[x2.name].position || DEFAULT_POSITION;
 
     let diff = x1pos - x2pos;
+
     if (!diff) {
       diff = configFields[x1.name].is_optional - configFields[x2.name].is_optional;
     }
@@ -104,7 +108,9 @@ class ConfigurationForm extends React.Component {
     const data = this.getValue();
 
     const { submitAction } = this.props;
+
     submitAction(data);
+
     if (this.modal && this.modal.close) {
       this.modal.close();
     }
@@ -118,7 +124,9 @@ class ConfigurationForm extends React.Component {
 
   _closeModal = () => {
     const { cancelAction, titleValue } = this.props;
+
     this.setState($.extend(this._copyStateFromProps(this.props), { titleValue: titleValue }));
+
     if (cancelAction) {
       cancelAction();
     }
@@ -130,6 +138,7 @@ class ConfigurationForm extends React.Component {
 
   _handleChange = (field, value) => {
     const { values } = this.state;
+
     values[field] = value;
     this.setState({ values: values });
   };
@@ -155,8 +164,10 @@ class ConfigurationForm extends React.Component {
 
     let shouldAutoFocus = true;
     let titleElement;
+
     if (includeTitleField) {
       const { titleValue } = this.state;
+
       titleElement = (
         <TitleField key={`${typeName}-title`}
                     typeName={typeName}
@@ -164,6 +175,7 @@ class ConfigurationForm extends React.Component {
                     onChange={this._handleTitleChange}
                     helpBlock={helpBlock} />
       );
+
       shouldAutoFocus = false;
     }
 
@@ -174,9 +186,11 @@ class ConfigurationForm extends React.Component {
 
     const renderedConfigFields = configFieldKeys.map((key) => {
       const configField = this._renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
+
       if (shouldAutoFocus) {
         shouldAutoFocus = false;
       }
+
       return configField;
     });
 

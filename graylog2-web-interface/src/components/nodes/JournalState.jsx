@@ -28,6 +28,7 @@ const JournalState = createReactClass({
       segments: 'org.graylog2.journal.segments',
       entriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
     };
+
     Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
 

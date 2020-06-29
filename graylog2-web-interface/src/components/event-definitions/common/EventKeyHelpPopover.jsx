@@ -10,6 +10,7 @@ class EventKeyHelpPopover extends React.Component {
 
   render() {
     const { id, ...otherProps } = this.props;
+
     return (
       <Popover id={id} title="More about Event Keys" {...otherProps}>
         <p>

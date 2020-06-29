@@ -26,9 +26,11 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   if (value === undefined || value == null) {
     return '';
   }
+
   if (!highlightRanges || !highlightRanges[field]) {
     return value;
   }
+
   const style = {
     backgroundColor: color,
   };
@@ -52,6 +54,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
     ], [[], 0])[0];
 
   const lastRange = last(sortBy(ranges, (r) => r.start + r.length));
+
   highlights.push(rest(lastRange.start + lastRange.length));
 
   return <>{highlights}</>;

@@ -64,13 +64,17 @@ export const SearchJobStore = singletonStore(
 
     run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
       const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
+
       SearchJobActions.run.promise(promise);
+
       return promise;
     },
 
     jobStatus(jobId: SearchJobId): Promise<SearchJobType> {
       const promise = fetch('GET', jobStatusUrl(jobId));
+
       SearchJobActions.jobStatus.promise(promise);
+
       return promise;
     },
 

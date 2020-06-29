@@ -18,6 +18,7 @@ class CaffeineCacheFieldSet extends React.Component {
 
   _update = (value, unit, enabled, name) => {
     const config = ObjectUtils.clone(this.props.config);
+
     config[name] = enabled ? value : 0;
     config[`${name}_unit`] = unit;
     this.props.updateConfig(config);

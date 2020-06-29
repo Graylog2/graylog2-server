@@ -51,7 +51,6 @@ const CollectorProcessControl = createReactClass({
     this.setState({ isConfigurationWarningHidden: true });
   },
 
-
   renderSummaryContent(selectedAction, selectedSidecars) {
     return (
       <>

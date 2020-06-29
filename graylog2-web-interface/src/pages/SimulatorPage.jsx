@@ -25,12 +25,14 @@ class SimulatorPage extends React.Component {
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
       const filteredStreams = streams.filter((s) => !HIDDEN_STREAMS.includes(s.id));
+
       this.setState({ streams: filteredStreams });
     });
   }
 
   _isLoading = () => {
     const { streams } = this.state;
+
     return !streams;
   };
 

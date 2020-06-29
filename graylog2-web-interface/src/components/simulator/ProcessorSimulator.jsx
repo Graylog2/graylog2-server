@@ -63,6 +63,7 @@ class ProcessorSimulator extends React.Component {
 
   _onStreamSelect = (selectedStream) => {
     const stream = this.props.streams.find((s) => s.id.toLowerCase() === selectedStream.toLowerCase());
+
     this.setState({ stream: stream });
   };
 

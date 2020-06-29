@@ -12,10 +12,13 @@ const FindWidgetAndQueryIdInView = (widgetId: WidgetId, view: View): ?[Widget, Q
     if (foundWidget) {
       return foundWidget;
     }
+
     const widget = state.widgets.find((w) => w.id === widgetId);
+
     if (widget) {
       return [widget, queryId];
     }
+
     return undefined;
   }, undefined);
 };

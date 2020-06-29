@@ -26,6 +26,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const { config } = this.props;
+
     this.state = {
       config,
       isValid: false,
@@ -35,6 +36,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   _summary = (): React.Element<'tr'>[] => {
     const literal = 'literal';
     const { config: { entries } } = this.props;
+
     return entries.map((urlConfig, idx) => {
       return (
         <tr key={urlConfig.id}>
@@ -62,6 +64,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   _saveConfig = () => {
     const { config, isValid } = this.state;
     const { updateConfig } = this.props;
+
     if (isValid) {
       updateConfig(config).then(() => {
         this._closeModal();
@@ -71,20 +74,21 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
   _update = (config: WhiteListConfig, isValid: boolean) => {
     const updatedState = { config, isValid };
+
     this.setState(updatedState);
   }
-
 
   _resetConfig = () => {
     const { config } = this.props;
     const updatedState = { ...this.state, config };
+
     this.setState(updatedState);
   }
-
 
   render() {
     const { config: { entries, disabled } } = this.props;
     const { isValid } = this.state;
+
     return (
       <div>
         <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small> }</h2>

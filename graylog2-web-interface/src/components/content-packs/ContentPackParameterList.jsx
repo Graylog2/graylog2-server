@@ -46,13 +46,16 @@ class ContentPackParameterList extends React.Component {
     const { appliedParameter } = this.props;
 
     const entityIds = Object.keys(appliedParameter);
+
     /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
     for (const i in entityIds) {
       const params = appliedParameter[entityIds[i]];
+
       if (findIndex(params, { paramName: paramName }) >= 0) {
         return true;
       }
     }
+
     return false;
   };
 
@@ -92,10 +95,13 @@ class ContentPackParameterList extends React.Component {
   _filterParameters = (filter, parametersArg) => {
     const { contentPack } = this.props;
     const parameters = ObjectUtils.clone(parametersArg || contentPack.parameters);
+
     if (!filter || filter.length <= 0) {
       this.setState({ filteredParameters: parameters, filter: undefined });
+
       return;
     }
+
     const regexp = RegExp(filter, 'i');
     const filteredParameters = parameters.filter((parameter) => {
       return regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name);
@@ -170,6 +176,7 @@ class ContentPackParameterList extends React.Component {
     const headers = readOnly
       ? ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used']
       : ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
+
     return (
       <div>
         <h2>Parameters list</h2>

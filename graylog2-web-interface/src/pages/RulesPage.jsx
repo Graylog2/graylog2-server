@@ -13,7 +13,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 
-
 const RulesPage = createReactClass({
   displayName: 'RulesPage',
 

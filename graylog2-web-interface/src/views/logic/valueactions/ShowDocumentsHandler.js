@@ -55,6 +55,7 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
     .build();
 
   const title = `Messages for ${valuePathQuery}`;
+
   return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
 };
 

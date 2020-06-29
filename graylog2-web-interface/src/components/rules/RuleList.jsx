@@ -82,6 +82,7 @@ class RuleList extends React.Component {
 
   toggleMetricsConfig = () => {
     const { openMetricsConfig } = this.state;
+
     this.setState({ openMetricsConfig: !openMetricsConfig });
   };
 
@@ -89,6 +90,7 @@ class RuleList extends React.Component {
     if (metricsConfig && metricsConfig.metrics_enabled) {
       return <Button bsStyle="warning" onClick={this.toggleMetricsConfig}>Debug Metrics: ON</Button>;
     }
+
     return <Button onClick={this.toggleMetricsConfig}>Debug Metrics</Button>;
   };
 

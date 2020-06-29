@@ -12,6 +12,7 @@ const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 function getExtractorDTO(extractor) {
   const converters = {};
+
   extractor.converters.forEach((converter) => {
     converters[converter.type] = converter.config;
   });
@@ -44,6 +45,7 @@ const ExtractorsStore = Reflux.createStore({
 
   list(inputId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')));
+
     promise.then((response) => {
       this.extractors = response.extractors;
       this.trigger({ extractors: this.extractors });
@@ -69,6 +71,7 @@ const ExtractorsStore = Reflux.createStore({
 
   get(inputId, extractorId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
+
     promise.then((response) => {
       this.extractor = response;
       this.trigger({ extractor: this.extractor });
@@ -91,14 +94,17 @@ const ExtractorsStore = Reflux.createStore({
 
   _silentExtractorCreate(inputId, extractor) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.create(inputId).url);
+
     return fetch('POST', url, getExtractorDTO(extractor));
   },
 
   create(inputId, extractor, calledFromMethod) {
     const promise = this._silentExtractorCreate(inputId, extractor);
+
     promise
       .then(() => {
         UserNotification.success(`Extractor ${extractor.title} created successfully`);
+
         if (this.extractor) {
           ExtractorsActions.get.triggerPromise(inputId, extractor.id);
         }
@@ -111,6 +117,7 @@ const ExtractorsStore = Reflux.createStore({
     if (!calledFromMethod) {
       ExtractorsActions.create.promise(promise);
     }
+
     return promise;
   },
 
@@ -118,9 +125,11 @@ const ExtractorsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.update(inputId, extractor.id).url);
 
     const promise = fetch('PUT', url, getExtractorDTO(extractor));
+
     promise
       .then(() => {
         UserNotification.success(`Extractor "${extractor.title}" updated successfully`);
+
         if (this.extractor) {
           ExtractorsActions.get.triggerPromise(inputId, extractor.id);
         }
@@ -133,6 +142,7 @@ const ExtractorsStore = Reflux.createStore({
     if (!calledFromMethod) {
       ExtractorsActions.update.promise(promise);
     }
+
     return promise;
   },
 
@@ -140,9 +150,11 @@ const ExtractorsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.delete(inputId, extractor.id).url);
 
     const promise = fetch('DELETE', url);
+
     promise
       .then(() => {
         UserNotification.success(`Extractor "${extractor.title}" deleted successfully`);
+
         if (this.extractors) {
           ExtractorsActions.list.triggerPromise(inputId);
         }
@@ -158,15 +170,19 @@ const ExtractorsStore = Reflux.createStore({
   order(inputId, orderedExtractors) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ExtractorsController.order(inputId).url);
     const orderedExtractorsMap = {};
+
     orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
 
     const promise = fetch('POST', url, { order: orderedExtractorsMap });
+
     promise.then(() => {
       UserNotification.success('Extractor positions updated successfully');
+
       if (this.extractors) {
         ExtractorsActions.list.triggerPromise(inputId);
       }
     });
+
     promise.catch((error) => {
       UserNotification.error(`Changing extractor positions failed: ${error}`,
         'Could not update extractor positions');
@@ -182,9 +198,11 @@ const ExtractorsStore = Reflux.createStore({
 
     extractors.forEach((extractor) => {
       const promise = this._silentExtractorCreate(inputId, extractor);
+
       promise
         .then(() => successfulImports++)
         .catch(() => failedImports++);
+
       promises.push(promise);
     });
 

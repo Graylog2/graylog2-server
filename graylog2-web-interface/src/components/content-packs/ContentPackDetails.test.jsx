@@ -16,6 +16,7 @@ describe('<ContentPackDetails />', () => {
       .url('http://www.graylog.com')
       .build();
     const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+
     expect(wrapper.find('[href="http://www.graylog.com"]')).toHaveLength(1);
     expect(wrapper).toMatchSnapshot();
   });
@@ -33,6 +34,7 @@ describe('<ContentPackDetails />', () => {
       entities: [],
     };
     const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -49,6 +51,7 @@ describe('<ContentPackDetails />', () => {
       entities: [],
     };
     const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+
     expect(wrapper.find('[href="thisurlisgreat"]')).toHaveLength(0);
   });
 
@@ -67,6 +70,7 @@ describe('<ContentPackDetails />', () => {
     };
     const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
     const descriptionContainer = wrapper.find('[dangerouslySetInnerHTML]');
+
     expect(descriptionContainer).toHaveLength(1);
     // eslint-disable-next-line no-script-url
     expect(descriptionContainer.html()).not.toContain('javascript:alert(123)');

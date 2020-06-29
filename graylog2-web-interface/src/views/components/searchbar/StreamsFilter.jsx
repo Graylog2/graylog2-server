@@ -8,6 +8,7 @@ const StreamsFilter = ({ disabled, value, streams, onChange }) => {
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
   const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
+
   return (
     <div style={{ position: 'relative', zIndex: 10 }} data-testid="streams-filter" title={placeholder}>
       <Select placeholder={placeholder}

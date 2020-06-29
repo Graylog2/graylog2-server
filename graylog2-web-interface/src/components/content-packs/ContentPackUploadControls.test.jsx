@@ -7,6 +7,7 @@ import ContentPackUploadControls from 'components/content-packs/ContentPackUploa
 describe('<ContentPackUploadControls />', () => {
   it('should render', () => {
     const wrapper = mount(<ContentPackUploadControls />);
+
     expect(wrapper).toMatchSnapshot();
   });
 });

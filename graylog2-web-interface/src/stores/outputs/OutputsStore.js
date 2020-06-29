@@ -21,16 +21,19 @@ const OutputsStore = Reflux.createStore({
   },
   loadForStreamId(streamId: string, callback: (outputs: Array<Output>) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.index(streamId).url);
+
     fetch('GET', url)
       .then(callback, this._failCallback);
   },
   loadAvailableTypes(callback: (available: any) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
+
     fetch('GET', url)
       .then(callback, this._failCallback);
   },
   loadAvailable(typeName: string, callback: (available: any) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
+
     fetch('GET', url)
       .then((resp) => {
         return resp.types[typeName];
@@ -39,6 +42,7 @@ const OutputsStore = Reflux.createStore({
   },
   remove(outputId: string, callback: (error: any) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.delete(outputId).url);
+
     fetch('DELETE', url)
       .then(callback, (error) => {
         UserNotification.error(`Terminating output failed with status: ${error}`,

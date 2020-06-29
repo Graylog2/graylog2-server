@@ -108,6 +108,7 @@ class SearchForm extends React.Component {
   // eslint-disable-next-line react/no-deprecated
   componentWillReceiveProps(nextProps) {
     const { query } = this.props;
+
     // The query might get reset outside of this component so we have to adjust the internal state
     if (query !== nextProps.query) {
       this.setState({ query: nextProps.query });
@@ -123,6 +124,7 @@ class SearchForm extends React.Component {
    */
   _setLoadingState = () => {
     const { useLoadingState } = this.props;
+
     return new Promise((resolve) => {
       if (useLoadingState) {
         this.setState({ isLoading: true }, resolve);
@@ -134,6 +136,7 @@ class SearchForm extends React.Component {
 
   _resetLoadingState = () => {
     const { useLoadingState } = this.props;
+
     if (useLoadingState) {
       this.setState({ isLoading: false });
     }
@@ -158,6 +161,7 @@ class SearchForm extends React.Component {
   _onReset = () => {
     this._resetLoadingState();
     const { query, onQueryChange, onReset } = this.props;
+
     this.setState({ query: query });
     onQueryChange(query);
     onReset();
@@ -166,6 +170,7 @@ class SearchForm extends React.Component {
   handleQueryChange = (e) => {
     const { onQueryChange } = this.props;
     const query = e.target.value;
+
     this.setState({ query: query });
     onQueryChange(query);
   };
@@ -188,6 +193,7 @@ class SearchForm extends React.Component {
       searchBsStyle,
     } = this.props;
     const { query, isLoading } = this.state;
+
     return (
       <div className={wrapperClass} style={{ marginTop: topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>

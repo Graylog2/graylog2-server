@@ -34,6 +34,7 @@ class SystemJob extends React.Component {
   _onCancel = (job) => {
     return (e) => {
       e.preventDefault();
+
       // eslint-disable-next-line no-alert
       if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
         SystemJobsActions.cancelJob(job.id);

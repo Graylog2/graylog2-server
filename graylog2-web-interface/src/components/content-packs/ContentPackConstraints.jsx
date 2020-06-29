@@ -27,6 +27,7 @@ class ContentPackConstraints extends React.Component {
   _rowFormatter = (item) => {
     const { isFulfilled } = this.props;
     const constraint = item.constraint || item;
+
     constraint.fulfilled = isFulfilled || constraint.fulfilled;
     const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
 
@@ -49,7 +50,9 @@ class ContentPackConstraints extends React.Component {
     const headers = ['Name', 'Type', 'Version', 'Fulfilled'];
     let constraints = unfilteredConstraints.map((constraint) => {
       const newConstraint = constraint.constraint || constraint;
+
       newConstraint.fulfilled = constraint.fulfilled;
+
       return newConstraint;
     });
 

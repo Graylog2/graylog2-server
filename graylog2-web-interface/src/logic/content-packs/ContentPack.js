@@ -10,6 +10,7 @@ export default class ContentPack {
       if (e instanceof Entity) {
         return e;
       }
+
       return Entity.fromJSON(e, false, parameters);
     });
 
@@ -88,6 +89,7 @@ export default class ContentPack {
       parameters,
       entities,
     } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({
       v,
@@ -118,6 +120,7 @@ export default class ContentPack {
     } = this._value;
 
     const entitiesJSON = entities.map((e) => e.toJSON());
+
     return {
       v,
       id,
@@ -145,6 +148,7 @@ export default class ContentPack {
       parameters,
       entities,
     } = value;
+
     return new ContentPack(
       v,
       id,
@@ -182,65 +186,79 @@ class Builder {
 
   v(value) {
     this.value = this.value.set('v', value);
+
     return this;
   }
 
   id(value) {
     this.value = this.value.set('id', value);
+
     return this;
   }
 
   rev(value) {
     this.value = this.value.set('rev', value);
+
     return this;
   }
 
   name(value) {
     this.value = this.value.set('name', value);
+
     return this;
   }
 
   summary(value) {
     this.value = this.value.set('summary', value);
+
     return this;
   }
 
   description(value) {
     this.value = this.value.set('description', value);
+
     return this;
   }
 
   vendor(value) {
     this.value = this.value.set('vendor', value);
+
     return this;
   }
 
   url(value) {
     this.value = this.value.set('url', value);
+
     return this;
   }
 
   parameters(value) {
     this.value = this.value.set('parameters', value);
+
     return this;
   }
 
   removeParameter(value) {
     const parameters = this.value.get('parameters').slice(0);
+
     remove(parameters, (parameter) => parameter.name === value.name);
     this.value = this.value.set('parameters', parameters);
+
     return this;
   }
 
   addParameter(value) {
     const parameters = this.value.get('parameters');
     const newParameters = concat(parameters, value);
+
     this.value = this.value.set('parameters', newParameters);
+
     return this;
   }
 
   entities(value) {
     this.value = this.value.set('entities', value);
+
     return this;
   }
 
@@ -257,6 +275,7 @@ class Builder {
       parameters,
       entities,
     } = this.value.toObject();
+
     return new ContentPack(
       v,
       id,

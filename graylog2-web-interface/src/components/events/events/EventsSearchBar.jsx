@@ -39,12 +39,14 @@ class EventsSearchBar extends React.Component {
   updateSearchTimeRange = (nextValue, nextUnit) => {
     const { onTimeRangeChange } = this.props;
     const durationInSeconds = moment.duration(lodash.max([nextValue, 1]), nextUnit).asSeconds();
+
     onTimeRangeChange('relative', durationInSeconds);
     this.setState({ timeRangeDuration: nextValue, timeRangeUnit: nextUnit });
   };
 
   handlePageSizeChange = (event) => {
     const { onPageSizeChange } = this.props;
+
     onPageSizeChange(FormsUtils.getValueFromInput(event.target));
   };
 
@@ -55,6 +57,7 @@ class EventsSearchBar extends React.Component {
   handleSearchReload = () => {
     this.setState({ isReloadingResults: true });
     const { onSearchReload } = this.props;
+
     onSearchReload(this.resetLoadingState);
   };
 

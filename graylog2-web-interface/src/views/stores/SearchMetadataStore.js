@@ -40,9 +40,12 @@ export const SearchMetadataStore = singletonStore(
         .then((metadata) => {
           this.state = metadata;
           this._trigger();
+
           return this.state;
         });
+
       SearchMetadataActions.parseSearch.promise(promise);
+
       return promise;
     },
 
@@ -52,9 +55,12 @@ export const SearchMetadataStore = singletonStore(
         .then((metadata) => {
           this.state = metadata;
           this._trigger();
+
           return this.state;
         });
+
       SearchMetadataActions.parseSearchId.promise(promise);
+
       return promise;
     },
 

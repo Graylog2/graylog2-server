@@ -28,6 +28,7 @@ class LookupTableFieldValueProviderFormContainer extends React.Component {
 
   componentDidMount() {
     const { currentUser } = this.props;
+
     if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }
@@ -49,6 +50,7 @@ class LookupTableFieldValueProviderFormContainer extends React.Component {
     }
 
     const isLoading = typeof fieldTypes.all !== 'object' || !lookupTables.tables;
+
     if (isLoading) {
       return <Spinner text="Loading Field Provider information..." />;
     }

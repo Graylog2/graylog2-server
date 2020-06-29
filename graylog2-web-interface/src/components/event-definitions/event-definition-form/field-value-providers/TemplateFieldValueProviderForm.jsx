@@ -32,6 +32,7 @@ class TemplateFieldValueProviderForm extends React.Component {
     const value = FormsUtils.getValueFromInput(event.target);
     const nextProviders = lodash.cloneDeep(config.providers);
     const templateProvider = nextProviders.find((provider) => provider.type === TemplateFieldValueProviderForm.type);
+
     templateProvider[name] = value;
     onChange({ ...config, providers: nextProviders });
   };

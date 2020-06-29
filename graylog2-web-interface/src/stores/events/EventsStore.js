@@ -42,6 +42,7 @@ const EventsStore = Reflux.createStore({
   eventsUrl({ segments = [], query = {} }) {
     const uri = new URI(this.sourceUrl);
     const nextSegments = lodash.concat(uri.segment(), segments);
+
     uri.segmentCoded(nextSegments);
     uri.query(query);
 
@@ -50,6 +51,7 @@ const EventsStore = Reflux.createStore({
 
   refresh() {
     const { query, page, pageSize, filter } = this.parameters;
+
     this.search({
       query: query,
       page: page,
@@ -76,9 +78,11 @@ const EventsStore = Reflux.createStore({
         filter: response.parameters.filter,
         timerange: response.parameters.timerange,
       };
+
       this.totalEvents = response.total_events;
       this.context = response.context;
       this.propagateChanges();
+
       return response;
     });
 

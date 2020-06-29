@@ -9,6 +9,7 @@ describe('<EditPatternModal />', () => {
     const wrapper = mount(<EditPatternModal savePattern={() => {}}
                                             testPattern={() => {}}
                                             validPatternName={() => {}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -17,6 +18,7 @@ describe('<EditPatternModal />', () => {
                                             savePattern={() => {}}
                                             testPattern={() => {}}
                                             validPatternName={() => {}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 });

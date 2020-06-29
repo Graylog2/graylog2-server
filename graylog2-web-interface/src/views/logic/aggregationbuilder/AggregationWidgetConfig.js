@@ -86,6 +86,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     if (this._value.visualizationConfig === null) {
       return undefined;
     }
+
     return this._value.visualizationConfig;
   }
 
@@ -103,6 +104,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   get isEmpty(): boolean {
     const empty = (arr) => !arr.length;
+
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
   }
 
@@ -134,6 +136,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualizationConfig,
       eventAnnotation,
     } = this._value;
+
     return {
       column_pivots: columnPivots,
       formatting_settings: formattingSettings,
@@ -162,6 +165,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       ]
         .every((key) => isDeepEqual(this[key], other[key]));
     }
+
     return false;
   }
 
@@ -170,6 +174,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
         .every((key) => isEqualForSearch(this[key], other[key]));
     }
+
     return false;
   }
 
@@ -269,6 +274,7 @@ class Builder {
     const filteredSorts = sort.filter((s) => availableSorts
       .find((availableSort) => (s.field === availableSort.function || s.field === availableSort.field)));
     const computedRollup = columnPivots.length > 0 ? rollup : true;
+
     return new AggregationWidgetConfig(
       columnPivots,
       rowPivots,
