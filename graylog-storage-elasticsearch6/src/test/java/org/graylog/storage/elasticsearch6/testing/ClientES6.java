@@ -56,7 +56,7 @@ import static com.google.common.base.Strings.nullToEmpty;
 import static com.google.common.collect.Iterators.toArray;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ClientES6 implements Client {
+public class  ClientES6 implements Client {
     private static final Duration ES_TIMEOUT = Duration.seconds(5L);
     private final JestClient client;
 
