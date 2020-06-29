@@ -65,7 +65,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, 'invalid');
 
-    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
+    await waitFor(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
   });
 
   it('shows error message for to date if parsing fails after changing input', async () => {
@@ -77,6 +77,6 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, 'invalid');
 
-    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
+    await waitFor(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
   });
 });
