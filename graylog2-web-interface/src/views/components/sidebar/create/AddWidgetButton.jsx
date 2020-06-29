@@ -53,9 +53,9 @@ type CreatorComponentProps = {
 
 type ComponentCreator = {|
   component: React.ComponentType<CreatorComponentProps>,
+  condition?: () => boolean,
   title: string,
   type: CreatorType,
-  condition?: () => boolean,
 |};
 
 type Creator = ComponentCreator | FunctionalCreator;
