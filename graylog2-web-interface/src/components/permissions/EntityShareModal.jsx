@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import type { GRN } from 'logic/permissions/types';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import EntityShareStore, { EntityShareActions } from 'stores/permissions/EntityShareStore';
@@ -50,8 +51,16 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
   };
 
   const _handleSelection = ({ granteeId, roleId }: SelectionRequest) => {
+    console.log(granteeId, roleId);
+    console.log(entityShareState.selectedGranteeRoles.merge({ [granteeId]: roleId }));
     return EntityShareActions.prepare(entityGRN, {
       selected_grantee_roles: entityShareState.selectedGranteeRoles.merge({ [granteeId]: roleId }),
+    });
+  };
+
+  const _handleDeletion = (granteeId: GRN) => {
+    return EntityShareActions.prepare(entityGRN, {
+      selected_grantee_roles: entityShareState.selectedGranteeRoles.remove(granteeId),
     });
   };
 
@@ -71,8 +80,10 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
                               onSubmit={_handleSelection} />
             <StyledGranteesList availableRoles={entityShareState.availableRoles}
                                 entityGRN={entityGRN}
+                                onRoleChange={_handleSelection}
                                 availableGrantees={entityShareState.availableGrantees}
-                                selectedGranteeRoles={entityShareState.selectedGranteeRoles} />
+                                selectedGranteeRoles={entityShareState.selectedGranteeRoles}
+                                onDelete={_handleDeletion} />
             {/* sharable url box */}
           </>
         )}
