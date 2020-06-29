@@ -11,6 +11,7 @@ const _formatTimestamp = (epoch) => {
 
 const _generateSeries = (results) => {
   const data = new Immutable.OrderedMap(results);
+
   return [{
     type: 'bar',
     x: data.keySeq().map(_formatTimestamp).toArray(),

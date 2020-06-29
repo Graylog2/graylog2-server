@@ -15,10 +15,13 @@ import { chartData } from '../ChartData';
 
 const getChartColor = (fullData, name) => {
   const data = fullData.find((d) => (d.name === name));
+
   if (data && data.line && data.line.color) {
     const { line: { color } } = data;
+
     return color;
   }
+
   return undefined;
 };
 
@@ -39,8 +42,10 @@ const AreaVisualization: VisualizationComponent = makeVisualization(({ config, d
 
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator);
   const layout = {};
+
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;
   }

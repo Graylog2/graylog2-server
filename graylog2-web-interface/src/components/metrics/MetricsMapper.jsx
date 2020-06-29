@@ -35,6 +35,7 @@ const MetricsMapper = createReactClass({
     if (this.state.metricsUpdatedAt && nextState.metricsUpdatedAt) {
       return nextState.metricsUpdatedAt > this.state.metricsUpdatedAt;
     }
+
     return true;
   },
 
@@ -58,12 +59,14 @@ const MetricsMapper = createReactClass({
           if (!metricsMap[nodeId]) {
             metricsMap[nodeId] = {};
           }
+
           metricsMap[nodeId][key] = this.state.metrics[nodeId][metricName];
         }
       });
     });
 
     const value = this.props.computeValue(metricsMap);
+
     return (
       <span>
         {value}

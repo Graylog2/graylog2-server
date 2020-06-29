@@ -41,9 +41,11 @@ class NotificationBadge extends React.PureComponent {
 
   render() {
     const { total } = this.props;
+
     if (!total) {
       return null;
     }
+
     return (
       <Nav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>

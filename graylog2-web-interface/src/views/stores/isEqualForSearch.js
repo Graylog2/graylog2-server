@@ -10,12 +10,15 @@ const _isEqual = (first, second) => {
   if (hasEqualsForSearch(first)) {
     return first.equalsForSearch(second);
   }
+
   if (isImmutable(first) && isImmutable(second)) {
     return isEqualWith(first.toJS(), second.toJS(), _isEqual);
   }
+
   if (hasEquals(first)) {
     return first.equals(second);
   }
+
   return undefined;
 };
 

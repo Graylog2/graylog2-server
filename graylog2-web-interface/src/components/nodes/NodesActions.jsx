@@ -44,6 +44,7 @@ class NodesActions extends React.Component {
 
   render() {
     const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname().toString();
+
     return (
       <div className="item-actions">
         <LinkContainer to={Routes.SYSTEM.NODES.SHOW(this.props.node.node_id)}>

@@ -10,7 +10,6 @@ import WidgetColorContext from './WidgetColorContext';
 import ChartColorContext from '../visualizations/ChartColorContext';
 import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
 
-
 jest.mock('views/stores/ChartColorRulesStore', () => ({
   ChartColorRulesActions: {
     set: jest.fn(),
@@ -48,11 +47,14 @@ describe('WidgetColorContext', () => {
 
   it('extracts coloring rules for current widget', () => {
     const { colors } = container.props();
+
     expect(colors).toEqual({ localhost: '#171EFE', 'sum(bytes)': '#affe42' });
     expect();
   });
+
   it('supplies setter for color of current widget', () => {
     const { setColor } = container.props();
+
     setColor('avg(took_ms)', '#FEFC67');
 
     expect(ChartColorRulesActions.set).toHaveBeenCalledWith('deadbeef', 'avg(took_ms)', '#FEFC67');

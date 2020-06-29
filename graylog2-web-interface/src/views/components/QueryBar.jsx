@@ -23,15 +23,19 @@ const onCloseTab = (queryId, currentQuery, queries) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
+
   let promise;
+
   if (queryId === currentQuery) {
     const currentQueryIdIndex = queries.indexOf(queryId);
     const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
     const newQuery = queries.remove(queryId).get(newQueryIdIndex);
+
     promise = ViewActions.selectQuery(newQuery);
   } else {
     promise = Promise.resolve();
   }
+
   return promise.then(() => QueriesActions.remove(queryId)).then(() => ViewStatesActions.remove(queryId));
 };
 
@@ -39,6 +43,7 @@ const QueryBar = ({ children, queries, queryTitles, viewMetadata }) => {
   const { activeQuery } = viewMetadata;
   const childrenWithQueryId = React.Children.map(children, (child) => React.cloneElement(child, { queryId: activeQuery }));
   const selectQueryAndExecute = (queryId) => onSelectQuery(queryId);
+
   return (
     <QueryTabs queries={queries}
                selectedQueryId={activeQuery}

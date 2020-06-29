@@ -19,12 +19,14 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
 
       if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())) {
         event.preventDefault();
+
         return;
       }
 
       // Check custom validation for plugin fields
       if (!validate(formDOMNode)) {
         event.preventDefault();
+
         return;
       }
 
@@ -34,6 +36,7 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
         onSubmitForm(event);
       }
     };
+
     return (
       <form onSubmit={onSubmit} ref={ref}>
         {children}
@@ -43,6 +46,5 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
     );
   },
 );
-
 
 export default InlineForm;

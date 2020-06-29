@@ -13,7 +13,6 @@ import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
 import LdapComponentStyle from './LdapComponent.css';
 
-
 const { RolesStore } = CombinedProvider.get('Roles');
 const { LdapActions } = CombinedProvider.get('Ldap');
 
@@ -22,6 +21,7 @@ const GroupMappingLink = ({ text, onClick }) => {
     <Button bsStyle="link" bsSize="xs" className="btn-text" onClick={onClick}>{text}</Button>
   );
 };
+
 GroupMappingLink.propTypes = {
   text: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
@@ -167,11 +167,13 @@ class LdapComponent extends React.Component {
   _onLdapSettingsChange = (ldapSettings) => {
     const settings = cloneDeep(ldapSettings);
     const ldapUri = new URI(settings.ldap_uri);
+
     this.setState({ ldapSettings: settings, ldapUri: ldapUri, hidePasswordInput: settings.system_password_set });
   };
 
   _isLoading = () => {
     const { ldapSettings, roles } = this.state;
+
     return !ldapSettings || !roles;
   };
 
@@ -191,6 +193,7 @@ class LdapComponent extends React.Component {
     const newState = {};
 
     let formattedValue = value;
+
     // Convert URI object into string to store it in the state
     if (attribute === 'ldap_uri' && typeof value === 'object') {
       newState.ldapUri = value;
@@ -200,6 +203,7 @@ class LdapComponent extends React.Component {
     // Clone state to not modify it directly
     const { ldapSettings } = this.state;
     const settings = cloneDeep(ldapSettings);
+
     settings[attribute] = formattedValue;
     newState.ldapSettings = settings;
     newState.serverConnectionStatus = {};
@@ -209,54 +213,63 @@ class LdapComponent extends React.Component {
   _setUriScheme = (scheme) => {
     const { ldapUri } = this.state;
     const nextLdapUri = ldapUri.clone();
+
     nextLdapUri.scheme(scheme);
     this._setSetting('ldap_uri', nextLdapUri);
   };
 
   _uriScheme = () => {
     const { ldapUri } = this.state;
+
     return `${ldapUri.scheme()}://`;
   };
 
   _setUriHost = (host) => {
     const { ldapUri } = this.state;
     const nextLdapUri = ldapUri.clone();
+
     nextLdapUri.hostname(host);
     this._setSetting('ldap_uri', nextLdapUri);
   };
 
   _uriHost = () => {
     const { ldapUri } = this.state;
+
     return ldapUri.hostname();
   };
 
   _setUriPort = (port) => {
     const { ldapUri } = this.state;
     const nextLdapUri = ldapUri.clone();
+
     nextLdapUri.port(port);
     this._setSetting('ldap_uri', nextLdapUri);
   };
 
   _uriPort = () => {
     const { ldapUri } = this.state;
+
     return ldapUri.port();
   };
 
   _setAdditionalDefaultGroups = (rolesString) => {
     // only keep non-empty entries
     const roles = rolesString.split(',').filter((v) => v !== '');
+
     this._setSetting('additional_default_groups', roles);
   };
 
   _saveSettings = (event) => {
     event.preventDefault();
     const { ldapSettings } = this.state;
+
     LdapActions.update(ldapSettings);
   };
 
   _onShowGroups = (event) => {
     event.preventDefault();
     const { onShowGroups } = this.props;
+
     onShowGroups();
   };
 

@@ -9,6 +9,7 @@ import FieldTypesContext from './FieldTypesContext';
 
 const DefaultFieldTypesProvider = ({ children }: { children: React.Node }) => {
   const fieldTypes = useStore(FieldTypesStore);
+
   return (
     fieldTypes
       ? (

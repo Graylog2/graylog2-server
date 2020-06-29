@@ -46,6 +46,7 @@ describe('RuntimeErrorBoundary', () => {
         message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
         stack: 'This the stack trace.',
       });
+
       expect(ErrorsActions.report.mock.calls[0][0].type).toEqual(ReactErrorType);
       expect(ErrorsActions.report.mock.calls[0][0].componentStack).not.toBeNull();
     });

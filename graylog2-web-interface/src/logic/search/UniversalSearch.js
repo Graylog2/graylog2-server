@@ -7,9 +7,11 @@ const UniversalSearch = {
     if (initialized) {
       return;
     }
+
     $('#scroll-to-search-hint, #scroll-to-search-hint i').on('click', () => {
       $('html, body').animate({ scrollTop: 0 }, 'fast');
     });
+
     initialized = true;
   },
   escape(source) {
@@ -18,10 +20,12 @@ const UniversalSearch = {
   },
   _query() {
     const query = $('#universalsearch-query');
+
     return query;
   },
   setQuery(search) {
     const query = this._query();
+
     query.val(search);
     query.effect('bounce');
     this.scrollToSearchbarHint();
@@ -39,20 +43,26 @@ const UniversalSearch = {
     // this may look too complicated, but avoids false positives when one segment would be the prefix of another
     const oldQuery = this.getQuery();
     const segments = oldQuery.split(' ');
+
     return segments.some((segment) => segment === segmentInQuestion);
   },
   addSegment(segment, operator) {
     let oldQuery = this.getQuery();
+
     if (this.queryContainsSegment(segment)) {
       return;
     }
+
     if (oldQuery === '*') {
       oldQuery = '';
     }
+
     let newQuery = '';
+
     if (typeof operator !== 'undefined' && oldQuery !== '') {
       newQuery = `${oldQuery} ${operator} `;
     }
+
     newQuery += segment;
     this.setQuery(newQuery);
   },
@@ -80,6 +90,7 @@ const UniversalSearch = {
       possibleMatches.forEach((possibleMatch) => {
         if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
           const match = {};
+
           match[displayKey] = possibleMatch;
           matches.push(match);
         }
@@ -88,6 +99,7 @@ const UniversalSearch = {
       possibleMatches.forEach((possibleMatch) => {
         if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
           const match = {};
+
           match[displayKey] = possibleMatch;
           matches.push(match);
         }

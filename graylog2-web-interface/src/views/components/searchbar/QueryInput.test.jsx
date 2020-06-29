@@ -31,11 +31,13 @@ describe('QueryInput', () => {
 
   const _mount = (component) => {
     const wrapper = mount(component);
+
     return wrapper.find('ReactAce');
   };
 
   it('renders with minimal props', () => {
     const wrapper = mount(<SimpleQueryInput />);
+
     expect(wrapper).not.toBeNull();
   });
 

@@ -38,7 +38,9 @@ const StageForm = createReactClass({
 
   getInitialState() {
     let { stage } = this.props;
+
     stage = cloneDeep(stage);
+
     return {
       // when editing, take the stage that's been passed in
       stage: {
@@ -55,6 +57,7 @@ const StageForm = createReactClass({
 
   _onChange(event) {
     let { stage } = this.state;
+
     stage = cloneDeep(stage);
     stage[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState({ stage });
@@ -62,6 +65,7 @@ const StageForm = createReactClass({
 
   _onRulesChange(newRules) {
     let { stage } = this.state;
+
     stage = cloneDeep(stage);
     stage.rules = newRules;
     this.setState({ stage });
@@ -74,6 +78,7 @@ const StageForm = createReactClass({
   _saved() {
     this._closeModal();
     const { create } = this.props;
+
     if (create) {
       this.setState(this.getInitialState());
     }
@@ -82,12 +87,14 @@ const StageForm = createReactClass({
   _save() {
     const { stage } = this.state;
     const { save } = this.props;
+
     save(stage, this._saved);
   },
 
   _getFormattedOptions(rules) {
     const { stage } = this.state;
     const chosenRules = stage.rules;
+
     return rules ? rules.filter((rule) => this._filterChosenRules(rule, chosenRules)).map(this._formatRuleOption) : [];
   },
 
@@ -103,6 +110,7 @@ const StageForm = createReactClass({
     let triggerButtonContent;
     const { create } = this.props;
     const { stage, rules } = this.state;
+
     if (create) {
       triggerButtonContent = 'Add new stage';
     } else {

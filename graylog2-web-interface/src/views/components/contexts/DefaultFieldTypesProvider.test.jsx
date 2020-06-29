@@ -24,6 +24,7 @@ describe('DefaultFieldTypesProvider', () => {
 
   const renderSUT = () => {
     const consume = jest.fn();
+
     render(
       <DefaultFieldTypesProvider>
         <FieldTypesContext.Consumer>
@@ -31,17 +32,20 @@ describe('DefaultFieldTypesProvider', () => {
         </FieldTypesContext.Consumer>
       </DefaultFieldTypesProvider>,
     );
+
     return consume;
   };
 
   it('provides no field types with empty store', () => {
     asMock(FieldTypesStore.getInitialState).mockReturnValue(undefined);
     const consume = renderSUT();
+
     expect(consume).toHaveBeenCalledWith(undefined);
   });
 
   it('provides field types of field types store', () => {
     const fieldStoreState = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
+
     asMock(FieldTypesStore.getInitialState).mockReturnValue(fieldStoreState);
 
     const consume = renderSUT();

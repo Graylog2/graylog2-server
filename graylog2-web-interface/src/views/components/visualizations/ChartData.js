@@ -52,13 +52,16 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
     const xLabels = getXLabelsFromLeafs(leafs);
     const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
     const valuesBySeries = {};
+
     flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
       const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
+
       if (value.value !== null && value.value !== undefined) {
         set(valuesBySeries, [joinedKey, targetIdx], value.value);
       }
     });
+
     return { valuesBySeries, xLabels };
   };
 };
@@ -82,6 +85,7 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
     const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
     const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
     const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
+
     return [name, newKeys, newValues, z];
   });
 };
@@ -97,6 +101,7 @@ export const chartData = (
   leafValueMatcher?: Value => boolean,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
+
   return flow([
     transformKeys(rowPivots, columnPivots),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),

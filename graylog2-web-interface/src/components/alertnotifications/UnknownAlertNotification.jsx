@@ -26,6 +26,7 @@ class UnknownAlertNotification extends React.Component {
         </Alert>
       </Col>
     );
+
     return (
       <EntityListItem key={`entry-list-${notification.id}`}
                       title="Unknown notification"

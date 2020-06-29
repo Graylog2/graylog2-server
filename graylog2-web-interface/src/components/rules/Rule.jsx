@@ -11,7 +11,6 @@ import Routes from 'routing/Routes';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 
-
 class Rule extends React.Component {
   static propTypes = {
     rule: PropTypes.object,
@@ -23,6 +22,7 @@ class Rule extends React.Component {
 
   render() {
     let title;
+
     if (this.props.create) {
       title = 'Create pipeline rule';
     } else {

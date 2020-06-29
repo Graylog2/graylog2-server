@@ -32,6 +32,7 @@ describe('<DataAdapterCreate />', () => {
     const callback = () => {};
     const types = {};
     const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -43,6 +44,7 @@ describe('<DataAdapterCreate />', () => {
       },
     };
     const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -65,6 +67,7 @@ describe('<DataAdapterCreate />', () => {
         },
       };
       const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
       expect(wrapper).toMatchSnapshot();
       expect(console.error.mock.calls.length).toBe(1);
     });

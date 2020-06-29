@@ -38,7 +38,9 @@ class LUTTableEntry extends React.Component {
     if (total < 1) {
       return 'n/a';
     }
+
     const hitRate = (totalHits * 100.0) / total;
+
     return `${NumberUtils.formatNumber(hitRate)}%`;
   };
 

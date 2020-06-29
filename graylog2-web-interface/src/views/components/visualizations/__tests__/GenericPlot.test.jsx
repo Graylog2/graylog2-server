@@ -37,6 +37,7 @@ describe('GenericPlot', () => {
       expect(onZoom).not.toHaveBeenCalled();
     });
   });
+
   describe('layout handling', () => {
     it('configures legend to be displayed horizontally', () => {
       const wrapper = mount(<GenericPlot chartData={[]} />);
@@ -46,6 +47,7 @@ describe('GenericPlot', () => {
 
       expect(generatedLayout.legend.orientation).toEqual('h');
     });
+
     it('merges in passed layout property', () => {
       const layout = { customProperty: 42 };
       const wrapper = mount(<GenericPlot chartData={[]} layout={layout} />);
@@ -56,13 +58,16 @@ describe('GenericPlot', () => {
       expect(generatedLayout.customProperty).toEqual(42);
       expect(generatedLayout.autosize).toEqual(true);
     });
+
     it('configures resize handler to be used', () => {
       const wrapper = mount(<GenericPlot chartData={[]} />);
 
       const plot = wrapper.find('PlotlyComponent');
+
       expect(plot).toHaveProp('useResizeHandler', true);
     });
   });
+
   it('disables modebar', () => {
     const wrapper = mount(<GenericPlot chartData={[]} />);
 
@@ -71,12 +76,15 @@ describe('GenericPlot', () => {
 
     expect(generatedConfig.displayModeBar).toEqual(false);
   });
+
   it('passes chart data to plot component', () => {
     const wrapper = mount(<GenericPlot chartData={[{ x: 23 }, { x: 42 }]} />);
 
     const plot = wrapper.find('PlotlyComponent');
+
     expect(plot).toHaveProp('data', [{ x: 23 }, { x: 42 }]);
   });
+
   it('extracts series color from context', () => {
     const lens = {
       colors: {
@@ -96,14 +104,18 @@ describe('GenericPlot', () => {
     expect(newChartData.find((chart) => chart.name === 'count()').marker.color).toEqual('#783a8e');
     expect(newChartData.find((chart) => chart.name === 'sum(bytes)').marker.color).toBeUndefined();
   });
+
   describe('has color picker', () => {
     const getChartColor = (fullData, name) => {
       const data = fullData.find((d) => (d.name === name));
+
       if (data && data.marker && data.marker.color) {
         // $FlowFixMe the check above ensures the presents of marker
         const { marker: { color } } = data;
+
         return color;
       }
+
       return undefined;
     };
 
@@ -125,6 +137,7 @@ describe('GenericPlot', () => {
       const { onLegendClick } = plotlyComponent.props();
 
       const result = onLegendClick(event(genericPlot));
+
       wrapper.update();
 
       return result;
@@ -139,13 +152,18 @@ describe('GenericPlot', () => {
       expect(wrapper.find('color-picker')).not.toExist();
 
       const result = openLegend(wrapper, genericPlot);
+
       expect(result).toBeFalsy();
 
       const colorPicker = wrapper.find('color-picker');
+
       expect(colorPicker).toExist();
+
       const { color } = colorPicker.props();
+
       expect(color).toEqual('#414141');
     });
+
     it('calling onChange when new color is selected', () => {
       const lens = {
         colors: {},
@@ -172,6 +190,7 @@ describe('GenericPlot', () => {
       expect(lens.setColor).toHaveBeenCalledWith('x', '#141414');
     });
   });
+
   it('calls render completion callback after plotting', () => {
     const onRenderComplete = jest.fn();
     const wrapper = mount((
@@ -180,7 +199,9 @@ describe('GenericPlot', () => {
       </RenderCompletionCallback.Provider>
     ));
     const { onAfterPlot } = wrapper.find('PlotlyComponent').props();
+
     onAfterPlot();
+
     expect(onRenderComplete).toHaveBeenCalled();
   });
 });

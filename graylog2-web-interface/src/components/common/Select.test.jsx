@@ -11,53 +11,64 @@ describe('Select', () => {
 
     it('should convert multi to isMulti', () => {
       const multiWrapper = mount(<Select multi options={options} onChange={onChange} />);
+
       expect(multiWrapper.find('Select').last().props().isMulti).toBeTruthy();
 
       const nonMultiWrapper = mount(<Select options={options} onChange={onChange} />);
+
       expect(nonMultiWrapper.find('Select').last().props().isMulti).toBeFalsy();
     });
 
     it('should convert disabled to isDisabled', () => {
       const disabledWrapper = mount(<Select disabled options={options} onChange={onChange} />);
+
       expect(disabledWrapper.find('Select').last().props().isDisabled).toBeTruthy();
 
       const enabledWrapper = mount(<Select options={options} onChange={onChange} />);
+
       expect(enabledWrapper.find('Select').last().props().isDisabled).toBeFalsy();
     });
 
     it('should convert clearable to isClearable', () => {
       const clearableWrapper = mount(<Select options={options} onChange={onChange} />);
+
       expect(clearableWrapper.find('Select').last().props().isClearable).toBeTruthy();
 
       const nonClearableWrapper = mount(<Select clearable={false} options={options} onChange={onChange} />);
+
       expect(nonClearableWrapper.find('Select').last().props().isClearable).toBeFalsy();
     });
 
     it('should use displayKey to select the option label', () => {
       const customOptions = [{ customLabel: 'my great label', value: 'value' }];
       const wrapper = mount(<Select options={customOptions} onChange={onChange} displayKey="customLabel" menuIsOpen />);
+
       expect(wrapper.find(Components.Option).props().children).toBe('my great label');
     });
 
     it('should use valueKey to select the option value', () => {
       const customOptions = [{ label: 'label', customValue: 42 }];
       const wrapper = mount(<Select options={customOptions} onChange={onChange} valueKey="customValue" menuIsOpen />);
+
       expect(wrapper.find(Components.Option).props().value).toBe(42);
     });
 
     it('should use matchProp to configure how options are filtered', () => {
       const matchAnyWrapper = mount(<Select options={options} onChange={onChange} />);
       const matchAnyFilter = matchAnyWrapper.find(SelectComponent).props().filterOption;
+
       expect(matchAnyFilter(options[0], 'label')).toBeTruthy();
       expect(matchAnyFilter(options[0], 'value')).toBeTruthy();
 
       const matchLabelWrapper = mount(<Select options={options} onChange={onChange} matchProp="label" />);
       const matchLabelFilter = matchLabelWrapper.find(SelectComponent).props().filterOption;
+
       expect(matchLabelFilter(options[0], 'label')).toBeTruthy();
       expect(matchLabelFilter(options[0], 'value')).toBeFalsy();
 
       const matchValueWrapper = mount(<Select options={options} onChange={onChange} matchProp="value" />);
       const matchValueFilter = matchValueWrapper.find(SelectComponent).props().filterOption;
+
       expect(matchValueFilter(options[0], 'label')).toBeFalsy();
       expect(matchValueFilter(options[0], 'value')).toBeTruthy();
     });
@@ -65,12 +76,14 @@ describe('Select', () => {
     it('should use optionRenderer to customize options\' appearance', () => {
       const optionRenderer = (option) => `Custom ${option.label}`;
       const wrapper = mount(<Select options={options} onChange={onChange} optionRenderer={optionRenderer} menuIsOpen />);
+
       expect(wrapper.find(Components.Option).props().children).toBe('Custom label');
     });
 
     it('should use valueRenderer to customize selected value\'s appearance', () => {
       const valueRenderer = (option) => `Custom ${option.value}`;
       const wrapper = mount(<Select options={options} onChange={onChange} valueRenderer={valueRenderer} value={options[0].value} />);
+
       expect(wrapper.find(Components.SingleValue).props().children).toBe('Custom value');
     });
 
@@ -81,6 +94,7 @@ describe('Select', () => {
       ];
       const wrapper = mount(<Select options={customOptions} onChange={onChange} menuIsOpen />);
       const renderedOptions = wrapper.find(Components.Option);
+
       expect(renderedOptions).toHaveLength(2);
       expect(renderedOptions.at(0).props().isDisabled).toBeFalsy();
       expect(renderedOptions.at(1).props().isDisabled).toBeTruthy();
@@ -89,6 +103,7 @@ describe('Select', () => {
     it('should add custom props to input using inputProps', () => {
       const inputProps = { id: 'myId' };
       const wrapper = mount(<Select options={options} onChange={onChange} menuIsOpen inputProps={inputProps} />);
+
       expect(wrapper.find(Components.Input).props().id).toBe(inputProps.id);
     });
   });

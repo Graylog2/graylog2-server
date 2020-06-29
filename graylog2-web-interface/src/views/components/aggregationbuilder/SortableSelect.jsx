@@ -12,12 +12,15 @@ const SortableSelectContainer = SortableContainer(Select);
 
 const _arrayMove = (array, from, to) => {
   const result = array.slice();
+
   result.splice(to < 0 ? result.length + to : to, 0, result.splice(from, 1)[0]);
+
   return result;
 };
 
 const _onSortEnd = ({ oldIndex, newIndex }, onChange, values) => {
   const newItems = _arrayMove(values, oldIndex, newIndex);
+
   onChange(newItems.map(({ field }) => ({ label: field, value: field })));
 };
 
@@ -29,6 +32,7 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
   const Item = (props: {data: {value: string}}) => {
     const { data: { value: itemValue } } = props;
     const index = findIndex(value, (v) => v.field === itemValue);
+
     return <SortableMultiValue index={index} {...props} innerProps={{ title: itemValue }} />;
   };
 

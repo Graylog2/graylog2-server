@@ -82,24 +82,31 @@ const ViewManagementStore = singletonStore(
 
     get(viewId: string): Promise<ViewJson> {
       const promise = fetch('GET', `${viewsUrl}/${viewId}`);
+
       ViewManagementActions.get.promise(promise);
+
       return promise;
     },
 
     create(view: View): Promise<View> {
       const promise = fetch('POST', viewsUrl, JSON.stringify(view));
+
       ViewManagementActions.create.promise(promise);
+
       return promise;
     },
 
     createCompleted(): Promise<void> {
       const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
       return CurrentUserStore.reload();
     },
 
     update(view: View): Promise<View> {
       const promise = fetch('PUT', viewsIdUrl(view.id), JSON.stringify(view));
+
       ViewManagementActions.update.promise(promise);
+
       return promise;
     },
 
@@ -113,6 +120,7 @@ const ViewManagementStore = singletonStore(
             page: response.page,
             perPage: response.per_page,
           };
+
           this.trigger({
             list: this.views,
             pagination: this.pagination,
@@ -140,6 +148,7 @@ const ViewManagementStore = singletonStore(
     forValue() {
       const promise = fetch('POST', forValueUrl())
         .catch((error) => UserNotification.error(`Finding matching views for value failed with status: ${error}`, 'Could not find matching views'));
+
       ViewManagementActions.forValue.promise(promise);
     },
   }),

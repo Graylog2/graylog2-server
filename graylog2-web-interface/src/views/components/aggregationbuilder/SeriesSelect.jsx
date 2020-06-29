@@ -27,6 +27,7 @@ const parseSeries = (series: Array<Option>) => (series ? series.map((s) => s.val
 
 const newSeriesConfigChange = (values, series, newSeries, onChange) => {
   const newValues = values.map((s) => (s === series ? newSeries : s));
+
   return onChange(newValues);
 };
 
@@ -50,6 +51,7 @@ class SeriesSelect extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const { suggester } = props;
+
     this.state = {
       options: suggester.defaults,
     };
@@ -64,6 +66,7 @@ class SeriesSelect extends React.Component<Props, State> {
         .map((value) => ({ label: value.toString(), value: last.value, parameterNeeded: false, incomplete: true, parameter: value }));
 
       this.setState({ options });
+
       return false;
     }
 
@@ -72,7 +75,9 @@ class SeriesSelect extends React.Component<Props, State> {
         [{ label: 'Back to function list', backToFunctions: true }],
         suggester.for(last.value, last.parameter),
       );
+
       this.setState({ options });
+
       return false;
     }
 
@@ -84,11 +89,13 @@ class SeriesSelect extends React.Component<Props, State> {
 
     // $FlowFixMe: Only `Option` present now.
     onChange(parseSeries(newSeries));
+
     return true;
   };
 
   _resetToFunctions = () => {
     const { suggester } = this.props;
+
     this.setState({ options: suggester.defaults });
   };
 
@@ -106,6 +113,7 @@ class SeriesSelect extends React.Component<Props, State> {
         .map((s) => (s && s.config && s.config.name ? s.config.name : null))
         .map((name) => trim(name))
         .filter((name) => name !== null && name !== undefined && name !== '');
+
       return (
         <span className={className}>
           <ConfigurableElement {...rest}
@@ -120,6 +128,7 @@ class SeriesSelect extends React.Component<Props, State> {
     const _components = {
       MultiValueLabel: valueComponent,
     };
+
     return (
       <Select placeholder="None: click to add series"
               onChange={this._onChange}

@@ -16,6 +16,7 @@ const interpolationOptions = ['linear', 'step-after', 'spline'].map(_makeOption)
 
 const LineVisualizationConfiguration = ({ config = LineVisualizationConfig.empty(), onChange }: Props) => {
   const _onChange = useCallback(({ value }) => onChange(config.toBuilder().interpolation(value).build()), [config, onChange]);
+
   return (
     <>
       <span>Interpolation:</span>

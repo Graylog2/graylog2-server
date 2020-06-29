@@ -39,6 +39,7 @@ const timerangeStrategy = (type: ?TimeRangeTypes) => {
 export default function TimeRangeInput({ disabled, config }: Props) {
   const [{ value }] = useField('timerange.type');
   const { component: Component } = timerangeStrategy(value);
+
   return <Component disabled={disabled} config={config} />;
 }
 

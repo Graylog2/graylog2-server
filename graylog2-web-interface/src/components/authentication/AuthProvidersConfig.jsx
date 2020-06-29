@@ -71,6 +71,7 @@ const AuthProvidersConfig = createReactClass({
 
   _toggleStatus(realmName) {
     const { config } = this.state;
+
     return () => {
       const disabledProcessors = config.disabled_realms;
       const update = ObjectUtils.clone(config);
@@ -100,6 +101,7 @@ const AuthProvidersConfig = createReactClass({
         </Alert>
       );
     }
+
     return null;
   },
 
@@ -128,6 +130,7 @@ const AuthProvidersConfig = createReactClass({
 
     return config.realm_order.map((name) => {
       const realm = (descriptors[name] || { id: name, title: 'Unavailable' });
+
       return { id: realm.name, title: realm.displayName };
     });
   },

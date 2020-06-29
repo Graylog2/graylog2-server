@@ -22,6 +22,7 @@ describe('MessageConfigGenerator', () => {
 
     expect(result).toEqual([{ decorators: [], sort: defaultSort, type: 'messages' }]);
   });
+
   it('adds decorators to search type', () => {
     const decorators = [
       { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },

@@ -28,6 +28,7 @@ const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
 const ReplaySearchButton = () => {
   const { query, timerange, streams } = useContext(DrilldownContext);
   const searchLink = buildSearchLink(timerange, query.query_string, streams);
+
   return (
     <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
       <IconButton name="play" focusable={false} />

@@ -9,6 +9,7 @@ class HistogramDetails extends React.Component {
 
   render() {
     const histogram = this.props.metric.metric;
+
     return (
       <dl className="metric-def metric-histogram">
         <dt>95th percentile:</dt>

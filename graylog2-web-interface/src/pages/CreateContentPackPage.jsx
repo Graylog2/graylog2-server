@@ -13,7 +13,6 @@ import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 
-
 const { ContentPacksActions } = CombinedProvider.get('ContentPacks');
 const { CatalogActions, CatalogStore } = CombinedProvider.get('Catalog');
 
@@ -58,9 +57,11 @@ const CreateContentPackPage = createReactClass({
             + 'Graylog logs for more information.';
           const title = 'Could not import content pack';
           let smallMessage = '';
+
           if (response.additional && response.additional.body && response.additional.body.message) {
             smallMessage = `<br /><small>${response.additional.body.message}</small>`;
           }
+
           UserNotification.error(message + smallMessage, title);
         },
       );
@@ -75,6 +76,7 @@ const CreateContentPackPage = createReactClass({
         .entities(result.entities.map((e) => Entity.fromJSON(e, true, contentPack.parameters)))
         .build();
       const fetchedEntities = result.entities.map((e) => Entity.fromJSON(e, false, contentPack.parameters));
+
       this.setState({ contentPack: newContentPack, fetchedEntities });
     });
   },

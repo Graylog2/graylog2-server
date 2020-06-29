@@ -36,6 +36,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
         if (onDelete) {
           onDelete(streamRule.id);
         }
+
         UserNotification.success('Stream rule has been successfully deleted.', 'Success');
       });
     }
@@ -46,6 +47,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
       if (onSubmit) {
         onSubmit(streamRuleId, data);
       }
+
       UserNotification.success('Stream rule has been successfully updated.', 'Success');
     });
   };

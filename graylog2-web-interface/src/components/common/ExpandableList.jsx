@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import style from './ExpandableList.css';
+
 /**
  * The ExpandableList will take a array or one of ExpandeableListItem to render
  * in list. This list can be expanded or flattened to give the user a overview

@@ -10,6 +10,7 @@ const ListGroup = ({ className, ...props }) => {
 ListGroup.propTypes = {
   className: PropTypes.string,
 };
+
 ListGroup.defaultProps = {
   className: undefined,
 };

@@ -31,6 +31,7 @@ export default class Viewport {
 
   toBuilder() {
     const { center, zoom } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ center, zoom }));
   }
@@ -52,6 +53,7 @@ export default class Viewport {
   static fromJSON(value: ViewportJson) {
     // eslint-disable-next-line camelcase
     const { center_x, center_y, zoom } = value;
+
     // eslint-disable-next-line camelcase
     return Viewport.create([center_x, center_y], zoom);
   }
@@ -75,6 +77,7 @@ class Builder {
 
   build() {
     const { center, zoom } = this.value.toObject();
+
     return new Viewport(center, zoom);
   }
 }

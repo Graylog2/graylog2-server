@@ -28,6 +28,7 @@ class ContentPackVersions extends React.Component {
   constructor(props) {
     super(props);
     const { contentPackRevisions } = this.props;
+
     this.state = { selectedVersion: contentPackRevisions.latestRevision };
 
     this.onChange = this.onChange.bind(this);
@@ -41,6 +42,7 @@ class ContentPackVersions extends React.Component {
     this.setState({
       selectedVersion: event.target.value,
     });
+
     onChange(event.target.value);
   }
 
@@ -48,9 +50,9 @@ class ContentPackVersions extends React.Component {
     if (header === 'Action') {
       return (<th className="text-right">{header}</th>);
     }
+
     return (<th>{header}</th>);
   };
-
 
   rowFormatter(pack) {
     const { onDeletePack } = this.props;
@@ -63,6 +65,7 @@ class ContentPackVersions extends React.Component {
                                   contentPackId={pack.id}
                                   revision={pack.rev} />
     );
+
     return (
       <tr key={pack.id + pack.rev}>
         <td>
@@ -137,6 +140,7 @@ class ContentPackVersions extends React.Component {
   render() {
     const { contentPackRevisions: { contentPacks } } = this.props;
     const headers = ['Select', 'Revision', 'Action'];
+
     return (
       <DataTable id="content-packs-versions"
                  headers={headers}

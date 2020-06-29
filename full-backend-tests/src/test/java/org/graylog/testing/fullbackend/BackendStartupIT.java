@@ -67,7 +67,8 @@ class BackendStartupIT {
                 "Threat Intelligence Plugin",
                 "Collector",
                 "AWS plugins",
-                "Elasticsearch 6 Support");
+                "Elasticsearch 6 Support",
+                "Elasticsearch 7 Support");
     }
 
     @Test

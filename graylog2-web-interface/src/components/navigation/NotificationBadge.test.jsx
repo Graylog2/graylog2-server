@@ -13,6 +13,7 @@ describe('NotificationBadge', () => {
       NotificationsActions: { list: jest.fn() },
       NotificationsStore: StoreMock('listen'),
     };
+
     const combinedProviderMock = new CombinedProviderMock({
       Notifications: notifications,
     });

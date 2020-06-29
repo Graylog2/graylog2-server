@@ -21,44 +21,57 @@ const _systemTitle = (pathname) => {
   if (_isActive(pathname, '/system/overview')) {
     return `${prefix} / Overview`;
   }
+
   if (_isActive(pathname, '/system/nodes')) {
     return `${prefix} / Nodes`;
   }
+
   if (_isActive(pathname, '/system/inputs')) {
     return `${prefix} / Inputs`;
   }
+
   if (_isActive(pathname, '/system/outputs')) {
     return `${prefix} / Outputs`;
   }
+
   if (_isActive(pathname, '/system/indices')) {
     return `${prefix} / Indices`;
   }
+
   if (_isActive(pathname, '/system/logging')) {
     return `${prefix} / Logging`;
   }
+
   if (_isActive(pathname, '/system/authentication')) {
     return `${prefix} / Authentication`;
   }
+
   if (_isActive(pathname, '/system/contentpacks')) {
     return `${prefix} / Content Packs`;
   }
+
   if (_isActive(pathname, '/system/grokpatterns')) {
     return `${prefix} / Grok Patterns`;
   }
+
   if (_isActive(pathname, '/system/lookuptables')) {
     return `${prefix} / Lookup Tables`;
   }
+
   if (_isActive(pathname, '/system/configurations')) {
     return `${prefix} / Configurations`;
   }
+
   if (_isActive(pathname, '/system/pipelines')) {
     return `${prefix} / Pipelines`;
   }
+
   if (_isActive(pathname, '/system/sidecars')) {
     return `${prefix} / Sidecars`;
   }
 
   const pluginRoute = PluginStore.exports('systemnavigation').filter((route) => _isActive(pathname, route.path))[0];
+
   if (pluginRoute) {
     return `${prefix} / ${pluginRoute.description}`;
   }
@@ -72,9 +85,11 @@ const SystemMenu = ({ location }) => {
     .map(({ description, path, permissions }) => {
       const prefixedPath = URLUtils.appPrefixed(path);
       const link = <NavigationLink description={description} path={prefixedPath} />;
+
       if (permissions) {
         return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
       }
+
       return <NavigationLink key={description} path={prefixedPath} description={description} />;
     });
 

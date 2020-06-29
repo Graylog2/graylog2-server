@@ -11,6 +11,7 @@ type Props = {
 
 const ViewTypeLabel = ({ type, capitalize }: Props) => {
   const typeLabel = type.toLowerCase();
+
   return capitalize ? StringUtils.capitalizeFirstLetter(typeLabel) : typeLabel;
 };
 

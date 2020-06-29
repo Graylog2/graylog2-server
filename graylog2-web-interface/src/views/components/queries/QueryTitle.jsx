@@ -52,6 +52,7 @@ class QueryTitle extends React.Component<Props, State> {
 
   _onClose = () => {
     const { onClose } = this.props;
+
     onClose();
   };
 
@@ -61,6 +62,7 @@ class QueryTitle extends React.Component<Props, State> {
     const { editing, title } = this.state;
     const { active, id, openEditModal } = this.props;
     const isActive = !editing && active;
+
     return (
       <>
         <TitleWrap aria-label={title} active={isActive}>

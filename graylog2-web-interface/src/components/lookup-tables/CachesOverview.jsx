@@ -89,6 +89,7 @@ class CachesOverview extends React.Component {
     if (!caches) {
       return <Spinner text="Loading caches" />;
     }
+
     const cacheTableEntries = caches.map((cache) => {
       return (
         <CacheTableEntry key={cache.id}

@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-
 import { Button, ButtonGroup, ButtonToolbar, Tab, Tabs } from 'components/graylog';
 import { TableList } from 'components/common';
 
@@ -18,6 +17,7 @@ class PermissionSelector extends React.Component {
     const streamItemButtons = (stream) => {
       const isRead = this.props.permissions.contains(`streams:read:${stream.id}`);
       const isEdit = this.props.permissions.contains(`streams:edit:${stream.id}`);
+
       return (
         <ButtonGroup bsSize="small">
           <Button bsStyle={isRead ? 'info' : 'default'}
@@ -50,6 +50,7 @@ class PermissionSelector extends React.Component {
     const dashboardItemButtons = (dashboard) => {
       const isRead = this.props.permissions.contains(`dashboards:read:${dashboard.id}`);
       const isEdit = this.props.permissions.contains(`dashboards:edit:${dashboard.id}`);
+
       return (
         <ButtonGroup bsSize="small">
           <Button bsStyle={isRead ? 'info' : 'default'}
@@ -158,6 +159,7 @@ class PermissionSelector extends React.Component {
         added = added.add(readTarget);
       }
     }, this);
+
     this.props.onChange(added, deleted);
   };
 
@@ -175,6 +177,7 @@ class PermissionSelector extends React.Component {
         added = added.add(readTarget).add(editTarget);
       }
     }, this);
+
     this.props.onChange(added, deleted);
   };
 }

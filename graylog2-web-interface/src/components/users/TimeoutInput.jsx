@@ -26,6 +26,7 @@ const TimeoutInput = createReactClass({
 
   getInitialState() {
     const unit = this._estimateUnit(this.props.value);
+
     return {
       sessionTimeoutNever: (this.props.value ? this.props.value === -1 : false),
       value: (this.props.value ? Math.floor(this.props.value / unit) : 0),
@@ -37,6 +38,7 @@ const TimeoutInput = createReactClass({
     if (this.state.sessionTimeoutNever) {
       return -1;
     }
+
     return (this.timeout.value * this.session_timeout_unit.getValue());
   },
 

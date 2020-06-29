@@ -33,11 +33,14 @@ const CreateInputControl = createReactClass({
     let options = [];
 
     const { inputTypes } = this.state;
+
     if (inputTypes) {
       const inputTypesIds = Object.keys(inputTypes);
+
       options = inputTypesIds.map((id) => {
         return { value: id, label: inputTypes[id] };
       });
+
       options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
     } else {
       options.push({ value: 'none', label: 'No inputs available', disabled: true });
@@ -86,6 +89,7 @@ const CreateInputControl = createReactClass({
 
     if (selectedInputDefinition && !customInputsComponent) {
       const inputTypeName = inputTypes[selectedInput];
+
       inputModal = (
         <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                    key="configuration-form-input"

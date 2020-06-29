@@ -24,6 +24,7 @@ const StreamSelect = ({ onChange, value, streams }: Props) => {
   const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
     .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
     .map(({ title, id }) => ({ label: title, value: id }))];
+
   return (
     <SelectContainer>
       <Select inputId="streams-filter"

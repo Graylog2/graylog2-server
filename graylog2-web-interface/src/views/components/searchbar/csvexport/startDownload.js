@@ -12,13 +12,17 @@ import type { SearchType } from 'views/logic/queries/SearchType';
 
 const getFilename = (view, selectedWidget) => {
   let filename = 'search-result';
+
   if (selectedWidget) {
     const widgetTitle = view.getWidgetTitleByWidget(selectedWidget);
+
     filename = `${widgetTitle}-${filename}`;
   } else {
     const viewTitle = view.title || `Untitled ${ViewTypeLabel({ type: view.type, capitalize: true })}`;
+
     filename = `${viewTitle}-${filename}`;
   }
+
   return StringUtils.replaceSpaces(filename, '-');
 };
 

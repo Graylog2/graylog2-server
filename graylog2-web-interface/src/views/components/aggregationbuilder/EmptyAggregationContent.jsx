@@ -13,11 +13,13 @@ type Props = {|
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
+
   useEffect(() => {
     if (onRenderComplete) {
       onRenderComplete();
     }
   }, [onRenderComplete]);
+
   const interactive = useContext(InteractiveContext);
   const text = editing
     ? (
@@ -27,6 +29,7 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
       </p>
     )
     : (<p>Please {interactive ? <Button bsStyle="info" onClick={toggleEdit}>Edit</Button> : 'edit'} the widget to see results here.</p>);
+
   return (
     <Jumbotron>
       <h2>Empty Aggregation</h2>

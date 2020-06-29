@@ -21,6 +21,7 @@ const LdapGroupsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/groups`);
 
     const promise = fetch('GET', url);
+
     promise.then(
       (response) => {
         this.groups = response;
@@ -41,6 +42,7 @@ const LdapGroupsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings/groups`);
 
     const promise = fetch('GET', url);
+
     promise.then(
       (response) => {
         this.mapping = response;
@@ -59,6 +61,7 @@ const LdapGroupsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings/groups`);
 
     const promise = fetch('PUT', url, mapping);
+
     promise.then(
       () => {
         this.loadMapping();

@@ -21,6 +21,7 @@ class ShardMeter extends React.Component {
 
   render() {
     const sm = this.props.shardMeter;
+
     return (
       <span>
         <h3 style={{ display: 'inline' }}>{this.props.title}</h3>

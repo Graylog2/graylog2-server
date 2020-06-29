@@ -34,6 +34,7 @@ class SystemMessagesComponent extends React.Component {
 
   render() {
     let content;
+
     if (this.state.total && this.state.messages) {
       const numberPages = Math.ceil(this.state.total / this.PER_PAGE);
       const paginatorSize = 10;

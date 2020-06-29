@@ -35,6 +35,7 @@ class AlertNotificationsList extends React.Component {
 
   _formatNotification = (notification) => {
     const stream = this.props.streams.find((s) => s.id === notification.stream_id);
+
     return (
       <AlertNotification key={notification.id}
                          alertNotification={notification}

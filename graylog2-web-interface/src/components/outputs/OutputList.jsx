@@ -50,6 +50,7 @@ class OutputList extends React.Component {
     }
 
     const outputs = this.props.outputs.sort(this._sortByTitle).map(this._formatOutput);
+
     return <div>{outputs}</div>;
   }
 }

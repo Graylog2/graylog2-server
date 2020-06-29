@@ -61,6 +61,7 @@ class StreamRulesEditor extends React.Component {
 
   onMessageLoaded = (message) => {
     this.setState({ message: message });
+
     if (message !== undefined) {
       const { streamId } = this.props;
 
@@ -91,6 +92,7 @@ class StreamRulesEditor extends React.Component {
 
   _onStreamRuleFormSubmit = (streamRuleId, data) => {
     const { streamId } = this.props;
+
     StreamRulesStore.create(streamId, data, () => {});
   };
 
@@ -114,6 +116,7 @@ class StreamRulesEditor extends React.Component {
           </>
         );
       }
+
       return (
         <>
           <MatchIcon name="times" /> This message would not be routed to this stream.

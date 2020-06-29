@@ -15,6 +15,7 @@ const mockActions = () => {
   const ViewManagementActions = {
     update: jest.fn(() => Promise.resolve(mockBaseView)).mockName('update'),
   };
+
   jest.doMock('views/stores/ViewManagementStore', () => ({ ViewManagementActions }));
   jest.doMock('views/stores/ViewStore', () => ({ ViewActions }));
 
@@ -25,6 +26,7 @@ describe('OnSaveViewAction', () => {
   afterEach(() => {
     jest.resetModules();
   });
+
   it('saves a given view', () => {
     const { ViewManagementActions, ViewActions } = mockActions();
     const onSaveView = loadSUT();
@@ -65,6 +67,7 @@ describe('OnSaveViewAction', () => {
   it('shows notification upon success', () => {
     mockActions();
     const UserNotification = { success: jest.fn().mockName('success') };
+
     jest.doMock('util/UserNotification', () => UserNotification);
     const onSaveView = loadSUT();
     const view = View.create();
@@ -79,11 +82,13 @@ describe('OnSaveViewAction', () => {
 
   it('does not do anything if saving fails', () => {
     const { ViewManagementActions } = mockActions();
+
     ViewManagementActions.update = jest.fn(() => Promise.reject(new Error('Something bad happened!')));
     const UserNotification = {
       success: jest.fn().mockName('success'),
       error: jest.fn().mockName('error'),
     };
+
     jest.doMock('util/UserNotification', () => UserNotification);
 
     const onSaveView = loadSUT();

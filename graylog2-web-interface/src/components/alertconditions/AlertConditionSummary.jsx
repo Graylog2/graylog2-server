@@ -39,6 +39,7 @@ class AlertConditionSummary extends React.Component {
     );
 
     let title;
+
     if (this.props.isDetailsView) {
       title = (condition.title ? condition.title : 'Untitled');
     } else {

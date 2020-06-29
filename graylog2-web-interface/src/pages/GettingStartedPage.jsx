@@ -1,8 +1,8 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import connect from 'stores/connect';
 
+import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import { Row } from 'components/graylog';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
@@ -29,8 +29,10 @@ const GettingStartedPage = ({ system, location }: Props) => {
   if (!system) {
     return <Spinner />;
   }
+
   const { cluster_id: clusterId, operating_system: operatingSystem, version } = system;
   const _onDismiss = () => history.push(Routes.STARTPAGE);
+
   return (
     <DocumentTitle title="Getting started">
       <Row>

@@ -76,17 +76,20 @@ const RolesStore = Reflux.createStore({
           'Could not delete role');
       }
     });
+
     return promise;
   },
   getMembers(rolename: string): Promise<RoleMembership[]> {
     const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(encodeURIComponent(rolename)).url);
     const promise = fetch('GET', url);
+
     promise.catch((error) => {
       if (error.additional.status !== 404) {
         UserNotification.error(`Could not load role's members with status: ${error}`,
           'Could not load role members');
       }
     });
+
     return promise;
   },
 });

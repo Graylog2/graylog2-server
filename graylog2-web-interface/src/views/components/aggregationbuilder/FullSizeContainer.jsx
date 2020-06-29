@@ -45,6 +45,7 @@ class FullSizeContainer extends React.Component<Props, State> {
       const height = this.wrapper.offsetHeight;
       const width = this.wrapper.offsetWidth;
       const { height: currentHeight, width: currentWidth } = this.state;
+
       if (height !== currentHeight || width !== currentWidth) {
         // eslint-disable-next-line react/no-did-update-set-state
         this.setState({ height, width });
@@ -55,6 +56,7 @@ class FullSizeContainer extends React.Component<Props, State> {
   render() {
     const { children } = this.props;
     const { height, width } = this.state;
+
     return (
       <Wrapper ref={(elem) => { this.wrapper = elem; }}>
         {children({ height, width })}

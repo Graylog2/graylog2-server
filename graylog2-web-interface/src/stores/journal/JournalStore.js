@@ -9,6 +9,7 @@ const JournalStore = Reflux.createStore({
 
   get(nodeId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl(nodeId)));
+
     promise.catch((error) => {
       UserNotification.error(`Getting journal information on node ${nodeId} failed: ${error}`, 'Could not get journal information');
     });

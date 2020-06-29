@@ -40,13 +40,17 @@ const CollectorsStore = Reflux.createStore({
 
   getCollector(collectorId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collectorId}`));
+
     promise.catch((error) => {
       let errorMessage = `Fetching Collector failed with status: ${error}`;
+
       if (error.status === 404) {
         errorMessage = `Unable to find a collector with ID <${collectorId}>, please ensure it was not deleted.`;
       }
+
       UserNotification.error(errorMessage, 'Could not retrieve Collector');
     });
+
     CollectorsActions.getCollector.promise(promise);
   },
 
@@ -64,11 +68,13 @@ const CollectorsStore = Reflux.createStore({
 
   all() {
     const promise = this._fetchCollectors({ pageSize: 0 });
+
     promise
       .then(
         (response) => {
           this.collectors = response.collectors;
           this.propagateChanges();
+
           return response.collectors;
         },
         (error) => {
@@ -82,6 +88,7 @@ const CollectorsStore = Reflux.createStore({
 
   list({ query = '', page = 1, pageSize = 10 }) {
     const promise = this._fetchCollectors({ query: query, page: page, pageSize: pageSize });
+
     promise
       .then(
         (response) => {
@@ -91,10 +98,12 @@ const CollectorsStore = Reflux.createStore({
             pageSize: response.pagination.per_page,
             total: response.pagination.total,
           };
+
           this.total = response.total;
           this.paginatedCollectors = response.collectors;
 
           this.propagateChanges();
+
           return response.collectors;
         },
         (error) => {
@@ -112,6 +121,7 @@ const CollectorsStore = Reflux.createStore({
 
   create(collector) {
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors`), collector);
+
     promise
       .then(
         (response) => {
@@ -126,11 +136,13 @@ const CollectorsStore = Reflux.createStore({
             'Could not retrieve collectors');
         },
       );
+
     CollectorsActions.create.promise(promise);
   },
 
   update(collector) {
     const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collector.id}`), collector);
+
     promise
       .then(
         (response) => {
@@ -145,16 +157,19 @@ const CollectorsStore = Reflux.createStore({
             'Could not retrieve collectors');
         },
       );
+
     CollectorsActions.update.promise(promise);
   },
 
   delete(collector) {
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collector.id}`);
     const promise = fetch('DELETE', url);
+
     promise
       .then((response) => {
         UserNotification.success('', `Collector "${collector.name}" successfully deleted`);
         this.refreshList();
+
         return response;
       }, (error) => {
         UserNotification.error(`Deleting Collector failed: ${error.status === 400 ? error.responseMessage : error.message}`,
@@ -169,10 +184,12 @@ const CollectorsStore = Reflux.createStore({
     const method = 'POST';
 
     const promise = fetch(method, url);
+
     promise
       .then((response) => {
         UserNotification.success('', `Collector "${name}" successfully copied`);
         this.refreshList();
+
         return response;
       }, (error) => {
         UserNotification.error(`Saving collector "${name}" failed with status: ${error.message}`,
@@ -190,6 +207,7 @@ const CollectorsStore = Reflux.createStore({
       executable_path: ' ',
       default_template: ' ',
     };
+
     lodash.merge(payload, collector);
 
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/validate`), payload);

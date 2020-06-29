@@ -23,6 +23,7 @@ const LoadingPage = ({ text }) => {
 LoadingPage.propTypes = {
   text: PropTypes.string,
 };
+
 LoadingPage.defaultProps = {
   text: 'Loading, please wait...',
 };

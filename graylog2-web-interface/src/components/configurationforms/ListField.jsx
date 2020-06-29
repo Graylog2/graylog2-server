@@ -37,6 +37,7 @@ class ListField extends React.Component {
 
   _handleChange = (nextValue) => {
     const values = (nextValue === '' ? [] : nextValue.split(','));
+
     this.props.onChange(this.state.title, values);
     this.setState({ value: values });
   };

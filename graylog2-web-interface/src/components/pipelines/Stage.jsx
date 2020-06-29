@@ -35,12 +35,14 @@ const Stage = createReactClass({
     let rule = ruleArg;
 
     let ruleTitle;
+
     // this can happen when a rule has been renamed, but not all references are updated
     if (!rule) {
       rule = {
         id: `invalid-${ruleIdx}`,
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
+
       ruleTitle = <span><Icon name="exclamation-triangle" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
     } else {
       ruleTitle = (
@@ -49,6 +51,7 @@ const Stage = createReactClass({
         </Link>
       );
     }
+
     return (
       <tr key={rule.id}>
         <td style={{ width: 400 }}>
@@ -102,6 +105,7 @@ const Stage = createReactClass({
     ];
 
     let description;
+
     if (this.props.isLastStage) {
       description = 'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
     } else {
@@ -121,6 +125,7 @@ const Stage = createReactClass({
       </span>
     );
     let content;
+
     // We check if we have the rules details before trying to render them
     if (this.state.rules) {
       content = this._formatRules(stage, this.props.stage.rules.map((name) => this.state.rules.filter((r) => r.title === name)[0]));

@@ -35,6 +35,7 @@ const App = ({ children, location }) => (
       if (!currentUser) {
         return <Spinner />;
       }
+
       return (
         <ScratchpadProvider loginName={currentUser.username}>
           <Navigation requestPath={location.pathname}

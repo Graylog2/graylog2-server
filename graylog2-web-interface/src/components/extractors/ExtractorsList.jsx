@@ -14,7 +14,6 @@ import StoreProvider from 'injection/StoreProvider';
 import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
-
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 
@@ -55,6 +54,7 @@ const ExtractorsList = createReactClass({
     }
 
     let sortExtractorsButton;
+
     if (this.state.extractors.length > 1) {
       sortExtractorsButton = (
         <Button bsSize="xsmall" bsStyle="primary" className="pull-right" onClick={this._openSortModal}>

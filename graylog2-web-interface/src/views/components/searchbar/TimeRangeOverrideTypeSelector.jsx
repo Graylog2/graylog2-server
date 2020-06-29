@@ -19,6 +19,7 @@ const TimeRangeOverrideTypeSelector = () => {
       name,
     },
   }), [onChange, value]);
+
   return (
     <ButtonToolbar className="pull-left">
       <TimeRangeDropdownButton onSelect={onSelect}>

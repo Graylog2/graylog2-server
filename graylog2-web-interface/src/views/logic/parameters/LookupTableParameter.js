@@ -19,7 +19,6 @@ export type LookupTableParameterJson = ParameterJson & {
   key: string,
 };
 
-
 export default class LookupTableParameter extends Parameter {
   static type = 'lut-parameter-v1';
 
@@ -41,6 +40,7 @@ export default class LookupTableParameter extends Parameter {
   toBuilder(): Builder {
     const { type, name, title, description, dataType, defaultValue, optional, binding } = this._value;
     const { lookupTable, key } = this._value2;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, binding, lookupTable, key }));
   }
@@ -141,6 +141,7 @@ class Builder {
 
   build(): LookupTableParameter {
     const { name, title, description, dataType, defaultValue, optional, lookupTable, key } = this.value.toObject();
+
     return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 }

@@ -12,6 +12,7 @@ const ContentPackInstallView = (props) => {
   const { comment } = props.install;
   const createdAt = props.install.created_at;
   const createdBy = props.install.created_by;
+
   return (
     <div>
       <Row>
