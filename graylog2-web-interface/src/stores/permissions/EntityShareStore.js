@@ -1,13 +1,14 @@
 // @flow strict
 import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GRN, SelectedGranteeRoles } from 'logic/permissions/types';
-import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
+import type { GRN } from 'logic/permissions/types';
+import EntityShareState, { type EntityShareStateJson, type SelectedGranteeRoles } from 'logic/permissions/EntityShareState';
 
 type EntityShareStoreState = {
   state: EntityShareState,
@@ -29,7 +30,7 @@ type EntityShareActionsType = RefluxActions<{
 type EntityShareStoreType = Store<EntityShareStoreState>;
 
 const defaultPreparePayload = {
-  selected_grantee_roles: {},
+  selected_grantee_roles: Immutable.Map(),
 };
 
 export const EntityShareActions: EntityShareActionsType = singletonActions(
@@ -61,7 +62,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
     },
 
     update(entityGRN: GRN, payload: EntityShareUpdatePayload): Promise<EntityShareState> {
-      const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN));
+      const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
       EntityShareActions.update.promise(promise);

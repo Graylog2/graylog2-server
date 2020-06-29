@@ -34,9 +34,15 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
     EntityShareActions.prepare(entityGRN);
   }, []);
 
+  const handleSave = () => {
+    return EntityShareActions.update(entityGRN, {
+      grantee_roles: entityShareState.selectedGranteeRoles,
+    }).then(onClose);
+  };
+
   return (
-    <BootstrapModalConfirm onCancel={() => {}}
-                           onConfirm={() => {}}
+    <BootstrapModalConfirm onCancel={onClose}
+                           onConfirm={handleSave}
                            onModalClose={onClose}
                            title={title}
                            confirmButtonText="Save"
