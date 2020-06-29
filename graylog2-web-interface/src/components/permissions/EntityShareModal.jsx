@@ -17,7 +17,15 @@ const StyledGranteesList = styled(GranteesList)`
   margin-top: 20px;
 `;
 
-const generateGRN = (id, type) => `grn::::${type}:${id}`;
+const _generateGRN = (id, type) => `grn::::${type}:${id}`;
+
+const _filterAvailableGrantees = ({ availableGrantees, activeShares, selectedGranteeRoles }) => {
+  const activeSharesUserIds = activeShares.map((activeShare) => activeShare.grantee);
+  const availableGranteeRolesUserIds = selectedGranteeRoles.entrySeq().map(([granteeGRN]) => granteeGRN);
+  const assignedUserIds = [...activeSharesUserIds, ...availableGranteeRolesUserIds];
+
+  return availableGrantees.filter((grantee) => !assignedUserIds.includes(grantee.id));
+};
 
 type Props = {
   entityId: string,
@@ -28,7 +36,8 @@ type Props = {
 
 const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
-  const entityGRN = generateGRN(entityId, entityType);
+  const entityGRN = _generateGRN(entityId, entityType);
+  const filteredGrantees = entityShareState && _filterAvailableGrantees(entityShareState);
 
   useEffect(() => {
     EntityShareActions.prepare(entityGRN);
@@ -51,7 +60,7 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
         {!entityShareState && <Spinner />}
         {entityShareState && (
           <>
-            <GranteesSelector availableGrantees={entityShareState.availableGrantees}
+            <GranteesSelector availableGrantees={filteredGrantees}
                               availableRoles={entityShareState.availableRoles}
                               entityGRN={entityGRN} />
             <StyledGranteesList activeShares={entityShareState.activeShares}
