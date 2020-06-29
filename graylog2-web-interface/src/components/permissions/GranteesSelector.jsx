@@ -4,7 +4,9 @@ import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-import EntityShareState, { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
+import { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import type { GRN } from 'logic/permissions/types';
 import Role from 'logic/permissions/Role';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
@@ -81,15 +83,24 @@ type FormData = {
 type Props = {
   availableGrantees: AvailableGrantees,
   availableRoles: AvailableRoles,
-  onSubmit: (FormData) => Promise<EntityShareState>,
+  entityGRN: GRN,
 };
 
-const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
+const GranteesSelector = ({ entityGRN, availableGrantees, availableRoles }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialRoleId = _initialRoleId(availableRoles);
+  const handleSubmit = (formData: FormData) => {
+    const { granteeId, roleId } = formData;
+
+    return EntityShareActions.prepare(entityGRN, {
+      selected_grantee_roles: {
+        [granteeId]: roleId,
+      },
+    });
+  };
 
   return (
-    <Formik onSubmit={onSubmit} initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
+    <Formik onSubmit={handleSubmit} initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
       {({ isSubmitting, isValid, errors }) => (
         <Form>
           <FormElements>
