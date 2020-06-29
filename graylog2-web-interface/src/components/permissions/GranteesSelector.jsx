@@ -2,7 +2,9 @@
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
+import * as Immutable from 'immutable';
 
+import { defaultCompare } from 'views/logic/DefaultCompare';
 import { type ThemeInterface } from 'theme';
 import { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
@@ -54,11 +56,20 @@ const SubmitButton = styled(Button)`
   margin-left: 15px;
 `;
 
-const _granteesOptions = (grantees: AvailableGrantees) => (
-  grantees.map((grantee) => (
+const _granteesOptions = (grantees: AvailableGrantees) => {
+  const granteesByType = grantees
+    .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title)).groupBy((grantee) => grantee.type);
+
+  const sortedGrantees = Immutable.List().concat(
+    granteesByType.get('global'),
+    granteesByType.get('team'),
+    granteesByType.get('user'),
+  );
+
+  return sortedGrantees.map((grantee) => (
     { label: grantee.title, value: grantee.id, granteeType: grantee.type }
-  )).toJS()
-);
+  )).toJS();
+};
 
 const _initialRoleId = (roles: AvailableRoles) => {
   const initialRoleTitle = 'Viewer';
@@ -93,9 +104,7 @@ const GranteesSelector = ({ entityGRN, availableGrantees, availableRoles }: Prop
     const { granteeId, roleId } = formData;
 
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_roles: {
-        [granteeId]: roleId,
-      },
+      selected_grantee_roles: Immutable.Map({ [granteeId]: roleId }),
     });
   };
 
