@@ -3,9 +3,14 @@ package org.graylog.storage.elasticsearch7;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.shaded.elasticsearch7.org.apache.http.HttpHost;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog2.indexer.IndexNotFoundException;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -13,6 +18,8 @@ import javax.inject.Named;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class ElasticsearchClient {
     private final RestHighLevelClient client;
@@ -41,11 +48,35 @@ public class ElasticsearchClient {
         ));
     }
 
+    public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
+        final MultiSearchRequest multiSearchRequest = new MultiSearchRequest()
+                .add(searchRequest);
+
+        final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
+
+        return firstResponseFrom(result, errorMessage);
+    }
+
+    private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
+        checkArgument(result != null);
+        checkArgument(result.getResponses().length == 1);
+
+        if (result.getResponses()[0].getResponse() == null) {
+            throw exceptionFrom(result.getResponses()[0].getFailure(), errorMessage);
+        }
+
+        return result.getResponses()[0].getResponse();
+    }
+
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {
+        return execute(fn, "An error occurred: ");
+    }
+
+    public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
             return fn.apply(client, requestOptions());
         } catch (Exception e) {
-            throw exceptionFrom(e);
+            throw exceptionFrom(e, errorMessage);
         }
     }
 
@@ -53,7 +84,17 @@ public class ElasticsearchClient {
         return RequestOptions.DEFAULT;
     }
 
-    private ElasticsearchException exceptionFrom(Exception e) {
-        return new ElasticsearchException(e);
+    private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
+        if (e instanceof ElasticsearchException) {
+            final ElasticsearchException elasticsearchException = (ElasticsearchException)e;
+            if (isIndexNotFoundException(elasticsearchException)) {
+                throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
+            }
+        }
+        return new ElasticsearchException(errorMessage, e);
+    }
+
+    private boolean isIndexNotFoundException(ElasticsearchException e) {
+        return e.getMessage().contains("index_not_found_exception");
     }
 }
