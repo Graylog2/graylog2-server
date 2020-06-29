@@ -21,12 +21,13 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.utilities.GRNRegistry;
 import org.graylog2.shared.security.RestPermissions;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
 
 @Singleton
 public class BuiltinRoles {
-    private static final ImmutableMap<String, RoleDTO> ROLES;
+    private static ImmutableMap<String, RoleDTO> ROLES;
 
     public final static String ROLE_ENTITY_VIEWER = "grn::::role:54e3deadbeefdeadbeef0000";
     public final static String ROLE_ENTITY_MANAGER = "grn::::role:54e3deadbeefdeadbeef0001";
@@ -36,13 +37,12 @@ public class BuiltinRoles {
     public final static String ROLE_DASHBOARD_CREATOR = "grn::::role:54e3deadbeefdeadbeef1002";
     public final static String ROLE_STREAM_CREATOR = "grn::::role:54e3deadbeefdeadbeef1003";
 
-    private static final GRNRegistry GRN_REGISTRY = GRNRegistry.createWithBuiltinTypes();
-
-    static {
+    @Inject
+    public BuiltinRoles(GRNRegistry grnRegistry) {
 
         ROLES = ImmutableMap.<String, RoleDTO>builder()
                 .put(ROLE_ENTITY_VIEWER, RoleDTO.create(
-                        GRN_REGISTRY.parse(ROLE_ENTITY_VIEWER).entity(),
+                        grnRegistry.parse(ROLE_ENTITY_VIEWER).entity(),
                         "Viewer",
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
@@ -51,7 +51,7 @@ public class BuiltinRoles {
                         )
                 ))
                 .put(ROLE_ENTITY_MANAGER, RoleDTO.create(
-                        GRN_REGISTRY.parse(ROLE_ENTITY_MANAGER).entity(),
+                        grnRegistry.parse(ROLE_ENTITY_MANAGER).entity(),
                         "Manager",
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
@@ -63,7 +63,7 @@ public class BuiltinRoles {
                         )
                 ))
                 .put(ROLE_ENTITY_OWNER, RoleDTO.create(
-                        GRN_REGISTRY.parse(ROLE_ENTITY_OWNER).entity(),
+                        grnRegistry.parse(ROLE_ENTITY_OWNER).entity(),
                         "Owner",
                         ImmutableSet.of(
                                 RestPermissions.ENTITY_OWN,
@@ -76,7 +76,7 @@ public class BuiltinRoles {
                         )
                 ))
                 .put(ROLE_COLLECTION_CREATOR, RoleDTO.create(
-                        GRN_REGISTRY.parse(ROLE_COLLECTION_CREATOR).entity(),
+                        grnRegistry.parse(ROLE_COLLECTION_CREATOR).entity(),
                         "Collection Creator",
                         // TODO this is an enterprise role, do we want pluggable roles?
                         // TODO or another solution?
@@ -84,12 +84,12 @@ public class BuiltinRoles {
                         ImmutableSet.of("collections:create")
                 ))
                 .put(ROLE_DASHBOARD_CREATOR, RoleDTO.create(
-                        GRN_REGISTRY.parse(ROLE_DASHBOARD_CREATOR).entity(),
+                        grnRegistry.parse(ROLE_DASHBOARD_CREATOR).entity(),
                         "Dashboard Creator",
                         ImmutableSet.of(RestPermissions.DASHBOARDS_CREATE)
                 ))
                 .put(ROLE_STREAM_CREATOR, RoleDTO.create(
-                        GRN_REGISTRY.parse(ROLE_STREAM_CREATOR).entity(),
+                        grnRegistry.parse(ROLE_STREAM_CREATOR).entity(),
                         "Stream Creator",
                         ImmutableSet.of(RestPermissions.STREAMS_CREATE)
                 ))
