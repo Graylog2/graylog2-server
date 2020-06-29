@@ -163,7 +163,6 @@ const Panel = ({
 
   const handleToggle = (nextIsExpanded) => {
     setIsExpanded(nextIsExpanded);
-
     onToggle(nextIsExpanded);
   };
 
@@ -249,15 +248,10 @@ Panel.defaultProps = {
 };
 
 Panel.Body = BootstrapPanel.Body;
-
 Panel.Collapse = BootstrapPanel.Collapse;
-
 Panel.Footer = PanelFooter;
-
 Panel.Heading = PanelHeading;
-
 Panel.Title = BootstrapPanel.Title;
-
 Panel.Toggle = BootstrapPanel.Toggle;
 
 /** @component */
