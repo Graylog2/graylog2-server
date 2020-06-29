@@ -50,6 +50,7 @@ class ValueActions extends React.Component<Props, State> {
 
   constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
+
     this.state = {
       open: false,
       overflowingComponents: {},
@@ -73,6 +74,7 @@ class ValueActions extends React.Component<Props, State> {
       .map((action: ActionDefinition) => {
         const setActionComponents = (fn) => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
         const handler = createHandlerFor(action, setActionComponents);
+
         const onSelect = () => {
           this._onMenuToggle();
           handler(handlerArgs);

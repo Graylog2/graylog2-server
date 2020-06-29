@@ -44,6 +44,7 @@ const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fie
   const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
 
   setLoadingState(true);
+
   onSortChange(newSort).then(() => {
     setLoadingState(false);
   });

@@ -30,6 +30,7 @@ class ContentPackParameters extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
       parameterToDelete: undefined,

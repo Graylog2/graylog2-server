@@ -29,6 +29,7 @@ describe('ExpandRows', () => {
     const result = expandRows(['timestamp', 'controller'], ['action'], pivotResult);
 
     expect(result).toHaveLength(2);
+
     expect(result).toEqual([
       {
         action: {
@@ -76,6 +77,7 @@ describe('ExpandRows', () => {
     const result = expandRows([], [], pivotResult);
 
     expect(result).toHaveLength(1);
+
     expect(result).toEqual([{
       'avg(took_ms)': 80.65076335877863,
       'min(took_ms)': 36,

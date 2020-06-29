@@ -102,6 +102,7 @@ class ConfigurationsPage extends React.Component {
     // Put two plugin config components per row.
     while (pluginConfigs.length > 0) {
       idx += 1;
+
       rows.push(
         <Row key={`plugin-config-row-${idx}`}>
           <Col md={6}>

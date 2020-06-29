@@ -24,6 +24,7 @@ class RuntimeErrorPage extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       showDetails: AppConfig.gl2DevMode(),
     };

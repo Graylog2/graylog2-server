@@ -42,6 +42,7 @@ const SortSelect = ({ pivots, series, onChange, sort }: Props) => {
   const seriesOptions = series.map((s) => ({ label: s.effectiveName, value: SortConfig.fromSeries(s) }));
   const fields = [].concat(pivotOptions, seriesOptions);
   const options = mapFields(fields);
+
   const _onChange = (newValue, reason) => {
     if (reason.action === 'clear') {
       return onChange([]);

@@ -26,11 +26,13 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 describe('DrilldownContextProvider', () => {
   // eslint-disable-next-line no-unused-vars
   const Consumer = ({ streams, timerange, query }) => null;
+
   const TestComponent = () => {
     const { streams, timerange, query } = useContext(DrilldownContext);
 
     return <Consumer streams={streams} timerange={timerange} query={query} />;
   };
+
   const widget = MessagesWidget.builder()
     .streams(['stream1', 'stream2'])
     .timerange({ type: 'relative', range: 1800 })
@@ -45,6 +47,7 @@ describe('DrilldownContextProvider', () => {
     expect(timerange).toEqual(expectedTimerange);
     expect(query).toEqual(expectedQuery);
   };
+
   const renderSUT = (viewType) => mount(
     <ViewTypeContext.Provider value={viewType}>
       <DrilldownContextProvider widget={widget}>

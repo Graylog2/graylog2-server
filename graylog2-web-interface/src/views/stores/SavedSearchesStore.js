@@ -57,6 +57,7 @@ const SavedSearchesStore = singletonStore(
       const promise = fetch('GET', `${savedSearchesUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
           this.searches = response.views;
+
           this.pagination = {
             total: response.total,
             count: response.count,

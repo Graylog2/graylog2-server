@@ -57,6 +57,7 @@ const SidecarsStore = Reflux.createStore({
         this.sidecars = response.sidecars;
         this.query = response.query;
         this.onlyActive = response.only_active;
+
         this.pagination = {
           total: response.pagination.total,
           count: response.pagination.count,

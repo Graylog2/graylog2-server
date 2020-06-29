@@ -123,6 +123,7 @@ describe('MigrateFieldCharts', () => {
 
         return actionMock.mock.calls[0][1].widgetPositions[widget.id];
       };
+
       const expWidgetPos = new WidgetPosition(1, 1, 4, Infinity);
 
       Store.get.mockImplementation(mockStoreGet());

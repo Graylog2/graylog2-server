@@ -37,6 +37,7 @@ const definitionFor = (type: string, parameters: Array<string>): Definition => {
 };
 
 export const isFunction = (s: string) => testSeriesRegex.test(s);
+
 export const parseSeries = (s: string) => {
   const funcNameResult = funcNameRegex.exec(s);
 

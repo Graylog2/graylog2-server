@@ -13,6 +13,7 @@ const mockCurrentUser = { timezone: 'UTC' };
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
+
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),

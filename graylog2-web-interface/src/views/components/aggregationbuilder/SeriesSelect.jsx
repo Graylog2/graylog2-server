@@ -106,6 +106,7 @@ class SeriesSelect extends React.Component<Props, State> {
   render() {
     const { onChange, series } = this.props;
     const { options } = this.state;
+
     const valueComponent = ({ children, innerProps, ...rest }) => {
       const element = rest.data.value;
       const { className } = innerProps;
@@ -125,6 +126,7 @@ class SeriesSelect extends React.Component<Props, State> {
         </span>
       );
     };
+
     const _components = {
       MultiValueLabel: valueComponent,
     };

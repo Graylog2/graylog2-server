@@ -65,6 +65,7 @@ export const ViewStore: ViewStoreType = singletonStore(
 
     init() {
       QueriesActions.create.listen(this.createQuery);
+
       ViewManagementActions.update.completed.listen(() => {
         this.dirty = false;
         this._trigger();

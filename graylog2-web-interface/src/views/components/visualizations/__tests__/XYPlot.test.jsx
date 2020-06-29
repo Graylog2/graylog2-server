@@ -107,6 +107,7 @@ describe('XYPlot', () => {
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
 
     expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
+
     expect(QueriesActions.timerange).toHaveBeenCalledWith('dummyquery', {
       type: 'absolute',
       from: '2018-10-12T04:04:21.723Z',

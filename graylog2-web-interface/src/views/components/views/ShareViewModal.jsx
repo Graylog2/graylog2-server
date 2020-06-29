@@ -59,6 +59,7 @@ class ShareViewModal extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       viewSharing: null,
       loaded: false,

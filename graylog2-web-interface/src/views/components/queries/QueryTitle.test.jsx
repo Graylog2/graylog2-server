@@ -28,6 +28,7 @@ describe('QueryTitle', () => {
 
     return () => new Promise((resolve) => {
       onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
       setImmediate(() => {
         resolve();
       });

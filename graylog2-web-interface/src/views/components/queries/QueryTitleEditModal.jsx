@@ -29,6 +29,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       titleDraft: '',
     };

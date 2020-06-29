@@ -48,6 +48,7 @@ class NewSearchPage extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       hookComponent: undefined,
       loaded: false,

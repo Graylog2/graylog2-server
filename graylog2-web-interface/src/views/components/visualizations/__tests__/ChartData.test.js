@@ -140,6 +140,7 @@ describe('Chart helper functions', () => {
     it('should allow passing a format series function to modify the series structure', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
       const generatorFunction = (type, name, x, y, z) => ({ type, name, x, y, z });
+
       const formatSeriesCustom = ({ valuesBySeries, xLabels }) => {
         // In this example we want to create only one series, with an z value, which contains all series data
         const z: Array<any> = Object.values(valuesBySeries).map((series) => {
@@ -156,6 +157,7 @@ describe('Chart helper functions', () => {
           z,
         ]];
       };
+
       const result = chartData(config, input, 'heatmap', generatorFunction, formatSeriesCustom);
       const expectedResult = readFixture('ChartData.test.oneColumOneRowPivot.result.json');
 

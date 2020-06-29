@@ -118,8 +118,10 @@ class MessageList extends React.Component<Props, State> {
 
     RefreshActions.disable();
     setLoadingState(true);
+
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
+
       this.setState({
         errors: response.result.errors,
         currentPage: pageNo,

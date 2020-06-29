@@ -267,6 +267,7 @@ describe('useStore', () => {
 
       return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;
     };
+
     const wrapper = mount(<Component />);
 
     act(() => SimpleStore.setValue(42));
@@ -276,6 +277,7 @@ describe('useStore', () => {
 
   it('does not rerender component if state does not change', () => {
     let renderCount = 0;
+
     const SimpleComponentWithRenderCounter = () => {
       renderCount += 1;
       const { value } = useStore(SimpleStore) || {};

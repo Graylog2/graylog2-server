@@ -27,6 +27,7 @@ class CreateUsersPage extends React.Component {
 
     request.permissions = [];
     delete request['session-timeout-never'];
+
     UsersStore.create(request).then(() => {
       UserNotification.success(`User ${request.username} was created successfully.`, 'Success!');
       history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);

@@ -25,6 +25,7 @@ import ExtendedSearchPage from './ExtendedSearchPage';
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/layout/Footer', () => <div />);
 jest.mock('util/History', () => ({ push: jest.fn() }));
+
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
     ['listen', () => jest.fn()],
@@ -109,6 +110,7 @@ describe('ExtendedSearchPage', () => {
     SearchConfigActions.refresh = jest.fn();
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
+
     ViewStore.getInitialState = jest.fn(() => ({
       view: View.create().toBuilder().type(View.Type.Dashboard).build(),
       dirty: false,
