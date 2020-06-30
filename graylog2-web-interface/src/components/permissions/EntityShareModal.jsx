@@ -12,10 +12,12 @@ import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
+import ShareableEnityURL from './ShareableEnityURL';
 
 const StyledGranteesList = styled(GranteesList)`
   width: calc(100% - 153px);
   margin-top: 20px;
+  margin-bottom: 40px;
 `;
 
 const _generateGRN = (id, type) => `grn::::${type}:${id}`;
@@ -83,7 +85,7 @@ const EntityShareModal = ({ description, title, entityId, entityType, onClose }:
                                 onRoleChange={_handleSelection}
                                 selectedGrantees={entityShareState.selectedGrantees}
                                 onDelete={_handleDeletion} />
-            {/* sharable url box */}
+            <ShareableEnityURL />
           </>
         )}
       </>
