@@ -2,12 +2,7 @@ package org.graylog.storage.elasticsearch6;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.github.joschi.jadconfig.util.Duration;
-import com.github.rholder.retry.WaitStrategies;
-import com.github.rholder.retry.WaitStrategy;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
@@ -21,7 +16,6 @@ import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
-import org.graylog2.indexer.messages.IndexBlockRetryAttempt;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -35,30 +29,16 @@ import javax.inject.Named;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class MessagesAdapterES6 implements MessagesAdapter {
-    private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
     private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterES6.class);
-
-    @VisibleForTesting
-    static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
-
-    // the wait strategy uses powers of 2 to compute wait times.
-    // see https://github.com/rholder/guava-retrying/blob/177b6c9b9f3e7957f404f0bdb8e23374cb1de43f/src/main/java/com/github/rholder/retry/WaitStrategies.java#L304
-    // using 500 leads to the expected exponential pattern of 1000, 2000, 4000, 8000, ...
-    private static final int retrySecondsMultiplier = 500;
-
-    @VisibleForTesting
-    static final WaitStrategy exponentialWaitSeconds = WaitStrategies.exponentialWait(retrySecondsMultiplier, MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
 
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];";
@@ -174,7 +154,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
             indexedSuccessfully += chunk.size();
 
-            final Set<BulkResult.BulkResultItem> remainingFailures = retryOnlyIndexBlockItemsForever(chunk, result.getFailedItems());
+            final List<BulkResult.BulkResultItem> remainingFailures = result.getFailedItems();
 
             failedItems.addAll(remainingFailures);
             if (LOG.isDebugEnabled()) {
@@ -209,60 +189,5 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         }
 
         return runBulkRequest(bulk.build(), chunk.size());
-    }
-
-    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<IndexingRequest> chunk, List<BulkResult.BulkResultItem> allFailedItems) throws IOException {
-        Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
-        final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
-        List<IndexingRequest> blockedMessages = messagesForResultItems(chunk, indexBlocks);
-
-        if (!indexBlocks.isEmpty()) {
-            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
-        }
-
-        long attempt = 1;
-
-        while (!indexBlocks.isEmpty()) {
-            waitBeforeRetrying(attempt++);
-
-            final BulkResult bulkResult = bulkIndexChunk(blockedMessages);
-
-            final List<BulkResult.BulkResultItem> failedItems = bulkResult.getFailedItems();
-
-            indexBlocks = indexBlocksFrom(failedItems);
-            blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
-
-            final Set<BulkResult.BulkResultItem> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
-            otherFailures.addAll(newOtherFailures);
-
-            if (indexBlocks.isEmpty()) {
-                LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
-            }
-        }
-
-        return otherFailures;
-    }
-
-    private void waitBeforeRetrying(long attempt) {
-        try {
-            final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private List<IndexingRequest> messagesForResultItems(List<IndexingRequest> chunk, Set<BulkResult.BulkResultItem> indexBlocks) {
-        final Set<String> blockedMessageIds = indexBlocks.stream().map(item -> item.id).collect(Collectors.toSet());
-
-        return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.message().getId())).collect(Collectors.toList());
-    }
-
-    private Set<BulkResult.BulkResultItem> indexBlocksFrom(List<BulkResult.BulkResultItem> allFailedItems) {
-        return allFailedItems.stream().filter(this::hasFailedDueToBlockedIndex).collect(Collectors.toSet());
-    }
-
-    private boolean hasFailedDueToBlockedIndex(BulkResult.BulkResultItem item) {
-        return item.errorType.equals(INDEX_BLOCK_ERROR) && item.errorReason.equals(INDEX_BLOCK_REASON);
     }
 }

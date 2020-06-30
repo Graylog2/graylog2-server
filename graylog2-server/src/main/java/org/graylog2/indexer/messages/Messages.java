@@ -23,8 +23,11 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.rholder.retry.WaitStrategy;
 import com.google.auto.value.AutoValue;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexSet;
@@ -38,6 +41,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +55,17 @@ public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
 
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
+
+    // the wait strategy uses powers of 2 to compute wait times.
+    // see https://github.com/rholder/guava-retrying/blob/177b6c9b9f3e7957f404f0bdb8e23374cb1de43f/src/main/java/com/github/rholder/retry/WaitStrategies.java#L304
+    // using 500 leads to the expected exponential pattern of 1000, 2000, 4000, 8000, ...
+    private static final int retrySecondsMultiplier = 500;
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitSeconds = WaitStrategies.exponentialWait(retrySecondsMultiplier, MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
+
+    @VisibleForTesting
+    static final WaitStrategy exponentialWaitMilliseconds = WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit());
 
     @SuppressWarnings("UnstableApiUsage")
     private static final Retryer<List<IndexingError>> BULK_REQUEST_RETRYER = RetryerBuilder.<List<IndexingError>>newBuilder()
@@ -67,7 +82,6 @@ public class Messages {
                 }
             })
             .build();
-
 
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
     private final MessagesAdapter messagesAdapter;
@@ -109,7 +123,9 @@ public class Messages {
 
         final List<IndexingError> indexFailures = runBulkRequest(indexingRequestList, messageList.size());
 
-        final Set<String> failedIds = indexFailures.stream()
+        final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexFailures);
+
+        final Set<String> failedIds = remainingErrors.stream()
                 .map(indexingError -> indexingError.message().getId())
                 .collect(Collectors.toSet());
         final List<IndexingRequest> successfulRequests = indexingRequestList.stream()
@@ -120,6 +136,59 @@ public class Messages {
         accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
 
         return propagateFailure(indexFailures);
+    }
+
+    private Set<IndexingError> retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems) {
+        Set<IndexingError> indexBlocks = indexBlocksFrom(allFailedItems);
+        final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
+        List<IndexingRequest> blockedMessages = messagesForResultItems(messages, indexBlocks);
+
+        if (!indexBlocks.isEmpty()) {
+            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+        }
+
+        long attempt = 1;
+
+        while (!indexBlocks.isEmpty()) {
+            waitBeforeRetrying(attempt++);
+
+            final List<Messages.IndexingError> failedItems = runBulkRequest(blockedMessages, messages.size());
+
+            indexBlocks = indexBlocksFrom(failedItems);
+            blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
+
+            final Set<IndexingError> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            otherFailures.addAll(newOtherFailures);
+
+            if (indexBlocks.isEmpty()) {
+                LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
+            }
+        }
+
+        return otherFailures;
+    }
+
+    private List<IndexingRequest> messagesForResultItems(List<IndexingRequest> chunk, Set<IndexingError> indexBlocks) {
+        final Set<String> blockedMessageIds = indexBlocks.stream().map(item -> item.message().getId()).collect(Collectors.toSet());
+
+        return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.message().getId())).collect(Collectors.toList());
+    }
+
+    private Set<IndexingError> indexBlocksFrom(List<IndexingError> allFailedItems) {
+        return allFailedItems.stream().filter(this::hasFailedDueToBlockedIndex).collect(Collectors.toSet());
+    }
+
+    private boolean hasFailedDueToBlockedIndex(IndexingError indexingError) {
+        return indexingError.errorType().equals(IndexingError.ErrorType.IndexBlocked);
+    }
+
+    private void waitBeforeRetrying(long attempt) {
+        try {
+            final long sleepTime = exponentialWaitSeconds.computeSleepTime(new IndexBlockRetryAttempt(attempt));
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count) {
