@@ -23,11 +23,11 @@ import io.searchbox.core.Get;
 import io.searchbox.core.Index;
 import io.searchbox.indices.Analyze;
 import org.apache.http.client.config.RequestConfig;
-import org.graylog2.indexer.ElasticsearchException;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
+import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.IndexBlockRetryAttempt;
 import org.graylog2.indexer.messages.IndexingRequest;
@@ -91,14 +91,17 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             .build();
 
     private final Meter invalidTimestampMeter;
+    private final ChunkedBulkIndexer chunkedBulkIndexer;
 
     @Inject
     public MessagesAdapterES6(JestClient client,
                               @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
-                              MetricRegistry metricRegistry) {
+                              MetricRegistry metricRegistry,
+                              ChunkedBulkIndexer chunkedBulkIndexer) {
         this.client = client;
         this.useExpectContinue = useExpectContinue;
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
+        this.chunkedBulkIndexer = chunkedBulkIndexer;
     }
 
     @Override
@@ -125,37 +128,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         tokens.forEach(token -> terms.add((String) token.get("token")));
 
         return terms;
-    }
-
-    @Override
-    public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList) {
-        if (messageList.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        int chunkSize = messageList.size();
-        int offset = 0;
-        final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        for (;;) {
-            try {
-                final List<BulkResult.BulkResultItem> failures = bulkIndexChunked(messageList, offset, chunkSize);
-                failedItems.addAll(failures);
-                break; // on success
-            } catch (EntityTooLargeException e) {
-                LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
-                if (chunkSize == messageList.size()) {
-                    LOG.warn("Consider lowering the \"output_batch_size\" setting.");
-                }
-                failedItems.addAll(e.failedItems);
-                offset += e.indexedSuccessfully;
-                chunkSize /= 2;
-            }
-            if (chunkSize == 0) {
-                throw new ElasticsearchException("Bulk index cannot split output batch any further.");
-            }
-        }
-
-        return indexFailuresFromMessages(failedItems, messageList);
     }
 
     private List<IndexFailure> indexFailuresFromMessages(List<BulkResult.BulkResultItem> failedItems, List<IndexingRequest> messageList) {
@@ -212,8 +184,16 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         }
     }
 
+    @Override
+    public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList) {
+        return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
+    }
 
-    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<IndexingRequest> messageList, int offset, int chunkSize) throws EntityTooLargeException {
+    private List<IndexFailure> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
+        final List<IndexingRequest> messageList = command.requests;
+        final int offset = command.offset;
+        int chunkSize = command.size;
+
         chunkSize = Math.min(messageList.size(), chunkSize);
 
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
@@ -224,7 +204,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             final BulkResult result = bulkIndexChunk(chunk);
 
             if (result.getResponseCode() == 413) {
-                throw new EntityTooLargeException(indexedSuccessfully, failedItems);
+                throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexFailuresFromMessages(failedItems, messageList));
             }
 
             // TODO should we check result.isSucceeded()?
@@ -249,7 +229,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             }
             chunkCount++;
         }
-        return failedItems;
+        return indexFailuresFromMessages(failedItems, messageList);
     }
 
     private BulkResult bulkIndexChunk(List<IndexingRequest> chunk) {
@@ -321,15 +301,5 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
     private boolean hasFailedDueToBlockedIndex(BulkResult.BulkResultItem item) {
         return item.errorType.equals(INDEX_BLOCK_ERROR) && item.errorReason.equals(INDEX_BLOCK_REASON);
-    }
-
-    private static class EntityTooLargeException extends Exception {
-        private final int indexedSuccessfully;
-        private final List<BulkResult.BulkResultItem> failedItems;
-
-        public EntityTooLargeException(int indexedSuccessfully, List<BulkResult.BulkResultItem> failedItems)  {
-            this.indexedSuccessfully = indexedSuccessfully;
-            this.failedItems = failedItems;
-        }
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

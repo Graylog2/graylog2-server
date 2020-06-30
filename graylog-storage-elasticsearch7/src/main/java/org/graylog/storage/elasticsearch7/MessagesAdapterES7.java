@@ -8,6 +8,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetRequest
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
 import org.graylog2.indexer.IndexFailure;
+import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
@@ -24,11 +25,13 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class MessagesAdapterES7 implements MessagesAdapter {
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
+    private final ChunkedBulkIndexer chunkedBulkIndexer;
 
     @Inject
-    public MessagesAdapterES7(ElasticsearchClient elasticsearchClient, MetricRegistry metricRegistry) {
+    public MessagesAdapterES7(ElasticsearchClient elasticsearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer) {
         this.client = elasticsearchClient;
         this.invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
+        this.chunkedBulkIndexer = chunkedBulkIndexer;
     }
 
     @Override
@@ -51,6 +54,12 @@ public class MessagesAdapterES7 implements MessagesAdapter {
 
     @Override
     public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList) {
+        return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
+    }
+
+    private List<IndexFailure> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
+        final List<IndexingRequest> messageList = command.requests;
+
         if (messageList.isEmpty()) {
             return Collections.emptyList();
         }

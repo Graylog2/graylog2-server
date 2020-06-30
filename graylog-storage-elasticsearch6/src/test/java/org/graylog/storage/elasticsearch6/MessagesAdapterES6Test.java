@@ -7,6 +7,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.BulkResult;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
@@ -38,7 +39,7 @@ class MessagesAdapterES6Test {
     void setUp() {
         this.jestClient = mock(JestClient.class);
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry);
+        this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry, new ChunkedBulkIndexer());
     }
 
     public static class MockedBulkResult extends BulkResult {

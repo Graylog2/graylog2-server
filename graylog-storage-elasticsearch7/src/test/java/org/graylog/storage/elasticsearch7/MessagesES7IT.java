@@ -5,6 +5,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequ
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.junit.Rule;
@@ -20,7 +21,7 @@ public class MessagesES7IT extends MessagesIT {
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES7(this.elasticsearch.elasticsearchClient(), metricRegistry);
+        return new MessagesAdapterES7(this.elasticsearch.elasticsearchClient(), metricRegistry, new ChunkedBulkIndexer());
     }
 
     @Override
