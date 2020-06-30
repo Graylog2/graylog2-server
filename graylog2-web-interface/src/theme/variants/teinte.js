@@ -31,7 +31,7 @@ grayScale.forEach((tint, index) => {
 
 const variant = {
   danger: '#ad0707',
-  default: '#1f1f1f',
+  default: lighten(global.textDefault, 0.25),
   info: '#0063be',
   primary: '#702785',
   success: '#00ae42',
@@ -46,26 +46,31 @@ const variant = {
 
 Object.keys(variant).forEach((name) => {
   if (typeof variant[name] === 'string') {
-    variant.light[name] = lighten(variant[name], 0.15);
-    variant.lighter[name] = lighten(variant[name], 0.5);
-    variant.lightest[name] = lighten(variant[name], 0.85);
+    variant.light[name] = lighten(variant[name], 0.22);
+    variant.lighter[name] = lighten(variant[name], 0.55);
+    variant.lightest[name] = lighten(variant[name], 0.88);
 
-    variant.dark[name] = darken(variant[name], 0.15);
-    variant.darker[name] = darken(variant[name], 0.5);
-    variant.darkest[name] = darken(variant[name], 0.85);
+    variant.dark[name] = darken(variant[name], 0.22);
+    variant.darker[name] = darken(variant[name], 0.55);
+    variant.darkest[name] = darken(variant[name], 0.88);
   }
 });
 
+const table = {
+  background: lighten(variant.default, 0.95),
+  backgroundAlt: lighten(variant.default, 0.85),
+  backgroundHover: lighten(variant.default, 0.9),
+};
+
 /* eslint-disable prefer-destructuring */
-global.tableBackground = gray[100];
-global.tableBackgroundAlt = gray[80];
-global.inputBackground = global.contentBackground;
+global.inputBackground = variant.lightest.default;
 /* eslint-enable prefer-destructuring */
 
 const teinte = {
   brand,
   global,
   gray,
+  table,
   variant,
 };
 
