@@ -47,7 +47,7 @@ type Props = {
 };
 
 class QueryTabs extends React.Component<Props> {
-  queryTitleEditModal: ?QueryTitleEditModal
+  queryTitleEditModal: ?QueryTitleEditModal;
 
   static propTypes = {
     children: PropTypes.node,

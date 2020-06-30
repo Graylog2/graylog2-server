@@ -51,6 +51,7 @@ class SideBar extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       selectedKey: undefined,
       open: false,

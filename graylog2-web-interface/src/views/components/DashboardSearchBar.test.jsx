@@ -9,6 +9,7 @@ import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
+
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideActions: {
     set: jest.fn(() => Promise.resolve()),

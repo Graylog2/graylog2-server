@@ -1,4 +1,5 @@
 const _isWildCard = (permissionSet) => (permissionSet.indexOf('*') > -1);
+
 const _permissionPredicate = (permissionSet, p) => {
   if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
     return true;

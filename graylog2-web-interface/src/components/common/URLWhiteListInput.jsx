@@ -10,6 +10,7 @@ import FormsUtils from 'util/FormsUtils';
 import URLWhiteListFormModal from 'components/common/URLWhiteListFormModal';
 
 const ToolsStore = StoreProvider.getStore('Tools');
+
 type Props = {
   label: string,
   onChange: (event: SyntheticInputEvent<EventTarget>) => void,
@@ -75,6 +76,7 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
         }
       }
     };
+
     const timer = setTimeout(() => checkSuggestion(), 250);
 
     return () => clearTimeout(timer);

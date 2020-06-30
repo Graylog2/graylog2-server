@@ -35,6 +35,7 @@ const LoginForm = ({ onErrorChange }) => {
     const location = document.location.host;
 
     promise = SessionActions.login(username, password, location);
+
     promise.catch((error) => {
       if (error.additional.status === 401) {
         onErrorChange('Invalid credentials, please verify them and retry.');

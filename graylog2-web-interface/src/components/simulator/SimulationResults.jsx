@@ -22,6 +22,7 @@ const VIEW_OPTIONS = {
 class SimulationResults extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       viewOption: VIEW_OPTIONS.SIMULATION_SUMMARY,
     };

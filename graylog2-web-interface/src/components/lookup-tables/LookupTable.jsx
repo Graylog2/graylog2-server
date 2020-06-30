@@ -48,6 +48,7 @@ class LookupTable extends React.Component {
 
   _lookupKey = (e) => {
     e.preventDefault();
+
     LookupTablesActions.lookup(this.props.table.name, this.state.lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });

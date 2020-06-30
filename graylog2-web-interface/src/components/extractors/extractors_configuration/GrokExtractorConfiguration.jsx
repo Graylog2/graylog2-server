@@ -45,6 +45,7 @@ class GrokExtractorConfiguration extends React.Component {
     this.loadPromise = GrokPatternsStore.loadPatterns((patterns) => {
       if (!this.loadPromise.isCancelled()) {
         this.loadPromise = undefined;
+
         this.setState({
           patterns: patterns,
         });

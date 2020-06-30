@@ -30,6 +30,7 @@ describe('PivotConfigGenerator', () => {
     const result = PivotConfigGenerator({ config: widgetConfig });
 
     expect(result).toHaveLength(2);
+
     expect(result[0]).toMatchSnapshot({
       id: expect.any(String),
     });
@@ -55,6 +56,7 @@ describe('PivotConfigGenerator', () => {
     const result = PivotConfigGenerator({ config: widgetConfig });
 
     expect(result).toHaveLength(2);
+
     expect(result[0]).toMatchSnapshot({
       id: expect.any(String),
     });
@@ -71,6 +73,7 @@ describe('PivotConfigGenerator', () => {
       .columnPivots([])
       .series([Series.forFunction('count')])
       .build();
+
     const generateConfigForPivotWithTimeUnit = ({ timeUnit, expectedMappedTimeUnit }) => {
       const config = createWidgetConfigWithPivot(Pivot.create(
         'foo',

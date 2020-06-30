@@ -91,6 +91,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then((response) => {
       this.notifications = response.notifications;
       this.query = response.query;
+
       this.pagination = {
         count: response.count,
         page: response.page,

@@ -74,6 +74,7 @@ class EventNotificationsContainer extends React.Component {
       }
 
       this.testPromise = EventNotificationsActions.testPersisted(definition);
+
       this.testPromise
         .then(
           (response) => {

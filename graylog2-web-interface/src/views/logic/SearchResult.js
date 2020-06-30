@@ -10,6 +10,7 @@ class SearchResult {
     this._result = fromJS(result);
 
     this._results = fromJS(mapValues(result.results, (queryResult) => new QueryResult(queryResult)));
+
     this._errors = fromJS(get(result, 'errors', []).map((error) => {
       if (error.type === 'result_window_limit') {
         return new ResultWindowLimitError(error, this);

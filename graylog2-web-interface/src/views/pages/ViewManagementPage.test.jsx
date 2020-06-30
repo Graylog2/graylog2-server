@@ -9,6 +9,7 @@ jest.mock('routing/Routes', () => ({
 }));
 
 jest.mock('views/components/views/ViewList', () => 'view-list');
+
 jest.mock('components/common', () => ({
   DocumentTitle: mockComponent('DocumentTitle'),
   PageHeader: mockComponent('PageHeader'),

@@ -7,6 +7,7 @@ import QueryInput from './QueryInput';
 import UserPreferencesContext, { defaultUserPreferences } from '../../../contexts/UserPreferencesContext';
 
 jest.mock('./SearchBarAutocompletions', () => ({}));
+
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: {
     getInitialState: jest.fn(),

@@ -7,6 +7,7 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 
 export default function withStreams(WrappedComponent, hiddenStreams = []) {
   const wrappedComponentName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
+
   class WithStreams extends React.Component {
     state = {
       streams: undefined,

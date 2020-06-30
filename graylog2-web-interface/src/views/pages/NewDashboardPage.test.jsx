@@ -12,6 +12,7 @@ import View from 'views/logic/views/View';
 import NewDashboardPage from './NewDashboardPage';
 
 jest.mock('./ExtendedSearchPage', () => () => <div>Extended search page</div>);
+
 jest.mock('components/common', () => ({
   IfPermitted: jest.fn(({ children }) => <>{children}</>),
 }));

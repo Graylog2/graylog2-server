@@ -33,6 +33,7 @@ describe('Routes', () => {
   describe('with prefix', () => {
     beforeAll(() => {
       jest.resetModules();
+
       window.appConfig = {
         gl2AppPathPrefix: prefix,
       };

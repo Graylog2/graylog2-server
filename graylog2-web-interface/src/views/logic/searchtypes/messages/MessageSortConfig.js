@@ -12,7 +12,7 @@ type InternalState = {
 };
 
 export default class MessageSortConfig {
-  _value: InternalState
+  _value: InternalState;
 
   constructor(field: string, direction: Direction) {
     this._value = { field, direction };

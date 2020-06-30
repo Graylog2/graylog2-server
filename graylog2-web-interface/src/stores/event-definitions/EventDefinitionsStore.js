@@ -93,6 +93,7 @@ const EventDefinitionsStore = Reflux.createStore({
       this.eventDefinitions = response.event_definitions;
       this.context = response.context;
       this.query = response.query;
+
       this.pagination = {
         count: response.count,
         page: response.page,

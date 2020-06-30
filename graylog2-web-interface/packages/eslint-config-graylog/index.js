@@ -55,29 +55,29 @@ module.exports = {
     'padding-line-between-statements': [
       'error',
       {
+        blankLine: 'any',
+        prev: ['let', 'const'],
+        next: ['let', 'const'],
+      },
+      {
+        blankLine: 'any',
+        prev: 'expression',
+        next: 'expression',
+      },
+      {
+        blankLine: 'any',
+        prev: 'export',
+        next: 'export',
+      },
+      {
         blankLine: 'always',
-        prev: ['block', 'block-like', 'cjs-export', 'class', 'export', 'import'],
+        prev: ['block', 'multiline-block-like', 'cjs-export', 'class', 'multiline-expression'],
         next: '*',
       },
       {
         blankLine: 'always',
         prev: '*',
-        next: ['block', 'block-like', 'expression'],
-      },
-      {
-        blankLine: 'always',
-        prev: '*',
-        next: 'return',
-      },
-      {
-        blankLine: 'any',
-        prev: ['export', 'import'],
-        next: ['export', 'import'],
-      },
-      {
-        blankLine: 'any',
-        prev: ['let', 'const'],
-        next: ['let', 'const'],
+        next: ['block', 'multiline-block-like', 'class', 'multiline-expression', 'return'],
       },
     ],
 

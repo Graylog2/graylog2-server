@@ -35,6 +35,7 @@ class StreamComponent extends React.Component {
 
   componentDidMount() {
     this.loadData();
+
     StreamRulesStore.types().then((types) => {
       this.setState({ streamRuleTypes: types });
     });

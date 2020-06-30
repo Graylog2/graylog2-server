@@ -15,6 +15,7 @@ import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixture
 import AreaVisualization from '../AreaVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
+
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
 }));

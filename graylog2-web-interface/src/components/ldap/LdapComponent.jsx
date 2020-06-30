@@ -151,6 +151,7 @@ class LdapComponent extends React.Component {
 
   componentDidMount() {
     LdapActions.loadSettings().then(this._onLdapSettingsChange);
+
     RolesStore.loadRoles().then((roles) => {
       this.setState({ roles: this._formatAdditionalRoles(roles) });
     });

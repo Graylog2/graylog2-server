@@ -38,6 +38,7 @@ class LUTTablesPage extends React.Component {
     const { tables, dataAdapters } = this.props;
 
     this._stopErrorStatesTimer();
+
     this.errorStatesTimer = setInterval(() => {
       let tableNames = null;
 

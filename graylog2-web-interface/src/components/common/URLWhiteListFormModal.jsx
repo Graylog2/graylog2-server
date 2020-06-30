@@ -45,6 +45,7 @@ class URLWhiteListFormModal extends React.Component<Props, State> {
 
     constructor(props) {
       super(props);
+
       this.state = {
         config: { entries: [], disabled: false },
         isValid: false,
