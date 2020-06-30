@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -135,7 +136,7 @@ public class Messages {
         recordTimestamp(successfulRequests);
         accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
 
-        return propagateFailure(indexFailures);
+        return propagateFailure(remainingErrors);
     }
 
     private Set<IndexingError> retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems) {
@@ -225,7 +226,7 @@ public class Messages {
         }
     }
 
-    private List<String> propagateFailure(List<IndexingError> indexingErrors) {
+    private List<String> propagateFailure(Collection<IndexingError> indexingErrors) {
         if (indexingErrors.isEmpty()) {
             return Collections.emptyList();
         }
