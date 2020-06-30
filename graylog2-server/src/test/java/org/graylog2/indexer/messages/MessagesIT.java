@@ -23,6 +23,7 @@ import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -38,8 +39,10 @@ import org.junit.Test;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -82,6 +85,29 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     @After
     public void tearDown() {
         client().deleteIndices(INDEX_NAME);
+    }
+
+    protected abstract boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id);
+
+    @Test
+    public void getRetrievesPreviouslyStoredMessage() throws Exception {
+        final String index = UUID.randomUUID().toString();
+        client().createIndex(index);
+
+        final Map<String, Object> source = new HashMap<>();
+        source.put("message", "This is my message");
+        source.put("source", "logsender");
+        source.put("timestamp", "2017-04-13 15:29:00.000");
+
+        assertThat(indexMessage(index, source, "1")).isTrue();
+
+        final ResultMessage resultMessage = messages.get("1", index);
+        final Message message = resultMessage.getMessage();
+
+        assertThat(message).isNotNull();
+        assertThat(message.getMessage()).isEqualTo("This is my message");
+        assertThat(message.getSource()).isEqualTo("logsender");
+        assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-04-13T15:29:00.000Z"));
     }
 
     @Test

@@ -192,9 +192,8 @@ public class MessagesAdapterES6 implements MessagesAdapter {
     private List<IndexFailure> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
         final List<IndexingRequest> messageList = command.requests;
         final int offset = command.offset;
-        int chunkSize = command.size;
 
-        chunkSize = Math.min(messageList.size(), chunkSize);
+        int chunkSize = Math.min(messageList.size(), command.size);
 
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
         final Iterable<List<IndexingRequest>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);

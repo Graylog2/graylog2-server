@@ -21,7 +21,6 @@ import org.graylog2.indexer.IndexFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,18 +38,15 @@ public class ChunkedBulkIndexer {
 
         int chunkSize = messageList.size();
         int offset = 0;
-        final List<IndexFailure> failedItems = new ArrayList<>();
         for (;;) {
             try {
                 final List<IndexFailure> failures = bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
-                failedItems.addAll(failures);
-                break; // on success
+                return failures;
             } catch (ChunkedBulkIndexer.EntityTooLargeException e) {
                 LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
                 if (chunkSize == messageList.size()) {
                     LOG.warn("Consider lowering the \"output_batch_size\" setting.");
                 }
-                failedItems.addAll(e.failedItems);
                 offset += e.indexedSuccessfully;
                 chunkSize /= 2;
             }
@@ -58,8 +54,6 @@ public class ChunkedBulkIndexer {
                 throw new ElasticsearchException("Bulk index cannot split output batch any further.");
             }
         }
-
-        return failedItems;
     }
 
     public static class Chunk {
