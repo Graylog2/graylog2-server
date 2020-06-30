@@ -15,10 +15,11 @@ const _rolesOptions = (roles: AvailableRoles) => (
 
 type Props = {
   roles: AvailableRoles,
+  title?: string,
   onChange?: $PropertyType<Role, 'id'> => void,
 };
 
-const RolesSelect = ({ roles, onChange, ...rest }: Props) => {
+const RolesSelect = ({ roles, onChange, title, ...rest }: Props) => {
   const rolesOptions = _rolesOptions(roles);
 
   const handleChange = useCallback((name, roleId, onFieldChange) => {
@@ -33,10 +34,11 @@ const RolesSelect = ({ roles, onChange, ...rest }: Props) => {
     <Field name="roleId">
       {({ field: { name, value, onChange: onFieldChange } }) => (
         <Select {...rest}
-                placeholder="Select a role"
+                placeholder={title}
                 options={rolesOptions}
                 clearable={false}
                 onChange={(roleId) => handleChange(name, roleId, onFieldChange)}
+                inputProps={{ 'aria-label': title }}
                 value={value} />
       )}
     </Field>
@@ -45,6 +47,7 @@ const RolesSelect = ({ roles, onChange, ...rest }: Props) => {
 
 RolesSelect.defaultProps = {
   onChange: undefined,
+  title: 'Select a role',
 };
 
 export default RolesSelect;
