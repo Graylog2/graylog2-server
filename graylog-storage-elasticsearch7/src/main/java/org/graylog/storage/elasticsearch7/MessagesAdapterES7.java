@@ -11,6 +11,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRespo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
@@ -61,7 +63,12 @@ public class MessagesAdapterES7 implements MessagesAdapter {
 
     @Override
     public List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException {
-        return null;
+        final AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(index, analyzer, toAnalyze);
+
+        final AnalyzeResponse result = client.execute((c, requestOptions) -> c.indices().analyze(analyzeRequest, requestOptions));
+        return result.getTokens().stream()
+                .map(AnalyzeResponse.AnalyzeToken::getTerm)
+                .collect(Collectors.toList());
     }
 
     @Override

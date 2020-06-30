@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -108,6 +109,14 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(message.getMessage()).isEqualTo("This is my message");
         assertThat(message.getSource()).isEqualTo("logsender");
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-04-13T15:29:00.000Z"));
+    }
+
+    @Test
+    public void analyzingFieldReturnsTokens() throws IOException {
+        final String randomIndex = client().createRandomIndex("analyze-");
+        final List<String> terms = messages.analyze("The quick brown fox jumps over the lazy dog", randomIndex, "standard");
+
+        assertThat(terms).containsExactlyInAnyOrder("the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog");
     }
 
     @Test
