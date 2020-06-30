@@ -8,8 +8,6 @@ import Role from 'logic/permissions/Role';
 
 import GranteesListItem from './GranteesListItem';
 
-const _userLookup = (userId: GRN, grantees: AvailableGrantees) => grantees.find((grantee) => grantee.id === userId);
-
 type Props = {
   availableRoles: AvailableRoles,
   availableGrantees: AvailableGrantees,

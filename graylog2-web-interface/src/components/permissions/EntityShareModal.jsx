@@ -27,13 +27,14 @@ const _filterAvailableGrantees = ({ availableGrantees, selectedGranteeRoles }) =
 };
 
 type Props = {
+  description: string,
   entityId: string,
   entityType: string,
   title: string,
   onClose: () => void,
 };
 
-const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
+const EntityShareModal = ({ description, title, entityId, entityType, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = _generateGRN(entityId, entityType);
   const filteredGrantees = entityShareState && _filterAvailableGrantees(entityShareState);
@@ -71,6 +72,9 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
         {!entityShareState && <Spinner />}
         {entityShareState && (
           <>
+            <p>
+              {description}
+            </p>
             <GranteesSelector availableGrantees={filteredGrantees}
                               availableRoles={entityShareState.availableRoles}
                               onSubmit={_handleSelection} />
