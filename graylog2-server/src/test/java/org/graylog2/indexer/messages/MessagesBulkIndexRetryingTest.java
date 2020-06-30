@@ -180,7 +180,7 @@ class MessagesBulkIndexRetryingTest {
 
     private Messages.IndexingError errorResultItem(String messageId, Messages.IndexingError.ErrorType errorType, String errorReason) {
         final Message message = mock(Message.class);
-        when(message.getTimestamp()).thenReturn(DateTime.now());
+        when(message.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
         when(message.getId()).thenReturn(messageId);
 
         return Messages.IndexingError.create(message, "randomIndex", errorType, errorReason);
