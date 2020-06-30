@@ -34,7 +34,6 @@ import org.graylog2.utilities.GRNRegistry;
 import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -150,17 +149,16 @@ public class EntitySharesService {
                 .build();
     }
 
-    // The "selected grantees" return value should always contain the active shares as well to make it easier for
-    // the frontend. The "active shares" can then be used as reference to see which grantees are already persisted
-    // in the database and which are new.
-    private Map<GRN, GRN> getSelectedGranteeRoles(ImmutableSet<ActiveShare> activeShares, ImmutableMap<GRN, GRN> granteeRoles) {
-        final Map<GRN, GRN> activeGranteeRoles = activeShares.stream()
-                .collect(Collectors.toMap(ActiveShare::grantee, activeShare -> grnRegistry.parse(activeShare.role())));
-
-        final Map<GRN, GRN> mergedGrantees = new HashMap<>();
-        mergedGrantees.putAll(activeGranteeRoles);
-        mergedGrantees.putAll(granteeRoles);
-        return mergedGrantees;
+    private Map<GRN, GRN> getSelectedGranteeRoles(ImmutableSet<ActiveShare> activeShares, ImmutableMap<GRN, GRN> selectedGrantees) {
+        // If the user doesn't submit a grantee selection we return the active shares as selection so the frontend
+        // can just render it
+        if (selectedGrantees.isEmpty()) {
+            return activeShares.stream()
+                    .collect(Collectors.toMap(ActiveShare::grantee, activeShare -> grnRegistry.parse(activeShare.role())));
+        }
+        // If the user submits a grantee selection, we only return that one because we expect the frontend to always
+        // submit the full selection not only added/removed grantees.
+        return selectedGrantees;
     }
 
     private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser) {
