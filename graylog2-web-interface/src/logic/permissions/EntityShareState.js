@@ -97,6 +97,23 @@ export default class EntityShareState {
     return this._value.missingDependencies;
   }
 
+  get selectedGrantees() {
+    const _userLookup = (userId: GRN) => this._value.availableGrantees.find((grantee) => grantee.id === userId);
+
+    const granteesWithRole = this._value.selectedGranteeRoles.entrySeq().map(([granteeId, roleId]) => {
+      const grantee = _userLookup(granteeId);
+
+      return Immutable.Map(
+        {
+          ...grantee,
+          roleId,
+        },
+      );
+    });
+
+    return _sortAndOrderGrantees(granteesWithRole);
+  }
+
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const {
