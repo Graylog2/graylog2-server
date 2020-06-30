@@ -26,4 +26,9 @@ public class ElasticsearchInstanceES6Factory implements ElasticsearchInstanceFac
     public ElasticsearchInstance create(Network network) {
         return ElasticsearchInstanceES6.create(network);
     }
+
+    @Override
+    public String version() {
+        return "6";
+    }
 }
