@@ -1,6 +1,4 @@
 // @flow strict
-import type { Grantee as GranteeType } from 'logic/permissions/types';
-
 import { type GranteeInterface } from './GranteeInterface';
 import Grantee from './Grantee';
 import Role from './Role';

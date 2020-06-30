@@ -248,7 +248,9 @@ const ApiRoutes = {
       const streamFilter = this._streamFilter(streamId);
 
       queryString.query = query;
+
       Object.keys(timerange).forEach((key) => { queryString[key] = timerange[key]; });
+
       Object.keys(streamFilter).forEach((key) => { queryString[key] = streamFilter[key]; });
 
       return queryString;

@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
-import * as Immutable from 'immutable';
 
 import { type ThemeInterface } from 'theme';
 import EntityShareState, { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
