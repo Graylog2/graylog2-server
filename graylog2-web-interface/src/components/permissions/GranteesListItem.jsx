@@ -17,6 +17,8 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
   display: flex;
   align-items: center;
   width: 100%;
+  margin-bottom: 5px;
+  padding: 5px;
 `;
 
 const GranteeeInfo = styled.div`

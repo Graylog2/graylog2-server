@@ -15,7 +15,6 @@ import GranteesList from './GranteesList';
 import ShareableEnityURL from './ShareableEnityURL';
 
 const StyledGranteesList = styled(GranteesList)`
-  width: calc(100% - 153px);
   margin-top: 20px;
   margin-bottom: 40px;
 `;
