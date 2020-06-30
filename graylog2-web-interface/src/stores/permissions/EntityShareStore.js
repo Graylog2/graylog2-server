@@ -41,7 +41,7 @@ export const EntityShareActions: EntityShareActionsType = singletonActions(
   }),
 );
 
-const EntityShareStore: EntityShareStoreType = singletonStore(
+export const EntityShareStore: EntityShareStoreType = singletonStore(
   'permissions.EntityShare',
   () => Reflux.createStore({
     listenables: [EntityShareActions],

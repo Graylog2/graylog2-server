@@ -89,7 +89,8 @@ const GranteesSelector = ({ onSubmit, availableGrantees, availableRoles }: Props
   const initialRoleId = _initialRoleId(availableRoles);
 
   return (
-    <Formik onSubmit={onSubmit} initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
+    <Formik onSubmit={(data) => onSubmit(data)}
+            initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
       {({ isSubmitting, isValid, errors }) => (
         <Form>
           <FormElements>
@@ -99,12 +100,14 @@ const GranteesSelector = ({ onSubmit, availableGrantees, availableRoles }: Props
                                 options={granteesOptions}
                                 onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                 optionRenderer={_renderGranteesSelectOption}
+                                inputProps={{ 'aria-label': 'Search for users and teams' }}
                                 value={value} />
               )}
             </Field>
             <StyledRolesSelect roles={availableRoles} />
             <SubmitButton type="submit"
                           bsStyle="success"
+                          title="Add Collaborator"
                           disabled={isSubmitting || !isValid}>
               Add Collaborator
             </SubmitButton>

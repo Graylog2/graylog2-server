@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import type { GRN } from 'logic/permissions/types';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
-import EntityShareStore, { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
@@ -93,8 +93,10 @@ const EntityShareModal = ({ description, title, entityId, entityType, onClose }:
 };
 
 EntityShareModal.propTypes = {
+  description: PropTypes.string.isRequired,
   entityId: PropTypes.string.isRequired,
   entityType: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
 };
 

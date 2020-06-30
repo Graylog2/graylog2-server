@@ -58,7 +58,9 @@ const GranteesListItem = ({ onDelete, onRoleChange, grantee: { id, roleId, type,
             <StyledGranteeIcon type={type} />
             {title}
           </GranteeeInfo>
-          <StyledRolesSelect roles={availableRoles} onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })} />
+          <StyledRolesSelect roles={availableRoles}
+                             title={`Change the role for ${title}`}
+                             onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })} />
           <DeleteIcon name="trash" onClick={() => onDelete(id)} title={`Delete sharing for ${title}`} />
         </Container>
       </Form>
