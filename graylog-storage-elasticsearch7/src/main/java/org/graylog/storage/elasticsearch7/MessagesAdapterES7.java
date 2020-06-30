@@ -69,7 +69,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     }
 
     @Override
-    public List<Messages.IndexingError> bulkIndex(List<IndexingRequest> messageList) {
+    public List<Messages.IndexingError> bulkIndex(List<IndexingRequest> messageList) throws IOException {
         return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
     }
 
