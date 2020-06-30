@@ -20,12 +20,10 @@ const StyledGranteesList = styled(GranteesList)`
 
 const _generateGRN = (id, type) => `grn::::${type}:${id}`;
 
-const _filterAvailableGrantees = ({ availableGrantees, activeShares, selectedGranteeRoles }) => {
-  const activeSharesUserIds = activeShares.map((activeShare) => activeShare.grantee);
+const _filterAvailableGrantees = ({ availableGrantees, selectedGranteeRoles }) => {
   const availableGranteeRolesUserIds = selectedGranteeRoles.entrySeq().map(([granteeGRN]) => granteeGRN);
-  const assignedUserIds = [...activeSharesUserIds, ...availableGranteeRolesUserIds];
 
-  return availableGrantees.filter((grantee) => !assignedUserIds.includes(grantee.id));
+  return availableGrantees.filter((grantee) => !availableGranteeRolesUserIds.includes(grantee.id));
 };
 
 type Props = {
@@ -51,8 +49,6 @@ const EntityShareModal = ({ title, entityId, entityType, onClose }: Props) => {
   };
 
   const _handleSelection = ({ granteeId, roleId }: SelectionRequest) => {
-    console.log(granteeId, roleId);
-    console.log(entityShareState.selectedGranteeRoles.merge({ [granteeId]: roleId }));
     return EntityShareActions.prepare(entityGRN, {
       selected_grantee_roles: entityShareState.selectedGranteeRoles.merge({ [granteeId]: roleId }),
     });

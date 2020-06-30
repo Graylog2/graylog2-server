@@ -8,6 +8,7 @@ import type {
   ActiveShare as ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 import Role from './Role';
 import Grantee from './Grantee';
@@ -18,6 +19,18 @@ export type AvailableGrantees = Immutable.List<Grantee>;
 export type AvailableRoles = Immutable.List<Role>;
 export type ActiveShares = Immutable.List<ActiveShare>;
 export type SelectedGranteeRoles = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>;
+
+const _sortAndOrderGrantees = (grantees: AvailableGrantees) => {
+  const granteesByType = grantees
+    .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
+    .groupBy((grantee) => grantee.type);
+
+  return Immutable.List().concat(
+    granteesByType.get('global'),
+    granteesByType.get('team'),
+    granteesByType.get('user'),
+  ).filter((grantee) => grantee);
+};
 
 type InternalState = {|
   entity: GRN,
@@ -52,7 +65,7 @@ export default class EntityShareState {
   ) {
     this._value = {
       entity,
-      availableGrantees,
+      availableGrantees: _sortAndOrderGrantees(availableGrantees),
       availableRoles,
       activeShares,
       selectedGranteeRoles,
