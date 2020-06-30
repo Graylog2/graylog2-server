@@ -16,6 +16,13 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.IndexFailure;
@@ -34,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -41,6 +49,25 @@ import java.util.stream.Collectors;
 @Singleton
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
+
+    private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static final Retryer<List<IndexingError>> BULK_REQUEST_RETRYER = RetryerBuilder.<List<IndexingError>>newBuilder()
+            .retryIfException(t -> t instanceof IOException)
+            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
+            .withRetryListener(new RetryListener() {
+                @Override
+                public <V> void onRetry(Attempt<V> attempt) {
+                    if (attempt.hasException()) {
+                        LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                    } else if (attempt.getAttemptNumber() > 1) {
+                        LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
+                    }
+                }
+            })
+            .build();
+
 
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
     private final MessagesAdapter messagesAdapter;
@@ -80,7 +107,7 @@ public class Messages {
                 .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        final List<IndexingError> indexFailures = messagesAdapter.bulkIndex(indexingRequestList);
+        final List<IndexingError> indexFailures = runBulkRequest(indexingRequestList, messageList.size());
 
         final Set<String> failedIds = indexFailures.stream()
                 .map(indexingError -> indexingError.message().getId())
@@ -93,6 +120,19 @@ public class Messages {
         accountTotalMessageSizes(indexingRequestList, isSystemTraffic);
 
         return propagateFailure(indexFailures);
+    }
+
+    private List<IndexingError> runBulkRequest(List<IndexingRequest> indexingRequestList, int count) {
+        try {
+            return BULK_REQUEST_RETRYER.call(() -> messagesAdapter.bulkIndex(indexingRequestList));
+        } catch (ExecutionException | RetryException e) {
+            if (e instanceof RetryException) {
+                LOG.error("Could not bulk index {} messages. Giving up after {} attempts.", count, ((RetryException) e).getNumberOfFailedAttempts());
+            } else {
+                LOG.error("Couldn't bulk index " + count + " messages.", e);
+            }
+            throw new RuntimeException(e);
+        }
     }
 
     private void accountTotalMessageSizes(List<IndexingRequest> requests, boolean isSystemTraffic) {

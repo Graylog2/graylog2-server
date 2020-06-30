@@ -3,11 +3,6 @@ package org.graylog.storage.elasticsearch6;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.rholder.retry.Attempt;
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.RetryListener;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.common.annotations.VisibleForTesting;
@@ -45,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,21 +66,6 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
     private final JestClient client;
     private final boolean useExpectContinue;
-
-    private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
-            .retryIfException(t -> t instanceof IOException)
-            .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
-            .withRetryListener(new RetryListener() {
-                @Override
-                public <V> void onRetry(Attempt<V> attempt) {
-                    if (attempt.hasException()) {
-                        LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
-                    } else if (attempt.getAttemptNumber() > 1) {
-                        LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
-                    }
-                }
-            })
-            .build();
 
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
@@ -163,31 +142,18 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         }
     }
 
-    private BulkResult runBulkRequest(final Bulk request, int count) {
-        try {
-            if (useExpectContinue) {
-                // Enable Expect-Continue to catch 413 errors before we send the actual data
-                final RequestConfig requestConfig = RequestConfig.custom().setExpectContinueEnabled(true).build();
-                return BULK_REQUEST_RETRYER.call(() -> JestUtils.execute(client, requestConfig, request));
-            } else {
-                return BULK_REQUEST_RETRYER.call(() -> client.execute(request));
-            }
-        } catch (ExecutionException | RetryException e) {
-            if (e instanceof RetryException) {
-                LOG.error("Could not bulk index {} messages. Giving up after {} attempts.", count, ((RetryException) e).getNumberOfFailedAttempts());
-            } else {
-                LOG.error("Couldn't bulk index " + count + " messages.", e);
-            }
-            throw new RuntimeException(e);
-        }
+    private BulkResult runBulkRequest(final Bulk request, int count) throws IOException {
+        // Enable Expect-Continue to catch 413 errors before we send the actual data
+        final RequestConfig requestConfig = RequestConfig.custom().setExpectContinueEnabled(useExpectContinue).build();
+        return JestUtils.execute(client, requestConfig, request);
     }
 
     @Override
-    public List<Messages.IndexingError> bulkIndex(List<IndexingRequest> messageList) {
+    public List<Messages.IndexingError> bulkIndex(List<IndexingRequest> messageList) throws IOException {
         return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
     }
 
-    private List<Messages.IndexingError> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
+    private List<Messages.IndexingError> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
         final List<IndexingRequest> messageList = command.requests;
         final int offset = command.offset;
 
@@ -229,7 +195,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         return indexingErrorsFrom(failedItems, messageList);
     }
 
-    private BulkResult bulkIndexChunk(List<IndexingRequest> chunk) {
+    private BulkResult bulkIndexChunk(List<IndexingRequest> chunk) throws IOException {
         final Bulk.Builder bulk = new Bulk.Builder();
 
         for (IndexingRequest entry : chunk) {
@@ -245,7 +211,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         return runBulkRequest(bulk.build(), chunk.size());
     }
 
-    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<IndexingRequest> chunk, List<BulkResult.BulkResultItem> allFailedItems) {
+    private Set<BulkResult.BulkResultItem> retryOnlyIndexBlockItemsForever(List<IndexingRequest> chunk, List<BulkResult.BulkResultItem> allFailedItems) throws IOException {
         Set<BulkResult.BulkResultItem> indexBlocks = indexBlocksFrom(allFailedItems);
         final Set<BulkResult.BulkResultItem> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
         List<IndexingRequest> blockedMessages = messagesForResultItems(chunk, indexBlocks);

@@ -26,5 +26,5 @@ public interface MessagesAdapter {
 
     List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException;
 
-    List<Messages.IndexingError> bulkIndex(final List<IndexingRequest> messageList);
+    List<Messages.IndexingError> bulkIndex(final List<IndexingRequest> messageList) throws IOException;
 }

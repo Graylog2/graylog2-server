@@ -20,6 +20,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,10 +28,10 @@ public class ChunkedBulkIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(ChunkedBulkIndexer.class);
 
     public interface BulkIndex {
-        List<Messages.IndexingError> apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException;
+        List<Messages.IndexingError> apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException;
     }
 
-    public List<Messages.IndexingError> index(List<IndexingRequest> messageList, BulkIndex bulkIndex) {
+    public List<Messages.IndexingError> index(List<IndexingRequest> messageList, BulkIndex bulkIndex) throws IOException {
         if (messageList.isEmpty()) {
             return Collections.emptyList();
         }
