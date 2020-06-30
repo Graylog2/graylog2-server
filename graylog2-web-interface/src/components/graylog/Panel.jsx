@@ -44,7 +44,7 @@ const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
-  background-color: ${theme.utils.colorLevel(theme.colors.global.background, -4)};
+  background-color: ${theme.colors.global.background};
 
   > ${PanelHeading} {
     .panel-title,

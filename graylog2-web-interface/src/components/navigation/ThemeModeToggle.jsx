@@ -1,7 +1,6 @@
 // @flow strict
 /* eslint-disable camelcase */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { withTheme, type StyledComponent } from 'styled-components';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -112,8 +111,8 @@ const ThemeModeToggle = ({ theme }) => {
   );
 };
 
-// ThemeModeToggle.propTypes = {
-
-// };
+ThemeModeToggle.propTypes = {
+  theme: themePropTypes.isRequired,
+};
 
 export default withTheme(ThemeModeToggle);
