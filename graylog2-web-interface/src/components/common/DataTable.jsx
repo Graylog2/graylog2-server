@@ -1,10 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { isEqual } from 'lodash';
+import styled from 'styled-components';
 
+import { tableCss } from 'components/graylog/Table';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
 import DataTableElement from './DataTableElement';
+
+const StyledTable = styled.table`
+  ${tableCss}
+`;
 
 /**
  * Component that renders a data table, letting consumers of the component to
@@ -183,14 +189,14 @@ class DataTable extends React.Component {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <table className={`table ${className}`}>
+        <StyledTable className={`table ${className}`}>
           <thead>
             {this.getFormattedHeaders()}
           </thead>
           <tbody>
             {this.getFormattedDataRows()}
           </tbody>
-        </table>
+        </StyledTable>
       );
     }
 
