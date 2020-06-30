@@ -14,13 +14,16 @@ import Role from './Role';
 import Grantee from './Grantee';
 import ActiveShare from './ActiveShare';
 import MissingDependency from './MissingDependency';
+import SelectedGrantee from './SelectedGrantee';
+import type { GranteeInterface } from './GranteeInterface';
 
 export type AvailableGrantees = Immutable.List<Grantee>;
 export type AvailableRoles = Immutable.List<Role>;
 export type ActiveShares = Immutable.List<ActiveShare>;
 export type SelectedGranteeRoles = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>;
+export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
-const _sortAndOrderGrantees = (grantees: AvailableGrantees) => {
+const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
   const granteesByType = grantees
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
     .groupBy((grantee) => grantee.type);
@@ -65,7 +68,7 @@ export default class EntityShareState {
   ) {
     this._value = {
       entity,
-      availableGrantees: _sortAndOrderGrantees(availableGrantees),
+      availableGrantees: _sortAndOrderGrantees<Grantee>(availableGrantees),
       availableRoles,
       activeShares,
       selectedGranteeRoles,
@@ -100,18 +103,17 @@ export default class EntityShareState {
   get selectedGrantees() {
     const _userLookup = (userId: GRN) => this._value.availableGrantees.find((grantee) => grantee.id === userId);
 
-    const granteesWithRole = this._value.selectedGranteeRoles.entrySeq().map(([granteeId, roleId]) => {
+    const granteesWithRole: Immutable.List<SelectedGrantee> = this._value.selectedGranteeRoles.entrySeq().map(([granteeId, roleId]) => {
       const grantee = _userLookup(granteeId);
 
-      return Immutable.Map(
-        {
-          ...grantee,
-          roleId,
-        },
-      );
-    });
+      if (!grantee) {
+        throw new Error(`Cannot find grantee with id ${granteeId} in available grantees`);
+      }
 
-    return _sortAndOrderGrantees(granteesWithRole);
+      return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
+    }).toList();
+
+    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithRole);
   }
 
   // eslint-disable-next-line no-use-before-define
