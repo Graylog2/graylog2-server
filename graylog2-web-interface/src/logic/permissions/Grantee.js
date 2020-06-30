@@ -3,9 +3,11 @@ import * as Immutable from 'immutable';
 
 import type { Grantee as GranteeType } from 'logic/permissions/types';
 
+import type { GranteeInterface } from './GranteeInterface';
+
 type InternalState = GranteeType;
 
-export default class Grantee {
+export default class Grantee implements GranteeInterface {
   _value: InternalState;
 
   constructor(

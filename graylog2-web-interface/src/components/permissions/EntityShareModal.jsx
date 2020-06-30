@@ -81,8 +81,7 @@ const EntityShareModal = ({ description, title, entityId, entityType, onClose }:
             <StyledGranteesList availableRoles={entityShareState.availableRoles}
                                 entityGRN={entityGRN}
                                 onRoleChange={_handleSelection}
-                                availableGrantees={entityShareState.availableGrantees}
-                                selectedGranteeRoles={entityShareState.selectedGranteeRoles}
+                                selectedGrantees={entityShareState.selectedGrantees}
                                 onDelete={_handleDeletion} />
             {/* sharable url box */}
           </>

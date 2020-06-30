@@ -7,6 +7,7 @@ import { type ThemeInterface } from 'theme';
 import EntityShareState, { type AvailableRoles } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Role from 'logic/permissions/Role';
+import SelectedGrantee from 'logic/permissions/SelectedGrantee';
 import { IconButton } from 'components/common';
 
 import GranteeIcon from './GranteeIcon';
@@ -37,9 +38,8 @@ const DeleteIcon = styled(IconButton)`
 `;
 
 type Props = {
-  grantee: Grantee,
+  grantee: SelectedGrantee,
   availableRoles: AvailableRoles,
-  granteeRoleId: $PropertyType<Role, 'id'>,
   onRoleChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
     roleId: $PropertyType<Role, 'id'>,
@@ -47,17 +47,17 @@ type Props = {
   onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,
 };
 
-const GranteesListItem = ({ onDelete, onRoleChange, grantee, availableRoles, granteeRoleId }: Props) => {
+const GranteesListItem = ({ onDelete, onRoleChange, grantee: { id, roleId, type, title }, availableRoles }: Props) => {
   return (
-    <Formik initialValues={{ roleId: granteeRoleId }} onSubmit={() => {}}>
+    <Formik initialValues={{ roleId }} onSubmit={() => {}}>
       <Form>
         <Container>
           <GranteeeInfo>
-            <StyledGranteeIcon type={grantee.type} />
-            {grantee.title}
+            <StyledGranteeIcon type={type} />
+            {title}
           </GranteeeInfo>
-          <StyledRolesSelect roles={availableRoles} onChange={(roleId) => onRoleChange({ granteeId: grantee.id, roleId })} />
-          <DeleteIcon name="trash" onClick={() => onDelete(grantee.id)} title={`Delete sharing for ${grantee.title}`} />
+          <StyledRolesSelect roles={availableRoles} onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })} />
+          <DeleteIcon name="trash" onClick={() => onDelete(id)} title={`Delete sharing for ${title}`} />
         </Container>
       </Form>
     </Formik>
