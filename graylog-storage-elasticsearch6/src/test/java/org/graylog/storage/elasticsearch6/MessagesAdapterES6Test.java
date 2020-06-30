@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.graylog.storage.elasticsearch6.MessagesAdapterES6.INDEX_BLOCK_ERROR;
 import static org.graylog.storage.elasticsearch6.MessagesAdapterES6.INDEX_BLOCK_REASON;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,7 +71,19 @@ class MessagesAdapterES6Test {
     }
 
     @Test
-    public void bulkIndexingShouldNotRetryForIndexMappingErrors() throws Exception {
+    void bulkIndexReturnsEmptyListIfSuccessful() throws Exception {
+        final BulkResult jestResult = mock(BulkResult.class);
+        when(jestResult.isSucceeded()).thenReturn(true);
+        when(jestClient.execute(any())).thenReturn(jestResult);
+        final List<IndexingRequest> messageList = messageListWith(messageWithId("some-message"));
+
+        final List<Messages.IndexingError> indexingErrors = messagesAdapter.bulkIndex(messageList);
+
+        assertThat(indexingErrors).isEmpty();
+    }
+
+    @Test
+    public void bulkIndexingParsesIndexMappingErrors() throws Exception {
         final String messageId = "BOOMID";
 
         final BulkResult jestResult = mock(BulkResult.class);
@@ -91,97 +105,45 @@ class MessagesAdapterES6Test {
             .thenReturn(jestResult)
             .thenThrow(new IllegalStateException("JestResult#execute should not be called twice."));
 
-        final Message mockedMessage = mock(Message.class);
-        when(mockedMessage.getId()).thenReturn(messageId);
-        when(mockedMessage.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
-
-        final List<IndexingRequest> messageList = messageListWith(mockedMessage);
+        final List<IndexingRequest> messageList = messageListWith(messageWithId(messageId));
 
         final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messageList);
 
-        assertThat(result).hasSize(1);
-
-        verify(jestClient, times(1)).execute(any());
+        assertThat(result).hasSize(1)
+                .extracting(indexingError -> indexingError.message().getId(), Messages.IndexingError::errorType, Messages.IndexingError::errorMessage)
+                .containsExactly(tuple(messageId, Messages.IndexingError.ErrorType.MappingError, "failed to parse [http_response_code]"));
     }
 
     @Test
-    public void bulkIndexingShouldRetry() throws Exception {
-        final BulkResult jestResult = mock(BulkResult.class);
-        when(jestResult.isSucceeded()).thenReturn(true);
-        when(jestResult.getFailedItems()).thenReturn(Collections.emptyList());
-
+    public void bulkIndexPropagatesIOExceptions() throws Exception {
         when(jestClient.execute(any()))
-                .thenThrow(new IOException("Boom!"))
-                .thenReturn(jestResult);
+                .thenThrow(new IOException("Boom!"));
 
         final List<IndexingRequest> messageList = messageListWith(mock(Message.class));
 
-        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messageList);
-
-        assertThat(result).isNotNull().isEmpty();
-
-        verify(jestClient, times(2)).execute(any());
+        assertThatThrownBy(() -> messagesAdapter.bulkIndex(messageList))
+                .isInstanceOf(IOException.class);
     }
 
     @Test
-    public void bulkIndexingShouldRetryIfIndexBlocked() throws IOException {
-        final BulkResult errorResult = mock(BulkResult.class);
-        final BulkResult.BulkResultItem errorItem = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
-        when(errorResult.isSucceeded()).thenReturn(false);
-        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(errorItem));
-
-        final BulkResult successResult = mock(BulkResult.class);
-
-        when(jestClient.execute(any()))
-                .thenReturn(errorResult)
-                .thenReturn(successResult);
-
-        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id"));
-
-        verify(jestClient, times(2)).execute(any());
-        assertThat(result).isNotNull().isEmpty();
-    }
-
-    @Test
-    public void indexBlockedRetriesShouldOnlyRetryIndexBlockedErrors() throws IOException {
+    public void parsesErrorTypesAndReturnsIndexingErrors() throws IOException {
         final BulkResult errorResult = mock(BulkResult.class);
         final BulkResult.BulkResultItem indexBlockedError = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
         final BulkResult.BulkResultItem otherError = errorResultItem("other-error-id", "something else", "something else");
         when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(indexBlockedError, otherError));
 
-        final BulkResult successResult = mock(BulkResult.class);
-
         when(jestClient.execute(any()))
-                .thenReturn(errorResult)
-                .thenReturn(successResult);
+                .thenReturn(errorResult);
 
         final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
-        verify(jestClient, times(2)).execute(any());
-        assertThat(result).extracting(failure -> failure.message().getId()).containsOnly("other-error-id");
+        verify(jestClient, times(1)).execute(any());
+        assertThat(result).extracting(indexingError -> indexingError.message().getId(), Messages.IndexingError::errorType, Messages.IndexingError::errorMessage)
+                .containsExactlyInAnyOrder(
+                        tuple("blocked-id", Messages.IndexingError.ErrorType.IndexBlocked, INDEX_BLOCK_REASON),
+                        tuple("other-error-id", Messages.IndexingError.ErrorType.Unknown, "something else")
+                );
     }
-
-    @Test
-    public void retriedIndexBlockErrorsThatFailWithDifferentErrorsAreTreatedAsPersistentFailures() throws IOException {
-        final BulkResult errorResult = mock(BulkResult.class);
-        final BulkResult.BulkResultItem indexBlockedError = errorResultItem("blocked-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
-        final BulkResult.BulkResultItem initialIndexBlockedError = errorResultItem("other-error-id", INDEX_BLOCK_ERROR, INDEX_BLOCK_REASON);
-        when(errorResult.getFailedItems()).thenReturn(ImmutableList.of(indexBlockedError, initialIndexBlockedError));
-
-        final BulkResult secondErrorResult = mock(BulkResult.class);
-        final BulkResult.BulkResultItem otherError = errorResultItem("other-error-id", "something else", "something else");
-        when(secondErrorResult.getFailedItems()).thenReturn(ImmutableList.of(otherError));
-
-        when(jestClient.execute(any()))
-                .thenReturn(errorResult)
-                .thenReturn(secondErrorResult);
-
-        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
-
-        verify(jestClient, times(2)).execute(any());
-        assertThat(result).extracting(failure -> failure.message().getId()).containsOnly("other-error-id");
-    }
-
     private List<IndexingRequest> messagesWithIds(String... ids) {
         return Arrays.stream(ids)
                 .map(this::messageWithId)
