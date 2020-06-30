@@ -11,7 +11,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import io.searchbox.client.JestClient;
@@ -24,8 +23,6 @@ import io.searchbox.core.Index;
 import io.searchbox.indices.Analyze;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
@@ -71,6 +68,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
 
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];";
+    static final String MAPPER_PARSING_EXCEPTION = "mapper_parsing_exception";
 
     private final JestClient client;
     private final boolean useExpectContinue;
@@ -130,7 +128,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         return terms;
     }
 
-    private List<IndexFailure> indexFailuresFromMessages(List<BulkResult.BulkResultItem> failedItems, List<IndexingRequest> messageList) {
+    private List<Messages.IndexingError> indexingErrorsFrom(List<BulkResult.BulkResultItem> failedItems, List<IndexingRequest> messageList) {
         if (failedItems.isEmpty()) {
             return Collections.emptyList();
         }
@@ -139,13 +137,13 @@ public class MessagesAdapterES6 implements MessagesAdapter {
                 .map(IndexingRequest::message)
                 .distinct()
                 .collect(Collectors.toMap(Message::getId, Function.identity()));
-        final List<IndexFailure> indexFailures = new ArrayList<>(failedItems.size());
+        final List<Messages.IndexingError> indexFailures = new ArrayList<>(failedItems.size());
         for (BulkResult.BulkResultItem item : failedItems) {
             LOG.warn("Failed to index message: index=<{}> id=<{}> error=<{}>", item.index, item.id, item.error);
 
             final Message messageEntry = messageMap.get(item.id);
 
-            final IndexFailure indexFailure = indexFailureFromResultItem(item, messageEntry);
+            final Messages.IndexingError indexFailure = indexingErrorFromResultItem(item, messageEntry);
 
             indexFailures.add(indexFailure);
         }
@@ -153,16 +151,16 @@ public class MessagesAdapterES6 implements MessagesAdapter {
         return indexFailures;
     }
 
-    private IndexFailure indexFailureFromResultItem(BulkResult.BulkResultItem item, Message messageEntry) {
-        final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                .put("letter_id", item.id)
-                .put("index", item.index)
-                .put("type", item.type)
-                .put("message", item.error)
-                .put("timestamp", messageEntry.getTimestamp())
-                .build();
+    private Messages.IndexingError indexingErrorFromResultItem(BulkResult.BulkResultItem item, Message message) {
+        return Messages.IndexingError.create(message, item.index, errorTypeFromResponse(item), item.errorReason);
+    }
 
-        return new IndexFailureImpl(doc);
+    private Messages.IndexingError.ErrorType errorTypeFromResponse(BulkResult.BulkResultItem item) {
+        switch (item.errorType) {
+            case INDEX_BLOCK_ERROR: return Messages.IndexingError.ErrorType.IndexBlocked;
+            case MAPPER_PARSING_EXCEPTION: return Messages.IndexingError.ErrorType.MappingError;
+            default: return Messages.IndexingError.ErrorType.Unknown;
+        }
     }
 
     private BulkResult runBulkRequest(final Bulk request, int count) {
@@ -185,11 +183,11 @@ public class MessagesAdapterES6 implements MessagesAdapter {
     }
 
     @Override
-    public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList) {
+    public List<Messages.IndexingError> bulkIndex(List<IndexingRequest> messageList) {
         return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
     }
 
-    private List<IndexFailure> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
+    private List<Messages.IndexingError> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
         final List<IndexingRequest> messageList = command.requests;
         final int offset = command.offset;
 
@@ -203,7 +201,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             final BulkResult result = bulkIndexChunk(chunk);
 
             if (result.getResponseCode() == 413) {
-                throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexFailuresFromMessages(failedItems, messageList));
+                throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(failedItems, messageList));
             }
 
             // TODO should we check result.isSucceeded()?
@@ -228,7 +226,7 @@ public class MessagesAdapterES6 implements MessagesAdapter {
             }
             chunkCount++;
         }
-        return indexFailuresFromMessages(failedItems, messageList);
+        return indexingErrorsFrom(failedItems, messageList);
     }
 
     private BulkResult bulkIndexChunk(List<IndexingRequest> chunk) {

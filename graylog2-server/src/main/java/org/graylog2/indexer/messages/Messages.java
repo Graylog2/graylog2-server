@@ -16,8 +16,10 @@
  */
 package org.graylog2.indexer.messages;
 
-import org.graylog2.indexer.ElasticsearchException;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.IndexFailure;
+import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -28,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -79,9 +80,11 @@ public class Messages {
                 .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        final List<IndexFailure> indexFailures = messagesAdapter.bulkIndex(indexingRequestList);
+        final List<IndexingError> indexFailures = messagesAdapter.bulkIndex(indexingRequestList);
 
-        final Set<String> failedIds = indexFailures.stream().map(IndexFailure::letterId).collect(Collectors.toSet());
+        final Set<String> failedIds = indexFailures.stream()
+                .map(indexingError -> indexingError.message().getId())
+                .collect(Collectors.toSet());
         final List<IndexingRequest> successfulRequests = indexingRequestList.stream()
                 .filter(indexingRequest -> !failedIds.contains(indexingRequest.message().getId()))
                 .collect(Collectors.toList());
@@ -113,10 +116,12 @@ public class Messages {
         }
     }
 
-    private List<String> propagateFailure(List<IndexFailure> indexFailures) {
-        if (indexFailures.isEmpty()) {
+    private List<String> propagateFailure(List<IndexingError> indexingErrors) {
+        if (indexingErrors.isEmpty()) {
             return Collections.emptyList();
         }
+
+        final List<IndexFailure> indexFailures = indexingErrors.stream().map(this::createIndexFailure).collect(Collectors.toList());
 
         try {
             // TODO: Magic number
@@ -130,7 +135,42 @@ public class Messages {
                 .collect(Collectors.toList());
     }
 
+    private IndexFailure createIndexFailure(IndexingError indexError) {
+        final Message message = indexError.message();
+        final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
+                .put("letter_id", message.getId())
+                .put("index", indexError.index())
+                .put("type", indexError.errorType())
+                .put("message", indexError.errorMessage())
+                .put("timestamp", message.getTimestamp())
+                .build();
+
+        return new IndexFailureImpl(doc);
+
+    }
+
     public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
         return indexFailureQueue;
+    }
+
+    @AutoValue
+    public abstract static class IndexingError {
+        public enum ErrorType {
+            IndexBlocked,
+            MappingError,
+            Unknown;
+        }
+        public abstract Message message();
+        public abstract String index();
+        public abstract ErrorType errorType();
+        public abstract String errorMessage();
+
+        public static IndexingError create(Message message, String index, ErrorType errorType, String errorMessage) {
+            return new AutoValue_Messages_IndexingError(message, index, errorType, errorMessage);
+        }
+
+        public static IndexingError create(Message message, String index) {
+            return create(message, index, ErrorType.Unknown, "");
+        }
     }
 }

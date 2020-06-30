@@ -2,7 +2,6 @@ package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkItemResponse;
@@ -14,8 +13,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexReq
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.IndexingRequest;
@@ -72,11 +69,11 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     }
 
     @Override
-    public List<IndexFailure> bulkIndex(List<IndexingRequest> messageList) {
+    public List<Messages.IndexingError> bulkIndex(List<IndexingRequest> messageList) {
         return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
     }
 
-    private List<IndexFailure> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
+    private List<Messages.IndexingError> bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
         final List<IndexingRequest> messageList = command.requests;
         final int offset = command.offset;
         final int chunkSize = command.size;
@@ -88,7 +85,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         final Iterable<List<IndexingRequest>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
         int chunkCount = 1;
         int indexedSuccessfully = 0;
-        final List<IndexFailure> indexFailures = new ArrayList<>();
+        final List<Messages.IndexingError> indexFailures = new ArrayList<>();
         for (List<IndexingRequest> chunk : chunks) {
 
             final BulkRequest bulkRequest = new BulkRequest();
@@ -102,7 +99,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
             } catch (ElasticsearchException e) {
                 for (ElasticsearchException cause : e.guessRootCauses()) {
                     if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
-                        throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexFailuresFrom(chunk));
+                        throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
                     }
                 }
                 throw e;
@@ -110,20 +107,26 @@ public class MessagesAdapterES7 implements MessagesAdapter {
 
             indexedSuccessfully += chunk.size();
 
-            final List<BulkItemResponse> failures = Arrays.stream(result.getItems()).filter(BulkItemResponse::isFailed).collect(Collectors.toList());
-            indexFailures.addAll(indexFailuresFrom(failures, messageList));
+            final List<BulkItemResponse> failures = Arrays.stream(result.getItems())
+                    .filter(BulkItemResponse::isFailed)
+                    .collect(Collectors.toList());
+            indexFailures.addAll(indexingErrorsFrom(failures, messageList));
         }
 
         return indexFailures;
     }
 
-    private List<IndexFailure> indexFailuresFrom(List<IndexingRequest> messageList) {
+    private List<Messages.IndexingError> indexingErrorsFrom(List<IndexingRequest> messageList) {
         return messageList.stream()
-                .map(request -> new IndexFailureImpl(request.message().getFields()))
+                .map(this::indexingErrorFrom)
                 .collect(Collectors.toList());
     }
 
-    private List<IndexFailure> indexFailuresFrom(List<BulkItemResponse> failedItems, List<IndexingRequest> messageList) {
+    private Messages.IndexingError indexingErrorFrom(IndexingRequest indexingRequest) {
+        return Messages.IndexingError.create(indexingRequest.message(), indexingRequest.indexSet().getWriteIndexAlias());
+    }
+
+    private List<Messages.IndexingError> indexingErrorsFrom(List<BulkItemResponse> failedItems, List<IndexingRequest> messageList) {
         if (failedItems.isEmpty()) {
             return Collections.emptyList();
         }
@@ -137,21 +140,17 @@ public class MessagesAdapterES7 implements MessagesAdapter {
                 .map(item -> {
                     final Message message = messageMap.get(item.getId());
 
-                    return indexFailureFromResponse(item, message);
+                    return indexingErrorFromResponse(item, message);
                 })
                 .collect(Collectors.toList());
     }
 
-    private IndexFailure indexFailureFromResponse(BulkItemResponse item, Message message) {
-        final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                .put("letter_id", item.getId())
-                .put("index", item.getIndex())
-                .put("type", item.getType())
-                .put("message", item.getFailureMessage())
-                .put("timestamp", message.getTimestamp())
-                .build();
+    private Messages.IndexingError indexingErrorFromResponse(BulkItemResponse item, Message message) {
+        return Messages.IndexingError.create(message, item.getIndex(), errorTypeFromResponse(item), item.getFailureMessage());
+    }
 
-        return new IndexFailureImpl(doc);
+    private Messages.IndexingError.ErrorType errorTypeFromResponse(BulkItemResponse item) {
+        return Messages.IndexingError.ErrorType.Unknown;
     }
 
     private IndexRequest indexRequestFrom(IndexingRequest request) {

@@ -17,7 +17,6 @@
 package org.graylog2.indexer.messages;
 
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.IndexFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +27,10 @@ public class ChunkedBulkIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(ChunkedBulkIndexer.class);
 
     public interface BulkIndex {
-        List<IndexFailure> apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException;
+        List<Messages.IndexingError> apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException;
     }
 
-    public List<IndexFailure> index(List<IndexingRequest> messageList, BulkIndex bulkIndex) {
+    public List<Messages.IndexingError> index(List<IndexingRequest> messageList, BulkIndex bulkIndex) {
         if (messageList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -40,8 +39,7 @@ public class ChunkedBulkIndexer {
         int offset = 0;
         for (;;) {
             try {
-                final List<IndexFailure> failures = bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
-                return failures;
+                return bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
             } catch (ChunkedBulkIndexer.EntityTooLargeException e) {
                 LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
                 if (chunkSize == messageList.size()) {
@@ -70,9 +68,9 @@ public class ChunkedBulkIndexer {
 
     public static class EntityTooLargeException extends Exception {
         public final int indexedSuccessfully;
-        public final List<IndexFailure> failedItems;
+        public final List<Messages.IndexingError> failedItems;
 
-        public EntityTooLargeException(int indexedSuccessfully, List<IndexFailure> failedItems)  {
+        public EntityTooLargeException(int indexedSuccessfully, List<Messages.IndexingError> failedItems)  {
             this.indexedSuccessfully = indexedSuccessfully;
             this.failedItems = failedItems;
         }

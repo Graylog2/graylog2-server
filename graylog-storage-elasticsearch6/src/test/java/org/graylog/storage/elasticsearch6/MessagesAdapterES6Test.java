@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.BulkResult;
-import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.IndexingRequest;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -60,7 +60,7 @@ class MessagesAdapterES6Test {
 
     @Test
     public void bulkIndexingShouldNotDoAnythingForEmptyList() throws Exception {
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(Collections.emptyList());
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(Collections.emptyList());
 
         assertThat(result).isNotNull()
                 .isEmpty();
@@ -97,7 +97,7 @@ class MessagesAdapterES6Test {
 
         final List<IndexingRequest> messageList = messageListWith(mockedMessage);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList);
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messageList);
 
         assertThat(result).hasSize(1);
 
@@ -116,7 +116,7 @@ class MessagesAdapterES6Test {
 
         final List<IndexingRequest> messageList = messageListWith(mock(Message.class));
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messageList);
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messageList);
 
         assertThat(result).isNotNull().isEmpty();
 
@@ -136,7 +136,7 @@ class MessagesAdapterES6Test {
                 .thenReturn(errorResult)
                 .thenReturn(successResult);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id"));
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id"));
 
         verify(jestClient, times(2)).execute(any());
         assertThat(result).isNotNull().isEmpty();
@@ -155,10 +155,10 @@ class MessagesAdapterES6Test {
                 .thenReturn(errorResult)
                 .thenReturn(successResult);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(jestClient, times(2)).execute(any());
-        assertThat(result).extracting(IndexFailure::letterId).containsOnly("other-error-id");
+        assertThat(result).extracting(failure -> failure.message().getId()).containsOnly("other-error-id");
     }
 
     @Test
@@ -176,10 +176,10 @@ class MessagesAdapterES6Test {
                 .thenReturn(errorResult)
                 .thenReturn(secondErrorResult);
 
-        final List<IndexFailure> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
+        final List<Messages.IndexingError> result = messagesAdapter.bulkIndex(messagesWithIds("blocked-id", "other-error-id"));
 
         verify(jestClient, times(2)).execute(any());
-        assertThat(result).extracting(IndexFailure::letterId).containsOnly("other-error-id");
+        assertThat(result).extracting(failure -> failure.message().getId()).containsOnly("other-error-id");
     }
 
     private List<IndexingRequest> messagesWithIds(String... ids) {
