@@ -180,7 +180,7 @@ public class Messages {
         final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
                 .put("letter_id", message.getId())
                 .put("index", indexError.index())
-                .put("type", indexError.errorType())
+                .put("type", indexError.errorType().toString())
                 .put("message", indexError.errorMessage())
                 .put("timestamp", message.getTimestamp())
                 .build();
