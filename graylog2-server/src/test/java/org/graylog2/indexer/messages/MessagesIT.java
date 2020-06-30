@@ -100,7 +100,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT);
     }
 
-    protected abstract Double messageCount(String indexName);
+    protected abstract long messageCount(String indexName);
 
     @Test
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {

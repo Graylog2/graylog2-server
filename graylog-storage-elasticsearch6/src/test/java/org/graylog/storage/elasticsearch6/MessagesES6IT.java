@@ -40,11 +40,11 @@ public class MessagesES6IT extends MessagesIT {
     }
 
     @Override
-    protected Double messageCount(String indexName) {
+    protected long messageCount(String indexName) {
         final Count count = new Count.Builder().addIndex(indexName).build();
 
         final CountResult result = JestUtils.execute(jestClient(elasticsearch), count, () -> "Unable to count documents");
-        return result.getCount();
+        return result.getCount().longValue();
     }
 
     @Test
