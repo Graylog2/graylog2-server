@@ -4,7 +4,6 @@ import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
 import * as Immutable from 'immutable';
 
-import { defaultCompare } from 'views/logic/DefaultCompare';
 import { type ThemeInterface } from 'theme';
 import EntityShareState, { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
 import Role from 'logic/permissions/Role';
@@ -55,16 +54,7 @@ const SubmitButton = styled(Button)`
 `;
 
 const _granteesOptions = (grantees: AvailableGrantees) => {
-  const granteesByType = grantees
-    .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title)).groupBy((grantee) => grantee.type);
-
-  const sortedGrantees = Immutable.List().concat(
-    granteesByType.get('global'),
-    granteesByType.get('team'),
-    granteesByType.get('user'),
-  );
-
-  return sortedGrantees.map((grantee) => (
+  return grantees.map((grantee) => (
     { label: grantee.title, value: grantee.id, granteeType: grantee.type }
   )).toJS();
 };
