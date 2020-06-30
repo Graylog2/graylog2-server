@@ -20,6 +20,8 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class MessagesAdapterES7 implements MessagesAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterES7.class);
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
@@ -102,7 +106,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
                         throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
                     }
                 }
-                throw e;
+                throw new org.graylog2.indexer.ElasticsearchException(e);
             }
 
             indexedSuccessfully += chunk.size();
@@ -111,6 +115,21 @@ public class MessagesAdapterES7 implements MessagesAdapter {
                     .filter(BulkItemResponse::isFailed)
                     .collect(Collectors.toList());
             indexFailures.addAll(indexingErrorsFrom(failures, messageList));
+
+            if (LOG.isDebugEnabled()) {
+                String chunkInfo = "";
+                if (chunkSize != messageList.size()) {
+                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
+                            (int) Math.ceil((double) messageList.size() / chunkSize), offset);
+                }
+                LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
+                        result.getItems().length, chunkInfo, failures.size());
+            }
+            if (!failures.isEmpty()) {
+                LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
+                        failures.size(), result.buildFailureMessage());
+            }
+            chunkCount++;
         }
 
         return indexFailures;
