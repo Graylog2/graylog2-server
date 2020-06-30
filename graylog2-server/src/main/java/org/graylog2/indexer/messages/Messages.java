@@ -161,7 +161,9 @@ public class Messages {
             return Collections.emptyList();
         }
 
-        final List<IndexFailure> indexFailures = indexingErrors.stream().map(this::createIndexFailure).collect(Collectors.toList());
+        final List<IndexFailure> indexFailures = indexingErrors.stream()
+                .map(IndexingError::toIndexFailure)
+                .collect(Collectors.toList());
 
         try {
             // TODO: Magic number
@@ -173,20 +175,6 @@ public class Messages {
         return indexFailures.stream()
                 .map(IndexFailure::letterId)
                 .collect(Collectors.toList());
-    }
-
-    private IndexFailure createIndexFailure(IndexingError indexError) {
-        final Message message = indexError.message();
-        final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
-                .put("letter_id", message.getId())
-                .put("index", indexError.index())
-                .put("type", indexError.errorType().toString())
-                .put("message", indexError.errorMessage())
-                .put("timestamp", message.getTimestamp())
-                .build();
-
-        return new IndexFailureImpl(doc);
-
     }
 
     public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {
@@ -211,6 +199,19 @@ public class Messages {
 
         public static IndexingError create(Message message, String index) {
             return create(message, index, ErrorType.Unknown, "");
+        }
+
+        public IndexFailure toIndexFailure() {
+            final Message message = this.message();
+            final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
+                    .put("letter_id", message.getId())
+                    .put("index", this.index())
+                    .put("type", this.errorType().toString())
+                    .put("message", this.errorMessage())
+                    .put("timestamp", message.getTimestamp())
+                    .build();
+
+            return new IndexFailureImpl(doc);
         }
     }
 }
