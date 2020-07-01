@@ -40,32 +40,30 @@ const DeleteIcon = styled(IconButton)`
 `;
 
 type Props = {
-  grantee: SelectedGrantee,
   availableRoles: AvailableRoles,
+  grantee: SelectedGrantee,
+  onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,
   onRoleChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
     roleId: $PropertyType<Role, 'id'>,
   }) => Promise<EntityShareState>,
-  onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,
 };
 
-const GranteesListItem = ({ onDelete, onRoleChange, grantee: { id, roleId, type, title }, availableRoles }: Props) => {
-  return (
-    <Formik initialValues={{ roleId }} onSubmit={() => {}}>
-      <Form>
-        <Container>
-          <GranteeeInfo>
-            <StyledGranteeIcon type={type} />
-            {title}
-          </GranteeeInfo>
-          <StyledRolesSelect roles={availableRoles}
-                             title={`Change the role for ${title}`}
-                             onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })} />
-          <DeleteIcon name="trash" onClick={() => onDelete(id)} title={`Delete sharing for ${title}`} />
-        </Container>
-      </Form>
-    </Formik>
-  );
-};
+const GranteesListItem = ({ availableRoles, grantee: { id, roleId, type, title }, onDelete, onRoleChange }: Props) => (
+  <Formik initialValues={{ roleId }} onSubmit={() => {}}>
+    <Form>
+      <Container>
+        <GranteeeInfo>
+          <StyledGranteeIcon type={type} />
+          {title}
+        </GranteeeInfo>
+        <StyledRolesSelect onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })}
+                           roles={availableRoles}
+                           title={`Change the role for ${title}`} />
+        <DeleteIcon name="trash" onClick={() => onDelete(id)} title={`Delete sharing for ${title}`} />
+      </Container>
+    </Form>
+  </Formik>
+);
 
 export default GranteesListItem;

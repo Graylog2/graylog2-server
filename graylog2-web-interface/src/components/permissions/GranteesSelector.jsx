@@ -13,6 +13,17 @@ import { Select } from 'components/common';
 import GranteeIcon from './GranteeIcon';
 import RolesSelect from './RolesSelect';
 
+export type SelectionRequest = {
+  granteeId: $PropertyType<Grantee, 'id'>,
+  roleId: $PropertyType<Role, 'id'>,
+};
+
+type Props = {
+  availableGrantees: AvailableGrantees,
+  availableRoles: AvailableRoles,
+  onSubmit: SelectionRequest => Promise<EntityShareState>,
+};
+
 const FormElements = styled.div`
   display: flex;
 `;
@@ -73,18 +84,7 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-export type SelectionRequest = {
-  granteeId: $PropertyType<Grantee, 'id'>,
-  roleId: $PropertyType<Role, 'id'>,
-};
-
-type Props = {
-  availableGrantees: AvailableGrantees,
-  availableRoles: AvailableRoles,
-  onSubmit: SelectionRequest => Promise<EntityShareState>,
-};
-
-const GranteesSelector = ({ onSubmit, availableGrantees, availableRoles }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialRoleId = _initialRoleId(availableRoles);
 
@@ -96,27 +96,27 @@ const GranteesSelector = ({ onSubmit, availableGrantees, availableRoles }: Props
           <FormElements>
             <Field name="granteeId" validate={_isRequired('grantee')}>
               {({ field: { name, value, onChange } }) => (
-                <GranteesSelect placeholder="Search for users and teams"
-                                options={granteesOptions}
+                <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
                                 onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                 optionRenderer={_renderGranteesSelectOption}
-                                inputProps={{ 'aria-label': 'Search for users and teams' }}
+                                options={granteesOptions}
+                                placeholder="Search for users and teams"
                                 value={value} />
               )}
             </Field>
             <StyledRolesSelect roles={availableRoles} />
-            <SubmitButton type="submit"
-                          bsStyle="success"
+            <SubmitButton bsStyle="success"
+                          disabled={isSubmitting || !isValid}
                           title="Add Collaborator"
-                          disabled={isSubmitting || !isValid}>
+                          type="submit">
               Add Collaborator
             </SubmitButton>
           </FormElements>
           {errors && (
             <Errors>
-              {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => {
-                return <span key={fieldKey}>{String(value)}.</span>;
-              })}
+              {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => (
+                <span key={fieldKey}>{String(value)}.</span>
+              ))}
             </Errors>
           )}
         </Form>

@@ -14,9 +14,9 @@ const _rolesOptions = (roles: AvailableRoles) => (
 );
 
 type Props = {
+  onChange?: $PropertyType<Role, 'id'> => void,
   roles: AvailableRoles,
   title?: string,
-  onChange?: $PropertyType<Role, 'id'> => void,
 };
 
 const RolesSelect = ({ roles, onChange, title, ...rest }: Props) => {
@@ -34,11 +34,11 @@ const RolesSelect = ({ roles, onChange, title, ...rest }: Props) => {
     <Field name="roleId">
       {({ field: { name, value, onChange: onFieldChange } }) => (
         <Select {...rest}
-                placeholder={title}
-                options={rolesOptions}
                 clearable={false}
-                onChange={(roleId) => handleChange(name, roleId, onFieldChange)}
                 inputProps={{ 'aria-label': title }}
+                onChange={(roleId) => handleChange(name, roleId, onFieldChange)}
+                options={rolesOptions}
+                placeholder={title}
                 value={value} />
       )}
     </Field>
