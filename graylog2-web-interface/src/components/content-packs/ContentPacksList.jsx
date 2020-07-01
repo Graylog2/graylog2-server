@@ -11,9 +11,9 @@ import {
   DropdownButton,
   MenuItem,
   Modal,
-  Pagination,
   Row,
 } from 'components/graylog';
+import Pagination from 'components/graylog/Pagination';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -164,17 +164,15 @@ class ContentPacksList extends React.Component {
     this.setState({ pageSize: event.target.value });
   }
 
-  _onChangePage(eventKey, event) {
-    event.preventDefault();
-    const pageNo = Number(eventKey);
-
-    this.setState({ currentPage: pageNo });
+  _onChangePage(nextPage) {
+    this.setState({ currentPage: nextPage });
   }
 
   render() {
     const { filteredContentPacks, pageSize, currentPage } = this.state;
     const { contentPacks } = this.props;
     const numberPages = Math.ceil(filteredContentPacks.length / pageSize);
+    console.log('numberPages', numberPages, filteredContentPacks.length, pageSize, filteredContentPacks.length / pageSize)
     const pagination = (
       <Pagination totalPages={numberPages}
                   currentPage={currentPage}
@@ -183,6 +181,7 @@ class ContentPacksList extends React.Component {
     const pageSizeSelector = (
       <span>Show:&nbsp;
         <select onChange={this._itemsShownChange} value={pageSize}>
+          <option>1</option>
           <option>10</option>
           <option>25</option>
           <option>50</option>
