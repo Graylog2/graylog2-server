@@ -74,11 +74,11 @@ public class IndexMappingFactoryTest {
 
     @Test
     public void createIndexMappingFailsIfElasticsearch6VersionIsTooHigh() throws Exception {
-        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("7.0.0")));
+        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("9.0.0")));
 
         assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES))
                 .isInstanceOf(ElasticsearchException.class)
-                .hasMessageStartingWith("Unsupported Elasticsearch version: 7.0.0")
+                .hasMessageStartingWith("Unsupported Elasticsearch version: 9.0.0")
                 .hasNoCause();
     }
 
