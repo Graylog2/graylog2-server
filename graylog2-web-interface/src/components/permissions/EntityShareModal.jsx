@@ -8,84 +8,101 @@ import type { GRN } from 'logic/permissions/types';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import EntityShareState from 'logic/permissions/EntityShareState';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import ShareableEnityURL from './ShareableEnityURL';
 
+type Props = {
+  description: string,
+  entityId: string,
+  entityType: string,
+  onClose: () => void,
+  title: string,
+};
+
+type ModalContentProps = {
+  description: $PropertyType<Props, 'description'>,
+  entityGRN: GRN,
+  entityShareState: EntityShareState,
+};
+
 const StyledGranteesList = styled(GranteesList)`
   margin-top: 20px;
   margin-bottom: 40px;
 `;
 
-const _generateGRN = (id, type) => `grn::::${type}:${id}`;
-
-const _filterAvailableGrantees = ({ availableGrantees, selectedGranteeRoles }) => {
+const _filterAvailableGrantees = (availableGrantees, selectedGranteeRoles) => {
   const availableGranteeRolesUserIds = selectedGranteeRoles.entrySeq().map(([granteeGRN]) => granteeGRN);
 
   return availableGrantees.filter((grantee) => !availableGranteeRolesUserIds.includes(grantee.id));
 };
 
-type Props = {
-  description: string,
-  entityId: string,
-  entityType: string,
-  title: string,
-  onClose: () => void,
-};
-
-const EntityShareModal = ({ description, title, entityId, entityType, onClose }: Props) => {
-  const { state: entityShareState } = useStore(EntityShareStore);
-  const entityGRN = _generateGRN(entityId, entityType);
-  const filteredGrantees = entityShareState && _filterAvailableGrantees(entityShareState);
-
-  useEffect(() => {
-    EntityShareActions.prepare(entityGRN);
-  }, []);
-
-  const handleSave = () => {
-    return EntityShareActions.update(entityGRN, {
-      grantee_roles: entityShareState.selectedGranteeRoles,
-    }).then(onClose);
-  };
+const ModalContent = ({ entityShareState: { availableGrantees, selectedGranteeRoles, availableRoles, selectedGrantees }, description, entityGRN }: ModalContentProps) => {
+  const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeRoles);
 
   const _handleSelection = ({ granteeId, roleId }: SelectionRequest) => {
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_roles: entityShareState.selectedGranteeRoles.merge({ [granteeId]: roleId }),
+      selected_grantee_roles: selectedGranteeRoles.merge({ [granteeId]: roleId }),
     });
   };
 
   const _handleDeletion = (granteeId: GRN) => {
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_roles: entityShareState.selectedGranteeRoles.remove(granteeId),
+      selected_grantee_roles: selectedGranteeRoles.remove(granteeId),
     });
   };
 
   return (
-    <BootstrapModalConfirm onCancel={onClose}
-                           onConfirm={handleSave}
+    <>
+      <p>
+        {description}
+      </p>
+      <GranteesSelector availableGrantees={filteredGrantees}
+                        availableRoles={availableRoles}
+                        onSubmit={_handleSelection} />
+      <StyledGranteesList availableRoles={availableRoles}
+                          entityGRN={entityGRN}
+                          onDelete={_handleDeletion}
+                          onRoleChange={_handleSelection}
+                          selectedGrantees={selectedGrantees} />
+      <ShareableEnityURL />
+    </>
+  );
+};
+
+const _generateGRN = (id, type) => `grn::::${type}:${id}`;
+
+const EntityShareModal = ({ description, entityId, entityType, title, onClose }: Props) => {
+  const { state: entityShareState } = useStore(EntityShareStore);
+  const entityGRN = _generateGRN(entityId, entityType);
+
+  useEffect(() => {
+    EntityShareActions.prepare(entityGRN);
+  }, []);
+
+  const _handleSave = () => {
+    return EntityShareActions.update(entityGRN, {
+      grantee_roles: entityShareState.selectedGranteeRoles,
+    }).then(onClose);
+  };
+
+  return (
+    <BootstrapModalConfirm confirmButtonText="Save"
+                           onCancel={onClose}
+                           onConfirm={_handleSave}
                            onModalClose={onClose}
-                           title={title}
-                           confirmButtonText="Save"
-                           showModal>
+                           showModal
+                           title={title}>
       <>
-        {!entityShareState && <Spinner />}
-        {entityShareState && (
-          <>
-            <p>
-              {description}
-            </p>
-            <GranteesSelector availableGrantees={filteredGrantees}
-                              availableRoles={entityShareState.availableRoles}
-                              onSubmit={_handleSelection} />
-            <StyledGranteesList availableRoles={entityShareState.availableRoles}
-                                entityGRN={entityGRN}
-                                onRoleChange={_handleSelection}
-                                selectedGrantees={entityShareState.selectedGrantees}
-                                onDelete={_handleDeletion} />
-            <ShareableEnityURL />
-          </>
+        {entityShareState ? (
+          <ModalContent description={description}
+                        entityGRN={entityGRN}
+                        entityShareState={entityShareState} />
+        ) : (
+          <Spinner />
         )}
       </>
     </BootstrapModalConfirm>

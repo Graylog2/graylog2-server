@@ -21,30 +21,28 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
 
 type Props = {
   availableRoles: AvailableRoles,
-  entityGRN: GRN,
-  selectedGrantees: SelectedGrantees,
   className?: string,
+  entityGRN: GRN,
+  onDelete: (GRN) => Promise<EntityShareState>,
   onRoleChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
     roleId: $PropertyType<Role, 'id'>,
   }) => Promise<EntityShareState>,
-  onDelete: (GRN) => Promise<EntityShareState>,
+  selectedGrantees: SelectedGrantees,
 };
 
-const GranteesList = ({ onDelete, onRoleChange, entityGRN, availableRoles, selectedGrantees, className }: Props) => {
-  return (
-    <Container className={className}>
-      {selectedGrantees.map((grantee) => (
-        <GranteesListItem availableRoles={availableRoles}
-                          grantee={grantee}
-                          entityGRN={entityGRN}
-                          key={grantee.id}
-                          onRoleChange={onRoleChange}
-                          onDelete={onDelete} />
-      ))}
-    </Container>
-  );
-};
+const GranteesList = ({ onDelete, onRoleChange, entityGRN, availableRoles, selectedGrantees, className }: Props) => (
+  <Container className={className}>
+    {selectedGrantees.map((grantee) => (
+      <GranteesListItem availableRoles={availableRoles}
+                        entityGRN={entityGRN}
+                        grantee={grantee}
+                        key={grantee.id}
+                        onDelete={onDelete}
+                        onRoleChange={onRoleChange} />
+    ))}
+  </Container>
+);
 
 GranteesList.defaultProps = {
   className: undefined,
