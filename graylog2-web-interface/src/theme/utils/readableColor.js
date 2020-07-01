@@ -1,17 +1,15 @@
 // @flow strict
 import chroma from 'chroma-js';
 
-import { teinte } from 'theme/colors';
-
 export type ReadableColor = {
   (string, void | string, void | string): string,
 };
 
-export default function readableColor(
+const readableColor = (colors) => (
   hex: string,
-  darkColor?: string = teinte.global.textDefault,
-  lightColor?: string = teinte.global.textAlt,
-): string {
+  darkColor?: string = colors.global.textDefault,
+  lightColor?: string = colors.global.textAlt,
+): string => {
   /**
    * Returns `textDefault` or `textAlt` (or optional light and dark return colors) for best contrast depending on the luminosity of the given color. Follows [W3C specs for readability](https://www.w3.org/TR/WCAG20-TECHS/G18.html).
    *
@@ -23,4 +21,6 @@ export default function readableColor(
   const luminanceRatio = 0.179;
 
   return chroma(hex).luminance() < luminanceRatio ? lightColor : darkColor;
-}
+};
+
+export default readableColor;
