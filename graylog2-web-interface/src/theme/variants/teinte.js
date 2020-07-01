@@ -63,7 +63,7 @@ const table = {
 };
 
 /* eslint-disable prefer-destructuring */
-global.inputBackground = variant.lightest.default;
+global.inputBackground = global.contentBackground;
 /* eslint-enable prefer-destructuring */
 
 const teinte = {
