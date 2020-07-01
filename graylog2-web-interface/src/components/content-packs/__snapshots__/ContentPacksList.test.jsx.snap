@@ -423,7 +423,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "fdBWEX",
+                                              "lastClassName": "eXfwDC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -447,7 +447,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 fdBWEX"
+                                          className="FormControl-sc-1amoaox-0 eXfwDC"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -456,7 +456,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -997,7 +997,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "eZbLWu",
+                                "lastClassName": "jRLKfG",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1016,11 +1016,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <StyledComponent
@@ -1080,7 +1080,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -1099,11 +1099,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -1167,7 +1167,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eYvbcA",
+                                                        "lastClassName": "rPkcW",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -1190,12 +1190,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 rPkcW"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA badge"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 rPkcW badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -1432,7 +1432,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1454,7 +1454,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-1"
                                           pullRight={true}
                                           title="More Actions"
@@ -1493,7 +1493,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-1"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -1509,7 +1509,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-1"
                                                         onClick={[Function]}
@@ -1519,7 +1519,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-1"
                                                           onClick={[Function]}
@@ -1903,7 +1903,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -1922,11 +1922,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -1990,7 +1990,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eYvbcA",
+                                                        "lastClassName": "rPkcW",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -2013,12 +2013,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 rPkcW"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA badge"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 rPkcW badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -2255,7 +2255,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2277,7 +2277,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-2"
                                           pullRight={true}
                                           title="More Actions"
@@ -2316,7 +2316,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-2"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -2332,7 +2332,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-2"
                                                         onClick={[Function]}
@@ -2342,7 +2342,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-2"
                                                           onClick={[Function]}
@@ -2726,7 +2726,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -2745,11 +2745,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -3014,7 +3014,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3036,7 +3036,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-3"
                                           pullRight={true}
                                           title="More Actions"
@@ -3075,7 +3075,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-3"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -3091,7 +3091,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-3"
                                                         onClick={[Function]}
@@ -3101,7 +3101,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-3"
                                                           onClick={[Function]}
@@ -3484,7 +3484,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -3503,11 +3503,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -3772,7 +3772,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3794,7 +3794,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-4"
                                           pullRight={true}
                                           title="More Actions"
@@ -3833,7 +3833,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-4"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -3849,7 +3849,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-4"
                                                         onClick={[Function]}
@@ -3859,7 +3859,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-4"
                                                           onClick={[Function]}
@@ -4243,7 +4243,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -4262,11 +4262,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -4531,7 +4531,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4553,7 +4553,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-5"
                                           pullRight={true}
                                           title="More Actions"
@@ -4592,7 +4592,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-5"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -4608,7 +4608,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-5"
                                                         onClick={[Function]}
@@ -4618,7 +4618,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-5"
                                                           onClick={[Function]}
@@ -5002,7 +5002,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -5021,11 +5021,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -5290,7 +5290,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5312,7 +5312,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-6"
                                           pullRight={true}
                                           title="More Actions"
@@ -5351,7 +5351,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-6"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -5367,7 +5367,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-6"
                                                         onClick={[Function]}
@@ -5377,7 +5377,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-6"
                                                           onClick={[Function]}
@@ -5761,7 +5761,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -5780,11 +5780,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -6049,7 +6049,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6071,7 +6071,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-7"
                                           pullRight={true}
                                           title="More Actions"
@@ -6110,7 +6110,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-7"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -6126,7 +6126,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-7"
                                                         onClick={[Function]}
@@ -6136,7 +6136,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-7"
                                                           onClick={[Function]}
@@ -6520,7 +6520,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -6539,11 +6539,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -6808,7 +6808,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6830,7 +6830,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-8"
                                           pullRight={true}
                                           title="More Actions"
@@ -6869,7 +6869,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-8"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -6885,7 +6885,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-8"
                                                         onClick={[Function]}
@@ -6895,7 +6895,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-8"
                                                           onClick={[Function]}
@@ -7278,7 +7278,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -7297,11 +7297,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -7566,7 +7566,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7588,7 +7588,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-9"
                                           pullRight={true}
                                           title="More Actions"
@@ -7627,7 +7627,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-9"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -7643,7 +7643,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-9"
                                                         onClick={[Function]}
@@ -7653,7 +7653,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-9"
                                                           onClick={[Function]}
@@ -8037,7 +8037,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "eZbLWu",
+                            "lastClassName": "jRLKfG",
                             "rules": Array [
                               [Function],
                             ],
@@ -8056,11 +8056,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 eZbLWu list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 jRLKfG list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -8325,7 +8325,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "hsmsMV",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8347,7 +8347,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                           id="more-actions-10"
                                           pullRight={true}
                                           title="More Actions"
@@ -8386,7 +8386,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV"
                                                       id="more-actions-10"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -8402,7 +8402,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-10"
                                                         onClick={[Function]}
@@ -8412,7 +8412,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hsmsMV dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-10"
                                                           onClick={[Function]}
@@ -9253,7 +9253,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "fdBWEX",
+                                              "lastClassName": "eXfwDC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -9277,7 +9277,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 fdBWEX"
+                                          className="FormControl-sc-1amoaox-0 eXfwDC"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -9286,7 +9286,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
