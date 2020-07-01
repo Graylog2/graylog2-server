@@ -9,7 +9,10 @@ import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.junit.Rule;
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
@@ -17,6 +20,18 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 public class ClusterES6IT extends ClusterIT {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+
+    @Test
+    public void getClusterAllocationDiskSettings() {
+        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
+
+        //Default Elasticsearch settings in Elasticsearch 5.6
+        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isNull();
+    }
 
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {

@@ -74,8 +74,7 @@ public class ClusterAdapterES6 implements ClusterAdapter {
 
     @Override
     public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        final Optional<JsonNode> result = clusterHealth(indices);
-        return result.map(this::extractHealthStatus);
+        return health(indices);
     }
 
     @Override
