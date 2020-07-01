@@ -95,10 +95,10 @@ describe('ViewActionsMenu', () => {
 
   it('should dashboard share modal', () => {
     const { getByText } = render(<SimpleViewActionMenu />);
-    const editMenuItem = getByText(/Share/i);
+    const openShareButton = getByText(/Share/i);
 
-    fireEvent.click(editMenuItem);
+    fireEvent.click(openShareButton);
 
-    expect(getByText(/Who is supposed to access the dashboard/i)).not.toBeNull();
+    expect(getByText(/Sharing dashboard:/i)).not.toBeNull();
   });
 });
