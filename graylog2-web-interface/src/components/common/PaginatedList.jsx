@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import { Pagination } from 'components/graylog';
+// import { Pagination } from 'components/graylog';
+import Pagination from 'components/graylog/Pagination';
 import { Input } from 'components/bootstrap';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 
@@ -89,13 +90,8 @@ const PaginatedList = ({
         <div className="text-center pagination-wrapper">
           <Pagination bsSize="small"
                       items={numberPages}
-                      maxButtons={10}
                       activePage={currentPage}
-                      onSelect={_onChangePage}
-                      prev
-                      next
-                      first
-                      last />
+                      onSelect={_onChangePage} />
         </div>
       </IfInteractive>
     </>

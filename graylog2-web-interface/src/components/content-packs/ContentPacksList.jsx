@@ -4,7 +4,8 @@ import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { Button, Row, Col, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'components/graylog';
+import { Button, Row, Col, DropdownButton, MenuItem, Modal, ButtonToolbar } from 'components/graylog';
+import Pagination from 'components/graylog/Pagination';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -175,11 +176,7 @@ class ContentPacksList extends React.Component {
                   items={numberPages}
                   maxButtons={this.MAX_PAGE_BUTTONS}
                   activePage={currentPage}
-                  onSelect={this._onChangePage}
-                  prev
-                  next
-                  first
-                  last />
+                  onSelect={this._onChangePage} />
     );
     const pageSizeSelector = (
       <span>Show:&nbsp;

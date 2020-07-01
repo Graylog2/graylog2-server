@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Col, Pagination, Row } from 'components/graylog';
+import { Col, Row } from 'components/graylog';
+import Pagination from 'components/graylog/Pagination';
 import StoreProvider from 'injection/StoreProvider';
 import { Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
@@ -48,10 +49,6 @@ class SystemMessagesComponent extends React.Component {
                         items={numberPages}
                         activePage={this.state.currentPage}
                         onSelect={this._onSelected}
-                        prev
-                        next
-                        first
-                        last
                         maxButtons={Math.min(paginatorSize, numberPages)} />
           </nav>
         </div>
