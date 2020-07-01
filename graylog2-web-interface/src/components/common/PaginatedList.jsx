@@ -72,10 +72,9 @@ const PaginatedList = ({
     onChange(INITIAL_PAGE, newPageSize);
   };
 
-  const _onChangePage = (pageNo: number, event: MouseEvent) => {
-    event.preventDefault();
-    setCurrentPage(pageNo);
-    onChange(pageNo, pageSize);
+  const _onChangePage = (pageNum: number) => {
+    setCurrentPage(pageNum);
+    onChange(pageNum, pageSize);
   };
 
   return (
@@ -88,10 +87,9 @@ const PaginatedList = ({
 
       <IfInteractive>
         <div className="text-center pagination-wrapper">
-          <Pagination bsSize="small"
-                      items={numberPages}
-                      activePage={currentPage}
-                      onSelect={_onChangePage} />
+          <Pagination totalPages={numberPages}
+                      currentPage={currentPage}
+                      onChange={_onChangePage} />
         </div>
       </IfInteractive>
     </>

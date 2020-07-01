@@ -4,8 +4,16 @@ import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { Button, Row, Col, DropdownButton, MenuItem, Modal, ButtonToolbar } from 'components/graylog';
-import Pagination from 'components/graylog/Pagination';
+import {
+  Button,
+  ButtonToolbar,
+  Col,
+  DropdownButton,
+  MenuItem,
+  Modal,
+  Pagination,
+  Row,
+} from 'components/graylog';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -13,7 +21,6 @@ import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
 import ContentPackInstall from './ContentPackInstall';
-import ContentPacksListStyle from './ContentPacksList.css';
 
 class ContentPacksList extends React.Component {
   static propTypes = {
@@ -29,8 +36,6 @@ class ContentPacksList extends React.Component {
     onInstall: () => {},
     contentPackMetadata: {},
   };
-
-  MAX_PAGE_BUTTONS = 10;
 
   constructor(props) {
     super(props);
@@ -171,12 +176,9 @@ class ContentPacksList extends React.Component {
     const { contentPacks } = this.props;
     const numberPages = Math.ceil(filteredContentPacks.length / pageSize);
     const pagination = (
-      <Pagination bsSize="small"
-                  bsStyle={`pagination ${ContentPacksListStyle.pager}`}
-                  items={numberPages}
-                  maxButtons={this.MAX_PAGE_BUTTONS}
-                  activePage={currentPage}
-                  onSelect={this._onChangePage} />
+      <Pagination totalPages={numberPages}
+                  currentPage={currentPage}
+                  onChange={this._onChangePage} />
     );
     const pageSizeSelector = (
       <span>Show:&nbsp;

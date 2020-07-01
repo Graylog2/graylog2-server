@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Col, Row } from 'components/graylog';
-import Pagination from 'components/graylog/Pagination';
+import { Col, Pagination, Row } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import { Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
@@ -38,18 +37,15 @@ class SystemMessagesComponent extends React.Component {
 
     if (this.state.total && this.state.messages) {
       const numberPages = Math.ceil(this.state.total / this.PER_PAGE);
-      const paginatorSize = 10;
 
       content = (
         <div>
           <SystemMessagesList messages={this.state.messages} />
 
           <nav style={{ textAlign: 'center' }}>
-            <Pagination bsSize="small"
-                        items={numberPages}
-                        activePage={this.state.currentPage}
-                        onSelect={this._onSelected}
-                        maxButtons={Math.min(paginatorSize, numberPages)} />
+            <Pagination totalPages={numberPages}
+                        currentPage={this.state.currentPage}
+                        onChange={this._onSelected} />
           </nav>
         </div>
       );
