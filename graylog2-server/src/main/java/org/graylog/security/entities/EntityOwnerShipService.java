@@ -5,6 +5,7 @@ import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.GRN;
 import org.graylog2.utilities.GRNRegistry;
@@ -36,12 +37,14 @@ public class EntityOwnerShipService {
     }
 
 
-    public void registerNewView(String id, String currentUserName) {
+    public void registerNewView(String id) {
         final GRN grn = grnRegistry.newGRN(ModelTypes.DASHBOARD_V2.name(), id);
-        registerNewEntity(grn, currentUserName);
+        registerNewEntity(grn);
     }
 
-    private void registerNewEntity(GRN entity, String currentUserName) {
+    private void registerNewEntity(GRN entity) {
+        final String currentUserName = RestResource.getCurrentUserName();
+
         // TODO maybe we should do everything user related with just the username String?
 //        if (currentUserName.equals(rootUsername)) {
 //            return;
