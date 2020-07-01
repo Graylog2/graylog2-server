@@ -18,4 +18,12 @@ declare module 'react-router' {
   declare export class browserHistory {
     static push: ({pathname: string, state: {}}) => void,
   }
+  declare export class Link extends React$Component<Props> {
+    to: (string | { [key: string]: any } | () => {}),
+    activeStyle?: any,
+    activeClassName?: string,
+    onlyActiveOnIndex: boolean,
+    onClick?: () => void,
+    target?: string,
+  }
 }
