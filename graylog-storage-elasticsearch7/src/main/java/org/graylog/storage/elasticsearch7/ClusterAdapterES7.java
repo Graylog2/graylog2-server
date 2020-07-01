@@ -16,7 +16,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetInd
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
-import org.graylog.storage.elasticsearch7.cat.NodesResponse;
+import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
@@ -85,19 +85,19 @@ public class ClusterAdapterES7 implements ClusterAdapter {
 
     @Override
     public Set<NodeFileDescriptorStats> fileDescriptorStats() {
-        final NodesResponse result = nodes();
+        final List<NodeResponse> result = nodes();
         return result.stream()
                 .map(node -> NodeFileDescriptorStats.create(node.name(), node.ip(), node.host(), node.fileDescriptorMax()))
                 .collect(Collectors.toSet());
     }
 
-    private NodesResponse nodes() {
+    private List<NodeResponse> nodes() {
         return client.execute(catApi::nodes);
     }
 
     @Override
     public Set<NodeDiskUsageStats> diskUsageStats() {
-        final NodesResponse result = nodes();
+        final List<NodeResponse> result = nodes();
         return result.stream()
                 .map(node -> NodeDiskUsageStats.create(node.name(), node.ip(), node.host(), node.diskUsed(), node.diskTotal(), node.diskUsedPercent()))
                 .collect(Collectors.toSet());

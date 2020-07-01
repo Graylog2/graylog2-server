@@ -6,7 +6,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.MainResponse;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
-import org.graylog.storage.elasticsearch7.cat.NodesResponse;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
@@ -17,6 +16,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +57,7 @@ public class ClusterES7IT extends ClusterIT {
     }
 
     private NodeResponse currentNode() {
-        final NodesResponse nodes = elasticsearch.elasticsearchClient().execute(catApi()::nodes);
+        final List<NodeResponse> nodes = elasticsearch.elasticsearchClient().execute(catApi()::nodes);
         return nodes.get(0);
     }
 

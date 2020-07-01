@@ -1,5 +1,6 @@
 package org.graylog.storage.elasticsearch7.cat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
@@ -8,6 +9,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 
 public class CatApi {
     private final ObjectMapper objectMapper;
@@ -17,26 +19,20 @@ public class CatApi {
         this.objectMapper = objectMapper;
     }
 
-    public IndicesResponse indices(RestHighLevelClient c, RequestOptions requestOptions) throws IOException {
-        return perform(c,
-                request("GET", "indices", requestOptions),
-                IndicesResponse.class);
-    }
-
-    public NodesResponse nodes(RestHighLevelClient c, RequestOptions requestOptions) throws IOException {
+    public List<NodeResponse> nodes(RestHighLevelClient c, RequestOptions requestOptions) throws IOException {
         final Request request = request("GET", "nodes", requestOptions);
         request.addParameter("h", "id,name,host,ip,fileDescriptorMax,diskUsed,diskTotal,diskUsedPercent");
         request.addParameter("full_id", "true");
-        return perform(c, request, NodesResponse.class);
+        return perform(c, request, new TypeReference<List<NodeResponse>>() {});
     }
 
-    private <R> R perform(RestHighLevelClient c, Request request, Class<R> responseClass) throws IOException {
+    private <R> R perform(RestHighLevelClient c, Request request, TypeReference<R> responseClass) throws IOException {
         final Response response = c.getLowLevelClient().performRequest(request);
 
         return returnType(response, responseClass);
     }
 
-    private <R> R returnType(Response response, Class<R> responseClass) throws IOException {
+    private <R> R returnType(Response response, TypeReference<R> responseClass) throws IOException {
         return objectMapper.readValue(response.getEntity().getContent(), responseClass);
     }
 
