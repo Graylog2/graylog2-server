@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.db;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
+import org.graylog.security.entities.EntityOwnerShipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -61,7 +62,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
         TestViewService(MongoConnection mongoConnection,
                         MongoJackObjectMapperProvider mapper,
                         ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view));
+            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), mock(EntityOwnerShipService.class));
         }
     }
 

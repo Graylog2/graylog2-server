@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.views;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.entities.EntityOwnerShipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,8 +85,8 @@ public class ViewServiceUsesViewRequirementsTest {
                 mongodb.mongoConnection(),
                 objectMapperProvider,
                 clusterConfigService,
-                viewRequirementsFactory
-        );
+                viewRequirementsFactory,
+                mock(EntityOwnerShipService.class));
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
     }
 

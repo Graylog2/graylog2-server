@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.IndexSet;
@@ -72,6 +74,23 @@ public abstract class RestResource {
                     return w.withDefaultPrettyPrinter();
                 }
             });
+        }
+    }
+
+    // TODO move this somewhere else?
+    public static String getCurrentUserName() {
+        try {
+            final Subject subject = SecurityUtils.getSubject();
+            final Object p = subject.getPrincipal();
+            if (!(p instanceof String)) {
+                final String msg = "Unknown SecurityContext class " + p + ", cannot continue.";
+                LOG.error(msg);
+                return null;
+            }
+            return (String) p;
+        } catch (IllegalStateException | UnavailableSecurityManagerException e) {
+            LOG.error("Cannot retrieve current subject, SecurityContext isn't set.");
+            return null;
         }
     }
 

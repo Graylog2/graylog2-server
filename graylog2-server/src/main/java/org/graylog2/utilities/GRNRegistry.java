@@ -17,6 +17,7 @@
 package org.graylog2.utilities;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Singleton;
 import java.util.Collection;
@@ -110,6 +111,10 @@ public class GRNRegistry {
         checkArgument(!isNullOrEmpty(entity), "entity cannot be null or empty");
 
         return newGRNBuilder(type).entity(entity).build();
+    }
+
+    public GRN ofUser(User user) {
+        return newGRN("user", user.getName());
     }
 
     /**
