@@ -15,8 +15,6 @@ import GranteeIcon from './GranteeIcon';
 import RolesSelect from './RolesSelect';
 
 const currentStateColor = (theme: ThemeInterface, currentState: CurrentGranteeState) => {
-  console.log('currentState', currentState);
-
   switch (currentState) {
     case 'new':
       return theme.colors.variant.lighter.success;

@@ -16,13 +16,16 @@ const Conainter: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
+
   > div:last-child > div {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
+
   > div:not(:first-child) > div {
     border-left: 0;
   }
+
   > div:not(:first-child):not(:last-child) > div {
     border-radius: 0;
   }
