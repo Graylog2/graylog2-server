@@ -25,6 +25,7 @@ type Props = {
 const _iconName = (type) => {
   switch (type) {
     case 'global':
+      return 'building';
     case 'team':
       return 'users';
     case 'user':
