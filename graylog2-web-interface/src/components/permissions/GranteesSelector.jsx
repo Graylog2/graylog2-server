@@ -9,6 +9,7 @@ import Role from 'logic/permissions/Role';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
 import { Select } from 'components/common';
+import SelectGroup from 'components/common/SelectGroup';
 
 import GranteeIcon from './GranteeIcon';
 import RolesSelect from './RolesSelect';
@@ -55,8 +56,12 @@ const StyledGranteeIcon = styled(GranteeIcon)`
   margin-right: 5px;
 `;
 
-const StyledRolesSelect = styled(RolesSelect)`
-  flex: 0.5;
+const StyledSelectGroup = styled(SelectGroup)`
+  flex: 1;
+
+  > div:last-child {
+    flex: 0.5;
+  }
 `;
 
 const SubmitButton = styled(Button)`
@@ -94,17 +99,19 @@ const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props
       {({ isSubmitting, isValid, errors }) => (
         <Form>
           <FormElements>
-            <Field name="granteeId" validate={_isRequired('grantee')}>
-              {({ field: { name, value, onChange } }) => (
-                <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
-                                onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-                                optionRenderer={_renderGranteesSelectOption}
-                                options={granteesOptions}
-                                placeholder="Search for users and teams"
-                                value={value} />
-              )}
-            </Field>
-            <StyledRolesSelect roles={availableRoles} />
+            <StyledSelectGroup>
+              <Field name="granteeId" validate={_isRequired('grantee')}>
+                {({ field: { name, value, onChange } }) => (
+                  <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
+                                  onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+                                  optionRenderer={_renderGranteesSelectOption}
+                                  options={granteesOptions}
+                                  placeholder="Search for users and teams"
+                                  value={value} />
+                )}
+              </Field>
+              <RolesSelect roles={availableRoles} />
+            </StyledSelectGroup>
             <SubmitButton bsStyle="success"
                           disabled={isSubmitting || !isValid}
                           title="Add Collaborator"
