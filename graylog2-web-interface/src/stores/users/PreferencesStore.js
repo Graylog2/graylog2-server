@@ -8,7 +8,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const PreferencesActions = ActionsProvider.getActions('Preferences');
 
-type Preference = {
+export type Preference = {
   name: string,
   value: any,
 };
