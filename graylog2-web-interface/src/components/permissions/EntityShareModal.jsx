@@ -31,14 +31,14 @@ type ModalContentProps = {
 };
 
 const StyledGranteesList = styled(GranteesList)`
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 `;
 
 const GranteesSelectorHeadline = styled.h5`
   margin-bottom: 10px;
 `;
 const GranteesListHeadline = styled.h5`
-  margin-top: 20px;
+  margin-top: 25px;
   margin-bottom: 10px;
 `;
 
