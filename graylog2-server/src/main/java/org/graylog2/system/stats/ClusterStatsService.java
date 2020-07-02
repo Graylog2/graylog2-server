@@ -22,6 +22,8 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.cluster.PendingTasksStats;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.inputs.InputService;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -30,6 +32,7 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
+import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.graylog2.system.stats.mongo.MongoProbe;
 import org.graylog2.system.stats.mongo.MongoStats;
 import org.graylog2.users.RoleService;
@@ -110,7 +113,25 @@ public class ClusterStatsService {
 
     public ElasticsearchStats elasticsearchStats() {
         final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
-        return clusterAdapter.statsForIndices(indices);
+        final org.graylog2.system.stats.elasticsearch.ClusterStats clusterStats = clusterAdapter.clusterStats();
+
+        final PendingTasksStats pendingTasksStats = clusterAdapter.pendingTasks();
+
+        final ShardStats shardStats = clusterAdapter.shardStats(indices);
+        final org.graylog2.system.stats.elasticsearch.ClusterHealth clusterHealth = org.graylog2.system.stats.elasticsearch.ClusterHealth.from(
+                shardStats,
+                pendingTasksStats
+        );
+        final HealthStatus healthStatus = clusterAdapter.health(indices).orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
+
+        return ElasticsearchStats.create(
+                clusterStats.clusterName(),
+                clusterStats.clusterVersion(),
+                healthStatus,
+                clusterHealth,
+                clusterStats.nodesStats(),
+                clusterStats.indicesStats()
+        );
     }
 
     public MongoStats mongoStats() {

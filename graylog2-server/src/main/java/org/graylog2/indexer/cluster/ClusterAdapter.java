@@ -21,7 +21,8 @@ import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
-import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
+import org.graylog2.system.stats.elasticsearch.ClusterStats;
+import org.graylog2.system.stats.elasticsearch.ShardStats;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -48,5 +49,9 @@ public interface ClusterAdapter {
 
     Optional<ClusterHealth> clusterHealthStats(Collection<String> indices);
 
-    ElasticsearchStats statsForIndices(Collection<String> indices);
+    ClusterStats clusterStats();
+
+    PendingTasksStats pendingTasks();
+
+    ShardStats shardStats(Collection<String> indices);
 }

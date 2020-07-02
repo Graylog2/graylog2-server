@@ -27,7 +27,6 @@ import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
-import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
@@ -178,29 +177,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     @Override
-    public ElasticsearchStats statsForIndices(Collection<String> indices) {
-        final ClusterStats clusterStats = this.clusterStats();
-
-        final PendingTasksStats pendingTasksStats = this.pendingTasks();
-
-        final ShardStats shardStats = this.shardStats(indices);
-        final org.graylog2.system.stats.elasticsearch.ClusterHealth clusterHealth = org.graylog2.system.stats.elasticsearch.ClusterHealth.from(
-                shardStats,
-                pendingTasksStats
-        );
-        final HealthStatus healthStatus = this.health(indices).orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
-
-        return ElasticsearchStats.create(
-                clusterStats.clusterName(),
-                clusterStats.clusterVersion(),
-                healthStatus,
-                clusterHealth,
-                clusterStats.nodesStats(),
-                clusterStats.indicesStats()
-        );
-    }
-
-    private PendingTasksStats pendingTasks() {
+    public PendingTasksStats pendingTasks() {
         final Request request = new Request("GET", "/_cluster/pending_tasks");
 
         final JsonNode response = client.execute((c, requestOptions) -> jsonApi.perform(c, request, requestOptions),
@@ -218,7 +195,8 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         return PendingTasksStats.create(pendingTasksSize, pendingTasksTimeInQueue);
     }
 
-    private ClusterStats clusterStats() {
+    @Override
+    public ClusterStats clusterStats() {
         final Request request = new Request("GET", "/_cluster/stats/nodes");
 
         final JsonNode clusterStatsResponseJson = client.execute((c, requestOptions) -> jsonApi.perform(c, request, requestOptions),
@@ -256,7 +234,8 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         return ClusterStats.create(clusterName, clusterVersion, nodesStats, indicesStats);
     }
 
-    private ShardStats shardStats(Collection<String> indices) {
+    @Override
+    public ShardStats shardStats(Collection<String> indices) {
         return clusterHealth(indices)
                 .map(response -> ShardStats.create(
                         response.getNumberOfNodes(),

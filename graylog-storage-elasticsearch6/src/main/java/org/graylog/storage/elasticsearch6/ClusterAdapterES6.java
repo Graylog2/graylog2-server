@@ -16,6 +16,8 @@ import io.searchbox.cluster.PendingClusterTasks;
 import io.searchbox.cluster.Stats;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
+import org.graylog.storage.elasticsearch6.cluster.GetAllocationDiskSettings;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
@@ -23,12 +25,9 @@ import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
-import org.graylog.storage.elasticsearch6.cluster.GetAllocationDiskSettings;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
-import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
@@ -177,7 +176,8 @@ public class ClusterAdapterES6 implements ClusterAdapter {
         });
     }
 
-    private ShardStats shardStats(Collection<String> indices) {
+    @Override
+    public ShardStats shardStats(Collection<String> indices) {
         final Health clusterHealthRequest = new Health.Builder()
                 .addIndex(indices)
                 .build();
@@ -195,7 +195,8 @@ public class ClusterAdapterES6 implements ClusterAdapter {
         );
     }
 
-    private PendingTasksStats pendingTasks() {
+    @Override
+    public PendingTasksStats pendingTasks() {
         final JestResult pendingClusterTasksResponse = JestUtils.execute(jestClient, new PendingClusterTasks.Builder().build(), () -> "Couldn't read Elasticsearch pending cluster tasks");
         final JsonNode pendingClusterTasks = pendingClusterTasksResponse.getJsonObject().path("tasks");
         final int pendingTasksSize = pendingClusterTasks.size();
@@ -209,7 +210,8 @@ public class ClusterAdapterES6 implements ClusterAdapter {
         return PendingTasksStats.create(pendingTasksSize, pendingTasksTimeInQueue);
     }
 
-    private ClusterStats clusterStats() {
+    @Override
+    public ClusterStats clusterStats() {
         final JestResult clusterStatsResponse = JestUtils.execute(jestClient, new Stats.Builder().build(), () -> "Couldn't read Elasticsearch cluster stats");
         final JsonNode clusterStatsResponseJson = clusterStatsResponse.getJsonObject();
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
@@ -243,29 +245,6 @@ public class ClusterAdapterES6 implements ClusterAdapter {
         );
 
         return ClusterStats.create(clusterName, clusterVersion, nodesStats, indicesStats);
-    }
-
-    @Override
-    public ElasticsearchStats statsForIndices(Collection<String> indices) {
-        final ClusterStats clusterStats = this.clusterStats();
-
-        final PendingTasksStats pendingTasksStats = this.pendingTasks();
-
-        final ShardStats shardStats = this.shardStats(indices);
-        final org.graylog2.system.stats.elasticsearch.ClusterHealth clusterHealth = org.graylog2.system.stats.elasticsearch.ClusterHealth.from(
-                shardStats,
-                pendingTasksStats
-        );
-        final HealthStatus healthStatus = this.health(indices).orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
-
-        return ElasticsearchStats.create(
-                clusterStats.clusterName(),
-                clusterStats.clusterVersion(),
-                healthStatus,
-                clusterHealth,
-                clusterStats.nodesStats(),
-                clusterStats.indicesStats()
-        );
     }
 
     private JsonNode getNodeInfo(String nodeId) {
