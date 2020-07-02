@@ -18,6 +18,9 @@ package org.graylog.events.indices;
 
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.IndexingRequest;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -41,12 +44,12 @@ public class EventIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(EventIndexer.class);
 
     private final StreamService streamService;
-    private final EventIndexerAdapter eventIndexerAdapter;
+    private final Messages messages;
 
     @Inject
-    public EventIndexer(StreamService streamService, EventIndexerAdapter eventIndexerAdapter) {
+    public EventIndexer(StreamService streamService, Messages messages) {
         this.streamService = streamService;
-        this.eventIndexerAdapter = eventIndexerAdapter;
+        this.messages = messages;
     }
 
     public void write(List<EventWithContext> eventsWithContext) {
@@ -56,19 +59,20 @@ public class EventIndexer {
 
         // Pre-load all write index targets of all events to avoid looking them up for every event when building the bulk request
         final Set<String> streamIds = streamIdsForEvents(eventsWithContext);
-        final Map<String, String> streamIndices = indexAliasesForStreams(streamIds);
-        final List<Map.Entry<String, Event>> requests = eventsWithContext.stream()
+        final Map<String, IndexSet> streamIndices = indexAliasesForStreams(streamIds);
+        final List<IndexingRequest> requests = eventsWithContext.stream()
                 .map(EventWithContext::event)
                 // Collect a set of indices for the event to avoid writing to the same index set twice if
                 // multiple streams use the same index set.
                 .flatMap(event -> assignEventsToTargetIndices(event, streamIndices))
+                .map(event -> IndexingRequest.create(event.getKey(), event.getValue()))
                 .collect(Collectors.toList());
-        eventIndexerAdapter.write(requests);
+        messages.bulkIndexRequests(requests, true);
     }
 
-    private Map<String, String> indexAliasesForStreams(Set<String> streamIds) {
+    private Map<String, IndexSet> indexAliasesForStreams(Set<String> streamIds) {
         return streamService.loadByIds(streamIds).stream()
-            .collect(Collectors.toMap(Persisted::getId, stream -> stream.getIndexSet().getWriteIndexAlias()));
+            .collect(Collectors.toMap(Persisted::getId, org.graylog2.plugin.streams.Stream::getIndexSet));
     }
 
     private Set<String> streamIdsForEvents(List<EventWithContext> eventsWithContext) {
@@ -78,16 +82,16 @@ public class EventIndexer {
             .collect(Collectors.toSet());
     }
 
-    private Stream<? extends AbstractMap.SimpleEntry<String, Event>> assignEventsToTargetIndices(Event event, Map<String, String> streamIndices) {
-        final Set<String> indices = indicesForEvent(event, streamIndices);
+    private Stream<AbstractMap.SimpleEntry<IndexSet, Event>> assignEventsToTargetIndices(Event event, Map<String, IndexSet> streamIndices) {
+        final Set<IndexSet> indices = indicesForEvent(event, streamIndices);
         return indices.stream()
                 .map(index -> new AbstractMap.SimpleEntry<>(index, event));
     }
 
-    private Set<String> indicesForEvent(Event event, Map<String, String> streamIndices) {
+    private Set<IndexSet> indicesForEvent(Event event, Map<String, IndexSet> streamIndices) {
         return event.getStreams().stream()
                 .map(streamId -> {
-                    final String index = streamIndices.get(streamId);
+                    final IndexSet index = streamIndices.get(streamId);
                     if (index == null) {
                         LOG.warn("Couldn't find index set of stream <{}> for event <{}> (definition: {}/{})", streamId,
                                 event.getId(), event.getEventDefinitionType(), event.getEventDefinitionId());

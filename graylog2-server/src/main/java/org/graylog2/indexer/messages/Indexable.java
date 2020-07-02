@@ -16,20 +16,17 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.google.auto.value.AutoValue;
-import org.graylog2.indexer.IndexSet;
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
+import java.util.Map;
 
-@AutoValue
-@JsonAutoDetect
-public abstract class IndexingRequest {
-    public abstract IndexSet indexSet();
-    public abstract Indexable message();
-
-    public static IndexingRequest create(@NotNull IndexSet indexSet, @NotNull Indexable message) {
-        return new AutoValue_IndexingRequest(indexSet, message);
-    }
-
+public interface Indexable {
+    String getId();
+    long getSize();
+    DateTime getReceiveTime();
+    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);
+    DateTime getTimestamp();
 }
