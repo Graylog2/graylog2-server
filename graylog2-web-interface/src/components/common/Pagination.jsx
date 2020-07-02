@@ -5,9 +5,10 @@ import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
 import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import Icon from './Icon';
 
-const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
+// const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
+const StyledBootstrapPagination = styled((props) => <BootstrapPagination {...props} />)(({ theme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
 
@@ -53,7 +54,8 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css
   }
 `);
 
-const Pagination = createUltimatePagination({
+const UltimatePagination = createUltimatePagination({
+// const Pagination = createUltimatePagination({
   WrapperComponent: StyledBootstrapPagination,
   itemTypeToComponent: {
     /* eslint-disable react/prop-types */
@@ -90,6 +92,30 @@ const Pagination = createUltimatePagination({
     /* eslint-enable react/prop-types */
   },
 });
+
+const Pagination = ({
+  currentPage,
+  totalPages,
+  boundaryPagesRange,
+  siblingPagesRange,
+  hideEllipsis,
+  hidePreviousAndNextPageLinks,
+  hideFirstAndLastPageLinks,
+  disabled,
+  onChange,
+}) => {
+  return (
+    <UltimatePagination currentPage={currentPage}
+                        totalPages={totalPages}
+                        boundaryPagesRange={boundaryPagesRange}
+                        siblingPagesRange={siblingPagesRange}
+                        hideEllipsis={hideEllipsis}
+                        hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+                        hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+                        disabled={disabled}
+                        onChange={onChange} />
+  );
+};
 
 Pagination.propTypes = {
   /**
