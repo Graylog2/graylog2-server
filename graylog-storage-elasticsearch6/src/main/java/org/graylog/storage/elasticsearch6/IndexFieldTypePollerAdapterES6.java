@@ -6,6 +6,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.indices.mapping.GetMapping;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
+import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -51,7 +52,7 @@ public class IndexFieldTypePollerAdapterES6 implements IndexFieldTypePollerAdapt
         final JsonNode properties = result.getJsonObject()
                 .path(indexName)
                 .path("mappings")
-                .path("message") // TODO: Hardcoded index type name
+                .path(IndexMapping.TYPE_MESSAGE) // TODO: Hardcoded index type name
                 .path("properties");
 
         if (properties.isMissingNode()) {
