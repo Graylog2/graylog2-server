@@ -31,13 +31,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class ElasticsearchClientConfiguration {
-    @Parameter(value = "elasticsearch_version", validators = ElasticsearchVersionValidator.class)
+    @Parameter(value = "elasticsearch_version", validators = {ElasticsearchVersionValidator.class})
     String elasticsearchVersion = "7";
 
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));
 
-    @Parameter(value = "elasticsearch_connect_timeout")
+    @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
     Duration elasticsearchConnectTimeout = Duration.seconds(10);
 
     @Parameter(value = "elasticsearch_socket_timeout", validators = {PositiveDurationValidator.class})
