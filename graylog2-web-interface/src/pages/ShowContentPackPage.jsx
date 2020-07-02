@@ -64,6 +64,7 @@ const ShowContentPackPage = createReactClass({
     if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content pack revision deleted successfully.', 'Success');
+
         ContentPacksActions.get(contentPackId).catch((error) => {
           if (error.status !== 404) {
             UserNotification.error('An internal server error occurred. Please check your logfiles for more information');

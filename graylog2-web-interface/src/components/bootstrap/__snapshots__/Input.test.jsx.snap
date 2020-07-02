@@ -93,7 +93,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "FormControl-sc-1amoaox-0",
                                 "isStatic": false,
-                                "lastClassName": "fdBWEX",
+                                "lastClassName": "eXfwDC",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -117,7 +117,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                         >
                           <FormControl
                             bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 fdBWEX"
+                            className="FormControl-sc-1amoaox-0 eXfwDC"
                             componentClass="input"
                             inputRef={[Function]}
                             label=""
@@ -126,7 +126,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                             type="text"
                           >
                             <input
-                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                               id="inputWithAddon"
                               label=""
                               name="inputWithAddon"
@@ -290,7 +290,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "FormControl-sc-1amoaox-0",
                                 "isStatic": false,
-                                "lastClassName": "fdBWEX",
+                                "lastClassName": "eXfwDC",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -314,7 +314,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         >
                           <FormControl
                             bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 fdBWEX"
+                            className="FormControl-sc-1amoaox-0 eXfwDC"
                             componentClass="input"
                             inputRef={[Function]}
                             label=""
@@ -323,7 +323,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                             type="text"
                           >
                             <input
-                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                               id="inputWithButton"
                               label=""
                               name="inputWithButton"
@@ -515,7 +515,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                               "componentStyle": ComponentStyle {
                                 "componentId": "FormControl-sc-1amoaox-0",
                                 "isStatic": false,
-                                "lastClassName": "fdBWEX",
+                                "lastClassName": "eXfwDC",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -539,7 +539,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                         >
                           <FormControl
                             bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 fdBWEX"
+                            className="FormControl-sc-1amoaox-0 eXfwDC"
                             componentClass="input"
                             inputRef={[Function]}
                             label=""
@@ -548,7 +548,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                             type="text"
                           >
                             <input
-                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                               id="inputWithCheckboxAddon"
                               label=""
                               name="inputWithCheckboxAddon"
@@ -708,7 +708,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "fdBWEX",
+                          "lastClassName": "eXfwDC",
                           "rules": Array [
                             [Function],
                           ],
@@ -732,7 +732,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                      className="FormControl-sc-1amoaox-0 eXfwDC"
                       componentClass="input"
                       inputRef={[Function]}
                       label=""
@@ -741,7 +741,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                       type="text"
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                         id="inputWithoutNameProp"
                         label=""
                         name="inputWithNameProp"
@@ -845,7 +845,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "fdBWEX",
+                          "lastClassName": "eXfwDC",
                           "rules": Array [
                             [Function],
                           ],
@@ -869,7 +869,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                      className="FormControl-sc-1amoaox-0 eXfwDC"
                       componentClass="input"
                       inputRef={[Function]}
                       label=""
@@ -878,7 +878,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                       type="text"
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                         id="inputWithoutNameProp"
                         label=""
                         name="inputWithoutNameProp"

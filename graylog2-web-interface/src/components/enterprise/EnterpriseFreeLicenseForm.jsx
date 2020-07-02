@@ -14,6 +14,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       formFields: {
         firstName: '',

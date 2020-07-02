@@ -184,6 +184,7 @@ class EditExtractor extends React.Component {
     const { updatedExtractor } = this.state;
 
     event.preventDefault();
+
     ExtractorsActions.save.triggerPromise(inputId, updatedExtractor)
       .then(() => onSave());
   };

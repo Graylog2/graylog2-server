@@ -29,6 +29,7 @@ const _defaultValueTransformer = (values) => values.map(({ field }) => ({ value:
 const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...remainingProps }) => {
   const values = valueTransformer(value);
   const SortableMultiValue = SortableElement(Components.MultiValue);
+
   const Item = (props: {data: {value: string}}) => {
     const { data: { value: itemValue } } = props;
     const index = findIndex(value, (v) => v.field === itemValue);

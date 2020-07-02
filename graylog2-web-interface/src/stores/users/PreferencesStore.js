@@ -68,17 +68,20 @@ const PreferencesStore = Reflux.createStore({
   },
   loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void): void {
     const url = this.URL + userName;
+
     const successCallback = (data: PreferencesResponse) => {
       const sortedArray = this.convertPreferenceMapToArray(data.preferences);
 
       callback(sortedArray);
     };
+
     const failCallback = (errorThrown) => {
       UserNotification.error(
         `Loading of user preferences for "${userName}" failed with status: ${errorThrown}. Try reloading the page`,
         'Could not retrieve user preferences from server',
       );
     };
+
     const promise = fetch('GET', url)
       .then(successCallback, failCallback);
 

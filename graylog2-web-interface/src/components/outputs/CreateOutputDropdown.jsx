@@ -52,6 +52,7 @@ class CreateOutputDropdown extends React.Component {
     const outputType = evt.target.value;
 
     this.setState({ typeName: evt.target.value });
+
     this.props.getTypeDefinition(outputType, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
     });

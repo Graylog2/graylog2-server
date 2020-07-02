@@ -94,6 +94,7 @@ const ShowAlertPage = createReactClass({
       }
     } else {
       statusLabel = <Label bsStyle="danger">Unresolved</Label>;
+
       resolvedState = (
         <span>
           This alert was triggered at{' '}

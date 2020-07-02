@@ -71,6 +71,7 @@ const EventsStore = Reflux.createStore({
 
     promise.then((response) => {
       this.events = response.events;
+
       this.parameters = {
         query: response.parameters.query,
         page: response.parameters.page,

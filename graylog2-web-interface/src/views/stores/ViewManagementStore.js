@@ -114,6 +114,7 @@ const ViewManagementStore = singletonStore(
       const promise = fetch('GET', `${viewsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
           this.views = response.views;
+
           this.pagination = {
             total: response.total,
             count: response.count,

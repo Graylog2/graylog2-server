@@ -87,6 +87,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
   constructor(props: ActionDropdownProps) {
     super(props);
+
     this.state = {
       show: false,
     };

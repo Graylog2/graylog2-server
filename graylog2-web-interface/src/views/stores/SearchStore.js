@@ -140,12 +140,14 @@ export const SearchStore = singletonStore(
       );
 
       const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
+
       const handleSearchResult = (searchResult: SearchResult): SearchResult => {
         const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
         const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);
 
         return updatedResult;
       };
+
       const startActionPromise = (executePromise) => SearchActions.reexecuteSearchTypes.promise(executePromise);
 
       return this._executePromise(executionState, startActionPromise, handleSearchResult);

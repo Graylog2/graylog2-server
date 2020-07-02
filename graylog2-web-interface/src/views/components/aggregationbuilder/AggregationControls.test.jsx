@@ -14,6 +14,7 @@ import AggregationControls from './AggregationControls';
 
 jest.mock('stores/connect', () => (x) => x);
 jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select');
+
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: { exports: jest.fn(() => []) },
 }));

@@ -37,6 +37,7 @@ const NotificationsList = createReactClass({
 
     if (count === 0) {
       title = 'No notifications';
+
       content = (
         <Alert bsStyle="success" className="notifications-none">
           <Icon name="check-circle" />{' '}
@@ -45,6 +46,7 @@ const NotificationsList = createReactClass({
       );
     } else {
       title = `There ${this._formatNotificationCount(count)}`;
+
       content = this.state.notifications.map((notification) => {
         return <Notification key={`${notification.type}-${notification.timestamp}`} notification={notification} />;
       });

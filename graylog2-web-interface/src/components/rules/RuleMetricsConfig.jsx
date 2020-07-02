@@ -21,6 +21,7 @@ export default class RuleMetricsConfig extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       nextConfig: props.config,
     };

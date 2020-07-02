@@ -38,6 +38,7 @@ const mockEffectiveTimeRange = {
 };
 
 jest.mock('views/components/messagelist/MessageTableEntry', () => ({}));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(
     'listen',
@@ -47,6 +48,7 @@ jest.mock('views/stores/ViewStore', () => ({
 
 jest.mock('stores/inputs/InputsStore', () => MockStore('listen', 'getInitialState'));
 jest.mock('actions/inputs/InputsActions', () => ({ list: jest.fn(() => Promise.resolve()) }));
+
 jest.mock('views/stores/SelectedFieldsStore', () => ({
   SelectedFieldsStore: MockStore('listen', 'selectedFields'),
 }));

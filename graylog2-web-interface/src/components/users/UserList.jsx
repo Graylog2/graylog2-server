@@ -40,6 +40,7 @@ const UserList = createReactClass({
 
   componentDidMount() {
     this.loadUsers();
+
     RolesStore.loadRoles().done((roles) => {
       this.setState({ roles: roles.map((role) => role.name) });
     });

@@ -59,6 +59,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
 
       clipboard.on('success', () => {
         setOpened(true);
+
         setTimeout(() => {
           setOpened(false);
         }, 1000);

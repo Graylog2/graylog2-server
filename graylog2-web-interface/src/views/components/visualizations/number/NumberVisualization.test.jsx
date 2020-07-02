@@ -17,6 +17,7 @@ jest.mock('react-sizeme', () => ({
 
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
 jest.mock('stores/connect', () => (x) => x);
+
 jest.mock('views/components/messagelist/CustomHighlighting', () => {
   /* eslint-disable-next-line react/prop-types */
   return ({ children }) => {

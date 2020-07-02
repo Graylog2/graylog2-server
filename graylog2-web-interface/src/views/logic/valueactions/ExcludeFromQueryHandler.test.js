@@ -42,6 +42,7 @@ describe('ExcludeFromQueryHandler', () => {
 
   beforeEach(() => {
     ViewStore.listen = jest.fn(() => () => {});
+
     ViewStore.getInitialState = jest.fn(() => ({
       view,
       activeQuery: 'queryId',

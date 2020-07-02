@@ -77,6 +77,7 @@ describe('SavedSearchControls', () => {
       wrapper.find('button[title="Save search"]').simulate('click');
       wrapper.find('input[value="title"]').simulate('change', { target: { value: 'Test' } });
       wrapper.find('button[children="Create new"]').simulate('click');
+
       setImmediate(() => {
         expect(onLoadView).toHaveBeenCalledTimes(1);
 
