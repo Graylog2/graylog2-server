@@ -96,8 +96,8 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
       {shareViewOpen && (
         <EntityShareModal entityId={view.id}
                           entityType="dashboard"
+                          entityTitle={view.title}
                           description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
-                          title={`Sharing ${viewTypeLabel}: ${view.title}`}
                           onClose={() => setShareViewOpen(false)} />
       )}
       {csvExportOpen && <CSVExportModal view={view} closeModal={() => setCsvExportOpen(false)} />}
