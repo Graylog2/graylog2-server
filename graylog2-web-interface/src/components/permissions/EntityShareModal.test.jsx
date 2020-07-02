@@ -109,6 +109,12 @@ describe('EntityShareModal', () => {
 
       expect(getByDisplayValue('http://localhost/')).not.toBeNull();
     });
+
+    it('missing dependecies warning', () => {
+      const { getByText } = render(<SimpleEntityShareModal />);
+
+      expect(getByText('There are missing dependecies for the current set of collaborators')).not.toBeNull();
+    });
   });
 
   describe('grantee selector', () => {

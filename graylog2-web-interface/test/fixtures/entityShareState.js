@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import EntityShareState from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Role from 'logic/permissions/Role';
+import MissingDependency from 'logic/permissions/MissingDependency';
 import ActiveShare from 'logic/permissions/ActiveShare';
 
 // grantees
@@ -56,12 +57,24 @@ const activeShares = Immutable.List([janeIsOwner]);
 // selected grantee roles
 const janeIsSelected = Immutable.Map({ [janeIsOwner.grantee]: janeIsOwner.role });
 
+// missing dependencies
+const missingDependecy = MissingDependency
+  .builder()
+  .id('grn::::stream:57bc9188e62a2373778d9e03')
+  .type('stream')
+  .title('Security Data')
+  .owners(Immutable.List([john, security]))
+  .build();
+
+export const missingDependencies = Immutable.Map({ [jane.id]: Immutable.List([missingDependecy]) });
+
 const entityShareState = EntityShareState
   .builder()
   .entity('grn::::dashboard:dashboard-id')
   .availableGrantees(availableGrantees)
   .availableRoles(availableRoles)
   .activeShares(activeShares)
+  .missingDependencies(missingDependencies)
   .selectedGranteeRoles(janeIsSelected)
   .build();
 
