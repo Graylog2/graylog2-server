@@ -138,8 +138,8 @@ public class StreamRouterEngine {
         this.rulesList.addAll(greaterRules);
         this.rulesList.addAll(smallerRules);
         this.rulesList.addAll(containsRules);
-        this.rulesList.addAll(regexRules);
         this.rulesList.addAll(matchInputRules);
+        this.rulesList.addAll(regexRules);
     }
 
     /**

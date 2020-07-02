@@ -27,6 +27,6 @@ public class MatchInput implements StreamRuleMatcher {
            return rule.getInverted();
        }
         final String value = msg.getField(Message.FIELD_GL2_SOURCE_INPUT).toString();
-        return rule.getInverted() ^ value.trim().equals(rule.getValue());
+        return rule.getInverted() ^ value.trim().equalsIgnoreCase(rule.getValue());
     }
 }
