@@ -116,7 +116,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "FormControl-sc-1amoaox-0",
                         "isStatic": false,
-                        "lastClassName": "fdBWEX",
+                        "lastClassName": "eXfwDC",
                         "rules": Array [
                           [Function],
                         ],
@@ -138,14 +138,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <FormControl
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                    className="FormControl-sc-1amoaox-0 eXfwDC"
                     componentClass="input"
                     onChange={[Function]}
                     type="text"
                     value="count()"
                   >
                     <input
-                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                       onChange={[Function]}
                       type="text"
                       value="count()"
