@@ -38,14 +38,14 @@ public abstract class EntitySharePrepareResponse {
     @JsonProperty("available_grantees")
     public abstract ImmutableSet<AvailableGrantee> availableGrantees();
 
-    @JsonProperty("available_roles")
-    public abstract ImmutableSet<AvailableRole> availableRoles();
+    @JsonProperty("available_capabilities")
+    public abstract ImmutableSet<AvailableCapability> availableCapabilities();
 
     @JsonProperty("active_shares")
     public abstract ImmutableSet<ActiveShare> activeShares();
 
-    @JsonProperty("selected_grantee_roles")
-    public abstract ImmutableMap<GRN, GRN> selectedGranteeRoles();
+    @JsonProperty("selected_grantees")
+    public abstract ImmutableMap<GRN, GRN> selectedGrantees();
 
     @JsonProperty("missing_dependencies")
     public abstract ImmutableSet<MissingDependency> missingDependencies();
@@ -60,7 +60,7 @@ public abstract class EntitySharePrepareResponse {
         public static Builder create() {
             return new AutoValue_EntitySharePrepareResponse.Builder()
                     .activeShares(Collections.emptySet())
-                    .selectedGranteeRoles(Collections.emptyMap())
+                    .selectedGrantees(Collections.emptyMap())
                     .missingDependencies(Collections.emptySet());
         }
 
@@ -70,14 +70,14 @@ public abstract class EntitySharePrepareResponse {
         @JsonProperty("available_grantees")
         public abstract Builder availableGrantees(Set<AvailableGrantee> availableGrantees);
 
-        @JsonProperty("available_roles")
-        public abstract Builder availableRoles(Set<AvailableRole> availableRoles);
+        @JsonProperty("available_capabilities")
+        public abstract Builder availableCapabilities(Set<AvailableCapability> availableCapabilities);
 
         @JsonProperty("active_shares")
         public abstract Builder activeShares(Set<ActiveShare> activeShares);
 
-        @JsonProperty("selected_grantee_roles")
-        public abstract Builder selectedGranteeRoles(Map<GRN, GRN> selectedGranteeRoles);
+        @JsonProperty("selected_grantees")
+        public abstract Builder selectedGrantees(Map<GRN, GRN> selectedGrantees);
 
         @JsonProperty("missing_dependencies")
         public abstract Builder missingDependencies(Set<MissingDependency> missingDependencies);
@@ -105,7 +105,7 @@ public abstract class EntitySharePrepareResponse {
     }
 
     @AutoValue
-    public static abstract class AvailableRole {
+    public static abstract class AvailableCapability {
         @JsonProperty("id")
         public abstract String id();
 
@@ -113,9 +113,9 @@ public abstract class EntitySharePrepareResponse {
         public abstract String title();
 
         @JsonCreator
-        public static AvailableRole create(@JsonProperty("id") String id,
-                                           @JsonProperty("title") String title) {
-            return new AutoValue_EntitySharePrepareResponse_AvailableRole(id, title);
+        public static AvailableCapability create(@JsonProperty("id") String id,
+                                                 @JsonProperty("title") String title) {
+            return new AutoValue_EntitySharePrepareResponse_AvailableCapability(id, title);
         }
     }
 
@@ -127,14 +127,14 @@ public abstract class EntitySharePrepareResponse {
         @JsonProperty("grantee")
         public abstract GRN grantee();
 
-        @JsonProperty("role")
-        public abstract String role();
+        @JsonProperty("capability")
+        public abstract String capability();
 
         @JsonCreator
         public static ActiveShare create(@JsonProperty("grant") String grant,
                                          @JsonProperty("grantee") GRN grantee,
-                                         @JsonProperty("role") String role) {
-            return new AutoValue_EntitySharePrepareResponse_ActiveShare(grant, grantee, role);
+                                         @JsonProperty("capability") String capability) {
+            return new AutoValue_EntitySharePrepareResponse_ActiveShare(grant, grantee, capability);
         }
     }
 

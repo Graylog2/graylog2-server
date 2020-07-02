@@ -39,6 +39,7 @@ public class GRNRegistry {
     // TODO find a way to unify these
     private static final ImmutableSet<GRNType> BUILTIN_TYPES = ImmutableSet.<GRNType>builder()
             .add(GRNType.create("collection", "collections:"))
+            .add(GRNType.create("capability", "capabilities:"))
             .add(GRNType.create("dashboard", "dashboards:"))
             .add(GRNType.create("grant", "grants:"))
             .add(GRNType.create("role", "roles:"))

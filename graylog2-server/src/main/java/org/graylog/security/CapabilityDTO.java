@@ -21,14 +21,14 @@ import com.google.auto.value.AutoValue;
 import java.util.Set;
 
 @AutoValue
-public abstract class RoleDTO {
+public abstract class CapabilityDTO {
     public abstract String id();
 
     public abstract String title();
 
     public abstract Set<String> permissions();
 
-    public static RoleDTO create(String id, String title, Set<String> permissions) {
+    public static CapabilityDTO create(String id, String title, Set<String> permissions) {
         return builder()
                 .id(id)
                 .title(title)
@@ -37,7 +37,7 @@ public abstract class RoleDTO {
     }
 
     public static Builder builder() {
-        return new AutoValue_RoleDTO.Builder();
+        return new AutoValue_CapabilityDTO.Builder();
     }
 
     @AutoValue.Builder
@@ -48,6 +48,6 @@ public abstract class RoleDTO {
 
         public abstract Builder permissions(Set<String> permissions);
 
-        public abstract RoleDTO build();
+        public abstract CapabilityDTO build();
     }
 }

@@ -25,7 +25,7 @@ public class SecurityModule extends PluginModule {
     @Override
     protected void configure() {
 
-        bind(BuiltinRoles.class).asEagerSingleton();
+        bind(BuiltinCapabilities.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), GrantPermissionResolver.class)
                 .setDefault().to(DefaultGrantPermissionResolver.class);

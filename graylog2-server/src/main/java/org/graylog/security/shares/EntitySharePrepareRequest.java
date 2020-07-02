@@ -29,11 +29,11 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 public abstract class EntitySharePrepareRequest {
-    @JsonProperty("selected_grantee_roles")
-    public abstract ImmutableMap<GRN, GRN> selectedGranteeRoles();
+    @JsonProperty("selected_grantees")
+    public abstract ImmutableMap<GRN, GRN> selectedGrantees();
 
     @JsonCreator
-    public static EntitySharePrepareRequest create(@JsonProperty("selected_grantee_roles") Map<GRN, GRN> selectedGranteeRoles) {
-        return new AutoValue_EntitySharePrepareRequest(ImmutableMap.copyOf(firstNonNull(selectedGranteeRoles, Collections.emptyMap())));
+    public static EntitySharePrepareRequest create(@JsonProperty("selected_grantees") Map<GRN, GRN> selectedGrantees) {
+        return new AutoValue_EntitySharePrepareRequest(ImmutableMap.copyOf(firstNonNull(selectedGrantees, Collections.emptyMap())));
     }
 }

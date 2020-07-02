@@ -28,6 +28,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -39,7 +40,7 @@ import java.util.Optional;
 public abstract class GrantDTO {
     private static final String FIELD_ID = "id";
     static final String FIELD_GRANTEE = "grantee";
-    private static final String FIELD_ROLE = "role";
+    private static final String FIELD_CAPABILITY = "capability";
     public static final String FIELD_TARGET = "target";
     private static final String FIELD_CREATED_BY = "created_by";
     private static final String FIELD_CREATED_AT = "created_at";
@@ -57,10 +58,10 @@ public abstract class GrantDTO {
     public abstract GRN grantee();
 
     @NotBlank
-    @JsonProperty(FIELD_ROLE)
-    public abstract String role();
+    @JsonProperty(FIELD_CAPABILITY)
+    public abstract String capability();
 
-    @NotBlank
+    @NotNull
     @JsonProperty(FIELD_TARGET)
     public abstract GRN target();
 
@@ -104,8 +105,8 @@ public abstract class GrantDTO {
         @JsonProperty(FIELD_GRANTEE)
         public abstract Builder grantee(GRN grantee);
 
-        @JsonProperty(FIELD_ROLE)
-        public abstract Builder role(String role);
+        @JsonProperty(FIELD_CAPABILITY)
+        public abstract Builder capability(String capability);
 
         @JsonProperty(FIELD_TARGET)
         public abstract Builder target(GRN target);
