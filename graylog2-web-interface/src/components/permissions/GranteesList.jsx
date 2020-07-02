@@ -12,10 +12,10 @@ import GranteesListItem from './GranteesListItem';
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   >:nth-child(even) {
-    background: ${theme.utils.colorLevel(theme.colors.global.tableBackgroundAlt, -4)};
+    background: ${theme.colors.table.backgroundAlt};
   };
   >:nth-child(odd) {
-    background: ${theme.colors.global.tableBackground};
+    background: ${theme.colors.table.background};
   };
 `);
 
