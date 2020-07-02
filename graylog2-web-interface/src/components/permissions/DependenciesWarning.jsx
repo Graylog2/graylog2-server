@@ -41,23 +41,22 @@ const DependenciesWarning = ({ missingDependencies, selectedGrantees }: Props) =
           const grantee = selectedGrantees.find((selectedGrantee) => selectedGrantee.id === granteeGRN);
 
           return (grantee && (
-          <li key={grantee.id}>
-            {_cap(grantee.type)} {grantee.title} needs access to
-            {dependencyList.map((dependecy) => (
-              <List key={dependecy.id}>
-                <li>
-                  {_cap(dependecy.type)}: {dependecy.title}<br />
-                  Owners: {dependecy.owners.map((owner, key) => (
-                    <span key={owner.id}>
-                      {_cap(owner.type)} {owner.title}
-                      {key !== dependecy.owners.size - 1 && ', '}
-                    </span>
-                  ))}
-                </li>
-              </List>
-            ))}
-
-          </li>
+            <li key={grantee.id}>
+              {_cap(grantee.type)} {grantee.title} needs access to
+              {dependencyList.map((dependecy) => (
+                <List key={dependecy.id}>
+                  <li>
+                    {_cap(dependecy.type)}: {dependecy.title}<br />
+                    Owners: {dependecy.owners.map((owner, key) => (
+                      <span key={owner.id}>
+                        {_cap(owner.type)} {owner.title}
+                        {key !== dependecy.owners.size - 1 && ', '}
+                      </span>
+                    ))}
+                  </li>
+                </List>
+              ))}
+            </li>
           ));
         })}
       </List>
