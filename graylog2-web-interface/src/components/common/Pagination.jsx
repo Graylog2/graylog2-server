@@ -104,6 +104,17 @@ const Pagination = ({
   disabled,
   onChange,
 }) => {
+  if (totalPages <= 1) {
+    return null;
+  }
+
+  if (currentPage > totalPages) {
+    // eslint-disable-next-line no-console
+    console.warn('Graylog Pagination: `currentPage` prop should not be larger than `totalPages` prop.');
+
+    return null;
+  }
+
   return (
     <UltimatePagination currentPage={currentPage}
                         totalPages={totalPages}
