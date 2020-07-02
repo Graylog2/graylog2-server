@@ -51,7 +51,8 @@ class ContentPacksList extends React.Component {
     this._onChangePage = this._onChangePage.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
   }
 
@@ -172,12 +173,13 @@ class ContentPacksList extends React.Component {
     const { filteredContentPacks, pageSize, currentPage } = this.state;
     const { contentPacks } = this.props;
     const numberPages = Math.ceil(filteredContentPacks.length / pageSize);
-    console.log('numberPages', numberPages, filteredContentPacks.length, pageSize, filteredContentPacks.length / pageSize);
+
     const pagination = (
       <Pagination totalPages={numberPages}
                   currentPage={currentPage}
                   onChange={this._onChangePage} />
     );
+
     const pageSizeSelector = (
       <span>Show:&nbsp;
         <select onChange={this._itemsShownChange} value={pageSize}>
