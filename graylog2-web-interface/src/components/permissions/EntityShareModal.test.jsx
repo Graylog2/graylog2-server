@@ -4,9 +4,10 @@ import * as Immutable from 'immutable';
 import { cleanup, render, fireEvent, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
-import mockEntityShareState, { john, jane, viewer } from 'fixtures/entityShareState';
+import mockEntityShareState, { john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
 import selectEvent from 'react-select-event';
 
+import ActiveShare from 'logic/permissions/ActiveShare';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 
 import EntityShareModal from './EntityShareModal';
@@ -111,28 +112,44 @@ describe('EntityShareModal', () => {
   });
 
   describe('grantee selector', () => {
-    it('adds new selected grantee', async () => {
-      const newSelectedGrantee = john;
-      const initialRole = viewer;
-      const { getByText, getByLabelText } = render(<SimpleEntityShareModal />);
+    describe('adds new selected grantee', () => {
+      const addGrantee = async ({ newGrantee, role }) => {
+        const { getByText, getByLabelText } = render(<SimpleEntityShareModal />);
 
-      const granteesSelect = getByLabelText('Search for users and teams');
+        // Select a grantee
+        const granteesSelect = getByLabelText('Search for users and teams');
 
-      await selectEvent.openMenu(granteesSelect);
+        await selectEvent.openMenu(granteesSelect);
 
-      await selectEvent.select(granteesSelect, newSelectedGrantee.title);
+        await selectEvent.select(granteesSelect, newGrantee.title);
 
-      const submitButton = getByText('Add Collaborator');
+        // Select a role
+        const roleSelect = getByLabelText('Select a role');
 
-      fireEvent.click(submitButton);
+        await selectEvent.openMenu(roleSelect);
 
-      await wait(() => {
-        expect(EntityShareActions.prepare).toBeCalledTimes(2);
+        await act(async () => { await selectEvent.select(roleSelect, role.title); });
 
-        expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
-          selected_grantee_roles: mockEntityShareState.selectedGranteeRoles.merge({ [newSelectedGrantee.id]: initialRole.id }),
+        // Submit form
+        const submitButton = getByText('Add Collaborator');
+
+        fireEvent.click(submitButton);
+
+        await wait(() => {
+          expect(EntityShareActions.prepare).toBeCalledTimes(2);
+
+          expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
+            selected_grantee_roles: mockEntityShareState.selectedGranteeRoles.merge({ [newGrantee.id]: role.id }),
+          });
         });
-      });
+      };
+
+      it.each`
+        newGrantee  | granteeType   | role
+        ${john}     | ${'user'}     | ${viewer}
+        ${everyone} | ${'everyone'} | ${manager}
+        ${security} | ${'team'}     | ${owner}
+      `('sends new grantee $granteeType to preparation', addGrantee);
     });
 
     it('shows validation error', async () => {
@@ -173,21 +190,64 @@ describe('EntityShareModal', () => {
       });
     });
 
-    it('allows deleting a grantee', async () => {
-      const ownerTitle = jane.title;
-      const { getByTitle } = render(<SimpleEntityShareModal />);
-
-      const deleteButton = getByTitle(`Delete sharing for ${ownerTitle}`);
-
-      fireEvent.click(deleteButton);
-
-      await wait(() => {
-        expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
-
-        expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
-          selected_grantee_roles: Immutable.Map(),
-        });
+    describe('allows deleting a grantee', () => {
+      // active shares
+      const janeIsOwner = ActiveShare
+        .builder()
+        .grant('grant-id-1')
+        .grantee(jane.id)
+        .role(owner.id)
+        .build();
+      const securityIsManager = ActiveShare
+        .builder()
+        .grant('grant-id-2')
+        .grantee(security.id)
+        .role(manager.id)
+        .build();
+      const everyoneIsViewer = ActiveShare
+        .builder()
+        .grant('grant-id-3')
+        .grantee(everyone.id)
+        .role(viewer.id)
+        .build();
+      const activeShares = Immutable.List([janeIsOwner, securityIsManager, everyoneIsViewer]);
+      const selectedGranteeRoles = Immutable.Map({
+        [janeIsOwner.grantee]: janeIsOwner.role,
+        [securityIsManager.grantee]: securityIsManager.role,
+        [everyoneIsViewer.grantee]: everyoneIsViewer.role,
       });
+      const enitityShareState = mockEntityShareState
+        .toBuilder()
+        .activeShares(activeShares)
+        .selectedGranteeRoles(selectedGranteeRoles)
+        .build();
+
+      beforeEach(() => {
+        asMock(EntityShareStore.getInitialState).mockReturnValueOnce({ state: enitityShareState });
+      });
+
+      const deleteGrantee = async ({ grantee }) => {
+        const { getByTitle } = render(<SimpleEntityShareModal />);
+
+        const deleteButton = getByTitle(`Delete sharing for ${grantee.title}`);
+
+        fireEvent.click(deleteButton);
+
+        await wait(() => {
+          expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
+
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
+            selected_grantee_roles: selectedGranteeRoles.remove(grantee.id),
+          });
+        });
+      };
+
+      it.each`
+        grantee     | granteeType   | role
+        ${jane}     | ${'user'}     | ${viewer}
+        ${security} | ${'team'}     | ${manager}
+        ${everyone} | ${'everyone'} | ${owner}
+      `('sends deleted grantee $granteeType to preparation', deleteGrantee);
     });
   });
 });
