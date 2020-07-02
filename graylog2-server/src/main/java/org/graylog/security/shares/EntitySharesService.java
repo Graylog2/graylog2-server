@@ -178,6 +178,9 @@ public class EntitySharesService {
     private ImmutableSet<MissingDependency> getMissingDependencies(GRN ownedEntity, User sharingUser, ImmutableMap<GRN, GRN> selectedGranteeRoles) {
         // TODO: We need to compute the missing dependencies by taking the selectedGrantees into account.
         //       (e.g. missing grants for selectedGrantees on the streams required for a dashboard to work correctly)
+        // TODO: We only check for existing grants for the actual grantee. If the grantee is a team, we only check if
+        //       the team has a grant, not if any users in the team can access the dependency via other grants.
+        //       The same for the "everyone" grantee, we only check if  the "everyone" grantee has access to a dependency.
         // TODO: We can only expose the missing dependencies that the sharing user has access to to avoid
         //       leaking information to the user.
         final ImmutableSet<MissingDependency> dependencies = entityDependencyResolver.resolve(ownedEntity);
