@@ -18,6 +18,12 @@ package org.graylog.schema;
 
 public class VendorFields {
     public static final String VENDOR_ALERT_SEVERITY = "vendor_alert_severity";
+<<<<<<< Updated upstream
+=======
+    public static final String VENDOR_ALERT_SEVERITY_LEVEL = "vendor_alert_severity_level";
+    public static final String VENDOR_AUTHENTICATION_PROVIDER = "vendor_authentication_provider";
+    public static final String VENDOR_CREDENTIAL_TYPE = "vendor_credential_type";
+>>>>>>> Stashed changes
     public static final String VENDOR_EVENT_ACTION = "vendor_event_action";
     public static final String VENDOR_EVENT_DESCRIPTION = "vendor_event_description";
     public static final String VENDOR_EVENT_OUTCOME = "vendor_event_outcome";
