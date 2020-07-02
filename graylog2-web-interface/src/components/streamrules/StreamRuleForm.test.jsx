@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+
 import StreamRuleForm from './StreamRuleForm';
 
 jest.mock('components/common', () => ({
@@ -43,6 +44,7 @@ describe('StreamRuleForm', () => {
                       streamRuleTypes={streamRuleTypes}
                       title="Bach" />,
     );
+
     expect(container).toMatchSnapshot();
   });
 
@@ -53,6 +55,7 @@ describe('StreamRuleForm', () => {
                       streamRuleTypes={streamRuleTypes}
                       title="Bach" />,
     );
+
     expect(container).toMatchSnapshot();
   });
 
@@ -73,11 +76,13 @@ describe('StreamRuleForm', () => {
     fireEvent.change(ruleTypeSelection, { target: { name: 'type', value: 8 } });
     const submitBtn = getByText('Save');
     fireEvent.click(submitBtn);
+
     expect(submit).toHaveBeenCalledTimes(0);
 
     const inputSelection = getByTestId('input-selection');
     fireEvent.change(inputSelection, { target: { name: 'value', value: 'my-id' } });
     fireEvent.click(submitBtn);
+
     expect(submit).toHaveBeenCalledTimes(1);
   });
 });

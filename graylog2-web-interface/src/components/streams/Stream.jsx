@@ -82,13 +82,13 @@ class Stream extends React.Component {
     };
   }
 
-  _closeStreamRuleForm() {
+  _closeStreamRuleForm = () => {
     this.setState({ showStreamRuleForm: false });
-  },
+  };
 
-  _openStreamRuleForm() {
+  _openStreamRuleForm = () => {
     this.setState({ showStreamRuleForm: true });
-  },
+  };
 
   _onDelete= (stream) => {
     // eslint-disable-next-line no-alert
@@ -136,10 +136,6 @@ class Stream extends React.Component {
       StreamsStore.pause(stream.id, (response) => response)
         .finally(() => this.setState({ loading: false }));
     }
-  }
-
-  _onQuickAdd = () => {
-    this.quickAddStreamRuleForm.open();
   }
 
   _onSaveStreamRule = (streamRuleId, streamRule) => {
@@ -221,7 +217,7 @@ class Stream extends React.Component {
                         onDelete={this._onDelete}
                         onUpdate={this._onUpdate}
                         onClone={this._onClone}
-                        onQuickAdd={this._onQuickAdd}
+                        onQuickAdd={this._openStreamRuleForm}
                         indexSets={indexSets}
                         isDefaultStream={isDefaultStream} />
       </OverlayElement>
