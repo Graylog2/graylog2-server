@@ -65,4 +65,5 @@ const ShareableEnityURL = ({ entityURL }: Props) => (
 ShareableEnityURL.defaultProps = {
   entityURL: window.location.href,
 };
+
 export default ShareableEnityURL;
