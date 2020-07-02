@@ -34,7 +34,7 @@ const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetad
 
 const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
   const currentUser = useContext(CurrentUserContext);
-  const [shareViewOpen, setShareViewOpen] = useState(false);
+  const [shareViewOpen, setShareViewOpen] = useState(true);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
   const [editViewOpen, setEditViewOpen] = useState(false);

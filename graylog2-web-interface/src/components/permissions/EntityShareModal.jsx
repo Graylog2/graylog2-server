@@ -13,6 +13,7 @@ import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
+import DependenciesWarning from './DependenciesWarning';
 import ShareableEnityURL from './ShareableEnityURL';
 
 type Props = {
@@ -52,8 +53,9 @@ const ModalContent = ({
   entityShareState: {
     activeShares,
     availableGrantees,
-    selectedGranteeRoles,
     availableRoles,
+    missingDependencies,
+    selectedGranteeRoles,
     selectedGrantees,
   },
   description,
@@ -106,6 +108,10 @@ const ModalContent = ({
                           onDelete={_handleDeletion}
                           onRoleChange={_handleSelection}
                           selectedGrantees={selectedGrantees} />
+      {missingDependencies && (
+        <DependenciesWarning missingDependencies={missingDependencies}
+                             selectedGrantees={selectedGrantees} />
+      )}
       <ShareableEnityURL />
     </>
   );
