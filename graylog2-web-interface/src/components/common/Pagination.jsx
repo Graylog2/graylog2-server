@@ -124,7 +124,8 @@ const Pagination = ({
                         hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
                         hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
                         disabled={disabled}
-                        onChange={onChange} />
+                        onChange={onChange}
+                        data-testid="graylog-pagination" />
   );
 };
 
