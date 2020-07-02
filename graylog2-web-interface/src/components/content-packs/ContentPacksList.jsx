@@ -183,7 +183,6 @@ class ContentPacksList extends React.Component {
     const pageSizeSelector = (
       <span>Show:&nbsp;
         <select onChange={this._itemsShownChange} value={pageSize}>
-          <option>1</option>
           <option>10</option>
           <option>25</option>
           <option>50</option>

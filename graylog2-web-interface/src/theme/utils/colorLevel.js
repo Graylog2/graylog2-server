@@ -7,7 +7,7 @@ export type ColorLevel = {
   (string, void | number): string,
 };
 
-const colorLevel = (colorHex: string, level?: number = 0): string => {
+export default function colorLevel(colorHex: string, level?: number = 0): string {
   /**
    * Recreating `color-level` from Bootstrap's SCSS functions
    * https://github.com/twbs/bootstrap/blob/08ba61e276a6393e8e2b97d56d2feb70a24fe22c/scss/_functions.scss#L97
@@ -21,6 +21,4 @@ const colorLevel = (colorHex: string, level?: number = 0): string => {
   const mixLevel = absLevel < 0 ? 0 : upperLevel;
 
   return chroma.mix(colorBase, colorHex, mixLevel).css();
-};
-
-export default colorLevel;
+}

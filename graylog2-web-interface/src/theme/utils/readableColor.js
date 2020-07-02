@@ -7,11 +7,11 @@ export type ReadableColor = {
   (string, void | string, void | string): string,
 };
 
-const readableColor = (
+export default function readableColor(
   hex: string,
   darkColor?: string = teinte.global.textDefault,
   lightColor?: string = teinte.global.textAlt,
-): string => {
+): string {
   /**
    * Returns `textDefault` or `textAlt` (or optional light and dark return colors) for best contrast depending on the luminosity of the given color. Follows [W3C specs for readability](https://www.w3.org/TR/WCAG20-TECHS/G18.html).
    *
@@ -23,6 +23,4 @@ const readableColor = (
   const luminanceRatio = 0.179;
 
   return chroma(hex).luminance() < luminanceRatio ? lightColor : darkColor;
-};
-
-export default readableColor;
+}

@@ -5,8 +5,6 @@ import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
-const onChangePageMock = jest.fn();
-
 describe('<ContentPacksList />', () => {
   URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
 
