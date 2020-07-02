@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -27,6 +27,7 @@ type ModalContentProps = {
   description: $PropertyType<Props, 'description'>,
   entityGRN: GRN,
   entityShareState: EntityShareState,
+  setDisableSubmit: (boolean) => void,
 };
 
 const StyledGranteesList = styled(GranteesList)`
@@ -47,18 +48,35 @@ const _filterAvailableGrantees = (availableGrantees, selectedGranteeRoles) => {
   return availableGrantees.filter((grantee) => !availableGranteeRolesUserIds.includes(grantee.id));
 };
 
-const ModalContent = ({ entityShareState: { availableGrantees, selectedGranteeRoles, availableRoles, selectedGrantees }, description, entityGRN }: ModalContentProps) => {
+const ModalContent = ({
+  entityShareState: { availableGrantees, selectedGranteeRoles, availableRoles, selectedGrantees },
+  description,
+  entityGRN,
+  setDisableSubmit,
+}: ModalContentProps) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeRoles);
 
   const _handleSelection = ({ granteeId, roleId }: SelectionRequest) => {
+    setDisableSubmit(true);
+
     return EntityShareActions.prepare(entityGRN, {
       selected_grantee_roles: selectedGranteeRoles.merge({ [granteeId]: roleId }),
+    }).then((response) => {
+      setDisableSubmit(false);
+
+      return response;
     });
   };
 
   const _handleDeletion = (granteeId: GRN) => {
+    setDisableSubmit(true);
+
     return EntityShareActions.prepare(entityGRN, {
       selected_grantee_roles: selectedGranteeRoles.remove(granteeId),
+    }).then((response) => {
+      setDisableSubmit(false);
+
+      return response;
     });
   };
 
@@ -90,6 +108,7 @@ const _generateGRN = (id, type) => `grn::::${type}:${id}`;
 
 const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const entityGRN = _generateGRN(entityId, entityType);
 
   useEffect(() => {
@@ -97,13 +116,16 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
   }, []);
 
   const _handleSave = () => {
+    setDisableSubmit(true);
+
     return EntityShareActions.update(entityGRN, {
       grantee_roles: entityShareState.selectedGranteeRoles,
     }).then(onClose);
   };
 
   return (
-    <BootstrapModalConfirm confirmButtonText="Save"
+    <BootstrapModalConfirm confirmButtonDisabled={disableSubmit}
+                           confirmButtonText="Save"
                            onCancel={onClose}
                            onConfirm={_handleSave}
                            onModalClose={onClose}
@@ -113,7 +135,8 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
         {entityShareState ? (
           <ModalContent description={description}
                         entityGRN={entityGRN}
-                        entityShareState={entityShareState} />
+                        entityShareState={entityShareState}
+                        setDisableSubmit={setDisableSubmit} />
         ) : (
           <Spinner />
         )}
