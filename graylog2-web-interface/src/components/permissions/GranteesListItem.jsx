@@ -26,6 +26,15 @@ const GranteeeInfo = styled.div`
   display: flex;
   align-items: center;
   flex: 1;
+  overflow: hidden;
+  margin-right: 10px;
+`;
+
+const Title = styled.div`
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const StyledRolesSelect = styled(RolesSelect)`
@@ -69,7 +78,7 @@ const GranteesListItem = ({ availableRoles, grantee: { id, roleId, type, title }
         <Container>
           <GranteeeInfo>
             <StyledGranteeIcon type={type} />
-            {title}
+            <Title>{title}</Title>
           </GranteeeInfo>
           <StyledRolesSelect onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })}
                              roles={availableRoles}
