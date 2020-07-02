@@ -18,7 +18,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 UjHmV in modal"
+        class="fade Modal-nuree8-0 eNmkew in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -70,7 +70,7 @@ Object {
                     >
                       <div />
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <label
                           class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -80,7 +80,8 @@ Object {
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
                             name="type"
@@ -133,7 +134,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <label
                           class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -143,7 +144,7 @@ Object {
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -156,7 +157,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <span>
                           <div
@@ -179,7 +180,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <label
                           class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -189,7 +190,7 @@ Object {
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -229,6 +230,7 @@ Object {
                         <br />
                         <br />
                         <div />
+                         
                         <a
                           href="https://github.com/Graylog2/graylog2-server/tree/MAJOR_AND_MINOR_VERSION_MOCK/graylog2-server/src/main/java/org/graylog2/streams/matchers"
                           rel="noopener noreferrer"
@@ -348,7 +350,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 UjHmV in modal"
+        class="fade Modal-nuree8-0 eNmkew in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -402,7 +404,7 @@ Object {
                         field_1
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <label
                           class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -412,7 +414,8 @@ Object {
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
                             name="type"
@@ -465,7 +468,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <label
                           class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -475,7 +478,7 @@ Object {
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -488,7 +491,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <span>
                           <div
@@ -511,7 +514,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                       >
                         <label
                           class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -521,7 +524,7 @@ Object {
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -563,6 +566,7 @@ Object {
                         <br />
                         <br />
                         <div />
+                         
                         <a
                           href="https://github.com/Graylog2/graylog2-server/tree/MAJOR_AND_MINOR_VERSION_MOCK/graylog2-server/src/main/java/org/graylog2/streams/matchers"
                           rel="noopener noreferrer"
