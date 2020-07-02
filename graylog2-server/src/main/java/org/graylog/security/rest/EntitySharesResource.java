@@ -115,7 +115,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
         // TODO: We need to make the return value of this resource more useful to the frontend
         //       (e.g. returning a list of entities with title, etc.)
-        final List<GrantDTO> grants = grantService.getForTarget(grn, currentUser);
+        final List<GrantDTO> grants = grantService.getForTarget(grn);
 
         return Response.ok(ImmutableMap.of("grants", grants)).build();
     }

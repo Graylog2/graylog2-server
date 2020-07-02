@@ -99,10 +99,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         }
     }
 
-    public List<GrantDTO> getForTarget(GRN targetGRN, GRN currentUserGRN) {
-        return db.find(DBQuery.and(
-                DBQuery.is(GrantDTO.FIELD_TARGET, targetGRN.toString()),
-                DBQuery.notEquals(GrantDTO.FIELD_GRANTEE, currentUserGRN.toString())
-        )).toArray();
+    public List<GrantDTO> getForTarget(GRN targetGRN) {
+        return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, targetGRN.toString())).toArray();
     }
 }

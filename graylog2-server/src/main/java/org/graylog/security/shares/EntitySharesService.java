@@ -103,7 +103,7 @@ public class EntitySharesService {
      */
     public EntitySharePrepareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         final String userName = sharingUser.getName();
-        final List<GrantDTO> existingGrants = grantService.getForTarget(ownedEntity, grnRegistry.newGRN("user", sharingUser.getName()));
+        final List<GrantDTO> existingGrants = grantService.getForTarget(ownedEntity);
 
         // Update capabilities of existing grants (for a grantee)
         existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
@@ -162,7 +162,7 @@ public class EntitySharesService {
     }
 
     private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser) {
-        final List<GrantDTO> activeGrants = grantService.getForTarget(ownedEntity, grnRegistry.newGRN("user", sharingUser.getName()));
+        final List<GrantDTO> activeGrants = grantService.getForTarget(ownedEntity);
 
         return activeGrants.stream()
                 .map(grant -> ActiveShare.create(grnRegistry.newGRN("grant", grant.id()).toString(), grant.grantee(), grant.capability()))
