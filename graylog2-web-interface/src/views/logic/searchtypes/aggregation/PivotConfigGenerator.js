@@ -57,10 +57,10 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
     default:
   }
 
+  // $FlowFixMe: Not properly typed yet.
   return {
     type,
     field,
-    // $FlowFixMe: Not properly typed yet.
     ...newConfig,
   };
 };
