@@ -3,7 +3,14 @@ import * as Immutable from 'immutable';
 
 import type { MissingDependency as MissingDependencyType } from 'logic/permissions/types';
 
-type InternalState = MissingDependencyType;
+import Grantee from './Grantee';
+
+type InternalState = {
+  id: $PropertyType<MissingDependencyType, 'id'>,
+  owners: Immutable.List<Grantee>,
+  title: $PropertyType<MissingDependencyType, 'title'>,
+  type: $PropertyType<MissingDependencyType, 'type'>,
+};
 
 export default class MissingDependency {
   _value: InternalState;
@@ -12,8 +19,9 @@ export default class MissingDependency {
     id: $PropertyType<InternalState, 'id'>,
     owners: $PropertyType<InternalState, 'owners'>,
     title: $PropertyType<InternalState, 'title'>,
+    type: $PropertyType<InternalState, 'type'>,
   ) {
-    this._value = { id, owners, title };
+    this._value = { id, owners, title, type };
   }
 
   get id(): $PropertyType<InternalState, 'id'> {
@@ -28,6 +36,10 @@ export default class MissingDependency {
     return this._value.title;
   }
 
+  get type(): $PropertyType<InternalState, 'type'> {
+    return this._value.type;
+  }
+
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, owners, title } = this._value;
@@ -37,19 +49,21 @@ export default class MissingDependency {
   }
 
   toJSON() {
-    const { id, owners, title } = this._value;
+    const { id, owners, title, type } = this._value;
 
-    return { id, owners, title };
+    return { id, owners, title, type };
   }
 
   static fromJSON(value: MissingDependencyType): MissingDependency {
-    const { id, owners, title } = value;
+    const { id, owners, title, type } = value;
+    const formattedOwners = Immutable.fromJS(owners.map((o) => Grantee.fromJSON(o)));
 
     return MissingDependency
       .builder()
       .id(id)
-      .owners(owners)
+      .owners(formattedOwners)
       .title(title)
+      .type(type)
       .build();
   }
 
@@ -81,9 +95,13 @@ class Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  build(): MissingDependency {
-    const { id, owners, title } = this.value.toObject();
+  type(value: $PropertyType<InternalState, 'type'>): Builder {
+    return new Builder(this.value.set('type', value));
+  }
 
-    return new MissingDependency(id, owners, title);
+  build(): MissingDependency {
+    const { id, owners, title, type } = this.value.toObject();
+
+    return new MissingDependency(id, owners, title, type);
   }
 }

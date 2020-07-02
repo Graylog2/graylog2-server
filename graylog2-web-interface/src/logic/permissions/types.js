@@ -21,6 +21,7 @@ export type ActiveShare = {|
 
 export type MissingDependency = {|
   id: GRN,
-  owners: Array<$PropertyType<Grantee, 'id'>>,
-  title: String,
+  owners: Array<Grantee>,
+  title: string,
+  type: string,
 |};

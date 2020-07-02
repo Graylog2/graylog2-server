@@ -20,8 +20,35 @@ import type { GranteeInterface } from './GranteeInterface';
 export type AvailableGrantees = Immutable.List<Grantee>;
 export type AvailableRoles = Immutable.List<Role>;
 export type ActiveShares = Immutable.List<ActiveShare>;
+export type MissingDependencies = Immutable.Map<GRN, Immutable.List<MissingDependency>>;
 export type SelectedGranteeRoles = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
+
+const mockMissingDependencies = () => {
+  const owner1 = Grantee
+    .builder()
+    .id('grn::::user:jane')
+    .title('Jane Doe')
+    .type('user')
+    .build();
+
+  const owner2 = Grantee
+    .builder()
+    .id('grn::::team:reporting')
+    .title('Reporting')
+    .type('team')
+    .build();
+
+  const missingDependecy = MissingDependency
+    .builder()
+    .id('grn::::stream:57bc9188e62a2373778d9e03')
+    .type('stream')
+    .title('Security Data')
+    .owners(Immutable.List([owner1, owner2]))
+    .build();
+
+  return Immutable.Map({ 'grn::::team:abc123': Immutable.List([missingDependecy]) });
+};
 
 const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
   const granteesByType = grantees
@@ -41,7 +68,7 @@ type InternalState = {|
   availableRoles: AvailableRoles,
   activeShares: ActiveShares,
   selectedGranteeRoles: SelectedGranteeRoles,
-  missingDependencies: Immutable.List<MissingDependency>,
+  missingDependencies: MissingDependencies,
 |};
 
 export type EntityShareStateJson = {|
@@ -52,7 +79,7 @@ export type EntityShareStateJson = {|
   selected_grantee_roles: {|
     [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Role, 'id'>,
   |} | {||},
-  missing_dependencies: Array<MissingDependencyType>,
+  missing_dependencies: {[GRN]: Array<MissingDependencyType>},
 |};
 
 export default class EntityShareState {
@@ -72,7 +99,7 @@ export default class EntityShareState {
       availableRoles,
       activeShares,
       selectedGranteeRoles,
-      missingDependencies,
+      missingDependencies: mockMissingDependencies(),
     };
   }
 
@@ -173,7 +200,14 @@ export default class EntityShareState {
     const availableRoles = Immutable.fromJS(available_roles.map((ar) => Role.fromJSON(ar)));
     const activeShares = Immutable.fromJS(active_shares.map((as) => ActiveShare.fromJSON(as)));
     const selectedGranteeRoles = Immutable.fromJS(selected_grantee_roles);
-    const missingDependencies = Immutable.fromJS(missing_dependencies.map((md) => MissingDependency.fromJSON(md)));
+    const missingDependencies = Immutable.fromJS(
+      Object.entries(missing_dependencies).map(
+        ([granteeGRN, dependencyList]) => ({
+          // $FlowFixMe: Object entries returns mixed value
+          [granteeGRN]: dependencyList.map((dependency) => MissingDependency.fromJSON(dependency)),
+        }),
+      ),
+    );
 
     /* eslint-enable camelcase */
     return new EntityShareState(
