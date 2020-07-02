@@ -18,9 +18,9 @@ import ShareableEnityURL from './ShareableEnityURL';
 type Props = {
   description: string,
   entityId: string,
+  entityTitle: string,
   entityType: string,
   onClose: () => void,
-  title: string,
 };
 
 type ModalContentProps = {
@@ -88,7 +88,7 @@ const ModalContent = ({ entityShareState: { availableGrantees, selectedGranteeRo
 
 const _generateGRN = (id, type) => `grn::::${type}:${id}`;
 
-const EntityShareModal = ({ description, entityId, entityType, title, onClose }: Props) => {
+const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = _generateGRN(entityId, entityType);
 
@@ -108,7 +108,7 @@ const EntityShareModal = ({ description, entityId, entityType, title, onClose }:
                            onConfirm={_handleSave}
                            onModalClose={onClose}
                            showModal
-                           title={title}>
+                           title={<>Sharing: {entityType}: <i>{entityTitle}</i></>}>
       <>
         {entityShareState ? (
           <ModalContent description={description}
@@ -125,9 +125,9 @@ const EntityShareModal = ({ description, entityId, entityType, title, onClose }:
 EntityShareModal.propTypes = {
   description: PropTypes.string.isRequired,
   entityId: PropTypes.string.isRequired,
+  entityTitle: PropTypes.string.isRequired,
   entityType: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
 };
 
 export default EntityShareModal;
