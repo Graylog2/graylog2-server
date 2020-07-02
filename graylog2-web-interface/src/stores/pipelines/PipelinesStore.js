@@ -63,6 +63,7 @@ const PipelinesStore = Reflux.createStore({
       UserNotification.error(`Saving pipeline failed with status: ${error.message}`,
         'Could not save processing pipeline');
     };
+
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.create().url);
     const pipeline = {
       title: pipelineSource.title,
@@ -87,6 +88,7 @@ const PipelinesStore = Reflux.createStore({
       UserNotification.error(`Updating pipeline failed with status: ${error.message}`,
         'Could not update processing pipeline');
     };
+
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.update(pipelineSource.id).url);
     const pipeline = {
       id: pipelineSource.id,
@@ -111,6 +113,7 @@ const PipelinesStore = Reflux.createStore({
       UserNotification.error(`Deleting pipeline failed with status: ${error.message}`,
         `Could not delete processing pipeline "${pipelineId}"`);
     };
+
     const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
 
     return fetch('DELETE', url).then(() => {

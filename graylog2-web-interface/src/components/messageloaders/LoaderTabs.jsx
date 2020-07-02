@@ -52,6 +52,7 @@ class LoaderTabs extends React.Component {
 
   loadData = () => {
     InputsActions.list();
+
     StreamsStore.listStreams().then((response) => {
       const streams = {};
 

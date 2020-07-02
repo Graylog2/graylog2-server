@@ -9,6 +9,7 @@ describe('QueryTitleEditModal', () => {
   afterEach(cleanup);
 
   const modalHeadline = 'Editing dashboard page title';
+
   const openModal = (modalRef, currentTitle = 'CurrentTitle') => {
     if (modalRef) {
       modalRef.open(currentTitle);
@@ -84,6 +85,7 @@ describe('QueryTitleEditModal', () => {
     const cancelButton = getByText('Cancel');
 
     fireEvent.click(cancelButton);
+
     await wait(() => {
       expect(queryByText(modalHeadline)).toBeNull();
     });

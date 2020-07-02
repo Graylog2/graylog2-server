@@ -46,6 +46,7 @@ type Props = {
 
 const PivotSelect = ({ onChange, value, ...props }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
+
   // eslint-disable-next-line react/prop-types
   const ValueComponent = ({ children, innerProps, ...rest }) => {
     const element = rest.data;

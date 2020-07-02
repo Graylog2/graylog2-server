@@ -56,6 +56,7 @@ const DashboardsStore = singletonStore(
       const promise = fetch('GET', `${dashboardsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
           this.dashboards = response.views;
+
           this.pagination = {
             total: response.total,
             count: response.count,

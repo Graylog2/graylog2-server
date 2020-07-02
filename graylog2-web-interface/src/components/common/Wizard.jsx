@@ -73,6 +73,7 @@ class Wizard extends React.Component {
     super(props);
 
     this._warnOnInvalidActiveStep(props.activeStep, props.steps);
+
     this.state = {
       selectedStep: props.steps[0].key,
     };

@@ -18,6 +18,7 @@ export default class ViewPropertiesModal extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       view: props.view,
       title: props.title,

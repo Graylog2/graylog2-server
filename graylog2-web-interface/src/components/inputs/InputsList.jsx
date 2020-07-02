@@ -140,6 +140,7 @@ const InputsList = createReactClass({
     const filterMethod = (input) => {
       return regExp.test(input.title);
     };
+
     const filteredGlobalInputs = this.state.globalInputs.filter(filterMethod);
     const filteredLocalInputs = this.state.localInputs.filter(filterMethod);
 

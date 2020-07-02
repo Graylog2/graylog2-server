@@ -109,6 +109,7 @@ class SourceCodeEditor extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       height: props.height,
       width: props.width,

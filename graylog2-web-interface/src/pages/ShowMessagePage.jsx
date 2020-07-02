@@ -29,6 +29,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
   const [allStreams, setAllStreams] = useState();
 
   useEffect(() => { NodesActions.list(); }, []);
+
   useEffect(() => {
     MessagesActions.loadMessage(index, messageId)
       .then((_message) => {

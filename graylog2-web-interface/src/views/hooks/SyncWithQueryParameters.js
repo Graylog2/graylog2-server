@@ -65,6 +65,7 @@ export const syncWithQueryParameters = (query: string, action: (string) => mixed
 
 export const useSyncWithQueryParameters = (query: string) => {
   useEffect(() => syncWithQueryParameters(query, history.replace), []);
+
   useActionListeners(
     [QueriesActions.update.completed],
     () => syncWithQueryParameters(query),

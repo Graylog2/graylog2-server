@@ -6,6 +6,7 @@ import FieldTypeMapping from './FieldTypeMapping';
 describe('FieldTypeFor', () => {
   it('returns `FieldType.Unknown` if field type is not found', () => {
     expect(fieldTypeFor('', [])).toEqual(FieldType.Unknown);
+
     expect(fieldTypeFor('bar', [FieldTypeMapping.create('foo', FieldTypes.LONG())]))
       .toEqual(FieldType.Unknown);
   });

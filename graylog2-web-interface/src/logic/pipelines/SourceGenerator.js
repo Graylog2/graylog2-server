@@ -4,6 +4,7 @@ const SourceGenerator = {
 
     pipeline.stages.forEach((stage) => {
       source += `stage ${stage.stage} match ${stage.match_all ? 'all' : 'either'}\n`;
+
       stage.rules.forEach((rule) => {
         source += `rule "${rule}"\n`;
       });

@@ -47,12 +47,14 @@ const InputStateControl = createReactClass({
 
   _startInput() {
     this.setState({ loading: true });
+
     InputStatesStore.start(this.props.input)
       .finally(() => this.setState({ loading: false }));
   },
 
   _stopInput() {
     this.setState({ loading: true });
+
     InputStatesStore.stop(this.props.input)
       .finally(() => this.setState({ loading: false }));
   },

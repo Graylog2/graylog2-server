@@ -19,6 +19,7 @@ export default class ConfigurableElement extends React.Component {
 
   constructor(props, context) {
     super(props, context);
+
     this.state = {
       isOpen: false,
     };

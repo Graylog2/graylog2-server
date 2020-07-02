@@ -64,6 +64,7 @@ class PermissionSelector extends React.Component {
         </ButtonGroup>
       );
     };
+
     const multiDashboardButtons = (dashboardIds) => {
       const selectedDashboards = this.props.dashboards.filter((dashboard) => dashboardIds.contains(dashboard.id));
       const allRead = selectedDashboards.every((dashboard) => this.props.permissions.contains(`dashboards:read:${dashboard.id}`));

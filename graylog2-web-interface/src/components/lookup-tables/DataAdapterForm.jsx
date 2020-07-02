@@ -254,6 +254,7 @@ class DataAdapterForm extends React.Component {
       const p = plugin[0];
 
       pluginDisplayName = p.displayName;
+
       configFieldSet = React.createElement(p.formComponent, {
         config: dataAdapter.config,
         handleFormEvent: this._onConfigChange,
@@ -275,6 +276,7 @@ class DataAdapterForm extends React.Component {
     // width
     if (documentationComponent) {
       formRowWidth = 6;
+
       documentationColumn = (
         <Col lg={formRowWidth}>
           {documentationComponent}

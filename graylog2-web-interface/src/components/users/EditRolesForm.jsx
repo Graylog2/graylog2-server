@@ -43,6 +43,7 @@ class EditRolesForm extends React.Component {
       const userClone = ObjectUtils.clone(user);
 
       userClone.roles = roles;
+
       UsersStore.update(user.username, userClone).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
         history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);

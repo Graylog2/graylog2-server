@@ -35,6 +35,7 @@ describe('AddToQueryHandler', () => {
     QueriesStore.getInitialState = jest.fn(() => queries);
     QueriesActions.query = mockAction(jest.fn(() => Promise.resolve()));
     ViewStore.listen = jest.fn(() => () => {});
+
     ViewStore.getInitialState = jest.fn(() => ({
       view,
       activeQuery: 'queryId',

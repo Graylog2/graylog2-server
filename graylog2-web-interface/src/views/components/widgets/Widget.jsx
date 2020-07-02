@@ -209,6 +209,7 @@ class Widget extends React.Component<Props, State> {
 
         ViewActions.update(updatedDashboard).then(() => {
           this._onToggleMoveWidgetToTab();
+
           ViewActions.selectQuery(queryId).then(() => {
             SearchActions.executeWithCurrentState();
           });
