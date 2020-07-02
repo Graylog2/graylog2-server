@@ -41,7 +41,7 @@ describe('EntityShareModal', () => {
                         entityId="dashboard-id"
                         entityType="dashboard"
                         onClose={() => {}}
-                        title="The title"
+                        entityTitle="The title"
                         {...props} />
     );
   };
