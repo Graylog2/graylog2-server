@@ -48,6 +48,7 @@ export default class SpecificUsers extends ViewSharing {
     return new SpecificUsers(viewId, users);
   }
 
+  // $FlowFixMe: Forcing subclass of json format
   static fromJSON(value: SpecificUsersJson) {
     // eslint-disable-next-line camelcase
     const { view_id, users } = value;
