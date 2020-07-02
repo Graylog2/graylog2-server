@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Pagination /> should display Pagination 1`] = `
+<ul
+  class="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU pagination"
+  data-testid="graylog-pagination"
+>
+  <li
+    aria-label="First"
+    class="disabled"
+  >
+    <span>
+      <svg
+        class="svg-inline--fa fa-angle-double-left"
+      />
+    </span>
+  </li>
+  <li
+    aria-label="Prev"
+    class="disabled"
+  >
+    <span>
+      <svg
+        class="svg-inline--fa fa-angle-left"
+      />
+    </span>
+  </li>
+  <li
+    class="active"
+  >
+    <span>
+      1
+      <span
+        class="sr-only"
+      >
+        (current)
+      </span>
+    </span>
+  </li>
+  <li
+    class=""
+  >
+    <a
+      href="#"
+      role="button"
+    >
+      2
+    </a>
+  </li>
+  <li
+    class=""
+  >
+    <a
+      href="#"
+      role="button"
+    >
+      3
+    </a>
+  </li>
+  <li
+    class=""
+  >
+    <a
+      href="#"
+      role="button"
+    >
+      4
+    </a>
+  </li>
+  <li
+    class=""
+  >
+    <a
+      href="#"
+      role="button"
+    >
+      5
+    </a>
+  </li>
+  <li
+    aria-label="Next"
+    class=""
+  >
+    <a
+      href="#"
+      role="button"
+    >
+      <svg
+        class="svg-inline--fa fa-angle-right"
+      />
+    </a>
+  </li>
+  <li
+    aria-label="Last"
+    class=""
+  >
+    <a
+      href="#"
+      role="button"
+    >
+      <svg
+        class="svg-inline--fa fa-angle-double-right"
+      />
+    </a>
+  </li>
+</ul>
+`;

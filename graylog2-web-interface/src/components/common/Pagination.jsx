@@ -70,7 +70,6 @@ const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled
 `);
 
 const UltimatePagination = createUltimatePagination({
-// const Pagination = createUltimatePagination({
   WrapperComponent: StyledBootstrapPagination,
   itemTypeToComponent: {
     /* eslint-disable react/prop-types */
