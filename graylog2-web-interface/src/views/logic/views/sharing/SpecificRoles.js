@@ -48,6 +48,7 @@ export default class SpecificRoles extends ViewSharing {
     return new SpecificRoles(viewId, roles);
   }
 
+  // $FlowFixMe: Forcing subclass of json format
   static fromJSON(value: SpecificRolesJson) {
     // eslint-disable-next-line camelcase
     const { view_id, roles } = value;
