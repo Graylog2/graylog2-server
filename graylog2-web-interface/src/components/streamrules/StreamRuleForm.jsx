@@ -9,7 +9,6 @@ import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
-
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import FormsUtils from 'util/FormsUtils';
@@ -75,12 +74,15 @@ class StreamRuleForm extends React.Component<Props, State> {
 
   _validateMatchInput = () => {
     const { streamRule: { value } } = this.state;
+
     if (String(value) === String(this.PLACEHOLDER_INPUT)) {
       this.setState({ error: 'Please choose an input' });
+
       return false;
     }
 
     this.setState({ error: '' });
+
     return true;
   };
 
@@ -99,11 +101,13 @@ class StreamRuleForm extends React.Component<Props, State> {
       currentStreamRule.value = '';
       this.setState({ streamRule: currentStreamRule });
     }
+
     if (String(type) === String(this.MATCH_INPUT)) {
       if (!this._validateMatchInput()) {
         return;
       }
     }
+
     onSubmit(streamRule.id, currentStreamRule);
     onClose();
   };
@@ -119,9 +123,11 @@ class StreamRuleForm extends React.Component<Props, State> {
     const { streamRule } = this.state;
 
     streamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
+
     if (event.target.name === 'type' && String(streamRule.type) === String(this.MATCH_INPUT)) {
       streamRule.value = String(this.PLACEHOLDER_INPUT);
     }
+
     this.setState({ streamRule });
   };
 
@@ -134,12 +140,15 @@ class StreamRuleForm extends React.Component<Props, State> {
   valueBox = () => {
     const { streamRule: { value, type }, error } = this.state;
     const { inputs } = this.props;
+
     switch (String(type)) {
       case String(this.FIELD_PRESENCE_RULE_TYPE):
       case String(this.ALWAYS_MATCH_RULE_TYPE):
         return '';
+
       case String(this.MATCH_INPUT): {
         const bsStyle = error && error.length > 0 ? 'error' : undefined;
+
         return (
           <Input bsStyle={bsStyle}
                  help={error}
@@ -156,6 +165,7 @@ class StreamRuleForm extends React.Component<Props, State> {
           </Input>
         );
       }
+
       default:
         return <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} />;
     }
@@ -163,6 +173,7 @@ class StreamRuleForm extends React.Component<Props, State> {
 
   fieldBox = () => {
     const { streamRule: { field, type } } = this.state;
+
     switch (String(type)) {
       case String(this.ALWAYS_MATCH_RULE_TYPE):
       case String(this.MATCH_INPUT):
@@ -179,6 +190,7 @@ class StreamRuleForm extends React.Component<Props, State> {
     const streamRuleTypes = ruleTypes.map(this._formatStreamRuleType);
     const fieldBox = this.fieldBox();
     const valueBox = this.valueBox();
+
     return (
       <BootstrapModalForm title={title}
                           show
