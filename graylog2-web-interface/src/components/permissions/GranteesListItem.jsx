@@ -1,14 +1,15 @@
 // @flow strict
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 import { Formik, Form } from 'formik';
 
 import { type ThemeInterface } from 'theme';
 import EntityShareState, { type AvailableRoles } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
+import { Spinner, IconButton } from 'components/common';
 import Role from 'logic/permissions/Role';
 import SelectedGrantee from 'logic/permissions/SelectedGrantee';
-import { IconButton } from 'components/common';
 
 import GranteeIcon from './GranteeIcon';
 import RolesSelect from './RolesSelect';
@@ -35,7 +36,11 @@ const StyledGranteeIcon = styled(GranteeIcon)`
   margin-right: 5px;
 `;
 
-const DeleteIcon = styled(IconButton)`
+const Actions = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
   margin-left: 10px;
 `;
 
@@ -49,21 +54,37 @@ type Props = {
   }) => Promise<EntityShareState>,
 };
 
-const GranteesListItem = ({ availableRoles, grantee: { id, roleId, type, title }, onDelete, onRoleChange }: Props) => (
-  <Formik initialValues={{ roleId }} onSubmit={() => {}}>
-    <Form>
-      <Container>
-        <GranteeeInfo>
-          <StyledGranteeIcon type={type} />
-          {title}
-        </GranteeeInfo>
-        <StyledRolesSelect onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })}
-                           roles={availableRoles}
-                           title={`Change the role for ${title}`} />
-        <DeleteIcon name="trash" onClick={() => onDelete(id)} title={`Delete sharing for ${title}`} />
-      </Container>
-    </Form>
-  </Formik>
-);
+const GranteesListItem = ({ availableRoles, grantee: { id, roleId, type, title }, onDelete, onRoleChange }: Props) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = () => {
+    setIsDeleting(true);
+
+    onDelete(id).then(() => setIsDeleting(false));
+  };
+
+  return (
+    <Formik initialValues={{ roleId }} onSubmit={() => {}}>
+      <Form>
+        <Container>
+          <GranteeeInfo>
+            <StyledGranteeIcon type={type} />
+            {title}
+          </GranteeeInfo>
+          <StyledRolesSelect onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })}
+                             roles={availableRoles}
+                             title={`Change the role for ${title}`} />
+          <Actions>
+            {isDeleting ? (
+              <Spinner text="" />
+            ) : (
+              <IconButton name="trash" onClick={handleDelete} title={`Delete sharing for ${title}`} />
+            )}
+          </Actions>
+        </Container>
+      </Form>
+    </Formik>
+  );
+};
 
 export default GranteesListItem;
