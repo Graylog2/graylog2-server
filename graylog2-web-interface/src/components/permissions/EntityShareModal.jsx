@@ -30,8 +30,15 @@ type ModalContentProps = {
 };
 
 const StyledGranteesList = styled(GranteesList)`
+  margin-bottom: 20px;
+`;
+
+const GranteesSelectorHeadline = styled.h5`
+  margin-bottom: 10px;
+`;
+const GranteesListHeadline = styled.h5`
   margin-top: 20px;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
 `;
 
 const _filterAvailableGrantees = (availableGrantees, selectedGranteeRoles) => {
@@ -57,12 +64,18 @@ const ModalContent = ({ entityShareState: { availableGrantees, selectedGranteeRo
 
   return (
     <>
+      <GranteesSelectorHeadline>
+        Add collaborator
+      </GranteesSelectorHeadline>
       <p>
         {description}
       </p>
       <GranteesSelector availableGrantees={filteredGrantees}
                         availableRoles={availableRoles}
                         onSubmit={_handleSelection} />
+      <GranteesListHeadline>
+        Current collaborators
+      </GranteesListHeadline>
       <StyledGranteesList availableRoles={availableRoles}
                           entityGRN={entityGRN}
                           onDelete={_handleDeletion}
