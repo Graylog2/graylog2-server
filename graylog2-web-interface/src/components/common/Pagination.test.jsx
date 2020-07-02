@@ -13,6 +13,7 @@ describe('<Pagination />', () => {
                                                totalPages={totalPages} />);
 
     expect(getByTestId('graylog-pagination')).not.toBeNull();
+    expect(getByTestId('graylog-pagination')).toMatchSnapshot();
   });
 
   it('should not render Pagination if only 1 page', () => {
@@ -24,7 +25,7 @@ describe('<Pagination />', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('should return next page to `onChange`', () => {
+  it('should return proper page to `onChange`', () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
@@ -37,6 +38,19 @@ describe('<Pagination />', () => {
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage + 1);
   });
 
+  it('should return previous page to `onChange`', () => {
+    const currentPage = 2;
+    const totalPages = 10;
+    const onChangeSpy = jest.fn();
+    const { getByLabelText } = render(<Pagination currentPage={currentPage}
+                                                  totalPages={totalPages}
+                                                  onChange={onChangeSpy} />);
+
+    fireEvent.click(getByLabelText('Prev'));
+
+    expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
+  });
+
   it('should return last page to `onChange`', () => {
     const currentPage = 2;
     const totalPages = 10;
@@ -47,6 +61,19 @@ describe('<Pagination />', () => {
 
     fireEvent.click(getByLabelText('Last'));
 
-    expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
+    expect(onChangeSpy).toHaveBeenLastCalledWith(totalPages);
+  });
+
+  it('should return first page to `onChange`', () => {
+    const currentPage = 2;
+    const totalPages = 10;
+    const onChangeSpy = jest.fn();
+    const { getByLabelText } = render(<Pagination currentPage={currentPage}
+                                                  totalPages={totalPages}
+                                                  onChange={onChangeSpy} />);
+
+    fireEvent.click(getByLabelText('First'));
+
+    expect(onChangeSpy).toHaveBeenLastCalledWith(1);
   });
 });

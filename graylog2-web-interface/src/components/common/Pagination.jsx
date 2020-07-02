@@ -1,14 +1,29 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
+// $FlowFixMe Need typing for react-ultimate-pagination dependency
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
-import styled, { css } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
+
+import type { ThemeInterface } from 'theme';
 
 import Icon from './Icon';
 
-// const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
-const StyledBootstrapPagination = styled((props) => <BootstrapPagination {...props} />)(({ theme }) => css`
+type Props = {
+  currentPage: number,
+  totalPages: number,
+  boundaryPagesRange: number,
+  siblingPagesRange: number,
+  hideEllipsis: boolean,
+  hidePreviousAndNextPageLinks: boolean,
+  hideFirstAndLastPageLinks: boolean,
+  disabled: boolean,
+  onChange: (nextPage: number) => void,
+};
+
+const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled(BootstrapPagination)(({ theme }) => css`
   &.pagination {
     font-size: ${theme.fonts.size.small};
 
@@ -103,7 +118,7 @@ const Pagination = ({
   hideFirstAndLastPageLinks,
   disabled,
   onChange,
-}) => {
+}: Props) => {
   if (totalPages <= 1) {
     return null;
   }
