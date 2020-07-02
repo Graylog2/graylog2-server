@@ -2,6 +2,7 @@
 import { type GranteeInterface } from './GranteeInterface';
 import Grantee from './Grantee';
 import Role from './Role';
+import type { ActiveShares } from './EntityShareState';
 
 type InternalState = {
   id: $PropertyType<Grantee, 'id'>,
@@ -9,6 +10,8 @@ type InternalState = {
   type: $PropertyType<Grantee, 'type'>,
   roleId: $PropertyType<Role, 'id'>,
 };
+
+export type CurrentState = 'new' | 'changed' | 'unchanged';
 
 export default class SelectedGrantee implements GranteeInterface {
   _value: InternalState;
@@ -36,6 +39,16 @@ export default class SelectedGrantee implements GranteeInterface {
 
   get roleId(): $PropertyType<InternalState, 'roleId'> {
     return this._value.roleId;
+  }
+
+  currentState(activeShares: ActiveShares): CurrentState {
+    const { roleId, id } = this._value;
+    const activeShare = activeShares.find((share) => share.grantee === id);
+
+    if (!activeShare) return 'new';
+    if (activeShare.role !== roleId) return 'changed';
+
+    return 'unchanged';
   }
 
   static create(
