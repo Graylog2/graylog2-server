@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-// import { Pagination } from 'components/graylog';
-import Pagination from 'components/graylog/Pagination';
 import { Input } from 'components/bootstrap';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
+
+import Pagination from './Pagination';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
 const INITIAL_PAGE = 1;

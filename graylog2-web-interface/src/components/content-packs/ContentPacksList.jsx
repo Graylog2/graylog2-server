@@ -13,7 +13,7 @@ import {
   Modal,
   Row,
 } from 'components/graylog';
-import Pagination from 'components/graylog/Pagination';
+import { Pagination } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -172,7 +172,7 @@ class ContentPacksList extends React.Component {
     const { filteredContentPacks, pageSize, currentPage } = this.state;
     const { contentPacks } = this.props;
     const numberPages = Math.ceil(filteredContentPacks.length / pageSize);
-    console.log('numberPages', numberPages, filteredContentPacks.length, pageSize, filteredContentPacks.length / pageSize)
+    console.log('numberPages', numberPages, filteredContentPacks.length, pageSize, filteredContentPacks.length / pageSize);
     const pagination = (
       <Pagination totalPages={numberPages}
                   currentPage={currentPage}
