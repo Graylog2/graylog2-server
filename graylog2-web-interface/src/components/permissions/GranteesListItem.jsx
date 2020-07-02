@@ -9,18 +9,32 @@ import EntityShareState, { type AvailableRoles } from 'logic/permissions/EntityS
 import Grantee from 'logic/permissions/Grantee';
 import { Spinner, IconButton } from 'components/common';
 import Role from 'logic/permissions/Role';
-import SelectedGrantee from 'logic/permissions/SelectedGrantee';
+import SelectedGrantee, { type CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 
 import GranteeIcon from './GranteeIcon';
 import RolesSelect from './RolesSelect';
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+const currentStateColor = (theme: ThemeInterface, currentState: CurrentGranteeState) => {
+  console.log('currentState', currentState);
+
+  switch (currentState) {
+    case 'new':
+      return theme.colors.variant.lighter.success;
+    case 'changed':
+      return theme.colors.variant.lighter.warning;
+    default:
+      return 'transparent';
+  }
+};
+
+const Container: StyledComponent<{ currentState: CurrentGranteeState }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, currentState }) => `
   display: flex;
   align-items: center;
   width: 100%;
   margin-bottom: 5px;
   padding: 5px;
-`;
+  border-left: 5px solid ${currentStateColor(theme, currentState)};
+`);
 
 const GranteeeInfo = styled.div`
   display: flex;
@@ -55,6 +69,7 @@ const Actions = styled.div`
 
 type Props = {
   availableRoles: AvailableRoles,
+  currentGranteeState: CurrentGranteeState,
   grantee: SelectedGrantee,
   onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,
   onRoleChange: ({
@@ -63,7 +78,7 @@ type Props = {
   }) => Promise<EntityShareState>,
 };
 
-const GranteesListItem = ({ availableRoles, grantee: { id, roleId, type, title }, onDelete, onRoleChange }: Props) => {
+const GranteesListItem = ({ availableRoles, currentGranteeState, grantee: { id, roleId, type, title }, onDelete, onRoleChange }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
@@ -75,7 +90,7 @@ const GranteesListItem = ({ availableRoles, grantee: { id, roleId, type, title }
   return (
     <Formik initialValues={{ roleId }} onSubmit={() => {}}>
       <Form>
-        <Container>
+        <Container currentState={currentGranteeState}>
           <GranteeeInfo>
             <StyledGranteeIcon type={type} />
             <Title>{title}</Title>

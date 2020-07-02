@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
-import EntityShareState, { type AvailableRoles, type SelectedGrantees } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type ActiveShares, type AvailableRoles, type SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Role from 'logic/permissions/Role';
 import { type ThemeInterface } from 'theme';
@@ -20,6 +20,7 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
 `);
 
 type Props = {
+  activeShares: ActiveShares,
   availableRoles: AvailableRoles,
   className?: string,
   entityGRN: GRN,
@@ -31,16 +32,21 @@ type Props = {
   selectedGrantees: SelectedGrantees,
 };
 
-const GranteesList = ({ onDelete, onRoleChange, entityGRN, availableRoles, selectedGrantees, className }: Props) => (
+const GranteesList = ({ activeShares, onDelete, onRoleChange, entityGRN, availableRoles, selectedGrantees, className }: Props) => (
   <Container className={className}>
-    {selectedGrantees.map((grantee) => (
-      <GranteesListItem availableRoles={availableRoles}
-                        entityGRN={entityGRN}
-                        grantee={grantee}
-                        key={grantee.id}
-                        onDelete={onDelete}
-                        onRoleChange={onRoleChange} />
-    ))}
+    {selectedGrantees.map((grantee) => {
+      const currentGranteeState = grantee.currentState(activeShares);
+
+      return (
+        <GranteesListItem availableRoles={availableRoles}
+                          currentGranteeState={currentGranteeState}
+                          entityGRN={entityGRN}
+                          grantee={grantee}
+                          key={grantee.id}
+                          onDelete={onDelete}
+                          onRoleChange={onRoleChange} />
+      );
+    })}
   </Container>
 );
 

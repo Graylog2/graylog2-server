@@ -49,7 +49,13 @@ const _filterAvailableGrantees = (availableGrantees, selectedGranteeRoles) => {
 };
 
 const ModalContent = ({
-  entityShareState: { availableGrantees, selectedGranteeRoles, availableRoles, selectedGrantees },
+  entityShareState: {
+    activeShares,
+    availableGrantees,
+    selectedGranteeRoles,
+    availableRoles,
+    selectedGrantees,
+  },
   description,
   entityGRN,
   setDisableSubmit,
@@ -94,7 +100,8 @@ const ModalContent = ({
       <GranteesListHeadline>
         Current collaborators
       </GranteesListHeadline>
-      <StyledGranteesList availableRoles={availableRoles}
+      <StyledGranteesList activeShares={activeShares}
+                          availableRoles={availableRoles}
                           entityGRN={entityGRN}
                           onDelete={_handleDeletion}
                           onRoleChange={_handleSelection}
