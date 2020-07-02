@@ -1,12 +1,43 @@
+// @flow strict
 import Reflux from 'reflux';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
+
+export type InputTypes = {
+  [type: string]: string,
+};
+
+export type ConfigurationField = {
+  field_type: 'boolean' | 'text' | 'dropdown' | 'list' | 'number',
+  name: string,
+  human_name: string,
+  description: string,
+  default_value: any,
+  is_optional: boolean,
+  attributes: Array<string>,
+  additional_info: any,
+  position: number,
+};
+
+export type InputDescription = {
+  type: string,
+  name: string,
+  is_exclusive: boolean,
+  requested_configuration: {
+    [key: string]: ConfigurationField,
+  },
+  link_to_docs: string,
+};
+
+export type InputDescriptions = {
+  [type: string]: InputDescription,
+};
 
 const InputTypesStore = Reflux.createStore({
   listenables: [InputTypesActions],
@@ -18,19 +49,19 @@ const InputTypesStore = Reflux.createStore({
     this.list();
   },
 
-  getInitialState() {
+  getInitialState(): { inputTypes: InputTypes, inputDescriptions: InputDescriptions } {
     return { inputTypes: this.inputTypes, inputDescriptions: this.inputDescriptions };
   },
 
   list() {
-    const promiseTypes = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
-    const promiseDescriptions = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/all`));
+    const promiseTypes = fetch('GET', qualifyUrl(this.sourceUrl));
+    const promiseDescriptions = fetch('GET', qualifyUrl(`${this.sourceUrl}/all`));
     const promise = Promise.all([promiseTypes, promiseDescriptions]);
     promise
       .then(
-        (responses) => {
-          this.inputTypes = responses[0].types;
-          this.inputDescriptions = responses[1];
+        ([typesResponse: { types: InputTypes }, descriptionsResponse: InputDescriptions]) => {
+          this.inputTypes = typesResponse.types;
+          this.inputDescriptions = descriptionsResponse;
           this.trigger(this.getInitialState());
         },
         (error) => {
@@ -42,8 +73,8 @@ const InputTypesStore = Reflux.createStore({
     InputTypesActions.list.promise(promise);
   },
 
-  get(inputTypeId) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputTypeId}`));
+  get(inputTypeId: string) {
+    const promise = fetch('GET', qualifyUrl(`${this.sourceUrl}/${inputTypeId}`));
 
     promise
       .catch((error) => {
