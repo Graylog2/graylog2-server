@@ -151,7 +151,13 @@ const valueContainer = (base) => ({
   padding: '2px 12px',
 });
 
-const _components: { [string]: React.ComponentType<any> } = {
+type OverriddenComponents = {|
+  DropdownIndicator: React.ComponentType<any>,
+  MultiValueRemove: React.ComponentType<any>,
+  IndicatorSeparator: React.ComponentType<any>,
+|};
+
+const _components: OverriddenComponents = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
@@ -170,15 +176,19 @@ const _styles = ({ size, theme }) => ({
   valueContainer,
 });
 
+type ComponentsProp = {|
+  MultiValueLabel?: React.ComponentType<any>,
+|};
+
 type Props = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
   clearable?: boolean,
-  components: ?{| [string]: React.ComponentType<any> |},
+  components?: ?ComponentsProp,
   delimiter?: string,
   disabled?: boolean,
-  displayKey?: string,
+  displayKey: string,
   ignoreAccents?: boolean,
   inputProps?: { [string]: any },
   matchProp?: 'any' | 'label' | 'value',
@@ -191,12 +201,18 @@ type Props = {
   size?: 'normal' | 'small',
   theme: ThemeInterface,
   value?: string,
-  valueKey?: string,
+  valueKey: string,
   valueRenderer?: (Option) => React.Node,
 };
 
+type CustomComponents = {|
+  Input?: React.ComponentType<any>,
+  Option?: React.ComponentType<any>,
+  SingleValue?: React.ComponentType<any>,
+|};
+
 type State = {
-  customComponents?: {| [string]: React.ComponentType<any> |},
+  customComponents: CustomComponents,
   value: any,
 };
 
@@ -357,7 +373,7 @@ class Select extends React.Component<Props, State> {
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: string): Array<Option> => {
-    const { options, displayKey = '', valueKey = '', delimiter } = this.props;
+    const { options, displayKey, valueKey, delimiter } = this.props;
 
     return value.split(delimiter).map((v: string) => {
       const predicate: Option = {
@@ -440,7 +456,7 @@ class Select extends React.Component<Props, State> {
     const stringify = (option) => option[matchProp];
     const customFilter = this.createCustomFilter(stringify);
 
-    const mergedComponents: { [string]: React.ComponentType<any> } = {
+    const mergedComponents = {
       ..._components,
       ...components,
       ...customComponents,
