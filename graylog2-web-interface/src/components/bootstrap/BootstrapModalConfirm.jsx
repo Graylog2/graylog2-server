@@ -30,7 +30,7 @@ class BootstrapModalConfirm extends React.Component {
     /** Function to call when the modal is closed. The function does not receive any arguments. */
     onModalClose: PropTypes.func,
     /** Function to call when the action is not confirmed. The function does not receive any arguments. */
-    onCancel: PropTypes.func.isRequired,
+    onCancel: PropTypes.func,
     /**
      * Function to call when the action is confirmed. The function receives a callback function to close the modal
      * dialog box as first argument.
@@ -52,6 +52,7 @@ class BootstrapModalConfirm extends React.Component {
     confirmButtonText: 'Confirm',
     cancelButtonDisabled: false,
     confirmButtonDisabled: false,
+    onCancel: () => {},
     onModalOpen: () => {},
     onModalClose: () => {},
   };
@@ -60,6 +61,7 @@ class BootstrapModalConfirm extends React.Component {
     const { onCancel } = this.props;
 
     onCancel();
+
     this.close();
   };
 

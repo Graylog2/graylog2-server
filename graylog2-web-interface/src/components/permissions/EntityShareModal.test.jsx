@@ -54,7 +54,7 @@ describe('EntityShareModal', () => {
     expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity);
   });
 
-  it('updates entiy share state on submit', async () => {
+  it('updates entity share state on submit', async () => {
     const { getByText } = render(<SimpleEntityShareModal />);
 
     const submitButton = getByText('Save');
@@ -77,7 +77,7 @@ describe('EntityShareModal', () => {
     fireEvent.click(cancelButton);
 
     await wait(() => {
-      expect(onClose).toHaveBeenCalled();
+      expect(onClose).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -103,7 +103,7 @@ describe('EntityShareModal', () => {
       expect(getByText('The title')).not.toBeNull();
     });
 
-    it('sharable url', () => {
+    it('shareable url', () => {
       const { getByDisplayValue } = render(<SimpleEntityShareModal />);
 
       expect(getByDisplayValue('http://localhost/')).not.toBeNull();
@@ -162,7 +162,7 @@ describe('EntityShareModal', () => {
 
       await selectEvent.openMenu(roleSelect);
 
-      await selectEvent.select(roleSelect, viewer.title);
+      await act(async () => { await selectEvent.select(roleSelect, viewer.title); });
 
       await wait(() => {
         expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
