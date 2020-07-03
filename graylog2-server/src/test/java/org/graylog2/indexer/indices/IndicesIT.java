@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.assertj.jodatime.api.Assertions;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
@@ -291,9 +292,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final String indexName = client().createRandomIndex("indices_it_");
 
-        indices.indexCreationDate(indexName).ifPresent(
-                indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
-        );
+        final Optional<DateTime> indexCreationDate = indices.indexCreationDate(indexName);
+        assertThat(indexCreationDate).isNotEmpty()
+                .hasValueSatisfying(date -> Assertions.assertThat(date).isEqualToIgnoringMillis(now));
     }
 
     @Test
