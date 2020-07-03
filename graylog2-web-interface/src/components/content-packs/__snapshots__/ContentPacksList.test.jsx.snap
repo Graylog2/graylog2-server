@@ -1156,7 +1156,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "eXfwDC",
+                                          "lastClassName": "fdBWEX",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1183,7 +1183,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     <FormControl
                                       bsClass="form-control"
                                       bsSize="small"
-                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      className="FormControl-sc-1amoaox-0 fdBWEX"
                                       componentClass="select"
                                       inputRef={[Function]}
                                       label="Show:"
@@ -1194,7 +1194,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       value={10}
                                     >
                                       <select
-                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
                                         id="page-size"
                                         label="Show:"
                                         name="page-size"
@@ -9588,7 +9588,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "eXfwDC",
+                                          "lastClassName": "fdBWEX",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -9615,7 +9615,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     <FormControl
                                       bsClass="form-control"
                                       bsSize="small"
-                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      className="FormControl-sc-1amoaox-0 fdBWEX"
                                       componentClass="select"
                                       inputRef={[Function]}
                                       label="Show:"
@@ -9626,7 +9626,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       value={10}
                                     >
                                       <select
-                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
                                         id="page-size"
                                         label="Show:"
                                         name="page-size"
@@ -10301,7 +10301,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "eXfwDC",
+                                          "lastClassName": "fdBWEX",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -10328,7 +10328,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     <FormControl
                                       bsClass="form-control"
                                       bsSize="small"
-                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      className="FormControl-sc-1amoaox-0 fdBWEX"
                                       componentClass="select"
                                       inputRef={[Function]}
                                       label="Show:"
@@ -10339,7 +10339,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       value={10}
                                     >
                                       <select
-                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
                                         id="page-size"
                                         label="Show:"
                                         name="page-size"
@@ -10590,7 +10590,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "eXfwDC",
+                                          "lastClassName": "fdBWEX",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -10617,7 +10617,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     <FormControl
                                       bsClass="form-control"
                                       bsSize="small"
-                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      className="FormControl-sc-1amoaox-0 fdBWEX"
                                       componentClass="select"
                                       inputRef={[Function]}
                                       label="Show:"
@@ -10628,7 +10628,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       value={10}
                                     >
                                       <select
-                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
                                         id="page-size"
                                         label="Show:"
                                         name="page-size"
