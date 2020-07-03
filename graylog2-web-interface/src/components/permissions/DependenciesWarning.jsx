@@ -26,6 +26,7 @@ const Headline = styled.div`
 const List = styled.ul`
   list-style: initial;
   padding-left: 20px;
+
   ul {
     list-style: circle;
   }
