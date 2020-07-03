@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import EntityShareState from 'logic/permissions/EntityShareState';
+import EntityShareState, { type MissingDependencies } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
 import MissingDependency from 'logic/permissions/MissingDependency';
@@ -80,7 +80,7 @@ const missingDependecy = MissingDependency
   .owners(Immutable.List([john, security]))
   .build();
 
-export const missingDependencies = Immutable.Map({ [jane.id]: Immutable.List([missingDependecy]) });
+export const missingDependencies: MissingDependencies = Immutable.Map({ [jane.id]: Immutable.List([missingDependecy]) });
 
 const entityShareState = EntityShareState
   .builder()

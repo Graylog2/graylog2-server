@@ -99,7 +99,7 @@ export default class EntityShareState {
       availableCapabilities: availableCapabilities,
       activeShares,
       selectedGranteeCapabilities: selectedGranteeCapabilities,
-      missingDependencies: mockMissingDependencies(),
+      missingDependencies: missingDependencies || mockMissingDependencies(),
     };
   }
 

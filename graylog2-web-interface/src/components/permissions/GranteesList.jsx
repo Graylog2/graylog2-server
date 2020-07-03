@@ -20,10 +20,10 @@ const Header = styled.div`
 
 const List: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   >:nth-child(even) {
-    background: ${theme.colors.global.backgroundAlt};
+    background: ${theme.colors.table.backgroundAlt};
   };
   >:nth-child(odd) {
-    background: ${theme.colors.global.background};
+    background: ${theme.colors.table.background};
   };
 `);
 

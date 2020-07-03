@@ -11,7 +11,7 @@ type Props = {
 };
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
-  <div className={`${className} form-inline page-size`} style={{ float: 'right' }}>
+  <div className={`${className ?? ''} form-inline page-size`} style={{ float: 'right' }}>
     <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={onChange}>
       {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
     </Input>
