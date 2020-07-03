@@ -4,7 +4,16 @@ import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { Button, Row, Col, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'components/graylog';
+import {
+  Button,
+  ButtonToolbar,
+  Col,
+  DropdownButton,
+  MenuItem,
+  Modal,
+  Row,
+} from 'components/graylog';
+import { Pagination } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -12,7 +21,6 @@ import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
 import ContentPackInstall from './ContentPackInstall';
-import ContentPacksListStyle from './ContentPacksList.css';
 
 class ContentPacksList extends React.Component {
   static propTypes = {
@@ -29,8 +37,6 @@ class ContentPacksList extends React.Component {
     contentPackMetadata: {},
   };
 
-  MAX_PAGE_BUTTONS = 10;
-
   constructor(props) {
     super(props);
 
@@ -45,7 +51,8 @@ class ContentPacksList extends React.Component {
     this._onChangePage = this._onChangePage.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ filteredContentPacks: nextProps.contentPacks });
   }
 
@@ -158,29 +165,21 @@ class ContentPacksList extends React.Component {
     this.setState({ pageSize: event.target.value });
   }
 
-  _onChangePage(eventKey, event) {
-    event.preventDefault();
-    const pageNo = Number(eventKey);
-
-    this.setState({ currentPage: pageNo });
+  _onChangePage(nextPage) {
+    this.setState({ currentPage: nextPage });
   }
 
   render() {
     const { filteredContentPacks, pageSize, currentPage } = this.state;
     const { contentPacks } = this.props;
     const numberPages = Math.ceil(filteredContentPacks.length / pageSize);
+
     const pagination = (
-      <Pagination bsSize="small"
-                  bsStyle={`pagination ${ContentPacksListStyle.pager}`}
-                  items={numberPages}
-                  maxButtons={this.MAX_PAGE_BUTTONS}
-                  activePage={currentPage}
-                  onSelect={this._onChangePage}
-                  prev
-                  next
-                  first
-                  last />
+      <Pagination totalPages={numberPages}
+                  currentPage={currentPage}
+                  onChange={this._onChangePage} />
     );
+
     const pageSizeSelector = (
       <span>Show:&nbsp;
         <select onChange={this._itemsShownChange} value={pageSize}>
