@@ -35,23 +35,23 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultGrantPermissionResolver.class);
 
     private final Logger logger;
-    private final BuiltinRoles builtinRoles;
+    private final BuiltinCapabilities builtinCapabilities;
     private final DBGrantService grantService;
     private final GRNRegistry grnRegistry;
 
     @Inject
-    public DefaultGrantPermissionResolver(BuiltinRoles builtinRoles,
+    public DefaultGrantPermissionResolver(BuiltinCapabilities builtinCapabilities,
                                           DBGrantService grantService,
                                           GRNRegistry grnRegistry) {
-        this(LOG, builtinRoles, grantService, grnRegistry);
+        this(LOG, builtinCapabilities, grantService, grnRegistry);
     }
 
     public DefaultGrantPermissionResolver(Logger logger,
-                                          BuiltinRoles builtinRoles,
+                                          BuiltinCapabilities builtinCapabilities,
                                           DBGrantService grantService,
                                           GRNRegistry grnRegistry) {
         this.logger = logger;
-        this.builtinRoles = builtinRoles;
+        this.builtinCapabilities = builtinCapabilities;
         this.grantService = grantService;
         this.grnRegistry = grnRegistry;
     }
@@ -78,12 +78,12 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
         final ImmutableSet.Builder<Permission> permissionsBuilder = ImmutableSet.builder();
 
         for (GrantDTO grant : grants) {
-            final Optional<RoleDTO> role = builtinRoles.get(grant.role());
+            final Optional<CapabilityDTO> capability = builtinCapabilities.get(grant.capability());
 
-            if (role.isPresent()) {
+            if (capability.isPresent()) {
                 final Set<GRN> targets = resolveTargets(grant.target());
 
-                for (String permission : role.get().permissions()) {
+                for (String permission : capability.get().permissions()) {
                     for (GRN target : targets) {
                         if (target.isPermissionApplicable(permission)) {
                             // TODO Find a better way to distinguish between old and new types of permissions
@@ -97,7 +97,7 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
                     }
                 }
             } else {
-                logger.warn("Couldn't find role <{}>", grant.role());
+                logger.warn("Couldn't find capability <{}>", grant.capability());
             }
         }
 

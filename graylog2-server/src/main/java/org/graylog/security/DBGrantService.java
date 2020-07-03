@@ -19,12 +19,12 @@ package org.graylog.security;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.utilities.GRN;
+import org.graylog2.utilities.GRNRegistry;
 import org.mongojack.DBQuery;
 
 import javax.annotation.Nullable;
@@ -45,8 +45,8 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
     @Inject
     public DBGrantService(MongoConnection mongoConnection,
-                             MongoJackObjectMapperProvider mapper,
-                             GRNRegistry grnRegistry) {
+                          MongoJackObjectMapperProvider mapper,
+                          GRNRegistry grnRegistry) {
         super(mongoConnection, mapper, GrantDTO.class, COLLECTION_NAME);
         this.grnRegistry = grnRegistry;
 
@@ -86,7 +86,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
         return super.save(existingGrant.toBuilder()
                 .grantee(updatedGrant.grantee())
-                .role(updatedGrant.role())
+                .capability(updatedGrant.capability())
                 .target(updatedGrant.target())
                 .updatedBy(requireNonNull(currentUser, "currentUser cannot be null").getName())
                 .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
@@ -99,10 +99,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         }
     }
 
-    public List<GrantDTO> getForTarget(GRN targetGRN, GRN currentUserGRN) {
-        return db.find(DBQuery.and(
-                DBQuery.is(GrantDTO.FIELD_TARGET, targetGRN.toString()),
-                DBQuery.notEquals(GrantDTO.FIELD_GRANTEE, currentUserGRN.toString())
-        )).toArray();
+    public List<GrantDTO> getForTarget(GRN targetGRN) {
+        return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, targetGRN.toString())).toArray();
     }
 }
