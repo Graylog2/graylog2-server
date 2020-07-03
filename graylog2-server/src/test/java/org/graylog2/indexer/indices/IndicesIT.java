@@ -14,13 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of Graylog.
+ * <p>
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.indexer.indices;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
@@ -57,6 +72,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
@@ -248,7 +265,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         client().putTemplate(templateName, templateSource);
 
-        // TODO: Test is coupled to sresponse structure
+        // TODO: Test is coupled to response structure
         final JsonNode beforeTemplate = client().getTemplate(templateName);
         // TODO: Test is based on document types, which are deprecated and will be removed
         final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
@@ -311,13 +328,8 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         indices.create(testIndexName, indexSet);
         client().waitForGreenStatus(testIndexName);
 
-        // Check index mapping
-        // TODO: Test is coupled to response structure, should be abstracted in Client implementation
-        final JsonNode indexMappings = client().getMapping(testIndexName);
-        final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
-
-        assertThat(mapping.path("_source").path("enabled")).isEqualTo(BooleanNode.getFalse());
-        assertThat(mapping.path("properties").path("source").path("type")).isEqualTo(new TextNode("text"));
+        assertThat(client().isSourceEnabled(testIndexName)).isFalse();
+        assertThat(client().fieldType(testIndexName, "source")).isEqualTo("text");
     }
 
     @Test
@@ -328,7 +340,6 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         final String index = client().createRandomIndex("indices_it_");
 
         indices.close(index);
-
 
         assertThat(listener.indicesClosedEvents).containsOnly(IndicesClosedEvent.create(index));
         assertThat(listener.indicesDeletedEvents).isEmpty();
@@ -406,5 +417,43 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 .containsOnly(index1);
         assertThat(indices.getIndices(indexSet, "close"))
                 .containsOnly(index2);
+    }
+
+    @Test
+    public void storeSizeInBytesReturnsValue() {
+        final String index = client().createRandomIndex("foo");
+
+        final Optional<Long> storeSizeInBytes = indices.getStoreSizeInBytes(index);
+
+        assertThat(storeSizeInBytes).isNotEmpty();
+    }
+
+    @Test
+    public void retrievesCreationTimeOfIndex() {
+        final String index = client().createRandomIndex("foo");
+
+        final Optional<DateTime> storeSizeInBytes = indices.indexCreationDate(index);
+
+        assertThat(storeSizeInBytes).isNotEmpty();
+    }
+
+    @Test
+    public void retrievesAllAliasesForIndex() {
+        final String index1 = client().createRandomIndex("foo-");
+        final String index2 = client().createRandomIndex("foo-");
+
+        client().addAliasMapping(index1, "alias1");
+        client().addAliasMapping(index2, "alias2");
+        client().addAliasMapping(index2, "alias3");
+
+        final Map<String, Set<String>> indexNamesAndAliases = indices.getIndexNamesAndAliases("foo-*");
+
+        assertThat(indexNamesAndAliases)
+                .containsAllEntriesOf(
+                        ImmutableMap.of(
+                                index1, Collections.singleton("alias1"),
+                                index2, ImmutableSet.of("alias2", "alias3")
+                        )
+                );
     }
 }

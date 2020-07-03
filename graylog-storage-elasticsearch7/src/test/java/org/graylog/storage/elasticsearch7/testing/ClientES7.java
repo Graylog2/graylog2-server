@@ -26,7 +26,10 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetInd
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetaData;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
@@ -90,22 +93,39 @@ public class ClientES7 implements Client {
                 .alias(alias);
         indicesAliasesRequest.addAliasAction(aliasAction);
 
-        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
+                "failed to add alias " + alias + " for index " + indexName);
     }
 
     @Override
-    public JsonNode getMapping(String... indices) {
-        return null;
+    public boolean isSourceEnabled(String testIndexName) {
+        final GetMappingsResponse mapping = getMapping(testIndexName);
+        return true;
+    }
+
+    @Override
+    public String fieldType(String testIndexName, String source) {
+        final GetMappingsResponse mapping = getMapping(testIndexName);
+        return mapping.mappings().get("source").type();
+    }
+
+    private GetMappingsResponse getMapping(String... indices) {
+        final GetMappingsRequest request = new GetMappingsRequest().indices(indices);
+        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions));
     }
 
     @Override
     public JsonNode getTemplate(String templateName) {
+        final GetIndexTemplatesRequest request = new GetIndexTemplatesRequest(templateName);
+        final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
         return null;
     }
 
     @Override
-    public void putTemplate(String templateName, Object source) {
-
+    public void putTemplate(String templateName, Map<String, Object> source) {
+        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName).source(source);
+        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
+                "Unable to put template " + templateName);
     }
 
     @Override
