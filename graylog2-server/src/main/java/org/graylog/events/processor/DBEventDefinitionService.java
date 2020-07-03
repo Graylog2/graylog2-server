@@ -18,6 +18,7 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.security.entities.EntityOwnerShipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -38,19 +39,29 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
     private static final String COLLECTION_NAME = "event_definitions";
 
     private final DBEventProcessorStateService stateService;
+    private final EntityOwnerShipService entityOwnerShipService;
 
     @Inject
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
-                                    DBEventProcessorStateService stateService) {
+                                    DBEventProcessorStateService stateService,
+                                    EntityOwnerShipService entityOwnerShipService) {
         super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME);
         this.stateService = stateService;
+        this.entityOwnerShipService = entityOwnerShipService;
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              String sortByField, int page, int perPage) {
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
                 getSortBuilder("asc", sortByField), page, perPage);
+    }
+
+    @Override
+    public EventDefinitionDto save(EventDefinitionDto eventDefinitionDto) {
+        final EventDefinitionDto dto = super.save(eventDefinitionDto);
+        entityOwnerShipService.registerNewView(dto.id());
+        return dto;
     }
 
     @Override

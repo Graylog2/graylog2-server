@@ -30,6 +30,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog.security.entities.EntityOwnerShipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -50,6 +51,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class AggregationEventProcessorConfigTest {
     @Rule
@@ -72,7 +74,7 @@ public class AggregationEventProcessorConfigTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
+        this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnerShipService.class));
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 
