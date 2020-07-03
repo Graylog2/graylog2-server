@@ -5,14 +5,14 @@ import styled, { type StyledComponent } from 'styled-components';
 import { Formik, Form } from 'formik';
 
 import { type ThemeInterface } from 'theme';
-import EntityShareState, { type AvailableRoles } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type AvailableCapabilities } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import { Spinner, IconButton } from 'components/common';
-import Role from 'logic/permissions/Role';
+import Capability from 'logic/permissions/Capability';
 import SelectedGrantee, { type CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 
 import GranteeIcon from './GranteeIcon';
-import RolesSelect from './RolesSelect';
+import CapabilitySelect from './CapabilitySelect';
 
 const currentStateColor = (theme: ThemeInterface, currentState: CurrentGranteeState) => {
   switch (currentState) {
@@ -48,7 +48,7 @@ const Title = styled.div`
   white-space: nowrap;
 `;
 
-const StyledRolesSelect = styled(RolesSelect)`
+const StyledCapabilitySelect = styled(CapabilitySelect)`
   flex: 0.5;
 `;
 
@@ -65,17 +65,17 @@ const Actions = styled.div`
 `;
 
 type Props = {
-  availableRoles: AvailableRoles,
+  availableCapabilities: AvailableCapabilities,
   currentGranteeState: CurrentGranteeState,
   grantee: SelectedGrantee,
   onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,
-  onRoleChange: ({
+  onCapabilityChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
-    roleId: $PropertyType<Role, 'id'>,
+    capabilityId: $PropertyType<Capability, 'id'>,
   }) => Promise<EntityShareState>,
 };
 
-const GranteesListItem = ({ availableRoles, currentGranteeState, grantee: { id, roleId, type, title }, onDelete, onRoleChange }: Props) => {
+const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee: { id, capabilityId, type, title }, onDelete, onCapabilityChange }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
@@ -85,16 +85,16 @@ const GranteesListItem = ({ availableRoles, currentGranteeState, grantee: { id, 
   };
 
   return (
-    <Formik initialValues={{ roleId }} onSubmit={() => {}}>
+    <Formik initialValues={{ capabilityId }} onSubmit={() => {}}>
       <Form>
         <Container currentState={currentGranteeState}>
           <GranteeeInfo>
             <StyledGranteeIcon type={type} />
             <Title>{title}</Title>
           </GranteeeInfo>
-          <StyledRolesSelect onChange={(newRoleId) => onRoleChange({ granteeId: id, roleId: newRoleId })}
-                             roles={availableRoles}
-                             title={`Change the role for ${title}`} />
+          <StyledCapabilitySelect onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
+                                  capabilities={availableCapabilities}
+                                  title={`Change the capability for ${title}`} />
           <Actions>
             {isDeleting ? (
               <Spinner text="" />
