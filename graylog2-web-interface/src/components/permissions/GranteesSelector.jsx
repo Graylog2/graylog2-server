@@ -4,24 +4,24 @@ import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-import EntityShareState, { type AvailableGrantees, type AvailableRoles } from 'logic/permissions/EntityShareState';
-import Role from 'logic/permissions/Role';
+import EntityShareState, { type AvailableGrantees, type AvailableCapabilities } from 'logic/permissions/EntityShareState';
+import Capability from 'logic/permissions/Capability';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
 import { Select } from 'components/common';
 import SelectGroup from 'components/common/SelectGroup';
 
 import GranteeIcon from './GranteeIcon';
-import RolesSelect from './RolesSelect';
+import CapabilitySelect from './CapabilitySelect';
 
 export type SelectionRequest = {
   granteeId: $PropertyType<Grantee, 'id'>,
-  roleId: $PropertyType<Role, 'id'>,
+  capabilityId: $PropertyType<Capability, 'id'>,
 };
 
 type Props = {
   availableGrantees: AvailableGrantees,
-  availableRoles: AvailableRoles,
+  availableCapabilities: AvailableCapabilities,
   className?: string,
   onSubmit: SelectionRequest => Promise<EntityShareState>,
 };
@@ -75,10 +75,10 @@ const _granteesOptions = (grantees: AvailableGrantees) => {
   )).toJS();
 };
 
-const _initialRoleId = (roles: AvailableRoles) => {
-  const initialRoleTitle = 'Viewer';
+const _initialCapabilityId = (capabilities: AvailableCapabilities) => {
+  const initialCapabilityTitle = 'Viewer';
 
-  return roles.find((role) => role.title === initialRoleTitle)?.id;
+  return capabilities.find((capability) => capability.title === initialCapabilityTitle)?.id;
 };
 
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
@@ -90,14 +90,14 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-const GranteesSelector = ({ availableGrantees, availableRoles, className, onSubmit }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
-  const initialRoleId = _initialRoleId(availableRoles);
+  const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
   return (
     <div className={className}>
       <Formik onSubmit={(data) => onSubmit(data)}
-              initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
+              initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
             <FormElements>
@@ -112,7 +112,7 @@ const GranteesSelector = ({ availableGrantees, availableRoles, className, onSubm
                                     value={value} />
                   )}
                 </Field>
-                <RolesSelect roles={availableRoles} />
+                <CapabilitySelect capabilities={availableCapabilities} />
               </StyledSelectGroup>
               <SubmitButton bsStyle="success"
                             disabled={isSubmitting || !isValid}

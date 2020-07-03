@@ -31,32 +31,32 @@ const GranteesSelectorHeadline = styled.h5`
   margin-bottom: 10px;
 `;
 
-const _filterAvailableGrantees = (availableGrantees, selectedGranteeRoles) => {
-  const availableGranteeRolesUserIds = selectedGranteeRoles.entrySeq().map(([granteeGRN]) => granteeGRN);
+const _filterAvailableGrantees = (availableGrantees, selectedGranteeCapabilities) => {
+  const availableGranteeCapabilitiesUserIds = selectedGranteeCapabilities.entrySeq().map(([granteeGRN]) => granteeGRN);
 
-  return availableGrantees.filter((grantee) => !availableGranteeRolesUserIds.includes(grantee.id));
+  return availableGrantees.filter((grantee) => !availableGranteeCapabilitiesUserIds.includes(grantee.id));
 };
 
 const EntityShareSettings = ({
   entityShareState: {
     activeShares,
     availableGrantees,
-    availableRoles,
+    availableCapabilities,
     missingDependencies,
-    selectedGranteeRoles,
+    selectedGranteeCapabilities,
     selectedGrantees,
   },
   description,
   entityGRN,
   setDisableSubmit,
 }: Props) => {
-  const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeRoles);
+  const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
-  const _handleSelection = ({ granteeId, roleId }: SelectionRequest) => {
+  const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
     setDisableSubmit(true);
 
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_roles: selectedGranteeRoles.merge({ [granteeId]: roleId }),
+      selected_grantee_capabilities: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
     }).then((response) => {
       setDisableSubmit(false);
 
@@ -68,7 +68,7 @@ const EntityShareSettings = ({
     setDisableSubmit(true);
 
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_roles: selectedGranteeRoles.remove(granteeId),
+      selected_grantee_capabilities: selectedGranteeCapabilities.remove(granteeId),
     }).then((response) => {
       setDisableSubmit(false);
 
@@ -88,15 +88,15 @@ const EntityShareSettings = ({
       </Section>
       <Section>
         <GranteesSelector availableGrantees={filteredGrantees}
-                          availableRoles={availableRoles}
+                          availableCapabilities={availableCapabilities}
                           onSubmit={_handleSelection} />
       </Section>
       <Section>
         <GranteesList activeShares={activeShares}
-                      availableRoles={availableRoles}
+                      availableCapabilities={availableCapabilities}
                       entityGRN={entityGRN}
                       onDelete={_handleDeletion}
-                      onRoleChange={_handleSelection}
+                      onCapabilityChange={_handleSelection}
                       selectedGrantees={selectedGrantees}
                       title="Current collaborators" />
       </Section>

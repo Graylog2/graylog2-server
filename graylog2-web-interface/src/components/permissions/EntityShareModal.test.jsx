@@ -65,7 +65,7 @@ describe('EntityShareModal', () => {
     await wait(() => {
       expect(EntityShareActions.update).toBeCalledTimes(1);
 
-      expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, { grantee_roles: mockEntityShareState.selectedGranteeRoles });
+      expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, { grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities });
     });
   });
 
@@ -119,7 +119,7 @@ describe('EntityShareModal', () => {
 
   describe('grantee selector', () => {
     describe('adds new selected grantee', () => {
-      const addGrantee = async ({ newGrantee, role }) => {
+      const addGrantee = async ({ newGrantee, capability }) => {
         const { getByText, getByLabelText } = render(<SimpleEntityShareModal />);
 
         // Select a grantee
@@ -129,12 +129,12 @@ describe('EntityShareModal', () => {
 
         await selectEvent.select(granteesSelect, newGrantee.title);
 
-        // Select a role
-        const roleSelect = getByLabelText('Select a role');
+        // Select a capability
+        const capabilitySelect = getByLabelText('Select a capability');
 
-        await selectEvent.openMenu(roleSelect);
+        await selectEvent.openMenu(capabilitySelect);
 
-        await act(async () => { await selectEvent.select(roleSelect, role.title); });
+        await act(async () => { await selectEvent.select(capabilitySelect, capability.title); });
 
         // Submit form
         const submitButton = getByText('Add Collaborator');
@@ -145,13 +145,13 @@ describe('EntityShareModal', () => {
           expect(EntityShareActions.prepare).toBeCalledTimes(2);
 
           expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
-            selected_grantee_roles: mockEntityShareState.selectedGranteeRoles.merge({ [newGrantee.id]: role.id }),
+            selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
           });
-        });
+        })
       };
 
       it.each`
-        newGrantee  | granteeType   | role
+        newGrantee  | granteeType   | capability
         ${john}     | ${'user'}     | ${viewer}
         ${everyone} | ${'everyone'} | ${manager}
         ${security} | ${'team'}     | ${owner}
@@ -177,21 +177,21 @@ describe('EntityShareModal', () => {
       expect(getByText(ownerTitle)).not.toBeNull();
     });
 
-    it('allows updating the role of a grantee', async () => {
+    it('allows updating the capability of a grantee', async () => {
       const ownerTitle = jane.title;
       const { getByLabelText } = render(<SimpleEntityShareModal />);
 
-      const roleSelect = getByLabelText(`Change the role for ${ownerTitle}`);
+      const capabilitySelect = getByLabelText(`Change the capability for ${ownerTitle}`);
 
-      await selectEvent.openMenu(roleSelect);
+      await selectEvent.openMenu(capabilitySelect);
 
-      await act(async () => { await selectEvent.select(roleSelect, viewer.title); });
+      await act(async () => { await selectEvent.select(capabilitySelect, viewer.title); });
 
       await wait(() => {
         expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
         expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
-          selected_grantee_roles: mockEntityShareState.selectedGranteeRoles.merge({ [jane.id]: viewer.id }),
+          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
         });
       });
     });
@@ -202,30 +202,30 @@ describe('EntityShareModal', () => {
         .builder()
         .grant('grant-id-1')
         .grantee(jane.id)
-        .role(owner.id)
+        .capability(owner.id)
         .build();
       const securityIsManager = ActiveShare
         .builder()
         .grant('grant-id-2')
         .grantee(security.id)
-        .role(manager.id)
+        .capability(manager.id)
         .build();
       const everyoneIsViewer = ActiveShare
         .builder()
         .grant('grant-id-3')
         .grantee(everyone.id)
-        .role(viewer.id)
+        .capability(viewer.id)
         .build();
       const activeShares = Immutable.List([janeIsOwner, securityIsManager, everyoneIsViewer]);
-      const selectedGranteeRoles = Immutable.Map({
-        [janeIsOwner.grantee]: janeIsOwner.role,
-        [securityIsManager.grantee]: securityIsManager.role,
-        [everyoneIsViewer.grantee]: everyoneIsViewer.role,
+      const selectedGranteeCapabilities = Immutable.Map({
+        [janeIsOwner.grantee]: janeIsOwner.capability,
+        [securityIsManager.grantee]: securityIsManager.capability,
+        [everyoneIsViewer.grantee]: everyoneIsViewer.capability,
       });
       const enitityShareState = mockEntityShareState
         .toBuilder()
         .activeShares(activeShares)
-        .selectedGranteeRoles(selectedGranteeRoles)
+        .selectedGranteeCapabilities(selectedGranteeCapabilities)
         .build();
 
       beforeEach(() => {
@@ -243,13 +243,13 @@ describe('EntityShareModal', () => {
           expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
-            selected_grantee_roles: selectedGranteeRoles.remove(grantee.id),
+            selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
           });
         });
       };
 
       it.each`
-        grantee     | granteeType   | role
+        grantee     | granteeType   | capability
         ${jane}     | ${'user'}     | ${viewer}
         ${security} | ${'team'}     | ${manager}
         ${everyone} | ${'everyone'} | ${owner}

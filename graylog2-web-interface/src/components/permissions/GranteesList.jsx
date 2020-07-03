@@ -5,9 +5,9 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import { Pagination, PageSizeSelect } from 'components/common';
-import EntityShareState, { type ActiveShares, type AvailableRoles, type SelectedGrantees } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type ActiveShares, type AvailableCapabilities, type SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
-import Role from 'logic/permissions/Role';
+import Capability from 'logic/permissions/Capability';
 import { type ThemeInterface } from 'theme';
 
 import GranteesListItem from './GranteesListItem';
@@ -20,10 +20,10 @@ const Header = styled.div`
 
 const List: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
   >:nth-child(even) {
-    background: ${theme.colors.table.backgroundAlt};
+    background: ${theme.colors.global.backgroundAlt};
   };
   >:nth-child(odd) {
-    background: ${theme.colors.table.background};
+    background: ${theme.colors.global.background};
   };
 `);
 
@@ -46,13 +46,13 @@ const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => `
 
 type Props = {
   activeShares: ActiveShares,
-  availableRoles: AvailableRoles,
+  availableCapabilities: AvailableCapabilities,
   className?: string,
   entityGRN: GRN,
   onDelete: (GRN) => Promise<EntityShareState>,
-  onRoleChange: ({
+  onCapabilityChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
-    roleId: $PropertyType<Role, 'id'>,
+    capabilityId: $PropertyType<Capability, 'id'>,
   }) => Promise<EntityShareState>,
   selectedGrantees: SelectedGrantees,
   title: string,
@@ -65,7 +65,7 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
   return selectedGrantees.slice(begin, end);
 };
 
-const GranteesList = ({ activeShares, onDelete, onRoleChange, entityGRN, availableRoles, selectedGrantees, className, title }: Props) => {
+const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, availableCapabilities, selectedGrantees, className, title }: Props) => {
   const pageSizes = [10, 50, 100];
   const [pageSize, setPageSize] = useState(pageSizes[0]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,13 +83,13 @@ const GranteesList = ({ activeShares, onDelete, onRoleChange, entityGRN, availab
           const currentGranteeState = grantee.currentState(activeShares);
 
           return (
-            <GranteesListItem availableRoles={availableRoles}
+            <GranteesListItem availableCapabilities={availableCapabilities}
                               currentGranteeState={currentGranteeState}
                               entityGRN={entityGRN}
                               grantee={grantee}
                               key={grantee.id}
                               onDelete={onDelete}
-                              onRoleChange={onRoleChange} />
+                              onCapabilityChange={onCapabilityChange} />
           );
         })}
       </List>

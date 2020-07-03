@@ -8,18 +8,18 @@ import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { GRN } from 'logic/permissions/types';
-import EntityShareState, { type EntityShareStateJson, type SelectedGranteeRoles } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type EntityShareStateJson, type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 
 type EntityShareStoreState = {
   state: EntityShareState,
 };
 
 type EntitySharePreparePayload = {|
-  selected_grantee_roles?: SelectedGranteeRoles,
+  selected_grantee_capabilities?: SelectedGranteeCapabilities,
 |};
 
 type EntityShareUpdatePayload = {|
-  grantee_roles?: SelectedGranteeRoles,
+  grantee_capabilities?: SelectedGranteeCapabilities,
 |};
 
 type EntityShareActionsType = RefluxActions<{
@@ -30,7 +30,7 @@ type EntityShareActionsType = RefluxActions<{
 type EntityShareStoreType = Store<EntityShareStoreState>;
 
 const defaultPreparePayload = {
-  selected_grantee_roles: Immutable.Map(),
+  selected_grantee_capabilities: Immutable.Map(),
 };
 
 export const EntityShareActions: EntityShareActionsType = singletonActions(
