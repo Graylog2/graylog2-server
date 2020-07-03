@@ -33,31 +33,31 @@ describe('EntityShareState', () => {
         .builder()
         .grant('grant-jane-id')
         .grantee(jane.id)
-        .role(owner.id)
+        .capability(owner.id)
         .build();
       const everyoneIsViewer = ActiveShare
         .builder()
         .grant('grant-everyone-id')
         .grantee(everyone.id)
-        .role(viewer.id)
+        .capability(viewer.id)
         .build();
       const securityIsManager = ActiveShare
         .builder()
         .grant('grant-security-id')
         .grantee(security.id)
-        .role(manager.id)
+        .capability(manager.id)
         .build();
       const activeShares = Immutable.List([janeIsOwner, everyoneIsViewer, securityIsManager]);
 
       const selection = Immutable.Map({
-        [janeIsOwner.grantee]: janeIsOwner.role,
-        [everyoneIsViewer.grantee]: everyoneIsViewer.role,
-        [securityIsManager.grantee]: securityIsManager.role,
+        [janeIsOwner.grantee]: janeIsOwner.capability,
+        [everyoneIsViewer.grantee]: everyoneIsViewer.capability,
+        [securityIsManager.grantee]: securityIsManager.capability,
       });
 
       const { selectedGrantees } = entityShareStateFixture.toBuilder()
         .activeShares(activeShares)
-        .selectedGranteeRoles(selection)
+        .selectedGranteeCapabilities(selection)
         .build();
 
       const [first, second, third] = selectedGrantees.toArray();
@@ -72,38 +72,38 @@ describe('EntityShareState', () => {
         .builder()
         .grant('grant-jane-id')
         .grantee(jane.id)
-        .role(owner.id)
+        .capability(owner.id)
         .build();
       const aliceIsOwner = ActiveShare
         .builder()
         .grant('grant-jane-id')
         .grantee(alice.id)
-        .role(owner.id)
+        .capability(owner.id)
         .build();
       const bobIsViewer = ActiveShare
         .builder()
         .grant('grant-bob-id')
         .grantee(bob.id)
-        .role(viewer.id)
+        .capability(viewer.id)
         .build();
       const johnIsManager = ActiveShare
         .builder()
         .grant('grant-john-id')
         .grantee(john.id)
-        .role(manager.id)
+        .capability(manager.id)
         .build();
       const activeShares = Immutable.List([janeIsOwner, aliceIsOwner, bobIsViewer, johnIsManager]);
 
       const selection = Immutable.Map({
-        [janeIsOwner.grantee]: janeIsOwner.role,
-        [aliceIsOwner.grantee]: aliceIsOwner.role,
-        [bobIsViewer.grantee]: bobIsViewer.role,
-        [johnIsManager.grantee]: johnIsManager.role,
+        [janeIsOwner.grantee]: janeIsOwner.capability,
+        [aliceIsOwner.grantee]: aliceIsOwner.capability,
+        [bobIsViewer.grantee]: bobIsViewer.capability,
+        [johnIsManager.grantee]: johnIsManager.capability,
       });
 
       const { selectedGrantees } = entityShareStateFixture.toBuilder()
         .activeShares(activeShares)
-        .selectedGranteeRoles(selection)
+        .selectedGranteeCapabilities(selection)
         .build();
 
       const [first, second, third, forth] = selectedGrantees.toArray();

@@ -1,11 +1,11 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { Role as RoleType } from 'logic/permissions/types';
+import type { Capability as CapabilityType } from 'logic/permissions/types';
 
-type InternalState = RoleType;
+type InternalState = CapabilityType;
 
-export default class Role {
+export default class Capability {
   _value: InternalState;
 
   constructor(
@@ -37,10 +37,10 @@ export default class Role {
     return { id, title };
   }
 
-  static fromJSON(value: InternalState): Role {
+  static fromJSON(value: InternalState): Capability {
     const { id, title } = value;
 
-    return Role
+    return Capability
       .builder()
       .id(id)
       .title(title)
@@ -71,9 +71,9 @@ class Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  build(): Role {
+  build(): Capability {
     const { id, title } = this.value.toObject();
 
-    return new Role(id, title);
+    return new Capability(id, title);
   }
 }

@@ -2,7 +2,7 @@
 
 export type GRN = string;
 
-export type Role = {|
+export type Capability = {|
   id: GRN,
   title: 'Viewer' | 'Manager' | 'Owner',
 |};
@@ -16,7 +16,7 @@ export type Grantee = {|
 export type ActiveShare = {|
   grant: GRN,
   grantee: GRN,
-  role: GRN,
+  capability: GRN,
 |};
 
 export type MissingDependency = {|

@@ -3,14 +3,14 @@ import * as Immutable from 'immutable';
 
 import type {
   Grantee as GranteeType,
-  Role as RoleType,
+  Capability as CapabilityType,
   MissingDependency as MissingDependencyType,
   ActiveShare as ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 
-import Role from './Role';
+import Capability from './Capability';
 import Grantee from './Grantee';
 import ActiveShare from './ActiveShare';
 import MissingDependency from './MissingDependency';
@@ -18,10 +18,10 @@ import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
 
 export type AvailableGrantees = Immutable.List<Grantee>;
-export type AvailableRoles = Immutable.List<Role>;
+export type AvailableCapabilities = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare>;
 export type MissingDependencies = Immutable.Map<GRN, Immutable.List<MissingDependency>>;
-export type SelectedGranteeRoles = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<RoleType, 'id'>>;
+export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
 const mockMissingDependencies = () => {
@@ -65,19 +65,19 @@ const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>)
 type InternalState = {|
   entity: GRN,
   availableGrantees: AvailableGrantees,
-  availableRoles: AvailableRoles,
+  availableCapabilities: AvailableCapabilities,
   activeShares: ActiveShares,
-  selectedGranteeRoles: SelectedGranteeRoles,
+  selectedGranteeCapabilities: SelectedGranteeCapabilities,
   missingDependencies: MissingDependencies,
 |};
 
 export type EntityShareStateJson = {|
   entity: $PropertyType<InternalState, 'entity'>,
   available_grantees: Array<GranteeType>,
-  available_roles: Array<RoleType>,
+  available_capabilities: Array<CapabilityType>,
   active_shares: Array<ActiveShareType>,
-  selected_grantee_roles: {|
-    [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Role, 'id'>,
+  selected_grantee_capabilities: {|
+    [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
   |} | {||},
   missing_dependencies: {[GRN]: Array<MissingDependencyType>},
 |};
@@ -88,17 +88,17 @@ export default class EntityShareState {
   constructor(
     entity: $PropertyType<InternalState, 'entity'>,
     availableGrantees: $PropertyType<InternalState, 'availableGrantees'>,
-    availableRoles: $PropertyType<InternalState, 'availableRoles'>,
+    availableCapabilities: $PropertyType<InternalState, 'availableCapabilities'>,
     activeShares: $PropertyType<InternalState, 'activeShares'>,
-    selectedGranteeRoles: $PropertyType<InternalState, 'selectedGranteeRoles'>,
+    selectedGranteeCapabilities: $PropertyType<InternalState, 'selectedGranteeCapabilities'>,
     missingDependencies: $PropertyType<InternalState, 'missingDependencies'>,
   ) {
     this._value = {
       entity,
       availableGrantees: _sortAndOrderGrantees<Grantee>(availableGrantees),
-      availableRoles,
+      availableCapabilities: availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities: selectedGranteeCapabilities,
       missingDependencies: mockMissingDependencies(),
     };
   }
@@ -111,16 +111,16 @@ export default class EntityShareState {
     return this._value.availableGrantees;
   }
 
-  get availableRoles(): $PropertyType<InternalState, 'availableRoles'> {
-    return this._value.availableRoles;
+  get availableCapabilities(): $PropertyType<InternalState, 'availableCapabilities'> {
+    return this._value.availableCapabilities;
   }
 
   get activeShares(): $PropertyType<InternalState, 'activeShares'> {
     return this._value.activeShares;
   }
 
-  get selectedGranteeRoles(): $PropertyType<InternalState, 'selectedGranteeRoles'> {
-    return this._value.selectedGranteeRoles;
+  get selectedGranteeCapabilities(): $PropertyType<InternalState, 'selectedGranteeCapabilities'> {
+    return this._value.selectedGranteeCapabilities;
   }
 
   get missingDependencies(): $PropertyType<InternalState, 'missingDependencies'> {
@@ -130,7 +130,7 @@ export default class EntityShareState {
   get selectedGrantees() {
     const _userLookup = (userId: GRN) => this._value.availableGrantees.find((grantee) => grantee.id === userId);
 
-    const granteesWithRole: Immutable.List<SelectedGrantee> = this._value.selectedGranteeRoles.entrySeq().map(([granteeId, roleId]) => {
+    const granteesWithCapabilities: Immutable.List<SelectedGrantee> = this._value.selectedGranteeCapabilities.entrySeq().map(([granteeId, roleId]) => {
       const grantee = _userLookup(granteeId);
 
       if (!grantee) {
@@ -140,7 +140,7 @@ export default class EntityShareState {
       return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
     }).toList();
 
-    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithRole);
+    return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities);
   }
 
   // eslint-disable-next-line no-use-before-define
@@ -148,9 +148,9 @@ export default class EntityShareState {
     const {
       entity,
       availableGrantees,
-      availableRoles,
+      availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities,
       missingDependencies,
     } = this._value;
 
@@ -158,9 +158,9 @@ export default class EntityShareState {
     return new Builder(Immutable.Map({
       entity,
       availableGrantees,
-      availableRoles,
+      availableCapabilities: availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities: selectedGranteeCapabilities,
       missingDependencies,
     }));
   }
@@ -169,18 +169,18 @@ export default class EntityShareState {
     const {
       entity,
       availableGrantees,
-      availableRoles,
+      availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities,
       missingDependencies,
     } = this._value;
 
     return {
       entity,
       available_grantees: availableGrantees,
-      available_roles: availableRoles,
+      available_capabilities: availableCapabilities,
       active_shares: activeShares,
-      selected_grantee_roles: selectedGranteeRoles,
+      selected_grantee_capabilities: selectedGranteeCapabilities,
       missing_dependencies: missingDependencies,
     };
   }
@@ -190,16 +190,16 @@ export default class EntityShareState {
     const {
       entity,
       available_grantees,
-      available_roles,
+      available_capabilities,
       active_shares,
-      selected_grantee_roles,
+      selected_grantee_capabilities,
       missing_dependencies,
     } = value;
 
     const availableGrantees = Immutable.fromJS(available_grantees.map((ag) => Grantee.fromJSON(ag)));
-    const availableRoles = Immutable.fromJS(available_roles.map((ar) => Role.fromJSON(ar)));
+    const availableCapabilities = Immutable.fromJS(available_capabilities.map((ar) => Capability.fromJSON(ar)));
     const activeShares = Immutable.fromJS(active_shares.map((as) => ActiveShare.fromJSON(as)));
-    const selectedGranteeRoles = Immutable.fromJS(selected_grantee_roles);
+    const selectedGranteeCapabilities = Immutable.fromJS(selected_grantee_capabilities);
     const missingDependencies = Immutable.fromJS(
       Object.entries(missing_dependencies).map(
         ([granteeGRN, dependencyList]) => ({
@@ -213,9 +213,9 @@ export default class EntityShareState {
     return new EntityShareState(
       entity,
       availableGrantees,
-      availableRoles,
+      availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities,
       missingDependencies,
     );
   }
@@ -244,16 +244,16 @@ class Builder {
     return new Builder(this.value.set('availableGrantees', value));
   }
 
-  availableRoles(value: $PropertyType<InternalState, 'availableRoles'>): Builder {
-    return new Builder(this.value.set('availableRoles', value));
+  availableCapabilities(value: $PropertyType<InternalState, 'availableCapabilities'>): Builder {
+    return new Builder(this.value.set('availableCapabilities', value));
   }
 
   activeShares(value: $PropertyType<InternalState, 'activeShares'>): Builder {
     return new Builder(this.value.set('activeShares', value));
   }
 
-  selectedGranteeRoles(value: $PropertyType<InternalState, 'selectedGranteeRoles'>): Builder {
-    return new Builder(this.value.set('selectedGranteeRoles', value));
+  selectedGranteeCapabilities(value: $PropertyType<InternalState, 'selectedGranteeCapabilities'>): Builder {
+    return new Builder(this.value.set('selectedGranteeCapabilities', value));
   }
 
   missingDependencies(value: $PropertyType<InternalState, 'missingDependencies'>): Builder {
@@ -264,18 +264,18 @@ class Builder {
     const {
       entity,
       availableGrantees,
-      availableRoles,
+      availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities,
       missingDependencies,
     } = this.value.toObject();
 
     return new EntityShareState(
       entity,
       availableGrantees,
-      availableRoles,
+      availableCapabilities,
       activeShares,
-      selectedGranteeRoles,
+      selectedGranteeCapabilities,
       missingDependencies,
     );
   }

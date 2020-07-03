@@ -9,20 +9,20 @@ import SelectedGrantee from './SelectedGrantee';
 describe('SelectedGrantee', () => {
   const aliceIsOwner = ActiveShare.builder()
     .grant('grant-alice-id')
-    .role(owner.id)
+    .capability(owner.id)
     .grantee(alice.id)
     .build();
   const activeShares = Immutable.List([aliceIsOwner]);
 
-  const checkCurrentState = ({ grantee, role, expectedReturn }) => {
-    const selectedGrantee = SelectedGrantee.create(grantee.id, grantee.title, grantee.type, role.id);
+  const checkCurrentState = ({ grantee, capability, expectedReturn }) => {
+    const selectedGrantee = SelectedGrantee.create(grantee.id, grantee.title, grantee.type, capability.id);
     const state = selectedGrantee.currentState(activeShares);
 
     expect(state).toBe(expectedReturn);
   };
 
   it.each`
-        grantee  | role       | expectedReturn
+        grantee  | capability | expectedReturn
         ${alice} | ${owner}   | ${'unchanged'}
         ${alice} | ${manager} | ${'changed'}
         ${bob}   | ${manager} | ${'new'}
