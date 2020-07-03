@@ -147,7 +147,7 @@ describe('EntityShareModal', () => {
           expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
             selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
           });
-        })
+        });
       };
 
       it.each`
