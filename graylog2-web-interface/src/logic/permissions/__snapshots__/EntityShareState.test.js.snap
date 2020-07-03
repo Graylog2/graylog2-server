@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EntityShareState should import from json 1`] = `
+Object {
+  "active_shares": Immutable.List [
+    Object {
+      "grant": "grn::::grant:5ee2393bb3ceb9225f056efe",
+      "grantee": "grn::::user:john",
+      "role": "grn::::role:54e3deadbeefdeadbeef0002",
+    },
+  ],
+  "available_grantees": Immutable.List [
+    Object {
+      "id": "grn::::builtin-team:everyone",
+      "title": "Everyone",
+      "type": "global",
+    },
+    Object {
+      "id": "grn::::team:security",
+      "title": "Security Folks",
+      "type": "team",
+    },
+    Object {
+      "id": "grn::::user:jane",
+      "title": "Jane Doe",
+      "type": "user",
+    },
+    Object {
+      "id": "grn::::user:john",
+      "title": "John Doe",
+      "type": "user",
+    },
+  ],
+  "available_roles": Immutable.List [
+    Object {
+      "id": "grn::::role:54e3deadbeefdeadbeef0000",
+      "title": "Viewer",
+    },
+    Object {
+      "id": "grn::::role:54e3deadbeefdeadbeef0001",
+      "title": "Manager",
+    },
+    Object {
+      "id": "grn::::role:54e3deadbeefdeadbeef0002",
+      "title": "Owner",
+    },
+  ],
+  "entity": "grn::::dashboard:57bc9188e62a2373778d9e06",
+  "missing_dependencies": Immutable.Map {
+    "grn::::team:abc123": Immutable.List [
+      Object {
+        "id": "grn::::stream:57bc9188e62a2373778d9e03",
+        "owners": Immutable.List [
+          Object {
+            "id": "grn::::user:jane",
+            "title": "Jane Doe",
+            "type": "user",
+          },
+          Object {
+            "id": "grn::::team:reporting",
+            "title": "Reporting",
+            "type": "team",
+          },
+        ],
+        "title": "Security Data",
+        "type": "stream",
+      },
+    ],
+  },
+  "selected_grantee_roles": Immutable.Map {
+    "grn::::user:jane": "grn::::role:54e3deadbeefdeadbeef0001",
+    "grn::::team:security": "grn::::role:54e3deadbeefdeadbeef0000",
+  },
+}
+`;
