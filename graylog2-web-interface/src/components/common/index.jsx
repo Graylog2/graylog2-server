@@ -33,6 +33,7 @@ export { default as OverlayElement } from './OverlayElement';
 export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';
 export { default as Pagination } from './Pagination';
+export { default as PageSizeSelect } from './PageSizeSelect';
 export { default as PaginatedList } from './PaginatedList';
 export { default as Pluralize } from './Pluralize';
 export { default as ReactGridContainer } from './ReactGridContainer';

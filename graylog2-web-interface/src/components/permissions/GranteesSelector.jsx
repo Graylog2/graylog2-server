@@ -22,6 +22,7 @@ export type SelectionRequest = {
 type Props = {
   availableGrantees: AvailableGrantees,
   availableRoles: AvailableRoles,
+  className?: string,
   onSubmit: SelectionRequest => Promise<EntityShareState>,
 };
 
@@ -89,47 +90,53 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-const GranteesSelector = ({ availableGrantees, availableRoles, onSubmit }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableRoles, className, onSubmit }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialRoleId = _initialRoleId(availableRoles);
 
   return (
-    <Formik onSubmit={(data) => onSubmit(data)}
-            initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
-      {({ isSubmitting, isValid, errors }) => (
-        <Form>
-          <FormElements>
-            <StyledSelectGroup>
-              <Field name="granteeId" validate={_isRequired('grantee')}>
-                {({ field: { name, value, onChange } }) => (
-                  <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
-                                  onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-                                  optionRenderer={_renderGranteesSelectOption}
-                                  options={granteesOptions}
-                                  placeholder="Search for users and teams"
-                                  value={value} />
-                )}
-              </Field>
-              <RolesSelect roles={availableRoles} />
-            </StyledSelectGroup>
-            <SubmitButton bsStyle="success"
-                          disabled={isSubmitting || !isValid}
-                          title="Add Collaborator"
-                          type="submit">
-              Add Collaborator
-            </SubmitButton>
-          </FormElements>
-          {errors && (
-            <Errors>
-              {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => (
-                <span key={fieldKey}>{String(value)}.</span>
-              ))}
-            </Errors>
-          )}
-        </Form>
-      )}
-    </Formik>
+    <div className={className}>
+      <Formik onSubmit={(data) => onSubmit(data)}
+              initialValues={{ granteeId: undefined, roleId: initialRoleId }}>
+        {({ isSubmitting, isValid, errors }) => (
+          <Form>
+            <FormElements>
+              <StyledSelectGroup>
+                <Field name="granteeId" validate={_isRequired('grantee')}>
+                  {({ field: { name, value, onChange } }) => (
+                    <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
+                                    onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+                                    optionRenderer={_renderGranteesSelectOption}
+                                    options={granteesOptions}
+                                    placeholder="Search for users and teams"
+                                    value={value} />
+                  )}
+                </Field>
+                <RolesSelect roles={availableRoles} />
+              </StyledSelectGroup>
+              <SubmitButton bsStyle="success"
+                            disabled={isSubmitting || !isValid}
+                            title="Add Collaborator"
+                            type="submit">
+                Add Collaborator
+              </SubmitButton>
+            </FormElements>
+            {errors && (
+              <Errors>
+                {Object.entries(errors).map(([fieldKey, value]: [string, mixed]) => (
+                  <span key={fieldKey}>{String(value)}.</span>
+                ))}
+              </Errors>
+            )}
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
+};
+
+GranteesSelector.defaultProps = {
+  className: undefined,
 };
 
 export default GranteesSelector;

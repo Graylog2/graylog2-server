@@ -25,11 +25,10 @@ const currentStateColor = (theme: ThemeInterface, currentState: CurrentGranteeSt
   }
 };
 
-const Container: StyledComponent<{ currentState: CurrentGranteeState }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, currentState }) => `
+const Container: StyledComponent<{ currentState: CurrentGranteeState }, ThemeInterface, HTMLLIElement> = styled.li(({ theme, currentState }) => `
   display: flex;
   align-items: center;
   width: 100%;
-  margin-bottom: 5px;
   padding: 5px;
   border-left: 5px solid ${currentStateColor(theme, currentState)};
 `);
