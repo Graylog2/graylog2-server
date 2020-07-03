@@ -64,4 +64,23 @@ public class DBGrantServiceTest {
         assertThat(dbService.getForGranteesOrGlobal(Collections.singleton(jane))).hasSize(3);
         assertThat(dbService.getForGranteesOrGlobal(Collections.singleton(john))).hasSize(2);
     }
+
+    @Test
+    @MongoDBFixtures("grants.json")
+    public void getForTarget() {
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
+        final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
+
+        assertThat(dbService.getForTarget(stream1)).hasSize(1);
+        assertThat(dbService.getForTarget(stream2)).hasSize(3);
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
+    public void getForTargetExcludingGrantee() {
+        final GRN stream = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
+        final GRN grantee = grnRegistry.parse("grn::::user:john");
+
+        assertThat(dbService.getForTargetExcludingGrantee(stream, grantee)).hasSize(2);
+    }
 }

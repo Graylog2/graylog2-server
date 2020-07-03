@@ -110,9 +110,6 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
         checkOwnership(grn);
 
-        final String userName = requireNonNull(getCurrentUser()).getName();
-        final GRN currentUser = grnRegistry.newGRN("user", userName);
-
         // TODO: We need to make the return value of this resource more useful to the frontend
         //       (e.g. returning a list of entities with title, etc.)
         final List<GrantDTO> grants = grantService.getForTarget(grn);

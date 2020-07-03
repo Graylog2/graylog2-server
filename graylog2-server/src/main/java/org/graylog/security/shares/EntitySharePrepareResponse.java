@@ -35,6 +35,9 @@ public abstract class EntitySharePrepareResponse {
     @JsonProperty("entity")
     public abstract String entity();
 
+    @JsonProperty("sharing_user")
+    public abstract GRN sharingUser();
+
     @JsonProperty("available_grantees")
     public abstract ImmutableSet<AvailableGrantee> availableGrantees();
 
@@ -66,6 +69,9 @@ public abstract class EntitySharePrepareResponse {
 
         @JsonProperty("entity")
         public abstract Builder entity(String entity);
+
+        @JsonProperty("sharing_user")
+        public abstract Builder sharingUser(GRN sharingUser);
 
         @JsonProperty("available_grantees")
         public abstract Builder availableGrantees(Set<AvailableGrantee> availableGrantees);
