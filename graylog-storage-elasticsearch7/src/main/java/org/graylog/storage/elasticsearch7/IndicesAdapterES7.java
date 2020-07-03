@@ -38,6 +38,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -72,14 +74,17 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final ElasticsearchClient client;
     private final StatsApi statsApi;
     private final CatApi catApi;
+    private final ClusterStateApi clusterStateApi;
 
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StatsApi statsApi,
-                             CatApi catApi) {
+                             CatApi catApi,
+                             ClusterStateApi clusterStateApi) {
         this.client = client;
         this.statsApi = statsApi;
         this.catApi = catApi;
+        this.clusterStateApi = clusterStateApi;
     }
 
     @Override
@@ -260,9 +265,10 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    // TODO: needs implementation
     public Map<String, Set<String>> fieldsInIndices(String[] writeIndexWildcards) {
-        return null;
+        final List<String> indexWildCards = Arrays.asList(writeIndexWildcards);
+        return client.execute((c, requestOptions) -> clusterStateApi.fields(c, requestOptions, indexWildCards),
+                "Unable to retrieve fields from indices: " + indexWildCards);
     }
 
     @Override
