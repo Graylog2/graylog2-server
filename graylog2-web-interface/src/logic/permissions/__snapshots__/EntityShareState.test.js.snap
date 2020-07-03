@@ -46,27 +46,29 @@ Object {
     },
   ],
   "entity": "grn::::dashboard:57bc9188e62a2373778d9e06",
-  "missing_dependencies": Immutable.Map {
-    "grn::::team:abc123": Immutable.List [
-      Object {
-        "id": "grn::::stream:57bc9188e62a2373778d9e03",
-        "owners": Immutable.List [
-          Object {
-            "id": "grn::::user:jane",
-            "title": "Jane Doe",
-            "type": "user",
-          },
-          Object {
-            "id": "grn::::team:reporting",
-            "title": "Reporting",
-            "type": "team",
-          },
-        ],
-        "title": "Security Data",
-        "type": "stream",
-      },
-    ],
-  },
+  "missing_dependencies": Immutable.List [
+    Immutable.Map {
+      "grn::::user:jane": Immutable.List [
+        Object {
+          "id": "grn::::stream:57bc9188e62a2373778d9e03",
+          "owners": Immutable.List [
+            Object {
+              "id": "grn::::user:john",
+              "title": "Jane Doe",
+              "type": "user",
+            },
+            Object {
+              "id": "grn::::team:security",
+              "title": "Security Folks",
+              "type": "team",
+            },
+          ],
+          "title": "Security Data",
+          "type": "stream",
+        },
+      ],
+    },
+  ],
   "selected_grantee_capabilities": Immutable.Map {
     "grn::::user:jane": "grn::::capability:54e3deadbeefdeadbeef0001",
     "grn::::team:security": "grn::::capability:54e3deadbeefdeadbeef0000",
