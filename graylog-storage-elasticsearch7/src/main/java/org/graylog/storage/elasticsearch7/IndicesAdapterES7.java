@@ -37,6 +37,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch7.state.StateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -68,12 +69,15 @@ import static java.util.stream.Collectors.toList;
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
     private final ElasticsearchClient client;
+    private final StateApi stateApi;
     private final StatsApi statsApi;
 
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
+                             StateApi stateApi,
                              StatsApi statsApi) {
         this.client = client;
+        this.stateApi = stateApi;
         this.statsApi = statsApi;
     }
 
@@ -137,7 +141,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public Optional<DateTime> indexCreationDate(String index) {
         final GetSettingsRequest request = new GetSettingsRequest()
                 .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, false, true, false));
+                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
 
         final GetSettingsResponse result = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Couldn't read settings of index " + index);
@@ -154,7 +158,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public void openIndex(String index) {
         final OpenIndexRequest request = new OpenIndexRequest(index);
 
-        client.execute((c, requestOptions) -> c.indices().open(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().open(request, requestOptions),
+                "Unable to open index " + index);
     }
 
     @Override
@@ -179,7 +184,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public void flush(String index) {
         final FlushRequest request = new FlushRequest(index);
 
-        client.execute((c, requestOptions) -> c.indices().flush(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().flush(request, requestOptions),
+                "Unable to flush index " + index);
     }
 
     @Override
@@ -201,19 +207,23 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public void removeAlias(String index, String alias) {
         final DeleteAliasRequest request = new DeleteAliasRequest(index, alias);
 
-        client.execute((c, requestOptions) -> c.indices().deleteAlias(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().deleteAlias(request, requestOptions),
+                "Unable to remove alias " + alias + ", pointing to " + index);
     }
 
     @Override
     public void close(String index) {
         final CloseIndexRequest request = new CloseIndexRequest(index);
 
-        client.execute((c, requestOptions) -> c.indices().close(request, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().close(request, requestOptions),
+                "Unable to close index " + index);
     }
 
     @Override
     public long numberOfMessages(String index) {
-
+        final JsonNode result = client.execute((c, requestOptions) -> statsApi.indexStats(c, index),
+                "Unable to retrieve index stats for " + index);
+        return result.path("primaries").path("docs").path("count").asLong();
     }
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
@@ -249,28 +259,38 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
+    // TODO: needs implementation
     public Map<String, Set<String>> fieldsInIndices(String[] writeIndexWildcards) {
         return null;
     }
 
     @Override
+    // TODO: needs implementation
     public Set<String> closedIndices(Collection<String> indices) {
         return null;
     }
 
     @Override
+    // TODO: needs implementation
     public Set<IndexStatistics> indicesStats(Collection<String> indices) {
         return null;
     }
 
     @Override
     public Optional<IndexStatistics> getIndexStats(String index) {
-        return Optional.empty();
+        final JsonNode indexStats = client.execute((c, requestOptions) -> statsApi.indexStatsWithShardLevel(c, index),
+                "Unable to retrieve index stats for " + index);
+        return indexStats.isMissingNode()
+                ? Optional.empty()
+                : Optional.of(IndexStatistics.create(index, indexStats));
     }
 
     @Override
-    public JsonNode getIndexStats(Collection<String> index) {
-        return null;
+    public JsonNode getIndexStats(Collection<String> indices) {
+        final JsonNode result = client.execute((c, requestOptions) -> statsApi.indexStatsWithDocsAndStore(c, indices),
+                "Couldn't check stats of indices " + indices);
+
+        return result.path("indices");
     }
 
     @Override
@@ -292,7 +312,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public Optional<Long> storeSizeInBytes(String index) {
-        final Map<String, Long> indexSizes = client.execute((c, options) -> statsApi.storeSizes(c));
+        final Map<String, Long> indexSizes = client.execute((c, options) -> stateApi.storeSizes(c));
         return Optional.ofNullable(indexSizes.get(index));
     }
 
@@ -403,16 +423,16 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public boolean isOpen(String index) {
-        return indexState(index).equals(StatsApi.State.Open);
+        return indexState(index).equals(StateApi.State.Open);
     }
 
     @Override
     public boolean isClosed(String index) {
-        return indexState(index).equals(StatsApi.State.Closed);
+        return indexState(index).equals(StateApi.State.Closed);
     }
 
-    private StatsApi.State indexState(String index) {
-        return client.execute((c, options) -> statsApi.indexState(c, index),
+    private StateApi.State indexState(String index) {
+        return client.execute((c, options) -> stateApi.indexState(c, index),
                 "Unable to retrieve index stats for " + index);
     }
 }

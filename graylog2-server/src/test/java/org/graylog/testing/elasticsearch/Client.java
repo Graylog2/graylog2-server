@@ -47,7 +47,7 @@ public interface Client {
     JsonNode getTemplate(String templateName);
 
     default JsonNode getTemplates() {
-        return getTemplate("");
+        return getTemplate("*");
     }
 
     void putTemplate(String templateName, Map<String, Object> source);
