@@ -52,6 +52,12 @@ public class GrantsAuthorizingRealm extends AuthorizingRealm {
         return info;
     }
 
+    // This class does not authenticate at all
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return false;
+    }
+
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         // This class does not authenticate at all
