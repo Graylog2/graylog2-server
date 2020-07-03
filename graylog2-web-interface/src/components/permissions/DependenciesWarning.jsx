@@ -14,6 +14,8 @@ type Props = {
 
 const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
   margin-top: 20px;
+  max-height: 240px;
+  overflow: auto;
 `;
 
 const Headline = styled.div`
@@ -42,14 +44,14 @@ const DependenciesWarning = ({ missingDependencies, selectedGrantees }: Props) =
 
           return (grantee && (
             <li key={grantee.id}>
-              {_cap(grantee.type)} {grantee.title} needs access to
+              {_cap(grantee.type)} <i>{grantee.title}</i> needs access to
               {dependencyList.map((dependecy) => (
                 <List key={dependecy.id}>
                   <li>
-                    {_cap(dependecy.type)}: {dependecy.title}<br />
+                    {_cap(dependecy.type)}: <i>{dependecy.title}</i><br />
                     Owners: {dependecy.owners.map((owner, key) => (
                       <span key={owner.id}>
-                        {_cap(owner.type)} {owner.title}
+                        {_cap(owner.type)} <i>{owner.title}</i>
                         {key !== dependecy.owners.size - 1 && ', '}
                       </span>
                     ))}
