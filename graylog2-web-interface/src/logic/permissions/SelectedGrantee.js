@@ -1,14 +1,14 @@
 // @flow strict
 import { type GranteeInterface } from './GranteeInterface';
 import Grantee from './Grantee';
-import Role from './Role';
+import Capability from './Capability';
 import type { ActiveShares } from './EntityShareState';
 
 type InternalState = {
   id: $PropertyType<Grantee, 'id'>,
   title: $PropertyType<Grantee, 'title'>,
   type: $PropertyType<Grantee, 'type'>,
-  roleId: $PropertyType<Role, 'id'>,
+  capabilityId: $PropertyType<Capability, 'id'>,
 };
 
 export type CurrentState = 'new' | 'changed' | 'unchanged';
@@ -20,9 +20,9 @@ export default class SelectedGrantee implements GranteeInterface {
     id: $PropertyType<InternalState, 'id'>,
     title: $PropertyType<InternalState, 'title'>,
     type: $PropertyType<InternalState, 'type'>,
-    roleId: $PropertyType<InternalState, 'roleId'>,
+    capabilityId: $PropertyType<InternalState, 'capabilityId'>,
   ) {
-    this._value = { id, title, type, roleId };
+    this._value = { id, title, type, capabilityId };
   }
 
   get id(): $PropertyType<InternalState, 'id'> {
@@ -37,16 +37,16 @@ export default class SelectedGrantee implements GranteeInterface {
     return this._value.type;
   }
 
-  get roleId(): $PropertyType<InternalState, 'roleId'> {
-    return this._value.roleId;
+  get capabilityId(): $PropertyType<InternalState, 'capabilityId'> {
+    return this._value.capabilityId;
   }
 
   currentState(activeShares: ActiveShares): CurrentState {
-    const { roleId, id } = this._value;
+    const { capabilityId, id } = this._value;
     const activeShare = activeShares.find((share) => share.grantee === id);
 
     if (!activeShare) return 'new';
-    if (activeShare.role !== roleId) return 'changed';
+    if (activeShare.capability !== capabilityId) return 'changed';
 
     return 'unchanged';
   }
@@ -55,8 +55,8 @@ export default class SelectedGrantee implements GranteeInterface {
     id: $PropertyType<InternalState, 'id'>,
     title: $PropertyType<InternalState, 'title'>,
     type: $PropertyType<InternalState, 'type'>,
-    roleId: $PropertyType<InternalState, 'roleId'>,
+    capabilityId: $PropertyType<InternalState, 'capabilityId'>,
   ) {
-    return new SelectedGrantee(id, title, type, roleId);
+    return new SelectedGrantee(id, title, type, capabilityId);
   }
 }

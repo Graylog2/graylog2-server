@@ -23,17 +23,17 @@
       "title": "Security Folks"
     }
   ],
-  "available_roles": [
+  "available_capabilities": [
     {
-      "id": "grn::::role:54e3deadbeefdeadbeef0000",
+      "id": "grn::::capability:54e3deadbeefdeadbeef0000",
       "title": "Viewer"
     },
     {
-      "id": "grn::::role:54e3deadbeefdeadbeef0001",
+      "id": "grn::::capability:54e3deadbeefdeadbeef0001",
       "title": "Manager"
     },
     {
-      "id": "grn::::role:54e3deadbeefdeadbeef0002",
+      "id": "grn::::capability:54e3deadbeefdeadbeef0002",
       "title": "Owner"
     }
   ],
@@ -41,12 +41,12 @@
     {
       "grant": "grn::::grant:5ee2393bb3ceb9225f056efe",
       "grantee": "grn::::user:john",
-      "role": "grn::::role:54e3deadbeefdeadbeef0002"
+      "capability": "grn::::capability:54e3deadbeefdeadbeef0002"
     }
   ],
-  "selected_grantee_roles": {
-    "grn::::user:jane": "grn::::role:54e3deadbeefdeadbeef0001",
-    "grn::::team:security": "grn::::role:54e3deadbeefdeadbeef0000"
+  "selected_grantee_capabilities": {
+    "grn::::user:jane": "grn::::capability:54e3deadbeefdeadbeef0001",
+    "grn::::team:security": "grn::::capability:54e3deadbeefdeadbeef0000"
   },
   "missing_dependencies": {
     "grn::::user:jane": [

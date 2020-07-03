@@ -11,9 +11,9 @@ export default class Grantee {
   constructor(
     grant: $PropertyType<ActiveShareType, 'grant'>,
     grantee: $PropertyType<ActiveShareType, 'grantee'>,
-    role: $PropertyType<ActiveShareType, 'role'>,
+    capability: $PropertyType<ActiveShareType, 'capability'>,
   ) {
-    this._value = { grant, grantee, role };
+    this._value = { grant, grantee, capability };
   }
 
   get grant(): $PropertyType<InternalState, 'grant'> {
@@ -24,32 +24,32 @@ export default class Grantee {
     return this._value.grantee;
   }
 
-  get role(): $PropertyType<InternalState, 'role'> {
-    return this._value.role;
+  get capability(): $PropertyType<InternalState, 'capability'> {
+    return this._value.capability;
   }
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const { grant, grantee, role } = this._value;
+    const { grant, grantee, capability } = this._value;
 
     // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map({ grant, grantee, role }));
+    return new Builder(Immutable.Map({ grant, grantee, capability }));
   }
 
   toJSON() {
-    const { grant, grantee, role } = this._value;
+    const { grant, grantee, capability } = this._value;
 
-    return { grant, grantee, role };
+    return { grant, grantee, capability };
   }
 
   static fromJSON(value: ActiveShareType): Grantee {
-    const { grant, grantee, role } = value;
+    const { grant, grantee, capability } = value;
 
     return Grantee
       .builder()
       .grant(grant)
       .grantee(grantee)
-      .role(role)
+      .capability(capability)
       .build();
   }
 
@@ -77,13 +77,13 @@ class Builder {
     return new Builder(this.value.set('grantee', value));
   }
 
-  role(value: $PropertyType<InternalState, 'role'>): Builder {
-    return new Builder(this.value.set('role', value));
+  capability(value: $PropertyType<InternalState, 'capability'>): Builder {
+    return new Builder(this.value.set('capability', value));
   }
 
   build(): Grantee {
-    const { grant, grantee, role } = this.value.toObject();
+    const { grant, grantee, capability } = this.value.toObject();
 
-    return new Grantee(grant, grantee, role);
+    return new Grantee(grant, grantee, capability);
   }
 }

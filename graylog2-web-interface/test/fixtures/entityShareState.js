@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 
 import EntityShareState from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
-import Role from 'logic/permissions/Role';
+import Capability from 'logic/permissions/Capability';
 import MissingDependency from 'logic/permissions/MissingDependency';
 import ActiveShare from 'logic/permissions/ActiveShare';
 
@@ -52,24 +52,24 @@ export const jane = Grantee
 
 const availableGrantees = Immutable.List([everyone, alice, bob, john, jane, security]); // keep this order
 
-// roles
-export const viewer = Role.builder().id('viewer-id').title('Viewer').build();
-export const manager = Role.builder().id('manager-id').title('Manager').build();
-export const owner = Role.builder().id('owner-id').title('Owner').build();
+// capabilities
+export const viewer = Capability.builder().id('viewer-id').title('Viewer').build();
+export const manager = Capability.builder().id('manager-id').title('Manager').build();
+export const owner = Capability.builder().id('owner-id').title('Owner').build();
 
-const availableRoles = Immutable.List([viewer, manager, owner]);
+const availableCapabilities = Immutable.List([viewer, manager, owner]);
 
 // active shares
 const janeIsOwner = ActiveShare
   .builder()
   .grant('grant-id')
   .grantee(jane.id)
-  .role(owner.id)
+  .capability(owner.id)
   .build();
 const activeShares = Immutable.List([janeIsOwner]);
 
-// selected grantee roles
-const janeIsSelected = Immutable.Map({ [janeIsOwner.grantee]: janeIsOwner.role });
+// selected grantee capabilities
+const janeIsSelected = Immutable.Map({ [janeIsOwner.grantee]: janeIsOwner.capability });
 
 // missing dependencies
 const missingDependecy = MissingDependency
@@ -86,10 +86,10 @@ const entityShareState = EntityShareState
   .builder()
   .entity('grn::::dashboard:dashboard-id')
   .availableGrantees(availableGrantees)
-  .availableRoles(availableRoles)
+  .availableCapabilities(availableCapabilities)
   .activeShares(activeShares)
   .missingDependencies(missingDependencies)
-  .selectedGranteeRoles(janeIsSelected)
+  .selectedGranteeCapabilities(janeIsSelected)
   .build();
 
 export default entityShareState;

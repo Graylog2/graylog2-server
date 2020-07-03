@@ -4,9 +4,23 @@ exports[`EntityShareState should import from json 1`] = `
 Object {
   "active_shares": Immutable.List [
     Object {
+      "capability": "grn::::capability:54e3deadbeefdeadbeef0002",
       "grant": "grn::::grant:5ee2393bb3ceb9225f056efe",
       "grantee": "grn::::user:john",
-      "role": "grn::::role:54e3deadbeefdeadbeef0002",
+    },
+  ],
+  "available_capabilities": Immutable.List [
+    Object {
+      "id": "grn::::capability:54e3deadbeefdeadbeef0000",
+      "title": "Viewer",
+    },
+    Object {
+      "id": "grn::::capability:54e3deadbeefdeadbeef0001",
+      "title": "Manager",
+    },
+    Object {
+      "id": "grn::::capability:54e3deadbeefdeadbeef0002",
+      "title": "Owner",
     },
   ],
   "available_grantees": Immutable.List [
@@ -31,20 +45,6 @@ Object {
       "type": "user",
     },
   ],
-  "available_roles": Immutable.List [
-    Object {
-      "id": "grn::::role:54e3deadbeefdeadbeef0000",
-      "title": "Viewer",
-    },
-    Object {
-      "id": "grn::::role:54e3deadbeefdeadbeef0001",
-      "title": "Manager",
-    },
-    Object {
-      "id": "grn::::role:54e3deadbeefdeadbeef0002",
-      "title": "Owner",
-    },
-  ],
   "entity": "grn::::dashboard:57bc9188e62a2373778d9e06",
   "missing_dependencies": Immutable.Map {
     "grn::::team:abc123": Immutable.List [
@@ -67,9 +67,9 @@ Object {
       },
     ],
   },
-  "selected_grantee_roles": Immutable.Map {
-    "grn::::user:jane": "grn::::role:54e3deadbeefdeadbeef0001",
-    "grn::::team:security": "grn::::role:54e3deadbeefdeadbeef0000",
+  "selected_grantee_capabilities": Immutable.Map {
+    "grn::::user:jane": "grn::::capability:54e3deadbeefdeadbeef0001",
+    "grn::::team:security": "grn::::capability:54e3deadbeefdeadbeef0000",
   },
 }
 `;
