@@ -332,9 +332,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
     @Test
     public void getIndices() {
-        final IndexSet indexSet = new TestIndexSet(indexSetConfig.toBuilder().indexPrefix("indices_it2").build());
-        final String index1 = client().createRandomIndex("indices_it2_");
-        final String index2 = client().createRandomIndex("indices_it2_");
+        final IndexSet indexSet = new TestIndexSet(indexSetConfig.toBuilder().indexPrefix("indices_it").build());
+        final String index1 = client().createRandomIndex("indices_it_");
+        final String index2 = client().createRandomIndex("indices_it_");
 
         client().closeIndex(index2);
 
