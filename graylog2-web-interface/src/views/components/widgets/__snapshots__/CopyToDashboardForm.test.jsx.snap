@@ -77,7 +77,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               </form>
             </div>
             <div
-              class="undefined form-inline page-size"
+              class=" form-inline page-size"
               style="float: right;"
             >
               <div
@@ -226,7 +226,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               </form>
             </div>
             <div
-              class="undefined form-inline page-size"
+              class=" form-inline page-size"
               style="float: right;"
             >
               <div
