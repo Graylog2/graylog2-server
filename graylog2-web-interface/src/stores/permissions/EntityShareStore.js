@@ -15,11 +15,11 @@ type EntityShareStoreState = {
 };
 
 type EntitySharePreparePayload = {|
-  selected_grantee_capabilities?: SelectedGranteeCapabilities,
+  selected_grantees?: SelectedGranteeCapabilities,
 |};
 
 type EntityShareUpdatePayload = {|
-  grantee_capabilities?: SelectedGranteeCapabilities,
+  grantee_capability?: SelectedGranteeCapabilities,
 |};
 
 type EntityShareActionsType = RefluxActions<{
@@ -30,7 +30,7 @@ type EntityShareActionsType = RefluxActions<{
 type EntityShareStoreType = Store<EntityShareStoreState>;
 
 const defaultPreparePayload = {
-  selected_grantee_capabilities: Immutable.Map(),
+  selected_grantees: Immutable.Map(),
 };
 
 export const EntityShareActions: EntityShareActionsType = singletonActions(

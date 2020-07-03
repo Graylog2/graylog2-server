@@ -56,7 +56,7 @@ const EntityShareSettings = ({
     setDisableSubmit(true);
 
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantee_capabilities: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
+      selected_grantees: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
     }).then((response) => {
       setDisableSubmit(false);
 

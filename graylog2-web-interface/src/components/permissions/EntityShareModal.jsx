@@ -33,7 +33,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
     setDisableSubmit(true);
 
     return EntityShareActions.update(entityGRN, {
-      grantee_capabilities: entityShareState.selectedGranteeCapabilities,
+      grantee_capability: entityShareState.selectedGranteeCapabilities,
     }).then(onClose);
   };
 
