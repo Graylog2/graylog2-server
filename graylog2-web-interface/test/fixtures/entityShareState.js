@@ -77,10 +77,10 @@ const missingDependecy = MissingDependency
   .id('grn::::stream:57bc9188e62a2373778d9e03')
   .type('stream')
   .title('Security Data')
-  .owners(Immutable.List([john, security]))
+  .owners(Immutable.List([john]))
   .build();
 
-export const missingDependencies: MissingDependencies = Immutable.Map({ [jane.id]: Immutable.List([missingDependecy]) });
+export const missingDependencies: MissingDependencies = Immutable.Map({ [security.id]: Immutable.List([missingDependecy]) });
 
 const entityShareState = EntityShareState
   .builder()
