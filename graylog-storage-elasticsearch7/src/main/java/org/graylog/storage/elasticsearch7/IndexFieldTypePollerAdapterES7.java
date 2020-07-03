@@ -1,8 +1,8 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Timer;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
+import org.graylog.storage.elasticsearch7.mapping.FieldMappingApi;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -18,21 +18,21 @@ import java.util.stream.Collectors;
 public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterES7.class);
     private final ElasticsearchClient client;
+    private final FieldMappingApi fieldMappingApi;
 
     @Inject
-    public IndexFieldTypePollerAdapterES7(ElasticsearchClient client) {
+    public IndexFieldTypePollerAdapterES7(ElasticsearchClient client,
+                                          FieldMappingApi fieldMappingApi) {
         this.client = client;
+        this.fieldMappingApi = fieldMappingApi;
     }
 
     @Override
     public Optional<Set<FieldTypeDTO>> pollIndex(String indexName, Timer pollTimer) {
-        final GetMappingsRequest request = new GetMappingsRequest()
-                .indices(indexName);
-
-        final GetMappingsResponse mappingsResponse;
+        final Map<String, String> fieldTypes;
         try (final Timer.Context ignored = pollTimer.time()) {
-            mappingsResponse = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions));
-        } catch (Exception e) {
+            fieldTypes = client.execute((c, requestOptions) -> fieldMappingApi.fieldTypes(c, indexName));
+        } catch (IndexNotFoundException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("Couldn't get mapping for index <{}>", indexName, e);
             } else {
@@ -41,11 +41,7 @@ public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapt
             return Optional.empty();
         }
 
-        final Map<String, String> fieldTypes = mappingsResponse.mappings().entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().type()));
-        return Optional.of(
-                fieldTypes.entrySet()
+        return Optional.of(fieldTypes.entrySet()
                         .stream()
                         // The "type" value is empty if we deal with a nested data type
                         // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
