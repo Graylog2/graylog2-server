@@ -108,14 +108,9 @@ const toggleSidebarPinning = (searchPageLayout) => {
     return;
   }
 
-  const { setConfig, config } = searchPageLayout;
-  const sidebarIsPinned = config?.sidebar.isPinned;
-  const newLayoutConfig = {
-    ...config,
-    sidebar: { isPinned: !sidebarIsPinned },
-  };
+  const { actions: { toggleSidebarPinning: togglePinning } } = searchPageLayout;
 
-  setConfig(newLayoutConfig);
+  togglePinning();
 };
 
 const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew: boolean) => {
