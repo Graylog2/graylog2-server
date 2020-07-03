@@ -312,8 +312,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public Optional<Long> storeSizeInBytes(String index) {
-        final Map<String, Long> indexSizes = client.execute((c, options) -> stateApi.storeSizes(c));
-        return Optional.ofNullable(indexSizes.get(index));
+        return client.execute((c, options) -> statsApi.storeSizes(c, index),
+                "Unable to retrieve store size for " + index);
     }
 
     @Override
@@ -398,9 +398,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
-        final DateTime min = new DateTime(minAgg.getValue(), DateTimeZone.UTC);
+        final long minUnixTime = new Double(minAgg.getValue()).longValue();
+        final DateTime min = new DateTime(minUnixTime, DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
-        final DateTime max = new DateTime(maxAgg.getValue(), DateTimeZone.UTC);
+        final long maxUnixTime = new Double(maxAgg.getValue()).longValue();
+        final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
         final Terms streams = f.getAggregations().get("streams");

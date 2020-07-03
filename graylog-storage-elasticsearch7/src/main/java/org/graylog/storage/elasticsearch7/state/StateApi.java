@@ -27,16 +27,6 @@ public class StateApi {
         this.objectMapper = objectMapper;
     }
 
-    public Map<String, Long> storeSizes(RestHighLevelClient client) throws IOException {
-        final JsonNode stats = state(client);
-        return Streams.stream(stats.path("metadata").path("indices").fields())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue()
-                        .path("primaries")
-                        .path("store")
-                        .path("size_in_bytes")
-                        .asLong(0)));
-    }
-
     public State indexState(RestHighLevelClient client, String index) throws IOException {
         final JsonNode stats = state(client);
         final String stateString = stats.path("metadata").path("indices").path(index).path("state").asText();
