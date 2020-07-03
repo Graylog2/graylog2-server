@@ -86,6 +86,7 @@ class EventNotificationFormContainer extends React.Component {
 
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
+
       promise.then(
         () => {
           this.setState({ isDirty: false }, () => {
@@ -104,6 +105,7 @@ class EventNotificationFormContainer extends React.Component {
       );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
+
       promise.then(
         () => {
           this.setState({ isDirty: false }, () => {
@@ -132,6 +134,7 @@ class EventNotificationFormContainer extends React.Component {
     const testResult = lodash.clone(initialTestResult);
 
     this.testPromise = EventNotificationsActions.test(notification);
+
     this.testPromise
       .then(
         (response) => {

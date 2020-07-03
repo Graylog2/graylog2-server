@@ -34,6 +34,7 @@ class AlertConditionTestModal extends React.Component {
     const { stream, condition } = this.props;
 
     this.setState({ isTesting: true, testResults: undefined });
+
     AlertConditionsActions.test(stream.id, condition.id)
       .then(
         (testResults) => this.setState({ testResults: testResults }),

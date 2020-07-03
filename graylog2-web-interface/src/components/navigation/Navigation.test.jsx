@@ -13,6 +13,7 @@ jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
+
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2ServerUrl: jest.fn(() => undefined),

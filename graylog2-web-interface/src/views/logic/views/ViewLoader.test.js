@@ -50,6 +50,7 @@ describe('ViewLoader', () => {
 
     return ViewLoader('foo').then((result) => {
       expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
+
       expect(result).toEqual(
         View.builder()
           .id('foo')

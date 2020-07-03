@@ -25,6 +25,7 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
 ));
 
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
+
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
     .timerange({ type: 'relative', range: 300 })

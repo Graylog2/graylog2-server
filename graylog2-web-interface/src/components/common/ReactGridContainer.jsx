@@ -179,6 +179,7 @@ class ReactGridContainer extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       layout: this.computeLayout(props.positions),
     };

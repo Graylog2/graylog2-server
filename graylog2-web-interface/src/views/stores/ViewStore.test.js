@@ -13,6 +13,7 @@ import { ViewActions, ViewStore } from './ViewStore';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 
 jest.mock('views/actions/SearchActions');
+
 jest.mock('views/logic/Widgets', () => ({
   widgetDefinition: () => ({
     searchTypes: () => [],

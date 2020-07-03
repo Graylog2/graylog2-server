@@ -47,6 +47,7 @@ const AlertNotification = createReactClass({
     const { alertNotification } = this.props;
 
     this.setState({ isTestingAlert: true });
+
     AlertNotificationsStore.testAlert(alertNotification.id)
       .finally(() => this.setState({ isTestingAlert: false }));
   },

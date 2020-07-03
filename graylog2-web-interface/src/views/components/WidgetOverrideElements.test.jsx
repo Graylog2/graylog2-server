@@ -46,11 +46,13 @@ describe('WidgetOverrideElements', () => {
 
   it('renders thrown component if element throws one', async () => {
     const Component = () => <span>I was thrown!</span>;
+
     const OverridingElement = ({ override }) => {
       useEffect(() => override(Component), []);
 
       return null;
     };
+
     const { getByText, queryByText } = render((
       <WidgetOverrideElements widgetOverrideElements={[OverridingElement]}>
         <span>Hello world!</span>

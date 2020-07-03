@@ -138,6 +138,7 @@ describe('SavedSearchList', () => {
       const listItem = getByText('test-0');
 
       fireEvent.click(listItem);
+
       await wait(() => {
         expect(browserHistory.push).toBeCalledTimes(1);
         expect(browserHistory.push).toHaveBeenCalledWith('SEARCH_VIEWID:foo-bar-0');

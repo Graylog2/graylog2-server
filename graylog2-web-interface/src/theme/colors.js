@@ -14,9 +14,12 @@ export type Colors = {
     linkHover: string,
     textAlt: string,
     textDefault: string,
-    tableBackground: string,
-    tableBackgroundAlt: string,
     inputBackground: string,
+  },
+  table: {
+    background: string,
+    backgroundAlt: string,
+    backgroundHover: string,
   },
   gray: {
     "10": string,

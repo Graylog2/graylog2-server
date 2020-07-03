@@ -38,6 +38,7 @@ class LdapGroupsComponent extends React.Component {
 
   componentDidMount() {
     LdapGroupsActions.loadMapping().then((mapping) => this.setState({ mapping: Immutable.Map(mapping) }));
+
     LdapGroupsActions.loadGroups()
       .then(
         (groups) => this.setState({ groups: Immutable.Set(groups) }),

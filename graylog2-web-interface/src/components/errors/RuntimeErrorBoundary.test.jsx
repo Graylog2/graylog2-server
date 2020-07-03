@@ -42,6 +42,7 @@ describe('RuntimeErrorBoundary', () => {
       );
 
       expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+
       expect(ErrorsActions.report.mock.calls[0][0].error).toStrictEqual({
         message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
         stack: 'This the stack trace.',

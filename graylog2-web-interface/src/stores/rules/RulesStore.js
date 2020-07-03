@@ -76,6 +76,7 @@ const RulesStore = Reflux.createStore({
       UserNotification.error(`Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
         `Could not save processing rule "${ruleSource.title}"`);
     };
+
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.create().url);
     const rule = {
       title: ruleSource.title,
@@ -99,6 +100,7 @@ const RulesStore = Reflux.createStore({
       UserNotification.error(`Updating rule "${ruleSource.title}" failed with status: ${error.message}`,
         `Could not update processing rule "${ruleSource.title}"`);
     };
+
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.update(ruleSource.id).url);
     const rule = {
       id: ruleSource.id,
@@ -122,6 +124,7 @@ const RulesStore = Reflux.createStore({
       UserNotification.error(`Deleting rule "${rule.title}" failed with status: ${error.message}`,
         `Could not delete processing rule "${rule.title}"`);
     };
+
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
 
     return fetch('DELETE', url).then(() => {

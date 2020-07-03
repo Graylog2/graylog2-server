@@ -24,6 +24,7 @@ const mockView = View.create()
 
 jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
 jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
     create: jest.fn(() => Promise.resolve({ view: mockView })),

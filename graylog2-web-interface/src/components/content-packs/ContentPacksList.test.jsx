@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { mount, shallow } from 'wrappedEnzyme';
 
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
@@ -43,14 +43,18 @@ describe('<ContentPacksList />', () => {
   });
 
   it('should do pagination', () => {
-    const wrapper = mount(<ContentPacksList contentPacks={contentPacks} />);
-    const beforeFilter = wrapper.find('div.content-packs-summary').length;
+    const NEXT_PAGE = 2;
+    const wrapper = shallow(<ContentPacksList contentPacks={contentPacks} />);
+    const onChangePageSpy = jest.spyOn(wrapper.instance(), '_onChangePage');
+    const beforeFilter = wrapper.find('.content-packs-summary').length;
 
     expect(beforeFilter).toBe(10);
 
-    wrapper.find('span[children="›"]').at(0).simulate('click');
-    const afterFilter = wrapper.find('div.content-packs-summary').length;
+    wrapper.instance()._onChangePage(NEXT_PAGE);
 
+    const afterFilter = wrapper.find('.content-packs-summary').length;
+
+    expect(onChangePageSpy).toHaveBeenCalledWith(NEXT_PAGE);
     expect(afterFilter).toBe(5);
   });
 

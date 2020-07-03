@@ -96,6 +96,7 @@ class Stream extends React.Component {
     const { stream } = this.props;
 
     this.setState({ loading: true });
+
     StreamsStore.resume(stream.id, (response) => response)
       .finally(() => this.setState({ loading: false }));
   }
@@ -122,6 +123,7 @@ class Stream extends React.Component {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       this.setState({ loading: true });
+
       StreamsStore.pause(stream.id, (response) => response)
         .finally(() => this.setState({ loading: false }));
     }

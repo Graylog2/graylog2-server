@@ -9,6 +9,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 import CurrentUserContext from './CurrentUserContext';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
 const CurrentUserProvider = ({ children }: { children: React.Node }) => {
   const currentUser = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
 

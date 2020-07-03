@@ -36,6 +36,7 @@ const SidecarEditConfigurationPage = createReactClass({
     CollectorConfigurationsActions.getConfiguration(configurationId).then(
       (configuration) => {
         this.setState({ configuration: configuration });
+
         CollectorConfigurationsActions.getConfigurationSidecars(configurationId)
           .then((configurationSidecars) => this.setState({ configurationSidecars: configurationSidecars }));
       },

@@ -61,7 +61,12 @@ public class GraylogBackend {
 
         MongoDBInstance mongoDB = MongoDBInstance.createStarted(network, MongoDBInstance.Lifecycle.CLASS);
 
-        NodeInstance node = NodeInstance.createStarted(network, MongoDBInstance.internalUri(), ElasticsearchInstance.internalUri(), extraPorts);
+        NodeInstance node = NodeInstance.createStarted(
+                network,
+                MongoDBInstance.internalUri(),
+                ElasticsearchInstance.internalUri(),
+                elasticsearchInstanceFactory.version(),
+                extraPorts);
 
         try {
             return new GraylogBackend(esFuture.get(), mongoDB, node);

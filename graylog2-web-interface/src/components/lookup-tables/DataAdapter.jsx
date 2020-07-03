@@ -33,6 +33,7 @@ class DataAdapter extends React.Component {
     const { lookupKey } = this.state;
 
     e.preventDefault();
+
     LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });

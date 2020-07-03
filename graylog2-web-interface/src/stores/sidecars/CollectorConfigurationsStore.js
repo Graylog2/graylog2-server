@@ -83,6 +83,7 @@ const CollectorConfigurationsStore = Reflux.createStore({
       .then(
         (response) => {
           this.query = response.query;
+
           this.pagination = {
             page: response.pagination.page,
             pageSize: response.pagination.per_page,

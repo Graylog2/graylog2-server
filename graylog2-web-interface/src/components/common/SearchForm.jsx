@@ -99,6 +99,7 @@ class SearchForm extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       query: props.query,
       isLoading: false,

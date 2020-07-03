@@ -44,6 +44,7 @@ jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
+
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
@@ -218,6 +219,7 @@ describe('<Widget />', () => {
     const duplicateBtn = getByText('Duplicate');
 
     WidgetActions.duplicate = mockAction(jest.fn(() => Promise.resolve(WidgetModel.builder().id('duplicatedWidgetId').build())));
+
     TitlesActions.set = mockAction(jest.fn((type, id, title) => {
       expect(type).toEqual(TitleTypes.Widget);
       expect(id).toEqual('duplicatedWidgetId');
@@ -327,6 +329,7 @@ describe('<Widget />', () => {
       SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
       Routes.pluginRoute = jest.fn((route) => (id) => `${route}-${id}`);
       browserHistory.push = jest.fn();
+
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
         .search(Search.builder().id('search-id').build())
         .id('new-id').type(View.Type.Dashboard)

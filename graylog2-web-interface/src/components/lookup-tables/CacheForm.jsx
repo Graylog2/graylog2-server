@@ -232,6 +232,7 @@ class CacheForm extends React.Component {
       const p = plugin[0];
 
       pluginDisplayName = p.displayName;
+
       configFieldSet = React.createElement(p.formComponent, {
         config: cache.config,
         handleFormEvent: this._onConfigChange,
@@ -250,6 +251,7 @@ class CacheForm extends React.Component {
 
     if (documentationComponent) {
       formRowWidth = 6;
+
       documentationColumn = (
         <Col lg={formRowWidth}>
           {documentationComponent}
