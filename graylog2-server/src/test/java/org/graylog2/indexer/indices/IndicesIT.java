@@ -33,6 +33,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -383,5 +384,14 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                                 index2, ImmutableSet.of("alias2", "alias3")
                         )
                 );
+    }
+
+    @Test
+    public void retrieveIndexStatisticsForIndices() {
+        final String index = client().createRandomIndex("indices_it_");
+
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(Collections.singleton(index));
+
+        assertThat(indicesStats).isNotEmpty();
     }
 }

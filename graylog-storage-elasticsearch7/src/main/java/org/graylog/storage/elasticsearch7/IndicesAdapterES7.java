@@ -3,6 +3,7 @@ package org.graylog.storage.elasticsearch7;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -60,6 +61,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -279,9 +281,22 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    // TODO: needs implementation
     public Set<IndexStatistics> indicesStats(Collection<String> indices) {
-        return null;
+        final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
+
+        final JsonNode allWithShardLevel = client.execute((c, requestOptions) -> statsApi.indexStatsWithShardLevel(c, indices),
+                "Unable to retrieve index stats for " + indices);
+        final Iterator<Map.Entry<String, JsonNode>> fields = allWithShardLevel.fields();
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> entry = fields.next();
+            final String index = entry.getKey();
+            final JsonNode indexStats = entry.getValue();
+            if (indexStats.isObject()) {
+                result.add(IndexStatistics.create(index, indexStats));
+            }
+        }
+
+        return result.build();
     }
 
     @Override

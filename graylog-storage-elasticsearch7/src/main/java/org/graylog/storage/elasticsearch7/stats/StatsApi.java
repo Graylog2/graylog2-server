@@ -27,12 +27,16 @@ public class StatsApi {
     }
 
     public JsonNode indexStatsWithShardLevel(RestHighLevelClient client, String index) throws IOException {
-        final JsonNode stats = stats(client, request -> {
+        return indexStatsWithShardLevel(client, Collections.singleton(index)).path(index);
+    }
+
+    public JsonNode indexStatsWithShardLevel(RestHighLevelClient client, Collection<String> indices) throws IOException {
+        final JsonNode stats = stats(client, indices, request -> {
             request.addParameter("level", "shards");
             request.addParameter("ignore_unavailable", "true");
         });
 
-        return stats.path("indices").path(index);
+        return stats.path("indices");
     }
 
     public JsonNode indexStatsWithDocsAndStore(RestHighLevelClient client, Collection<String> indices) throws IOException {
@@ -55,15 +59,18 @@ public class StatsApi {
         return stats(client, Collections.singleton(index), Collections.emptySet(), (request) -> {});
     }
 
-    private JsonNode stats(RestHighLevelClient client, Consumer<Request> fn) throws IOException {
-        return stats(client, Collections.emptySet(), Collections.emptySet(), fn);
-    }
-
     private JsonNode stats(RestHighLevelClient client,
                            Collection<String> indices,
                            Collection<String> metrics) throws IOException {
         return stats(client, indices, metrics, (request) -> {});
     }
+
+    private JsonNode stats(RestHighLevelClient client,
+                           Collection<String> indices,
+                           Consumer<Request> fn) throws IOException {
+        return stats(client, indices, Collections.emptySet(), fn);
+            }
+
     private JsonNode stats(RestHighLevelClient client,
                            Collection<String> indices,
                            Collection<String> metrics,
