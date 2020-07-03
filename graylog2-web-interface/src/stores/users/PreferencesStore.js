@@ -47,7 +47,7 @@ const PreferencesStore = Reflux.createStore({
 
     return preferencesAsMap;
   },
-  saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void, displaySuccessNotification: boolean = true): void {
+  saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void = () => {}, displaySuccessNotification: boolean = true): void {
     const preferencesAsMap = this.convertPreferenceArrayToMap(preferences);
     const url = `${this.URL + userName}/preferences`;
     const promise = fetch('PUT', url, { preferences: preferencesAsMap })
@@ -66,7 +66,7 @@ const PreferencesStore = Reflux.createStore({
 
     return promise;
   },
-  loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void): void {
+  loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void = () => {}): void {
     const url = this.URL + userName;
 
     const successCallback = (data: PreferencesResponse) => {

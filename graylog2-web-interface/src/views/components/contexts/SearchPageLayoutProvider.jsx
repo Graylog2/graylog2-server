@@ -5,10 +5,12 @@ import { useState } from 'react';
 
 import type { User } from 'stores/users/UsersStore';
 import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
-import PreferencesStore from 'stores/users/PreferencesStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
+
+const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 type Props = {
   children: React.Node,
@@ -45,7 +47,7 @@ const toggleSidebarPinning = (config, setConfig, userName, userPreferences) => {
 
   setConfig(newLayoutConfig);
 
-  PreferencesStore.saveUserPreferences(userName, createUserPreferencesArray(newUserPreferences), undefined, false);
+  PreferencesActions.saveUserPreferences(userName, createUserPreferencesArray(newUserPreferences), undefined, false);
 };
 
 const SearchPageLayoutProvider = ({ children, currentUser, userPreferences }: Props) => {
