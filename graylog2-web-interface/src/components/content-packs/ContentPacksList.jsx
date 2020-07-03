@@ -13,7 +13,7 @@ import {
   Modal,
   Row,
 } from 'components/graylog';
-import { Pagination } from 'components/common';
+import { Pagination, PageSizeSelect } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -180,16 +180,7 @@ class ContentPacksList extends React.Component {
                   onChange={this._onChangePage} />
     );
 
-    const pageSizeSelector = (
-      <span>Show:&nbsp;
-        <select onChange={this._itemsShownChange} value={pageSize}>
-          <option>10</option>
-          <option>25</option>
-          <option>50</option>
-          <option>100</option>
-        </select>
-      </span>
-    );
+    const pageSizeSelect = <PageSizeSelect onChange={this._itemsShownChange} pageSize={pageSize} pageSizes={[10, 25, 50, 100]} />;
 
     const noContentMessage = contentPacks.length <= 0
       ? 'No content packs found. Please create or upload one'
@@ -219,7 +210,7 @@ class ContentPacksList extends React.Component {
             {pagination}
           </Col>
           <Col md={2} className="text-right">
-            {pageSizeSelector}
+            {pageSizeSelect}
           </Col>
         </Row>
         {content}
@@ -229,7 +220,7 @@ class ContentPacksList extends React.Component {
             {pagination}
           </Col>
           <Col md={2} className="text-right">
-            {pageSizeSelector}
+            {pageSizeSelect}
           </Col>
         </Row>
       </div>

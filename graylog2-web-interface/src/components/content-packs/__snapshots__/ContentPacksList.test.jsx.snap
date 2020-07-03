@@ -1006,26 +1006,241 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
           <div
             className="text-right col-md-2"
           >
-            <span>
-              Show: 
-              <select
-                onChange={[Function]}
-                value={10}
+            <PageSizeSelect
+              onChange={[Function]}
+              pageSize={10}
+              pageSizes={
+                Array [
+                  10,
+                  25,
+                  50,
+                  100,
+                ]
+              }
+            >
+              <div
+                className="undefined form-inline page-size"
+                style={
+                  Object {
+                    "float": "right",
+                  }
+                }
               >
-                <option>
-                  10
-                </option>
-                <option>
-                  25
-                </option>
-                <option>
-                  50
-                </option>
-                <option>
-                  100
-                </option>
-              </select>
-            </span>
+                <Input
+                  addonAfter={null}
+                  bsSize="small"
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="page-size"
+                  label="Show:"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="select"
+                  value={10}
+                >
+                  <Component
+                    controlId="page-size"
+                    validationState={null}
+                  >
+                    <FormGroup__StyledFormGroup
+                      controlId="page-size"
+                      validationState={null}
+                    >
+                      <StyledComponent
+                        controlId="page-size"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "gcTkZc",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                          controlId="page-size"
+                          validationState={null}
+                        >
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          >
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hCskeX",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                              >
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  bsSize="small"
+                                  componentClass="select"
+                                  inputRef={[Function]}
+                                  label="Show:"
+                                  name="page-size"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="select"
+                                  value={10}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    componentClass="select"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "eXfwDC",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Show:"
+                                    name="page-size"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="select"
+                                    value={10}
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show:"
+                                      name="page-size"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      type="select"
+                                      value={10}
+                                    >
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        id="page-size"
+                                        label="Show:"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
+                                        value={10}
+                                      >
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </PageSizeSelect>
           </div>
         </Col>
       </div>
@@ -9223,26 +9438,241 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
           <div
             className="text-right col-md-2"
           >
-            <span>
-              Show: 
-              <select
-                onChange={[Function]}
-                value={10}
+            <PageSizeSelect
+              onChange={[Function]}
+              pageSize={10}
+              pageSizes={
+                Array [
+                  10,
+                  25,
+                  50,
+                  100,
+                ]
+              }
+            >
+              <div
+                className="undefined form-inline page-size"
+                style={
+                  Object {
+                    "float": "right",
+                  }
+                }
               >
-                <option>
-                  10
-                </option>
-                <option>
-                  25
-                </option>
-                <option>
-                  50
-                </option>
-                <option>
-                  100
-                </option>
-              </select>
-            </span>
+                <Input
+                  addonAfter={null}
+                  bsSize="small"
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="page-size"
+                  label="Show:"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="select"
+                  value={10}
+                >
+                  <Component
+                    controlId="page-size"
+                    validationState={null}
+                  >
+                    <FormGroup__StyledFormGroup
+                      controlId="page-size"
+                      validationState={null}
+                    >
+                      <StyledComponent
+                        controlId="page-size"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "gcTkZc",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                          controlId="page-size"
+                          validationState={null}
+                        >
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          >
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hCskeX",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                              >
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  bsSize="small"
+                                  componentClass="select"
+                                  inputRef={[Function]}
+                                  label="Show:"
+                                  name="page-size"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="select"
+                                  value={10}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    componentClass="select"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "eXfwDC",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Show:"
+                                    name="page-size"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="select"
+                                    value={10}
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show:"
+                                      name="page-size"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      type="select"
+                                      value={10}
+                                    >
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        id="page-size"
+                                        label="Show:"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
+                                        value={10}
+                                      >
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </PageSizeSelect>
           </div>
         </Col>
       </div>
@@ -9721,26 +10151,241 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
           <div
             className="text-right col-md-2"
           >
-            <span>
-              Show: 
-              <select
-                onChange={[Function]}
-                value={10}
+            <PageSizeSelect
+              onChange={[Function]}
+              pageSize={10}
+              pageSizes={
+                Array [
+                  10,
+                  25,
+                  50,
+                  100,
+                ]
+              }
+            >
+              <div
+                className="undefined form-inline page-size"
+                style={
+                  Object {
+                    "float": "right",
+                  }
+                }
               >
-                <option>
-                  10
-                </option>
-                <option>
-                  25
-                </option>
-                <option>
-                  50
-                </option>
-                <option>
-                  100
-                </option>
-              </select>
-            </span>
+                <Input
+                  addonAfter={null}
+                  bsSize="small"
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="page-size"
+                  label="Show:"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="select"
+                  value={10}
+                >
+                  <Component
+                    controlId="page-size"
+                    validationState={null}
+                  >
+                    <FormGroup__StyledFormGroup
+                      controlId="page-size"
+                      validationState={null}
+                    >
+                      <StyledComponent
+                        controlId="page-size"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "gcTkZc",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                          controlId="page-size"
+                          validationState={null}
+                        >
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          >
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hCskeX",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                              >
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  bsSize="small"
+                                  componentClass="select"
+                                  inputRef={[Function]}
+                                  label="Show:"
+                                  name="page-size"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="select"
+                                  value={10}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    componentClass="select"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "eXfwDC",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Show:"
+                                    name="page-size"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="select"
+                                    value={10}
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show:"
+                                      name="page-size"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      type="select"
+                                      value={10}
+                                    >
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        id="page-size"
+                                        label="Show:"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
+                                        value={10}
+                                      >
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </PageSizeSelect>
           </div>
         </Col>
       </div>
@@ -9795,26 +10440,241 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
           <div
             className="text-right col-md-2"
           >
-            <span>
-              Show: 
-              <select
-                onChange={[Function]}
-                value={10}
+            <PageSizeSelect
+              onChange={[Function]}
+              pageSize={10}
+              pageSizes={
+                Array [
+                  10,
+                  25,
+                  50,
+                  100,
+                ]
+              }
+            >
+              <div
+                className="undefined form-inline page-size"
+                style={
+                  Object {
+                    "float": "right",
+                  }
+                }
               >
-                <option>
-                  10
-                </option>
-                <option>
-                  25
-                </option>
-                <option>
-                  50
-                </option>
-                <option>
-                  100
-                </option>
-              </select>
-            </span>
+                <Input
+                  addonAfter={null}
+                  bsSize="small"
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="page-size"
+                  label="Show:"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="select"
+                  value={10}
+                >
+                  <Component
+                    controlId="page-size"
+                    validationState={null}
+                  >
+                    <FormGroup__StyledFormGroup
+                      controlId="page-size"
+                      validationState={null}
+                    >
+                      <StyledComponent
+                        controlId="page-size"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "gcTkZc",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                          controlId="page-size"
+                          validationState={null}
+                        >
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          >
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hCskeX",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                              >
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  bsSize="small"
+                                  componentClass="select"
+                                  inputRef={[Function]}
+                                  label="Show:"
+                                  name="page-size"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="select"
+                                  value={10}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    componentClass="select"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "eXfwDC",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Show:"
+                                    name="page-size"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="select"
+                                    value={10}
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show:"
+                                      name="page-size"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      type="select"
+                                      value={10}
+                                    >
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
+                                        id="page-size"
+                                        label="Show:"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
+                                        value={10}
+                                      >
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </PageSizeSelect>
           </div>
         </Col>
       </div>

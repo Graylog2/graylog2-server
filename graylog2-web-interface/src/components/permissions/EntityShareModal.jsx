@@ -31,15 +31,14 @@ type ModalContentProps = {
   setDisableSubmit: (boolean) => void,
 };
 
-const StyledGranteesList = styled(GranteesList)`
+const Section = styled.div`
   margin-bottom: 25px;
+  :last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const GranteesSelectorHeadline = styled.h5`
-  margin-bottom: 10px;
-`;
-const GranteesListHeadline = styled.h5`
-  margin-top: 25px;
   margin-bottom: 10px;
 `;
 
@@ -90,29 +89,37 @@ const ModalContent = ({
 
   return (
     <>
-      <GranteesSelectorHeadline>
-        Add collaborator
-      </GranteesSelectorHeadline>
-      <p>
-        {description}
-      </p>
-      <GranteesSelector availableGrantees={filteredGrantees}
-                        availableRoles={availableRoles}
-                        onSubmit={_handleSelection} />
-      <GranteesListHeadline>
-        Current collaborators
-      </GranteesListHeadline>
-      <StyledGranteesList activeShares={activeShares}
+      <Section>
+        <GranteesSelectorHeadline>
+          Add collaborator
+        </GranteesSelectorHeadline>
+        <p>
+          {description}
+        </p>
+      </Section>
+      <Section>
+        <GranteesSelector availableGrantees={filteredGrantees}
                           availableRoles={availableRoles}
-                          entityGRN={entityGRN}
-                          onDelete={_handleDeletion}
-                          onRoleChange={_handleSelection}
-                          selectedGrantees={selectedGrantees} />
+                          onSubmit={_handleSelection} />
+      </Section>
+      <Section>
+        <GranteesList activeShares={activeShares}
+                      availableRoles={availableRoles}
+                      entityGRN={entityGRN}
+                      onDelete={_handleDeletion}
+                      onRoleChange={_handleSelection}
+                      selectedGrantees={selectedGrantees}
+                      title="Current collaborators" />
+      </Section>
       {missingDependencies && (
-        <DependenciesWarning missingDependencies={missingDependencies}
-                             selectedGrantees={selectedGrantees} />
+        <Section>
+          <DependenciesWarning missingDependencies={missingDependencies}
+                               selectedGrantees={selectedGrantees} />
+        </Section>
       )}
-      <ShareableEnityURL />
+      <Section>
+        <ShareableEnityURL />
+      </Section>
     </>
   );
 };

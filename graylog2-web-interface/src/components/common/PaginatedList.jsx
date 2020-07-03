@@ -3,27 +3,13 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import { Input } from 'components/bootstrap';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 
 import Pagination from './Pagination';
+import PageSizeSelect from './PageSizeSelect';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
 const INITIAL_PAGE = 1;
-
-type PageSizeSelectProps = {
-  pageSize: number,
-  pageSizes: Array<number>,
-  onChange: (event: SyntheticInputEvent<HTMLLinkElement>) => void,
-};
-
-const PageSizeSelect = ({ pageSizes, pageSize, onChange }: PageSizeSelectProps) => (
-  <div className="form-inline page-size" style={{ float: 'right' }}>
-    <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={onChange}>
-      {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
-    </Input>
-  </div>
-);
 
 type Props = {
   children: React.Node,

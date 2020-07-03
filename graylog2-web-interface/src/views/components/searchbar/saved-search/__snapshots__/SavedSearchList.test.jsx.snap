@@ -182,7 +182,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               </form>
             </div>
             <div
-              class="form-inline page-size"
+              class="undefined form-inline page-size"
               style="float: right;"
             >
               <div
