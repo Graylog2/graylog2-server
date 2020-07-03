@@ -40,7 +40,7 @@ import java.util.Optional;
 public abstract class GrantDTO {
     private static final String FIELD_ID = "id";
     static final String FIELD_GRANTEE = "grantee";
-    private static final String FIELD_CAPABILITY = "capability";
+    static final String FIELD_CAPABILITY = "capability";
     public static final String FIELD_TARGET = "target";
     private static final String FIELD_CREATED_BY = "created_by";
     private static final String FIELD_CREATED_AT = "created_at";
@@ -59,7 +59,7 @@ public abstract class GrantDTO {
 
     @NotBlank
     @JsonProperty(FIELD_CAPABILITY)
-    public abstract String capability();
+    public abstract Capability capability();
 
     @NotNull
     @JsonProperty(FIELD_TARGET)
@@ -106,7 +106,7 @@ public abstract class GrantDTO {
         public abstract Builder grantee(GRN grantee);
 
         @JsonProperty(FIELD_CAPABILITY)
-        public abstract Builder capability(String capability);
+        public abstract Builder capability(Capability capability);
 
         @JsonProperty(FIELD_TARGET)
         public abstract Builder target(GRN target);

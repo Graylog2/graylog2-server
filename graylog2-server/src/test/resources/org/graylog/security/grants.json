@@ -5,7 +5,7 @@
         "$oid": "54e3deadbeefdeadbeef0000"
       },
       "grantee": "grn::::user:jane",
-      "capability": "grn::::capability:stream-read",
+      "capability": "view",
       "target": "grn::::stream:54e3deadbeefdeadbeef0000",
       "created_by": "admin",
       "created_at": {
@@ -21,7 +21,7 @@
         "$oid": "54e3deadbeefdeadbeef0001"
       },
       "grantee": "grn::::user:jane",
-      "capability": "grn::::capability:stream-manage",
+      "capability": "manage",
       "target": "grn::::stream:54e3deadbeefdeadbeef0001",
       "created_by": "admin",
       "created_at": {
@@ -39,7 +39,7 @@
         "$oid": "54e3deadbeefdeadbeef0002"
       },
       "grantee": "grn::::user:john",
-      "capability": "grn::::capability:stream-read",
+      "capability": "view",
       "target": "grn::::stream:54e3deadbeefdeadbeef0001",
       "created_by": "admin",
       "created_at": {
@@ -57,7 +57,7 @@
         "$oid": "54e3deadbeefdeadbeef0003"
       },
       "grantee": "grn::::builtin-team:everyone",
-      "capability": "grn::::capability:stream-read",
+      "capability": "view",
       "target": "grn::::stream:54e3deadbeefdeadbeef0001",
       "created_by": "admin",
       "created_at": {

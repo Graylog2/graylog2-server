@@ -19,6 +19,10 @@ package org.graylog.security;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import org.bson.Document;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -53,6 +57,21 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1));
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_TARGET, 1));
         // TODO: Add more indices
+
+        // TODO: Inline migration for development. Must be removed before shipping 4.0 GA!
+        final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        collection.updateMany(
+                Filters.eq(GrantDTO.FIELD_CAPABILITY, "grn::::capability:54e3deadbeefdeadbeef0000"),
+                Updates.set(GrantDTO.FIELD_CAPABILITY, Capability.VIEW.toId())
+        );
+        collection.updateMany(
+                Filters.eq(GrantDTO.FIELD_CAPABILITY, "grn::::capability:54e3deadbeefdeadbeef0001"),
+                Updates.set(GrantDTO.FIELD_CAPABILITY, Capability.MANAGE.toId())
+        );
+        collection.updateMany(
+                Filters.eq(GrantDTO.FIELD_CAPABILITY, "grn::::capability:54e3deadbeefdeadbeef0002"),
+                Updates.set(GrantDTO.FIELD_CAPABILITY, Capability.OWN.toId())
+        );
     }
 
     public ImmutableSet<GrantDTO> getForGranteesOrGlobal(Set<GRN> grantees) {

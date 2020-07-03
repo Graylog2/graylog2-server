@@ -19,7 +19,6 @@ package org.graylog.security;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.utilities.GRNRegistry;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,11 +26,7 @@ import java.util.Optional;
 
 @Singleton
 public class BuiltinCapabilities {
-    private static ImmutableMap<String, CapabilityDTO> CAPABILITIES;
-
-    public final static String CAPABILITY_ENTITY_VIEWER = "grn::::capability:54e3deadbeefdeadbeef0000";
-    public final static String CAPABILITY_ENTITY_MANAGER = "grn::::capability:54e3deadbeefdeadbeef0001";
-    public final static String CAPABILITY_ENTITY_OWNER = "grn::::capability:54e3deadbeefdeadbeef0002";
+    private static ImmutableMap<Capability, CapabilityDescriptor> CAPABILITIES;
 
     // TODO: Need to be migrated to roles
     public final static String ROLE_COLLECTION_CREATOR = "grn::::role:54e3deadbeefdeadbeef1001";
@@ -39,11 +34,10 @@ public class BuiltinCapabilities {
     public final static String ROLE_STREAM_CREATOR = "grn::::role:54e3deadbeefdeadbeef1003";
 
     @Inject
-    public BuiltinCapabilities(GRNRegistry grnRegistry) {
-
-        CAPABILITIES = ImmutableMap.<String, CapabilityDTO>builder()
-                .put(CAPABILITY_ENTITY_VIEWER, CapabilityDTO.create(
-                        grnRegistry.parse(CAPABILITY_ENTITY_VIEWER).entity(),
+    public BuiltinCapabilities() {
+        CAPABILITIES = ImmutableMap.<Capability, CapabilityDescriptor>builder()
+                .put(Capability.VIEW, CapabilityDescriptor.create(
+                        Capability.VIEW,
                         "Viewer",
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
@@ -51,8 +45,8 @@ public class BuiltinCapabilities {
                                 // TODO: Add missing collection permissions
                         )
                 ))
-                .put(CAPABILITY_ENTITY_MANAGER, CapabilityDTO.create(
-                        grnRegistry.parse(CAPABILITY_ENTITY_MANAGER).entity(),
+                .put(Capability.MANAGE, CapabilityDescriptor.create(
+                        Capability.MANAGE,
                         "Manager",
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
@@ -63,8 +57,8 @@ public class BuiltinCapabilities {
                                 // TODO: Add missing collection permissions
                         )
                 ))
-                .put(CAPABILITY_ENTITY_OWNER, CapabilityDTO.create(
-                        grnRegistry.parse(CAPABILITY_ENTITY_OWNER).entity(),
+                .put(Capability.OWN, CapabilityDescriptor.create(
+                        Capability.OWN,
                         "Owner",
                         ImmutableSet.of(
                                 RestPermissions.ENTITY_OWN,
@@ -76,6 +70,7 @@ public class BuiltinCapabilities {
                                 // TODO: Add missing collection permissions
                         )
                 ))
+                /* TODO: Needs to be moved to the actual roles registry
                 .put(ROLE_COLLECTION_CREATOR, CapabilityDTO.create(
                         grnRegistry.parse(ROLE_COLLECTION_CREATOR).entity(),
                         "Collection Creator",
@@ -94,18 +89,19 @@ public class BuiltinCapabilities {
                         "Stream Creator",
                         ImmutableSet.of(RestPermissions.STREAMS_CREATE)
                 ))
+                 */
                 .build();
     }
 
-    public static ImmutableSet<CapabilityDTO> allSharingCapabilities() {
+    public static ImmutableSet<CapabilityDescriptor> allSharingCapabilities() {
         return ImmutableSet.of(
-                CAPABILITIES.get(CAPABILITY_ENTITY_VIEWER),
-                CAPABILITIES.get(CAPABILITY_ENTITY_MANAGER),
-                CAPABILITIES.get(CAPABILITY_ENTITY_OWNER)
+                CAPABILITIES.get(Capability.VIEW),
+                CAPABILITIES.get(Capability.MANAGE),
+                CAPABILITIES.get(Capability.OWN)
         );
     }
 
-    public Optional<CapabilityDTO> get(String grn) {
-        return Optional.ofNullable(CAPABILITIES.get(grn));
+    public Optional<CapabilityDescriptor> get(Capability capability) {
+        return Optional.ofNullable(CAPABILITIES.get(capability));
     }
 }

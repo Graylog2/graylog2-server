@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.security.BuiltinCapabilities;
+import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDependencyResolver;
@@ -112,10 +113,10 @@ public class EntitySharesService {
 
         // Update capabilities of existing grants (for a grantee)
         existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
-            final GRN newCapability = request.selectedGrantees().get(g.grantee());
-            if (!g.capability().equals(newCapability.toString())) {
+            final Capability newCapability = request.selectedGrantees().get(g.grantee());
+            if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
-                        .capability(newCapability.toString())
+                        .capability(newCapability)
                         .updatedBy(userName)
                         .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
                         .build());
@@ -128,7 +129,7 @@ public class EntitySharesService {
             if (existingGrants.stream().noneMatch(eg -> eg.grantee().equals(grantee))) {
                 grantService.create(GrantDTO.builder()
                                 .grantee(grantee)
-                                .capability(capability.toString())
+                                .capability(capability)
                                 .target(ownedEntity)
                                 .build(),
                         sharingUser);
@@ -155,12 +156,12 @@ public class EntitySharesService {
                 .build();
     }
 
-    private Map<GRN, GRN> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, ImmutableMap<GRN, GRN> selectedGrantees) {
+    private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, ImmutableMap<GRN, Capability> selectedGrantees) {
         // If the user doesn't submit a grantee selection we return the active shares as selection so the frontend
         // can just render it
         if (selectedGrantees.isEmpty()) {
             return activeShares.stream()
-                    .collect(Collectors.toMap(ActiveShare::grantee, activeShare -> grnRegistry.parse(activeShare.capability())));
+                    .collect(Collectors.toMap(ActiveShare::grantee, ActiveShare::capability));
         }
         // If the user submits a grantee selection, we only return that one because we expect the frontend to always
         // submit the full selection not only added/removed grantees.
@@ -176,12 +177,13 @@ public class EntitySharesService {
     }
 
     private ImmutableSet<AvailableCapability> getAvailableCapabilities() {
+        // TODO: Don't use GRNs for capabilities
         return BuiltinCapabilities.allSharingCapabilities().stream()
-                .map(capability -> EntitySharePrepareResponse.AvailableCapability.create(grnRegistry.newGRN("capability", capability.id()).toString(), capability.title()))
+                .map(descriptor -> EntitySharePrepareResponse.AvailableCapability.create(descriptor.capability().toId(), descriptor.title()))
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private ImmutableSet<MissingDependency> getMissingDependencies(GRN ownedEntity, User sharingUser, ImmutableMap<GRN, GRN> selectedGrantees) {
+    private ImmutableSet<MissingDependency> getMissingDependencies(GRN ownedEntity, User sharingUser, ImmutableMap<GRN, Capability> selectedGrantees) {
         // TODO: We need to compute the missing dependencies by taking the selectedGrantees into account.
         //       (e.g. missing grants for selectedGrantees on the streams required for a dashboard to work correctly)
         // TODO: We only check for existing grants for the actual grantee. If the grantee is a team, we only check if
