@@ -22,6 +22,20 @@ export const security = Grantee
   .type('team')
   .build();
 
+export const alice = Grantee
+  .builder()
+  .id('grn::::user:alice-id')
+  .title('Alice Muad\'Dib')
+  .type('user')
+  .build();
+
+export const bob = Grantee
+  .builder()
+  .id('grn::::user:bob-id')
+  .title('Bob Bobson')
+  .type('user')
+  .build();
+
 export const john = Grantee
   .builder()
   .id('grn::::user:john-id')
@@ -36,7 +50,7 @@ export const jane = Grantee
   .type('user')
   .build();
 
-const availableGrantees = Immutable.List([everyone, john, jane, security]); // keep this order
+const availableGrantees = Immutable.List([everyone, alice, bob, john, jane, security]); // keep this order
 
 // roles
 export const viewer = Role.builder().id('viewer-id').title('Viewer').build();
