@@ -48,8 +48,8 @@ public abstract class EntitySharePrepareResponse {
     @JsonProperty("active_shares")
     public abstract ImmutableSet<ActiveShare> activeShares();
 
-    @JsonProperty("selected_grantees")
-    public abstract ImmutableMap<GRN, Capability> selectedGrantees();
+    @JsonProperty("selected_grantee_capabilities")
+    public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
 
     @JsonProperty("missing_dependencies")
     public abstract ImmutableSet<MissingDependency> missingDependencies();
@@ -64,7 +64,7 @@ public abstract class EntitySharePrepareResponse {
         public static Builder create() {
             return new AutoValue_EntitySharePrepareResponse.Builder()
                     .activeShares(Collections.emptySet())
-                    .selectedGrantees(Collections.emptyMap())
+                    .selectedGranteeCapabilities(Collections.emptyMap())
                     .missingDependencies(Collections.emptySet());
         }
 
@@ -83,8 +83,8 @@ public abstract class EntitySharePrepareResponse {
         @JsonProperty("active_shares")
         public abstract Builder activeShares(Set<ActiveShare> activeShares);
 
-        @JsonProperty("selected_grantees")
-        public abstract Builder selectedGrantees(Map<GRN, Capability> selectedGrantees);
+        @JsonProperty("selected_grantee_capabilities")
+        public abstract Builder selectedGranteeCapabilities(Map<GRN, Capability> selectedGranteeCapabilities);
 
         @JsonProperty("missing_dependencies")
         public abstract Builder missingDependencies(Set<MissingDependency> missingDependencies);

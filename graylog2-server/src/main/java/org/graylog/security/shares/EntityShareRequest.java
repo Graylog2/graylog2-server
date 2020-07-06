@@ -34,19 +34,19 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @AutoValue
 @JsonAutoDetect
 public abstract class EntityShareRequest {
-    @JsonProperty("selected_grantees")
-    public abstract ImmutableMap<GRN, Capability> selectedGrantees();
+    @JsonProperty("selected_grantee_capabilities")
+    public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
 
     public Set<GRN> grantees() {
-        return selectedGrantees().keySet();
+        return selectedGranteeCapabilities().keySet();
     }
 
     public Set<Capability> capabilities() {
-        return ImmutableSet.copyOf(selectedGrantees().values());
+        return ImmutableSet.copyOf(selectedGranteeCapabilities().values());
     }
 
     @JsonCreator
-    public static EntityShareRequest create(@JsonProperty("selected_grantees") Map<GRN, Capability> selectedGrantees) {
-        return new AutoValue_EntityShareRequest(ImmutableMap.copyOf(firstNonNull(selectedGrantees, Collections.emptyMap())));
+    public static EntityShareRequest create(@JsonProperty("selected_grantee_capabilities") Map<GRN, Capability> selectedGranteeCapabilities) {
+        return new AutoValue_EntityShareRequest(ImmutableMap.copyOf(firstNonNull(selectedGranteeCapabilities, Collections.emptyMap())));
     }
 }

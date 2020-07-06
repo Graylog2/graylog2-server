@@ -90,8 +90,8 @@ public class EntitySharesService {
                 .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
-                .selectedGrantees(getSelectedGranteeCapabilities(activeShares, request.selectedGrantees()))
-                .missingDependencies(getMissingDependencies(ownedEntity, sharingUser, request.selectedGrantees()))
+                .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request.selectedGranteeCapabilities()))
+                .missingDependencies(getMissingDependencies(ownedEntity, sharingUser, request.selectedGranteeCapabilities()))
                 .build();
     }
 
@@ -113,7 +113,7 @@ public class EntitySharesService {
 
         // Update capabilities of existing grants (for a grantee)
         existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
-            final Capability newCapability = request.selectedGrantees().get(g.grantee());
+            final Capability newCapability = request.selectedGranteeCapabilities().get(g.grantee());
             if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
                         .capability(newCapability)
@@ -125,7 +125,7 @@ public class EntitySharesService {
 
         // Create newly added grants
         // TODO Create multiple entries with one db query
-        request.selectedGrantees().forEach((grantee, capability) -> {
+        request.selectedGranteeCapabilities().forEach((grantee, capability) -> {
             if (existingGrants.stream().noneMatch(eg -> eg.grantee().equals(grantee))) {
                 grantService.create(GrantDTO.builder()
                                 .grantee(grantee)
@@ -139,7 +139,7 @@ public class EntitySharesService {
         // remove grants that are not present anymore
         // TODO delete multiple entries with one db query
         existingGrants.forEach((g) -> {
-            if (!request.selectedGrantees().containsKey(g.grantee())) {
+            if (!request.selectedGranteeCapabilities().containsKey(g.grantee())) {
                 grantService.delete(g.id());
             }
         });
@@ -151,21 +151,21 @@ public class EntitySharesService {
                 .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
-                .selectedGrantees(getSelectedGranteeCapabilities(activeShares, request.selectedGrantees()))
-                .missingDependencies(getMissingDependencies(ownedEntity, sharingUser, request.selectedGrantees()))
+                .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request.selectedGranteeCapabilities()))
+                .missingDependencies(getMissingDependencies(ownedEntity, sharingUser, request.selectedGranteeCapabilities()))
                 .build();
     }
 
-    private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, ImmutableMap<GRN, Capability> selectedGrantees) {
+    private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, ImmutableMap<GRN, Capability> selectedGranteeCapabilities) {
         // If the user doesn't submit a grantee selection we return the active shares as selection so the frontend
         // can just render it
-        if (selectedGrantees.isEmpty()) {
+        if (selectedGranteeCapabilities.isEmpty()) {
             return activeShares.stream()
                     .collect(Collectors.toMap(ActiveShare::grantee, ActiveShare::capability));
         }
         // If the user submits a grantee selection, we only return that one because we expect the frontend to always
         // submit the full selection not only added/removed grantees.
-        return selectedGrantees;
+        return selectedGranteeCapabilities;
     }
 
     private ImmutableSet<ActiveShare> getActiveShares(GRN ownedEntity, User sharingUser) {
@@ -183,9 +183,9 @@ public class EntitySharesService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private ImmutableSet<MissingDependency> getMissingDependencies(GRN ownedEntity, User sharingUser, ImmutableMap<GRN, Capability> selectedGrantees) {
-        // TODO: We need to compute the missing dependencies by taking the selectedGrantees into account.
-        //       (e.g. missing grants for selectedGrantees on the streams required for a dashboard to work correctly)
+    private ImmutableSet<MissingDependency> getMissingDependencies(GRN ownedEntity, User sharingUser, ImmutableMap<GRN, Capability> selectedGranteeCapabilities) {
+        // TODO: We need to compute the missing dependencies by taking the selectedGranteeCapabilities into account.
+        //       (e.g. missing grants for selectedGranteeCapabilities on the streams required for a dashboard to work correctly)
         // TODO: We only check for existing grants for the actual grantee. If the grantee is a team, we only check if
         //       the team has a grant, not if any users in the team can access the dependency via other grants.
         //       The same for the "everyone" grantee, we only check if  the "everyone" grantee has access to a dependency.
@@ -193,7 +193,7 @@ public class EntitySharesService {
         //       leaking information to the user.
         final ImmutableSet<MissingDependency> dependencies = entityDependencyResolver.resolve(ownedEntity);
         return dependencies.stream()
-                .filter(dependency -> true) // TODO: Only return dependencies the selectedGrantees don't have access to
+                .filter(dependency -> true) // TODO: Only return dependencies the selectedGranteeCapabilities don't have access to
                 .collect(ImmutableSet.toImmutableSet());
     }
 
