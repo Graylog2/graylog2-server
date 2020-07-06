@@ -43,9 +43,10 @@ public class HostFields {
     public static final String HOST_AS_ORGANIZATION_NAME = HOST_PREFIX + AutonomousSystemFields.AS_ORGANIZATION_NAME;
 
     // Geo Fields
+    public static final String HOST_GEO_CITY_ISO_CODE = HOST_PREFIX + GeoFields.GEO_CITY_ISO_CODE;
     public static final String HOST_GEO_CITY_NAME = HOST_PREFIX + GeoFields.GEO_CITY_NAME;
     public static final String HOST_GEO_STATE_NAME = HOST_PREFIX + GeoFields.GEO_STATE_NAME;
-    public static final String HOST_GEO_ISO_CODE = HOST_PREFIX + GeoFields.GEO_ISO_CODE;
+    public static final String HOST_GEO_COUNTRY_ISO_CODE = HOST_PREFIX + GeoFields.GEO_COUNTRY_ISO_CODE;
     public static final String HOST_GEO_COUNTRY_NAME = HOST_PREFIX + GeoFields.GEO_COUNTRY_NAME;
     public static final String HOST_GEO_COORDINATES = HOST_PREFIX + GeoFields.GEO_COORDINATES;
 }
