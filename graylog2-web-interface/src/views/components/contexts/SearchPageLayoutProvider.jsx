@@ -1,9 +1,11 @@
 // @flow strict
 import * as React from 'react';
+import { merge } from 'lodash';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
 import type { User } from 'stores/users/UsersStore';
+import View, { type ViewType } from 'views/logic/views/View';
 import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -20,7 +22,8 @@ type Props = {
 
 export const defaultLayoutConfig = (userPreferences?: UserPreferences) => ({
   sidebar: {
-    isPinned: userPreferences?.searchSidebarIsPinned ?? false,
+    searchSidebarIsPinned: userPreferences?.searchSidebarIsPinned ?? false,
+    dashboardSidebarIsPinned: userPreferences?.dashboardSidebarIsPinned ?? false,
   },
 });
 
@@ -31,18 +34,28 @@ const createUserPreferencesArray = (userPreferences) => {
   }));
 };
 
-const toggleSidebarPinning = (config, setConfig, userName, userPreferences) => {
-  const newState = !config.sidebar.isPinned;
+const sidebarPinningPreferenceKey = (viewType: ?ViewType): string => {
+  switch (viewType) {
+    case View.Type.Dashboard:
+      return 'dashboardSidebarIsPinned';
+    default:
+      return 'searchSidebarIsPinned';
+  }
+};
+
+const toggleSidebarPinning = (config, setConfig, userName, userPreferences, viewType) => {
+  const preferenceKey = sidebarPinningPreferenceKey(viewType);
+  const newState = !config.sidebar[preferenceKey];
   const newLayoutConfig = {
     ...config,
     sidebar: {
       ...config.sidebar,
-      isPinned: newState,
+      [preferenceKey]: newState,
     },
   };
   const newUserPreferences = {
     ...userPreferences,
-    searchSidebarIsPinned: newState,
+    [preferenceKey]: newState,
   };
 
   setConfig(newLayoutConfig);
@@ -52,10 +65,12 @@ const toggleSidebarPinning = (config, setConfig, userName, userPreferences) => {
 
 const SearchPageLayoutProvider = ({ children, currentUser, userPreferences }: Props) => {
   const [config, setConfig] = useState(defaultLayoutConfig(userPreferences));
-  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser?.username, userPreferences) };
+  const actions = { toggleSidebarPinning: (viewType) => toggleSidebarPinning(config, setConfig, currentUser?.username, userPreferences, viewType) };
+  const configHelpers = { sidebar: { isPinned: (viewType) => config.sidebar[sidebarPinningPreferenceKey(viewType)] } };
+  const conigWithHelpers = merge(config, configHelpers);
 
   return (
-    <SearchPageLayoutContext.Provider value={{ config, actions }}>
+    <SearchPageLayoutContext.Provider value={{ config: conigWithHelpers, actions }}>
       {children}
     </SearchPageLayoutContext.Provider>
   );
