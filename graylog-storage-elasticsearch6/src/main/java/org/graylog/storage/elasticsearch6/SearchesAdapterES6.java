@@ -284,7 +284,17 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                                                       int offset,
                                                       TimeRange range,
                                                       Sorting sort) {
-        return standardSearchRequest(query, limit, offset, range, null, sort, true);
+        return standardSearchRequest(query, limit, offset, range, sort, true);
+    }
+
+    private SearchSourceBuilder standardSearchRequest(
+            String query,
+            int limit,
+            int offset,
+            TimeRange range,
+            Sorting sort,
+            boolean highlight) {
+        return standardSearchRequest(query, limit, offset, range, null, sort, highlight);
     }
 
     private SearchSourceBuilder standardSearchRequest(
