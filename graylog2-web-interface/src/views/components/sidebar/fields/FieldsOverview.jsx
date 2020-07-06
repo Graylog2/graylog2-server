@@ -19,12 +19,33 @@ import FieldGroup from './FieldGroup';
 type Props = {
   activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
-  listHeight: number,
+  viewMetadata: ViewMetadata,
   viewMetadata: ViewMetadata,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   white-space: break-spaces;
+  height: 100%;
+  display: grid;
+  display: -ms-grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  -ms-grid-columns: 1fr;
+  -ms-grid-rows: auto 1fr;
+
+  > *:nth-child(1) {
+    grid-column: 1;
+    -ms-grid-column: 1;
+    grid-row: 1;
+    -ms-grid-row: 1;
+  }
+
+  > *:nth-child(2) {
+    grid-column: 1;
+    -ms-grid-column: 1;
+    grid-row: 2;
+    -ms-grid-row: 2;
+  }
 `;
 
 const FilterForm = styled.form`
@@ -32,7 +53,6 @@ const FilterForm = styled.form`
 `;
 
 const FilterInputWrapper = styled.div`
-  flex-grow: 1;
   margin-right: 5px;
 `;
 
@@ -40,12 +60,12 @@ const FilterInput = styled.input`
   width: 100%;
 `;
 
-const FieldListGroups = styled.div`
+const FieldGroups = styled.div`
   margin-top: 5px;
   margin-bottom: 0;
 `;
 
-const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata, listHeight }: Props) => {
+const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) => {
   const [currentGroup, setCurrentGroup] = useState('current');
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
@@ -53,56 +73,57 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata, listHeight
 
   return (
     <Container>
-      <FilterForm className="form-inline" onSubmit={(e) => e.preventDefault()}>
-        <FilterInputWrapper className="form-group has-feedback">
-          <FilterInput id="common-search-form-query-input"
-                       className="query form-control"
-                       onChange={handleSearch}
-                       value={filter || ''}
-                       placeholder="Filter fields"
-                       type="text"
-                       autoComplete="off"
-                       spellCheck="false" />
-        </FilterInputWrapper>
-        <div className="form-group">
-          <Button type="reset" className="reset-button" onClick={handleSearchReset}>
-            Reset
-          </Button>
-        </div>
-      </FilterForm>
-      <FieldListGroups>
-        List fields of{' '}
-        <FieldGroup selected={currentGroup === 'current'}
-                    group="current"
-                    text="current streams"
-                    title="This shows fields which are (prospectively) included in the streams you have selected."
-                    onSelect={setCurrentGroup} />
-        {', '}
-        <FieldGroup selected={currentGroup === 'all'}
-                    group="all"
-                    text="all"
-                    title="This shows all fields, but no reserved (gl2_*) fields."
-                    onSelect={setCurrentGroup} />
-        {' or '}
-        <FieldGroup onSelect={setCurrentGroup}
-                    selected={currentGroup === 'allreserved'}
-                    group="allreserved"
-                    text="all including reserved"
-                    title="This shows all fields, including reserved (gl2_*) fields." />
-        {' fields.'}
-      </FieldListGroups>
-      <hr />
-      <List activeQueryFields={activeQueryFields}
-            allFields={allFields}
-            currentGroup={currentGroup}
+      <div>
+        <FilterForm onSubmit={(e) => e.preventDefault()}>
+          <FilterInputWrapper className="form-group has-feedback">
+            <FilterInput id="common-search-form-query-input"
+                         className="query form-control"
+                         onChange={handleSearch}
+                         value={filter || ''}
+                         placeholder="Filter fields"
+                         type="text"
+                         autoComplete="off"
+                         spellCheck="false" />
+          </FilterInputWrapper>
+          <div className="form-group">
+            <Button type="reset" className="reset-button" onClick={handleSearchReset}>
+              Reset
+            </Button>
+          </div>
+        </FilterForm>
+        <FieldGroups>
+          List fields of{' '}
+          <FieldGroup selected={currentGroup === 'current'}
+                      group="current"
+                      text="current streams"
+                      title="This shows fields which are (prospectively) included in the streams you have selected."
+                      onSelect={setCurrentGroup} />
+          {', '}
+          <FieldGroup selected={currentGroup === 'all'}
+                      group="all"
+                      text="all"
+                      title="This shows all fields, but no reserved (gl2_*) fields."
+                      onSelect={setCurrentGroup} />
+          {' or '}
+          <FieldGroup onSelect={setCurrentGroup}
+                      selected={currentGroup === 'allreserved'}
+                      group="allreserved"
+                      text="all including reserved"
+                      title="This shows all fields, including reserved (gl2_*) fields." />
+          {' fields.'}
+        </FieldGroups>
+        <hr />
+      </div>
+      <List viewMetadata={viewMetadata}
             filter={filter}
-            listHeight={listHeight}
-            viewMetadata={viewMetadata} />
+            activeQueryFields={activeQueryFields}
+            allFields={allFields}
+            currentGroup={currentGroup} />
     </Container>
   );
 };
 
-const FieldListWithContext = (props) => (
+const FieldsOverviewWithContext = (props) => (
   <FieldTypesContext.Consumer>
     {(fieldTypes) => {
       const { viewMetadata: { activeQuery } } = props;
@@ -115,13 +136,8 @@ const FieldListWithContext = (props) => (
   </FieldTypesContext.Consumer>
 );
 
-FieldListWithContext.propTypes = {
+FieldsOverviewWithContext.propTypes = {
   viewMetadata: PropTypes.object.isRequired,
-  listHeight: PropTypes.number,
 };
 
-FieldListWithContext.defaultProps = {
-  listHeight: 50,
-};
-
-export default connect(FieldListWithContext, { viewMetadata: ViewMetadataStore });
+export default connect(FieldsOverviewWithContext, { viewMetadata: ViewMetadataStore });
