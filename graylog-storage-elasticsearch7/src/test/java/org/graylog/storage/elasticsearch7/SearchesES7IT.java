@@ -27,9 +27,7 @@ public class SearchesES7IT extends SearchesIT {
         return new SearchesAdapterES7(elasticsearch.elasticsearchClient(),
                 new Scroll(elasticsearch.elasticsearchClient(),
                         scrollResultFactory,
-                        sortOrderMapper,
-                        allowLeadingWildcardSearches,
-                        allowHighlighting),
+                        new Search(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches)),
                 new SearchRequestFactory(sortOrderMapper,
                         allowHighlighting,
                         allowLeadingWildcardSearches));
