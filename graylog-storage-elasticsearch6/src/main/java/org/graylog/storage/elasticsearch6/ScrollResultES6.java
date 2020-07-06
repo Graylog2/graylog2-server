@@ -57,7 +57,6 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
         ScrollResultES6 create(@Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, @Assisted List<String> fields);
     }
 
-
     @AssistedInject
     public ScrollResultES6(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted List<String> fields) {
         this(jestClient, objectMapper, initialResult, query, DEFAULT_SCROLL, fields);
@@ -155,10 +154,6 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
 
         public int getChunkNumber() {
             return chunkNumber;
-        }
-
-        public boolean isFirstChunk() {
-            return getChunkNumber() == 0;
         }
 
         public List<ResultMessage> getMessages() {

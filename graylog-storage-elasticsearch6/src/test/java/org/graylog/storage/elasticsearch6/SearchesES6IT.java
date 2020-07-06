@@ -31,6 +31,7 @@ public class SearchesES6IT extends SearchesIT {
                 new SortOrderMapper()
         );
     }
+
     @Override
     public Searches createSearches() {
         return new Searches(

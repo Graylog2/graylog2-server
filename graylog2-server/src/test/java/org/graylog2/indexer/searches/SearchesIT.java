@@ -237,19 +237,21 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
     public void testFieldStats() throws Exception {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
-        FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
+        FieldStatsResult fieldStats = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
 
-        assertThat(result.searchHits()).hasSize(10);
-        assertThat(result.count()).isEqualTo(8);
-        assertThat(result.min()).isEqualTo(1.0);
-        assertThat(result.max()).isEqualTo(4.0);
-        assertThat(result.mean()).isEqualTo(2.375);
-        assertThat(result.sum()).isEqualTo(19.0);
-        assertThat(result.sumOfSquares()).isEqualTo(53.0);
-        assertThat(result.variance()).isEqualTo(0.984375);
-        assertThat(result.stdDeviation()).isEqualTo(0.9921567416492215);
+        assertThat(fieldStats).satisfies(result -> {
+            assertThat(result.searchHits()).hasSize(10);
+            assertThat(result.count()).isEqualTo(8);
+            assertThat(result.min()).isEqualTo(1.0);
+            assertThat(result.max()).isEqualTo(4.0);
+            assertThat(result.mean()).isEqualTo(2.375);
+            assertThat(result.sum()).isEqualTo(19.0);
+            assertThat(result.sumOfSquares()).isEqualTo(53.0);
+            assertThat(result.variance()).isEqualTo(0.984375);
+            assertThat(result.stdDeviation()).isEqualTo(0.9921567416492215);
+        });
     }
 
     @Test
