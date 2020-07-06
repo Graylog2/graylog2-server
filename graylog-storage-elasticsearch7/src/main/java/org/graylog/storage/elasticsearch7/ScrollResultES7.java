@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final TimeValue DEFAULT_SCROLL = TimeValue.timeValueMinutes(1);
@@ -46,6 +48,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
 
         this.client = client;
         this.totalHits = initialResult.getHits().getTotalHits().value;
+        checkArgument(initialResult.getScrollId() != null, "Unable to extract scroll id from supplied search result!");
         this.scrollId = initialResult.getScrollId();
         this.initialResult = initialResult;
         this.scroll = scroll;

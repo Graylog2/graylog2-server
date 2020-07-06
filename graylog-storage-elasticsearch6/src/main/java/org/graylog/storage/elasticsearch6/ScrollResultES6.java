@@ -41,6 +41,7 @@ import java.util.stream.StreamSupport;
 public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final String DEFAULT_SCROLL = "1m";
+    private static final String SCROLL_ID_FIELD = "_scroll_id";
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -112,7 +113,10 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
     }
 
     private String getScrollIdFromResult(JestResult result) {
-        return result.getJsonObject().path("_scroll_id").asText();
+        if (!result.getJsonObject().hasNonNull(SCROLL_ID_FIELD)) {
+            throw new IllegalStateException("Unable to extract scroll id from search result!");
+        }
+        return result.getJsonObject().path(SCROLL_ID_FIELD).asText();
     }
 
     private JestResult getNextScrollResult() throws IOException {
