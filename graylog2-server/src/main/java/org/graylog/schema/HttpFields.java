@@ -32,6 +32,8 @@ public class HttpFields {
     public static final String HTTP_URL = "http_url";
     public static final String HTTP_URL_CATEGORY = "http_url_category";
     public static final String HTTP_USER_AGENT = "http_user_agent";
+    public static final String HTTP_USER_AGENT_ANALYZED = "http_user_agent_analyzed";
+    public static final String HTTP_USER_AGENT_LENGTH = "http_user_agent_length";
     public static final String HTTP_USER_AGENT_NAME = "http_user_agent_name";
     public static final String HTTP_USER_AGENT_OS = "http_user_agent_os";
     public static final String HTTP_VERSION = "http_version";
@@ -40,6 +42,4 @@ public class HttpFields {
     // Derived and Enriched Fields
     public static final String HTTP_URL_ANALYZED = "http_url_analyzed";
     public static final String HTTP_URL_LENGTH = "http_url_length";
-    public static final String HTTP_USER_AGENT_ANALYZED = "http_user_agent_analyzed";
-    public static final String HTTP_USER_AGENT_LENGTH = "http_user_agent_length";
 }
