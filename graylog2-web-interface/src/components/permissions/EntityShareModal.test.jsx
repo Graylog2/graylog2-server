@@ -65,7 +65,9 @@ describe('EntityShareModal', () => {
     await wait(() => {
       expect(EntityShareActions.update).toBeCalledTimes(1);
 
-      expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, { grantee_capability: mockEntityShareState.selectedGranteeCapabilities });
+      expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, {
+        selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities
+      });
     });
   });
 
@@ -145,7 +147,7 @@ describe('EntityShareModal', () => {
           expect(EntityShareActions.prepare).toBeCalledTimes(2);
 
           expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
-            selected_grantees: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
+            selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
           });
         });
       };
@@ -191,7 +193,7 @@ describe('EntityShareModal', () => {
         expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
         expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
-          selected_grantees: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
+          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
         });
       });
     });
@@ -243,7 +245,7 @@ describe('EntityShareModal', () => {
           expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
-            selected_grantees: selectedGranteeCapabilities.remove(grantee.id),
+            selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
           });
         });
       };

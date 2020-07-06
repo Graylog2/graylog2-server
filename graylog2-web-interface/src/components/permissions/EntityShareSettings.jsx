@@ -56,7 +56,7 @@ const EntityShareSettings = ({
     setDisableSubmit(true);
 
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantees: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
+      selected_grantee_capabilities: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
     }).then((response) => {
       setDisableSubmit(false);
 
@@ -68,7 +68,7 @@ const EntityShareSettings = ({
     setDisableSubmit(true);
 
     return EntityShareActions.prepare(entityGRN, {
-      selected_grantees: selectedGranteeCapabilities.remove(granteeId),
+      selected_grantee_capabilities: selectedGranteeCapabilities.remove(granteeId),
     }).then((response) => {
       setDisableSubmit(false);
 
@@ -100,7 +100,7 @@ const EntityShareSettings = ({
                       selectedGrantees={selectedGrantees}
                       title="Current collaborators" />
       </Section>
-      {missingDependencies && (
+      {missingDependencies && missingDependencies.size > 0 && (
         <Section>
           <DependenciesWarning missingDependencies={missingDependencies}
                                selectedGrantees={selectedGrantees} />
