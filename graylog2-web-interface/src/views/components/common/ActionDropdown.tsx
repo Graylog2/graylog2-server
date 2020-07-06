@@ -120,26 +120,26 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     this.setState(({ show }) => ({ show: !show }));
   };
 
-  adjustOptionOnSelectProp = (option: React.Element<*>, updateDepth: number) => {
-    if (option.props.onSelect) {
+  adjustChildOnSelectProp = (child: React.Element<*>, updateDepth: number) => {
+    if (child.props.onSelect) {
       return {
         onSelect: (eventKey: ?string, event: SyntheticInputEvent<HTMLButtonElement>) => {
-          option.props.onSelect();
+          child.props.onSelect();
           this._onToggle(event);
         },
       };
     }
 
-    if (option.props.children) {
+    if (child.props.children) {
       return {
-        children: this.adjustOptionsProps(option.props.children, updateDepth + 1),
+        children: this.adjustChildProps(child.props.children, updateDepth + 1),
       };
     }
 
     return {};
   };
 
-  adjustOptionsProps = (children: React.Node, updateDepth: number) => {
+  adjustChildProps = (children: React.Node, updateDepth: number) => {
     const maxChildDepth = 2;
 
     if (updateDepth > maxChildDepth) {
@@ -150,7 +150,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
       children,
       (child: React.ReactElement) => child && React.cloneElement(child, {
         ...child.props,
-        ...this.adjustOptionOnSelectProp(child, updateDepth + 1),
+        ...this.adjustChildOnSelectProp(child, updateDepth + 1),
       }),
     );
   }
@@ -158,7 +158,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   render() {
     const { children, container, element } = this.props;
     const { show } = this.state;
-    const mappedChildren = this.adjustOptionsProps(children, 1);
+    const mappedChildren = this.adjustChildProps(children, 1);
 
     return (
       <StopPropagation>
