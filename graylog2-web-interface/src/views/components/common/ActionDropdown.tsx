@@ -158,7 +158,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   render() {
     const { children, container, element } = this.props;
     const { show } = this.state;
-    const mappedChildren = this.adjustChildProps(children, 1);
+    const mappedChildren = this.adjustChildProps(children, 0);
 
     return (
       <StopPropagation>
