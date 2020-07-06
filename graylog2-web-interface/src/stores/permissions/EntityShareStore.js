@@ -1,6 +1,5 @@
 // @flow strict
 import Reflux from 'reflux';
-import * as Immutable from 'immutable';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -29,9 +28,7 @@ type EntityShareActionsType = RefluxActions<{
 
 type EntityShareStoreType = Store<EntityShareStoreState>;
 
-const defaultPreparePayload = {
-  selected_grantee_capabilities: Immutable.Map(),
-};
+const defaultPreparePayload = {};
 
 export const EntityShareActions: EntityShareActionsType = singletonActions(
   'permissions.EntityShare',
