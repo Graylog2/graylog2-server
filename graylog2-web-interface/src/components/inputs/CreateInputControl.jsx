@@ -2,15 +2,12 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';
 import { ExternalLinkButton, Select } from 'components/common';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import { InputForm } from 'components/inputs';
 
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
@@ -36,11 +33,14 @@ const CreateInputControl = createReactClass({
     let options = [];
 
     const { inputTypes } = this.state;
+
     if (inputTypes) {
       const inputTypesIds = Object.keys(inputTypes);
+
       options = inputTypesIds.map((id) => {
         return { value: id, label: inputTypes[id] };
       });
+
       options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
     } else {
       options.push({ value: 'none', label: 'No inputs available', disabled: true });
@@ -89,6 +89,7 @@ const CreateInputControl = createReactClass({
 
     if (selectedInputDefinition && !customInputsComponent) {
       const inputTypeName = inputTypes[selectedInput];
+
       inputModal = (
         <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                    key="configuration-form-input"

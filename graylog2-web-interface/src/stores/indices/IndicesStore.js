@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const IndicesActions = ActionsProvider.getActions('Indices');
@@ -23,6 +22,7 @@ const IndicesStore = Reflux.createStore({
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
+
       return { indices: this.indices, closedIndices: this.closedIndices };
     });
 
@@ -34,6 +34,7 @@ const IndicesStore = Reflux.createStore({
       this.indices = response.all.indices;
       this.closedIndices = response.closed.indices;
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
+
       return { indices: this.indices, closedIndices: this.closedIndices };
     });
 
@@ -41,14 +42,17 @@ const IndicesStore = Reflux.createStore({
   },
   multiple() {
     const indexNames = Object.keys(this.registrations);
+
     if (indexNames.length <= 0) {
       return;
     }
+
     const urlList = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
     const request = { indices: indexNames };
     const promise = fetch('POST', urlList, request).then((response) => {
       this.indices = { ...this.indices, ...response };
       this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
+
       return { indices: this.indices, closedIndices: this.closedIndices };
     });
 
@@ -77,6 +81,7 @@ const IndicesStore = Reflux.createStore({
   },
   unsubscribe(indexName) {
     this.registrations[indexName] = this.registrations[indexName] > 0 ? this.registrations[indexName] - 1 : 0;
+
     if (this.registrations[indexName] === 0) {
       delete this.registrations[indexName];
     }

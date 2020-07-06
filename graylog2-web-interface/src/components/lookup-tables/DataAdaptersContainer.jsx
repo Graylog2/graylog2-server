@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } = CombinedProvider.get(
@@ -38,9 +37,11 @@ const DataAdaptersContainer = createReactClass({
     if (!this.state.dataAdapters) {
       return <Spinner />;
     }
+
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => React.cloneElement(child,
         { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }));
+
     return <div>{childrenWithProps}</div>;
   },
 });

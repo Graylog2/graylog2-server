@@ -50,6 +50,7 @@ class ImportsViewModal extends React.Component {
         },
         (error) => {
           this.setState({ uploads: [], totalUploads: 0 });
+
           UserNotification.error(`Fetching uploads failed with error: ${error}`,
             'Could not get configuration uploads');
         },

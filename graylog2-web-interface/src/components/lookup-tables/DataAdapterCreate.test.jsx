@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import DataAdapterCreate from './DataAdapterCreate';
@@ -33,6 +32,7 @@ describe('<DataAdapterCreate />', () => {
     const callback = () => {};
     const types = {};
     const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -44,6 +44,7 @@ describe('<DataAdapterCreate />', () => {
       },
     };
     const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -66,6 +67,7 @@ describe('<DataAdapterCreate />', () => {
         },
       };
       const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
+
       expect(wrapper).toMatchSnapshot();
       expect(console.error.mock.calls.length).toBe(1);
     });

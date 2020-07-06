@@ -1,7 +1,7 @@
 // @flow strict
 import { Map } from 'immutable';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import Widget from 'views/logic/widgets/Widget';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -38,11 +38,15 @@ describe('RemoveFromAllTablesActionHandler', () => {
     const expectedWidgets = Map([[expectedMessageWidget.id, expectedMessageWidget], [pivotWidget.id, pivotWidget]]);
 
     WidgetStore.getInitialState = jest.fn(() => widgets);
+
     WidgetActions.updateWidgets = mockAction(jest.fn((newWidgets) => {
       expect(newWidgets).toEqual(expectedWidgets);
+
       return Promise.resolve();
     }));
+
     RemoveFromAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
+
     expect(WidgetActions.updateWidgets).toBeCalled();
   });
 });

@@ -1,17 +1,17 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled, { type StyledComponent } from 'styled-components';
 
+import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
+
 import VisualizationTypeSelect from './VisualizationTypeSelect';
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 import RowPivotSelect from './RowPivotSelect';
@@ -73,6 +73,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     super(props);
 
     const { config } = props;
+
     this.state = {
       config,
     };
@@ -88,6 +89,7 @@ export default class AggregationControls extends React.Component<Props, State> {
 
   _onSeriesChange = (series: $PropertyType<$PropertyType<Props, 'config'>, 'series'>) => {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().series(series).build() }));
+
     return true;
   };
 
@@ -124,6 +126,7 @@ export default class AggregationControls extends React.Component<Props, State> {
   _propagateState() {
     const { config } = this.state;
     const { onChange } = this.props;
+
     onChange(config);
   }
 
@@ -147,6 +150,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex((x) => x === visualization) >= 0;
     const childrenWithCallback = React.Children.map(children, (child) => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
+
     return (
       <Container>
         <TopRow>

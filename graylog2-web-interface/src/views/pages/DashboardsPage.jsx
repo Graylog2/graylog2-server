@@ -7,7 +7,6 @@ import { Col, Row, Button } from 'components/graylog';
 import connect from 'stores/connect';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common/index';
 import Routes from 'routing/Routes';
-
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
@@ -26,6 +25,7 @@ const handleViewDelete = (view) => {
   if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
     return ViewManagementActions.delete(view);
   }
+
   return null;
 };
 
@@ -35,6 +35,7 @@ const refreshDashboards = () => {
 
 const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
   useEffect(refreshDashboards, []);
+
   return (
     <DocumentTitle title="Dashboards">
       <span>

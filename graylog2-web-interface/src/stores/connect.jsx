@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { isFunction } from 'lodash';
+
 import isDeepEqual from './isDeepEqual';
 
 type StoreType<State> = {
@@ -24,12 +25,14 @@ const id = <V, R>(x: V) => {
 export function useStore<V, Store: StoreType<V>, R>(store: Store, propsMapper: PropsMapper<V, R> = id): R {
   const [storeState, setStoreState] = useState(() => propsMapper(store.getInitialState()));
   const storeStateRef = useRef(storeState);
+
   useEffect(() => store.listen((newState) => {
     if (!isDeepEqual(newState, storeStateRef.current)) {
       setStoreState(propsMapper(newState));
       storeStateRef.current = newState;
     }
   }), [store]);
+
   return storeState;
 }
 
@@ -65,6 +68,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
   mapProps: (ResultType<Stores>) => MappedProps = (props) => props,
 ): React.ComponentType<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
+
   class ConnectStoresWrapper extends React.Component<$Diff<$Call<ExtractComponentProps, ComponentType>, MappedProps>> {
     // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
@@ -77,12 +81,16 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
       // Retrieving initial state from each configured store
       const storeStates = Object.keys(stores).map((key) => {
         const store = stores[key];
+
         if (store === undefined || !isFunction(store.getInitialState)) {
           // eslint-disable-next-line no-console
           console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+
           return [key, undefined];
         }
+
         const state = store.getInitialState();
+
         return [key, state];
       }).reduce((prev, [key, state]) => ({ ...prev, [key]: state }), {});
 
@@ -92,11 +100,14 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
     componentDidMount() {
       this.unsubscribes = Object.keys(stores).map((key) => {
         const store = stores[key];
+
         if (store === undefined || !isFunction(store.listen)) {
           // eslint-disable-next-line no-console
           console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+
           return () => {};
         }
+
         return store.listen((partialState) => this.setState((state) => ({ ...state, [key]: partialState })));
       });
     }
@@ -114,9 +125,11 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
 
     _genProps = (state: ResultType<Stores>): MappedProps => {
       const storeProps = {};
+
       Object.keys(stores).forEach((key) => {
         storeProps[key] = state[key];
       });
+
       return mapProps(storeProps);
     };
 
@@ -127,6 +140,7 @@ function connect<Stores: Object, Props, ComponentType: React.ComponentType<Props
       return <Component {...nextProps} {...componentProps} />;
     }
   }
+
   ConnectStoresWrapper.displayName = `ConnectStoresWrapper[${wrappedComponentName}] stores=${Object.keys(stores).join(',')}`;
 
   return ConnectStoresWrapper;

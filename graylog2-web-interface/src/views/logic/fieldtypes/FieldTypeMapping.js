@@ -27,6 +27,7 @@ class FieldTypeMapping {
 
   static fromJSON(value: FieldTypeMappingJSON) {
     const { name, type } = value;
+
     return new FieldTypeMapping(name, FieldType.fromJSON(type));
   }
 

@@ -1,58 +1,107 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { SizeMe } from 'react-sizeme';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
-import { Title, TitleText, TitleIcon, Content } from './NavItem.styles';
-import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  isOpen: boolean,
   isSelected: boolean,
-  expandRight: boolean,
-  text: string,
+  title: string,
   icon: string,
-  onClick: (string) => void,
-  children: React.Element<any>,
+  onClick: () => void,
+  showTitleOnHover: boolean,
 };
 
-const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick }: Props) => {
-  // eslint-disable-next-line no-nested-ternary
+const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+  display: none;
+  position: absolute;
+  padding: 5px 10px;
+  left: 100%;
+
+  font-size: ${theme.fonts.size.body};
+  color: white;
+  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
+
+  z-index: 4;
+`);
+
+const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => `
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  width: 100%;
+  height: 40px;
+
+  text-align: center;
+  cursor: pointer;
+  font-size: ${theme.fonts.size.h3};
+  color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
+  cursor: pointer;
+  
+  :hover {
+    background: ${theme.colors.gray[30]};
+    > * {
+      display: block;
+    }
+  }
+
+  :active {
+    background: ${theme.colors.gray[20]};
+  }
+
+  &::after {
+    content: ' ';
+    display: ${isSelected ? 'block' : 'none'};
+    position: absolute;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-right: 10px solid white;
+    border-bottom: 10px solid transparent;
+  }
+
+  ${((!isSelected && showTitleOnHover) ? `
+    :hover::after {
+      display: block;
+      border-right-color: currentColor;
+    }
+
+    :active {
+      &::after, > div {
+        display: none;
+      }
+    }
+  ` : '')}
+`);
+
+const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
   return (
-    <>
-      <Title role="presentation" onClick={onClick} isSelected={isSelected} expandRight={expandRight}>
-        <TitleIcon><Icon name={icon} /></TitleIcon>
-        {(isOpen && <TitleText>{text}</TitleText>)}
-      </Title>
-      <SizeMe monitorHeight refreshRate={100}>
-        {({ size }) => {
-          return (
-            <Content isSelected={isSelected} expandRight={expandRight}>
-              {
-                isSelected && children
-                  ? React.cloneElement(children, { listHeight: size.height - 150 })
-                  : <span />
-              }
-            </Content>
-          );
-        }}
-      </SizeMe>
-    </>
+    <Container aria-label={title}
+               isSelected={isSelected}
+               onClick={onClick}
+               showTitleOnHover={showTitleOnHover}
+               title={showTitleOnHover ? '' : title}>
+      <Icon name={icon} />
+      {(showTitleOnHover && !isSelected) && <Title>{title}</Title>}
+    </Container>
   );
 };
 
 NavItem.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  isSelected: PropTypes.bool.isRequired,
-  expandRight: PropTypes.bool,
-  text: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
-  children: CustomPropTypes.OneOrMoreChildren.isRequired,
+  isSelected: PropTypes.bool,
+  showTitleOnHover: PropTypes.bool,
+  title: PropTypes.string.isRequired,
 };
 
 NavItem.defaultProps = {
-  expandRight: false,
+  isSelected: false,
+  showTitleOnHover: true,
 };
 
 export default NavItem;

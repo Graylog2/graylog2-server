@@ -1,15 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'components/graylog';
 import { Link } from 'react-router';
 import Reflux from 'reflux';
-
-import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
-
-import OutputsComponent from 'components/outputs/OutputsComponent';
-import SupportLink from 'components/support/SupportLink';
 import createReactClass from 'create-react-class';
 
+import { Col, Row } from 'components/graylog';
+import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
+import OutputsComponent from 'components/outputs/OutputsComponent';
+import SupportLink from 'components/support/SupportLink';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';
 
@@ -32,6 +30,7 @@ const StreamOutputsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     StreamsStore.get(params.streamId, (stream) => {
       this.setState({ stream: stream });
     });
@@ -39,9 +38,11 @@ const StreamOutputsPage = createReactClass({
 
   render() {
     const { stream, currentUser } = this.state;
+
     if (!stream) {
       return <Spinner />;
     }
+
     return (
       <DocumentTitle title={`Outputs for Stream ${stream.title}`}>
         <div>

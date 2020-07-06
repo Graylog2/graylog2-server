@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import moment from 'moment';
 
 import { Timestamp } from 'components/common';
-
 import DateTime from 'logic/datetimes/DateTime';
 
 const SystemInformation = createReactClass({
@@ -31,6 +30,7 @@ const SystemInformation = createReactClass({
   render() {
     const { systemInformation } = this.props;
     let jvmInformation;
+
     if (this.props.jvmInformation) {
       jvmInformation = <span>PID {this.props.jvmInformation.pid}, {this.props.jvmInformation.info}</span>;
     } else {

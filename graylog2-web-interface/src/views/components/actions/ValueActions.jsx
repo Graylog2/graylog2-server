@@ -2,16 +2,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { MenuItem } from 'components/graylog';
 
+import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
+
+import { createHandlerFor } from './ActionHandler';
+import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
+
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Value.css';
 import CustomPropTypes from '../CustomPropTypes';
-import { createHandlerFor } from './ActionHandler';
-import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
 
 type Props = {
   children: React.Node,
@@ -48,6 +50,7 @@ class ValueActions extends React.Component<Props, State> {
 
   constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
+
     this.state = {
       open: false,
       overflowingComponents: {},
@@ -65,11 +68,13 @@ class ValueActions extends React.Component<Props, State> {
     const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
       .filter((action: ActionDefinition) => {
         const { isHidden = (() => false: ActionHandlerCondition) } = action;
+
         return !isHidden(handlerArgs);
       })
       .map((action: ActionDefinition) => {
         const setActionComponents = (fn) => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
         const handler = createHandlerFor(action, setActionComponents);
+
         const onSelect = () => {
           this._onMenuToggle();
           handler(handlerArgs);
@@ -77,6 +82,7 @@ class ValueActions extends React.Component<Props, State> {
 
         const { isEnabled = (() => true: ActionHandlerCondition) } = action;
         const actionDisabled = !isEnabled(handlerArgs);
+
         return (
           <MenuItem key={`value-action-${field}-${action.type}`}
                     disabled={actionDisabled}

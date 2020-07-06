@@ -4,17 +4,19 @@ import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { type ThemeInterface } from 'theme';
 
+import { type ThemeInterface } from 'theme';
 import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 
 import ChartColorContext from './ChartColorContext';
+
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style/useable!css!./GenericPlot.css';
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+
+import styles from '!style/useable!css!./GenericPlot.css';
 
 type LegendConfig = {
   name: string,
@@ -104,6 +106,7 @@ class GenericPlot extends React.Component<Props, State> {
 
       return onZoom(from, to);
     }
+
     return true;
   };
 
@@ -111,11 +114,14 @@ class GenericPlot extends React.Component<Props, State> {
     const name = e.node.textContent;
     const target = e.node.querySelector('g.layers');
     const { getChartColor } = this.props;
+
     if (getChartColor) {
       const color = getChartColor(e.fullData, name);
+
       /* $FlowFixMe color is already declared as optional */
       this.setState({ legendConfig: { name, target, color } });
     }
+
     return false;
   };
 
@@ -170,14 +176,17 @@ class GenericPlot extends React.Component<Props, State> {
           const newChartData = chartData.map((chart) => {
             if (setChartColor && colors) {
               const conf = setChartColor(chart, colors);
+
               if (conf.line || conf.marker) {
                 return merge(chart, conf);
               }
+
               return chart;
             }
 
             return chart;
           });
+
           return (
             <InteractiveContext.Consumer>
               {(interactive) => (

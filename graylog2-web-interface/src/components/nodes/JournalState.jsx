@@ -5,11 +5,8 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 
 import { Pluralize, Spinner } from 'components/common';
-
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -31,6 +28,7 @@ const JournalState = createReactClass({
       segments: 'org.graylog2.journal.segments',
       entriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
     };
+
     Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
   },
 

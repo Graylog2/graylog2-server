@@ -1,8 +1,10 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import type { QueryMetadataJson } from './QueryMetadata';
-import type { ParameterJson } from '../parameters/Parameter';
 import QueryMetadata from './QueryMetadata';
+
+import type { ParameterJson } from '../parameters/Parameter';
 import Parameter from '../parameters/Parameter';
 
 type QueryMetadataMap = Immutable.Map<string, QueryMetadata>;
@@ -61,6 +63,7 @@ export default class SearchMetadata {
       .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata));
     const declaredParameters = Immutable.Map(declared_parameters)
       .map((parameter: ParameterJson) => Parameter.fromJSON(parameter));
+
     return new SearchMetadata(queryMetadata, declaredParameters);
   }
 }

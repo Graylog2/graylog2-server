@@ -3,14 +3,13 @@ import React from 'react';
 
 import { Col, Row, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
-
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider'; // To make IndexRangesActions work.
-
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 
 const IndicesActions = ActionsProvider.getActions('Indices');
 const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+
 StoreProvider.getStore('IndexRanges');
 
 class IndexDetails extends React.Component {
@@ -77,7 +76,9 @@ class IndexDetails extends React.Component {
     if (!this.props.index || !this.props.index.all_shards) {
       return <Spinner />;
     }
+
     const { index, indexRange, indexName } = this.props;
+
     return (
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />{' '}

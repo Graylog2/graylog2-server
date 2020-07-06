@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { CacheForm } from 'components/lookup-tables';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import ObjectUtils from 'util/ObjectUtils';
 
 class CacheCreate extends React.Component {
@@ -29,6 +29,7 @@ class CacheCreate extends React.Component {
 
   _onTypeSelect = (cacheType) => {
     const { types } = this.props;
+
     this.setState({
       type: cacheType,
       cache: {
@@ -50,12 +51,14 @@ class CacheCreate extends React.Component {
     } = this.props;
     const { type, cache } = this.state;
     const cachePlugins = {};
+
     PluginStore.exports('lookupTableCaches').forEach((p) => {
       cachePlugins[p.type] = p;
     });
 
     const sortedCaches = Object.keys(types).map((key) => {
       const typeItem = types[key];
+
       return { value: typeItem.type, label: cachePlugins[typeItem.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
@@ -98,6 +101,5 @@ class CacheCreate extends React.Component {
     );
   }
 }
-
 
 export default CacheCreate;

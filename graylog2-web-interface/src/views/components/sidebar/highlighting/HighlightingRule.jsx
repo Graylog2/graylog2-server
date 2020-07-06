@@ -2,21 +2,21 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
-import { type ThemeInterface } from 'theme';
 
+import { type ThemeInterface } from 'theme';
+import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
-
 import { ColorPickerPopover, Icon } from 'components/common';
+
 import ColorPreview from './ColorPreview';
 
 export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: grid;
   display: -ms-grid;
-  margin-top: 5px;
   grid-template-columns: max-content 1fr max-content;
   -ms-grid-columns: max-content 1fr max-content;
+  margin-top: 10px;
   word-break: break-word;
 
   > *:nth-child(1) {
@@ -55,11 +55,13 @@ type Props = {
 
 const updateColor = (rule, newColor, hidePopover) => {
   const newRule = rule.toBuilder().color(newColor).build();
+
   return HighlightingRulesActions.update(newRule).then(hidePopover);
 };
 
 const onDelete = (e, rule) => {
   e.preventDefault();
+
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
@@ -68,6 +70,7 @@ const onDelete = (e, rule) => {
 
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color } = rule;
+
   return (
     <HighlightingRuleGrid>
       <ColorPickerPopover id="formatting-rule-color"
@@ -80,7 +83,7 @@ const HighlightingRule = ({ rule }: Props) => {
         for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
       </div>
       <DeleteIcon role="presentation" title="Remove this Highlighting Rule" onClick={(e) => onDelete(e, rule)}>
-        <Icon name="trash-o" />
+        <Icon name="trash-alt" type="regular" />
       </DeleteIcon>
     </HighlightingRuleGrid>
   );

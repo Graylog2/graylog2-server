@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import createReactClass from 'create-react-class';
 
 import { MetricDetails } from 'components/metrics';
@@ -22,16 +21,17 @@ const Metric = createReactClass({
   },
 
   iconMapping: {
-    timer: 'clock-o',
+    timer: 'clock',
     histogram: 'signal',
     meter: 'play-circle',
-    gauge: 'dashboard',
+    gauge: 'tachometer-alt',
     counter: 'circle',
     unknown: 'question-circle',
   },
 
   _formatIcon(type) {
     const icon = this.iconMapping[type];
+
     if (icon) {
       return icon;
     }
@@ -43,6 +43,7 @@ const Metric = createReactClass({
     const { namespace } = this.props;
     const split = metricName.split(namespace);
     const unqualifiedMetricName = split.slice(1).join(namespace);
+
     return (
       <span>
         <span className="prefix">{namespace}</span>
@@ -59,6 +60,7 @@ const Metric = createReactClass({
   render() {
     const { metric } = this.props;
     const details = this.state.expanded ? <MetricDetails nodeId={this.props.nodeId} metric={this.props.metric} /> : null;
+
     return (
       <span>
         <div className="name">

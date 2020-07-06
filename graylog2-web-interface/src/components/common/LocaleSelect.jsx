@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import Select from 'components/common/Select';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const SystemStore = StoreProvider.getStore('System');
@@ -35,9 +34,11 @@ const LocaleSelect = createReactClass({
       .sort((a, b) => {
         const nameA = a.label.toUpperCase();
         const nameB = b.label.toUpperCase();
+
         if (nameA < nameB) {
           return -1;
         }
+
         if (nameA > nameB) {
           return 1;
         }
@@ -58,6 +59,7 @@ const LocaleSelect = createReactClass({
     }
 
     const locales = this._formatLocales(this.state.locales);
+
     return (
       <Select ref={(locale) => { this.locale = locale; }}
               {...this.props}

@@ -7,7 +7,6 @@ import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
-
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import FilterPreview from './FilterPreview';
@@ -29,6 +28,7 @@ class FilterPreviewContainer extends React.Component {
 
   fetchSearch = lodash.debounce((config) => {
     const { currentUser } = this.props;
+
     if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
       return;
     }
@@ -67,6 +67,7 @@ class FilterPreviewContainer extends React.Component {
 
   componentDidMount() {
     const { eventDefinition } = this.props;
+
     this.fetchSearch(eventDefinition.config);
   }
 

@@ -8,8 +8,8 @@ import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import { Icon, Spinner, Timestamp } from 'components/common';
-
 import Routes from 'routing/Routes';
+
 import MessageActions from './MessageActions';
 import MessageMetadata from './MessageMetadata';
 import NodeName from './NodeName';
@@ -51,6 +51,7 @@ class MessageDetail extends React.Component {
   _inputName = (inputId) => {
     const { inputs } = this.props;
     const input = inputs.get(inputId);
+
     return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
   };
 
@@ -80,6 +81,7 @@ class MessageDetail extends React.Component {
         <Link to={Routes.message_show(index, id)}>{id}</Link>
       );
     }
+
     return <span>{id} <Label bsStyle="warning">Not stored</Label></span>;
   };
 
@@ -98,6 +100,7 @@ class MessageDetail extends React.Component {
     } = this.props;
     const { showOriginal } = this.state;
     const { fields, index, id } = message;
+
     // Short circuit when all messages are being expanded at the same time
     if (expandAllRenderAsync) {
       return (
@@ -113,13 +116,16 @@ class MessageDetail extends React.Component {
     const streams = streamIds.map((streamId) => {
       // eslint-disable-next-line react/destructuring-assignment
       const stream = this.props.streams.get(streamId);
+
       if (stream !== undefined) {
         return <li key={stream.id}><StreamLink stream={stream} /></li>;
       }
+
       return null;
     });
 
     let timestamp = null;
+
     if (showTimestamp) {
       timestamp = [];
       const rawTimestamp = fields.timestamp;

@@ -7,7 +7,9 @@ import QueryTitleEditModal from './QueryTitleEditModal';
 
 describe('QueryTitleEditModal', () => {
   afterEach(cleanup);
+
   const modalHeadline = 'Editing dashboard page title';
+
   const openModal = (modalRef, currentTitle = 'CurrentTitle') => {
     if (modalRef) {
       modalRef.open(currentTitle);
@@ -20,9 +22,12 @@ describe('QueryTitleEditModal', () => {
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={() => Promise.resolve(Immutable.Map())} />,
     );
+
     // Modal should not be visible initially
     expect(queryByText(modalHeadline)).toBeNull();
+
     openModal(modalRef);
+
     // Modal should be visible
     expect(queryByText(modalHeadline)).not.toBeNull();
   });
@@ -33,7 +38,9 @@ describe('QueryTitleEditModal', () => {
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={() => Promise.resolve(Immutable.Map())} />,
     );
+
     openModal(modalRef);
+
     expect(getByDisplayValue('CurrentTitle')).not.toBeNull();
   });
 
@@ -44,13 +51,17 @@ describe('QueryTitleEditModal', () => {
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={onTitleChangeFn} />,
     );
+
     openModal(modalRef);
     const titleInput = getByDisplayValue('CurrentTitle');
     const saveButton = getByText('Save');
+
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });
     fireEvent.click(saveButton);
+
     expect(onTitleChangeFn).toHaveBeenCalledTimes(1);
     expect(onTitleChangeFn).toHaveBeenCalledWith('NewTitle');
+
     // Modal should not be visible anymore
     await wait(() => {
       expect(queryByText(modalHeadline)).toBeNull();
@@ -64,12 +75,17 @@ describe('QueryTitleEditModal', () => {
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
                            onTitleChange={onTitleChangeFn} />,
     );
+
     openModal(modalRef);
+
     // Modal should be visible
     expect(queryByText(modalHeadline)).not.toBeNull();
+
     // Modal should not be visible after click on cancel
     const cancelButton = getByText('Cancel');
+
     fireEvent.click(cancelButton);
+
     await wait(() => {
       expect(queryByText(modalHeadline)).toBeNull();
     });

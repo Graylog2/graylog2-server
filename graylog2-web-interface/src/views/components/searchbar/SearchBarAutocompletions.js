@@ -1,5 +1,6 @@
 // @flow strict
 import { sortBy, uniqBy } from 'lodash';
+
 import type { Editor, ResultsCallback, Session, Position, CompletionResult, AutoCompleter, Token } from './ace-types';
 
 export interface Completer {
@@ -30,11 +31,13 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
           // eslint-disable-next-line no-console
           console.warn('Exception thrown in completer: ', e);
         }
+
         return [];
       })
       .reduce((acc, cur) => [...acc, ...cur], []);
 
     const uniqResults = uniqBy(sortBy(results, ['score', 'name']), 'name');
+
     callback(null, uniqResults);
   }
 }

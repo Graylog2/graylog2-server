@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { capitalize } from 'lodash';
 
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+
 import Select from '../Select';
 
 type Props = {
@@ -15,6 +16,7 @@ const interpolationOptions = ['linear', 'step-after', 'spline'].map(_makeOption)
 
 const AreaVisualizationConfiguration = ({ config = AreaVisualizationConfig.empty(), onChange }: Props) => {
   const _onChange = useCallback(({ value }) => onChange(config.toBuilder().interpolation(value).build()), [config, onChange]);
+
   return (
     <>
       <span>Interpolation:</span>

@@ -8,9 +8,7 @@ import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
 import URLUtils from 'util/URLUtils';
-
 import Routes from 'routing/Routes';
-
 import {
   AlertConditionsPage,
   AlertNotificationsPage,
@@ -85,7 +83,6 @@ import {
   ThreadDumpPage,
   UsersPage,
 } from 'pages';
-
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
 const AppRouter = () => {

@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import FormsUtils from 'util/FormsUtils';
-import FieldHelpers from './FieldHelpers';
 
+import FormsUtils from 'util/FormsUtils';
+
+import FieldHelpers from './FieldHelpers';
 
 const NumberField = createReactClass({
   displayName: 'NumberField',
@@ -35,6 +36,7 @@ const NumberField = createReactClass({
 
   validationSpec(field) {
     const validationAttributes = field.attributes.map(this.mapValidationAttribute);
+
     if (validationAttributes.length > 0) {
       // The server may return more than one validation attribute, but it doesn't make sense to use more
       // than one validation for a number field, so we return the first one
@@ -46,6 +48,7 @@ const NumberField = createReactClass({
 
   handleChange(evt) {
     const numericValue = FormsUtils.getValueFromInput(evt.target);
+
     this.props.onChange(this.props.title, numericValue);
   },
 

@@ -4,7 +4,9 @@ import styled from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
+
 import styles from './WidgetHeader.css';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 const LoadingSpinner = styled(Spinner)`

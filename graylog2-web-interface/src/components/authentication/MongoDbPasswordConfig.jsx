@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { DocumentTitle, PageHeader } from 'components/common';
 
 class MongoDbPasswordConfig extends React.Component {

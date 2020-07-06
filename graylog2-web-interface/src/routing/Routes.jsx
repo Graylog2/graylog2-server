@@ -1,6 +1,7 @@
-import AppConfig from 'util/AppConfig';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
+
+import AppConfig from 'util/AppConfig';
 import { extendedSearchPath, viewsPath } from 'views/Constants';
 
 const Routes = {
@@ -50,6 +51,7 @@ const Routes = {
         if (from) {
           return `/system/index_sets/${indexSetId}/configuration?from=${from}`;
         }
+
         return `/system/index_sets/${indexSetId}/configuration`;
       },
       SHOW: (indexSetId) => `/system/index_sets/${indexSetId}`,
@@ -129,10 +131,13 @@ const Routes = {
     const queryParams = {
       q: query,
     };
+
     if (rangeType && timeRange) {
       queryParams[rangeType] = timeRange;
     }
+
     route.query(queryParams);
+
     return route.resource();
   },
   _common_search_url: (resource, query, timeRange, resolution) => {
@@ -149,6 +154,7 @@ const Routes = {
     }
 
     route.query(queryParams);
+
     return route.resource();
   },
   search: (query, timeRange, resolution) => {
@@ -186,6 +192,7 @@ const Routes = {
       example_index: index,
       example_id: messageId,
     };
+
     route.search(queryParams);
 
     return route.resource();
@@ -196,7 +203,6 @@ const Routes = {
   getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId, filter) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
 };
-
 
 const qualifyUrls = (routes, appPrefix) => {
   const qualifiedRoutes = {};
@@ -209,8 +215,10 @@ const qualifyUrls = (routes, appPrefix) => {
       case 'function':
         qualifiedRoutes[routeName] = (...params) => {
           const result = routes[routeName](...params);
+
           return new URI(`${appPrefix}/${result}`).normalizePath().resource();
         };
+
         break;
       case 'object':
         qualifiedRoutes[routeName] = qualifyUrls(routes[routeName], appPrefix);
@@ -224,6 +232,7 @@ const qualifyUrls = (routes, appPrefix) => {
 };
 
 const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+
 defaultExport.unqualified = Routes;
 
 /*
@@ -244,6 +253,7 @@ defaultExport.unqualified = Routes;
  */
 defaultExport.pluginRoute = (routeKey) => {
   const pluginRoutes = {};
+
   PluginStore.exports('routes').forEach((pluginRoute) => {
     const uri = new URI(pluginRoute.path);
     const segments = uri.segment();
@@ -254,6 +264,7 @@ defaultExport.pluginRoute = (routeKey) => {
       pluginRoutes[key] = (...paramValues) => {
         paramNames.forEach((param, idx) => {
           const value = String(paramValues[idx]);
+
           uri.segment(segments.indexOf(param), value);
         });
 
@@ -265,7 +276,9 @@ defaultExport.pluginRoute = (routeKey) => {
 
     pluginRoutes[key] = pluginRoute.path;
   });
+
   const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
+
   if (!route) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);
   }

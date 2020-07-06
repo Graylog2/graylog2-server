@@ -8,7 +8,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
-
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewList from 'views/components/views/ViewList';
 
@@ -21,12 +20,12 @@ const ViewManagementPage = createReactClass({
     return ViewManagementActions.search(query, page, perPage);
   },
 
-
   handleViewDelete(view) {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
       return ViewManagementActions.delete(view);
     }
+
     return null;
   },
 

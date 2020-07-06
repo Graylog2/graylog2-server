@@ -37,6 +37,7 @@ describe('ConfirmLeaveDialog', () => {
   it('unregisters window beforeunload handler upon unmount', () => {
     const router = mockRouter();
     const unsubscribe = jest.fn();
+
     router.setRouteLeaveHook.mockReturnValue(unsubscribe);
 
     const wrapper = mount(<ConfirmLeaveDialog route={{}} router={router} />);
@@ -58,11 +59,13 @@ describe('ConfirmLeaveDialog', () => {
   it('unregisters route leave handler upon unmount', () => {
     const router = mockRouter();
     const unsubscribe = jest.fn();
+
     router.setRouteLeaveHook.mockReturnValue(unsubscribe);
 
     const wrapper = mount(<ConfirmLeaveDialog route={{ __id__: 42 }} router={router} />);
 
     wrapper.unmount();
+
     expect(unsubscribe).toHaveBeenCalled();
   });
 });

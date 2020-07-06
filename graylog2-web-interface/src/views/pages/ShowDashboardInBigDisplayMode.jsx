@@ -12,6 +12,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
+
 import ShowViewPage from './ShowViewPage';
 
 type BigDisplayModeQuery = {|
@@ -46,11 +47,14 @@ const BodyPositioningWrapper = styled.div`
 const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, activeQuery } = {} }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
+
   useEffect(() => {
     RefreshActions.setInterval(configuration.refresh * 1000);
     RefreshActions.enable();
+
     return () => RefreshActions.disable();
   }, [configuration.refresh]);
+
   return (
     <InteractiveContext.Provider value={false}>
       <BodyPositioningWrapper>

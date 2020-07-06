@@ -12,6 +12,7 @@ describe('AggregationWidgetConfig', () => {
 
     expect(config.rollup).toEqual(true);
   });
+
   it('filters sorts referencing nonpresent metrics', () => {
     const config = AggregationWidgetConfig.builder()
       .series([Series.forFunction('count()')])

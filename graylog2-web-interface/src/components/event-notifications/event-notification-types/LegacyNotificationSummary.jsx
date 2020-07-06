@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { Alert } from 'components/graylog';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
@@ -20,6 +21,7 @@ class LegacyNotificationSummary extends React.Component {
     const typeData = legacyTypes[callbackType];
 
     let content;
+
     if (typeData) {
       const typeConfiguration = typeData.configuration;
 

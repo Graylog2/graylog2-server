@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Clearfix } from 'components/graylog';
-
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 // eslint-disable-next-line import/no-cycle

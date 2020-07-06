@@ -42,8 +42,9 @@ exports[`NumberVisualization should render a number visualization 1`] = `
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={

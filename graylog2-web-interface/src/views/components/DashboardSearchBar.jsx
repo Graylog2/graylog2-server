@@ -18,6 +18,7 @@ import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import TopRow from 'views/components/searchbar/TopRow';
+
 import DashboardSearchForm from './DashboardSearchBarForm';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 
@@ -35,6 +36,7 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
   if (!config) {
     return <Spinner />;
   }
+
   const submitForm = useCallback(({ timerange, queryString }) => GlobalOverrideActions.set(timerange, queryString)
     .then(() => performSearch()), [performSearch]);
   const { timerange, query: { query_string: queryString = '' } = {} } = globalOverride || {};
@@ -72,7 +74,11 @@ const DashboardSearchBar = ({ config, globalOverride, disableSearch = false, onE
                       {({ field: { name, value, onChange } }) => (
                         <QueryInput value={value}
                                     placeholder="Apply filter to all widgets"
-                                    onChange={(newQuery) => { onChange({ target: { value: newQuery, name } }); return Promise.resolve(); }}
+                                    onChange={(newQuery) => {
+                                      onChange({ target: { value: newQuery, name } });
+
+                                      return Promise.resolve();
+                                    }}
                                     onExecute={handleSubmit} />
                       )}
                     </Field>

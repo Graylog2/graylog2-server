@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import connect from 'stores/connect';
 import { ChartColorRulesStore, ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import type { ColorRule } from 'views/stores/ChartColorRulesStore';
+
 import ChartColorContext from '../visualizations/ChartColorContext';
 
 type Props = {

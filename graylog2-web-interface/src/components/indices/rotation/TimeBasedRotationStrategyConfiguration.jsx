@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
 import moment from 'moment';
+
+import { Input } from 'components/bootstrap';
 
 class TimeBasedRotationStrategyConfiguration extends React.Component {
   static propTypes = {
@@ -38,6 +39,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
   _isValidPeriod = (duration) => {
     const check = duration || this.state.rotation_period;
+
     return moment.duration(check).asMilliseconds() >= 3600000;
   };
 
@@ -45,6 +47,7 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     if (this._isValidPeriod()) {
       return undefined;
     }
+
     return 'error';
   };
 

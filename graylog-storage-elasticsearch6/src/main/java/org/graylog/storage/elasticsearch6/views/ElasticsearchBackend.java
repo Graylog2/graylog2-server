@@ -25,10 +25,10 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Parameter;
@@ -50,9 +50,9 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog.storage.elasticsearch6.IndexHelper;
+import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.graylog2.indexer.cluster.jest.JestUtils.checkForFailedShards;
+import static org.graylog.storage.elasticsearch6.jest.JestUtils.checkForFailedShards;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -143,7 +143,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .must(searchTypeSourceBuilder.query())
                     .must(
                             Objects.requireNonNull(
-                                    IndexHelper.getTimestampRangeFilter(
+                                    TimeRangeQueryFactory.create(
                                             query.effectiveTimeRange(searchType)
                                     ),
                                     "Timerange for search type " + searchType.id() + " cannot be found in query or search type."

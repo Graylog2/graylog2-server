@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-
-import { ListGroup } from 'components/graylog';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+
+import { ListGroup } from 'components/graylog';
 
 import SortableListItem from './SortableListItem';
 
@@ -84,6 +84,7 @@ class SortableList extends React.Component {
     const { onMoveItem } = this.props;
     const { items } = this.state;
     const tempItem = items[dragIndex];
+
     items[dragIndex] = items[hoverIndex];
     items[hoverIndex] = tempItem;
     this.setState({ items });
@@ -115,6 +116,5 @@ class SortableList extends React.Component {
     );
   }
 }
-
 
 export default DragDropContext(HTML5Backend)(SortableList);

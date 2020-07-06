@@ -1,8 +1,8 @@
 import Reflux from 'reflux';
+
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const NodesStore = StoreProvider.getStore('Nodes');
@@ -26,6 +26,7 @@ const ClusterOverviewStore = Reflux.createStore({
 
   cluster() {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+
     promise.then(
       (response) => {
         this.clusterOverview = response;
@@ -63,6 +64,7 @@ const ClusterOverviewStore = Reflux.createStore({
 
   jvm(nodeId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
+
     promise.catch((error) => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
 
     return promise;

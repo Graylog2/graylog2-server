@@ -80,307 +80,340 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
               className="data-table table-responsive"
               id="content-packs-constraints"
             >
-              <table
+              <DataTable__StyledTable
                 className="table "
               >
-                <thead>
-                  <tr>
-                    <DataTableElement
-                      element="Name"
-                      formatter={[Function]}
-                      index={0}
-                      key="header-0"
-                    >
-                      <th>
-                        Name
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Type"
-                      formatter={[Function]}
-                      index={1}
-                      key="header-1"
-                    >
-                      <th>
-                        Type
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Version"
-                      formatter={[Function]}
-                      index={2}
-                      key="header-2"
-                    >
-                      <th>
-                        Version
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Fulfilled"
-                      formatter={[Function]}
-                      index={3}
-                      key="header-3"
-                    >
-                      <th>
-                        Fulfilled
-                      </th>
-                    </DataTableElement>
-                  </tr>
-                </thead>
-                <tbody>
-                  <DataTableElement
-                    element={
-                      Object {
-                        "fulfilled": false,
-                        "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
-                        "type": "plugin-version",
-                        "version": ">=3.0.0-alpha.2",
-                      }
+                <StyledComponent
+                  className="table "
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "isStatic": false,
+                        "lastClassName": "efDjcv",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "DataTable__StyledTable",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "target": "table",
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    formatter={[Function]}
-                    index={0}
-                    key="row-0"
+                  }
+                  forwardedRef={null}
+                >
+                  <table
+                    className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
                   >
-                    <tr>
-                      <td>
-                        org.graylog.plugins.threatintel.ThreatIntelPlugin
-                      </td>
-                      <td>
-                        plugin-version
-                      </td>
-                      <td>
-                        &gt;=3.0.0-alpha.2
-                      </td>
-                      <td>
-                        <ContentPackConstraints__StyledBadge
-                          isFulfilled={false}
+                    <thead>
+                      <tr>
+                        <DataTableElement
+                          element="Name"
+                          formatter={[Function]}
+                          index={0}
+                          key="header-0"
                         >
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                  "isStatic": false,
-                                  "lastClassName": "fBopeI",
-                                  "rules": Array [
-                                    "background-color:",
-                                    [Function],
-                                    ";",
-                                  ],
-                                },
-                                "displayName": "ContentPackConstraints__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
-                            isFulfilled={false}
-                          >
-                            <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                          <th>
+                            Name
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Type"
+                          formatter={[Function]}
+                          index={1}
+                          key="header-1"
+                        >
+                          <th>
+                            Type
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Version"
+                          formatter={[Function]}
+                          index={2}
+                          key="header-2"
+                        >
+                          <th>
+                            Version
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Fulfilled"
+                          formatter={[Function]}
+                          index={3}
+                          key="header-3"
+                        >
+                          <th>
+                            Fulfilled
+                          </th>
+                        </DataTableElement>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <DataTableElement
+                        element={
+                          Object {
+                            "fulfilled": false,
+                            "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                            "type": "plugin-version",
+                            "version": ">=3.0.0-alpha.2",
+                          }
+                        }
+                        formatter={[Function]}
+                        index={0}
+                        key="row-0"
+                      >
+                        <tr>
+                          <td>
+                            org.graylog.plugins.threatintel.ThreatIntelPlugin
+                          </td>
+                          <td>
+                            plugin-version
+                          </td>
+                          <td>
+                            &gt;=3.0.0-alpha.2
+                          </td>
+                          <td>
+                            <ContentPackConstraints__StyledBadge
                               isFulfilled={false}
                             >
-                              <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                      "isStatic": false,
+                                      "lastClassName": "fBopeI",
+                                      "rules": Array [
+                                        "background-color:",
+                                        [Function],
+                                        ";",
+                                      ],
+                                    },
+                                    "displayName": "ContentPackConstraints__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                isFulfilled={false}
                               >
-                                <Badge__StyledBadge
+                                <Component
                                   className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                  isFulfilled={false}
                                 >
-                                  <StyledComponent
+                                  <ForwardRef
                                     className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                          "isStatic": false,
-                                          "lastClassName": "gDhrrS",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Badge__StyledBadge",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                   >
-                                    <Badge
-                                      bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                                      pullRight={false}
+                                    <Badge__StyledBadge
+                                      className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
                                     >
-                                      <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
+                                      <StyledComponent
+                                        className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                              "isStatic": false,
+                                              "lastClassName": "gDhrrS",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Badge__StyledBadge",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                       >
-                                        <Icon
-                                          name="times"
+                                        <Badge
+                                          bsClass="badge"
+                                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                          pullRight={false}
                                         >
-                                          <FontAwesomeIcon
-                                            icon={
-                                              Object {
-                                                "iconName": "times",
-                                                "prefix": "fas",
-                                              }
-                                            }
+                                          <span
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
                                           >
-                                            <svg
-                                              className="svg-inline--fa fa-times"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </span>
-                                    </Badge>
-                                  </StyledComponent>
-                                </Badge__StyledBadge>
-                              </ForwardRef>
-                            </Component>
-                          </StyledComponent>
-                        </ContentPackConstraints__StyledBadge>
-                      </td>
-                    </tr>
-                  </DataTableElement>
-                  <DataTableElement
-                    element={
-                      Object {
-                        "fulfilled": true,
-                        "type": "server-version",
-                        "version": ">=3.0.0-alpha.2+af8d8e0",
-                      }
-                    }
-                    formatter={[Function]}
-                    index={1}
-                    key="row-1"
-                  >
-                    <tr>
-                      <td>
-                        Graylog
-                      </td>
-                      <td>
-                        server-version
-                      </td>
-                      <td>
-                        &gt;=3.0.0-alpha.2+af8d8e0
-                      </td>
-                      <td>
-                        <ContentPackConstraints__StyledBadge
-                          isFulfilled={true}
-                        >
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                  "isStatic": false,
-                                  "lastClassName": "fBopeI",
-                                  "rules": Array [
-                                    "background-color:",
-                                    [Function],
-                                    ";",
-                                  ],
-                                },
-                                "displayName": "ContentPackConstraints__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
-                            isFulfilled={true}
-                          >
-                            <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                            <Icon
+                                              name="times"
+                                              type="solid"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={
+                                                  Object {
+                                                    "iconName": "times",
+                                                    "prefix": "fas",
+                                                  }
+                                                }
+                                              >
+                                                <svg
+                                                  className="svg-inline--fa fa-times"
+                                                />
+                                              </FontAwesomeIcon>
+                                            </Icon>
+                                          </span>
+                                        </Badge>
+                                      </StyledComponent>
+                                    </Badge__StyledBadge>
+                                  </ForwardRef>
+                                </Component>
+                              </StyledComponent>
+                            </ContentPackConstraints__StyledBadge>
+                          </td>
+                        </tr>
+                      </DataTableElement>
+                      <DataTableElement
+                        element={
+                          Object {
+                            "fulfilled": true,
+                            "type": "server-version",
+                            "version": ">=3.0.0-alpha.2+af8d8e0",
+                          }
+                        }
+                        formatter={[Function]}
+                        index={1}
+                        key="row-1"
+                      >
+                        <tr>
+                          <td>
+                            Graylog
+                          </td>
+                          <td>
+                            server-version
+                          </td>
+                          <td>
+                            &gt;=3.0.0-alpha.2+af8d8e0
+                          </td>
+                          <td>
+                            <ContentPackConstraints__StyledBadge
                               isFulfilled={true}
                             >
-                              <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                      "isStatic": false,
+                                      "lastClassName": "fBopeI",
+                                      "rules": Array [
+                                        "background-color:",
+                                        [Function],
+                                        ";",
+                                      ],
+                                    },
+                                    "displayName": "ContentPackConstraints__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                isFulfilled={true}
                               >
-                                <Badge__StyledBadge
+                                <Component
                                   className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                  isFulfilled={true}
                                 >
-                                  <StyledComponent
+                                  <ForwardRef
                                     className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                          "isStatic": false,
-                                          "lastClassName": "gDhrrS",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Badge__StyledBadge",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                   >
-                                    <Badge
-                                      bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
-                                      pullRight={false}
+                                    <Badge__StyledBadge
+                                      className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                                     >
-                                      <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
+                                      <StyledComponent
+                                        className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                              "isStatic": false,
+                                              "lastClassName": "gDhrrS",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Badge__StyledBadge",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                       >
-                                        <Icon
-                                          name="check"
+                                        <Badge
+                                          bsClass="badge"
+                                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                          pullRight={false}
                                         >
-                                          <FontAwesomeIcon
-                                            icon={
-                                              Object {
-                                                "iconName": "check",
-                                                "prefix": "fas",
-                                              }
-                                            }
+                                          <span
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
                                           >
-                                            <svg
-                                              className="svg-inline--fa fa-check"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </span>
-                                    </Badge>
-                                  </StyledComponent>
-                                </Badge__StyledBadge>
-                              </ForwardRef>
-                            </Component>
-                          </StyledComponent>
-                        </ContentPackConstraints__StyledBadge>
-                      </td>
-                    </tr>
-                  </DataTableElement>
-                </tbody>
-              </table>
+                                            <Icon
+                                              name="check"
+                                              type="solid"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={
+                                                  Object {
+                                                    "iconName": "check",
+                                                    "prefix": "fas",
+                                                  }
+                                                }
+                                              >
+                                                <svg
+                                                  className="svg-inline--fa fa-check"
+                                                />
+                                              </FontAwesomeIcon>
+                                            </Icon>
+                                          </span>
+                                        </Badge>
+                                      </StyledComponent>
+                                    </Badge__StyledBadge>
+                                  </ForwardRef>
+                                </Component>
+                              </StyledComponent>
+                            </ContentPackConstraints__StyledBadge>
+                          </td>
+                        </tr>
+                      </DataTableElement>
+                    </tbody>
+                  </table>
+                </StyledComponent>
+              </DataTable__StyledTable>
             </div>
           </div>
         </div>
@@ -464,307 +497,340 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
               className="data-table table-responsive"
               id="content-packs-constraints"
             >
-              <table
+              <DataTable__StyledTable
                 className="table "
               >
-                <thead>
-                  <tr>
-                    <DataTableElement
-                      element="Name"
-                      formatter={[Function]}
-                      index={0}
-                      key="header-0"
-                    >
-                      <th>
-                        Name
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Type"
-                      formatter={[Function]}
-                      index={1}
-                      key="header-1"
-                    >
-                      <th>
-                        Type
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Version"
-                      formatter={[Function]}
-                      index={2}
-                      key="header-2"
-                    >
-                      <th>
-                        Version
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Fulfilled"
-                      formatter={[Function]}
-                      index={3}
-                      key="header-3"
-                    >
-                      <th>
-                        Fulfilled
-                      </th>
-                    </DataTableElement>
-                  </tr>
-                </thead>
-                <tbody>
-                  <DataTableElement
-                    element={
-                      Object {
-                        "fulfilled": true,
-                        "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
-                        "type": "plugin-version",
-                        "version": ">=3.0.0-alpha.2",
-                      }
+                <StyledComponent
+                  className="table "
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "isStatic": false,
+                        "lastClassName": "efDjcv",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "DataTable__StyledTable",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "target": "table",
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    formatter={[Function]}
-                    index={0}
-                    key="row-0"
+                  }
+                  forwardedRef={null}
+                >
+                  <table
+                    className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
                   >
-                    <tr>
-                      <td>
-                        org.graylog.plugins.threatintel.ThreatIntelPlugin
-                      </td>
-                      <td>
-                        plugin-version
-                      </td>
-                      <td>
-                        &gt;=3.0.0-alpha.2
-                      </td>
-                      <td>
-                        <ContentPackConstraints__StyledBadge
-                          isFulfilled={true}
+                    <thead>
+                      <tr>
+                        <DataTableElement
+                          element="Name"
+                          formatter={[Function]}
+                          index={0}
+                          key="header-0"
                         >
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                  "isStatic": false,
-                                  "lastClassName": "fBopeI",
-                                  "rules": Array [
-                                    "background-color:",
-                                    [Function],
-                                    ";",
-                                  ],
-                                },
-                                "displayName": "ContentPackConstraints__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
-                            isFulfilled={true}
-                          >
-                            <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                          <th>
+                            Name
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Type"
+                          formatter={[Function]}
+                          index={1}
+                          key="header-1"
+                        >
+                          <th>
+                            Type
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Version"
+                          formatter={[Function]}
+                          index={2}
+                          key="header-2"
+                        >
+                          <th>
+                            Version
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Fulfilled"
+                          formatter={[Function]}
+                          index={3}
+                          key="header-3"
+                        >
+                          <th>
+                            Fulfilled
+                          </th>
+                        </DataTableElement>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <DataTableElement
+                        element={
+                          Object {
+                            "fulfilled": true,
+                            "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                            "type": "plugin-version",
+                            "version": ">=3.0.0-alpha.2",
+                          }
+                        }
+                        formatter={[Function]}
+                        index={0}
+                        key="row-0"
+                      >
+                        <tr>
+                          <td>
+                            org.graylog.plugins.threatintel.ThreatIntelPlugin
+                          </td>
+                          <td>
+                            plugin-version
+                          </td>
+                          <td>
+                            &gt;=3.0.0-alpha.2
+                          </td>
+                          <td>
+                            <ContentPackConstraints__StyledBadge
                               isFulfilled={true}
                             >
-                              <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                      "isStatic": false,
+                                      "lastClassName": "fBopeI",
+                                      "rules": Array [
+                                        "background-color:",
+                                        [Function],
+                                        ";",
+                                      ],
+                                    },
+                                    "displayName": "ContentPackConstraints__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                isFulfilled={true}
                               >
-                                <Badge__StyledBadge
+                                <Component
                                   className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                  isFulfilled={true}
                                 >
-                                  <StyledComponent
+                                  <ForwardRef
                                     className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                          "isStatic": false,
-                                          "lastClassName": "gDhrrS",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Badge__StyledBadge",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                   >
-                                    <Badge
-                                      bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
-                                      pullRight={false}
+                                    <Badge__StyledBadge
+                                      className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                                     >
-                                      <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
+                                      <StyledComponent
+                                        className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                              "isStatic": false,
+                                              "lastClassName": "gDhrrS",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Badge__StyledBadge",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                       >
-                                        <Icon
-                                          name="check"
+                                        <Badge
+                                          bsClass="badge"
+                                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                          pullRight={false}
                                         >
-                                          <FontAwesomeIcon
-                                            icon={
-                                              Object {
-                                                "iconName": "check",
-                                                "prefix": "fas",
-                                              }
-                                            }
+                                          <span
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
                                           >
-                                            <svg
-                                              className="svg-inline--fa fa-check"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </span>
-                                    </Badge>
-                                  </StyledComponent>
-                                </Badge__StyledBadge>
-                              </ForwardRef>
-                            </Component>
-                          </StyledComponent>
-                        </ContentPackConstraints__StyledBadge>
-                      </td>
-                    </tr>
-                  </DataTableElement>
-                  <DataTableElement
-                    element={
-                      Object {
-                        "fulfilled": true,
-                        "type": "server-version",
-                        "version": ">=3.0.0-alpha.2+af8d8e0",
-                      }
-                    }
-                    formatter={[Function]}
-                    index={1}
-                    key="row-1"
-                  >
-                    <tr>
-                      <td>
-                        Graylog
-                      </td>
-                      <td>
-                        server-version
-                      </td>
-                      <td>
-                        &gt;=3.0.0-alpha.2+af8d8e0
-                      </td>
-                      <td>
-                        <ContentPackConstraints__StyledBadge
-                          isFulfilled={true}
-                        >
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                  "isStatic": false,
-                                  "lastClassName": "fBopeI",
-                                  "rules": Array [
-                                    "background-color:",
-                                    [Function],
-                                    ";",
-                                  ],
-                                },
-                                "displayName": "ContentPackConstraints__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
-                            isFulfilled={true}
-                          >
-                            <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                            <Icon
+                                              name="check"
+                                              type="solid"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={
+                                                  Object {
+                                                    "iconName": "check",
+                                                    "prefix": "fas",
+                                                  }
+                                                }
+                                              >
+                                                <svg
+                                                  className="svg-inline--fa fa-check"
+                                                />
+                                              </FontAwesomeIcon>
+                                            </Icon>
+                                          </span>
+                                        </Badge>
+                                      </StyledComponent>
+                                    </Badge__StyledBadge>
+                                  </ForwardRef>
+                                </Component>
+                              </StyledComponent>
+                            </ContentPackConstraints__StyledBadge>
+                          </td>
+                        </tr>
+                      </DataTableElement>
+                      <DataTableElement
+                        element={
+                          Object {
+                            "fulfilled": true,
+                            "type": "server-version",
+                            "version": ">=3.0.0-alpha.2+af8d8e0",
+                          }
+                        }
+                        formatter={[Function]}
+                        index={1}
+                        key="row-1"
+                      >
+                        <tr>
+                          <td>
+                            Graylog
+                          </td>
+                          <td>
+                            server-version
+                          </td>
+                          <td>
+                            &gt;=3.0.0-alpha.2+af8d8e0
+                          </td>
+                          <td>
+                            <ContentPackConstraints__StyledBadge
                               isFulfilled={true}
                             >
-                              <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                      "isStatic": false,
+                                      "lastClassName": "fBopeI",
+                                      "rules": Array [
+                                        "background-color:",
+                                        [Function],
+                                        ";",
+                                      ],
+                                    },
+                                    "displayName": "ContentPackConstraints__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                isFulfilled={true}
                               >
-                                <Badge__StyledBadge
+                                <Component
                                   className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                  isFulfilled={true}
                                 >
-                                  <StyledComponent
+                                  <ForwardRef
                                     className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                          "isStatic": false,
-                                          "lastClassName": "gDhrrS",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Badge__StyledBadge",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                   >
-                                    <Badge
-                                      bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
-                                      pullRight={false}
+                                    <Badge__StyledBadge
+                                      className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
                                     >
-                                      <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
+                                      <StyledComponent
+                                        className="ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                              "isStatic": false,
+                                              "lastClassName": "gDhrrS",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Badge__StyledBadge",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                       >
-                                        <Icon
-                                          name="check"
+                                        <Badge
+                                          bsClass="badge"
+                                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI"
+                                          pullRight={false}
                                         >
-                                          <FontAwesomeIcon
-                                            icon={
-                                              Object {
-                                                "iconName": "check",
-                                                "prefix": "fas",
-                                              }
-                                            }
+                                          <span
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 fBopeI badge"
                                           >
-                                            <svg
-                                              className="svg-inline--fa fa-check"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </span>
-                                    </Badge>
-                                  </StyledComponent>
-                                </Badge__StyledBadge>
-                              </ForwardRef>
-                            </Component>
-                          </StyledComponent>
-                        </ContentPackConstraints__StyledBadge>
-                      </td>
-                    </tr>
-                  </DataTableElement>
-                </tbody>
-              </table>
+                                            <Icon
+                                              name="check"
+                                              type="solid"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={
+                                                  Object {
+                                                    "iconName": "check",
+                                                    "prefix": "fas",
+                                                  }
+                                                }
+                                              >
+                                                <svg
+                                                  className="svg-inline--fa fa-check"
+                                                />
+                                              </FontAwesomeIcon>
+                                            </Icon>
+                                          </span>
+                                        </Badge>
+                                      </StyledComponent>
+                                    </Badge__StyledBadge>
+                                  </ForwardRef>
+                                </Component>
+                              </StyledComponent>
+                            </ContentPackConstraints__StyledBadge>
+                          </td>
+                        </tr>
+                      </DataTableElement>
+                    </tbody>
+                  </table>
+                </StyledComponent>
+              </DataTable__StyledTable>
             </div>
           </div>
         </div>
@@ -848,299 +914,332 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
               className="data-table table-responsive"
               id="content-packs-constraints"
             >
-              <table
+              <DataTable__StyledTable
                 className="table "
               >
-                <thead>
-                  <tr>
-                    <DataTableElement
-                      element="Name"
-                      formatter={[Function]}
-                      index={0}
-                      key="header-0"
-                    >
-                      <th>
-                        Name
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Type"
-                      formatter={[Function]}
-                      index={1}
-                      key="header-1"
-                    >
-                      <th>
-                        Type
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Version"
-                      formatter={[Function]}
-                      index={2}
-                      key="header-2"
-                    >
-                      <th>
-                        Version
-                      </th>
-                    </DataTableElement>
-                    <DataTableElement
-                      element="Fulfilled"
-                      formatter={[Function]}
-                      index={3}
-                      key="header-3"
-                    >
-                      <th>
-                        Fulfilled
-                      </th>
-                    </DataTableElement>
-                  </tr>
-                </thead>
-                <tbody>
-                  <DataTableElement
-                    element={
-                      Object {
-                        "fulfilled": undefined,
-                        "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
-                        "type": "plugin-version",
-                        "version": ">=3.0.0-alpha.2",
-                      }
+                <StyledComponent
+                  className="table "
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "isStatic": false,
+                        "lastClassName": "efDjcv",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "DataTable__StyledTable",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "target": "table",
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    formatter={[Function]}
-                    index={0}
-                    key="row-0"
+                  }
+                  forwardedRef={null}
+                >
+                  <table
+                    className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
                   >
-                    <tr>
-                      <td>
-                        org.graylog.plugins.threatintel.ThreatIntelPlugin
-                      </td>
-                      <td>
-                        plugin-version
-                      </td>
-                      <td>
-                        &gt;=3.0.0-alpha.2
-                      </td>
-                      <td>
-                        <ContentPackConstraints__StyledBadge>
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                  "isStatic": false,
-                                  "lastClassName": "veRUI",
-                                  "rules": Array [
-                                    "background-color:",
-                                    [Function],
-                                    ";",
-                                  ],
-                                },
-                                "displayName": "ContentPackConstraints__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
-                          >
-                            <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                            >
-                              <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                    <thead>
+                      <tr>
+                        <DataTableElement
+                          element="Name"
+                          formatter={[Function]}
+                          index={0}
+                          key="header-0"
+                        >
+                          <th>
+                            Name
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Type"
+                          formatter={[Function]}
+                          index={1}
+                          key="header-1"
+                        >
+                          <th>
+                            Type
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Version"
+                          formatter={[Function]}
+                          index={2}
+                          key="header-2"
+                        >
+                          <th>
+                            Version
+                          </th>
+                        </DataTableElement>
+                        <DataTableElement
+                          element="Fulfilled"
+                          formatter={[Function]}
+                          index={3}
+                          key="header-3"
+                        >
+                          <th>
+                            Fulfilled
+                          </th>
+                        </DataTableElement>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <DataTableElement
+                        element={
+                          Object {
+                            "fulfilled": undefined,
+                            "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                            "type": "plugin-version",
+                            "version": ">=3.0.0-alpha.2",
+                          }
+                        }
+                        formatter={[Function]}
+                        index={0}
+                        key="row-0"
+                      >
+                        <tr>
+                          <td>
+                            org.graylog.plugins.threatintel.ThreatIntelPlugin
+                          </td>
+                          <td>
+                            plugin-version
+                          </td>
+                          <td>
+                            &gt;=3.0.0-alpha.2
+                          </td>
+                          <td>
+                            <ContentPackConstraints__StyledBadge>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                      "isStatic": false,
+                                      "lastClassName": "veRUI",
+                                      "rules": Array [
+                                        "background-color:",
+                                        [Function],
+                                        ";",
+                                      ],
+                                    },
+                                    "displayName": "ContentPackConstraints__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                               >
-                                <Badge__StyledBadge
+                                <Component
                                   className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
                                 >
-                                  <StyledComponent
+                                  <ForwardRef
                                     className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                          "isStatic": false,
-                                          "lastClassName": "gDhrrS",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Badge__StyledBadge",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                   >
-                                    <Badge
-                                      bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                                      pullRight={false}
+                                    <Badge__StyledBadge
+                                      className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
                                     >
-                                      <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
+                                      <StyledComponent
+                                        className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                              "isStatic": false,
+                                              "lastClassName": "gDhrrS",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Badge__StyledBadge",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                       >
-                                        <Icon
-                                          name="times"
+                                        <Badge
+                                          bsClass="badge"
+                                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                          pullRight={false}
                                         >
-                                          <FontAwesomeIcon
-                                            icon={
-                                              Object {
-                                                "iconName": "times",
-                                                "prefix": "fas",
-                                              }
-                                            }
+                                          <span
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
                                           >
-                                            <svg
-                                              className="svg-inline--fa fa-times"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </span>
-                                    </Badge>
-                                  </StyledComponent>
-                                </Badge__StyledBadge>
-                              </ForwardRef>
-                            </Component>
-                          </StyledComponent>
-                        </ContentPackConstraints__StyledBadge>
-                      </td>
-                    </tr>
-                  </DataTableElement>
-                  <DataTableElement
-                    element={
-                      Object {
-                        "fulfilled": undefined,
-                        "type": "server-version",
-                        "version": ">=3.0.0-alpha.2+af8d8e0",
-                      }
-                    }
-                    formatter={[Function]}
-                    index={1}
-                    key="row-1"
-                  >
-                    <tr>
-                      <td>
-                        Graylog
-                      </td>
-                      <td>
-                        server-version
-                      </td>
-                      <td>
-                        &gt;=3.0.0-alpha.2+af8d8e0
-                      </td>
-                      <td>
-                        <ContentPackConstraints__StyledBadge>
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                  "isStatic": false,
-                                  "lastClassName": "veRUI",
-                                  "rules": Array [
-                                    "background-color:",
-                                    [Function],
-                                    ";",
-                                  ],
-                                },
-                                "displayName": "ContentPackConstraints__StyledBadge",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
-                          >
-                            <Component
-                              className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                            >
-                              <ForwardRef
-                                className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                            <Icon
+                                              name="times"
+                                              type="solid"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={
+                                                  Object {
+                                                    "iconName": "times",
+                                                    "prefix": "fas",
+                                                  }
+                                                }
+                                              >
+                                                <svg
+                                                  className="svg-inline--fa fa-times"
+                                                />
+                                              </FontAwesomeIcon>
+                                            </Icon>
+                                          </span>
+                                        </Badge>
+                                      </StyledComponent>
+                                    </Badge__StyledBadge>
+                                  </ForwardRef>
+                                </Component>
+                              </StyledComponent>
+                            </ContentPackConstraints__StyledBadge>
+                          </td>
+                        </tr>
+                      </DataTableElement>
+                      <DataTableElement
+                        element={
+                          Object {
+                            "fulfilled": undefined,
+                            "type": "server-version",
+                            "version": ">=3.0.0-alpha.2+af8d8e0",
+                          }
+                        }
+                        formatter={[Function]}
+                        index={1}
+                        key="row-1"
+                      >
+                        <tr>
+                          <td>
+                            Graylog
+                          </td>
+                          <td>
+                            server-version
+                          </td>
+                          <td>
+                            &gt;=3.0.0-alpha.2+af8d8e0
+                          </td>
+                          <td>
+                            <ContentPackConstraints__StyledBadge>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                      "isStatic": false,
+                                      "lastClassName": "veRUI",
+                                      "rules": Array [
+                                        "background-color:",
+                                        [Function],
+                                        ";",
+                                      ],
+                                    },
+                                    "displayName": "ContentPackConstraints__StyledBadge",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ContentPackConstraints__StyledBadge-g7th4-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                               >
-                                <Badge__StyledBadge
+                                <Component
                                   className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
                                 >
-                                  <StyledComponent
+                                  <ForwardRef
                                     className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                                    forwardedComponent={
-                                      Object {
-                                        "$$typeof": Symbol(react.forward_ref),
-                                        "attrs": Array [],
-                                        "componentStyle": ComponentStyle {
-                                          "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                          "isStatic": false,
-                                          "lastClassName": "gDhrrS",
-                                          "rules": Array [
-                                            [Function],
-                                          ],
-                                        },
-                                        "displayName": "Badge__StyledBadge",
-                                        "foldedComponentIds": Array [],
-                                        "render": [Function],
-                                        "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
-                                        "target": [Function],
-                                        "toString": [Function],
-                                        "warnTooManyClasses": [Function],
-                                        "withComponent": [Function],
-                                      }
-                                    }
-                                    forwardedRef={null}
                                   >
-                                    <Badge
-                                      bsClass="badge"
-                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
-                                      pullRight={false}
+                                    <Badge__StyledBadge
+                                      className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
                                     >
-                                      <span
-                                        className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
+                                      <StyledComponent
+                                        className="ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                              "isStatic": false,
+                                              "lastClassName": "gDhrrS",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Badge__StyledBadge",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                       >
-                                        <Icon
-                                          name="times"
+                                        <Badge
+                                          bsClass="badge"
+                                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI"
+                                          pullRight={false}
                                         >
-                                          <FontAwesomeIcon
-                                            icon={
-                                              Object {
-                                                "iconName": "times",
-                                                "prefix": "fas",
-                                              }
-                                            }
+                                          <span
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS ContentPackConstraints__StyledBadge-g7th4-0 veRUI badge"
                                           >
-                                            <svg
-                                              className="svg-inline--fa fa-times"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </span>
-                                    </Badge>
-                                  </StyledComponent>
-                                </Badge__StyledBadge>
-                              </ForwardRef>
-                            </Component>
-                          </StyledComponent>
-                        </ContentPackConstraints__StyledBadge>
-                      </td>
-                    </tr>
-                  </DataTableElement>
-                </tbody>
-              </table>
+                                            <Icon
+                                              name="times"
+                                              type="solid"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={
+                                                  Object {
+                                                    "iconName": "times",
+                                                    "prefix": "fas",
+                                                  }
+                                                }
+                                              >
+                                                <svg
+                                                  className="svg-inline--fa fa-times"
+                                                />
+                                              </FontAwesomeIcon>
+                                            </Icon>
+                                          </span>
+                                        </Badge>
+                                      </StyledComponent>
+                                    </Badge__StyledBadge>
+                                  </ForwardRef>
+                                </Component>
+                              </StyledComponent>
+                            </ContentPackConstraints__StyledBadge>
+                          </td>
+                        </tr>
+                      </DataTableElement>
+                    </tbody>
+                  </table>
+                </StyledComponent>
+              </DataTable__StyledTable>
             </div>
           </div>
         </div>

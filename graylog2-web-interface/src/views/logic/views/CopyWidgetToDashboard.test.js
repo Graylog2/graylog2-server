@@ -1,13 +1,17 @@
 import { readFileSync } from 'fs';
+
 import { dirname } from 'path';
 
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
+
 import copyWidgetToDashboard from './CopyWidgetToDashboard';
+
 import ValueParameter from '../parameters/ValueParameter';
 import Parameter from '../parameters/Parameter';
 
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
 })));
@@ -37,7 +41,6 @@ describe('copyWidgetToDashboard', () => {
       .search(searchSearchFixture)
       .build();
 
-
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
     const dashboardView = dashboardViewFixture.toBuilder()
@@ -47,6 +50,7 @@ describe('copyWidgetToDashboard', () => {
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 
     const newDashboard = copyWidgetToDashboard(widgetId, searchView, dashboardView);
+
     expect(newDashboard).toMatchSnapshot();
   });
 });

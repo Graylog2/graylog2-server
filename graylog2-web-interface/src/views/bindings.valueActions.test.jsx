@@ -1,5 +1,6 @@
 // @flow strict
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
+
 import bindings from './bindings';
 import type { ActionHandlerCondition } from './components/actions/ActionHandler';
 
@@ -16,32 +17,40 @@ describe('Views bindings value actions', () => {
     type: FieldType.Unknown,
   };
   const findAction = (type) => valueActions.find((binding) => binding.type === type);
+
   describe('CreateExtractor', () => {
     // $FlowFixMe: We are assuming here it is generally present
     const action: ValueAction = findAction('create-extractor');
     const { isEnabled } = action;
+
     it('is present', () => {
       expect(action).toBeDefined();
     });
+
     it('has `isEnabled` condition', () => {
       expect(isEnabled).toBeDefined();
     });
+
     it('should be enabled for fields with a message context', () => {
       expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }))
         .toEqual(true);
     });
+
     it('should be disabled for fields without a message context', () => {
       expect(isEnabled({ ...defaultArguments, contexts: {}, field: 'something', type: FieldTypes.STRING() }))
         .toEqual(false);
     });
+
     it('should be enabled for fields with type string', () => {
       expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }))
         .toEqual(true);
     });
+
     it('should be enabled for fields with type number', () => {
       expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.INT() }))
         .toEqual(true);
     });
+
     it('should be enabled for compound fields', () => {
       expect(isEnabled({
         ...defaultArguments,
@@ -50,6 +59,7 @@ describe('Views bindings value actions', () => {
       }))
         .toEqual(true);
     });
+
     it('should be disabled for decorated fields', () => {
       expect(isEnabled({
         ...defaultArguments,

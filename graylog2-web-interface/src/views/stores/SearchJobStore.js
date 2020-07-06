@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
-
 import Search from 'views/logic/search/Search';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
@@ -65,13 +64,17 @@ export const SearchJobStore = singletonStore(
 
     run(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
       const promise = fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
+
       SearchJobActions.run.promise(promise);
+
       return promise;
     },
 
     jobStatus(jobId: SearchJobId): Promise<SearchJobType> {
       const promise = fetch('GET', jobStatusUrl(jobId));
+
       SearchJobActions.jobStatus.promise(promise);
+
       return promise;
     },
 

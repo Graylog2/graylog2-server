@@ -4,8 +4,8 @@ import * as React from 'react';
 import { FormControl, HelpBlock } from 'components/graylog';
 import { Icon } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
-import type { AutoInterval, Interval } from './Interval';
 
+import type { AutoInterval, Interval } from './Interval';
 import styles from './AutoTimeHistogramPivot.css';
 
 type OnChange = (Interval) => void;
@@ -17,6 +17,7 @@ type Props = {
 
 const _changeScaling = (event: SyntheticInputEvent<HTMLInputElement>, interval: AutoInterval, onChange: OnChange) => {
   const scaling = 1 / FormsUtils.getValueFromInput(event.target);
+
   onChange({ ...interval, scaling });
 };
 

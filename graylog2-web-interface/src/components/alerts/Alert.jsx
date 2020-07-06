@@ -4,7 +4,6 @@ import { Link } from 'react-router';
 
 import { Col, Label } from 'components/graylog';
 import { EntityListItem, Timestamp } from 'components/common';
-
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -30,6 +29,7 @@ class Alert extends React.Component {
     const { alert, alertCondition, stream, conditionType } = this.props;
 
     let alertTitle;
+
     if (alertCondition) {
       alertTitle = (
         <span>
@@ -49,6 +49,7 @@ class Alert extends React.Component {
     }
 
     let statusBadge;
+
     if (!alert.is_interval || alert.resolved_at) {
       statusBadge = <Label bsStyle="success">Resolved</Label>;
     } else {
@@ -56,6 +57,7 @@ class Alert extends React.Component {
     }
 
     let alertTime = <Timestamp dateTime={alert.triggered_at} format={DateTime.Formats.DATETIME} />;
+
     if (alert.is_interval) {
       alertTime = (
         <span>

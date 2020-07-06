@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { FormControl } from 'components/graylog';
 
 class MetricsFilterInput extends React.Component {
@@ -14,6 +15,7 @@ class MetricsFilterInput extends React.Component {
 
   render() {
     const { filter } = this.props;
+
     return (
       <FormControl type="text"
                    className="metrics-filter"

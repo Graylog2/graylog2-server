@@ -1,8 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Icon } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import style from './PluginList.css';
 
 const PluginList = createReactClass({
@@ -14,6 +15,7 @@ const PluginList = createReactClass({
 
   _formatPlugin(pluginName) {
     const plugin = PluginStore.get().filter((p) => p.metadata.name === pluginName)[0];
+
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
         <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;

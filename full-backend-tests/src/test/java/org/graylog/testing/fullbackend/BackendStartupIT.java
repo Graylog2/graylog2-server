@@ -17,6 +17,7 @@
 package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.storage.elasticsearch6.ElasticsearchInstanceES6Factory;
 import org.graylog.testing.completebackend.ApiIntegrationTest;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ import static org.graylog.testing.backenddriver.SearchDriver.searchAllMessages;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
 
-@ApiIntegrationTest(serverLifecycle = CLASS)
+@ApiIntegrationTest(serverLifecycle = CLASS, elasticsearchFactory = ElasticsearchInstanceES6Factory.class)
 class BackendStartupIT {
 
     private final GraylogBackend sut;
@@ -66,7 +67,8 @@ class BackendStartupIT {
                 "Threat Intelligence Plugin",
                 "Collector",
                 "AWS plugins",
-                "Elasticsearch 6 Support");
+                "Elasticsearch 6 Support",
+                "Elasticsearch 7 Support");
     }
 
     @Test

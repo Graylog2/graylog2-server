@@ -20,6 +20,7 @@ const StreamPermissionErrorPage = ({ error }: Props) => {
   );
   const streamIds = error?.additional?.body?.streams;
   const errorDetails = streamIds && streamIds.length > 0 && `You need permissions for streams with the id: ${streamIds.join(', ')}.`;
+
   return (
     <UnauthorizedErrorPage error={error} description={description} title="Missing Stream Permissions" errorDetails={errorDetails} />
   );

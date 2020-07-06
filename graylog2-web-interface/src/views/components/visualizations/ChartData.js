@@ -3,6 +3,7 @@ import { flatten, flow, isEqual, set } from 'lodash';
 
 import type { Key, Leaf, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+
 import transformKeys from './TransformKeys';
 
 export type ChartDefinition = {
@@ -15,6 +16,7 @@ export type ChartDefinition = {
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
 export type ExtractedSeries = Array<ChartData>;
+export type ValuesBySeries = { [string]: Array<number>};
 
 export type KeyJoiner = (Array<any>) => string;
 
@@ -28,7 +30,7 @@ export const flattenLeafs = (leafs: Array<Leaf>, matcher: Value => boolean = ({ 
   return flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
 };
 
-export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
+export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySeries: ValuesBySeries, xLabels: Array<any>}): ExtractedSeries => {
   return Object.keys(valuesBySeries).map((value) => [
     value,
     xLabels,
@@ -50,13 +52,16 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
     const xLabels = getXLabelsFromLeafs(leafs);
     const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
     const valuesBySeries = {};
+
     flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
       const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
+
       if (value.value !== null && value.value !== undefined) {
         set(valuesBySeries, [joinedKey, targetIdx], value.value);
       }
     });
+
     return { valuesBySeries, xLabels };
   };
 };
@@ -80,6 +85,7 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
     const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
     const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
     const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
+
     return [name, newKeys, newValues, z];
   });
 };
@@ -91,10 +97,11 @@ export const chartData = (
   data: Rows,
   chartType: string,
   generator: Generator = _defaultChartGenerator,
-  customSeriesFormatter?: ({valuesBySeries: Object, xLabels: Array<any>}) => ExtractedSeries = formatSeries,
+  customSeriesFormatter?: ({valuesBySeries: ValuesBySeries, xLabels: Array<any>}) => ExtractedSeries = formatSeries,
   leafValueMatcher?: Value => boolean,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
+
   return flow([
     transformKeys(rowPivots, columnPivots),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),

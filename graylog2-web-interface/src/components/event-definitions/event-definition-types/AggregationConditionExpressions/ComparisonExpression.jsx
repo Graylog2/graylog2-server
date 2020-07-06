@@ -4,7 +4,6 @@ import lodash from 'lodash';
 
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
-
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 // eslint-disable-next-line import/no-cycle
@@ -15,6 +14,7 @@ const ComparisonExpression = (props) => {
 
   const handleExpressionOperatorChange = (nextOperator) => {
     const nextExpression = lodash.cloneDeep(expression);
+
     nextExpression.expr = nextOperator;
     onChange({ conditions: nextExpression });
   };

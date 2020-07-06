@@ -84,10 +84,9 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -105,12 +104,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="name"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -181,7 +180,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -209,7 +208,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Name"
@@ -222,7 +221,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="name"
                                         label="Name"
                                         maxLength={250}
@@ -318,10 +317,9 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -339,12 +337,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="summary"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -415,7 +413,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -443,7 +441,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Summary"
@@ -456,7 +454,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="summary"
                                         label="Summary"
                                         maxLength={250}
@@ -551,10 +549,9 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -572,12 +569,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="description"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -647,7 +644,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -674,7 +671,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="textarea"
                                       inputRef={[Function]}
                                       label="Description"
@@ -686,7 +683,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <textarea
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="description"
                                         label="Description"
                                         name="description"
@@ -781,10 +778,9 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -802,12 +798,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="vendor"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -878,7 +874,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -906,7 +902,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Vendor"
@@ -919,7 +915,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="vendor"
                                         label="Vendor"
                                         maxLength={250}
@@ -1014,10 +1010,9 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -1035,12 +1030,12 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="url"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -1110,7 +1105,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1137,7 +1132,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="URL"
@@ -1149,7 +1144,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="url"
                                         label="URL"
                                         maxLength={250}
@@ -1398,19 +1393,16 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                     }
                   >
                     <ForwardRef
-                      bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
                       type="reset"
                     >
                       <Button__StyledButton
-                        bsStyle="default"
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
                         <StyledComponent
-                          bsStyle="default"
                           className="reset-button"
                           forwardedComponent={
                             Object {
@@ -1616,10 +1608,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -1637,12 +1628,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="name"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -1713,7 +1704,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1741,7 +1732,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Name"
@@ -1754,7 +1745,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="name"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="name"
                                         label="Name"
                                         maxLength={250}
@@ -1850,10 +1841,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -1871,12 +1861,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="summary"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -1947,7 +1937,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -1975,7 +1965,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Summary"
@@ -1988,7 +1978,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="summary"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="summary"
                                         label="Summary"
                                         maxLength={250}
@@ -2083,10 +2073,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -2104,12 +2093,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="description"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -2179,7 +2168,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2206,7 +2195,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="textarea"
                                       inputRef={[Function]}
                                       label="Description"
@@ -2218,7 +2207,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="description"
                                     >
                                       <textarea
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="description"
                                         label="Description"
                                         name="description"
@@ -2313,10 +2302,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -2334,12 +2322,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="vendor"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -2410,7 +2398,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2438,7 +2426,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Vendor"
@@ -2451,7 +2439,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="vendor"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="vendor"
                                         label="Vendor"
                                         maxLength={250}
@@ -2546,10 +2534,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                               "isStatic": false,
-                              "lastClassName": "ekazNr",
+                              "lastClassName": "gcTkZc",
                               "rules": Array [
                                 [Function],
-                                ";",
                               ],
                             },
                             "displayName": "FormGroup__StyledFormGroup",
@@ -2567,12 +2554,12 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                       >
                         <FormGroup
                           bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                           controlId="url"
                           validationState={null}
                         >
                           <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
                             <ControlLabel>
                               <StyledComponent
@@ -2642,7 +2629,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2669,7 +2656,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="URL"
@@ -2681,7 +2668,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       value="http://example.com"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         id="url"
                                         label="URL"
                                         maxLength={250}
@@ -2801,6 +2788,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     You can select between installed entities from the server (
                     <Icon
                       name="server"
+                      type="solid"
                     >
                       <FontAwesomeIcon
                         icon={
@@ -2819,6 +2807,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     <Icon
                       className="contentPackEntity"
                       name="archive"
+                      type="solid"
                     >
                       <FontAwesomeIcon
                         className="contentPackEntity"
@@ -3004,19 +2993,16 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                     }
                   >
                     <ForwardRef
-                      bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
                       type="reset"
                     >
                       <Button__StyledButton
-                        bsStyle="default"
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
                         <StyledComponent
-                          bsStyle="default"
                           className="reset-button"
                           forwardedComponent={
                             Object {
@@ -3162,9 +3148,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "ExpandableListItem__Container-sc-10hsq3a-1",
                                   "isStatic": false,
-                                  "lastClassName": "fxCnlF",
+                                  "lastClassName": "gvIcsL",
                                   "rules": Array [
-                                    "font-size:14px;line-height:20px;label{min-height:20px;margin-bottom:2px;margin-right:5px;*{cursor:pointer;}}",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "ExpandableListItem__Container",
@@ -3180,7 +3166,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                             forwardedRef={null}
                           >
                             <div
-                              className="ExpandableListItem__Container-sc-10hsq3a-1 fxCnlF"
+                              className="ExpandableListItem__Container-sc-10hsq3a-1 gvIcsL"
                             >
                               <Checkbox
                                 bsClass="checkbox"
@@ -3246,7 +3232,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ExpandableListItem__IconStack-sc-10hsq3a-3",
                                               "isStatic": false,
-                                              "lastClassName": "kNaqZg",
+                                              "lastClassName": "jXmspb",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3266,13 +3252,14 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                         tabIndex={0}
                                       >
                                         <div
-                                          className="ExpandableListItem__IconStack-sc-10hsq3a-3 kNaqZg fa-stack"
+                                          className="ExpandableListItem__IconStack-sc-10hsq3a-3 jXmspb fa-stack"
                                           onClick={[Function]}
                                           tabIndex={0}
                                         >
                                           <Icon
                                             className="fa-stack-1x"
                                             name="circle"
+                                            type="solid"
                                           >
                                             <FontAwesomeIcon
                                               className="fa-stack-1x"
@@ -3291,6 +3278,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                           <Icon
                                             className="fa-stack-1x"
                                             name="angle-up"
+                                            type="solid"
                                           >
                                             <FontAwesomeIcon
                                               className="fa-stack-1x"
@@ -3324,9 +3312,9 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ExpandableListItem__HeaderWrap-sc-10hsq3a-4",
                                         "isStatic": false,
-                                        "lastClassName": "daviui",
+                                        "lastClassName": "kOLPYP",
                                         "rules": Array [
-                                          "font-size:14px;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ExpandableListItem__HeaderWrap",
@@ -3342,7 +3330,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   forwardedRef={null}
                                 >
                                   <span
-                                    className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 daviui header"
+                                    className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 kOLPYP header"
                                   >
                                     <ExpandableListItem__Header
                                       onClick={[Function]}

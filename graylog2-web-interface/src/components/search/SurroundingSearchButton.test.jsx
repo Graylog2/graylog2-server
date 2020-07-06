@@ -3,6 +3,7 @@ import * as React from 'react';
 import { asElement, cleanup, fireEvent, render } from 'wrappedTestingLibrary';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
+
 import SurroundingSearchButton from './SurroundingSearchButton';
 import type { SearchesConfig } from './SearchConfig';
 
@@ -16,6 +17,7 @@ const getOption = (optionText, getByText) => {
 
 describe('SurroundingSearchButton', () => {
   afterEach(cleanup);
+
   const searchConfig: SearchesConfig = {
     analysis_disabled_fields: [],
     query_time_range_limit: 'PT0S',
@@ -38,8 +40,10 @@ describe('SurroundingSearchButton', () => {
   );
 
   const renderButton = (props = {}) => render(<TestComponent {...props} />);
+
   it('renders a button with a "Show surrounding messages" caption', () => {
     const { getByText } = renderButton();
+
     expect(getByText('Show surrounding messages')).toBeTruthy();
   });
 
@@ -102,6 +106,7 @@ describe('SurroundingSearchButton', () => {
 
     expect(option.href).toContain('highlightMessage=foo-bar');
   });
+
   it('includes current set of streams in generated urls', () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
     const { getByText } = render((

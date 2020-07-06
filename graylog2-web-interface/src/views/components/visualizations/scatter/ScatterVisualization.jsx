@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import EventHandler from 'views/logic/searchtypes/events/EventHandler';
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 
@@ -15,11 +15,14 @@ const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels
 const ScatterVisualization: VisualizationComponent = makeVisualization(({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
   const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', seriesGenerator);
   const layout = {};
+
   if (config.eventAnnotation && data.events) {
     const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+
     chartDataResult.push(eventChartData);
     layout.shapes = shapes;
   }
+
   return (
     <XYPlot config={config}
             chartData={chartDataResult}
@@ -31,7 +34,7 @@ const ScatterVisualization: VisualizationComponent = makeVisualization(({ config
 
 ScatterVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: AggregationResult.isRequired,
   height: PropTypes.number,
 };
 

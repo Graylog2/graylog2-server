@@ -5,11 +5,9 @@ import { Link } from 'react-router';
 
 import { Button, ButtonGroup, Col, Label, MessageDetailsDefinitionList, Row } from 'components/graylog';
 import { ClipboardButton, Icon, Timestamp } from 'components/common';
-
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
-
 import Routes from 'routing/Routes';
 
 class MessageDetail extends React.Component {
@@ -31,6 +29,7 @@ class MessageDetail extends React.Component {
   _inputName = (inputId) => {
     const { inputs } = this.props;
     const input = inputs.get(inputId);
+
     return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
   };
 
@@ -41,9 +40,10 @@ class MessageDetail extends React.Component {
 
     if (node) {
       const nodeURL = Routes.node(nodeId);
+
       nodeInformation = (
         <a href={nodeURL}>
-          <Icon name="code-fork" />
+          <Icon name="code-branch" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
@@ -52,11 +52,13 @@ class MessageDetail extends React.Component {
     } else {
       nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
     }
+
     return nodeInformation;
   };
 
   _formatMessageActions = () => {
     const { message, customFieldActions } = this.props;
+
     if (!customFieldActions) {
       return <ButtonGroup className="pull-right" bsSize="small" />;
     }
@@ -78,9 +80,11 @@ class MessageDetail extends React.Component {
     const streams = streamIds.map((id) => {
       // eslint-disable-next-line react/destructuring-assignment
       const stream = this.props.streams.get(id);
+
       if (stream !== undefined) {
         return <li key={stream.id}><StreamLink stream={stream} /></li>;
       }
+
       return null;
     });
 

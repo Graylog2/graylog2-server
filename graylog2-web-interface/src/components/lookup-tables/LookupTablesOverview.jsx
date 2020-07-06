@@ -4,7 +4,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
 import { PaginatedList, SearchForm, Icon } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
@@ -38,20 +37,25 @@ class LookupTablesOverview extends React.Component {
 
   _lookupName = (id, map) => {
     const empty = { title: 'None' };
+
     if (!map) {
       return empty;
     }
+
     return map[id] || empty;
   };
 
   _lookupAdapterError = (table) => {
     if (this.props.errorStates.dataAdapters && this.props.dataAdapters) {
       const adapter = this.props.dataAdapters[table.data_adapter_id];
+
       if (!adapter) {
         return null;
       }
+
       return this.props.errorStates.dataAdapters[adapter.name];
     }
+
     return null;
   };
 

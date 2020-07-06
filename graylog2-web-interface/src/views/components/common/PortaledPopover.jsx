@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
+
+import { Popover } from 'components/graylog';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 export default class PortaledPopover extends React.Component {
@@ -40,6 +42,7 @@ export default class PortaledPopover extends React.Component {
         </Position>
       </Portal>
     );
+
     return (
       <span>
         <a role="link"

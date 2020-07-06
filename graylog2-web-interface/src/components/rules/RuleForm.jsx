@@ -6,7 +6,6 @@ import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'componen
 import { SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-
 import history from 'util/History';
 
 import RuleFormStyle from './RuleForm.css';
@@ -65,6 +64,7 @@ class RuleForm extends React.Component {
     if (this.parseTimer !== undefined) {
       clearTimeout(this.parseTimer);
     }
+
     const { rule } = this.state;
     const { validateRule } = this.props;
 
@@ -79,12 +79,14 @@ class RuleForm extends React.Component {
 
   _onDescriptionChange = (event) => {
     const { rule } = this.state;
+
     rule.description = event.target.value;
     this.setState({ rule });
   };
 
   _onTitleChange = (event) => {
     const { rule } = this.state;
+
     rule.title = event.target.value;
     this.setState({ rule });
   };
@@ -146,6 +148,7 @@ class RuleForm extends React.Component {
     const { create } = this.props;
 
     let pipelinesUsingRule;
+
     if (!create) {
       pipelinesUsingRule = (
         <Input id="used-in-pipelines" label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">

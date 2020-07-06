@@ -5,9 +5,7 @@ import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -24,6 +22,7 @@ const ImportExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get.triggerPromise(params.inputId).then((input) => this.setState({ input: input }));
   },
 
@@ -38,6 +37,7 @@ const ImportExtractorsPage = createReactClass({
     }
 
     const { input } = this.state;
+
     return (
       <DocumentTitle title={`Import extractors to ${input.title}`}>
         <div>

@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Col, Row, Button } from 'components/graylog';
 import { LinkToNode, IfPermitted, Icon } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
-
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -28,11 +28,15 @@ const NodeLoggers = createReactClass({
   },
 
   componentDidMount() {
-    MetricsActions.add(this.props.nodeId, this.metric_name);
+    const { nodeId } = this.props;
+
+    MetricsActions.add(nodeId, this.metric_name);
   },
 
   componentWillUnmount() {
-    MetricsActions.remove(this.props.nodeId, this.metric_name);
+    const { nodeId } = this.props;
+
+    MetricsActions.remove(nodeId, this.metric_name);
   },
 
   metric_name: 'org.apache.logging.log4j.core.Appender.all',
@@ -40,24 +44,29 @@ const NodeLoggers = createReactClass({
   _formatThroughput() {
     const { metrics } = this.state;
     const { nodeId } = this.props;
+
     if (metrics && metrics[nodeId] && metrics[nodeId][this.metric_name]) {
       const { metric } = metrics[nodeId][this.metric_name];
+
       return metric.rate.total;
     }
+
     return 'n/a';
   },
 
   render() {
-    const { nodeId } = this.props;
-    const subsystems = Object.keys(this.props.subsystems)
+    const { nodeId, subsystems } = this.props;
+    const { showDetails } = this.state;
+    const subsystemKeys = Object.keys(subsystems)
       .map((subsystem) => (
         <LoggingSubsystem name={subsystem}
                           nodeId={nodeId}
                           key={`logging-subsystem-${nodeId}-${subsystem}`}
-                          subsystem={this.props.subsystems[subsystem]} />
+                          subsystem={subsystems[subsystem]} />
       ));
 
-    const logLevelMetrics = <LogLevelMetricsOverview nodeId={this.props.nodeId} />;
+    const logLevelMetrics = <LogLevelMetricsOverview nodeId={nodeId} />;
+
     return (
       <Row className="row-sm log-writing-node content">
         <Col md={12}>
@@ -67,20 +76,20 @@ const NodeLoggers = createReactClass({
                 <Button bsSize="sm"
                         bsStyle="primary"
                         className="trigger-log-level-metrics"
-                        onClick={() => this.setState({ showDetails: !this.state.showDetails })}>
-                  <Icon name="dashboard" />{' '}
-                  {this.state.showDetails ? 'Hide' : 'Show'} log level metrics
+                        onClick={() => this.setState({ showDetails: !showDetails })}>
+                  <Icon name="tachometer-alt" />{' '}
+                  {showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>
               <h2>
                 <LinkToNode nodeId={nodeId} />
-                <span style={{ fontSize: '12px' }}> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></span>
+                <small> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></small>
               </h2>
             </div>
             <div className="subsystems">
-              {subsystems}
+              {subsystemKeys}
             </div>
-            {this.state.showDetails && logLevelMetrics}
+            {showDetails && logLevelMetrics}
           </IfPermitted>
         </Col>
       </Row>

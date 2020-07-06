@@ -5,9 +5,7 @@ import { Button, Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
@@ -27,12 +25,14 @@ class SimulatorPage extends React.Component {
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
       const filteredStreams = streams.filter((s) => !HIDDEN_STREAMS.includes(s.id));
+
       this.setState({ streams: filteredStreams });
     });
   }
 
   _isLoading = () => {
     const { streams } = this.state;
+
     return !streams;
   };
 

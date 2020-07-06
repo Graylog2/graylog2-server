@@ -2,22 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import uuid from 'uuid/v4';
-import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import moment from 'moment';
 
+import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { MultiSelect, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
-
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import PermissionsMixin from 'util/PermissionsMixin';
+
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
 
@@ -43,6 +42,7 @@ class FilterForm extends React.Component {
         .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
         .map((streamOrId) => {
           const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
+
           return {
             label: stream.title,
             value: stream.id,
@@ -55,6 +55,7 @@ class FilterForm extends React.Component {
 
   _parseQuery = lodash.debounce((queryString) => {
     const { currentUser } = this.props;
+
     if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
       return;
     }
@@ -112,6 +113,7 @@ class FilterForm extends React.Component {
 
   componentDidMount() {
     const { currentUser } = this.props;
+
     if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }
@@ -122,6 +124,7 @@ class FilterForm extends React.Component {
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
+
     config[key] = value;
     onChange('config', config);
   };
@@ -132,6 +135,7 @@ class FilterForm extends React.Component {
     const queryParameters = config.query_parameters;
     const keptParameters = [];
     const staleParameters = {};
+
     queryParameters.forEach((p) => {
       if (paramsInQuery.has(p.name)) {
         keptParameters.push(p);
@@ -142,6 +146,7 @@ class FilterForm extends React.Component {
 
     const { queryParameterStash } = this.state;
     const newParameters = [];
+
     paramsInQuery.forEach((np) => {
       if (!keptParameters.find((p) => p.name === np)) {
         if (queryParameterStash[np]) {
@@ -176,6 +181,7 @@ class FilterForm extends React.Component {
 
   handleConfigChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
@@ -186,9 +192,11 @@ class FilterForm extends React.Component {
   handleTimeRangeChange = (fieldName) => {
     return (nextValue, nextUnit) => {
       const durationInMs = moment.duration(lodash.max([nextValue, 1]), nextUnit).asMilliseconds();
+
       this.propagateChange(fieldName, durationInMs);
 
       const stateFieldName = lodash.camelCase(fieldName);
+
       this.setState({
         [`${stateFieldName}Duration`]: nextValue,
         [`${stateFieldName}Unit`]: nextUnit,
@@ -213,7 +221,9 @@ class FilterForm extends React.Component {
     if (lodash.isEmpty(parameterButtons)) {
       return null;
     }
+
     const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter((param) => (param.embryonic)));
+
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
         <ControlLabel>Query Parameters</ControlLabel>

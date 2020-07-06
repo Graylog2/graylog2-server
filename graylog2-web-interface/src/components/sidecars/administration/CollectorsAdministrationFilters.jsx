@@ -2,8 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, ButtonToolbar } from 'components/graylog';
 
+import { Button, ButtonToolbar } from 'components/graylog';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { SelectPopover } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
@@ -37,17 +37,21 @@ const CollectorsAdministrationFilters = createReactClass({
     const collectorFormatter = (collectorId) => {
       const [id] = collectorId.split(';');
       const collector = lodash.find(collectors, { id: id });
+
       return <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />;
     };
 
     const filter = ([collectorId], callback) => {
       const [id] = collectorId ? collectorId.split(';') : [];
+
       this.onFilterChange('collector', id, callback);
     };
 
     let collectorFilter;
+
     if (filters.collector) {
       const collector = collectors.find((c) => c.id === filters.collector);
+
       collectorFilter = collector ? collectorMapper(collector) : undefined;
     }
 
@@ -75,17 +79,21 @@ const CollectorsAdministrationFilters = createReactClass({
     const configurationFormatter = (configurationId) => {
       const [id] = configurationId.split(';');
       const configuration = lodash.find(configurations, { id: id });
+
       return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
     };
 
     const filter = ([configurationId], callback) => {
       const [id] = configurationId ? configurationId.split(';') : [];
+
       this.onFilterChange('configuration', id, callback);
     };
 
     let configurationFilter;
+
     if (filters.configuration) {
       const configuration = configurations.find((c) => c.id === filters.configuration);
+
       configurationFilter = configuration ? configurationMapper(configuration) : undefined;
     }
 

@@ -1,6 +1,7 @@
 import chroma from 'chroma-js';
 
 function lighten(color, ratio) { return chroma.mix(color, '#fff', ratio).hex(); }
+
 function darken(color, ratio) { return chroma.mix(color, '#000', ratio).hex(); }
 
 const brand = {
@@ -21,14 +22,16 @@ global.linkHover = chroma(global.link).darken(1).hex();
 
 const grayScale = chroma.scale([global.textDefault, global.textAlt]).colors(10);
 const gray = {};
+
 grayScale.forEach((tint, index) => {
   const key = (index + 1) * 10;
+
   gray[key] = tint;
 });
 
 const variant = {
   danger: '#ad0707',
-  default: '#1f1f1f',
+  default: lighten(global.textDefault, 0.25),
   info: '#0063be',
   primary: '#702785',
   success: '#00ae42',
@@ -43,19 +46,23 @@ const variant = {
 
 Object.keys(variant).forEach((name) => {
   if (typeof variant[name] === 'string') {
-    variant.light[name] = lighten(variant[name], 0.15);
-    variant.lighter[name] = lighten(variant[name], 0.5);
-    variant.lightest[name] = lighten(variant[name], 0.85);
+    variant.light[name] = lighten(variant[name], 0.22);
+    variant.lighter[name] = lighten(variant[name], 0.55);
+    variant.lightest[name] = lighten(variant[name], 0.88);
 
-    variant.dark[name] = darken(variant[name], 0.15);
-    variant.darker[name] = darken(variant[name], 0.5);
-    variant.darkest[name] = darken(variant[name], 0.85);
+    variant.dark[name] = darken(variant[name], 0.22);
+    variant.darker[name] = darken(variant[name], 0.55);
+    variant.darkest[name] = darken(variant[name], 0.88);
   }
 });
 
+const table = {
+  background: lighten(variant.default, 0.95),
+  backgroundAlt: lighten(variant.default, 0.85),
+  backgroundHover: lighten(variant.default, 0.9),
+};
+
 /* eslint-disable prefer-destructuring */
-global.tableBackground = gray[100];
-global.tableBackgroundAlt = gray[80];
 global.inputBackground = global.contentBackground;
 /* eslint-enable prefer-destructuring */
 
@@ -63,6 +70,7 @@ const teinte = {
   brand,
   global,
   gray,
+  table,
   variant,
 };
 

@@ -5,11 +5,8 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 
 import { Spinner } from 'components/common';
-
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -59,6 +56,7 @@ const NodeThroughput = createReactClass({
         </span>
       );
     }
+
     return (
       <span>
         In {numeral(metrics.totalIn).format('0,0')} / Out {numeral(metrics.totalOut).format('0,0')} msg/s.

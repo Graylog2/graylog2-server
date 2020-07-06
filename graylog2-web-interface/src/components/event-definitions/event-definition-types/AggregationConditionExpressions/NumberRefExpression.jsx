@@ -5,7 +5,6 @@ import naturalSort from 'javascript-natural-sort';
 
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
-
 import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 const formatFunctions = (functions) => {
@@ -43,15 +42,19 @@ const NumberRefExpression = ({
     const series = lodash.cloneDeep(eventDefinition.config.series);
     const nextSeries = lodash.cloneDeep(getOrCreateSeries(expression.ref));
     const nextSeriesId = getSeriesId(nextSeries, nextFunction, nextField);
+
     if (nextFunction !== undefined) {
       nextSeries.function = nextFunction;
     }
+
     if (nextField !== undefined) {
       nextSeries.field = nextField;
     }
+
     nextSeries.id = nextSeriesId;
 
     const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
+
     if (seriesIndex >= 0) {
       series[seriesIndex] = nextSeries;
     } else {
@@ -59,6 +62,7 @@ const NumberRefExpression = ({
     }
 
     const nextExpression = lodash.cloneDeep(expression);
+
     nextExpression.ref = nextSeriesId;
 
     onChange({

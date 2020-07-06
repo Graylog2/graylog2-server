@@ -4,9 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 
@@ -34,10 +32,12 @@ const ShowMetricsPage = createReactClass({
     }
 
     let { nodeId } = this.props.params;
+
     // "master" node ID is a placeholder for master node, get first master node ID
     if (nodeId === 'master') {
       const nodeIDs = Object.keys(this.state.nodes);
       const masterNodes = nodeIDs.filter((nodeID) => this.state.nodes[nodeID].is_master);
+
       nodeId = masterNodes[0] || nodeIDs[0];
     }
 
@@ -46,6 +46,7 @@ const ShowMetricsPage = createReactClass({
     const { namespace } = MetricsStore;
     const names = this.state.metricsNames[nodeId];
     const { filter } = this.props.location.query;
+
     return (
       <DocumentTitle title={`Metrics of node ${node.short_node_id} / ${node.hostname}`}>
         <span>

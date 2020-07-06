@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 
 import { ListGroupItem } from 'components/graylog';
+
 import Icon from './Icon';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -108,9 +109,11 @@ class SortableListItem extends React.Component {
   render() {
     const { content, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
     const classes = [SortableListItemStyle.listGroupItem];
+
     if (isDragging) {
       classes.push('dragging');
     }
+
     if (isOver) {
       classes.push('over');
     }

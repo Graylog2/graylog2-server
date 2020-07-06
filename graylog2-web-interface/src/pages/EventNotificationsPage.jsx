@@ -4,7 +4,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
-
 import Routes from 'routing/Routes';
 
 const EventNotificationsPage = () => {

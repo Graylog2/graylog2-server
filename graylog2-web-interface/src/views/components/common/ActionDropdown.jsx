@@ -2,10 +2,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
+import { Overlay } from 'react-overlays';
 
 import { type ThemeInterface } from 'theme';
 import { MenuItem } from 'components/graylog';
-import { Overlay } from 'react-overlays';
+
 import StopPropagation from './StopPropagation';
 
 /**
@@ -86,6 +87,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
   constructor(props: ActionDropdownProps) {
     super(props);
+
     this.state = {
       show: false,
     };
@@ -113,6 +115,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
         } : {}),
       }),
     );
+
     return (
       <StopPropagation>
         <ActionToggle bsRole="toggle" onClick={this._onToggle}>
@@ -136,7 +139,6 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     );
   }
 }
-
 
 ActionDropdown.propTypes = {
   children: PropTypes.node.isRequired,

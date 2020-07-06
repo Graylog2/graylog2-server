@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
-
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import FormsUtils from 'util/FormsUtils';
 
@@ -23,11 +22,13 @@ class EventDetailsForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     const { onChange } = this.props;
+
     onChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
   handlePriorityChange = (nextPriority) => {
     const { onChange } = this.props;
+
     onChange('priority', lodash.toNumber(nextPriority));
   };
 

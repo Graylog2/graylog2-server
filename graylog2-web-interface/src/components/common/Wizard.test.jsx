@@ -18,27 +18,32 @@ describe('<Wizard />', () => {
 
   it('should render with 3 steps', () => {
     const wrapper = mount(<Wizard steps={steps} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with 3 steps and children', () => {
     const wrapper = mount(<Wizard steps={steps}><span>Preview</span></Wizard>);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render in horizontal mode with 3 steps', () => {
     const wrapper = mount(<Wizard steps={steps} horizontal />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render in horizontal mode with 3 steps and children', () => {
     const wrapper = mount(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   describe('When used in an uncontrolled way', () => {
     it('should render step 1 when nothing was clicked', () => {
       const wrapper = mount(<Wizard steps={steps} />);
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -48,7 +53,9 @@ describe('<Wizard />', () => {
 
     it('should render step 2 when clicked on step 2', () => {
       const wrapper = mount(<Wizard steps={steps} />);
+
       wrapper.find('a[children="Title2"]').simulate('click');
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -58,7 +65,9 @@ describe('<Wizard />', () => {
 
     it('should render step 2 when clicked on next', () => {
       const wrapper = mount(<Wizard steps={steps} />);
+
       wrapper.find('button[children="Next"]').simulate('click');
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -68,8 +77,10 @@ describe('<Wizard />', () => {
 
     it('should render step 3 when two times clicked on next', () => {
       const wrapper = mount(<Wizard steps={steps} />);
+
       wrapper.find('button[children="Next"]').simulate('click');
       wrapper.find('button[children="Next"]').simulate('click');
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(true);
@@ -80,9 +91,11 @@ describe('<Wizard />', () => {
     it('should render step 2 when two times clicked on next and one time clicked on previous', () => {
       const changeFn = jest.fn(() => {});
       const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
+
       wrapper.find('button[children="Next"]').simulate('click');
       wrapper.find('button[children="Next"]').simulate('click');
       wrapper.find('button[children="Previous"]').simulate('click');
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -95,10 +108,13 @@ describe('<Wizard />', () => {
   describe('When used in a controlled way', () => {
     it('should render active step given from prop', () => {
       const wrapper = mount(<Wizard steps={steps} activeStep="Key2" />);
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+
       wrapper.find('button[children="Next"]').simulate('click');
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -106,10 +122,13 @@ describe('<Wizard />', () => {
 
     it('should change the active step when prop changes', () => {
       const wrapper = mount(<Wizard steps={steps} activeStep="Key2" />);
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
+
       wrapper.setProps({ activeStep: 'Key1' });
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -118,17 +137,22 @@ describe('<Wizard />', () => {
     it('should show a warning when activeStep is not a key in steps', () => {
       /* eslint-disable no-console */
       const consoleWarn = console.warn;
+
       console.warn = jest.fn();
       const wrapper = mount(<Wizard steps={steps} activeStep={0} />);
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
       expect(console.warn.mock.calls.length).toBe(1);
+
       wrapper.setProps({ activeStep: 'Key12314' });
+
       expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
       expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
       expect(console.warn.mock.calls.length).toBe(2);
+
       console.warn = consoleWarn;
       /* eslint-enable no-console */
     });
@@ -140,11 +164,15 @@ describe('<Wizard />', () => {
     });
 
     const wrapper = mount(<Wizard steps={steps} onStepChange={changeFn} />);
+
     wrapper.find('button[children="Next"]').simulate('click');
+
     expect(changeFn.mock.calls.length).toBe(1);
 
     const controlledWrapped = mount(<Wizard steps={steps} onStepChange={changeFn} activeStep="Key1" />);
+
     controlledWrapped.find('button[children="Next"]').simulate('click');
+
     expect(changeFn.mock.calls.length).toBe(2);
   });
 
@@ -152,12 +180,15 @@ describe('<Wizard />', () => {
     steps[1].disabled = true;
     steps[2].disabled = true;
     const wrapper = mount(<Wizard steps={steps} />);
+
     wrapper.find('button[children="Next"]').simulate('click');
+
     expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
     expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
     expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
 
     wrapper.find('a[children="Title2"]').simulate('click');
+
     expect(wrapper.find('div[children="Component1"]').exists()).toBe(true);
     expect(wrapper.find('div[children="Component2"]').exists()).toBe(false);
     expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
@@ -165,20 +196,24 @@ describe('<Wizard />', () => {
 
   it('should render next/previous buttons by default', () => {
     const wrapperV = mount(<Wizard steps={steps} />);
+
     expect(wrapperV.find('button[children="Next"]').exists()).toBe(true);
     expect(wrapperV.find('button[children="Previous"]').exists()).toBe(true);
 
     const wrapperH = mount(<Wizard steps={steps} horizontal />);
+
     expect(wrapperH.find('svg.fa-caret-left').exists()).toBe(true);
     expect(wrapperH.find('svg.fa-caret-right').exists()).toBe(true);
   });
 
   it('should hide next/previous buttons if hidePreviousNextButtons is set', () => {
     const wrapperV = mount(<Wizard steps={steps} hidePreviousNextButtons />);
+
     expect(wrapperV.find('button[children="Next"]').exists()).toBe(false);
     expect(wrapperV.find('button[children="Previous"]').exists()).toBe(false);
 
     const wrapperH = mount(<Wizard steps={steps} horizontal hidePreviousNextButtons />);
+
     expect(wrapperH.find('button > svg.fa-caret-left').exists()).toBe(false);
     expect(wrapperH.find('button > svg.fa-caret-right').exists()).toBe(false);
   });

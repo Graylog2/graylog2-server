@@ -4,6 +4,7 @@ import { cleanup, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import type { SearchesConfig } from 'components/search/SearchConfig';
+
 import MessageActions from './MessageActions';
 
 const searchConfig: SearchesConfig = {
@@ -42,11 +43,13 @@ describe('MessageActions', () => {
 
   it('renders surrounding search button', () => {
     const { getByText } = renderActions();
+
     expect(getByText('Show surrounding messages')).toBeTruthy();
   });
 
   it('does not render surrounding search button if `disableSurroundingSearch` is `true`', () => {
     const { queryByText } = renderActions({ disableSurroundingSearch: true });
+
     expect(queryByText('Show surrounding messages')).toBeNull();
   });
 });

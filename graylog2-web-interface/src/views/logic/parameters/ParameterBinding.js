@@ -31,6 +31,7 @@ export default class ParameterBinding {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { type, value } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ type, value }));
   }
@@ -60,7 +61,9 @@ export default class ParameterBinding {
     if (json == null) {
       return null;
     }
+
     const { type, value } = json;
+
     return ParameterBinding.create(type, value);
   }
 }
@@ -82,6 +85,7 @@ class Builder {
 
   build(): ParameterBinding {
     const { type, value } = this._value.toObject();
+
     return new ParameterBinding(type, value);
   }
 }

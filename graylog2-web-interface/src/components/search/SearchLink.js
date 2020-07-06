@@ -4,6 +4,7 @@ import URI from 'urijs';
 
 import Routes from 'routing/Routes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+
 import { addToQuery, escape } from '../../views/logic/queries/QueryHelper';
 
 type InternalState = {
@@ -151,6 +152,7 @@ class Builder {
       highlightedMessage,
       filterFields,
     } = this.value.toObject();
+
     return new SearchLink(id, timerange, query, streams, highlightedMessage, filterFields);
   }
 }

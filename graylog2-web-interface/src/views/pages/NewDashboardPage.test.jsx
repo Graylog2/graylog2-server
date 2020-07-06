@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-
 import { render, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { act } from 'react-dom/test-utils';
@@ -13,12 +12,15 @@ import View from 'views/logic/views/View';
 import NewDashboardPage from './NewDashboardPage';
 
 jest.mock('./ExtendedSearchPage', () => () => <div>Extended search page</div>);
+
 jest.mock('components/common', () => ({
   IfPermitted: jest.fn(({ children }) => <>{children}</>),
 }));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: { create: jest.fn(() => Promise.resolve()), load: jest.fn(() => Promise.resolve()) },
 }));
+
 jest.mock('views/logic/views/ViewLoader', () => ({
   processHooks: jest.fn((promise, loadHooks, executeHooks, query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
@@ -29,6 +31,7 @@ describe('NewDashboardPage', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
+
   afterEach(() => {
     cleanup();
     jest.clearAllMocks();
@@ -38,7 +41,9 @@ describe('NewDashboardPage', () => {
     const { getByText } = render(<SimpleNewDashboardPage />);
 
     act(() => jest.advanceTimersByTime(200));
+
     expect(getByText('Loading...')).not.toBeNull();
+
     await waitForElement(() => getByText('Extended search page'));
   });
 
@@ -60,6 +65,7 @@ describe('NewDashboardPage', () => {
     ));
 
     await waitForElement(() => getByText('Extended search page'));
+
     expect(loedViewMock).toHaveBeenCalledTimes(1);
     expect(loedViewMock.mock.calls[0][0].type).toStrictEqual(View.Type.Dashboard);
   });
@@ -82,6 +88,7 @@ describe('NewDashboardPage', () => {
     ));
 
     await waitForElement(() => getByText('Extended search page'));
+
     expect(processHooksAction).toBeCalledTimes(1);
     expect(processHooksAction.mock.calls[0][3]).toStrictEqual({ q: '', rangetype: 'relative', relative: '300' });
   });
@@ -97,6 +104,7 @@ describe('NewDashboardPage', () => {
     ));
 
     await waitForElement(() => getByText('Extended search page'));
+
     expect(ViewActions.load).toHaveBeenCalledTimes(0);
   });
 });

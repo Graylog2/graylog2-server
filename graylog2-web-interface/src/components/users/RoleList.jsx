@@ -5,9 +5,7 @@ import Reflux from 'reflux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import { Button } from 'components/graylog';
 import { DataTable } from 'components/common';
 
@@ -25,6 +23,7 @@ const RoleList = createReactClass({
 
   _headerCellFormatter(header) {
     const className = (header === 'Actions' ? 'actions' : '');
+
     return <th className={className}>{header}</th>;
   },
 
@@ -32,6 +31,7 @@ const RoleList = createReactClass({
     if (this.isPermitted(this.state.currentUser.permissions, [`roles:edit:${role.name}`]) === false || role.read_only) {
       return null;
     }
+
     return (<Button key="edit" bsSize="xsmall" bsStyle="info" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</Button>);
   },
 
@@ -39,6 +39,7 @@ const RoleList = createReactClass({
     if (this.isPermitted(this.state.currentUser.permissions, [`roles:delete:${role.name}`]) === false || role.read_only) {
       return null;
     }
+
     return (<Button key="delete" bsSize="xsmall" bsStyle="primary" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</Button>);
   },
 

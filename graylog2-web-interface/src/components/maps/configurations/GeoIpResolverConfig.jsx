@@ -44,6 +44,7 @@ const GeoIpResolverConfig = createReactClass({
   _updateConfigField(field, value) {
     const { config } = this.state;
     const update = ObjectUtils.clone(config);
+
     update[field] = value;
     this.setState({ config: update });
   },

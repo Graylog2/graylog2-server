@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import lodash from 'lodash';
 
+import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { MultiSelect, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
@@ -54,12 +54,14 @@ class EmailNotificationForm extends React.Component {
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = lodash.cloneDeep(config);
+
     nextConfig[key] = value;
     onChange(nextConfig);
   };
 
   handleChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 

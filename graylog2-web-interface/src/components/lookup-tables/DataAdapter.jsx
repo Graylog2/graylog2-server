@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ContentPackMarker } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import Routes from 'routing/Routes';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import Styles from './ConfigSummary.css';
@@ -33,6 +33,7 @@ class DataAdapter extends React.Component {
     const { lookupKey } = this.state;
 
     e.preventDefault();
+
     LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });
@@ -40,6 +41,7 @@ class DataAdapter extends React.Component {
 
   render() {
     const plugins = {};
+
     PluginStore.exports('lookupTableAdapters').forEach((p) => {
       plugins[p.type] = p;
     });
@@ -47,11 +49,13 @@ class DataAdapter extends React.Component {
     const { dataAdapter } = this.props;
     const { lookupKey, lookupResult } = this.state;
     const plugin = plugins[dataAdapter.config.type];
+
     if (!plugin) {
       return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
     }
 
     const summary = plugin.summaryComponent;
+
     return (
       <Row className="content">
         <Col md={6}>

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
+import { Col, Row } from 'components/graylog';
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
 
 class IndicesOverview extends React.Component {
@@ -17,6 +17,7 @@ class IndicesOverview extends React.Component {
   _formatIndex = (indexName, index) => {
     const indexSummary = this.props.indices[indexName];
     const indexRange = indexSummary && indexSummary.range ? indexSummary.range : null;
+
     return (
       <Row key={`index-summary-${indexName}`} className="content index-description">
         <Col md={12}>
@@ -40,6 +41,7 @@ class IndicesOverview extends React.Component {
 
   _formatClosedIndex = (indexName, index) => {
     const indexRange = index.range;
+
     return (
       <Row key={`index-summary-${indexName}`} className="content index-description">
         <Col md={12}>
@@ -58,6 +60,7 @@ class IndicesOverview extends React.Component {
       return !this.props.indices[indexName].is_closed
         ? this._formatIndex(indexName, this.props.indices[indexName]) : this._formatClosedIndex(indexName, this.props.indices[indexName]);
     });
+
     return (
       <span>
         {indices.sort((index1, index2) => naturalSort(index2.key, index1.key))}

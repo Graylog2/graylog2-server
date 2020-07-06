@@ -6,6 +6,7 @@ import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
 import { BootstrapModalForm } from 'components/bootstrap';
+
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
 type State = {
@@ -30,6 +31,7 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
     // eslint-disable-next-line camelcase
     const { gl2_source_node, gl2_source_input } = message.fields;
     const { field } = this.props;
+
     this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(gl2_source_node,
       gl2_source_input, field, message.index, message.id);
   }
@@ -39,12 +41,15 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
 
   _onSubmit = () => {
     const { onClose } = this.props;
+
     onClose();
 
     const { selectedExtractor } = this.state;
+
     if (selectedExtractor) {
       const uri = this.extractorRoutes[selectedExtractor];
       const newWindow = window.open(uri, '_blank');
+
       newWindow.focus();
     }
   };
@@ -61,6 +66,7 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
 
   render() {
     const { selectedExtractor } = this.state;
+
     return (
       <BootstrapModalForm title="Select extractor type"
                           submitButtonDisabled={!selectedExtractor}

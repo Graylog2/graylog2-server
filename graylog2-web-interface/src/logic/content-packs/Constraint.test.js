@@ -1,4 +1,5 @@
 import { Set } from 'immutable';
+
 import Constraint from './Constraint';
 
 describe('Constraint', () => {
@@ -22,6 +23,7 @@ describe('Constraint', () => {
     const set = Set().add(constraint1)
       .add(constraint2)
       .add(constraint3);
+
     expect(set.size).toBe(2);
   });
 

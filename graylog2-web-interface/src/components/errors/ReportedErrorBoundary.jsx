@@ -6,7 +6,6 @@ import { withRouter } from 'react-router';
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { type ReportedError, ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
-
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
@@ -43,6 +42,7 @@ const ReportedErrorBoundary = ({ children, router }) => {
 
   useEffect(() => {
     const unlistenErrorsReport = ErrorsActions.report.listen(report);
+
     return () => {
       unlistenErrorsReport();
     };
@@ -50,6 +50,7 @@ const ReportedErrorBoundary = ({ children, router }) => {
 
   useEffect(() => {
     const unlistenRouter = router.listen(() => reportedError && setReportedError(null));
+
     return () => {
       unlistenRouter();
     };
@@ -61,6 +62,5 @@ const ReportedErrorBoundary = ({ children, router }) => {
 
   return children;
 };
-
 
 export default withRouter(ReportedErrorBoundary);

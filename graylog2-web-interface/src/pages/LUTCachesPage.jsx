@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+
 import connect from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
@@ -23,6 +22,7 @@ class LUTCachesPage extends React.Component {
   componentDidUpdate(prevProps) {
     const { location: { pathname } } = this.props;
     const { location: { pathname: prevPathname } } = prevProps;
+
     if (pathname !== prevPathname) {
       this._loadData(this.props);
     }
@@ -30,6 +30,7 @@ class LUTCachesPage extends React.Component {
 
   _loadData = (props) => {
     const { pagination } = props;
+
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
     } else if (this._isCreating(props)) {
@@ -131,6 +132,7 @@ class LUTCachesPage extends React.Component {
     );
   }
 }
+
 LUTCachesPage.propTypes = {
   cache: PropTypes.object,
   validationErrors: PropTypes.object,
@@ -147,6 +149,7 @@ LUTCachesPage.defaultProps = {
   types: null,
   caches: null,
 };
+
 export default connect(LUTCachesPage, { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
   ...otherProps,
   ...cachesStore,

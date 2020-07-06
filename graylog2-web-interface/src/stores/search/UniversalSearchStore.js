@@ -3,7 +3,6 @@ import jQuery from 'jquery';
 import md5 from 'md5';
 
 import MessageFormatter from 'logic/message/MessageFormatter';
-
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
@@ -22,6 +21,7 @@ const UniversalSearchStore = Reflux.createStore({
 
     return fetch('GET', url).then((response) => {
       const result = jQuery.extend({}, response);
+
       result.fields = response.fields.map((field) => {
         return {
           hash: md5(field),

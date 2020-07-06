@@ -9,7 +9,7 @@
 }
 
 :local(.itemWrapper) .header {
-    font-size: 14px;
+    font-size: 1rem; /* theme.fonts.size.body */
     padding: 10px 0;
     min-height: 20px;
 }

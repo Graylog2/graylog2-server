@@ -7,6 +7,7 @@ describe('<ProgressBar />', () => {
   afterEach(() => {
     cleanup();
   });
+
   it('properly renders with no props', () => {
     const { container } = render(<ProgressBar />);
 

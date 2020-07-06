@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Nav } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
 
+import { Badge, Nav } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
+
 import InactiveNavItem from './InactiveNavItem';
 
 const { NotificationsActions, NotificationsStore } = CombinedProvider.get('Notifications');
@@ -40,9 +41,11 @@ class NotificationBadge extends React.PureComponent {
 
   render() {
     const { total } = this.props;
+
     if (!total) {
       return null;
     }
+
     return (
       <Nav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>

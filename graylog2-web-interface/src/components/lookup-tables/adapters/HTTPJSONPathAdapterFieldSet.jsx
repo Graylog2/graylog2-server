@@ -1,9 +1,9 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Input } from 'components/bootstrap';
 import { URLWhiteListInput, KeyValueTable } from 'components/common';
-
 import ObjectUtils from 'util/ObjectUtils';
 
 type Headers = {[string]: string };
@@ -36,6 +36,7 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   onHTTPHeaderUpdate = (headers: Headers) => {
     const { config, updateConfig } = this.props;
     const configChange = ObjectUtils.clone(config);
+
     configChange.headers = headers;
     updateConfig(configChange);
   };

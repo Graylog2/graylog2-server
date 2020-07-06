@@ -39,4 +39,6 @@ public @interface ApiIntegrationTest {
     Lifecycle serverLifecycle() default Lifecycle.METHOD;
 
     int[] extraPorts() default {};
+
+    Class<? extends ElasticsearchInstanceFactory> elasticsearchFactory();
 }

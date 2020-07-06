@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
+
 import { OverlayTrigger, Tooltip } from 'components/graylog';
 
 class ShardRouting extends React.Component {
@@ -11,6 +12,7 @@ class ShardRouting extends React.Component {
   render() {
     const { route } = this.props;
     const tooltip = <Tooltip id="shard-route-state-tooltip">State: <i>{route.state}</i> on {route.node_hostname} ({route.node_name})</Tooltip>;
+
     return (
       <li className={classNames('shard', `shard-${route.state}`, { 'shard-primary': route.primary })}>
         <OverlayTrigger placement="top" overlay={tooltip}>

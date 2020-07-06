@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { SessionStore, SessionActions } = CombinedProvider.get('Session');
@@ -31,6 +30,7 @@ const CurrentUserStore = Reflux.createStore({
   sessionUpdate(sessionInfo) {
     if (sessionInfo.sessionId && sessionInfo.username) {
       const { username } = sessionInfo;
+
       this.update(username);
     } else {
       this.currentUser = undefined;
@@ -42,6 +42,7 @@ const CurrentUserStore = Reflux.createStore({
     if (this.currentUser !== undefined) {
       return this.update(this.currentUser.username);
     }
+
     return Promise.resolve();
   },
 

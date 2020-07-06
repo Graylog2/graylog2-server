@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import URI from 'urijs';
 
+import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 import { ExternalLink, IfPermitted } from 'components/common';
-
 import Routes from 'routing/Routes';
 
 class NodeMaintenanceDropdown extends React.Component {
@@ -15,6 +14,7 @@ class NodeMaintenanceDropdown extends React.Component {
 
   render() {
     const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname().toString();
+
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" bsSize="lg" title="Actions" id="node-maintenance-actions" pullRight>

@@ -5,7 +5,6 @@ import { Link } from 'react-router';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
-
 import Routes from 'routing/Routes';
 
 class SidecarsPage extends React.Component {

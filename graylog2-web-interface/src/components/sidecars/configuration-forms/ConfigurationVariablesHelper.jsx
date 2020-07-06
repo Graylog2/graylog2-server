@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import { Button, Alert, Table, Modal } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
@@ -77,6 +77,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
     Object.values(configurationVariables).forEach((configVar) => {
       const escapedName = `\${user.${configVar.name}}`;
+
       variableRows.push(
         <tr key={configVar.id}>
           <td><code>{escapedName}</code></td>
@@ -96,6 +97,7 @@ class ConfigurationVariablesHelper extends React.Component {
         </tr>,
       );
     });
+
     return variableRows;
   };
 
@@ -119,6 +121,7 @@ class ConfigurationVariablesHelper extends React.Component {
     if (typeof callback === 'function') {
       callback();
     }
+
     this._reloadVariables();
   };
 

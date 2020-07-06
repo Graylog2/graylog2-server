@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-
 import DocsHelper from 'util/DocsHelper';
 import FormUtils from 'util/FormsUtils';
 
@@ -26,6 +25,7 @@ class FlexdateConverterConfiguration extends React.Component {
 
   _toggleConverter = (event) => {
     let converter;
+
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
@@ -36,6 +36,7 @@ class FlexdateConverterConfiguration extends React.Component {
   _onChange = (key) => {
     return (data) => {
       const newConfig = this.props.configuration;
+
       // data can be an event or a value, we need to check its type :sick:
       newConfig[key] = typeof data === 'object' ? FormUtils.getValueFromInput(data.target) : data;
       this.props.onChange(this.props.type, this._getConverterObject(newConfig));

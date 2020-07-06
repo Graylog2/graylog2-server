@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import lodash from 'lodash';
 
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -46,6 +46,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
     const { config, onChange } = this.props;
     const nextProviders = lodash.cloneDeep(config.providers);
     const lookupProvider = nextProviders.find((provider) => provider.type === LookupTableFieldValueProviderForm.type);
+
     lookupProvider[key] = value;
     onChange({ ...config, providers: nextProviders });
   };
@@ -53,6 +54,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
+
     this.propagateChanges(name, value);
   };
 

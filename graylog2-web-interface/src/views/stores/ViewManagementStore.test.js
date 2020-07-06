@@ -1,8 +1,8 @@
 // @flow strict
 import StoreProvider from 'injection/StoreProvider';
-
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+
 import { ViewManagementActions } from './ViewManagementStore';
 
 jest.mock('injection/StoreProvider', () => ({ getStore: jest.fn() }));
@@ -15,7 +15,9 @@ describe('ViewManagementStore', () => {
     const CurrentUserStore = {
       reload: jest.fn(),
     };
+
     StoreProvider.getStore.mockReturnValue(CurrentUserStore);
+
     return ViewManagementActions.create(view).then(() => {
       expect(CurrentUserStore.reload).toHaveBeenCalled();
     });

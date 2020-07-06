@@ -1,10 +1,12 @@
 // @flow strict
 import uuid from 'uuid/v4';
 import { Set } from 'immutable';
+
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { Definition } from 'views/logic/aggregationbuilder/Series';
+
 import type { TimeUnit } from '../../../Constants';
 import SortConfig from '../../aggregationbuilder/SortConfig';
 
@@ -47,16 +49,18 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
         const { interval } = newConfig;
         // $FlowFixMe: We know this is the right type
         const { unit, value } = (interval: { interval: TimeConfig });
+
         newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
+
       break;
     default:
   }
 
+  // $FlowFixMe: Not properly typed yet.
   return {
     type,
     field,
-    // $FlowFixMe: Not properly typed yet.
     ...newConfig,
   };
 };
@@ -92,6 +96,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
       ...(generateConfig(uuid(), 'trend', config)),
       timerange: { type: 'offset', source: 'search_type', id: chartConfig.id },
     };
+
     configBuilder.add(trendConfig);
   }
 
@@ -101,6 +106,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
       name: 'events',
       type: 'events',
     };
+
     configBuilder.add(eventAnnotationConfig);
   }
 
@@ -135,6 +141,7 @@ class ConfigBuilder {
 
   add(val: Config) {
     this.value = this.value.add(val);
+
     return this;
   }
 

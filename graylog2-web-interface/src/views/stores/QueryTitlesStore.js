@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
+
 import { ViewStore } from './ViewStore';
 
 // eslint-disable-next-line import/prefer-default-export
@@ -18,6 +19,7 @@ export const QueryTitlesStore = singletonStore(
     onViewStoreUpdate({ view }) {
       const viewState = get(view, 'state', Immutable.Map());
       const newState = viewState.map((state) => state.titles.getIn(['tab', 'title'])).filter((v) => v !== undefined);
+
       if (!isEqual(this.state, newState)) {
         this.state = newState;
         this._trigger();

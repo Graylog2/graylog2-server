@@ -3,6 +3,7 @@ import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { ViewActions } from 'views/stores/ViewStore';
+
 import View from './View';
 
 type Router = {

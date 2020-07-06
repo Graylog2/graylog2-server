@@ -12,13 +12,9 @@ import styled from 'styled-components';
 import { Row, Col, Alert } from 'components/graylog';
 import ProgressBar, { Bar } from 'components/graylog/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Spinner, Timestamp, Icon } from 'components/common';
-
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 
@@ -80,6 +76,7 @@ const JournalDetails = createReactClass({
         utilizationRatio: 'org.graylog2.journal.utilization-ratio',
         oldestSegment: 'org.graylog2.journal.oldest-segment',
       };
+
       Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
     }
   },
@@ -120,6 +117,7 @@ const JournalDetails = createReactClass({
 
     const oldestSegment = moment(metrics.oldestSegment);
     let overcommittedWarning;
+
     if (metrics.utilizationRatio >= 1) {
       overcommittedWarning = (
         <span>

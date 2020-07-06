@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Input } from 'components/bootstrap';
 
 class ClosingRetentionStrategyConfiguration extends React.Component {
@@ -16,6 +17,7 @@ class ClosingRetentionStrategyConfiguration extends React.Component {
   _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
+
       update[field] = e.target.value;
 
       this.setState(update);

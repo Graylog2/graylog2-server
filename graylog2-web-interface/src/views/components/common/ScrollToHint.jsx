@@ -13,6 +13,7 @@ export default class ScrollToHint extends React.Component {
     if (!this.element) {
       return;
     }
+
     if (this.props.value !== nextProps.value) {
       UIUtils.scrollToHint(this.element);
     }
@@ -20,6 +21,7 @@ export default class ScrollToHint extends React.Component {
 
   render() {
     const { children } = this.props;
+
     return (
       <span ref={(element) => { this.element = element; }}>
         {children}

@@ -30,6 +30,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class ElasticsearchClientConfiguration {
+    @Parameter(value = "elasticsearch_version")
+    String elasticsearchVersion = "6";
+
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));
 

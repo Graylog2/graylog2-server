@@ -37,17 +37,21 @@ const EnterpriseStore = Reflux.createStore({
 
   getLicenseInfo() {
     const promise = fetch('GET', this.enterpriseUrl('license/info'));
+
     promise.then(
       (response) => {
         this.licenseStatus = response.free_license_info.license_status;
         this.propagateChanges();
+
         return response;
       },
       (error) => {
         const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+
         UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
       },
     );
+
     EnterpriseActions.getLicenseInfo.promise(promise);
   },
 
@@ -60,17 +64,21 @@ const EnterpriseStore = Reflux.createStore({
     };
 
     const promise = fetch('POST', this.enterpriseUrl('license'), requestBody);
+
     promise.then(
       (response) => {
         UserNotification.success('Your free Graylog Enterprise license should be on the way.', 'Success!');
         this.refresh();
+
         return response;
       },
       (error) => {
         const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+
         UserNotification.error(`Requesting a free Graylog Enterprise license failed: ${errorMessage}`, 'Error');
       },
     );
+
     EnterpriseActions.requestFreeEnterpriseLicense.promise(promise);
   },
 });

@@ -11,7 +11,6 @@ import DateTime from 'logic/datetimes/DateTime';
 import history from 'util/History';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
@@ -55,7 +54,9 @@ const IndexSetCreationPage = createReactClass({
 
   _saveConfiguration(indexSet) {
     const copy = indexSet;
+
     copy.creation_date = DateTime.now().toISOString();
+
     IndexSetsActions.create(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });

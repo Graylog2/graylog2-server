@@ -1,14 +1,17 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import mockComponent from 'helpers/mocking/MockComponent';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';
+
+import CurrentUserProvider from 'contexts/CurrentUserProvider';
+
 import AppRouter from './AppRouter';
 
 jest.mock('pages', () => ({
   StartPage: mockComponent('StartPage'),
 }));
+
 jest.mock('components/throughput/GlobalThroughput', () => mockComponent('GlobalThroughput'));
 
 jest.mock('injection/CombinedProvider', () => {
@@ -19,6 +22,7 @@ jest.mock('injection/CombinedProvider', () => {
       permissions: ['*'],
     },
   })]);
+
   return new MockCombinedProvider({
     CurrentUser: { CurrentUserStore: mockCurrentUserStoretore },
     Notifications: { NotificationsActions: { list: jest.fn() }, NotificationsStore: MockStore() },
@@ -30,7 +34,12 @@ jest.mock('components/errors/RouterErrorBoundary', () => mockComponent('RouterEr
 
 describe('AppRouter', () => {
   it('routes to Getting Started Page for `/` or empty location', () => {
-    const wrapper = mount(<AppRouter />);
+    const wrapper = mount(
+      <CurrentUserProvider>
+        <AppRouter />
+      </CurrentUserProvider>,
+    );
+
     expect(wrapper.find('StartPage')).toExist();
   });
 });

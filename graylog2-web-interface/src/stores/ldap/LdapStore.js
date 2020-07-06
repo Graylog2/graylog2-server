@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LdapActions = ActionsProvider.getActions('Ldap');
@@ -21,6 +20,7 @@ const LdapStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings`);
 
     const promise = fetch('GET', url);
+
     promise.then((response) => {
       this.ldapSettings = response;
       this.trigger({ ldapSettings: response });
@@ -33,6 +33,7 @@ const LdapStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings`);
 
     const promise = fetch('PUT', url, newLdapSettings);
+
     promise.then(
       () => {
         this.loadSettings();
@@ -46,6 +47,7 @@ const LdapStore = Reflux.createStore({
 
   _ldapTest(payload) {
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/test`);
+
     return fetch('POST', url, payload);
   },
 

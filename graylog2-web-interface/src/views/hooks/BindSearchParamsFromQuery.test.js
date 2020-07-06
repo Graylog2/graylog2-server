@@ -5,6 +5,7 @@ import View from 'views/logic/views/View';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { QueriesActions } from 'views/stores/QueriesStore';
+
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
 const MOCK_VIEW_QUERY_ID = 'query-id';
@@ -41,7 +42,9 @@ describe('BindSearchParamsFromQuery should', () => {
       ...defaultInput,
       view: view.toBuilder().type(View.Type.Dashboard).build(),
     };
+
     await bindSearchParamsFromQuery(input);
+
     expect(QueriesActions.update).not.toHaveBeenCalled();
   });
 
@@ -50,7 +53,9 @@ describe('BindSearchParamsFromQuery should', () => {
       ...defaultInput,
       query: { q: 'gl2_source_input:source-input-id' },
     };
+
     await bindSearchParamsFromQuery(input);
+
     expect(QueriesActions.update)
       .toHaveBeenCalledWith(
         MOCK_VIEW_QUERY_ID,
@@ -60,6 +65,7 @@ describe('BindSearchParamsFromQuery should', () => {
 
   it('not update query string when no query param is provided', async () => {
     await bindSearchParamsFromQuery(defaultInput);
+
     expect(QueriesActions.update).not.toHaveBeenCalled();
   });
 
@@ -72,7 +78,9 @@ describe('BindSearchParamsFromQuery should', () => {
       type: 'relative',
       range: 0,
     };
+
     await bindSearchParamsFromQuery(input);
+
     expect(QueriesActions.update)
       .toHaveBeenCalledWith(
         MOCK_VIEW_QUERY_ID,
@@ -90,7 +98,9 @@ describe('BindSearchParamsFromQuery should', () => {
       from: input.query.from,
       to: input.query.to,
     };
+
     await bindSearchParamsFromQuery(input);
+
     expect(QueriesActions.update)
       .toHaveBeenCalledWith(
         MOCK_VIEW_QUERY_ID,
@@ -106,7 +116,9 @@ describe('BindSearchParamsFromQuery should', () => {
     const expectedTimerange = {
       type: input.query.rangetype, keyword: input.query.keyword,
     };
+
     await bindSearchParamsFromQuery(input);
+
     expect(QueriesActions.update)
       .toHaveBeenCalledWith(
         MOCK_VIEW_QUERY_ID,
@@ -130,6 +142,7 @@ describe('BindSearchParamsFromQuery should', () => {
         Immutable.Map({ type: 'stream', id: 'stream3' }),
       ],
     });
+
     expect(QueriesActions.update)
       .toHaveBeenCalledWith(
         MOCK_VIEW_QUERY_ID,

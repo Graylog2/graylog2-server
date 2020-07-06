@@ -6,7 +6,6 @@ import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EventsContainer from 'components/events/events/EventsContainer';
-
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 

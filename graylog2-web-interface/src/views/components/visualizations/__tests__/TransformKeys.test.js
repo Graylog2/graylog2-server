@@ -2,10 +2,12 @@
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import CurrentUserStore from 'stores/users/CurrentUserStore';
 
-import transformKeys from '../TransformKeys';
 import * as fixtures from './TransformKeys.fixtures';
 
+import transformKeys from '../TransformKeys';
+
 jest.mock('stores/users/CurrentUserStore', () => ({ get: jest.fn() }));
+jest.mock('util/AppConfig', () => ({ rootTimeZone: jest.fn(() => 'America/Chicago') }));
 
 // eslint-disable-next-line global-require
 describe('TransformKeys', () => {
@@ -17,6 +19,7 @@ describe('TransformKeys', () => {
       rollup: false,
     }];
     const result = transformKeys([], [])(rows);
+
     expect(result).toEqual(rows);
   });
 
@@ -28,6 +31,7 @@ describe('TransformKeys', () => {
       rollup: false,
     }];
     const result = transformKeys([Pivot.create('foo', 'value')], [Pivot.create('bar', 'value')])(rows);
+
     expect(result).toEqual(rows);
   });
 
@@ -62,7 +66,7 @@ describe('TransformKeys', () => {
   });
 
   it('transforms column keys using current user\'s timezone', () => {
-    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'Europe/Berlin' });
+    CurrentUserStore.get.mockReturnValueOnce({ timezone: 'America/Los_Angeles' });
     const input = [
       {
         source: 'leaf',
@@ -80,19 +84,20 @@ describe('TransformKeys', () => {
 
     expect(result).toEqual([
       {
-        key: ['2018-10-01T17:10:55.323+02:00'],
+        key: ['2018-10-01T08:10:55.323-07:00'],
         source: 'leaf',
         values: [],
       }, {
-        key: ['2017-03-12T18:32:21.283+01:00'],
+        key: ['2017-03-12T10:32:21.283-07:00'],
         source: 'leaf',
         values: [],
       },
     ]);
   });
 
-  it('transforms column keys using UTC if user\'s timezone is null', () => {
+  it('transforms column keys using AppConfig rootTimeZone if user\'s timezone is null', () => {
     CurrentUserStore.get.mockReturnValueOnce({ timezone: null });
+
     const input = [
       {
         source: 'leaf',
@@ -110,11 +115,11 @@ describe('TransformKeys', () => {
 
     expect(result).toEqual([
       {
-        key: ['2018-10-01T15:10:55.323+00:00'],
+        key: ['2018-10-01T10:10:55.323-05:00'],
         source: 'leaf',
         values: [],
       }, {
-        key: ['2017-03-12T17:32:21.283+00:00'],
+        key: ['2017-03-12T12:32:21.283-05:00'],
         source: 'leaf',
         values: [],
       },

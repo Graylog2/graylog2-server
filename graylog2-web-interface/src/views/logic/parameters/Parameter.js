@@ -1,8 +1,11 @@
 // @flow strict
 
 import * as Immutable from 'immutable';
+
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+
 import type { ParameterBindingJsonRepresentation } from './ParameterBinding';
+
 import { singleton } from '../singleton';
 
 type InternalState = {
@@ -81,6 +84,7 @@ class Parameter {
     if (implementingClass) {
       return implementingClass.fromJSON(value);
     }
+
     throw new Error(`No class found for type <${type}>`);
   }
 
@@ -88,6 +92,7 @@ class Parameter {
     this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 }
+
 export default singleton('views.logic.parameters.Parameter', () => Parameter);
 
 export type ParameterMap = Immutable.Map<string, Parameter>;

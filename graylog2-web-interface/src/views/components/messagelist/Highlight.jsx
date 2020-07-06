@@ -5,6 +5,7 @@ import { get } from 'lodash';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
+
 import PossiblyHighlight from './PossiblyHighlight';
 
 type Props = {

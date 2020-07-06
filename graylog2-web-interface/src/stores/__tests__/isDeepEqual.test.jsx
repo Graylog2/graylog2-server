@@ -1,5 +1,6 @@
 // @flow strict
 import { Map, List } from 'immutable';
+
 import {
   arrayOfMaps,
   listWithObject,

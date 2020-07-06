@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import { cleanup, render } from 'wrappedTestingLibrary';
-
 import asMock from 'helpers/mocking/AsMock';
 import { MockCombinedProvider, MockStore } from 'helpers/mocking';
-import CombinedProvider from 'injection/CombinedProvider';
-import UserPreferencesContext, { defaultUserPreferences } from './UserPreferencesContext';
-import type { UserPreferences } from './UserPreferencesContext';
 
+import CombinedProvider from 'injection/CombinedProvider';
+
+import UserPreferencesContext, { defaultUserPreferences, type UserPreferences } from './UserPreferencesContext';
+import CurrentUserProvider from './CurrentUserProvider';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
@@ -17,17 +17,35 @@ jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({ Current
 describe('CurrentUserPreferencesProvider', () => {
   afterEach(cleanup);
 
-  const renderSUT = (): ((UserPreferences) => null) => {
+  const SimpleCurrentUserPreferencesProvider = ({ children }: {children: JestMockFn<*, *>}) => (
+    <CurrentUserPreferencesProvider>
+      <UserPreferencesContext.Consumer>
+        {children}
+      </UserPreferencesContext.Consumer>
+    </CurrentUserPreferencesProvider>
+  );
+
+  const renderSUT = (): ((UserPreferences: UserPreferences) => null) => {
     const consume = jest.fn();
+
     render(
-      <CurrentUserPreferencesProvider>
-        <UserPreferencesContext.Consumer>
+      <CurrentUserProvider>
+        <SimpleCurrentUserPreferencesProvider>
           {consume}
-        </UserPreferencesContext.Consumer>
-      </CurrentUserPreferencesProvider>,
+        </SimpleCurrentUserPreferencesProvider>
+      </CurrentUserProvider>,
     );
+
     return consume;
   };
+
+  it('provides default user preferences when CurrentUserContext is not provided', () => {
+    const consume = jest.fn();
+
+    render(<SimpleCurrentUserPreferencesProvider>{consume}</SimpleCurrentUserPreferencesProvider>);
+
+    expect(consume).toHaveBeenCalledWith(defaultUserPreferences);
+  });
 
   it('provides default user preferences with empty store', () => {
     const consume = renderSUT();

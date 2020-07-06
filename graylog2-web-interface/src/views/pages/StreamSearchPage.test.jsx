@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { render, cleanup, wait, waitForElement, fireEvent } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-
 import asMock from 'helpers/mocking/AsMock';
 
 import { processHooks } from 'views/logic/views/ViewLoader';
@@ -13,6 +12,7 @@ import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
+
 import StreamSearchPage from './StreamSearchPage';
 
 const mockExtendedSearchPage = jest.fn(() => <div>Extended search page</div>);
@@ -21,23 +21,29 @@ const mockView = View.create()
   .type(View.Type.Search)
   .search(Search.builder().build())
   .build();
+
 jest.mock('./ExtendedSearchPage', () => mockExtendedSearchPage);
 jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
     create: jest.fn(() => Promise.resolve({ view: mockView })),
   },
 }));
+
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.resolve()),
   },
 }));
+
 jest.mock('views/hooks/SyncWithQueryParameters', () => ({
   syncWithQueryParameters: jest.fn(),
 }));
+
 jest.mock('views/logic/views/ViewLoader', () => {
   const originalModule = jest.requireActual('views/logic/views/ViewLoader');
+
   return {
     __esModule: true,
     ...originalModule,
@@ -49,6 +55,7 @@ describe('StreamSearchPage', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
+
   const mockRouter = {
     getCurrentLocation: jest.fn(() => ({ pathname: '/search', search: '?q=&rangetype=relative&relative=300' })),
   };
@@ -76,9 +83,11 @@ describe('StreamSearchPage', () => {
 
   it('shows loading spinner before rendering page', async () => {
     const { getByText } = render(<SimpleStreamSearchPage />);
+
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();
+
     await waitForElement(() => getByText('Extended search page'));
   });
 
@@ -104,10 +113,12 @@ describe('StreamSearchPage', () => {
           {(loadView) => <button type="button" onClick={() => loadView && loadView('special-view-id')}>Load view</button>}
         </ViewLoaderContext.Consumer>
       ));
+
       const viewGetAction = asMock(ViewManagementActions.get);
 
       const { getByText } = render(<SimpleStreamSearchPage />);
       const viewLoadButton = await waitForElement(() => getByText('Load view'));
+
       fireEvent.click(viewLoadButton);
 
       await wait(() => expect(viewGetAction).toHaveBeenCalledTimes(1));

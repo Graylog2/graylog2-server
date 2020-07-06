@@ -30,6 +30,7 @@ const contrastingColor = (color: string, wcagLevel?: string = 'AAA'): string => 
 
   while (mixture <= 1) {
     const percent = mixture.toFixed(2);
+
     outputColor = chroma.mix(color, mixColor, percent).css();
 
     if (chroma.contrast(color, outputColor) >= contrastRatios[wcagLevel]) {

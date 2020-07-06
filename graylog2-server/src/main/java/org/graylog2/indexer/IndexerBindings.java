@@ -19,7 +19,6 @@ package org.graylog2.indexer;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.plugin.inject.Graylog2Module;
 
 public class IndexerBindings extends Graylog2Module {
@@ -29,7 +28,5 @@ public class IndexerBindings extends Graylog2Module {
 
         install(new FactoryModuleBuilder().build(MongoIndexSet.Factory.class));
         bind(IndexSetRegistry.class).to(MongoIndexSetRegistry.class);
-
-        install(new FactoryModuleBuilder().build(ScrollResult.Factory.class));
     }
 }

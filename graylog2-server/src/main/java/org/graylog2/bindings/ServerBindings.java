@@ -89,6 +89,7 @@ import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserPermissionsCleanupListener;
+import org.graylog2.utilities.GRNRegistry;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -110,6 +111,7 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
+        bindGRNRegistry();
         install(new AuthenticatingRealmModule(configuration));
         install(new AuthorizationOnlyRealmModule());
         bindSearchResponseDecorators();
@@ -215,5 +217,9 @@ public class ServerBindings extends Graylog2Module {
     private void bindSearchResponseDecorators() {
         // only triggering an initialize to make sure that the binding exists
         searchResponseDecoratorBinder();
+    }
+
+    private void bindGRNRegistry() {
+        bind(GRNRegistry.class).toInstance(GRNRegistry.createWithBuiltinTypes());
     }
 }

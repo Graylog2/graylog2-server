@@ -28,6 +28,7 @@ class IndexerClusterHealthSummary extends React.Component {
 
   _formatTextForHealth = (health) => {
     const text = `Elasticsearch cluster is ${health.status}.`;
+
     switch (health.status) {
       case 'green': return text;
       case 'yellow':
@@ -39,7 +40,7 @@ class IndexerClusterHealthSummary extends React.Component {
   _iconNameForHealth = (health) => {
     switch (health.status) {
       case 'green': return 'check-circle';
-      case 'yellow': return 'warning';
+      case 'yellow': return 'exclamation-triangle';
       case 'red': return 'ambulance';
       default: return 'check-circle';
     }
@@ -47,6 +48,7 @@ class IndexerClusterHealthSummary extends React.Component {
 
   render() {
     const { health } = this.props;
+
     return (
       <ESClusterStatus bsStyle={this._alertClassForHealth(health)}>
         <Icon name={this._iconNameForHealth(health)} /> &nbsp;{this._formatTextForHealth(health)}{' '}

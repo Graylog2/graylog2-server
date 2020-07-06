@@ -2,13 +2,15 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import mockComponent from 'helpers/mocking/MockComponent';
-import HeatmapVisualization from '../HeatmapVisualization';
+
 import * as fixtures from './HeatmapVisualization.fixtures';
+
+import HeatmapVisualization from '../HeatmapVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
@@ -47,6 +49,7 @@ describe('HeatmapVisualization', () => {
                                                 toggleEdit={() => {}}
                                                 width={800} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', plotLayout);
     expect(genericPlot).toHaveProp('chartData', plotChartData);
   });

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { Popover } from 'components/graylog';
 
 class EventKeyHelpPopover extends React.Component {
@@ -9,6 +10,7 @@ class EventKeyHelpPopover extends React.Component {
 
   render() {
     const { id, ...otherProps } = this.props;
+
     return (
       <Popover id={id} title="More about Event Keys" {...otherProps}>
         <p>

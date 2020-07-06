@@ -6,14 +6,14 @@ import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.params.Parameters;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.common.Strings;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -39,11 +39,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class SearchesAdapterES6 implements SearchesAdapter {
     private static final String DEFAULT_SCROLLTIME = "1m";
@@ -353,7 +353,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
         final Optional<BoolQueryBuilder> rangeQueryBuilder = scrollCommand.range()
                 .map(range -> QueryBuilders.boolQuery()
-                        .must(IndexHelper.getTimestampRangeFilter(range)));
+                        .must(TimeRangeQueryFactory.create(range)));
         final Optional<BoolQueryBuilder> filterQueryBuilder = scrollCommand.filter()
                 .filter(filter -> !isWildcardQuery(filter))
                 .map(QueryBuilders::queryStringQuery)
@@ -446,7 +446,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
 
         if (range != null) {
             bfb = QueryBuilders.boolQuery()
-                    .must(IndexHelper.getTimestampRangeFilter(range));
+                    .must(TimeRangeQueryFactory.create(range));
         }
 
         // Not creating a filter for a "*" value because an empty filter used to be submitted that way.

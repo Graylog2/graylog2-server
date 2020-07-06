@@ -5,10 +5,12 @@ import mockComponent from 'helpers/mocking/MockComponent';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
+
 import Query from './Query';
+import WidgetGrid from './WidgetGrid';
+
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
-import WidgetGrid from './WidgetGrid';
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
 jest.mock('views/logic/Widgets', () => ({ widgetDefinition: () => ({}) }));
@@ -49,6 +51,7 @@ describe('Query', () => {
              fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
+
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', {});
     expect(widgetGrid).toHaveProp('data', { widget1: [{ foo: 23 }], widget2: [{ bar: 42 }] });
@@ -74,6 +77,7 @@ describe('Query', () => {
              fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
+
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget1: [error] });
     expect(widgetGrid).toHaveProp('data', { widget1: [], widget2: [{ bar: 42 }] });
@@ -100,6 +104,7 @@ describe('Query', () => {
              fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
+
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget2: [error1, error2] });
     expect(widgetGrid).toHaveProp('data', { widget1: [{ foo: 17 }], widget2: [] });
@@ -124,6 +129,7 @@ describe('Query', () => {
              fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
+
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget1: [error1], widget2: [error2] });
     expect(widgetGrid).toHaveProp('data', { widget1: [], widget2: [] });
@@ -147,10 +153,10 @@ describe('Query', () => {
                fields={Immutable.List()} />
       </ViewTypeContext.Provider>
     ));
+
     expect(wrapper.html()).toContain('<h2>This dashboard has no widgets yet</h2>');
     expect(wrapper.html()).toContain('4. <b>Share</b> the dashboard with your colleagues.');
   });
-
 
   it('renders search widget creation explanation on the search page, if no widget is defined', () => {
     const results = {
@@ -169,6 +175,7 @@ describe('Query', () => {
                fields={Immutable.List()} />
       </ViewTypeContext.Provider>
     ));
+
     expect(wrapper.html()).toContain('<h2>There are no widgets defined to visualize the search result</h2>');
     expect(wrapper.html()).not.toContain('4. <b>Share</b> the dashboard with your colleagues.');
   });

@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { isPermitted } from 'util/PermissionsMixin';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import {} from 'components/maps/configurations';
 
@@ -37,15 +38,18 @@ class ConfigurationsPage extends React.Component {
   componentDidMount() {
     style.use();
     const { currentUser: { permissions } } = this.props;
+
     this._checkConfig();
 
     ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG);
     ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG);
     ConfigurationsActions.list(SIDECAR_CONFIG);
     ConfigurationsActions.list(EVENTS_CONFIG);
+
     if (isPermitted(permissions, ['urlwhitelist:read'])) {
       ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
     }
+
     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
       ConfigurationsActions.list(systemConfig.configType);
     });
@@ -58,9 +62,11 @@ class ConfigurationsPage extends React.Component {
 
   _getConfig = (configType) => {
     const { configuration } = this.props;
+
     if (configuration && configuration[configType]) {
       return configuration[configType];
     }
+
     return null;
   };
 
@@ -96,6 +102,7 @@ class ConfigurationsPage extends React.Component {
     // Put two plugin config components per row.
     while (pluginConfigs.length > 0) {
       idx += 1;
+
       rows.push(
         <Row key={`plugin-config-row-${idx}`}>
           <Col md={6}>
@@ -113,9 +120,11 @@ class ConfigurationsPage extends React.Component {
 
   _checkConfig = () => {
     const { configuration } = this.props;
+
     this.checkLoadedTimer = setTimeout(() => {
       if (Object.keys(configuration).length > 0) {
         this.setState({ loaded: true }, this._clearTimeout);
+
         return;
       }
 

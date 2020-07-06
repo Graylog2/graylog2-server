@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import DayPicker from 'react-day-picker';
+
 import { OverlayTrigger, Popover } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
-import DayPicker from 'react-day-picker';
 
 import 'react-day-picker/lib/style.css';
 
@@ -29,6 +30,7 @@ class DatePicker extends React.Component {
 
   render() {
     let selectedDate;
+
     if (this.props.date) {
       try {
         selectedDate = DateTime.parseFromString(this.props.date);
@@ -42,7 +44,9 @@ class DatePicker extends React.Component {
         if (!selectedDate) {
           return false;
         }
+
         const dateTime = DateTime.ignoreTZ(date);
+
         return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
       },
     };

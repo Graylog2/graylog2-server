@@ -19,6 +19,7 @@ class CollectorConfigurationSelector extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       nextAssignedConfigurations: [],
     };
@@ -26,6 +27,7 @@ class CollectorConfigurationSelector extends React.Component {
 
   getAssignedConfigurations = (selectedSidecarCollectorPairs, configurations) => {
     const assignments = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
+
     return assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id));
   };
 
@@ -34,6 +36,7 @@ class CollectorConfigurationSelector extends React.Component {
 
     hideCallback();
     const nextAssignedConfigurations = configurations.filter((c) => configurationIds.includes(c.id));
+
     this.setState({ nextAssignedConfigurations }, this.modal.open);
   };
 
@@ -52,6 +55,7 @@ class CollectorConfigurationSelector extends React.Component {
     const { configurations, collectors } = this.props;
     const configuration = configurations.find((c) => c.id === configurationId);
     const collector = collectors.find((b) => b.id === configuration.collector_id);
+
     return (
       <span>
         <ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}&emsp;
@@ -77,6 +81,7 @@ class CollectorConfigurationSelector extends React.Component {
     );
 
     let actionSummary;
+
     if (nextAssignedConfigurations.length === 0) {
       actionSummary = <span>You are going to <b>remove</b> the configuration for collector {collectorIndicator} from:</span>;
     } else {
@@ -105,6 +110,7 @@ class CollectorConfigurationSelector extends React.Component {
 
     // Do not allow configuration changes when more than one log collector type is selected
     const selectedLogCollectors = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector));
+
     if (selectedLogCollectors.length > 1) {
       return (
         <SelectPopover id="status-filter"

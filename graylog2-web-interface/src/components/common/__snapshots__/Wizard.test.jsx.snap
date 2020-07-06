@@ -583,6 +583,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                                 >
                                   <Icon
                                     name="caret-left"
+                                    type="solid"
                                   >
                                     <FontAwesomeIcon
                                       icon={
@@ -672,6 +673,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                                 >
                                   <Icon
                                     name="caret-right"
+                                    type="solid"
                                   >
                                     <FontAwesomeIcon
                                       icon={
@@ -1443,6 +1445,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                                 >
                                   <Icon
                                     name="caret-left"
+                                    type="solid"
                                   >
                                     <FontAwesomeIcon
                                       icon={
@@ -1532,6 +1535,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                                 >
                                   <Icon
                                     name="caret-right"
+                                    type="solid"
                                   >
                                     <FontAwesomeIcon
                                       icon={

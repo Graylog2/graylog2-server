@@ -1,8 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
-import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
+import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type {
   VisualizationComponent,
   VisualizationComponentProps,
@@ -20,6 +19,7 @@ const _verticalDimensions = (idx, total) => {
 
   const sliceSize = 1 / rows;
   const spacer = sliceSize * 0.1;
+
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
@@ -28,6 +28,7 @@ const _horizontalDimensions = (idx, total) => {
 
   const sliceSize = 1 / Math.min(total, maxItemsPerRow);
   const spacer = sliceSize * 0.1;
+
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
@@ -45,6 +46,7 @@ const _generateSeries = (type, name, x, y, z, idx, total) => ({
 
 const getChartColor = (fullDataArray, name) => {
   const fullData = fullDataArray.find((d) => d.labels.indexOf(name) >= 0);
+
   if (fullData && fullData.labels && fullData.marker && fullData.marker.colors) {
     const indexOfName = fullData.labels.indexOf(name);
     // $FlowFixMe the check above ensures the presents of marker
@@ -53,11 +55,13 @@ const getChartColor = (fullDataArray, name) => {
     // $FlowFixMe the check above ensures the presents of colors
     return colors[indexOfName];
   }
+
   return undefined;
 };
 
 const setChartColor = (chart, colorMap) => {
   const colors = chart.labels.map((label) => colorMap[label]);
+
   return { marker: { colors } };
 };
 
@@ -69,7 +73,7 @@ const PieVisualization: VisualizationComponent = makeVisualization(({ config, da
 
 PieVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: AggregationResult.isRequired,
 };
 
 export default PieVisualization;

@@ -4,9 +4,10 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
 import { isFunction } from 'lodash';
+import type { FormikProps } from 'formik/@flow-typed';
 
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { FormikProps } from 'formik/@flow-typed';
+
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
 type Values = {
@@ -32,6 +33,7 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
     timerange: timerange ? onInitializingTimerange(timerange) : timerange,
     queryString,
   };
+
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize

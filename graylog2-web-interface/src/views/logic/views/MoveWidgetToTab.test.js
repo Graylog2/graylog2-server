@@ -1,13 +1,16 @@
 import { readFileSync } from 'fs';
+
 import { dirname } from 'path';
 
 import MoveWidgetToTab from './MoveWidgetToTab';
+import View from './View';
+
 import Parameter from '../parameters/Parameter';
 import ValueParameter from '../parameters/ValueParameter';
-import View from './View';
 import Search from '../search/Search';
 
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
 })));

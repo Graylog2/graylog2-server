@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { Alert, Col, Row } from 'components/graylog';
 
 import commonStyles from '../common/commonStyles.css';
@@ -12,6 +13,7 @@ class EventDefinitionValidationSummary extends React.Component {
   render() {
     const { validation } = this.props;
     const fieldsWithErrors = Object.keys(validation.errors);
+
     if (fieldsWithErrors.length === 0) {
       return null;
     }
@@ -26,6 +28,7 @@ class EventDefinitionValidationSummary extends React.Component {
               {fieldsWithErrors.map((field) => {
                 return validation.errors[field].map((error) => {
                   const effectiveError = (field === 'config' ? error.replace('config', 'condition') : error);
+
                   return <li key={`${field}-${effectiveError}`}>{effectiveError}</li>;
                 });
               })}

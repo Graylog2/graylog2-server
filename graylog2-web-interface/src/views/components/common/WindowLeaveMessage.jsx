@@ -2,12 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
+
 import connect from 'stores/connect';
-
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
-
 import { ViewStore } from 'views/stores/ViewStore';
-
 
 type Props = {
   dirty: boolean,

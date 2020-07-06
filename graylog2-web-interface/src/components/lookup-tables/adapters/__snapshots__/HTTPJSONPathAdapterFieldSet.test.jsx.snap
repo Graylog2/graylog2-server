@@ -4,7 +4,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
 <div>
   <fieldset>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
         class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
@@ -16,7 +16,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+          class="FormControl-sc-1amoaox-0 eXfwDC form-control"
           id="url"
           label="Lookup URL"
           name="url"
@@ -35,7 +35,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
         class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
@@ -47,7 +47,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+          class="FormControl-sc-1amoaox-0 eXfwDC form-control"
           id="single_value_jsonpath"
           label="Single value JSONPath"
           name="single_value_jsonpath"
@@ -60,7 +60,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
         class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
@@ -72,7 +72,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+          class="FormControl-sc-1amoaox-0 eXfwDC form-control"
           id="multi_value_jsonpath"
           label="Multi value JSONPath"
           name="multi_value_jsonpath"
@@ -84,7 +84,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
         class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
@@ -96,7 +96,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fdBWEX form-control"
+          class="FormControl-sc-1amoaox-0 eXfwDC form-control"
           id="user_agent"
           label="HTTP User-Agent"
           name="user_agent"
@@ -113,7 +113,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
         class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
@@ -168,12 +168,12 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                 <tr>
                   <td>
                     <div
-                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                     >
                       
                       <span>
                         <input
-                          class="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
+                          class="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
                           data-testid="newKey"
                           id="newKey"
                           label=""
@@ -188,12 +188,12 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                   </td>
                   <td>
                     <div
-                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                     >
                       
                       <span>
                         <input
-                          class="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
+                          class="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
                           data-testid="newValue"
                           id="newValue"
                           label=""

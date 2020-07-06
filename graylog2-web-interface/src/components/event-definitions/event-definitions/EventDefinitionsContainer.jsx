@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -31,12 +30,14 @@ class EventDefinitionsContainer extends React.Component {
 
   handlePageChange = (nextPage, nextPageSize) => {
     const { eventDefinitions } = this.props;
+
     this.fetchData({ page: nextPage, pageSize: nextPageSize, query: eventDefinitions.query });
   };
 
   handleQueryChange = (nextQuery, callback = () => {}) => {
     const { eventDefinitions } = this.props;
     const promise = this.fetchData({ query: nextQuery, pageSize: eventDefinitions.pagination.pageSize });
+
     promise.finally(callback);
   };
 

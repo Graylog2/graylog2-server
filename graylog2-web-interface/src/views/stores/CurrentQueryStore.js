@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 import { isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
+
 import { QueriesStore } from './QueriesStore';
 import { ViewStore } from './ViewStore';
 
@@ -18,8 +19,10 @@ export const CurrentQueryStore = singletonStore(
     },
     onQueriesStoreUpdate(queries) {
       this.queries = queries;
+
       if (this.activeQuery) {
         const newQuery = queries.get(this.activeQuery);
+
         if (!isEqual(newQuery, this.query)) {
           this.query = newQuery;
           this._trigger();

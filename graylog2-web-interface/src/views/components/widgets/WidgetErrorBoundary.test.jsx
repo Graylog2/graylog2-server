@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { render, waitForElement } from 'wrappedTestingLibrary';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 describe('WidgetErrorBoundary', () => {
@@ -12,6 +12,7 @@ describe('WidgetErrorBoundary', () => {
         <div>Hello World!</div>
       </WidgetErrorBoundary>
     ));
+
     await waitForElement(() => getByText('Hello World!'));
   });
 
@@ -26,6 +27,7 @@ describe('WidgetErrorBoundary', () => {
         <Component />
       </WidgetErrorBoundary>
     ));
+
     await waitForElement(() => getByText('While rendering this widget, the following error occurred:'));
     await waitForElement(() => getByText('Error: The dungeon collapses, you die!'));
 
@@ -40,6 +42,7 @@ describe('WidgetErrorBoundary', () => {
         <Component />
       </WidgetErrorBoundary>
     ));
+
     expect(getByTestId('child-component-test-id')).toHaveAttribute('extraProp', 'The extra prop');
   });
 });

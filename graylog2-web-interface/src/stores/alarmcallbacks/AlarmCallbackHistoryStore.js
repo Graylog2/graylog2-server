@@ -1,10 +1,9 @@
 import Reflux from 'reflux';
+
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const AlarmCallbackHistoryActions = ActionsProvider.getActions('AlarmCallbackHistory');
@@ -24,6 +23,7 @@ const AlarmCallbackHistoryStore = Reflux.createStore({
         (response) => {
           this.histories = response.histories;
           this.trigger({ histories: this.histories });
+
           return this.histories;
         },
         (error) => {

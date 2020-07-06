@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
-import bsStyleThemeVariant from './variants/bsStyle';
 
 const PanelHeading = styled(BootstrapPanel.Heading)``;
 
@@ -14,15 +13,19 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   border-top-color: ${theme.colors.gray[80]};
 `);
 
-const panelVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = theme.utils.colorLevel(theme.colors.variant.light[variant], -10);
-  const borderColor = theme.utils.colorLevel(theme.colors.variant.light[variant], 10);
+const panelVariantStyles = css(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
+
+  const backgroundColor = theme.colors.variant.lighter[bsStyle];
+  const borderColor = theme.colors.variant.dark[bsStyle];
 
   return css`
     border-color: ${borderColor};
 
     > ${PanelHeading} {
-      color: ${theme.utils.contrastingColor(backgroundColor)};
+      color: ${theme.utils.readableColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
@@ -32,7 +35,7 @@ const panelVariantStyles = (hex, variant) => css(({ theme }) => {
 
       .badge {
         color: ${backgroundColor};
-        background-color: ${hex};
+        background-color: ${theme.colors.variant[bsStyle]};
       }
     }
 
@@ -50,7 +53,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   > ${PanelHeading} {
     .panel-title,
     .panel-title h3 {
-      font-size: 16px;
+      font-size: ${theme.fonts.size.large};
     }
   }
 
@@ -69,12 +72,16 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
     }
   }
 
-  ${bsStyleThemeVariant(panelVariantStyles)};
+  ${panelVariantStyles};
 `);
 
-const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
-  const backgroundColor = theme.utils.colorLevel(theme.colors.variant.light[variant], -10);
-  const borderColor = theme.utils.colorLevel(theme.colors.variant.light[variant], 10);
+const deprecatedVariantStyles = css(({ bsStyle, theme }) => {
+  if (!bsStyle) {
+    return undefined;
+  }
+
+  const backgroundColor = theme.colors.variant.lighter[bsStyle];
+  const borderColor = theme.colors.variant.dark[bsStyle];
 
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
@@ -87,7 +94,7 @@ const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
 
       > .panel-title,
       > .panel-title > * {
-        font-size: 16px;
+        font-size: ${theme.fonts.size.large};
       }
 
       + .panel-collapse > .panel-body {
@@ -96,7 +103,7 @@ const deprecatedVariantStyles = (hex, variant) => css(({ theme }) => {
 
       .badge {
         color: ${backgroundColor};
-        background-color: ${hex};
+        background-color: ${theme.colors.variant[bsStyle]};
       }
     }
 
@@ -132,7 +139,7 @@ const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
     }
   }
 
-  ${bsStyleThemeVariant(deprecatedVariantStyles)}
+  ${deprecatedVariantStyles}
 `);
 
 const Panel = ({

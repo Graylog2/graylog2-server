@@ -1,10 +1,12 @@
 // @flow strict
 import { readFileSync } from 'fs';
+
 import { dirname } from 'path';
 import md5 from 'md5';
 import { flow, merge, fill } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+
 import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
@@ -17,8 +19,10 @@ describe('Chart helper functions', () => {
   describe('chartData', () => {
     it('should not fail for empty data', () => {
       const result = chartData(config, [], 'dummy');
+
       expect(result).toHaveLength(0);
     });
+
     it('should properly extract series from simplest fixture with one series and one row pivot', () => {
       const input = readFixture('ChartData.test.simplest.json');
       const result = chartData(config, input, 'dummy');
@@ -28,9 +32,11 @@ describe('Chart helper functions', () => {
         x: ['index', 'show', 'login', 'edit'],
         y: [27142, 7826, 6626, 1246],
       }];
+
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
+
     it('should properly extract series from simplest fixture and include provided chart type', () => {
       const input = readFixture('ChartData.test.simplest.json');
       const result = chartData(config, input, 'bar');
@@ -40,9 +46,11 @@ describe('Chart helper functions', () => {
         x: ['index', 'show', 'login', 'edit'],
         y: [27142, 7826, 6626, 1246],
       }];
+
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
+
     it('should remove non-present data points and leave order of values intact', () => {
       const input = readFixture('ChartData.test.withHoles.json');
       const result = chartData(config, input, 'bar');
@@ -69,9 +77,11 @@ describe('Chart helper functions', () => {
         ],
         y: [587008, 646728, 792102, 579708, 62596],
       }];
+
       expect(result).toHaveLength(2);
       expect(result).toEqual(expectedResult);
     });
+
     it('should not remove data points with a value of zero', () => {
       const input = readFixture('ChartData.test.withZeros.json');
       const result = chartData(config, input, 'bar');
@@ -87,9 +97,11 @@ describe('Chart helper functions', () => {
         ],
         y: [7813, 0, 0, 0, 702],
       }];
+
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
+
     it('should remove data points with a value of null or undefined', () => {
       const input = readFixture('ChartData.test.withNullAndUndefined.json');
       const result = chartData(config, input, 'bar');
@@ -102,33 +114,42 @@ describe('Chart helper functions', () => {
         ],
         y: [7813, 702],
       }];
+
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
+
     it('should properly extract series from fixture with two column pivots', () => {
       const input = readFixture('ChartData.test.twoColumnPivots.json');
       const result = chartData(config, input, 'dummy');
       const expectedResult = readFixture('ChartData.test.twoColumnPivots.result.json');
+
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });
+
     it('should include chart type in result', () => {
       const input = readFixture('ChartData.test.simple.json');
       const result = chartData(config, input, 'scatter');
       const expectedResult = readFixture('ChartData.test.simple.result.json');
+
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });
+
     it('should allow passing a format series function to modify the series structure', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
       const generatorFunction = (type, name, x, y, z) => ({ type, name, x, y, z });
+
       const formatSeriesCustom = ({ valuesBySeries, xLabels }) => {
         // In this example we want to create only one series, with an z value, which contains all series data
         const z: Array<any> = Object.values(valuesBySeries).map((series) => {
           const newSeries = fill(Array(xLabels.length), null);
+
           return merge(newSeries, series);
         });
         const yLabels = Object.keys(valuesBySeries);
+
         return [[
           'XYZ Chart',
           xLabels,
@@ -136,20 +157,25 @@ describe('Chart helper functions', () => {
           z,
         ]];
       };
+
       const result = chartData(config, input, 'heatmap', generatorFunction, formatSeriesCustom);
       const expectedResult = readFixture('ChartData.test.oneColumOneRowPivot.result.json');
+
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
+
     it('should allow passing a leaf source matcher function to modify the resulting series', () => {
       const input = readFixture('ChartData.test.simple.json');
       const leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
       const result = chartData(config, input, 'scatter', undefined, undefined, leafSourceMatcher);
       const expectedResult = readFixture('ChartData.test.simple.sourceMatcher.result.json');
+
       expect(result).toHaveLength(4);
       expect(result).toEqual(expectedResult);
     });
   });
+
   describe('generateChart', () => {
     it('should allow passing a generator function modelling the chart config', () => {
       const input = readFixture('ChartData.test.simple.json');
@@ -170,6 +196,7 @@ describe('Chart helper functions', () => {
         '57469e98b570e77672233b258c7d91a0',
         '88648c9ca14f65ef199856a4fda8836e',
       ];
+
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });

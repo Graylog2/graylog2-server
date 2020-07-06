@@ -5,7 +5,6 @@ import lodash from 'lodash';
 import { ConfirmLeaveDialog } from 'components/common';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 import EventNotificationForm from './EventNotificationForm';
@@ -70,6 +69,7 @@ class EventNotificationFormContainer extends React.Component {
   handleChange = (key, value) => {
     const { notification } = this.state;
     const nextNotification = lodash.cloneDeep(notification);
+
     nextNotification[key] = value;
     this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
   };
@@ -83,8 +83,10 @@ class EventNotificationFormContainer extends React.Component {
     const { notification } = this.state;
 
     let promise;
+
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
+
       promise.then(
         () => {
           this.setState({ isDirty: false }, () => {
@@ -95,6 +97,7 @@ class EventNotificationFormContainer extends React.Component {
         },
         (errorResponse) => {
           const { body } = errorResponse.additional;
+
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
           }
@@ -102,6 +105,7 @@ class EventNotificationFormContainer extends React.Component {
       );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
+
       promise.then(
         () => {
           this.setState({ isDirty: false }, () => {
@@ -112,6 +116,7 @@ class EventNotificationFormContainer extends React.Component {
         },
         (errorResponse) => {
           const { body } = errorResponse.additional;
+
           if (errorResponse.status === 400 && body && body.failed) {
             this.setState({ validation: body });
           }
@@ -124,20 +129,24 @@ class EventNotificationFormContainer extends React.Component {
 
   handleTest = () => {
     const { notification } = this.state;
+
     this.setState({ testResult: { isLoading: true }, validation: initialValidation });
     const testResult = lodash.clone(initialTestResult);
 
     this.testPromise = EventNotificationsActions.test(notification);
+
     this.testPromise
       .then(
         (response) => {
           testResult.error = false;
           testResult.message = 'Notification was executed successfully.';
+
           return response;
         },
         (errorResponse) => {
           testResult.error = true;
           const { body } = errorResponse.additional;
+
           if (errorResponse.status === 400 && body && body.failed) {
             testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
             this.setState({ validation: body });

@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-slim
+FROM openjdk:8-jre-slim-buster
 
 ARG GRAYLOG_VERSION
 ARG BUILD_DATE

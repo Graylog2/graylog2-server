@@ -5,7 +5,6 @@ import Reflux from 'reflux';
 
 import { ControlLabel, FormControl, FormGroup } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
@@ -32,6 +31,7 @@ const AlertConditionForm = createReactClass({
 
   getValue() {
     const values = this.configurationForm.getValue();
+
     return {
       title: values.title,
       type: this.props.conditionType.type,
@@ -49,12 +49,14 @@ const AlertConditionForm = createReactClass({
 
   _onSubmit() {
     const request = this.getValue();
+
     this.props.onSubmit(request);
   },
 
   _formatTitle(alertCondition, name) {
     const action = alertCondition ? 'Update' : 'Create new';
     const conditionName = alertCondition ? <em>{alertCondition.title || 'Untitled'}</em> : name;
+
     return <span>{action} {conditionName}</span>;
   },
 

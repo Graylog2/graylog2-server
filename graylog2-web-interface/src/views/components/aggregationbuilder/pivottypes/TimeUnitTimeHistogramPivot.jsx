@@ -1,12 +1,11 @@
 // @flow strict
 import * as React from 'react';
+
 import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'components/graylog';
-
 import FormsUtils from 'util/FormsUtils';
-
 import { TimeUnits } from 'views/Constants';
-import type { Interval, TimeUnitInterval } from './Interval';
 
+import type { Interval, TimeUnitInterval } from './Interval';
 import styles from './TimeUnitTimeHistogramPivot.css';
 
 type OnChange = (Interval) => void;
@@ -18,6 +17,7 @@ type Props = {
 
 const _changeValue = (event: SyntheticInputEvent<HTMLInputElement>, interval: TimeUnitInterval, onChange: OnChange) => {
   const value = FormsUtils.getValueFromInput(event.target);
+
   onChange({ ...interval, value });
 };
 

@@ -5,7 +5,6 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
-
 import type { RefluxActions } from 'stores/StoreTypes';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
@@ -83,24 +82,31 @@ const ViewManagementStore = singletonStore(
 
     get(viewId: string): Promise<ViewJson> {
       const promise = fetch('GET', `${viewsUrl}/${viewId}`);
+
       ViewManagementActions.get.promise(promise);
+
       return promise;
     },
 
     create(view: View): Promise<View> {
       const promise = fetch('POST', viewsUrl, JSON.stringify(view));
+
       ViewManagementActions.create.promise(promise);
+
       return promise;
     },
 
     createCompleted(): Promise<void> {
       const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+
       return CurrentUserStore.reload();
     },
 
     update(view: View): Promise<View> {
       const promise = fetch('PUT', viewsIdUrl(view.id), JSON.stringify(view));
+
       ViewManagementActions.update.promise(promise);
+
       return promise;
     },
 
@@ -108,12 +114,14 @@ const ViewManagementStore = singletonStore(
       const promise = fetch('GET', `${viewsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
           this.views = response.views;
+
           this.pagination = {
             total: response.total,
             count: response.count,
             page: response.page,
             perPage: response.per_page,
           };
+
           this.trigger({
             list: this.views,
             pagination: this.pagination,
@@ -141,6 +149,7 @@ const ViewManagementStore = singletonStore(
     forValue() {
       const promise = fetch('POST', forValueUrl())
         .catch((error) => UserNotification.error(`Finding matching views for value failed with status: ${error}`, 'Could not find matching views'));
+
       ViewManagementActions.forValue.promise(promise);
     },
   }),

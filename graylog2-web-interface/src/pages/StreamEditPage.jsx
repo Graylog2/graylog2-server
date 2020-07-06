@@ -2,11 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert } from 'components/graylog';
 
+import { Alert } from 'components/graylog';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -43,6 +42,7 @@ const StreamEditPage = createReactClass({
                          messageId={this.props.location.query.message_id}
                          index={this.props.location.query.index} />
     );
+
     if (this.state.stream.is_default) {
       content = (
         <div className="row content">
@@ -54,6 +54,7 @@ const StreamEditPage = createReactClass({
         </div>
       );
     }
+
     return (
       <DocumentTitle title={`Rules of Stream ${this.state.stream.title}`}>
         <div>

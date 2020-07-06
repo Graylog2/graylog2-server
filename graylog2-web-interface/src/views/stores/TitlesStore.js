@@ -5,6 +5,7 @@ import { get, isEqual } from 'lodash';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 import type { TitlesMap, TitleType } from './TitleTypes';
 
@@ -36,6 +37,7 @@ export const TitlesStore = singletonStore(
     },
     onViewStateStoreChange({ state }) {
       const titles = get(state, 'titles');
+
       if (!isEqual(titles, this.titles)) {
         this.titles = titles;
         this._trigger();
@@ -45,8 +47,10 @@ export const TitlesStore = singletonStore(
     set(type, id, title) {
       this.titles = this.titles.setIn([type, id], title);
       const promise = CurrentViewStateActions.titles(this.titles).then(() => this.titles);
+
       this._trigger();
       TitlesActions.set.promise(promise);
+
       return promise;
     },
 

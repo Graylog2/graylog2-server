@@ -4,14 +4,13 @@ import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { Col } from 'components/graylog';
-
 import FormsUtils from 'util/FormsUtils';
-
 import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {
   const handleChange = (event) => {
     const nextExpression = lodash.cloneDeep(expression);
+
     nextExpression.value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
     onChange({ conditions: nextExpression });
   };

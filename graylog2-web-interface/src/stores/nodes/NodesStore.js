@@ -1,8 +1,8 @@
 // @flow strict
 import Reflux from 'reflux';
+
 import { qualifyUrl } from 'util/URLUtils';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
-
 import ApiRoutes from 'routing/ApiRoutes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -58,14 +58,17 @@ const NodesStore = Reflux.createStore({
     const promise = this.promises.list || fetchPeriodically('GET', qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
       .then((response: NodesListResponse) => {
         this.nodes = {};
+
         if (response.nodes) {
           this.nodes = response.nodes
             .map((node) => [node.node_id, node])
             .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+
           this.clusterId = this._clusterId();
           this.nodeCount = this._nodeCount();
           this._propagateState();
         }
+
         return response;
       })
       .finally(() => delete this.promises.list);
@@ -81,6 +84,7 @@ const NodesStore = Reflux.createStore({
 
   _clusterId() {
     const nodeInCluster = Object.keys(this.nodes).map((id) => this.nodes[id]).find((node) => node.cluster_id);
+
     return (nodeInCluster ? nodeInCluster.cluster_id.toUpperCase() : undefined);
   },
 

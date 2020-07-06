@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
-
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
@@ -59,14 +57,18 @@ class CacheForm extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { type: currentType } = this.props;
+
     if (prevProps.type !== currentType) {
       this._input.getInputDOMNode().focus();
     }
+
     const { cache } = this.props;
+
     if (_.isEqual(cache, prevProps.cache)) {
       // props haven't change, don't update our state from them
       return;
     }
+
     this.updateState(cache);
   }
 
@@ -108,6 +110,7 @@ class CacheForm extends React.Component {
 
     // first cancel outstanding validation timer, we have new data
     this._clearTimer();
+
     if (validate) {
       this.validationCheckTimer = setTimeout(() => validate(cache), 500);
     }
@@ -117,16 +120,20 @@ class CacheForm extends React.Component {
     const { cache: stateCache } = this.state;
 
     const cache = ObjectUtils.clone(stateCache);
+
     cache[event.target.name] = FormsUtils.getValueFromInput(event.target);
     let { generateName } = this.state;
+
     if (generateName && event.target.name === 'title') {
       // generate the name
       cache.name = this._sanitizeTitle(cache.title);
     }
+
     if (event.target.name === 'name') {
       // the cache name has been changed manually, no longer automatically change it
       generateName = false;
     }
+
     this._validate(cache);
     this.setState({ cache: cache });
   };
@@ -135,6 +142,7 @@ class CacheForm extends React.Component {
     const { cache: stateCache } = this.state;
 
     const cache = ObjectUtils.clone(stateCache);
+
     cache.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(cache);
     this.setState({ cache: cache });
@@ -144,6 +152,7 @@ class CacheForm extends React.Component {
     const { cache: stateCache } = this.state;
 
     const cache = ObjectUtils.clone(stateCache);
+
     cache.config = newConfig;
     this._validate(cache);
     this.setState({ cache: cache });
@@ -158,6 +167,7 @@ class CacheForm extends React.Component {
     }
 
     let promise;
+
     if (create) {
       promise = LookupTableCachesActions.create(stateCache);
     } else {
@@ -177,6 +187,7 @@ class CacheForm extends React.Component {
     if (validationErrors[fieldName]) {
       return 'error';
     }
+
     return null;
   };
 
@@ -192,11 +203,13 @@ class CacheForm extends React.Component {
         </div>
       );
     }
+
     return <span>{defaultText}</span>;
   };
 
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
+
     return <TagName>{title} <small>({typeName})</small></TagName>;
   };
 
@@ -214,9 +227,12 @@ class CacheForm extends React.Component {
     let configFieldSet = null;
     let documentationComponent = null;
     let pluginDisplayName = cache.config.type;
+
     if (plugin && plugin.length > 0) {
       const p = plugin[0];
+
       pluginDisplayName = p.displayName;
+
       configFieldSet = React.createElement(p.formComponent, {
         config: cache.config,
         handleFormEvent: this._onConfigChange,
@@ -224,14 +240,18 @@ class CacheForm extends React.Component {
         validationMessage: this._validationMessage,
         validationState: this._validationState,
       });
+
       if (p.documentationComponent) {
         documentationComponent = React.createElement(p.documentationComponent);
       }
     }
+
     let documentationColumn = null;
     let formRowWidth = 8; // If there is no documentation component, we don't use the complete page width
+
     if (documentationComponent) {
       formRowWidth = 6;
+
       documentationColumn = (
         <Col lg={formRowWidth}>
           {documentationComponent}

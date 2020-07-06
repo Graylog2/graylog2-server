@@ -22,6 +22,7 @@ const PopoverHelp = () => {
       </p>
     </Popover>
   );
+
   return (
     <div className={DecoratorStyles.helpLinkContainer}>
       <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>

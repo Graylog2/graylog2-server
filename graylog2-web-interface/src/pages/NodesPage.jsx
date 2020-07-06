@@ -1,13 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import URI from 'urijs';
+
 import URLUtils from 'util/URLUtils';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';
-import URI from 'urijs';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const NodesStore = StoreProvider.getStore('Nodes');
@@ -20,6 +19,7 @@ const NodesPage = createReactClass({
 
   _isLoading() {
     const { nodes } = this.state;
+
     return !(nodes);
   },
 
@@ -27,6 +27,7 @@ const NodesPage = createReactClass({
     if (this._isLoading()) {
       return <Spinner />;
     }
+
     if (this._hasExternalURI()) {
       return (
         <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl(GLOBAL_API_BROWSER_URL)}>
@@ -34,6 +35,7 @@ const NodesPage = createReactClass({
         </ExternalLinkButton>
       );
     }
+
     return null;
   },
 
@@ -41,11 +43,13 @@ const NodesPage = createReactClass({
     const { nodes } = this.state;
     const nodeVals = Object.values(nodes);
     const publishURI = URLUtils.qualifyUrl('/');
+
     return (nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
   },
 
   render() {
     const { nodes, currentUser } = this.state;
+
     return (
       <DocumentTitle title="Nodes">
         <div>

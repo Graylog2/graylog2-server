@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import FormUtils from 'util/FormsUtils';
 
@@ -22,6 +22,7 @@ class SplitAndCountConverterConfiguration extends React.Component {
 
   _toggleConverter = (event) => {
     let converter;
+
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
@@ -32,6 +33,7 @@ class SplitAndCountConverterConfiguration extends React.Component {
   _onChange = (key) => {
     return (event) => {
       const newConfig = this.props.configuration;
+
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(this.props.type, this._getConverterObject(newConfig));
     };

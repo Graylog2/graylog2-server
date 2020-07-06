@@ -3,7 +3,6 @@ import React, { useRef, useMemo } from 'react';
 import type { Node, ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable as CreatableSelect } from 'react-select';
-
 import { Overlay } from 'react-overlays';
 import { createFilter } from 'react-select/lib/filters';
 
@@ -21,6 +20,7 @@ const OverlayInner = ({ children, style }: {children: Node, style?: { left: numb
 const getRefContainerWidth = (selectRef, allowOptionCreation) => {
   const currentRef = selectRef?.current;
   const containerRef = allowOptionCreation ? currentRef?.select?.select : currentRef?.select;
+
   return containerRef?.controlRef?.offsetWidth || 0;
 };
 
@@ -28,6 +28,7 @@ const menu = (selectRef, allowOptionCreation: boolean) => (base) => {
   const defaultMinWidth = 200;
   const containerWidth = getRefContainerWidth(selectRef, allowOptionCreation);
   const width = containerWidth > defaultMinWidth ? containerWidth : defaultMinWidth;
+
   return {
     ...base,
     position: 'relative',
@@ -67,6 +68,7 @@ const option = (base) => ({
 const valueContainer = (base) => ({
   ...base,
   minWidth: '6.5vw',
+  minHeight: '30px',
 });
 
 type Props = {
@@ -79,6 +81,7 @@ type Props = {
 
 const ValueWithTitle = (props: { data: { label: string } }) => {
   const { data: { label } } = props;
+
   return <Components.MultiValue {...props} innerProps={{ title: label }} />;
 };
 
@@ -87,6 +90,7 @@ const MenuOverlay = (selectRef) => (props) => {
     zIndex: 1050,
     position: 'absolute',
   };
+
   return (
     <Overlay placement="bottom"
              shouldUpdatePosition

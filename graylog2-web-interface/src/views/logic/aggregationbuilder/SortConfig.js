@@ -3,6 +3,7 @@ import * as Immutable from 'immutable';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
+
 import type { DirectionJson } from './Direction';
 import Direction from './Direction';
 
@@ -90,6 +91,7 @@ export default class SortConfig {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { type, field, direction } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ type, field, direction }));
   }
@@ -117,6 +119,7 @@ export class Builder {
 
   build() {
     const { type, field, direction } = this.value.toObject();
+
     return new SortConfig(type, field, direction);
   }
 }

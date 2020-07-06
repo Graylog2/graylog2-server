@@ -6,14 +6,11 @@ import Reflux from 'reflux';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
-
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import history from 'util/History';
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const ExtractorsStore = StoreProvider.getStore('Extractors');
@@ -48,14 +45,17 @@ const CreateExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get.triggerPromise(params.inputId);
     const { exampleIndex, exampleId } = this.state;
+
     MessagesActions.loadMessage.triggerPromise(exampleIndex, exampleId)
       .then((message) => this.setState({ exampleMessage: message }));
   },
 
   _isLoading() {
     const { exampleMessage, input } = this.state;
+
     return !(input && exampleMessage);
   },
 
@@ -63,6 +63,7 @@ const CreateExtractorsPage = createReactClass({
     let url;
     const { params } = this.props;
     const { input } = this.state;
+
     if (input.global) {
       url = Routes.global_input_extractors(params.inputId);
     } else {

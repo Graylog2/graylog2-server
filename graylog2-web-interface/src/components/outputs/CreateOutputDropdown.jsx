@@ -15,6 +15,7 @@ class CreateOutputDropdown extends React.Component {
 
   render() {
     const outputTypes = $.map(this.props.types, this._formatOutputType);
+
     return (
       <div>
         <div className="form-inline">
@@ -49,7 +50,9 @@ class CreateOutputDropdown extends React.Component {
 
   _onTypeChange = (evt) => {
     const outputType = evt.target.value;
+
     this.setState({ typeName: evt.target.value });
+
     this.props.getTypeDefinition(outputType, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
     });

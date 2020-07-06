@@ -3,7 +3,6 @@ import * as React from 'react';
 import { trim } from 'lodash';
 
 import connect from 'stores/connect';
-
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';

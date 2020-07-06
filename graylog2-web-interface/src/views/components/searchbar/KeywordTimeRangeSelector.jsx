@@ -7,9 +7,10 @@ import styled, { type StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
 import { connect, Field, useFormikContext } from 'formik';
 
-import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
+import type { ThemeInterface } from 'theme';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
@@ -22,14 +23,19 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, void, *> = styled(FormControl)`
+const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => `
   min-height: 34px;
-  font-size: 14px;
+  font-size: ${theme.fonts.size.large};
+`);
+
+const StyledTooltip = styled(Tooltip)`
+  white-space: nowrap;
 `;
 
 const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
   const to = DateTime.fromUTCDateTime(data.to).toString();
+
   return Immutable.Map({ from, to });
 };
 
@@ -45,6 +51,7 @@ const _validateKeyword = (
   if (keyword === undefined) {
     return undefined;
   }
+
   return trim(keyword) === ''
     ? Promise.resolve('Keyword must not be empty!')
     : ToolsStore.testNaturalDate(keyword)
@@ -59,6 +66,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
   );
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview(Immutable.Map());
+
     return 'Unable to parse keyword.';
   }, [setKeywordPreview]);
 
@@ -71,6 +79,7 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
 
   useEffect(() => {
     const { values: { timerange: { keyword } } } = formik;
+
     ToolsStore.testNaturalDate(keyword)
       .then(_setSuccessfullPreview, _setFailedPreview);
 
@@ -94,6 +103,11 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
               <InputGroup>
+                {error && (
+                  <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+                    {error}
+                  </StyledTooltip>
+                )}
                 <KeywordInput type="text"
                               className="input-sm"
                               name={name}

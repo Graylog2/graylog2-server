@@ -5,6 +5,7 @@ import React from 'react';
 import { Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
 const { ConfigurationVariableActions } = CombinedProvider.get('ConfigurationVariable');
@@ -61,6 +62,7 @@ class EditConfigurationVariableModal extends React.Component {
 
   _getId = (prefixIdName) => {
     const { id } = this.state;
+
     return `${prefixIdName} ${id}` || 'new';
   };
 
@@ -83,6 +85,7 @@ class EditConfigurationVariableModal extends React.Component {
 
     return (nextValue) => {
       const nextFormData = cloneDeep(formData);
+
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
@@ -96,6 +99,7 @@ class EditConfigurationVariableModal extends React.Component {
     if (this._hasErrors()) {
       // Ensure we display an error on the content field, as this is not validated by the browser
       this._validateFormData(formData);
+
       return;
     }
 
@@ -112,14 +116,17 @@ class EditConfigurationVariableModal extends React.Component {
     if (validationErrors[fieldName]) {
       return <span>{validationErrors[fieldName][0]}</span>;
     }
+
     return <span>{defaultText}</span>;
   };
 
   _validationState = (fieldName) => {
     const { validation_errors: validationErrors } = this.state;
+
     if (validationErrors[fieldName]) {
       return 'error';
     }
+
     return null;
   };
 
@@ -128,6 +135,7 @@ class EditConfigurationVariableModal extends React.Component {
     const { formData } = this.state;
 
     let triggerButtonContent;
+
     if (create) {
       triggerButtonContent = 'Create Variable';
     } else {

@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
-
 import mockAction from 'helpers/mocking/MockAction';
+
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
+
 import QueryTitle from './QueryTitle';
 
 jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));
@@ -19,12 +20,15 @@ describe('QueryTitle', () => {
 
   const findAction = (wrapper, name) => {
     const openMenuTrigger = wrapper.find('svg[data-testid="query-action-dropdown"]');
+
     openMenuTrigger.simulate('click');
 
     wrapper.update();
     const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
+
     return () => new Promise((resolve) => {
       onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
       setImmediate(() => {
         resolve();
       });

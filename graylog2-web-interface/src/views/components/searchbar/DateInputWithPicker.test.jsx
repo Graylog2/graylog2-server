@@ -2,9 +2,10 @@
 import * as React from 'react';
 import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import moment from 'moment-timezone';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import DateTime from 'logic/datetimes/DateTime';
+
 import DateInputWithPicker from './DateInputWithPicker';
 
 describe('DateInputWithPicker', () => {
@@ -14,6 +15,7 @@ describe('DateInputWithPicker', () => {
 
   it('renders with minimal props', () => {
     const { container } = render(<DateInputWithPicker value="2020-04-08 13:22:46" onChange={() => {}} name="date-picker" />);
+
     expect(container).not.toBeNull();
   });
 

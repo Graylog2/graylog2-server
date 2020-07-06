@@ -3,7 +3,6 @@ import { Navbar as BootstrapNavbar } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-
 const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   &.navbar-default {
     background-color: ${theme.colors.gray[90]};

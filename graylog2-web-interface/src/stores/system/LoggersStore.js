@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LoggersActions = ActionsProvider.getActions('Loggers');
@@ -32,6 +31,7 @@ const LoggersStore = Reflux.createStore({
     const promise = fetch('GET', url).then((response) => {
       this.state.loggers = response;
       this.trigger(this.state);
+
       return response;
     });
 
@@ -42,6 +42,7 @@ const LoggersStore = Reflux.createStore({
     const promise = fetch('GET', url).then((response) => {
       this.state.subsystems = response;
       this.trigger(this.state);
+
       return response;
     });
 
@@ -50,6 +51,7 @@ const LoggersStore = Reflux.createStore({
   setSubsystemLoggerLevel(nodeId, subsystem, level) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterLoggersResource.setSubsystemLoggerLevel(nodeId, subsystem, level).url);
     const promise = fetch('PUT', url);
+
     promise.then(() => {
       this.init();
     });

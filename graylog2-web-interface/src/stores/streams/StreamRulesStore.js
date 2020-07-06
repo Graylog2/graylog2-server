@@ -63,6 +63,7 @@ const StreamRulesStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.delete(streamId, streamRuleId).url);
+
     fetch('DELETE', url)
       .then(callback, failCallback)
       .then(this._emitChange.bind(this));

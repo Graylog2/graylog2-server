@@ -2,23 +2,21 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+
 import connect from 'stores/connect';
-
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 
 import MessageDetail from './MessageDetail';
-import TypeSpecificValue from '../TypeSpecificValue';
 import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
-
 import style from './MessageTableEntry.css';
 import type { Message } from './Types';
+
+import TypeSpecificValue from '../TypeSpecificValue';
 
 const { InputsStore } = CombinedProvider.get('Inputs');
 
@@ -33,6 +31,7 @@ const ConnectedMessageDetail = connect(
     const { streams = [] } = availableStreams;
     const { inputs = [] } = availableInputs;
     const { searchesClusterConfig } = configurations;
+
     return ({
       ...rest,
       allStreams: Immutable.List(streams),
@@ -81,23 +80,28 @@ const MessageTableEntry = ({
     if (strong) {
       return <strong>{children}</strong>;
     }
+
     return children;
   };
 
   const colSpanFixup = selectedFields.size + 1;
 
   let classes = 'message-group';
+
   if (expanded) {
     classes += ' message-group-toggled';
   }
+
   if (message.id === highlightMessage) {
     classes += ' message-highlight';
   }
+
   return (
     <tbody className={classes}>
       <tr className="fields-row" onClick={_toggleDetail}>
         { selectedFields.toArray().map((selectedFieldName, idx) => {
           const type = fieldType(selectedFieldName, message, fields);
+
           return (
             <td className={style.fieldsRowField} key={selectedFieldName}>
               {_renderStrong(

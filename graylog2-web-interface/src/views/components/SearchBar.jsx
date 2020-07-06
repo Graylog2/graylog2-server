@@ -10,7 +10,6 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { Spinner, Icon } from 'components/common';
 import { Col, Row } from 'components/graylog';
-
 import TopRow from 'views/components/searchbar/TopRow';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SavedSearchControls from 'views/components/searchbar/saved-search/SavedSearchControls';
@@ -27,6 +26,7 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import Query, { createElasticsearchQueryString, filtersForQuery, filtersToStreamSet } from 'views/logic/queries/Query';
 import type { FilterType, QueryId, TimeRange } from 'views/logic/queries/Query';
+
 import SearchBarForm from './searchbar/SearchBarForm';
 
 type Props = {
@@ -113,7 +113,11 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = def
                       {({ field: { name, value, onChange } }) => (
                         <QueryInput value={value}
                                     placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                    onChange={(newQuery) => { onChange({ target: { value: newQuery, name } }); return Promise.resolve(); }}
+                                    onChange={(newQuery) => {
+                                      onChange({ target: { value: newQuery, name } });
+
+                                      return Promise.resolve();
+                                    }}
                                     onExecute={handleSubmit} />
                       )}
                     </Field>

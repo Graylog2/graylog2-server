@@ -1,6 +1,6 @@
 :local(.sidecarId) {
     color: #aaaaaa;
-    font-size: 0.9em;
+    font-size: 0.833rem; /* theme.fonts.size.small */
 }
 
 :local(.disabledCollector) {
@@ -22,7 +22,7 @@
 }
 
 :local(.collectorEntry) .checkbox label {
-    font-size: 1.1em;
+    font-size: 1rem; /* theme.fonts.size.body */
 }
 
 :local(.alignedInformation) {

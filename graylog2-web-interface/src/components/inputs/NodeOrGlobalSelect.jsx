@@ -1,11 +1,10 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React, { useCallback, useState, useEffect } from 'react';
+
 import { useStore } from 'stores/connect';
 import { Input } from 'components/bootstrap';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Spinner } from 'components/common';
 
 const NodesStore = StoreProvider.getStore('Nodes');
@@ -24,6 +23,7 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
   useEffect(() => {
     if (!node && nodes) {
       const nodeIds = Object.keys(nodes);
+
       if (nodeIds.length === 1) {
         onChange('node', nodeIds[0]);
         setNode(nodeIds[0]);
@@ -33,13 +33,16 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
 
   const _onChangeGlobal = useCallback((evt) => {
     const isGlobal = evt.target.checked;
+
     setGlobal(isGlobal);
+
     if (isGlobal) {
       setNode('placeholder');
       onChange('node', undefined);
     } else {
       onChange('node', nodeState);
     }
+
     onChange('global', isGlobal);
   }, [onChange, nodeState, setNode, setGlobal]);
 
@@ -51,6 +54,7 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
   if (!nodes) {
     return <Spinner />;
   }
+
   const options = Object.keys(nodes)
     .map((nodeId) => {
       return <option key={nodeId} value={nodeId}>{nodes[nodeId].short_node_id} / {nodes[nodeId].hostname}</option>;

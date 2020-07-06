@@ -1,46 +1,75 @@
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
+
 import { Input } from 'components/bootstrap';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import type { Preference } from 'stores/users/PreferencesStore';
+
+type Props = {
+  userName: string,
+};
+
+type State = {
+  preferences: Array<Preference>,
+};
 
 const PreferencesStore = StoreProvider.getStore('Preferences');
 
-class UserPreferencesModal extends React.Component {
+class UserPreferencesModal extends React.Component<Props, State> {
   static propTypes = {
     userName: PropTypes.string.isRequired,
   };
 
-  state = { preferences: [] };
+  modal: ?BootstrapModalForm;
 
-  _onPreferenceChanged = (event) => {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = { preferences: [] };
+  }
+
+  _onPreferenceChanged = (event: SyntheticInputEvent<HTMLInputElement>) => {
     const { name } = event.target;
-    const preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
+    const { preferences } = this.state;
+    const preferenceToChange = preferences.filter((preference) => preference.name === name)[0];
+
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {
       preferenceToChange.value = event.target.value;
-      this.setState({ preferences: this.state.preferences });
+
+      this.setState({ preferences: preferences });
     }
   };
 
   _save = () => {
-    PreferencesStore.saveUserPreferences(this.state.preferences, this.modal.close);
+    const { userName } = this.props;
+    const { preferences } = this.state;
+
+    PreferencesStore.saveUserPreferences(userName, preferences, this.modal?.close);
   };
 
   openModal = () => {
-    PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
+    const { userName } = this.props;
+
+    PreferencesStore.loadUserPreferences(userName, (preferences) => {
       this.setState({ preferences: preferences });
-      this.modal.open();
+
+      if (this.modal) {
+        this.modal.open();
+      }
     });
   };
 
   render() {
+    const { userName } = this.props;
+    const { preferences } = this.state;
     let shouldAutoFocus = true;
 
-    const formattedPreferences = this.state.preferences.map((preference, index) => {
+    const formattedPreferences = preferences.map((preference, index) => {
       const formattedPreference = (
+        // eslint-disable-next-line react/no-array-index-key
         <div className="form-group" key={`${preference.name}-${index}`}>
           <Input type="text"
                  id={`${preference.name}-${index}`}
@@ -59,9 +88,10 @@ class UserPreferencesModal extends React.Component {
 
       return formattedPreference;
     });
+
     return (
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                          title={`Preferences for user ${this.props.userName}`}
+                          title={`Preferences for user ${userName}`}
                           onSubmitForm={this._save}
                           submitButtonText="Save">
         <div>{formattedPreferences}</div>

@@ -2,14 +2,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Row, Col, Checkbox } from 'components/graylog';
 import * as Immutable from 'immutable';
 
+import { Row, Col, Checkbox } from 'components/graylog';
 import FieldSelect from 'views/components/widgets/FieldSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
-
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -25,21 +24,25 @@ const FullHeightCol = styled(Col)`
 const _onFieldSelectionChanged = (fields, config, onChange) => {
   const newFields = fields.map(({ value }) => value);
   const newConfig = config.toBuilder().fields(newFields).build();
+
   return onChange(newConfig);
 };
 
 const _onShowMessageRowChanged = (config, onChange) => {
   const newConfig = config.toBuilder().showMessageRow(!config.showMessageRow).build();
+
   return onChange(newConfig);
 };
 
 const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, config, onChange) => {
   const newConfig = config.toBuilder().sort(sort).build();
+
   return onChange(newConfig);
 };
 
 const _onSortDirectionChange = (direction: $PropertyType<AggregationWidgetConfig, 'direction'>, config, onChange) => {
   const newConfig = config.toBuilder().sort(config.sort.map((sort) => sort.toBuilder().direction(direction).build())).build();
+
   return onChange(newConfig);
 };
 

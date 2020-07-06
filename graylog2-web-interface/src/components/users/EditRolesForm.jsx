@@ -1,15 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import { Button, Alert, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import ObjectUtils from 'util/ObjectUtils';
 import history from 'util/History';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';
 
@@ -38,11 +36,14 @@ class EditRolesForm extends React.Component {
     const { user } = this.props;
 
     evt.preventDefault();
+
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really update roles for "${user.username}"?`)) {
       const roles = this.roles.getValue().filter((value) => value !== '');
       const userClone = ObjectUtils.clone(user);
+
       userClone.roles = roles;
+
       UsersStore.update(user.username, userClone).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
         history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
@@ -58,16 +59,20 @@ class EditRolesForm extends React.Component {
 
   _onValueChange = (newRoles) => {
     const roles = newRoles.split(',');
+
     this.setState({ newRoles: roles });
   };
 
   render() {
     const { user } = this.props;
     const { roles, newRoles } = this.state;
+
     if (!roles) {
       return <Spinner />;
     }
+
     let rolesAlert = null;
+
     if (newRoles != null && !(newRoles.includes('Reader') || newRoles.includes('Admin'))) {
       rolesAlert = (
         <Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
@@ -75,6 +80,7 @@ class EditRolesForm extends React.Component {
         </Alert>
       );
     }
+
     const externalUser = user.external
       ? (
         <Col smOffset={3} sm={9} style={{ marginBottom: 15 }}>
@@ -116,6 +122,7 @@ class EditRolesForm extends React.Component {
         </form>
       </span>
     );
+
     return (
       <Row>
         <Col md={8}>

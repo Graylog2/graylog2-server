@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
@@ -22,6 +22,7 @@ class CachePicker extends React.Component {
 
   render() {
     const cachePlugins = {};
+
     PluginStore.exports('lookupTableCaches').forEach((p) => {
       cachePlugins[p.type] = p;
     });

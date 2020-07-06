@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
 
@@ -44,6 +45,7 @@ export default class LineVisualizationConfig extends VisualizationConfig {
 
   static fromJSON(type: string, value: LineVisualizationConfigJSON = { interpolation: 'linear' }) {
     const { interpolation = 'linear' } = value;
+
     return LineVisualizationConfig.create(interpolation);
   }
 }
@@ -63,6 +65,7 @@ class Builder {
 
   build() {
     const { interpolation } = this.value.toObject();
+
     return new LineVisualizationConfig(interpolation);
   }
 }

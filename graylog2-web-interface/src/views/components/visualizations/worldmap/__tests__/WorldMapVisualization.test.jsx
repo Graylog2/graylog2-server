@@ -8,6 +8,7 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+
 import WorldMapVisualization from '../WorldMapVisualization';
 
 jest.mock('../MapVisualization', () => 'map-visualization');
@@ -37,6 +38,7 @@ describe('WorldMapVisualization', () => {
     const { onChange: _onChange } = mapVisualization.at(0).props();
 
     const viewport = Viewport.create([0, 0], 0);
+
     _onChange(viewport);
 
     expect(onChange).not.toHaveBeenCalled();
@@ -58,6 +60,7 @@ describe('WorldMapVisualization', () => {
     const { onChange: _onChange } = mapVisualization.at(0).props();
 
     const viewport = Viewport.create([0, 0], 0);
+
     _onChange(viewport);
 
     expect(onChange).toHaveBeenCalledWith(WorldMapVisualizationConfig.create(viewport));
@@ -80,6 +83,7 @@ describe('WorldMapVisualization', () => {
     ));
 
     const { onRenderComplete } = wrapper.find('map-visualization').props();
+
     onRenderComplete();
 
     expect(renderCompletionCallback).toHaveBeenCalled();
@@ -120,6 +124,7 @@ describe('WorldMapVisualization', () => {
                              width={800} />
     ));
     const mapVisualization = wrapper.find('map-visualization');
+
     expect(mapVisualization).toHaveProp('data', mapData);
   });
 
@@ -149,6 +154,7 @@ describe('WorldMapVisualization', () => {
                              width={800} />
     ));
     const mapVisualization = wrapper.find('map-visualization');
+
     expect(mapVisualization).toHaveProp('data', mapData);
   });
 });

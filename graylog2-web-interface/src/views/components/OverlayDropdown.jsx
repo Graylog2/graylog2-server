@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-
 import { Overlay, Transition } from 'react-overlays';
 
 import styles from './OverlayDropdown.css';
@@ -33,6 +32,7 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
     const overflowRight = dropdownOffsetLeft + dropdownWidth >= document.body.clientWidth;
     const overflowLeft = dropdownOffsetLeft < 0;
     const trimmedDropdown = (overflowLeft && currentPlacement === 'left') || (overflowRight && currentPlacement === 'right');
+
     if (trimmedDropdown) {
       setCurrentPlacement(oppositePlacement[currentPlacement]);
     }

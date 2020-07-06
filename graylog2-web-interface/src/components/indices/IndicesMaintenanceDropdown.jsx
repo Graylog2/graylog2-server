@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const DeflectorActions = ActionsProvider.getActions('Deflector');
@@ -32,9 +31,11 @@ class IndicesMaintenanceDropdown extends React.Component {
 
   render() {
     let cycleButton;
+
     if (this.props.indexSet && this.props.indexSet.writable) {
       cycleButton = <MenuItem eventKey="2" onClick={this._onCycleDeflector}>Rotate active write index</MenuItem>;
     }
+
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>

@@ -1,8 +1,9 @@
 // @flow strict
 
+import * as Immutable from 'immutable';
+
 import Parameter from 'views/logic/parameters/Parameter';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import * as Immutable from 'immutable';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
 type InternalBuilderState = Immutable.Map<string, any>;
@@ -24,6 +25,7 @@ export default class ValueParameter extends Parameter {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { type, name, title, description, dataType, defaultValue, optional, binding } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, binding }));
   }
@@ -46,6 +48,7 @@ export default class ValueParameter extends Parameter {
   static fromJSON(value: ParameterJson): ValueParameter {
     // eslint-disable-next-line camelcase
     const { name, title, description, data_type, default_value, optional, binding } = value;
+
     return new ValueParameter(name, title, description, data_type, default_value, optional, ParameterBinding.fromJSON(binding));
   }
 
@@ -101,6 +104,7 @@ class Builder {
 
   build(): ValueParameter {
     const { name, title, description, dataType, defaultValue, optional, binding } = this.value.toObject();
+
     return new ValueParameter(name, title, description, dataType, defaultValue, optional, binding);
   }
 }

@@ -7,7 +7,6 @@ import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import history from 'util/History';
@@ -37,6 +36,7 @@ const SidecarEditConfigurationPage = createReactClass({
     CollectorConfigurationsActions.getConfiguration(configurationId).then(
       (configuration) => {
         this.setState({ configuration: configuration });
+
         CollectorConfigurationsActions.getConfigurationSidecars(configurationId)
           .then((configurationSidecars) => this.setState({ configurationSidecars: configurationSidecars }));
       },

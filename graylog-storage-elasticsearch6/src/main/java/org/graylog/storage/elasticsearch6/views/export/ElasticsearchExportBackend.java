@@ -19,16 +19,16 @@ package org.graylog.storage.elasticsearch6.views.export;
 import com.google.inject.name.Named;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.TermsQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.storage.elasticsearch6.IndexHelper;
+import org.graylog.storage.elasticsearch6.TimeRangeQueryFactory;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
@@ -45,10 +45,10 @@ import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 @SuppressWarnings("rawtypes")
@@ -135,7 +135,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private QueryBuilder timestampFilter(ExportMessagesCommand command) {
-        return requireNonNull(IndexHelper.getTimestampRangeFilter(command.timeRange()));
+        return requireNonNull(TimeRangeQueryFactory.create(command.timeRange()));
     }
 
     private TermsQueryBuilder streamsFilter(ExportMessagesCommand command) {

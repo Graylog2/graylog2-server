@@ -4,6 +4,7 @@ import { isEqual } from 'lodash';
 
 import type { Store } from 'stores/StoreTypes';
 import { singletonStore } from 'views/logic/singleton';
+
 import { ViewStore } from './ViewStore';
 
 export type ViewMetaData = {
@@ -29,12 +30,15 @@ export const ViewMetadataStore: ViewMetadataStoreType = singletonStore(
     },
     onViewStoreUpdate({ view, activeQuery }) {
       let newState;
+
       if (view) {
         const { id, title, description, summary } = view;
+
         newState = { id, title, description, summary, activeQuery };
       } else {
         newState = {};
       }
+
       if (!isEqual(this.state, newState)) {
         this.state = newState;
         this._trigger();

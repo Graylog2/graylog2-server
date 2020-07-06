@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Row, Col, Button } from 'components/graylog';
 import { ContentPackMarker } from 'components/common';
 
@@ -11,11 +11,13 @@ import Styles from './ConfigSummary.css';
 
 const Cache = ({ cache }) => {
   const plugins = {};
+
   PluginStore.exports('lookupTableCaches').forEach((p) => {
     plugins[p.type] = p;
   });
 
   const plugin = plugins[cache.config.type];
+
   if (!plugin) {
     return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
   }

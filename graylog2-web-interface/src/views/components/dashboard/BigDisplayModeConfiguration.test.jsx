@@ -9,6 +9,7 @@ import View, { type ViewStateMap } from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
 jest.mock('util/History', () => ({}));
@@ -36,6 +37,7 @@ const createViewWithQueries = () => {
   const searchWithQueries = search.toBuilder()
     .queries(queries)
     .build();
+
   return view.toBuilder()
     .state(states)
     .search(searchWithQueries)
@@ -47,12 +49,14 @@ describe('BigDisplayModeConfiguration', () => {
 
   it('generates markup that matches snapshot', () => {
     const { container } = render(<BigDisplayModeConfiguration view={view} />);
+
     expect(container).toMatchSnapshot();
   });
 
   it('disables menu item if `disabled` prop is `true`', () => {
     const { getByText, queryByText } = render(<BigDisplayModeConfiguration view={view} disabled />);
     const menuItem = getByText('Full Screen');
+
     fireEvent.submit(menuItem);
 
     expect(queryByText('Configuring Full Screen')).toBeNull();
@@ -61,6 +65,7 @@ describe('BigDisplayModeConfiguration', () => {
   it('opens modal when menu item is clicked', async () => {
     const { getByText } = render(<BigDisplayModeConfiguration view={view} />);
     const menuItem = getByText('Full Screen');
+
     fireEvent.click(menuItem);
 
     await waitForElement(() => getByText('Configuring Full Screen'));
@@ -87,6 +92,7 @@ describe('BigDisplayModeConfiguration', () => {
     const refreshInterval = asElement(getByLabelText('Refresh Interval'), HTMLInputElement);
 
     fireEvent.change(refreshInterval, { target: { value: 'a string' } });
+
     expect(refreshInterval.value).toBe('');
   });
 
@@ -96,6 +102,7 @@ describe('BigDisplayModeConfiguration', () => {
     const cycleInterval = asElement(getByLabelText('Tab cycle interval'), HTMLInputElement);
 
     fireEvent.change(cycleInterval, { target: { value: 'a string' } });
+
     expect(cycleInterval.value).toBe('');
   });
 
@@ -108,6 +115,7 @@ describe('BigDisplayModeConfiguration', () => {
     it('on form submit', () => {
       const { getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
       const form = getByTestId('modal-form');
+
       expect(form).not.toBeNull();
 
       fireEvent.submit(form);
@@ -124,6 +132,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.change(refreshInterval, { target: { value: 42 } });
 
       const form = getByTestId('modal-form');
+
       fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
@@ -134,9 +143,11 @@ describe('BigDisplayModeConfiguration', () => {
       const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={view} show />);
 
       const cycleInterval = getByLabelText('Tab cycle interval');
+
       fireEvent.change(cycleInterval, { target: { value: 4242 } });
 
       const form = getByTestId('modal-form');
+
       fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
@@ -148,9 +159,11 @@ describe('BigDisplayModeConfiguration', () => {
       const { getByLabelText, getByTestId } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
 
       const query1 = getByLabelText('Page#1');
+
       fireEvent.click(query1);
 
       const form = getByTestId('modal-form');
+
       fireEvent.submit(form);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');

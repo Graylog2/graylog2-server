@@ -4,9 +4,7 @@ import React from 'react';
 import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
@@ -29,6 +27,7 @@ class BulkLoadPatternModal extends React.Component {
 
     reader.onload = (loaded) => {
       const request = loaded.target.result;
+
       GrokPatternsStore.bulkImport(request, replacePatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this.modal.close();

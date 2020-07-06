@@ -1,4 +1,5 @@
 import Reflux from 'reflux';
+
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
@@ -17,6 +18,7 @@ const CodecTypesStore = Reflux.createStore({
 
   list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.CodecTypesController.list().url));
+
     promise.then(
       (response) => {
         this.codecTypes = response;

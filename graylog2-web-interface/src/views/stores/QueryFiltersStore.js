@@ -4,6 +4,7 @@ import { isEqual } from 'lodash';
 
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { filtersForQuery } from 'views/logic/queries/Query';
+
 import { QueriesActions, QueriesStore } from './QueriesStore';
 
 export const QueryFiltersActions = singletonActions(
@@ -29,7 +30,9 @@ export const QueryFiltersStore = singletonStore(
     onQueriesStoreChange(newQueries) {
       const newFilters = newQueries.map((q) => q.filter);
       const oldFilters = this.queries.map((q) => q.filter);
+
       this.queries = newQueries;
+
       if (!isEqual(newFilters, oldFilters)) {
         this._trigger();
       }
@@ -39,7 +42,9 @@ export const QueryFiltersStore = singletonStore(
       const streamFilter = filtersForQuery(streams);
       const newQuery = this.queries.get(queryId).toBuilder().filter(streamFilter).build();
       const promise = QueriesActions.update(queryId, newQuery);
+
       QueryFiltersActions.streams.promise(promise);
+
       return promise;
     },
 

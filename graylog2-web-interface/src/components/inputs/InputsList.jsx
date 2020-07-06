@@ -6,12 +6,11 @@ import styled from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-
 import EntityList from 'components/common/EntityList';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
+
 import InputListItem from './InputListItem';
 import CreateInputControl from './CreateInputControl';
 
@@ -95,6 +94,7 @@ const InputsList = createReactClass({
       globalInputs: globalInputs,
       localInputs: localInputs,
     });
+
     this._onFilterInputs(this.state.filter);
   },
 
@@ -119,6 +119,7 @@ const InputsList = createReactClass({
       if (resetLoadingState) {
         resetLoadingState();
       }
+
       return;
     }
 
@@ -128,22 +129,27 @@ const InputsList = createReactClass({
         filteredLocalInputs: localInputs,
         filter: undefined,
       });
+
       if (resetLoadingState) {
         resetLoadingState();
       }
+
       return;
     }
 
     const filterMethod = (input) => {
       return regExp.test(input.title);
     };
+
     const filteredGlobalInputs = this.state.globalInputs.filter(filterMethod);
     const filteredLocalInputs = this.state.localInputs.filter(filterMethod);
+
     this.setState({
       filteredGlobalInputs: filteredGlobalInputs,
       filteredLocalInputs: filteredLocalInputs,
       filter: filter,
     });
+
     if (resetLoadingState) {
       resetLoadingState();
     }
@@ -151,6 +157,7 @@ const InputsList = createReactClass({
 
   _onFilterReset() {
     const { globalInputs, localInputs } = this.state;
+
     this.setState({
       filteredGlobalInputs: globalInputs,
       filteredLocalInputs: localInputs,

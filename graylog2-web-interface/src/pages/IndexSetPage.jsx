@@ -10,11 +10,8 @@ import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { DocumentationLink } from 'components/support';
-
 import DocsHelper from 'util/DocsHelper';
-
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Routes from 'routing/Routes';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
@@ -134,6 +131,7 @@ const IndexSetPage = createReactClass({
 
     let indicesInfo;
     let indicesOverview;
+
     if (this.state.indexerOverview && this.state.indexDetails.closedIndices) {
       const deflectorInfo = this.state.indexerOverview.deflector;
 
@@ -147,6 +145,7 @@ const IndexSetPage = createReactClass({
           <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
         </span>
       );
+
       indicesOverview = (
         <IndicesOverview indices={this.state.indexerOverview.indices}
                          indexDetails={this.state.indexDetails.indices}

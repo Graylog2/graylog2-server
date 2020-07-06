@@ -11,7 +11,6 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
 
 const InputTypesStore = StoreProvider.getStore('InputTypes');
@@ -92,6 +91,7 @@ const InputListItem = createReactClass({
     }
 
     let showMetricsMenuItem;
+
     if (!this.props.input.global) {
       showMetricsMenuItem = (
         <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>

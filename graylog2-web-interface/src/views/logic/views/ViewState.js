@@ -7,6 +7,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import TitleTypes from 'views/stores/TitleTypes';
 import type { TitlesMap, TitleType } from 'views/stores/TitleTypes';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
+
 import type { FormattingSettingsJSON } from './formatting/FormattingSettings';
 import FormattingSettings from './formatting/FormattingSettings';
 import type { WidgetMapping } from './types';
@@ -88,7 +89,9 @@ export default class ViewState {
     const widgetIdTranslation = {};
     const newWidgets = this.widgets.map((widget) => {
       const newWidget = widget.toBuilder().newId().build();
+
       widgetIdTranslation[widget.id] = newWidget.id;
+
       return newWidget;
     });
     const newWidgetTitles = Map(this.titles.get(TitleTypes.Widget, Map()).mapEntries(([key, value]) => [widgetIdTranslation[key], value]));
@@ -96,6 +99,7 @@ export default class ViewState {
       .set(TitleTypes.Widget, newWidgetTitles)
       .updateIn([TitleTypes.Tab, 'title'], (value) => (value ? `${value} (Copy)` : value));
     const newWidgetPositions = Map(this.widgetPositions).mapEntries(([key, value]) => [widgetIdTranslation[key], value]).toJS();
+
     return this.toBuilder()
       .widgetMapping(Map())
       .widgetPositions(newWidgetPositions)
@@ -107,6 +111,7 @@ export default class ViewState {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const value: Object = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map(value));
   }
@@ -115,6 +120,7 @@ export default class ViewState {
     if (other === undefined) {
       return false;
     }
+
     if (!(other instanceof ViewState)) {
       return false;
     }
@@ -129,6 +135,7 @@ export default class ViewState {
 
   toJSON() {
     const { fields, formatting, titles, widgets, widgetMapping, widgetPositions } = this._value;
+
     return {
       selected_fields: fields,
       formatting,
@@ -141,6 +148,7 @@ export default class ViewState {
 
   static fromJSON(value: ViewStateJson): ViewState {
     const { selected_fields: selectedFields, titles, widgets, widget_mapping: widgetMapping, positions, formatting } = value;
+
     return ViewState.builder()
       .titles(fromJS(titles))
       .widgets(List(widgets.map((w) => Widget.fromJSON(w))))
@@ -191,6 +199,7 @@ class Builder {
 
   build(): ViewState {
     const { fields, formatting, titles, widgets, widgetMapping, widgetPositions } = this.value.toObject();
+
     return new ViewState(fields, titles, widgets, widgetMapping, widgetPositions, formatting);
   }
 }

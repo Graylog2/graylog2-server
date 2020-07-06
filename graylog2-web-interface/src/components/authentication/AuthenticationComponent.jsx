@@ -5,11 +5,11 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import PermissionsMixin from 'util/PermissionsMixin';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
@@ -70,6 +70,7 @@ const AuthenticationComponent = createReactClass({
         key: `auth-configuration-${params.name}`,
       });
     }
+
     return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{params.name}</code>, this is an error.</Alert>);
   },
 
@@ -84,6 +85,7 @@ const AuthenticationComponent = createReactClass({
     if (!authenticators) {
       return <Spinner />;
     }
+
     if (params.name === undefined) {
       return (
         <AuthProvidersConfig config={authenticators}
@@ -91,6 +93,7 @@ const AuthenticationComponent = createReactClass({
                              updateConfig={this._onUpdateProviders} />
       );
     }
+
     return this._pluginPane();
   },
 
@@ -106,6 +109,7 @@ const AuthenticationComponent = createReactClass({
           const auth = this.authenticatorConfigurations[name];
           const title = (auth || { displayName: name }).displayName;
           const numberedTitle = `${idx + 1}. ${title}`;
+
           return (
             <LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
               <NavItem key={name} title={numberedTitle}>{numberedTitle}</NavItem>
@@ -116,6 +120,7 @@ const AuthenticationComponent = createReactClass({
         authenticators.unshift(
           <NavItemDivider key="divider" disabled title="Provider Settings">Provider Settings</NavItemDivider>,
         );
+
         authenticators.unshift(
           <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
             <NavItem key="settings" title="Configure Provider Order">Configure Provider Order</NavItem>
@@ -134,6 +139,7 @@ const AuthenticationComponent = createReactClass({
         </LinkContainer>,
       );
     }
+
     if (this.isPermitted(currentUser.permissions, ['users:list'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
@@ -153,6 +159,7 @@ const AuthenticationComponent = createReactClass({
         </LinkContainer>,
       ];
     }
+
     const subnavigation = (
       <Nav stacked bsStyle="pills">
         {authenticators}

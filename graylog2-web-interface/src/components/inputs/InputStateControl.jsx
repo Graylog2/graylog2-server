@@ -33,24 +33,28 @@ const InputStateControl = createReactClass({
     }
 
     const nodeIDs = Object.keys(this.state.inputState);
+
     if (nodeIDs.length === 0) {
       return false;
     }
 
     return nodeIDs.some((nodeID) => {
       const nodeState = this.state.inputState[nodeID];
+
       return nodeState.state === 'RUNNING';
     });
   },
 
   _startInput() {
     this.setState({ loading: true });
+
     InputStatesStore.start(this.props.input)
       .finally(() => this.setState({ loading: false }));
   },
 
   _stopInput() {
     this.setState({ loading: true });
+
     InputStatesStore.stop(this.props.input)
       .finally(() => this.setState({ loading: false }));
   },

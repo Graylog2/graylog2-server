@@ -1,8 +1,8 @@
 // @flow strict
 import React from 'react';
 import { render } from 'wrappedTestingLibrary';
-
 import suppressConsole from 'helpers/suppressConsole';
+
 import RouterErrorBoundary from './RouterErrorBoundary';
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
@@ -35,6 +35,7 @@ describe('RouterErrorBoundary', () => {
           <ErroneusComponent />
         </RouterErrorBoundary>,
       );
+
       expect(getByText('Oh no, a banana peel fell on the party gorilla\'s head!')).not.toBeNull();
     });
   });

@@ -3,12 +3,11 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import connect from 'stores/connect';
 import { isEmpty, get } from 'lodash';
+
+import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Messages } from 'views/Constants';
-
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
@@ -17,7 +16,6 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-
 import { PaginatedList } from 'components/common';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import MessageTable from 'views/components/widgets/MessageTable';
@@ -99,12 +97,14 @@ class MessageList extends React.Component<Props, State> {
 
   componentDidMount() {
     const onRenderComplete = this.context;
+
     InputsActions.list().then(() => (onRenderComplete && onRenderComplete()));
     SearchActions.execute.completed.listen(this._resetPagination);
   }
 
   _resetPagination = () => {
     const { currentPage } = this.state;
+
     if (currentPage !== 1) {
       this.setState({ currentPage: 1, errors: [] });
     }
@@ -115,10 +115,13 @@ class MessageList extends React.Component<Props, State> {
     const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
     const { effectiveTimerange } = searchTypes[searchTypeId];
     const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
+
     RefreshActions.disable();
     setLoadingState(true);
+
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
+
       this.setState({
         errors: response.result.errors,
         currentPage: pageNo,
@@ -131,16 +134,20 @@ class MessageList extends React.Component<Props, State> {
     const { data: { messages } } = this.props;
     const { currentPage } = this.state;
     const defaultKey = `message-list-${currentPage}`;
+
     if (!isEmpty(messages)) {
       const firstMessageId = messages[0].message._id;
+
       return `${defaultKey}-${firstMessageId}`;
     }
+
     return defaultKey;
   };
 
   _onSortChange = (newSort: SortConfig[]) => {
     const { onConfigChange, config } = this.props;
     const newConfig = config.toBuilder().sort(newSort).build();
+
     return onConfigChange(newConfig);
   }
 

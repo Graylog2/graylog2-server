@@ -5,6 +5,7 @@ import { get, isEqual } from 'lodash';
 
 import type ViewState from 'views/logic/views/ViewState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
 type StateUpdate = {
@@ -37,6 +38,7 @@ export const SelectedFieldsStore = singletonStore(
 
     onViewStoreChange(newState: StateUpdate) {
       const selectedFields = Set(get(newState, 'state.fields'));
+
       if (!isEqual(this.selectedFields, selectedFields)) {
         this.selectedFields = selectedFields;
         this._trigger();

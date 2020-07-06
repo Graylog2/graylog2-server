@@ -1,8 +1,8 @@
 // @flow strict
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Spinner from 'components/common/Spinner';
 
+import Spinner from 'components/common/Spinner';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import { processHooks } from 'views/logic/views/ViewLoader';
 import withPluginEntities from 'views/logic/withPluginEntities';
@@ -32,11 +32,13 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
     let mounted = true;
     const { state = {} } = location;
     const { view: searchView } = state;
+
     if (searchView && searchView.search) {
       const { query } = location;
       /* $FlowFixMe the searchView.search is guard enough and instanceof does not work here */
       const dashboardView = viewTransformer(searchView);
       const loadPromise = ViewActions.load(dashboardView, true).then(() => dashboardView);
+
       processHooks(
         loadPromise,
         loadingViewHooks,
@@ -50,6 +52,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
     } else {
       ViewActions.create(View.Type.Dashboard).then(() => mounted && setLoaded(true));
     }
+
     return () => { mounted = false; };
   }, []);
 

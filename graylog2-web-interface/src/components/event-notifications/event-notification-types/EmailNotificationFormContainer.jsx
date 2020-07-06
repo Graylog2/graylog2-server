@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
@@ -30,6 +29,7 @@ class EmailNotificationFormContainer extends React.Component {
 
   loadUsers = () => {
     const { currentUser } = this.props;
+
     if (PermissionsMixin.isPermitted(currentUser.permissions, 'users:list')) {
       UsersStore.loadUsers()
         .then((users) => {
@@ -46,6 +46,7 @@ class EmailNotificationFormContainer extends React.Component {
     if (!users) {
       return <p><Spinner text="Loading Notification information..." /></p>;
     }
+
     return <EmailNotificationForm {...this.props} users={users} />;
   }
 }

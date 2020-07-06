@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, Spinner } from 'components/common';
-
 import Rule from 'components/rules/Rule';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -33,11 +32,13 @@ const RuleDetailsPage = createReactClass({
 
   _save(rule, callback) {
     let promise;
+
     if (rule.id) {
       promise = RulesActions.update.triggerPromise(rule);
     } else {
       promise = RulesActions.save.triggerPromise(rule);
     }
+
     promise.then(() => callback());
   },
 

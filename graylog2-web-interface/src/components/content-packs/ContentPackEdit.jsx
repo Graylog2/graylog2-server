@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import { AutoAffix } from 'react-overlays';
+
 import { Spinner, Wizard, ScrollButton } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
-
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
@@ -48,6 +47,7 @@ class ContentPackEdit extends React.Component {
     const { selectedEntities } = this.props;
     const selection = Object.keys(selectedEntities)
       .reduce((acc, key) => { return acc + selectedEntities[key].length; }, 0) > 0;
+
     return !(content.name && content.summary && content.vendor && selection);
   }
 
@@ -64,11 +64,14 @@ class ContentPackEdit extends React.Component {
 
       Object.keys(configPaths).forEach((path) => {
         const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path; });
+
         if (index >= 0) {
           configPaths[path].setParameter(parameters[index].paramName);
         }
       });
+
       newEntityBuilder.data(entityData.getData()).parameters(this.props.contentPack.parameters);
+
       return newEntityBuilder.build();
     });
     const newContentPack = this.props.contentPack.toBuilder()
@@ -84,20 +87,26 @@ class ContentPackEdit extends React.Component {
         const newContentPack = this.props.contentPack.toBuilder()
           .entities(this.props.fetchedEntities || [])
           .build();
+
         this.props.onStateChange({ contentPack: newContentPack });
+
         if (Object.keys(this.props.selectedEntities).length > 0) {
           this.props.onGetEntities(this.props.selectedEntities);
         }
+
         break;
       }
+
       case 'preview': {
         this._prepareForPreview();
         break;
       }
+
       default: {
         break;
       }
     }
+
     this.setState({ selectedStep: selectedStep });
   };
 

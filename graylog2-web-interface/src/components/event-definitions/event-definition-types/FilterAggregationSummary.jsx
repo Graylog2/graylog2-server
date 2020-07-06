@@ -11,11 +11,9 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 
-
 import AggregationConditionSummary from './AggregationConditionSummary';
 import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
-
 import styles from './FilterAggregationSummary.css';
 
 class FilterAggregationSummary extends React.Component {
@@ -27,6 +25,7 @@ class FilterAggregationSummary extends React.Component {
 
   getConditionType = (config) => {
     const { group_by: groupBy, series, conditions } = config;
+
     return (lodash.isEmpty(groupBy)
     && (!conditions || lodash.isEmpty(conditions) || conditions.expression === null)
     && lodash.isEmpty(series)
@@ -63,6 +62,7 @@ class FilterAggregationSummary extends React.Component {
       const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
         .map((p) => p.name)
         .join(', ');
+
       return (
         <Alert bsStyle="danger">
           <Icon name="exclamation-triangle" />&nbsp;There are undeclared query parameters: {undeclaredParameters}

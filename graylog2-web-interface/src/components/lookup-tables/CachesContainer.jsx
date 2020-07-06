@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesActions, LookupTableCachesStore } = CombinedProvider.get(
@@ -38,9 +37,11 @@ const CachesContainer = createReactClass({
     if (!this.state.caches) {
       return <Spinner />;
     }
+
     const childrenWithProps = React.Children.map(this.props.children,
       (child) => React.cloneElement(child,
         { caches: this.state.caches, pagination: this.state.pagination }));
+
     return <div>{childrenWithProps}</div>;
   },
 });

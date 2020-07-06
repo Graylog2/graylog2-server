@@ -8,6 +8,7 @@ import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRa
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRangeSelector';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
+
 import DisabledTimeRangeSelector from './DisabledTimeRangeSelector';
 
 type Props = {
@@ -38,6 +39,7 @@ const timerangeStrategy = (type: ?TimeRangeTypes) => {
 export default function TimeRangeInput({ disabled, config }: Props) {
   const [{ value }] = useField('timerange.type');
   const { component: Component } = timerangeStrategy(value);
+
   return <Component disabled={disabled} config={config} />;
 }
 

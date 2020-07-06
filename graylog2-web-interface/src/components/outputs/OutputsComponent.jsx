@@ -1,12 +1,12 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
+
 import { Row, Col } from 'components/graylog';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import UserNotification from 'util/UserNotification';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Spinner from 'components/common/Spinner';
+
 import OutputList from './OutputList';
 import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
@@ -27,10 +27,12 @@ const OutputsComponent = createReactClass({
       this.setState({
         outputs: resp.outputs,
       });
+
       if (this.props.streamId) {
         this._fetchAssignableOutputs(resp.outputs);
       }
     };
+
     if (this.props.streamId) {
       OutputsStore.loadForStreamId(this.props.streamId, callback);
     } else {
@@ -54,14 +56,17 @@ const OutputsComponent = createReactClass({
   _handleCreateOutput(data) {
     OutputsStore.save(data, (result) => {
       this.setState({ typeName: 'placeholder' });
+
       if (this.props.streamId) {
         StreamsStore.addOutput(this.props.streamId, result.id, (response) => {
           this._handleUpdate();
+
           return response;
         });
       } else {
         this._handleUpdate();
       }
+
       return result;
     });
   },
@@ -72,6 +77,7 @@ const OutputsComponent = createReactClass({
       const assignableOutputs = resp.outputs
         .filter((output) => { return streamOutputIds.indexOf(output.id) === -1; })
         .sort((output1, output2) => { return output1.title.localeCompare(output2.title); });
+
       this.setState({ assignableOutputs: assignableOutputs });
     });
   },
@@ -79,6 +85,7 @@ const OutputsComponent = createReactClass({
   _handleAssignOutput(outputId) {
     StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
       this._handleUpdate();
+
       return response;
     });
   },
@@ -88,6 +95,7 @@ const OutputsComponent = createReactClass({
       OutputsStore.remove(outputId, (response) => {
         UserNotification.success('Output was terminated.', 'Success');
         this._handleUpdate();
+
         return response;
       });
     }
@@ -98,6 +106,7 @@ const OutputsComponent = createReactClass({
       StreamsStore.removeOutput(streamId, outputId, (response) => {
         UserNotification.success('Output was removed from stream.', 'Success');
         this._handleUpdate();
+
         return response;
       });
     }
@@ -126,6 +135,7 @@ const OutputsComponent = createReactClass({
                                 outputs={this.state.assignableOutputs}
                                 onSubmit={this._handleAssignOutput} />
         ) : null);
+
       return (
         <div className="outputs">
           <Row className="content">
@@ -148,6 +158,7 @@ const OutputsComponent = createReactClass({
         </div>
       );
     }
+
     return <Spinner />;
   },
 });

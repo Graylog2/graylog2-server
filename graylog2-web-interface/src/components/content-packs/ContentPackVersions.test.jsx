@@ -1,8 +1,8 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
+
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
-
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
@@ -28,6 +28,7 @@ describe('<ContentPackVersions />', () => {
 
   it('should render with content pack versions', () => {
     const wrapper = mount(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -36,7 +37,9 @@ describe('<ContentPackVersions />', () => {
       expect(version).toEqual('1');
     });
     const wrapper = mount(<ContentPackVersions onChange={changeFn} contentPackRevisions={contentPackRevision} />);
+
     wrapper.find('input[value=1]').simulate('change', { target: { checked: true, value: '1' } });
+
     expect(changeFn.mock.calls.length).toBe(1);
   });
 
@@ -46,7 +49,9 @@ describe('<ContentPackVersions />', () => {
       expect(revision).toEqual(1);
     });
     const wrapper = mount(<ContentPackVersions onDeletePack={deleteFn} contentPackRevisions={contentPackRevision} />);
+
     wrapper.find('a[children="Delete"]').at(0).simulate('click');
+
     expect(deleteFn.mock.calls.length).toBe(1);
   });
 });

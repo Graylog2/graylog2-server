@@ -1,5 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
+
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 
@@ -45,29 +46,35 @@ export const RefreshStore = singletonStore(
         clearInterval(this.intervalId);
         this.intervalId = undefined;
       }
+
       this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
       this._trigger();
     },
 
     enable() {
       this.refreshConfig = { ...this.refreshConfig, enabled: true };
+
       if (!this.intervalId) {
         this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
       }
+
       this._trigger();
     },
 
     disable() {
       this.refreshConfig = { ...this.refreshConfig, enabled: false };
+
       if (this.intervalId) {
         clearInterval(this.intervalId);
         this.intervalId = undefined;
       }
+
       this._trigger();
     },
 
     _trigger() {
       const { enabled, interval } = this.refreshConfig;
+
       this.trigger({ enabled, interval });
     },
   }),

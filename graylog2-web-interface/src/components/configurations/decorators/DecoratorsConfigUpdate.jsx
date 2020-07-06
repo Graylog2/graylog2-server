@@ -10,6 +10,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
+
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
 
@@ -24,8 +25,10 @@ type Props = {
 
 const _updateOrder = (orderedDecorators, decorators, onChange) => {
   const newDecorators = cloneDeep(decorators);
+
   orderedDecorators.forEach((item, idx) => {
     const decorator = newDecorators.find((i) => i.id === item.id);
+
     if (decorator) {
       decorator.order = idx;
     }
@@ -33,7 +36,6 @@ const _updateOrder = (orderedDecorators, decorators, onChange) => {
 
   onChange(newDecorators);
 };
-
 
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);

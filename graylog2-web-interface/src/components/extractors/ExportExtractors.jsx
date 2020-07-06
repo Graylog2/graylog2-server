@@ -2,14 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ClipboardButton, Spinner } from 'components/common';
 import Version from 'util/Version';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
@@ -66,6 +64,7 @@ const ExportExtractors = createReactClass({
     };
 
     const formattedJSON = JSON.stringify(extractorsExportObject, null, 2);
+
     return (
       <Row className="content">
         <Col md={12}>

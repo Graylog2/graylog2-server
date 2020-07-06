@@ -5,9 +5,7 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import TimeHelper from 'util/TimeHelper';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const SessionStore = StoreProvider.getStore('Session');
@@ -109,10 +107,12 @@ const MetricsStore = Reflux.createStore({
       .forEach((metricName) => {
         metricsToFetch[metricName] = 1;
       });
+
     return metricsToFetch;
   },
   _buildMetricsFromResponse(response) {
     const metrics = {};
+
     Object.keys(response)
       .forEach((nodeId) => {
         const nodeMetrics = {};
@@ -120,6 +120,7 @@ const MetricsStore = Reflux.createStore({
         if (!response[nodeId]) {
           return;
         }
+
         response[nodeId].metrics.forEach((metric) => {
           nodeMetrics[metric.full_name] = metric;
         });
@@ -145,34 +146,42 @@ const MetricsStore = Reflux.createStore({
         this.metrics = this._buildMetricsFromResponse(response);
         // The metricsUpdatedAt value is used by components to decide if they should be re-rendered
         this.trigger({ metrics: this.metrics, metricsUpdatedAt: TimeHelper.nowInSeconds() });
+
         return this.metrics;
       });
+
       this.promises.list = promise;
     }
 
     MetricsActions.list.promise(this.promises.list);
+
     return this.promises.list;
   },
   names() {
     if (!this.nodes) {
       console.warn('Node list not yet available, not fetching metrics.');
+
       return;
     }
 
     const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
+
       return fetch('GET', url).then((response) => {
         return { nodeId: nodeId, names: response.metrics };
       });
     })).then((responses) => {
       const metricsNames = {};
+
       responses.forEach((response) => {
         if (response.nodeId) {
           metricsNames[response.nodeId] = response.names;
         }
       });
+
       this.trigger({ metricsNames: metricsNames });
       this.metricsNames = metricsNames;
+
       return metricsNames;
     });
 
@@ -182,6 +191,7 @@ const MetricsStore = Reflux.createStore({
     if (!this.registrations[nodeId]) {
       this.registrations[nodeId] = {};
     }
+
     this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] ? this.registrations[nodeId][metricName] + 1 : 1;
   },
   addGlobal(metricName) {
@@ -195,7 +205,9 @@ const MetricsStore = Reflux.createStore({
     if (!this.registrations[nodeId]) {
       return;
     }
+
     this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] > 0 ? this.registrations[nodeId][metricName] - 1 : 0;
+
     if (this.registrations[nodeId][metricName] === 0) {
       delete this.registrations[nodeId][metricName];
     }
@@ -204,7 +216,9 @@ const MetricsStore = Reflux.createStore({
     if (!this.globalRegistrations[metricName]) {
       return;
     }
+
     this.globalRegistrations[metricName] = this.globalRegistrations[metricName] > 0 ? this.globalRegistrations[metricName] - 1 : 0;
+
     if (this.globalRegistrations[metricName] === 0) {
       delete this.globalRegistrations[metricName];
     }

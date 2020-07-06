@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
 import { cloneDeep, debounce } from 'lodash';
 import styled from 'styled-components';
+
 import Input from 'components/bootstrap/Input';
 // Explicit import to fix eslint import/no-cycle
 import Select from 'components/common/Select';
@@ -44,6 +45,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     // eslint-disable-next-line prefer-const
     let stateUpdate = cloneDeep(config);
     const validationUpdate = cloneDeep(validationState);
+
     validationUpdate.errors[idx] = null;
     setValidationState(validationUpdate);
     stateUpdate.entries.splice(idx, 1);
@@ -52,27 +54,32 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const validURL = (str: string) => {
     let isValid = true;
+
     try {
       // eslint-disable-next-line no-unused-vars
       const test = new URL(str);
     } catch (e) {
       isValid = false;
     }
+
     return isValid;
   };
 
   const _isFormValid = (): boolean => {
     let isValid = true;
+
     if (validationState.errors.length > 0
       && validationState.errors.find(((el) => (el && el.title && el.title.valid) === false
       || (el && el.value && el.value.valid === false)))) {
       isValid = false;
     }
+
     return isValid;
   };
 
   const _updateState = (idx: number, type: string, name: string, value: string) => {
     const stateUpdate = cloneDeep(config);
+
     stateUpdate.entries[idx][name] = value;
     stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
     setConfig(stateUpdate);
@@ -80,6 +87,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const _updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
     const validationUpdate = cloneDeep(validationState);
+
     validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
     setValidationState(validationUpdate);
     _updateState(idx, type, name, value);
@@ -89,23 +97,30 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     switch (name) {
       case 'title': {
         const result = value.trim().length <= 0 ? { valid: false } : { valid: true };
+
         _updateValidationError(idx, type, name, result, value);
       }
+
         break;
       case 'value':
         if (type === literal) {
           const result = validURL(value) ? { valid: true } : { valid: false };
+
           _updateValidationError(idx, type, name, result, value);
         } else if (type === regex && value.trim().length > 0) {
           const promise = ToolsStore.testRegexValidity(value);
+
           promise.then((result) => {
             const res = result.is_valid ? { valid: true } : { valid: false };
+
             _updateValidationError(idx, type, name, res, value);
           });
         } else {
           const res = { valid: false };
+
           _updateValidationError(idx, type, name, res, value);
         }
+
         break;
       default:
         break;
@@ -124,6 +139,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const _onUpdateType = (idx: number, type: string) => {
     const stateUpdate = cloneDeep(config);
+
     _validate('value', idx, type, stateUpdate.entries[idx].value);
   };
 
@@ -180,9 +196,9 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     }));
   };
 
-
   useEffect(() => {
     const valid = _isFormValid();
+
     onUpdate(config, valid);
   }, [config]);
 

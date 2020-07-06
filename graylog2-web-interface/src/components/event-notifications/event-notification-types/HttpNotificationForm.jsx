@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+
 import { URLWhiteListInput } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 
@@ -14,12 +15,14 @@ class HttpNotificationForm extends React.Component {
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = lodash.cloneDeep(config);
+
     nextConfig[key] = value;
     onChange(nextConfig);
   };
 
   handleChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 

@@ -1,20 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { withRouter } from 'react-router';
-
-import { Badge, Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 import { isPermitted } from 'util/PermissionsMixin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import Routes from 'routing/Routes';
-import URLUtils from 'util/URLUtils';
-import AppConfig from 'util/AppConfig';
-
+import { appPrefixed } from 'util/URLUtils';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import { IfPermitted } from 'components/common';
 
@@ -23,6 +19,7 @@ import HelpMenu from './HelpMenu';
 import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
 import NavigationLink from './NavigationLink';
+import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import SystemMenu from './SystemMenu';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
@@ -31,11 +28,11 @@ import StyledNavbar from './Navigation.styles';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
 const formatSinglePluginRoute = ({ description, path, permissions }, topLevel = false) => {
-  const link = <NavigationLink key={description} description={description} path={URLUtils.appPrefixed(path)} topLevel={topLevel} />;
+  const link = <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
 
   if (permissions) {
     return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
@@ -49,6 +46,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+
     if (isEmpty) {
       return null;
     }
@@ -65,6 +63,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginExports = PluginStore.exports('navigation');
+
   if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
@@ -72,9 +71,11 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
       description: 'Enterprise',
     });
   }
+
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));
+  const pluginItems = PluginStore.exports('navigationItems');
 
   return (
     <StyledNavbar inverse fluid fixedTop>
@@ -85,11 +86,8 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
         </Navbar.Brand>
         <Navbar.Toggle />
-
-        {
-        AppConfig.gl2DevMode()
-          && <Badge bsStyle="danger" className="small-scrn-badge dev-badge">DEV</Badge>
-        }
+        <DevelopmentHeaderBadge smallScreen />
+        {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
 
       <Navbar.Collapse>
@@ -120,14 +118,10 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
         <NotificationBadge />
 
         <Nav navbar pullRight className="header-meta-nav">
-          {
-          AppConfig.gl2DevMode()
-            && (
-              <InactiveNavItem className="dev-badge-wrap">
-                <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
-              </InactiveNavItem>
-            )
-          }
+          <InactiveNavItem className="dev-badge-wrap">
+            <DevelopmentHeaderBadge />
+            {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
+          </InactiveNavItem>
 
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
             <GlobalThroughput />

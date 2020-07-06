@@ -8,9 +8,7 @@ import { Button, ListGroupItem } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import UserNotification from 'util/UserNotification';
 
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
@@ -38,6 +36,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
         if (onDelete) {
           onDelete(streamRule.id);
         }
+
         UserNotification.success('Stream rule has been successfully deleted.', 'Success');
       });
     }
@@ -48,6 +47,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
       if (onSubmit) {
         onSubmit(streamRuleId, data);
       }
+
       UserNotification.success('Stream rule has been successfully updated.', 'Success');
     });
   };
@@ -58,7 +58,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
         <Button bsStyle="link"
                 bsSize="xsmall"
                 onClick={_onDelete}>
-          <Icon name="trash-o" />
+          <Icon name="trash-alt" type="regular" />
         </Button>
         <Button bsStyle="link"
                 bsSize="xsmall"

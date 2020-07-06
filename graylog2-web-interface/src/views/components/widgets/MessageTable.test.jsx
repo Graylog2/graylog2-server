@@ -2,12 +2,14 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-
 import suppressConsole from 'helpers/suppressConsole';
+
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+
 import MessageTable from './MessageTable';
+
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 const messages = [
@@ -26,7 +28,6 @@ const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
 const activeQueryId = 'some-query-id';
 
-
 describe('MessageTable', () => {
   it('lists provided field in table head', () => {
     const wrapper = mount(<MessageTable activeQueryId={activeQueryId}
@@ -37,6 +38,7 @@ describe('MessageTable', () => {
                                         selectedFields={Immutable.Set()}
                                         setLoadingState={() => {}} />);
     const th = wrapper.find('th').at(0);
+
     expect(th.text()).toContain('file_name');
   });
 
@@ -50,6 +52,7 @@ describe('MessageTable', () => {
                                         messages={messages} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
+
     expect(td.text()).toContain('frank.txt');
   });
 
@@ -65,6 +68,7 @@ describe('MessageTable', () => {
                                           setLoadingState={() => {}}
                                           messages={messages} />);
       const messageTableEntry = wrapper.find('MessageTableEntry');
+
       expect(messageTableEntry).not.toBeEmptyRender();
     });
   });
@@ -81,6 +85,7 @@ describe('MessageTable', () => {
                                         messages={messages} />);
 
     const tableHeadFields = wrapper.find('Field').map((field) => field.text());
+
     expect(tableHeadFields).toEqual(configFields);
   });
 

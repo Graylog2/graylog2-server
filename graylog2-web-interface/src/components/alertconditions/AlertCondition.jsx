@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import { AlertConditionForm, AlertConditionSummary, AlertConditionTestModal, UnknownAlertCondition } from 'components/alertconditions';
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -70,6 +70,7 @@ const AlertCondition = createReactClass({
     }
 
     let actions = [];
+
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
         <Button key="test-button" bsStyle="info" onClick={this._openTestModal}>Test</Button>,

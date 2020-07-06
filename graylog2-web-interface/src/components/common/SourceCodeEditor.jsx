@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
-
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
@@ -110,6 +109,7 @@ class SourceCodeEditor extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       height: props.height,
       width: props.width,
@@ -134,9 +134,9 @@ class SourceCodeEditor extends React.Component {
     }
   }
 
-
   componentDidUpdate(prevProps) {
     const { height, width } = this.props;
+
     if (height !== prevProps.height || width !== prevProps.width) {
       this.reloadEditor();
     }
@@ -144,11 +144,13 @@ class SourceCodeEditor extends React.Component {
 
   handleResize = (event, { size }) => {
     const { height, width } = size;
+
     this.setState({ height: height, width: width }, this.reloadEditor);
   };
 
   reloadEditor = () => {
     const { resizable } = this.props;
+
     if (resizable) {
       this.reactAce.editor.resize();
     }
@@ -178,11 +180,13 @@ class SourceCodeEditor extends React.Component {
 
   handleSelectionChange = (selection) => {
     const { toolbar, readOnly } = this.props;
+
     if (!this.reactAce || !toolbar || readOnly) {
       return;
     }
 
     const selectedText = this.reactAce.editor.getSession().getTextRange(selection.getRange());
+
     this.setState({ selectedText: selectedText });
   };
 
@@ -208,6 +212,7 @@ class SourceCodeEditor extends React.Component {
     } = this.props;
     const validCssWidth = lodash.isFinite(width) ? width : '100%';
     const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
+
     return (
       <div>
         {toolbar
@@ -224,7 +229,7 @@ class SourceCodeEditor extends React.Component {
                                  disabled={this.isCopyDisabled()} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
-                    <Icon name="paste" fixedWidth />
+                    <Icon name="clipboard" fixedWidth />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
@@ -241,7 +246,7 @@ class SourceCodeEditor extends React.Component {
                         onClick={this.handleRedo}
                         title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
                         disabled={this.isRedoDisabled()}>
-                  <Icon name="repeat" fixedWidth />
+                  <Icon name="redo" fixedWidth />
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>

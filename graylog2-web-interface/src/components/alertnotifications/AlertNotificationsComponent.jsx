@@ -7,7 +7,6 @@ import naturalSort from 'javascript-natural-sort';
 import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -54,6 +53,7 @@ const AlertNotificationsComponent = createReactClass({
     const notifications = allNotifications.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';
       const t2 = a2.title || 'Untitled';
+
       return naturalSort(t1.toLowerCase(), t2.toLowerCase());
     });
 

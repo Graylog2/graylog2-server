@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
 import Routes from 'routing/Routes';
 import { Icon } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -20,11 +21,13 @@ type Props = {
 
 const NodeName = ({ nodeId, nodes }: Props) => {
   const node = nodes[nodeId];
+
   if (node) {
     const nodeURL = Routes.node(nodeId);
+
     return (
       <a href={nodeURL}>
-        <Icon name="code-fork" />
+        <Icon name="code-branch" />
         &nbsp;
         <span style={{ wordBreak: 'break-word' }}>
           {node.short_node_id}
@@ -35,6 +38,7 @@ const NodeName = ({ nodeId, nodes }: Props) => {
       </a>
     );
   }
+
   return <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
 };
 

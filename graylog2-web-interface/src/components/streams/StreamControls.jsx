@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { DropdownButton, MenuItem } from 'components/graylog';
 
+import { DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StoreProvider from 'injection/StoreProvider';

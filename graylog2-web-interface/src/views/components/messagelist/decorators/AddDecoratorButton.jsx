@@ -8,9 +8,10 @@ import { ConfigurationForm } from 'components/configurationforms';
 import { Select } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import DecoratorStyles from '!style!css!./decoratorStyles.css';
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
+
+import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
 const ConfigurationFormContainer = styled.div`
   margin-bottom: 10px;
@@ -62,6 +63,7 @@ class AddDecoratorButton extends React.Component {
       config: data.configuration,
       order: nextOrder,
     };
+
     onCreate(request);
     this.setState({ typeName: this.PLACEHOLDER });
   };
@@ -72,6 +74,7 @@ class AddDecoratorButton extends React.Component {
     const { decoratorTypes } = this.props;
 
     this.setState({ typeName: decoratorType });
+
     if (decoratorTypes[decoratorType]) {
       this.setState({ typeDefinition: decoratorTypes[decoratorType] });
     } else {
@@ -97,6 +100,7 @@ class AddDecoratorButton extends React.Component {
                            submitAction={this._handleSubmit}
                            cancelAction={this._handleCancel} />
       ) : null);
+
     return (
       <>
         <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>

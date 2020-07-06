@@ -1,4 +1,5 @@
 import Immutable, { Map, List } from 'immutable';
+
 import ValueRefHelper from './ValueRefHelper';
 
 /**
@@ -141,6 +142,7 @@ export default class ValueReferenceData {
       this.pathParameterSetter(path),
       this.pathType(path),
     );
+
     this.paths = this.paths.set(stringPath, leaf);
   }
 
@@ -153,6 +155,7 @@ export default class ValueReferenceData {
       if (ValueRefHelper.dataIsValueRef(this.data.getIn(path))) {
         return this.data.getIn(path.concat(ValueRefHelper.VALUE_REF_VALUE_FIELD));
       }
+
       return this.data.getIn(path);
     };
   }
@@ -200,6 +203,7 @@ export default class ValueReferenceData {
       if (ValueRefHelper.dataIsValueRef(data)) {
         return this.data.getIn(path.concat(ValueRefHelper.VALUE_REF_TYPE_FIELD));
       }
+
       return (typeof data);
     };
   }

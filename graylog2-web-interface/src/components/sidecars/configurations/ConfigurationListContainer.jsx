@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import ConfigurationList from './ConfigurationList';
 
 const { CollectorConfigurationsStore, CollectorConfigurationsActions } = CombinedProvider.get('CollectorConfigurations');
@@ -27,11 +28,13 @@ const ConfigurationListContainer = createReactClass({
 
   handlePageChange(page, pageSize) {
     const { query } = this.state.configurations;
+
     CollectorConfigurationsActions.list({ query: query, page: page, pageSize: pageSize });
   },
 
   handleQueryChange(query = '', callback = () => {}) {
     const { pageSize } = this.state.configurations.pagination;
+
     CollectorConfigurationsActions.list({ query: query, pageSize: pageSize }).finally(callback);
   },
 
@@ -39,6 +42,7 @@ const ConfigurationListContainer = createReactClass({
     CollectorConfigurationsActions.copyConfiguration(configuration, name)
       .then((response) => {
         callback();
+
         return response;
       });
   },

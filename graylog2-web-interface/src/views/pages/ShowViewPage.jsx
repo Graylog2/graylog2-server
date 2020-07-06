@@ -1,11 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import history from 'util/History';
 
+import history from 'util/History';
 import connect from 'stores/connect';
 import Spinner from 'components/common/Spinner';
-
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -15,7 +14,6 @@ import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
 import { SearchActions } from 'views/stores/SearchStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-
 import { ExtendedSearchPage } from 'views/pages';
 
 type Props = {
@@ -74,6 +72,7 @@ class ShowViewPage extends React.Component<Props, State> {
 
   componentDidUpdate({ params: { viewId: lastViewId } }) {
     const { params: { viewId } } = this.props;
+
     if (viewId !== lastViewId) {
       this.loadView(viewId);
     }
@@ -99,21 +98,26 @@ class ShowViewPage extends React.Component<Props, State> {
         if (e instanceof Error) {
           throw e;
         }
+
         this.setState({ hookComponent: e });
       },
     ).then((results) => {
       this.setState({ loaded: true });
+
       return results;
     }).then((results) => {
       SearchActions.executeWithCurrentState();
+
       return results;
     }).catch((e) => e);
   };
 
   render() {
     const { hookComponent, loaded } = this.state;
+
     if (hookComponent) {
       const HookComponent = hookComponent;
+
       return <HookComponent />;
     }
 

@@ -7,7 +7,6 @@ import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/comm
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
-
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
@@ -39,6 +38,7 @@ class EditEventDefinitionPage extends React.Component {
         .then(
           (response) => {
             const eventDefinition = response.event_definition;
+
             // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
             // backend. This field will be removed in the event definitions store before sending an event definition
             // back to the server.

@@ -1,6 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+
 import { ButtonToolbar } from 'components/graylog';
 
 import CollectorConfigurationSelector from './CollectorConfigurationSelector';
@@ -17,6 +18,7 @@ const CollectorsAdministrationActions = createReactClass({
 
   render() {
     const { collectors, configurations, selectedSidecarCollectorPairs, onConfigurationSelectionChange, onProcessAction } = this.props;
+
     return (
       <ButtonToolbar>
         <CollectorConfigurationSelector collectors={collectors}

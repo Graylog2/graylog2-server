@@ -1,28 +1,31 @@
 // @flow strict
 import moment from 'moment-timezone';
 
+import AppConfig from 'util/AppConfig';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { ColLeaf, Leaf, Key, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const formatTimestamp = (timestamp, tz = 'UTC'): string => {
+const formatTimestamp = (timestamp, tz = AppConfig.rootTimeZone()): string => {
   // the `true` parameter prevents returning the iso string in UTC (http://momentjs.com/docs/#/displaying/as-iso-string/)
-  return moment(timestamp).tz(tz || 'UTC').toISOString(true);
+  return moment(timestamp).tz(tz).toISOString(true);
 };
 
 const transformKey = (key: Key, indices: Array<number>, tz: string) => {
   if (indices.length === 0) {
     return key;
   }
+
   const newKey: Key = key.slice();
+
   indices.forEach((idx) => {
     if (newKey[idx]) {
       newKey[idx] = formatTimestamp(newKey[idx], tz);
     }
   });
+
   return newKey;
 };
 
@@ -39,23 +42,29 @@ export default (rowPivots: Array<Pivot>, columnPivots: Array<Pivot>): ((Rows) =>
     if (rowIndices.length === 0 && columnIndices.length === 0) {
       return result;
     }
+
     const currentUser = CurrentUserStore.get();
-    const tz = currentUser ? currentUser.timezone : 'UTC';
+    const timezone = currentUser?.timezone ?? AppConfig.rootTimeZone();
 
     return result.map((row) => {
       if (row.source !== 'leaf') {
         return row;
       }
+
       const newRow: Leaf = { ...row };
-      newRow.key = transformKey(row.key, rowIndices, tz);
+
+      newRow.key = transformKey(row.key, rowIndices, timezone);
 
       if (columnIndices.length > 0) {
         newRow.values = row.values.map((values) => {
           if (values.source !== 'col-leaf') {
             return values;
           }
+
           const newValues: ColLeaf = { ...values };
-          newValues.key = transformKey(values.key, columnIndices, tz);
+
+          newValues.key = transformKey(values.key, columnIndices, timezone);
+
           return newValues;
         });
       }

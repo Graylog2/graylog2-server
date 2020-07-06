@@ -35,9 +35,11 @@ describe('NumberRefExpression', () => {
     );
 
     const functionSelect = wrapper.find('Select.aggregation-function').at(0);
+
     expect(functionSelect.prop('value')).toBe(undefined);
 
     const fieldSelect = wrapper.find('Select.aggregation-function-field').at(0);
+
     expect(fieldSelect.prop('value')).toBe(undefined);
   });
 
@@ -61,9 +63,11 @@ describe('NumberRefExpression', () => {
     );
 
     const functionSelect = wrapper.find('Select.aggregation-function').at(0);
+
     expect(functionSelect.prop('value')).toBe('avg');
 
     const fieldSelect = wrapper.find('Select.aggregation-function-field').at(0);
+
     expect(fieldSelect.prop('value')).toBe('took_ms');
   });
 
@@ -94,7 +98,9 @@ describe('NumberRefExpression', () => {
     );
 
     const functionSelect = wrapper.find('Select Select.aggregation-function').at(0);
+
     functionSelect.prop('onChange')({ value: 'card' });
+
     expect(handleChange.mock.calls.length).toBe(1);
   });
 
@@ -125,7 +131,9 @@ describe('NumberRefExpression', () => {
     );
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
+
     fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+
     expect(handleChange.mock.calls.length).toBe(1);
   });
 
@@ -156,7 +164,9 @@ describe('NumberRefExpression', () => {
     );
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
+
     fieldSelect.prop('onChange')({ value: 'source' }, { action: 'select-option' });
+
     expect(handleChange.mock.calls.length).toBe(1);
   });
 });

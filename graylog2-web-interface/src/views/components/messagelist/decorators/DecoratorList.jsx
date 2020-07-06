@@ -39,11 +39,13 @@ class DecoratorList extends React.Component<Props> {
 
   _onReorderWrapper = (orderedItems: ReorderedItems) => {
     const { onReorder } = this.props;
+
     onReorder(orderedItems);
   };
 
   render() {
     const { decorators, disableDragging } = this.props;
+
     if (!decorators || decorators.length === 0) {
       return (
         <AlertContainer>
@@ -53,6 +55,7 @@ class DecoratorList extends React.Component<Props> {
         </AlertContainer>
       );
     }
+
     return (
       <SortableList items={decorators} onMoveItem={this._onReorderWrapper} disableDragging={disableDragging} />
     );

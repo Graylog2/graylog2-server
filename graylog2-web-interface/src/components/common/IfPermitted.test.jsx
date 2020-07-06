@@ -9,14 +9,18 @@ jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 
 describe('IfPermitted', () => {
   let element;
+
   beforeEach(() => {
     element = <p>Something!</p>;
   });
+
   describe('renders nothing if', () => {
     let wrapper;
+
     afterEach(() => {
       expect(wrapper.find('IfPermitted')).toBeEmptyRender();
     });
+
     it('no user is present', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission']}>
@@ -24,6 +28,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user does not have permissions', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission']} currentUser={{}}>
@@ -31,6 +36,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has empty permissions', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission']} currentUser={{ permissions: [] }}>
@@ -38,6 +44,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has undefined permissions', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission']} currentUser={{ permissions: undefined }}>
@@ -45,6 +52,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has different permissions', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission']} currentUser={{ permissions: ['someotherpermission'] }}>
@@ -52,6 +60,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user is missing one permission', () => {
       wrapper = mount((
         <IfPermitted permissions={['somepermission', 'someotherpermission']} currentUser={{ permissions: ['someotherpermission'] }}>
@@ -59,6 +68,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user is missing permission for specific id', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:otherid'] }}>
@@ -66,6 +76,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has permission for different action', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action']} currentUser={{ permissions: ['entity:otheraction'] }}>
@@ -73,6 +84,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has permission for id only', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action']} currentUser={{ permissions: ['entity:action:id'] }}>
@@ -81,11 +93,14 @@ describe('IfPermitted', () => {
       ));
     });
   });
+
   describe('renders children if', () => {
     let wrapper;
+
     afterEach(() => {
       expect(wrapper).toIncludeText('Something!');
     });
+
     it('empty permissions were passed', () => {
       wrapper = mount((
         <IfPermitted permissions={[]} currentUser={{ permissions: [] }}>
@@ -93,6 +108,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('empty permissions were passed and no user is present', () => {
       wrapper = mount((
         <IfPermitted permissions={[]}>
@@ -100,6 +116,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('undefined permissions were passed and no user is present', () => {
       wrapper = mount((
         <IfPermitted permissions={[]}>
@@ -107,6 +124,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has exact required permissions', () => {
       wrapper = mount((
         <IfPermitted permissions={['something']} currentUser={{ permissions: ['something'] }}>
@@ -114,6 +132,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has any exact required permission', () => {
       wrapper = mount((
         <IfPermitted permissions={['something', 'someother']} currentUser={{ permissions: ['something'] }} anyPermissions>
@@ -121,6 +140,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has exact required permission for action with entity id', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:id'] }}>
@@ -128,6 +148,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has wildcard permission', () => {
       wrapper = mount((
         <IfPermitted permissions={['something']} currentUser={{ permissions: ['*'] }}>
@@ -135,6 +156,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has wildcard permission for action', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action'] }}>
@@ -142,6 +164,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has wildcard permission for id', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:action:*'] }}>
@@ -149,6 +172,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has wildcard permission for entity', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action']} currentUser={{ permissions: ['entity:*'] }}>
@@ -156,6 +180,7 @@ describe('IfPermitted', () => {
         </IfPermitted>
       ));
     });
+
     it('user has wildcard permission for entity when permission for id is required', () => {
       wrapper = mount((
         <IfPermitted permissions={['entity:action:id']} currentUser={{ permissions: ['entity:*'] }}>
@@ -164,6 +189,7 @@ describe('IfPermitted', () => {
       ));
     });
   });
+
   it('passes props to children', () => {
     const Foo = mockComponent('Foo');
     const Bar = mockComponent('Bar');
@@ -179,6 +205,7 @@ describe('IfPermitted', () => {
     expect(wrapper.find(Bar)).toHaveProp('something', 42);
     expect(wrapper.find(Bar)).toHaveProp('otherProp', { foo: 'bar!' });
   });
+
   it('does not pass property to children if already present', () => {
     const Foo = mockComponent('Foo');
     const Bar = mockComponent('Bar');

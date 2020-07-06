@@ -7,9 +7,7 @@ import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 import { JSONValueInput } from 'components/common';
-
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
@@ -53,6 +51,7 @@ class LookupTableForm extends React.Component {
       // props haven't change, don't update our state from them
       return;
     }
+
     this.setState(this._initialState(nextProps.table));
   }
 
@@ -73,8 +72,10 @@ class LookupTableForm extends React.Component {
     if (!table.cache_id || !table.data_adapter_id) {
       return;
     }
+
     // first cancel outstanding validation timer, we have new data
     this._clearTimer();
+
     if (this.props.validate) {
       this.validationCheckTimer = setTimeout(() => this.props.validate(table), 500);
     }
@@ -103,6 +104,7 @@ class LookupTableForm extends React.Component {
 
   _onChange = (event) => {
     const table = ObjectUtils.clone(this.state.table);
+
     table[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(table);
     this.setState({ table: table });
@@ -110,6 +112,7 @@ class LookupTableForm extends React.Component {
 
   _onConfigChange = (event) => {
     const table = ObjectUtils.clone(this.state.table);
+
     table.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(table);
     this.setState({ table: table });
@@ -121,6 +124,7 @@ class LookupTableForm extends React.Component {
     }
 
     let promise;
+
     if (this.props.create) {
       promise = LookupTablesActions.create(this.state.table);
     } else {
@@ -134,6 +138,7 @@ class LookupTableForm extends React.Component {
 
   _onAdapterSelect = (id) => {
     const table = ObjectUtils.clone(this.state.table);
+
     table.data_adapter_id = id;
     this._validate(table);
     this.setState({ table: table });
@@ -141,6 +146,7 @@ class LookupTableForm extends React.Component {
 
   _onCacheSelect = (id) => {
     const table = ObjectUtils.clone(this.state.table);
+
     table.cache_id = id;
     this._validate(table);
     this.setState({ table: table });
@@ -158,6 +164,7 @@ class LookupTableForm extends React.Component {
 
   _onCheckEnableSingleDefault = (e) => {
     const value = FormsUtils.getValueFromInput(e.target);
+
     this.setState({ enable_default_single: value });
 
     if (value === false) {
@@ -167,6 +174,7 @@ class LookupTableForm extends React.Component {
 
   _onCheckEnableMultiDefault = (e) => {
     const value = FormsUtils.getValueFromInput(e.target);
+
     this.setState({ enable_default_multi: value });
 
     if (value === false) {
@@ -186,6 +194,7 @@ class LookupTableForm extends React.Component {
     if (this.props.validationErrors[fieldName]) {
       return 'error';
     }
+
     return null;
   };
 
@@ -199,6 +208,7 @@ class LookupTableForm extends React.Component {
         </div>
       );
     }
+
     return <span>{defaultText}</span>;
   };
 

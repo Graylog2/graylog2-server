@@ -4,7 +4,6 @@ import React from 'react';
 import { Row, Col, Button } from 'components/graylog';
 import { Icon } from 'components/common';
 import ISODurationUtils from 'util/ISODurationUtils';
-
 import ObjectUtils from 'util/ObjectUtils';
 
 /**
@@ -60,6 +59,7 @@ class TimeRangeOptionsForm extends React.Component {
 
           if (field === 'period') {
             value = value.toUpperCase();
+
             if (!value.startsWith('P')) {
               value = `P${value}`;
             }
@@ -98,7 +98,7 @@ class TimeRangeOptionsForm extends React.Component {
                        value={description}
                        onChange={this._onChange(idx, 'description')} />
                 <span className="input-group-addon">
-                  <Icon name="trash" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
+                  <Icon name="trash-alt" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
                 </span>
               </div>
             </Col>

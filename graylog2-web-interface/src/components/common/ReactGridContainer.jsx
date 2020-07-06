@@ -11,8 +11,10 @@ const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 const WidthProvidedGridLayout = (props) => {
   const { width } = props;
+
   return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout {...props} />;
 };
+
 WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
 WidthProvidedGridLayout.defaultProps = { width: undefined };
 
@@ -63,9 +65,11 @@ const _gridClass = (locked, isResizable, useDragHandle) => {
   if (locked || !isResizable) {
     return 'locked';
   }
+
   if (useDragHandle) {
     return '';
   }
+
   return 'unlocked';
 };
 
@@ -175,6 +179,7 @@ class ReactGridContainer extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       layout: this.computeLayout(props.positions),
     };
@@ -183,6 +188,7 @@ class ReactGridContainer extends React.Component {
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { positions } = this.props;
+
     if (!isEqual(nextProps.positions, positions)) {
       this.setState({ layout: this.computeLayout(nextProps.positions) });
     }
@@ -191,6 +197,7 @@ class ReactGridContainer extends React.Component {
   computeLayout = (positions) => {
     return Object.keys(positions).map((id) => {
       const { col, row, height, width } = positions[id];
+
       return {
         i: id,
         x: col ? Math.max(col - 1, 0) : 0,
@@ -206,11 +213,13 @@ class ReactGridContainer extends React.Component {
     // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
     const filteredNewLayout = newLayout.map((item) => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
     const { layout } = this.state;
+
     if (isEqual(layout, filteredNewLayout)) {
       return;
     }
 
     const newPositions = [];
+
     newLayout.forEach((widget) => {
       newPositions.push({
         id: widget.i,
@@ -222,6 +231,7 @@ class ReactGridContainer extends React.Component {
     });
 
     const { onPositionsChange } = this.props;
+
     onPositionsChange(newPositions);
   };
 

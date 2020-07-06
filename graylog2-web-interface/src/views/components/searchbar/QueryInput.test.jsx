@@ -3,9 +3,11 @@ import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 
 import QueryInput from './QueryInput';
+
 import UserPreferencesContext, { defaultUserPreferences } from '../../../contexts/UserPreferencesContext';
 
 jest.mock('./SearchBarAutocompletions', () => ({}));
+
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesStore: {
     getInitialState: jest.fn(),
@@ -30,11 +32,13 @@ describe('QueryInput', () => {
 
   const _mount = (component) => {
     const wrapper = mount(component);
+
     return wrapper.find('ReactAce');
   };
 
   it('renders with minimal props', () => {
     const wrapper = mount(<SimpleQueryInput />);
+
     expect(wrapper).not.toBeNull();
   });
 

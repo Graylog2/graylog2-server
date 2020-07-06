@@ -2,6 +2,9 @@
 
 type ConfigType = { [string]: mixed };
 
+export const DateType = 'time';
+export const ValuesType = 'values';
+
 export type PivotJson = {
   field: string,
   type: string,
@@ -39,11 +42,13 @@ export default class Pivot {
 
   static fromJSON(value: PivotJson) {
     const { field, type, config = {} } = value;
+
     return new Pivot(field, type, config);
   }
 
   toJSON(): PivotJson {
     const { field, type, config } = this._value;
+
     return { field, type, config };
   }
 }

@@ -1,8 +1,8 @@
-import { createGlobalStyle, css } from 'styled-components';
+import { css } from 'styled-components';
 
 import bgImage from 'images/auth/loginbg.jpg';
 
-const AuthThemeStyles = createGlobalStyle(({ theme }) => css`
+const authStyles = css(({ theme }) => `
   body {
     /* we love science */
     background: url(${bgImage}) no-repeat center center fixed ${theme.colors.global.background};
@@ -10,4 +10,4 @@ const AuthThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 `);
 
-export default AuthThemeStyles;
+export default authStyles;

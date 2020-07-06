@@ -1,6 +1,7 @@
 // @flow strict
-import { List, Map } from 'immutable';
 import { readFileSync } from 'fs';
+
+import { List, Map } from 'immutable';
 import { dirname } from 'path';
 
 import Search from 'views/logic/search/Search';
@@ -13,6 +14,7 @@ import ViewStateGenerator from './ViewStateGenerator';
 import viewTransformer from './ViewTransformer';
 
 const mockList = jest.fn(() => Promise.resolve([]));
+
 jest.mock('injection/CombinedProvider', () => ({
   get: (type) => ({
     Decorators: {
@@ -46,6 +48,7 @@ describe('ViewTransformer', () => {
         .build();
 
       const dashboardView = viewTransformer(searchView);
+
       expect(dashboardView.type).toBe(View.Type.Dashboard);
     });
 
@@ -68,6 +71,7 @@ describe('ViewTransformer', () => {
         .build();
 
       const dashboardView = viewTransformer(searchView);
+
       expect(dashboardView.id).not.toStrictEqual(searchView.id);
     });
 
@@ -91,6 +95,7 @@ describe('ViewTransformer', () => {
         .search(search)
         .build();
       const dashboardView = viewTransformer(searchView);
+
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBe(query.timerange);
       expect(dashboardView.state.get('query-id').widgets.first().query).toBeUndefined();
       expect(dashboardView.state.get('query-id').widgets.first().streams).toStrictEqual([]);
@@ -116,6 +121,7 @@ describe('ViewTransformer', () => {
         .search(search)
         .build();
       const dashboardView = viewTransformer(searchView);
+
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBeUndefined();
       expect(dashboardView.state.get('query-id').widgets.first().query).toBe(query.query);
       expect(dashboardView.state.get('query-id').widgets.first().streams).toStrictEqual([]);
@@ -141,6 +147,7 @@ describe('ViewTransformer', () => {
         .search(search)
         .build();
       const dashboardView = viewTransformer(searchView);
+
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBeUndefined();
       expect(dashboardView.state.get('query-id').widgets.first().query).toBeUndefined();
       expect(dashboardView.state.get('query-id').widgets.first().streams).toStrictEqual(['1234-abcd']);
@@ -176,6 +183,7 @@ describe('ViewTransformer', () => {
         .search(searchFixture)
         .build();
       const dashboardView = viewTransformer(searchView);
+
       expect(dashboardView).toMatchSnapshot({
         _value: {
           id: expect.any(String),

@@ -3,8 +3,8 @@ import React from 'react';
 import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
-
 import asMock from 'helpers/mocking/AsMock';
+
 import ToolsStore from 'stores/tools/ToolsStore';
 
 import OriginalKeywordTimeRangeSelector from './KeywordTimeRangeSelector';
@@ -35,6 +35,7 @@ describe('KeywordTimeRangeSelector', () => {
 
   const findValidationState = (container) => {
     const formGroup = container.querySelector('.form-group');
+
     return formGroup && formGroup.className.includes('has-error')
       ? 'error'
       : null;
@@ -42,20 +43,25 @@ describe('KeywordTimeRangeSelector', () => {
 
   const changeInput = async (input, value) => act(async () => {
     const { name } = asElement(input, HTMLInputElement);
+
     fireEvent.change(input, { target: { value, name } });
   });
 
   const asyncRender = async (element) => {
     let wrapper;
+
     await act(async () => { wrapper = render(element); });
+
     if (!wrapper) {
       throw new Error('Render returned `null`.');
     }
+
     return wrapper;
   };
 
   it('renders value passed to it', async () => {
     const { getByDisplayValue } = await asyncRender(<KeywordTimeRangeSelector value="Last hour" />);
+
     expect(getByDisplayValue('Last hour')).not.toBeNull();
   });
 
@@ -139,5 +145,16 @@ describe('KeywordTimeRangeSelector', () => {
     await changeInput(input, 'invalid');
 
     expect(queryByText('Preview:')).toBeNull();
+  });
+
+  it('shows error message if parsing fails after changing input', async () => {
+    const { getByDisplayValue, queryByText } = await asyncRender(<KeywordTimeRangeSelector value="last week" />);
+
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
+    const input = getByDisplayValue('last week');
+
+    await changeInput(input, 'invalid');
+
+    expect(queryByText('Unable to parse keyword.')).not.toBeNull();
   });
 });

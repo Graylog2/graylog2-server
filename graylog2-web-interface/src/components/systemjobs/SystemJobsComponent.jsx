@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'components/graylog';
 
+import { Col, Row } from 'components/graylog';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
-
 import { Spinner } from 'components/common';
 import { SystemJobsList } from 'components/systemjobs';
 
@@ -23,9 +22,11 @@ const SystemJobsComponent = ({ jobs }) => {
   if (!jobs) {
     return <Spinner />;
   }
+
   const jobList = Object.keys(jobs)
     .map((nodeId) => (jobs[nodeId] ? jobs[nodeId].jobs : []))
     .reduce((a, b) => a.concat(b), []);
+
   return (
     <Row className="content">
       <Col md={12}>

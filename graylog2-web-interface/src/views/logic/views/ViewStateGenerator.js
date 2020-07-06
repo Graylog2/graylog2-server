@@ -2,11 +2,13 @@
 import * as Immutable from 'immutable';
 
 import CombinedProvider from 'injection/CombinedProvider';
-import WidgetPosition from '../widgets/WidgetPosition';
+
 import View from './View';
 import ViewState from './ViewState';
-import { resultHistogram, allMessagesTable } from '../Widgets';
 import type { ViewType } from './View';
+
+import { resultHistogram, allMessagesTable } from '../Widgets';
+import WidgetPosition from '../widgets/WidgetPosition';
 import Widget from '../widgets/Widget';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
@@ -54,6 +56,7 @@ const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
 
 export default async (type: ViewType, streamId: ?string) => {
   const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
+
   return ViewState.create()
     .toBuilder()
     .titles(titles)

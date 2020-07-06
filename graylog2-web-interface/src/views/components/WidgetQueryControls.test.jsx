@@ -2,12 +2,14 @@
 import * as React from 'react';
 import { asElement, render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+import WrappingContainer from 'WrappingContainer';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
-import WrappingContainer from 'WrappingContainer';
+
 import WidgetQueryControls from './WidgetQueryControls';
+
 import { WidgetActions } from '../stores/WidgetStore';
 
 jest.mock('views/stores/WidgetStore', () => ({
@@ -15,18 +17,22 @@ jest.mock('views/stores/WidgetStore', () => ({
     update: jest.fn(),
   },
 }));
+
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideActions: {
     reset: jest.fn(() => Promise.resolve()),
   },
 }));
+
 jest.mock('views/actions/SearchActions', () => ({
   refresh: jest.fn(() => Promise.resolve()),
 }));
+
 jest.mock('stores/connect', () => (x) => x);
 
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
+
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
@@ -34,6 +40,7 @@ jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Input
 
 describe('WidgetQueryControls', () => {
   beforeEach(() => { jest.clearAllMocks(); });
+
   afterEach(cleanup);
 
   const config = {
@@ -59,40 +66,49 @@ describe('WidgetQueryControls', () => {
                            {...props} />
     </WrappingContainer>,
   );
+
   it('should do something', () => {
     const { container } = renderSUT();
+
     expect(container).toMatchSnapshot();
   });
 
   describe('displays if global override is set', () => {
     const indicatorText = 'These controls are disabled, because a filter is applied to all widgets.';
+
     it('shows an indicator if global override is set', async () => {
       const { getByText, getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+
       await waitForElement(() => getByText(indicatorText));
       await waitForElement(() => getByTestId('reset-filter'));
     });
 
     it('does not show an indicator if global override is not set', async () => {
       const { queryByText } = renderSUT({ globalOverride: emptyGlobalOverride });
+
       expect(queryByText(indicatorText)).toBeNull();
     });
 
     it('triggers resetting the global override store when reset filter button is clicked', async () => {
       const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
       const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
+
       fireEvent.click(resetFilterButton);
+
       expect(GlobalOverrideActions.reset).toHaveBeenCalled();
     });
 
     it('executes search when reset filter button is clicked', async () => {
       const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
       const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
+
       fireEvent.click(resetFilterButton);
       await wait(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notification', async () => {
       const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
+
       await waitForElement(() => getByText(indicatorText));
 
       rerender(
@@ -107,6 +123,7 @@ describe('WidgetQueryControls', () => {
     it('disables timerange controls when global override is present', () => {
       const { getByDisplayValue } = renderSUT({ globalOverride: globalOverrideWithQuery });
       const timeRangeSelect = getByDisplayValue('Search in last day');
+
       expect(timeRangeSelect).toBeDisabled();
     });
   });
@@ -114,6 +131,7 @@ describe('WidgetQueryControls', () => {
   it('changes the widget\'s timerange when time range input is used', async () => {
     const { getByDisplayValue, getByText, getByTitle } = renderSUT();
     const timeRangeSelect = getByDisplayValue('Search in last day');
+
     expect(timeRangeSelect).not.toBeNull();
 
     const optionForAllMessages = asElement(getByText('Search in all messages'), HTMLOptionElement);
@@ -121,6 +139,7 @@ describe('WidgetQueryControls', () => {
     fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
 
     const searchButton = getByTitle(/Perform search/);
+
     fireEvent.click(searchButton);
 
     await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
@@ -131,11 +150,13 @@ describe('WidgetQueryControls', () => {
   it('changes the widget\'s timerange type when switching to absolute time range', async () => {
     const { getByText, getByTitle } = renderSUT();
     const absoluteTimeRangeSelect = getByText('Absolute');
+
     expect(absoluteTimeRangeSelect).not.toBeNull();
 
     fireEvent.click(absoluteTimeRangeSelect);
 
     const searchButton = getByTitle(/Perform search/);
+
     fireEvent.click(searchButton);
 
     await wait(() => expect(WidgetActions.update)
@@ -156,6 +177,7 @@ describe('WidgetQueryControls', () => {
       ],
     });
     const streamFilter = container.querySelector('div[data-testid="streams-filter"] > div');
+
     expect(streamFilter).not.toBeNull();
 
     // Flow is not parsing the jest assertion before
@@ -164,6 +186,7 @@ describe('WidgetQueryControls', () => {
     }
 
     const searchButton = getByTitle(/Perform search/);
+
     fireEvent.click(searchButton);
 
     await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({

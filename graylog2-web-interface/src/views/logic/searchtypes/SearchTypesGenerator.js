@@ -1,6 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
+
 import Widget from 'views/logic/widgets/Widget';
 
 import { widgetDefinition } from '../Widgets';
@@ -33,12 +34,15 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
     .map((searchType) => {
       widgetMapping = widgetMapping.update(searchType.widgetId, new Immutable.Set(), (widgetSearchTypes) => widgetSearchTypes.add(searchType.id));
       const typeDefinition = searchTypeDefinition(searchType.type);
+
       if (!typeDefinition || !typeDefinition.defaults) {
         // eslint-disable-next-line no-console
         console.warn(`Unable to find type definition or defaults for search type ${searchType.type} - skipping!`);
       }
+
       const { defaults = {} } = typeDefinition || {};
       const { config, widgetId, ...rest } = searchType;
+
       return Immutable.Map(defaults)
         .merge(rest)
         .merge(config)

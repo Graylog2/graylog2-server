@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
-
 import { Icon } from 'components/common';
 import { Button } from 'components/graylog';
 import ErrorPage from 'components/errors/ErrorPage';
@@ -25,6 +24,7 @@ class RuntimeErrorPage extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       showDetails: AppConfig.gl2DevMode(),
     };

@@ -2,18 +2,15 @@
 import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
-
 import { ViewActions } from 'views/stores/ViewStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import View from 'views/logic/views/View';
 import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
-
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
 
@@ -52,10 +49,12 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
         if (e instanceof Error) {
           throw e;
         }
+
         setHookComponent(e);
       },
     ).then((view) => {
       setLoaded(true);
+
       return view;
     }).then(() => {
       SearchActions.executeWithCurrentState();
@@ -82,6 +81,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
     return loadNewView({}).then(() => {
       const { pathname, search } = router.getCurrentLocation();
       const currentQuery = `${pathname}${search}`;
+
       // running syncWithQueryParameters with the "old" query, will replace the url query with the new view settings
       syncWithQueryParameters(currentQuery);
     });
@@ -102,6 +102,7 @@ const StreamSearchPage = ({ params: { streamId }, route, router, loadingViewHook
       </ViewLoaderContext.Provider>
     );
   }
+
   return <Spinner />;
 };
 

@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import lodash from 'lodash';
+
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
@@ -44,12 +45,14 @@ const SidecarsAdministrationStore = Reflux.createStore({
         this.sidecars = response.sidecars;
         this.query = response.query;
         this.filters = response.filters;
+
         this.pagination = {
           total: response.pagination.total,
           count: response.pagination.count,
           page: response.pagination.page,
           pageSize: response.pagination.per_page,
         };
+
         this.propagateChanges();
 
         return response;
@@ -83,6 +86,7 @@ const SidecarsAdministrationStore = Reflux.createStore({
     promise.then(
       (response) => {
         UserNotification.success('', `${lodash.upperFirst(action)} for ${formattedCollectors.length} collectors requested`);
+
         return response;
       },
       (error) => {

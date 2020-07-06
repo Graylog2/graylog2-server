@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 import uuid from 'uuid/v4';
 
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+
 import { singleton } from '../singleton';
 
 export type WidgetState = {
@@ -60,6 +61,7 @@ class Widget {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { id, type, config, filter, timerange, query, streams } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Map({ id, type, config, filter, timerange, query, streams }));
   }
@@ -106,6 +108,7 @@ class Builder {
 
   id(value: string) {
     this.value = this.value.set('id', value);
+
     return this;
   }
 
@@ -115,36 +118,43 @@ class Builder {
 
   type(value: string) {
     this.value = this.value.set('type', value);
+
     return this;
   }
 
   config(value: any) {
     this.value = this.value.set('config', value);
+
     return this;
   }
 
   filter(value: string) {
     this.value = this.value.set('filter', value);
+
     return this;
   }
 
   timerange(value: TimeRange) {
     this.value = this.value.set('timerange', value);
+
     return this;
   }
 
   query(value: QueryString) {
     this.value = this.value.set('query', value);
+
     return this;
   }
 
   streams(value: Array<string>) {
     this.value = this.value.set('streams', value);
+
     return this;
   }
 
   build(): Widget {
     const { id, type, config, filter, timerange, query, streams } = this.value.toObject();
+
     return new Widget(id, type, config, filter, timerange, query, streams);
   }
 }

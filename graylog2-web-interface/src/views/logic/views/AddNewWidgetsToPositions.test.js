@@ -1,15 +1,17 @@
 // @flow strict
 import * as Immutable from 'immutable';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+
 import AddNewWidgetsToPositions from './AddNewWidgetsToPositions';
 
 describe('AddNewWidgetsToPositions', () => {
   PluginStore.exports = () => {
     return [{ type: 'MESSAGES', defaultHeight: 5, defaultWidth: 6 }];
   };
+
   it('should add a new widget to the first row and column', () => {
     const newMessageList = Widget.builder().id('foo-1').type('MESSAGES').build();
     const widgets = [newMessageList];

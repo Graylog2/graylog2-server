@@ -1,5 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
+
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export type MessageListOptions = {
@@ -49,6 +50,7 @@ export default class GlobalOverride {
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
     const { timerange, query, keepSearchTypes, searchTypes } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ timerange, query, keepSearchTypes, searchTypes }));
   }
@@ -75,6 +77,7 @@ export default class GlobalOverride {
   static fromJSON(value: JsonRepresentation): GlobalOverride {
     // eslint-disable-next-line camelcase
     const { timerange, query, keep_search_types, search_types } = value;
+
     return GlobalOverride.create(timerange, query, keep_search_types, search_types);
   }
 }
@@ -106,6 +109,7 @@ class Builder {
 
   build(): GlobalOverride {
     const { timerange, query, keepSearchTypes, searchTypes } = this.value.toObject();
+
     return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes);
   }
 }

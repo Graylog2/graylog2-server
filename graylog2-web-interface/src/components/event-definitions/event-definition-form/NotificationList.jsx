@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button } from 'components/graylog';
 import { DataTable } from 'components/common';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 class NotificationList extends React.Component {
   static propTypes = {
@@ -17,12 +17,14 @@ class NotificationList extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   handleRemoveClick = (notificationId) => {
     return () => {
       const { onRemoveNotificationClick } = this.props;
+
       onRemoveNotificationClick(notificationId);
     };
   };
@@ -41,6 +43,7 @@ class NotificationList extends React.Component {
         </tr>
       );
     }
+
     const plugin = this.getNotificationPlugin(notification.config.type);
 
     return (
@@ -82,6 +85,7 @@ class NotificationList extends React.Component {
         </>
       );
     }
+
     return (
       <>
         <DataTable id="event-definition-notifications"

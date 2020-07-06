@@ -13,6 +13,7 @@ import { singletonStore } from 'views/logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
+
 import type { QueriesList } from '../actions/QueriesActions';
 
 export { QueriesActions } from 'views/actions/QueriesActions';
@@ -38,10 +39,13 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
     onViewStoreChange(state) {
       const { view } = state;
+
       if (!view || !view.search) {
         return;
       }
+
       const { search } = view;
+
       this.search = search;
 
       const { queries } = search;
@@ -57,14 +61,18 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const newQuery = this.queries.get(queryId).toBuilder().newId().build();
       const promise: Promise<QueriesList> = ViewStatesActions.duplicate(queryId)
         .then((newViewState) => QueriesActions.create(newQuery, newViewState));
+
       QueriesActions.duplicate.promise(promise);
+
       return promise;
     },
 
     remove(queryId: QueryId) {
       const newQueries = this.queries.remove(queryId);
       const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+
       QueriesActions.remove.promise(promise);
+
       return promise;
     },
     update(queryId: QueryId, query: Query) {
@@ -72,7 +80,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const promise: Promise<QueriesList> = this.queries.get(queryId).equals(query)
         ? Promise.resolve(this.queries)
         : this._propagateQueryChange(newQueries).then(() => newQueries);
+
       QueriesActions.update.promise(promise);
+
       return promise;
     },
 
@@ -81,7 +91,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const newQuery = activeQuery.toBuilder().query({ ...activeQuery.query, query_string: query }).build();
       const newQueries = this.queries.set(queryId, newQuery);
       const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+
       QueriesActions.query.promise(promise);
+
       return promise;
     },
     timerange(queryId: QueryId, timerange: TimeRange) {
@@ -90,7 +102,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const promise: Promise<QueriesList> = query.timerange === timerange
         ? Promise.resolve(this.queries)
         : this._propagateQueryChange(newQueries).then(() => newQueries);
+
       QueriesActions.timerange.promise(promise);
+
       return promise;
     },
     rangeParams(queryId: QueryId, key: string, value: string | number) {
@@ -99,7 +113,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const newTimerange = { ...oldTimerange, [key]: value };
 
       const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimerange);
+
       QueriesActions.rangeParams.promise(promise);
+
       return promise;
     },
     rangeType(queryId: QueryId, type: TimeRangeTypes) {
@@ -110,6 +126,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
         if (type === oldType) {
           resolve(this.queries);
+
           return;
         }
 
@@ -123,24 +140,30 @@ export const QueriesStore: QueriesStoreType = singletonStore(
               from: moment().subtract(oldTimerange.range, 'seconds').toISOString(),
               to: moment().toISOString(),
             };
+
             break;
           case 'relative':
             newTimerange = {
               type,
               range: 300,
             };
+
             break;
           case 'keyword':
             newTimerange = {
               type,
               keyword: 'Last five Minutes',
             };
+
             break;
           default: throw new Error(`Invalid time range type: ${type}`);
         }
+
         resolve(QueriesActions.timerange(queryId, newTimerange));
       });
+
       QueriesActions.rangeType.promise(promise);
+
       return promise;
     },
 
@@ -148,6 +171,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const newSearch = this.search.toBuilder()
         .queries(newQueries.valueSeq().toList())
         .build();
+
       return ViewActions.search(newSearch);
     },
 

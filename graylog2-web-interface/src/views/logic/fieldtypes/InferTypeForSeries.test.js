@@ -4,9 +4,10 @@
 import each from 'jest-each';
 
 import inferTypeForSeries from './InferTypeForSeries';
-import Series from '../aggregationbuilder/Series';
 import FieldTypeMapping from './FieldTypeMapping';
 import FieldType, { FieldTypes } from './FieldType';
+
+import Series from '../aggregationbuilder/Series';
 
 describe('InferTypeForSeries', () => {
   each`
@@ -18,6 +19,7 @@ describe('InferTypeForSeries', () => {
     ${'sumofsquares'} | ${FieldTypes.FLOAT()}
   `.test('returns expected type for constant type function "$func(field)"', ({ func, expectedType }) => {
     const functionName = `${func}(foo)`;
+
     expect(inferTypeForSeries(Series.forFunction(functionName), []))
       .toEqual(FieldTypeMapping.create(functionName, expectedType));
   });
@@ -35,6 +37,7 @@ describe('InferTypeForSeries', () => {
     const types = [FieldTypeMapping.create(fieldName, fieldType)];
 
     const functionName = `${func}(${fieldName})`;
+
     expect(inferTypeForSeries(Series.forFunction(functionName), types))
       .toEqual(FieldTypeMapping.create(functionName, fieldType));
   });

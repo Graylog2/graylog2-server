@@ -2,12 +2,14 @@
 import * as React from 'react';
 import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
-
 import { StoreMock as MockStore } from 'helpers/mocking';
+
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+
 import DashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/ViewActionsMenu', () => () => <span>View Actions</span>);
+
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideActions: {
     set: jest.fn(() => Promise.resolve()),
@@ -27,19 +29,23 @@ describe('DashboardSearchBar', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
   afterEach(cleanup);
 
   const onExecute = jest.fn();
 
   it('defaults to no override being selected', () => {
     const { container, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
     expect(container).not.toBeNull();
     expect(getByTitle('There is no override for the timerange currently selected')).toBeVisible();
   });
 
   it('allows selecting relative time range', async () => {
     const { getByText, queryByText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
     expect(queryByText('Search in last five minutes')).toBeNull();
+
     const relativeTimerange = getByText('Relative');
 
     fireEvent.click(relativeTimerange);
@@ -49,13 +55,17 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     expect(getByText('Search in last five minutes')).toBeVisible();
+
     await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', range: 300 }, ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 
   it('allows selecting absolute time range', async () => {
     const { getByText, getAllByPlaceholderText, queryByPlaceholderText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
     expect(queryByPlaceholderText('YYYY-MM-DD HH:mm:ss')).toBeNull();
+
     const absoluteTimerange = getByText('Absolute');
 
     fireEvent.click(absoluteTimerange);
@@ -71,12 +81,15 @@ describe('DashboardSearchBar', () => {
       from: expect.anything(),
       to: expect.anything(),
     }), ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 
   it('allows selecting keyword time range', async () => {
     const { getByText, getByPlaceholderText, queryByPlaceholderText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
+
     expect(queryByPlaceholderText('Last week')).toBeNull();
+
     const keywordTimerange = getByText('Keyword');
 
     await act(async () => {
@@ -90,15 +103,18 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'keyword', keyword: 'Last five minutes' }, ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 
   it('allows resetting the timerange override', async () => {
     const { getByText, getByTitle } = render(<DashboardSearchBar onExecute={onExecute} config={config} />);
     const relativeTimerange = getByText('Relative');
+
     fireEvent.click(relativeTimerange);
 
     const disableOverride = getByText('No Override');
+
     fireEvent.click(disableOverride);
 
     const searchButton = getByTitle(/Perform search/);
@@ -106,6 +122,7 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 });

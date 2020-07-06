@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
-import CustomPropTypes from '../CustomPropTypes';
+import { Popover } from 'components/graylog';
 
 import styles from './ConfigurableElement.css';
+
+import CustomPropTypes from '../CustomPropTypes';
 
 export default class ConfigurableElement extends React.Component {
   static propTypes = {
@@ -18,6 +19,7 @@ export default class ConfigurableElement extends React.Component {
 
   constructor(props, context) {
     super(props, context);
+
     this.state = {
       isOpen: false,
     };
@@ -50,6 +52,7 @@ export default class ConfigurableElement extends React.Component {
         </Position>
       </Portal>
     );
+
     return (
       <span onMouseDown={this._stopEvent} onKeyDown={this._stopEvent}>
         <span ref={(elem) => { this.target = elem; }} onClick={this._onClick} className={styles.labelAsLink}>

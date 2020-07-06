@@ -8,13 +8,17 @@ class AppGlobalNotifications extends React.Component {
         if (!notification.component) {
           // eslint-disable-next-line no-console
           console.error('Missing "component" for globalNotification plugin:', notification);
+
           return null;
         }
+
         const Component = notification.component;
+
         if (!notification.key) {
           // eslint-disable-next-line no-console
           console.warn('Missing "key" for globalNotification plugin:', notification);
         }
+
         return <Component key={notification.key} />;
       })
       .filter((component) => !!component);

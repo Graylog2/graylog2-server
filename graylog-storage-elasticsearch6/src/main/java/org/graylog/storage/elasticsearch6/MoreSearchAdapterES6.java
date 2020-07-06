@@ -4,14 +4,14 @@ import com.google.common.base.Stopwatch;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.common.xcontent.ToXContent;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
@@ -35,10 +35,10 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class MoreSearchAdapterES6 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES6.class);
@@ -64,7 +64,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timerange)));
+                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -116,7 +116,7 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
 
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
-                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(timeRange)));
+                .filter(requireNonNull(TimeRangeQueryFactory.create(timeRange)));
 
         // Filtering with an empty streams list doesn't work and would return zero results
         if (!streams.isEmpty()) {

@@ -2,10 +2,11 @@
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
 import View from './View';
 import ViewDeserializer from './ViewDeserializer';
+
+import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
 const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
   return hooks.reduce((prev, cur: ViewHook) => prev.then(() => cur(args)), Promise.resolve());
@@ -17,12 +18,15 @@ type OnError = () => void;
 
 const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess) => {
   let promise;
+
   if (viewHooks.length > 0) {
     const retry = () => _processViewHooks(viewHooks, view, query, onSuccess);
+
     promise = _chainHooks(viewHooks, { view, retry, query });
   } else {
     promise = Promise.resolve(true);
   }
+
   return promise.then(() => view).then(onSuccess).then(() => view);
 };
 
@@ -55,6 +59,7 @@ const ViewLoader = (viewId: string,
       } else {
         throw error;
       }
+
       return View.create();
     });
 

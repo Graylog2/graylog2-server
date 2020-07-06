@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { TimeUnit } from 'components/common';
 
 class MaxmindAdapterSummary extends React.Component {
@@ -14,6 +15,7 @@ class MaxmindAdapterSummary extends React.Component {
       MAXMIND_CITY: 'City database',
       MAXMIND_COUNTRY: 'Country database',
     };
+
     return (
       <dl>
         <dt>Database file path</dt>

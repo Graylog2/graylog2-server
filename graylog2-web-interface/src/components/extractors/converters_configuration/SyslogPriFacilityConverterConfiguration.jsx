@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
 
+import { Input } from 'components/bootstrap';
 import FormUtils from 'util/FormsUtils';
 
 class SyslogPriFacilityConverterConfiguration extends React.Component {
@@ -21,6 +21,7 @@ class SyslogPriFacilityConverterConfiguration extends React.Component {
 
   _toggleConverter = (event) => {
     let converter;
+
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }

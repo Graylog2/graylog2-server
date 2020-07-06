@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 
@@ -33,6 +32,7 @@ class LegacyNotificationSummaryContainer extends React.Component {
     if (!allLegacyTypes) {
       return <p><Spinner text="Loading legacy notification information..." /></p>;
     }
+
     return <LegacyNotificationSummary {...this.props} legacyTypes={allLegacyTypes} />;
   }
 }

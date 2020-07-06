@@ -1,8 +1,8 @@
 // @flow strict
 import React, { useCallback, useState } from 'react';
 import URI from 'urijs';
-import history from 'util/History';
 
+import history from 'util/History';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
@@ -112,6 +112,7 @@ const createQueryFromConfiguration = (
     refresh: Number(refreshInterval).toString(),
   };
   const allQueryIndices = view.search.queries.toIndexedSeq().map((_, v) => v).toJS();
+
   return !queryTabs || allQueryIndices.join(',') === queryTabs.join(',')
     ? basicConfiguration
     : { ...basicConfiguration, tabs: queryTabs.join(',') };

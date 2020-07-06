@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 import { Link } from 'react-router';
 
+import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/graylog';
 import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -64,6 +63,7 @@ class ProcessorSimulator extends React.Component {
 
   _onStreamSelect = (selectedStream) => {
     const stream = this.props.streams.find((s) => s.id.toLowerCase() === selectedStream.toLowerCase());
+
     this.setState({ stream: stream });
   };
 

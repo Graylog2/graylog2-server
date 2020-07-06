@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 import mockAction from 'helpers/mocking/MockAction';
 
+import { DashboardsActions } from 'views/stores/DashboardsStore';
 import View from 'views/logic/views/View';
+
 import CopyToDashboardForm from './CopyToDashboardForm';
 
 describe('CopyToDashboardForm', () => {
@@ -27,6 +28,7 @@ describe('CopyToDashboardForm', () => {
 
   it('should render the modal minimal', () => {
     const { baseElement } = render(<CopyToDashboardForm />);
+
     expect(baseElement).toMatchSnapshot();
   });
 
@@ -35,6 +37,7 @@ describe('CopyToDashboardForm', () => {
                                                         widgetId="widget-id"
                                                         onCancel={() => {}}
                                                         onSubmit={() => {}} />);
+
     expect(baseElement).toMatchSnapshot();
   });
 
@@ -45,7 +48,9 @@ describe('CopyToDashboardForm', () => {
                                                       onCancel={onCancel}
                                                       onSubmit={() => {}} />);
     const cancelButton = getByText('Cancel');
+
     fireEvent.click(cancelButton);
+
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -56,7 +61,9 @@ describe('CopyToDashboardForm', () => {
                                                       onCancel={() => {}}
                                                       onSubmit={onSubmit} />);
     const submitButton = getByText('Select');
+
     fireEvent.click(submitButton);
+
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
@@ -67,9 +74,12 @@ describe('CopyToDashboardForm', () => {
                                                       onCancel={() => {}}
                                                       onSubmit={onSubmit} />);
     const firstView = getByText('view 1');
+
     fireEvent.click(firstView);
     const submitButton = getByText('Select');
+
     fireEvent.click(submitButton);
+
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith('widget-id', 'view-1');
   });
@@ -82,12 +92,16 @@ describe('CopyToDashboardForm', () => {
                            onCancel={() => {}}
                            onSubmit={() => {}} />,
     );
+
     expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
+
     const searchInput = getByPlaceholderText('Enter search query...');
+
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
     const searchButton = getByText('Search');
 
     fireEvent.click(searchButton);
+
     expect(DashboardsActions.search).toHaveBeenCalledWith('view 1', 1, 5);
   });
 });

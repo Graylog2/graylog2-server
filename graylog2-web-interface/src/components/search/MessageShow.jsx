@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'components/graylog';
 import Immutable from 'immutable';
+
+import { Col, Row } from 'components/graylog';
 import StringUtils from 'util/StringUtils';
+
 import MessageDetail from './MessageDetail';
 
 class MessageShow extends React.Component {
@@ -38,12 +40,14 @@ class MessageShow extends React.Component {
   renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.
     const { message } = this.props;
+
     return StringUtils.stringify(message.fields[fieldName]);
   };
 
   render() {
     const { inputs, message } = this.props;
     const { streams, nodes } = this.state;
+
     return (
       <Row className="content">
         <Col md={12}>

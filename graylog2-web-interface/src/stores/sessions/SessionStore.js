@@ -4,7 +4,6 @@ import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const SessionActions = ActionsProvider.getActions('Session');
@@ -49,6 +48,7 @@ const SessionStore = Reflux.createStore({
   validate() {
     const sessionId = Store.get('sessionId');
     const username = Store.get('username');
+
     this.validatingSession = true;
     this._propagateState();
     const promise = this._validateSession(sessionId)
@@ -59,6 +59,7 @@ const SessionStore = Reflux.createStore({
             username: username || response.username,
           });
         }
+
         if (sessionId && username) {
           this._removeSession();
         }

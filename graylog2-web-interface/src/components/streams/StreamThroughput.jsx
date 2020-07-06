@@ -4,9 +4,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { Spinner } from 'components/common';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -37,6 +35,7 @@ const StreamThroughput = createReactClass({
     return Object.keys(this.state.metrics)
       .map((nodeId) => {
         const metricDefinition = this.state.metrics[nodeId][this._metricName()];
+
         return metricDefinition !== undefined ? metricDefinition.metric.value : 0;
       })
       .reduce((throughput1, throughput2) => throughput1 + throughput2, 0);
@@ -46,6 +45,7 @@ const StreamThroughput = createReactClass({
     if (!this.state.metrics) {
       return <Spinner />;
     }
+
     return (
       <span>{this._calculateThroughput()} messages/second</span>
     );

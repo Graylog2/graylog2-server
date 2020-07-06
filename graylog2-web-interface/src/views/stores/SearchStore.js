@@ -5,7 +5,6 @@ import { debounce, get, isEqual } from 'lodash';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchJobActions } from 'views/stores/SearchJobStore';
@@ -64,6 +63,7 @@ export const SearchStore = singletonStore(
     onViewStoreUpdate({ view }: { view: View }) {
       this.view = view;
       const search = get(view, 'search');
+
       if (!isEqual(this.search, search)) {
         this.search = search;
         this.onUpdate(search);
@@ -76,6 +76,7 @@ export const SearchStore = singletonStore(
 
     onUpdate(search) {
       const { queries } = search;
+
       if (queries && queries.size > 0) {
         this._debouncedParse(this.search);
       }
@@ -86,15 +87,20 @@ export const SearchStore = singletonStore(
       const promise = fetch('POST', createSearchUrl, JSON.stringify(newSearch))
         .then((response) => {
           const search = Search.fromJSON(response);
+
           return { search: search };
         });
+
       SearchActions.create.promise(promise);
+
       return promise;
     },
 
     get(searchId: SearchId): Promise<Search> {
       const promise = fetch('GET', `${searchUrl}/${searchId}`);
+
       SearchActions.get.promise(promise);
+
       return promise;
     },
 
@@ -103,6 +109,7 @@ export const SearchStore = singletonStore(
         if (job && job.execution.done) {
           return resolve(new SearchResult(job));
         }
+
         return resolve(Bluebird.delay(250)
           .then(() => SearchJobActions.jobStatus(job.id))
           .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
@@ -116,6 +123,7 @@ export const SearchStore = singletonStore(
     execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
       const handleSearchResult = (searchResult: SearchResult) => searchResult;
       const startActionPromise = (executePromise) => SearchActions.execute.promise(executePromise);
+
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
@@ -132,25 +140,33 @@ export const SearchStore = singletonStore(
       );
 
       const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
+
       const handleSearchResult = (searchResult: SearchResult): SearchResult => {
         const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
         const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);
+
         return updatedResult;
       };
+
       const startActionPromise = (executePromise) => SearchActions.reexecuteSearchTypes.promise(executePromise);
+
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
     executeWithCurrentState(): Promise<SearchExecutionResult> {
       const promise = SearchActions.execute(this.executionState);
+
       SearchActions.executeWithCurrentState.promise(promise);
+
       return promise;
     },
 
     parameters(newParameters: Array<Parameter>): Promise<View> {
       const newSearch = this.search.toBuilder().parameters(newParameters).build();
       const promise = ViewActions.search(newSearch);
+
       SearchActions.parameters.promise(promise);
+
       return promise;
     },
 
@@ -158,19 +174,25 @@ export const SearchStore = singletonStore(
       if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
       }
+
       if (this.search) {
         const { widgetMapping, search } = this.view;
+
         this.executePromise = this.trackJob(search, executionState)
           .then((result: SearchResult) => {
             this.result = handleSearchResult(result);
             this.widgetMapping = widgetMapping;
             this._trigger();
             this.executePromise = undefined;
+
             return { result, widgetMapping };
           }, displayError);
+
         startActionPromise(this.executePromise);
+
         return this.executePromise;
       }
+
       throw new Error('Unable to execute search when no search is loaded!');
     },
 

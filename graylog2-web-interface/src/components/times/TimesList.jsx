@@ -1,12 +1,11 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Row } from 'components/graylog';
 import moment from 'moment';
+
+import { Col, Row } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { Spinner, Timestamp } from 'components/common';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -32,10 +31,12 @@ const TimesList = createReactClass({
     if (!this.state.system) {
       return <Spinner />;
     }
+
     const { time } = this.state;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const { currentUser } = this.state;
     const serverTimezone = this.state.system.timezone;
+
     return (
       <Row className="content">
         <Col md={12}>

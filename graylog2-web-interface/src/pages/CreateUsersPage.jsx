@@ -1,12 +1,10 @@
 import React from 'react';
+
 import { Row, Col } from 'components/graylog';
 import Routes from 'routing/Routes';
-
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import NewUserForm from 'components/users/NewUserForm';
 
@@ -26,8 +24,10 @@ class CreateUsersPage extends React.Component {
 
   _onSubmit = (r) => {
     const request = r;
+
     request.permissions = [];
     delete request['session-timeout-never'];
+
     UsersStore.create(request).then(() => {
       UserNotification.success(`User ${request.username} was created successfully.`, 'Success!');
       history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
@@ -46,6 +46,7 @@ class CreateUsersPage extends React.Component {
     if (!roles) {
       return <Spinner />;
     }
+
     return (
       <DocumentTitle title="Create new user">
         <span>

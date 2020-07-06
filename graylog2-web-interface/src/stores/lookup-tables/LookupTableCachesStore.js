@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LookupTableCachesActions = ActionsProvider.getActions('LookupTableCaches');
@@ -42,17 +41,21 @@ const LookupTableCachesStore = Reflux.createStore({
 
   reloadPage() {
     const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
+
     LookupTableCachesActions.reloadPage.promise(promise);
+
     return promise;
   },
 
   searchPaginated(page, perPage, query) {
     let url;
+
     if (query) {
       url = this._url(`caches?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}`);
     } else {
       url = this._url(`caches?page=${page}&per_page=${perPage}`);
     }
+
     const promise = fetch('GET', url);
 
     promise.then((response) => {
@@ -63,11 +66,13 @@ const LookupTableCachesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
+
       this.caches = response.caches;
       this.propagateChanges();
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
 
     LookupTableCachesActions.searchPaginated.promise(promise);
+
     return promise;
   },
 
@@ -81,6 +86,7 @@ const LookupTableCachesStore = Reflux.createStore({
     }, this._errorHandler(`Fetching lookup table cache ${idOrName} failed`, 'Could not retrieve lookup table cache'));
 
     LookupTableCachesActions.get.promise(promise);
+
     return promise;
   },
 
@@ -94,6 +100,7 @@ const LookupTableCachesStore = Reflux.createStore({
     }, this._errorHandler('Creating lookup table cache failed', `Could not create lookup table cache "${cache.name}"`));
 
     LookupTableCachesActions.create.promise(promise);
+
     return promise;
   },
 
@@ -107,6 +114,7 @@ const LookupTableCachesStore = Reflux.createStore({
     }, this._errorHandler('Updating lookup table cache failed', `Could not update lookup table cache "${cache.name}"`));
 
     LookupTableCachesActions.update.promise(promise);
+
     return promise;
   },
 
@@ -120,6 +128,7 @@ const LookupTableCachesStore = Reflux.createStore({
     }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table cache types'));
 
     LookupTableCachesActions.getTypes.promise(promise);
+
     return promise;
   },
 
@@ -130,6 +139,7 @@ const LookupTableCachesStore = Reflux.createStore({
     promise.catch(this._errorHandler('Deleting lookup table cache failed', `Could not delete lookup table cache "${idOrName}"`));
 
     LookupTableCachesActions.delete.promise(promise);
+
     return promise;
   },
 
@@ -141,19 +151,24 @@ const LookupTableCachesStore = Reflux.createStore({
       this.validationErrors = response.errors;
       this.propagateChanges();
     }, this._errorHandler('Lookup table cache validation failed', `Could not validate lookup table cache "${cache.name}"`));
+
     LookupTableCachesActions.validate.promise(promise);
+
     return promise;
   },
 
   _errorHandler(message, title, cb) {
     return (error) => {
       let errorMessage;
+
       try {
         errorMessage = error.additional.body.message;
       } catch (e) {
         errorMessage = error.message;
       }
+
       UserNotification.error(`${message}: ${errorMessage}`, title);
+
       if (cb) {
         cb(error);
       }

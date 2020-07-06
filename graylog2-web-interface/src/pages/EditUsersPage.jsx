@@ -2,11 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import { Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import UserForm from 'components/users/UserForm';
-
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const UsersStore = StoreProvider.getStore('Users');
@@ -45,6 +43,7 @@ class EditUsersPage extends React.Component {
     // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to reset the start page?')) {
       const { params: { username } } = this.props;
+
       StartpageStore.set(username).then(() => this._loadUser(username));
     }
   };
@@ -58,6 +57,7 @@ class EditUsersPage extends React.Component {
     }
 
     let resetStartpageButton;
+
     if (!user.read_only && user.startpage !== null && Object.keys(user.startpage).length > 0) {
       resetStartpageButton = <Button bsStyle="info" onClick={this._resetStartpage}>Reset custom startpage</Button>;
     }

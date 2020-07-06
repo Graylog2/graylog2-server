@@ -53,6 +53,7 @@ class CopyConfigurationModal extends React.Component {
   _changeName = (event) => {
     const { validateConfiguration } = this.props;
     const name = event.target.value;
+
     this.setState({ name, errorMessage: undefined });
 
     validateConfiguration({ name }).then((validation) => {

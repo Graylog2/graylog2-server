@@ -2,14 +2,16 @@
 import React from 'react';
 import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
+
 import SavedSearchList from './SavedSearchList';
 
 const createViewsResponse = (count = 1) => {
   const views = [];
+
   if (count > 0) {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < count; i++) {
@@ -38,12 +40,14 @@ describe('SavedSearchList', () => {
     afterEach(() => {
       cleanup();
     });
+
     it('should render empty', () => {
       const views = createViewsResponse(0);
       const { baseElement } = render(<SavedSearchList toggleModal={() => {}}
                                                       showModal
                                                       deleteSavedSearch={() => {}}
                                                       views={views} />);
+
       expect(baseElement).toMatchSnapshot();
     });
 
@@ -53,6 +57,7 @@ describe('SavedSearchList', () => {
                                                       showModal
                                                       deleteSavedSearch={() => {}}
                                                       views={views} />);
+
       expect(baseElement).toMatchSnapshot();
     });
 
@@ -66,7 +71,9 @@ describe('SavedSearchList', () => {
                                                     views={views} />);
 
       const cancel = getByText('Cancel');
+
       fireEvent.click(cancel);
+
       expect(onToggleModal).toBeCalledTimes(1);
     });
 
@@ -81,7 +88,9 @@ describe('SavedSearchList', () => {
                                                       deleteSavedSearch={onDelete}
                                                       views={views} />);
       const deleteBtn = getByTestId('delete-foo-bar-0');
+
       fireEvent.click(deleteBtn);
+
       expect(window.confirm).toBeCalledTimes(1);
       expect(onDelete).toBeCalledTimes(1);
     });
@@ -99,16 +108,21 @@ describe('SavedSearchList', () => {
         </ViewLoaderContext.Provider>,
       );
       const listItem = getByText('test-0');
+
       fireEvent.click(listItem);
+
       expect(onLoad).toBeCalledTimes(1);
     });
   });
+
   describe('load new saved search', () => {
     afterEach(() => {
       cleanup();
     });
+
     it('should change url after load', async () => {
       const onLoad = jest.fn(() => Promise.resolve());
+
       Routes.pluginRoute = jest.fn((route) => (id) => `${route}:${id}`);
       browserHistory.push = jest.fn();
       const views = createViewsResponse(1);
@@ -122,7 +136,9 @@ describe('SavedSearchList', () => {
         </ViewLoaderContext.Provider>,
       );
       const listItem = getByText('test-0');
+
       fireEvent.click(listItem);
+
       await wait(() => {
         expect(browserHistory.push).toBeCalledTimes(1);
         expect(browserHistory.push).toHaveBeenCalledWith('SEARCH_VIEWID:foo-bar-0');

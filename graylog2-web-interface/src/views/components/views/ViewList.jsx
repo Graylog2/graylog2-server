@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import { PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
 import IfPermitted from 'components/common/IfPermitted';
+
 import View from './View';
 
 const itemActionsFactory = (view, onViewDelete) => {
@@ -21,6 +22,7 @@ const itemActionsFactory = (view, onViewDelete) => {
 const reducer = (state, action) => {
   const { payload = {} } = action;
   const { newQuery, newPage, newPerPage } = payload;
+
   switch (action.type) {
     case 'search':
       return { ...state, query: newQuery, page: 1 };

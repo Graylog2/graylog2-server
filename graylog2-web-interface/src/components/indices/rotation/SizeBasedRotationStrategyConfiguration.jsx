@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
 
+import { Input } from 'components/bootstrap';
 import NumberUtils from 'util/NumberUtils';
 
 class SizeBasedRotationStrategyConfiguration extends React.Component {
@@ -18,6 +18,7 @@ class SizeBasedRotationStrategyConfiguration extends React.Component {
   _onInputUpdate = (field) => {
     return (e) => {
       const update = {};
+
       update[field] = e.target.value;
 
       this.setState(update);

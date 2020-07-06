@@ -3,12 +3,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import $ from 'jquery';
-import { Input } from 'components/bootstrap';
-// eslint-disable-next-line no-unused-vars
 import Typeahead from 'typeahead.js'; // Need to import this to load typeahead, even if the variable is never used
 
-import UniversalSearch from 'logic/search/UniversalSearch';
+import { Input } from 'components/bootstrap';
+// eslint-disable-next-line no-unused-vars
 
+import UniversalSearch from 'logic/search/UniversalSearch';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -40,6 +40,7 @@ class TypeAheadFieldInput extends React.Component {
   componentDidMount() {
     if (this.fieldInput) {
       const fieldInput = $(this.fieldInput.getInputDOMNode());
+
       fetch('GET', URLUtils.qualifyUrl(ApiRoutes.SystemApiController.fields().url))
         .then(
           (data) => {
@@ -64,10 +65,12 @@ class TypeAheadFieldInput extends React.Component {
         );
 
       const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
+
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
         if (this.props.onChange) {
           this.props.onChange(event);
         }
+
         if (this.props.valueLink) {
           this.props.valueLink.requestChange(event.target.value);
         }
@@ -78,8 +81,10 @@ class TypeAheadFieldInput extends React.Component {
   componentWillUnmount() {
     if (this.fieldInput) {
       const fieldInput = $(this.fieldInput.getInputDOMNode());
+
       fieldInput.typeahead('destroy');
       const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
+
       $(fieldFormGroup).off('typeahead:change typeahead:selected');
     }
   }

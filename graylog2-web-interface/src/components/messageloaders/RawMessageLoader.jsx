@@ -7,9 +7,7 @@ import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const MessagesActions = ActionsProvider.getActions('Messages');
@@ -49,6 +47,7 @@ const RawMessageLoader = createReactClass({
 
   componentDidMount() {
     CodecTypesActions.list();
+
     if (this.props.inputIdSelector) {
       InputsActions.list();
     }
@@ -60,9 +59,11 @@ const RawMessageLoader = createReactClass({
     event.preventDefault();
 
     const { message, remoteAddress, codec, codecConfiguration, inputId } = this.state;
+
     this.setState({ loading: true });
     const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress || this.DEFAULT_REMOTE_ADDRESS,
       codec, codecConfiguration);
+
     promise.then((loadedMessage) => {
       this.props.onMessageLoaded(
         loadedMessage,
@@ -75,11 +76,13 @@ const RawMessageLoader = createReactClass({
         },
       );
     });
+
     promise.finally(() => this.setState({ loading: false }));
   },
 
   _bindValue(event) {
     const newState = {};
+
     newState[event.target.name] = event.target.value;
     this.setState(newState);
   },
@@ -90,6 +93,7 @@ const RawMessageLoader = createReactClass({
     }
 
     const codecTypesIds = Object.keys(this.state.codecTypes);
+
     if (codecTypesIds.length === 0) {
       return [{ value: 'none', label: 'No codecs available' }];
     }
@@ -98,6 +102,7 @@ const RawMessageLoader = createReactClass({
       .filter((id) => id !== 'random-http-msg') // Skip Random HTTP codec, as nobody wants to enter a raw random message.
       .map((id) => {
         const { name } = this.state.codecTypes[id];
+
         // Add id as label on codecs not having a descriptor name
         return { value: id, label: name === '' ? id : name };
       })
@@ -110,6 +115,7 @@ const RawMessageLoader = createReactClass({
     }
 
     const inputIds = Object.keys(this.state.inputs);
+
     if (inputIds.length === 0) {
       return [{ value: 'none', label: 'No inputs available' }];
     }
@@ -118,6 +124,7 @@ const RawMessageLoader = createReactClass({
       .map((id) => {
         const inputId = this.state.inputs[id].id;
         const label = `${inputId} / ${this.state.inputs[id].title} / ${this.state.inputs[id].name}`;
+
         return { value: inputId, label: label };
       })
       .sort((inputA, inputB) => inputA.label.toLowerCase().localeCompare(inputB.label.toLowerCase()));
@@ -134,6 +141,7 @@ const RawMessageLoader = createReactClass({
 
   _onCodecConfigurationChange(field, value) {
     const newConfiguration = Object.assign(this.state.codecConfiguration);
+
     newConfiguration[field] = value;
     this._bindValue({ target: { name: 'codecConfiguration', value: newConfiguration } });
   },
@@ -191,14 +199,17 @@ const RawMessageLoader = createReactClass({
 
   render() {
     let codecConfigurationOptions;
+
     if (this.state.codecTypes && this.state.codec) {
       const codecConfiguration = this.state.codecTypes[this.state.codec].requested_configuration;
+
       codecConfigurationOptions = Object.keys(codecConfiguration)
         .sort((keyA, keyB) => codecConfiguration[keyA].is_optional - codecConfiguration[keyB].is_optional)
         .map((key) => this._formatConfigField(key, codecConfiguration[key]));
     }
 
     let inputIdSelector;
+
     if (this.props.inputIdSelector) {
       inputIdSelector = (
         <Input id="input"

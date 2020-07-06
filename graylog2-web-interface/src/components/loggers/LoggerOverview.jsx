@@ -4,7 +4,6 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import { NodeLoggers } from 'components/loggers';
-
 import StoreProvider from 'injection/StoreProvider';
 
 const LoggersStore = StoreProvider.getStore('Loggers');
@@ -17,6 +16,7 @@ const LoggerOverview = createReactClass({
     if (!this.state.loggers || !this.state.subsystems) {
       return <Spinner />;
     }
+
     const { subsystems } = this.state;
     const nodeLoggers = Object.keys(this.state.loggers)
       .map((nodeId) => (
@@ -24,6 +24,7 @@ const LoggerOverview = createReactClass({
                      nodeId={nodeId}
                      subsystems={subsystems[nodeId] ? subsystems[nodeId].subsystems : {}} />
       ));
+
     return (
       <span>
         {nodeLoggers}

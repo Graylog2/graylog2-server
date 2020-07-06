@@ -6,7 +6,6 @@ import { Input, BootstrapModalForm } from 'components/bootstrap';
 import { TypeAheadFieldInput, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
-
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import FormsUtils from 'util/FormsUtils';
@@ -36,9 +35,11 @@ class StreamRuleForm extends React.Component {
     if (type === this.ALWAYS_MATCH_RULE_TYPE) {
       this.setState({ field: '' });
     }
+
     if (type === this.FIELD_PRESENCE_RULE_TYPE || type === this.ALWAYS_MATCH_RULE_TYPE) {
       this.setState({ value: '' });
     }
+
     onSubmit(streamRule.id, this.state);
     this.modal.close();
   };
@@ -63,6 +64,7 @@ class StreamRuleForm extends React.Component {
 
   handleChange = (event) => {
     const change = {};
+
     change[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState(change);
   };
@@ -76,6 +78,7 @@ class StreamRuleForm extends React.Component {
       ? <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus /> : '');
     const valueBox = (String(type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
       ? <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} /> : '');
+
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
                           title={title}
@@ -104,7 +107,7 @@ class StreamRuleForm extends React.Component {
               The server will try to convert to strings or numbers based on the matcher type as well as it can.
 
               <br /><br />
-              <Icon name={{ prefix: 'fab', iconName: 'github' }} />
+              <Icon name="github" type="brand" />&nbsp;
               <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
                  target="_blank"
                  rel="noopener noreferrer"> Take a look at the matcher code on GitHub
@@ -112,7 +115,7 @@ class StreamRuleForm extends React.Component {
               <br /><br />
               Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                       title="More information"
-                                                                      text={<Icon name="lightbulb-o" />} />
+                                                                      text={<Icon name="lightbulb" type="regular" />} />
             </Well>
           </Col>
         </div>

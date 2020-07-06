@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { DropdownButton, MenuItem } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { DropdownButton, MenuItem } from 'components/graylog';
 import ExtractorUtils from 'util/ExtractorUtils';
 
 class MessageFieldExtractorActions extends React.Component {
@@ -36,6 +37,7 @@ class MessageFieldExtractorActions extends React.Component {
   render() {
     const { fieldName, message } = this.props;
     const messageField = message.fields[fieldName];
+
     if (typeof messageField === 'string') {
       return (
         <div className="message-field-actions pull-right">
@@ -49,6 +51,7 @@ class MessageFieldExtractorActions extends React.Component {
         </div>
       );
     }
+
     return (
       <div className="message-field-actions pull-right">
         <DropdownButton pullRight

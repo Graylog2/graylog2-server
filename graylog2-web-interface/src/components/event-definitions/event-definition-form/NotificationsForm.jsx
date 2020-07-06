@@ -11,8 +11,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
 import NotificationList from './NotificationList';
-
 import styles from './NotificationsForm.css';
+
 import commonStyles from '../common/commonStyles.css';
 
 class NotificationsForm extends React.Component {
@@ -30,15 +30,18 @@ class NotificationsForm extends React.Component {
 
   toggleAddNotificationForm = () => {
     const { showAddNotificationForm } = this.state;
+
     this.setState({ showAddNotificationForm: !showAddNotificationForm });
   };
 
   handleAssignNotification = (nextNotification) => {
     const { onChange, eventDefinition } = this.props;
     const nextNotifications = lodash.cloneDeep(eventDefinition.notifications);
+
     nextNotifications.push({
       notification_id: nextNotification,
     });
+
     onChange('notifications', nextNotifications);
     this.toggleAddNotificationForm();
   };
@@ -47,6 +50,7 @@ class NotificationsForm extends React.Component {
     const { onChange, eventDefinition } = this.props;
     const notification = eventDefinition.notifications.find((n) => n.notification_id === notificationId);
     const nextNotifications = lodash.without(eventDefinition.notifications, notification);
+
     onChange('notifications', nextNotifications);
   };
 
@@ -80,7 +84,7 @@ class NotificationsForm extends React.Component {
         <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
-              <Button bsStyle="link" bsSize="small">Manage Notifications <Icon name="external-link" /></Button>
+              <Button bsStyle="link" bsSize="small">Manage Notifications <Icon name="external-link-alt" /></Button>
             </LinkContainer>
           </span>
           <h2 className={commonStyles.title}>Notifications <small>(optional)</small></h2>

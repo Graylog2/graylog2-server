@@ -2,12 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
-
 import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
-import ContentPackUtils from './ContentPackUtils';
 
+import ContentPackUtils from './ContentPackUtils';
 import ContentPackEntitiesList from './ContentPackEntitiesList';
 
 class ContentPackInstall extends React.Component {
@@ -26,9 +25,12 @@ class ContentPackInstall extends React.Component {
     const parameterInput = props.contentPack.parameters.reduce((result, parameter) => {
       if (parameter.default_value) {
         const newResult = result;
+
         newResult[parameter.name] = ContentPackUtils.convertToString(parameter);
+
         return newResult;
       }
+
       return result;
     }, {});
 
@@ -44,6 +46,7 @@ class ContentPackInstall extends React.Component {
       const contentPackId = this.props.contentPack.id;
       const contentPackRev = this.props.contentPack.rev;
       const parameters = this._convertedParameters();
+
       this.props.onInstall(contentPackId, contentPackRev,
         { parameters: parameters, comment: this.state.comment });
     }
@@ -54,13 +57,16 @@ class ContentPackInstall extends React.Component {
       const newResult = result;
       const paramType = this.props.contentPack.parameters.find((parameter) => parameter.name === paramName).type;
       const value = ContentPackUtils.convertValue(paramType, this.state.parameterInput[paramName]);
+
       newResult[paramName] = ValueRefHelper.createValueRef(paramType, value);
+
       return newResult;
     }, {});
   };
 
   _getValue = (name, value) => {
     const newParameterInput = this.state.parameterInput;
+
     newParameterInput[name] = value;
     this.setState({ parameterInput: newParameterInput });
   };
@@ -75,16 +81,22 @@ class ContentPackInstall extends React.Component {
       if (parameterInput[parameter.name] && parameterInput[parameter.name].length > 0) {
         return result;
       }
+
       const newResult = result;
+
       newResult[parameter.name] = 'Needs to be filled.';
+
       return newResult;
     }, {});
+
     this.setState({ errorMessages: errors });
+
     return Object.keys(errors).length <= 0;
   };
 
   renderParameter(parameter) {
     const error = this.state.errorMessages[parameter.name];
+
     return (
       <Input name={parameter.name}
              id={parameter.name}

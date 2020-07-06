@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ObjectUtils from 'util/ObjectUtils';
 
+import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 
@@ -18,6 +18,7 @@ class CaffeineCacheFieldSet extends React.Component {
 
   _update = (value, unit, enabled, name) => {
     const config = ObjectUtils.clone(this.props.config);
+
     config[name] = enabled ? value : 0;
     config[`${name}_unit`] = unit;
     this.props.updateConfig(config);

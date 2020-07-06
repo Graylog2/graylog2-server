@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Input } from 'components/bootstrap';
 import lodash from 'lodash';
 import $ from 'jquery';
+import Typeahead from 'typeahead.js';
 
 import UniversalSearch from 'logic/search/UniversalSearch';
 // eslint-disable-next-line no-unused-vars
-import Typeahead from 'typeahead.js';
+import { Input } from 'components/bootstrap';
 
 /**
  * Component that renders a field input with auto-completion capabilities.
@@ -106,6 +106,7 @@ class TypeAheadInput extends React.Component {
           if (props.suggestionText) {
             return `<div><strong>${lodash.escape(props.suggestionText)}</strong> ${lodash.escape(value[props.displayKey])}</div>`;
           }
+
           return `<div>${lodash.escape(value[props.displayKey])}</div>`;
         },
       },

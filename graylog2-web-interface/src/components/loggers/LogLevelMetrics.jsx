@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col } from 'components/graylog';
 import lodash from 'lodash';
 import numeral from 'numeral';
 
+import { Col } from 'components/graylog';
 import { Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -37,10 +37,12 @@ const LogLevelMetrics = createReactClass({
     const { loglevel, nodeId } = this.props;
     const { metrics } = this.state;
     let metricsDetails;
+
     if (!metrics || !metrics[nodeId] || !metrics[nodeId][this._metricName()]) {
       metricsDetails = <Spinner />;
     } else {
       const { metric } = metrics[nodeId][this._metricName()];
+
       metricsDetails = (
         <dl className="loglevel-metrics-list">
           <dt>Total written:</dt>
@@ -52,6 +54,7 @@ const LogLevelMetrics = createReactClass({
         </dl>
       );
     }
+
     return (
       <div className="loglevel-metrics-row">
         <Col md={4}>

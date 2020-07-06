@@ -7,12 +7,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { ButtonToolbar, Label, Tooltip, Button } from 'components/graylog';
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
-
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
-
 import CombinedProvider from 'injection/CombinedProvider';
+
 import style from './ShowAlertPage.css';
 
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
@@ -53,6 +52,7 @@ const ShowAlertPage = createReactClass({
     StreamsStore.get(alert.stream_id, (stream) => {
       this.setState({ stream: stream });
     });
+
     AlertConditionsActions.get(alert.stream_id, alert.condition_id, (error) => {
       if (error.additional && error.additional.status === 404) {
         this.setState({ alertCondition: {} });
@@ -80,9 +80,11 @@ const ShowAlertPage = createReactClass({
 
     let statusLabel;
     let resolvedState;
+
     if (!alert.is_interval || alert.resolved_at) {
       statusLabel = <Label bsStyle="success">Resolved</Label>;
       const resolvedAtTime = alert.resolved_at || alert.triggered_at;
+
       if (resolvedAtTime) {
         resolvedState = (
           <span>
@@ -92,6 +94,7 @@ const ShowAlertPage = createReactClass({
       }
     } else {
       statusLabel = <Label bsStyle="danger">Unresolved</Label>;
+
       resolvedState = (
         <span>
           This alert was triggered at{' '}

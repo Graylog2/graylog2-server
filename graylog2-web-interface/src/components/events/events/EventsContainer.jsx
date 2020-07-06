@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { isObject } from 'lodash';
 
 import { Spinner } from 'components/common';
-
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
@@ -35,9 +34,11 @@ class EventsContainer extends React.Component {
     const lastSearch = Store.get(LOCAL_STORAGE_ITEM) || {};
 
     const params = {};
+
     if (streamId) {
       params.query = `source_streams:${streamId}`;
     }
+
     if (lastSearch && isObject(lastSearch)) {
       params.filter = lastSearch.filter;
       params.timerange = lastSearch.timerange;
@@ -49,6 +50,7 @@ class EventsContainer extends React.Component {
 
   fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
     Store.set(LOCAL_STORAGE_ITEM, { filter: filter, timerange: timerange });
+
     return EventsActions.search({
       query: query,
       page: page,
@@ -64,6 +66,7 @@ class EventsContainer extends React.Component {
 
   handlePageChange = (nextPage, nextPageSize) => {
     const { events } = this.props;
+
     this.fetchEvents({
       page: nextPage,
       pageSize: nextPageSize,
@@ -81,12 +84,14 @@ class EventsContainer extends React.Component {
       filter: events.parameters.filter,
       timerange: events.parameters.timerange,
     });
+
     promise.finally(callback);
   };
 
   handleAlertFilterChange = (nextAlertFilter) => {
     return () => {
       const { events } = this.props;
+
       this.fetchEvents({
         query: events.parameters.query,
         pageSize: events.parameters.pageSize,
@@ -98,6 +103,7 @@ class EventsContainer extends React.Component {
 
   handleTimeRangeChange = (timeRangeType, range) => {
     const { events } = this.props;
+
     this.fetchEvents({
       query: events.parameters.query,
       pageSize: events.parameters.pageSize,
@@ -109,6 +115,7 @@ class EventsContainer extends React.Component {
   handleSearchReload = (callback = () => {}) => {
     const { events } = this.props;
     const promise = this.fetchEvents(events.parameters);
+
     promise.finally(callback);
   };
 

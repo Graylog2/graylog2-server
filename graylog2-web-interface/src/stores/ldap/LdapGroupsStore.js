@@ -1,9 +1,8 @@
 import Reflux from 'reflux';
+
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-
 import fetch from 'logic/rest/FetchProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
@@ -22,6 +21,7 @@ const LdapGroupsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/groups`);
 
     const promise = fetch('GET', url);
+
     promise.then(
       (response) => {
         this.groups = response;
@@ -42,6 +42,7 @@ const LdapGroupsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings/groups`);
 
     const promise = fetch('GET', url);
+
     promise.then(
       (response) => {
         this.mapping = response;
@@ -60,6 +61,7 @@ const LdapGroupsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings/groups`);
 
     const promise = fetch('PUT', url, mapping);
+
     promise.then(
       () => {
         this.loadMapping();

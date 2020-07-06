@@ -1,6 +1,8 @@
 // @flow strict
 import { groupBy } from 'lodash';
+
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
+
 import type { Event } from './EventHandler';
 import EventHandler from './EventHandler';
 
@@ -17,11 +19,13 @@ describe('EventHandler convert', () => {
 
   it('should convert events to chart data and shapes', () => {
     const result = EventHandler.toVisualizationData([event]);
+
     expect(result).toMatchSnapshot();
   });
 
   it('should convert events to char data', () => {
     const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder().build(), 'UTC');
+
     expect(result).toEqual({
       hovertemplate: '%{text}',
       marker: {
@@ -40,6 +44,7 @@ describe('EventHandler convert', () => {
 
   it('should convert events to char data and use new timezone', () => {
     const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder().build(), 'CET');
+
     expect(result).toEqual({
       hovertemplate: '%{text}',
       marker: {
@@ -58,6 +63,7 @@ describe('EventHandler convert', () => {
 
   it('should group duplicate events by timestamp and convert events to char data', () => {
     const result = EventHandler.toChartData(groupByTimestamp([event, event, event]), WidgetFormattingSettings.builder().build(), 'UTC');
+
     expect(result).toEqual({
       hovertemplate: '%{text}',
       marker: {
@@ -78,6 +84,7 @@ describe('EventHandler convert', () => {
     const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder()
       .chartColors({ Alerts: '#ffffff' })
       .build(), 'UTC');
+
     expect(result).toEqual({
       hovertemplate: '%{text}',
       marker: {
@@ -96,6 +103,7 @@ describe('EventHandler convert', () => {
 
   it('should convert events to shape data', () => {
     const result = EventHandler.toShapeData([event.timestamp], undefined, 'UTC');
+
     expect(result[0]).toEqual({
       layer: 'below',
       type: 'line',
@@ -113,6 +121,7 @@ describe('EventHandler convert', () => {
 
   it('should convert events to shape data with new timezone', () => {
     const result = EventHandler.toShapeData([event.timestamp], undefined, 'CET');
+
     expect(result[0]).toEqual({
       layer: 'below',
       type: 'line',
@@ -131,6 +140,7 @@ describe('EventHandler convert', () => {
   it('should convert events to shape data with custom color', () => {
     const widgetFormattingSettings = WidgetFormattingSettings.create({ Alerts: '#ffffff' });
     const result = EventHandler.toShapeData([event.timestamp], widgetFormattingSettings, 'UTC');
+
     expect(result[0]).toEqual({
       layer: 'below',
       type: 'line',

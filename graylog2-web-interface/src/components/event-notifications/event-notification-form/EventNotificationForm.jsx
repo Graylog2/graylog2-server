@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import { Alert, Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
-
 import FormsUtils from 'util/FormsUtils';
 
 class EventNotificationForm extends React.Component {
@@ -34,6 +33,7 @@ class EventNotificationForm extends React.Component {
 
   handleSubmit = (event) => {
     const { notification, onSubmit } = this.props;
+
     event.preventDefault();
 
     onSubmit(notification);
@@ -42,11 +42,13 @@ class EventNotificationForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     const { onChange } = this.props;
+
     onChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
   handleConfigChange = (nextConfig) => {
     const { onChange } = this.props;
+
     onChange('config', nextConfig);
   };
 
@@ -54,17 +56,20 @@ class EventNotificationForm extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
   };
 
   handleTypeChange = (nextType) => {
     const notificationPlugin = this.getNotificationPlugin(nextType);
     const defaultConfig = notificationPlugin.defaultConfig || {};
+
     this.handleConfigChange({ ...defaultConfig, type: nextType });
   };
 
   handleTestTrigger = () => {
     const { notification, onTest } = this.props;
+
     onTest(notification);
   };
 

@@ -6,8 +6,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Col, Row, Button } from 'components/graylog';
 import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
-import CollectorRow from './CollectorRow';
 
+import CollectorRow from './CollectorRow';
 import style from './CollectorList.css';
 
 const CollectorList = createReactClass({
@@ -25,11 +25,13 @@ const CollectorList = createReactClass({
 
   headerCellFormatter(header) {
     const className = (header === 'Actions' ? style.actionsColumn : '');
+
     return <th className={className}>{header}</th>;
   },
 
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
+
     return (
       <CollectorRow collector={collector}
                     onClone={onClone}

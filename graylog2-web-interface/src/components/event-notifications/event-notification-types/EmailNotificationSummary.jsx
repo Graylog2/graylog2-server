@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import { Well } from 'components/graylog';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
-
 import styles from './EmailNotificationSummary.css';
 
 class EmailNotificationSummary extends React.Component {
@@ -19,6 +19,7 @@ class EmailNotificationSummary extends React.Component {
 
   render() {
     const { notification } = this.props;
+
     return (
       <CommonNotificationSummary {...this.props}>
         <>

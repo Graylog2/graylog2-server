@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 import styled from 'styled-components';
+
+import { Alert } from 'components/graylog';
 
 const MessageTerms = styled.span(({ theme }) => `
   margin-right: 8px;
@@ -31,16 +32,19 @@ class MessageFieldDescription extends React.Component {
 
   _shouldShowTerms = () => {
     const { messageTerms } = this.state;
+
     return messageTerms.size !== 0;
   };
 
   _getFormattedTerms = () => {
     const { messageTerms } = this.state;
+
     return messageTerms.map((term) => <MessageTerms key={term}>{term}</MessageTerms>);
   };
 
   _getFormattedFieldActions = () => {
     const { customFieldActions, fieldName, message } = this.props;
+
     return customFieldActions ? React.cloneElement(customFieldActions, { fieldName, message }) : null;
   };
 
