@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+
 import AppGlobalNotifications from './AppGlobalNotifications';
 
 const AppWithGlobalNotifications = ({ children }) => {
   return (
     <div>
+      <GlobalThemeStyles />
       <AppGlobalNotifications />
       {children}
     </div>
