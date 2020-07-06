@@ -66,7 +66,7 @@ describe('EntityShareModal', () => {
       expect(EntityShareActions.update).toBeCalledTimes(1);
 
       expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, {
-        selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities
+        selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities,
       });
     });
   });
