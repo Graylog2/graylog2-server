@@ -27,7 +27,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -57,7 +56,7 @@ public abstract class GrantDTO {
     @JsonProperty(FIELD_GRANTEE)
     public abstract GRN grantee();
 
-    @NotBlank
+    @NotNull
     @JsonProperty(FIELD_CAPABILITY)
     public abstract Capability capability();
 
