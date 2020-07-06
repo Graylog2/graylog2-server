@@ -86,20 +86,4 @@ describe('CurrentUserPreferencesProvider', () => {
 
     expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(true);
   });
-
-  describe('updates user preferences on sidebar pinning', () => {
-    asMock(CurrentUserStore.getInitialState).mockReturnValue({
-      currentUser: {
-        preferences: {
-          searchSidebarIsPinned: true,
-          dashboardSidebarIsPinned: true,
-        },
-      },
-    });
-
-    const consume = renderSUT();
-    consume.actions.toggleSidebarPinning();
-
-    expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(true);
-  });
 });

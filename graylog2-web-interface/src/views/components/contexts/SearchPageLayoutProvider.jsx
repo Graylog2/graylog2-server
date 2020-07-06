@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useContext, useState } from 'react';
-import { merge } from 'lodash';
+import { merge, isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 
 import type { User } from 'stores/users/UsersStore';
@@ -10,6 +10,7 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import CombinedProvider from 'injection/CombinedProvider';
+import Store from 'logic/local-storage/Store';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 
@@ -19,14 +20,28 @@ type Props = {
   children: React.Node,
   currentUser: ?User,
   userPreferences: UserPreferences,
+  viewType: ?ViewType,
 };
 
-export const defaultLayoutConfig = (userPreferences?: UserPreferences) => ({
-  sidebar: {
-    searchSidebarIsPinned: userPreferences?.searchSidebarIsPinned ?? false,
-    dashboardSidebarIsPinned: userPreferences?.dashboardSidebarIsPinned ?? false,
-  },
-});
+export const defaultLayoutConfig = (currentUser: ?User, userPreferences?: UserPreferences) => {
+  let dashboardSidebarIsPinned = false;
+  let searchSidebarIsPinned = false;
+
+  if (currentUser?.id === 'local:admin') {
+    searchSidebarIsPinned = Store.get('searchSidebarIsPinned');
+    dashboardSidebarIsPinned = Store.get('dashboardSidebarIsPinned');
+  } else if (!isEmpty(userPreferences)) {
+    searchSidebarIsPinned = userPreferences.searchSidebarIsPinned;
+    dashboardSidebarIsPinned = userPreferences.searchSidebarIsPinned;
+  }
+
+  return {
+    sidebar: {
+      searchSidebarIsPinned,
+      dashboardSidebarIsPinned,
+    },
+  };
+};
 
 const createUserPreferencesArray = (userPreferences) => {
   return Object.entries(userPreferences).map(([name, value]) => ({
@@ -44,7 +59,7 @@ const sidebarPinningPreferenceKey = (viewType: ?ViewType): string => {
   }
 };
 
-const toggleSidebarPinning = (config, setConfig, userName, userPreferences, viewType) => {
+const toggleSidebarPinning = (config, setConfig, currentUser, userPreferences, viewType) => {
   const preferenceKey = sidebarPinningPreferenceKey(viewType);
   const newState = !config.sidebar[preferenceKey];
   const newLayoutConfig = {
@@ -54,20 +69,24 @@ const toggleSidebarPinning = (config, setConfig, userName, userPreferences, view
       [preferenceKey]: newState,
     },
   };
-  const newUserPreferences = {
-    ...userPreferences,
-    [preferenceKey]: newState,
-  };
 
   setConfig(newLayoutConfig);
 
-  PreferencesActions.saveUserPreferences(userName, createUserPreferencesArray(newUserPreferences), undefined, false);
+  if (currentUser?.id === 'local:admin') {
+    Store.set(preferenceKey, newState);
+  } else {
+    const newUserPreferences = {
+      ...userPreferences,
+      [preferenceKey]: newState,
+    };
+    PreferencesActions.saveUserPreferences(currentUser?.username, createUserPreferencesArray(newUserPreferences), undefined, false);
+  }
 };
 
-const SearchPageLayoutProvider = ({ children, currentUser, userPreferences }: Props) => {
-  const viewType = useContext(ViewTypeContext);
-  const [config, setConfig] = useState(defaultLayoutConfig(userPreferences));
-  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser?.username, userPreferences, viewType) };
+const SearchPageLayoutProvider = ({ children, currentUser, userPreferences, viewType }: Props) => {
+  const test = defaultLayoutConfig(currentUser, userPreferences);
+  const [config, setConfig] = useState(test);
+  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser, userPreferences, viewType) };
   const configHelpers = { sidebar: { isPinned: () => config.sidebar[sidebarPinningPreferenceKey(viewType)] } };
   const conigWithHelpers = merge(config, configHelpers);
 
@@ -87,16 +106,14 @@ SearchPageLayoutProvider.defaultProps = {
   userPreferences: {},
 };
 
-const SearchPageLayoutProviderWithContext = ({ ...rest }: { children: React.Node }) => (
-  <CurrentUserContext.Consumer>
-    {(currentUser) => (
-      <UserPreferencesContext.Consumer>
-        {(userPreferences) => (
-          <SearchPageLayoutProvider {...rest} userPreferences={userPreferences} currentUser={currentUser} />
-        )}
-      </UserPreferencesContext.Consumer>
-    )}
-  </CurrentUserContext.Consumer>
-);
+const SearchPageLayoutProviderWithContext = ({ ...rest }: { children: React.Node }) => {
+  const currentUser = useContext(CurrentUserContext);
+  const userPreferences = useContext(UserPreferencesContext);
+  const viewType = useContext(ViewTypeContext);
+
+  return (
+    <SearchPageLayoutProvider {...rest} userPreferences={userPreferences} currentUser={currentUser} viewType={viewType} />
+  );
+};
 
 export default SearchPageLayoutProviderWithContext;
