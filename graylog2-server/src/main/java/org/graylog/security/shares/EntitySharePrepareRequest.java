@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.security.Capability;
 import org.graylog2.utilities.GRN;
 
 import java.util.Collections;
@@ -29,11 +30,11 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 public abstract class EntitySharePrepareRequest {
-    @JsonProperty("selected_grantees")
-    public abstract ImmutableMap<GRN, GRN> selectedGrantees();
+    @JsonProperty("selected_grantee_capabilities")
+    public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
 
     @JsonCreator
-    public static EntitySharePrepareRequest create(@JsonProperty("selected_grantees") Map<GRN, GRN> selectedGrantees) {
-        return new AutoValue_EntitySharePrepareRequest(ImmutableMap.copyOf(firstNonNull(selectedGrantees, Collections.emptyMap())));
+    public static EntitySharePrepareRequest create(@JsonProperty("selected_grantee_capabilities") Map<GRN, Capability> selectedGranteeCapabilities) {
+        return new AutoValue_EntitySharePrepareRequest(ImmutableMap.copyOf(firstNonNull(selectedGranteeCapabilities, Collections.emptyMap())));
     }
 }

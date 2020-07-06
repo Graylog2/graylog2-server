@@ -46,6 +46,9 @@ public class DefaultGranteeService implements GranteeService {
         // TODO: We can only expose users that are in the same teams as the sharing user by default. There should
         //       also be a global config setting to allow exposing all existing users in the system.
         return userService.loadAll().stream()
+                // Don't return the sharing user in available grantees until we want to support that sharing users
+                // can remove themselves from an entity.
+                .filter(user -> !sharingUser.getId().equals(user.getId()))
                 .map(user -> AvailableGrantee.create(
                         grnRegistry.newGRN("user", user.getName()).toString(),
                         "user",

@@ -78,7 +78,7 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
         final ImmutableSet.Builder<Permission> permissionsBuilder = ImmutableSet.builder();
 
         for (GrantDTO grant : grants) {
-            final Optional<CapabilityDTO> capability = builtinCapabilities.get(grant.capability());
+            final Optional<CapabilityDescriptor> capability = builtinCapabilities.get(grant.capability());
 
             if (capability.isPresent()) {
                 final Set<GRN> targets = resolveTargets(grant.target());
