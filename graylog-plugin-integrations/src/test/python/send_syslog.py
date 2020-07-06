@@ -15,10 +15,12 @@
 
 import argparse
 import socket
+import time
+import sys
 from datetime import datetime
 
 
-class SyslogSender(object):
+class SocketSender(object):
     def __init__(self, server: str = 'localhost', port: int = 514, use_udp: bool = False) -> None:
         self.socket = None
         self.server = server
@@ -68,19 +70,44 @@ class SyslogSender(object):
             except:
                 self.close()
 
+class DelayValue(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if not 0 <= values <= 1000:
+            raise argparse.ArgumentError(self, "Invalid delay setting, value must be between 0-1000")
+        setattr(namespace, self.dest, values)
+
 
 def send_single_message(client, message):
     client.send(message)
     client.close()
 
 
-def send_messages_from_file(client, file):
+def send_messages_from_file(client, file, delay, lines, csv):
     input_file = open(file, 'r')
+    
+    # For CSV files, skip first line
+    if csv:
+        next(input_file)
+
+    # Track the number of lines sent
+    replay_line_count = 0
+
+    # Track the time to send
+    timer_start = time.perf_counter()
+
     for line in input_file:
         client.send(line)
+        time.sleep(delay * 0.001)
+        replay_line_count += 1
+        if replay_line_count == lines: break
+
     input_file.close()
     client.close()
 
+    time_taken = round(time.perf_counter() - timer_start,4)
+
+    print ( 'Replayed [%s] lines from [%s] in [%s] seconds' % ( replay_line_count, file, time_taken ), file=sys.stderr )
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -90,6 +117,9 @@ if __name__ == "__main__":
                         type=str)
     parser.add_argument('-p', '--port', help='The syslog port (defaults to 514)', default=514, type=int)
     parser.add_argument('-u', '--udp', help='Send message using UDP rather than TCP', action='store_true')
+    parser.add_argument('-d', '--delay', help='Add a delay in milliseconds [0-1000] after sending each line of a file', default=0, metavar="[0-1000]", type=int, action=DelayValue)
+    parser.add_argument('-l', '--lines', help='Limit number of lines to transmit (0 = no limit)', default=0, type=int)
+    parser.add_argument('-c', '--csv', help='When sending CSV file this option will skip the first line', action='store_true')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-m', '--message',
                        help="The message to be sent (may need to be surrounded by 'single quotes' if it contains spaces)",
@@ -97,11 +127,11 @@ if __name__ == "__main__":
     group.add_argument('-f', '--file', help='A newline-delimited file of messages to be sent', type=str)
     args = parser.parse_args()
 
-    client = SyslogSender(args.server, args.port, args.udp)
+    client = SocketSender(args.server, args.port, args.udp)
 
     if args.message:
         send_single_message(client, args.message)
     elif args.file:
-        send_messages_from_file(client, args.file)
+        send_messages_from_file(client, args.file, args.delay, args.lines, args.csv)
     else:
         parser.print_help()
