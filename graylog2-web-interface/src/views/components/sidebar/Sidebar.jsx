@@ -1,11 +1,10 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { type ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
@@ -54,8 +53,7 @@ const handleToggleSidebar = (initialSectionKey: string, activeSectionKey: ?strin
 };
 
 const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata, viewIsNew }: Props) => {
-  const viewType = useContext(ViewTypeContext);
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned(viewType) ?? false;
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned() ?? false;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(sidebarIsPinned ? initialSectionKey : null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);

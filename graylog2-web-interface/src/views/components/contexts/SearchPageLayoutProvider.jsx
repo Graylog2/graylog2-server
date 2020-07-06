@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
+import { useContext, useState } from 'react';
 import { merge } from 'lodash';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
 
 import type { User } from 'stores/users/UsersStore';
 import View, { type ViewType } from 'views/logic/views/View';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -64,9 +65,10 @@ const toggleSidebarPinning = (config, setConfig, userName, userPreferences, view
 };
 
 const SearchPageLayoutProvider = ({ children, currentUser, userPreferences }: Props) => {
+  const viewType = useContext(ViewTypeContext);
   const [config, setConfig] = useState(defaultLayoutConfig(userPreferences));
-  const actions = { toggleSidebarPinning: (viewType) => toggleSidebarPinning(config, setConfig, currentUser?.username, userPreferences, viewType) };
-  const configHelpers = { sidebar: { isPinned: (viewType) => config.sidebar[sidebarPinningPreferenceKey(viewType)] } };
+  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser?.username, userPreferences, viewType) };
+  const configHelpers = { sidebar: { isPinned: () => config.sidebar[sidebarPinningPreferenceKey(viewType)] } };
   const conigWithHelpers = merge(config, configHelpers);
 
   return (

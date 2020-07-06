@@ -3,21 +3,12 @@ import { render, fireEvent, wait } from 'wrappedTestingLibrary';
 import PropTypes from 'prop-types';
 import { StoreMock as MockStore, CombinedProviderMock as MockCombinedProvider } from 'helpers/mocking';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 import SearchPageLayoutContext from 'views/components/contexts/SearchPageLayoutContext';
 
 import Sidebar from './Sidebar';
-
-const { PreferencesActions } = CombinedProvider.get('Preferences');
-
-jest.mock('injection/CombinedProvider', () => {
-  return new MockCombinedProvider({
-    Preferences: { PreferencesActions: { list: jest.fn(), saveUserPreferences: jest.fn() }, PreferencesStore: MockStore() },
-  });
-});
 
 const mockCurrentUser = { timezone: 'UTC' };
 
@@ -223,33 +214,24 @@ describe('<Sidebar />', () => {
     expect(queryByText(viewMetaData.title)).toBe(null);
   });
 
-  describe('should update search page layout on sidebar pinning', () => {
-    const renderSidebar = async ({ viewType }) => {
-      const toggleSidebarPinning = jest.fn();
-      const layoutConfig = {
-        sidebar: {
-          isDashboardSidebarPinned: false,
-          isSearchSidebarPinned: false,
-          isPinned: () => false,
-        },
-      };
-      const { getByTitle } = render(
-        <SearchPageLayoutContext.Provider value={{ config: layoutConfig, actions: { toggleSidebarPinning } }}>
-          <SimpleSidebar viewType={viewType} />
-        </SearchPageLayoutContext.Provider>,
-      );
-
-      fireEvent.click(getByTitle('Open sidebar'));
-      fireEvent.click(getByTitle('Display sidebar inline'));
-
-      await wait(() => expect(toggleSidebarPinning).toHaveBeenCalledTimes(1));
-      await wait(() => expect(toggleSidebarPinning).toHaveBeenCalledWith(viewType));
+  it('should update search page layout on sidebar pinning', async () => {
+    const toggleSidebarPinning = jest.fn();
+    const layoutConfig = {
+      sidebar: {
+        isDashboardSidebarPinned: false,
+        isSearchSidebarPinned: false,
+        isPinned: () => false,
+      },
     };
+    const { getByTitle } = render(
+      <SearchPageLayoutContext.Provider value={{ config: layoutConfig, actions: { toggleSidebarPinning } }}>
+        <SimpleSidebar />
+      </SearchPageLayoutContext.Provider>,
+    );
 
-    it.each`
-      viewType
-      ${View.Type.Search}
-      ${View.Type.Dashboard}
-    `('with view type $viewType', renderSidebar);
+    fireEvent.click(getByTitle('Open sidebar'));
+    fireEvent.click(getByTitle('Display sidebar inline'));
+
+    await wait(() => expect(toggleSidebarPinning).toHaveBeenCalledTimes(1));
   });
 });

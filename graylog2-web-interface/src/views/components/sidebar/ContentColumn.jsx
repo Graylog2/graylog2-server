@@ -103,14 +103,14 @@ const CenterVertical = styled.div`
   align-content: center;
 `;
 
-const toggleSidebarPinning = (searchPageLayout, viewType) => {
+const toggleSidebarPinning = (searchPageLayout) => {
   if (!searchPageLayout) {
     return;
   }
 
   const { actions: { toggleSidebarPinning: togglePinning } } = searchPageLayout;
 
-  togglePinning(viewType);
+  togglePinning();
 };
 
 const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew: boolean) => {
@@ -125,37 +125,40 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew
   return savedViewTitle;
 };
 
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => (
-  <ViewTypeContext.Consumer>
-    {(viewType) => {
-      const title = sidebarTitle(viewMetadata, viewType, viewIsNew);
-      const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned(viewType);
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => {
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned();
 
-      return (
-        <Container sidebarIsPinned={sidebarIsPinned}>
-          <div>
-            <Header title={title}>
-              <CenterVertical>
-                <Title onClick={closeSidebar}>{title}</Title>
-              </CenterVertical>
-              <CenterVertical>
-                <OverlayToggle sidebarIsPinned={sidebarIsPinned}>
-                  <IconButton onClick={() => toggleSidebarPinning(searchPageLayout, viewType)}
-                              title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
-                              name="thumb-tack" />
-                </OverlayToggle>
-              </CenterVertical>
-            </Header>
-            <HorizontalRule />
-            <SectionTitle>{sectionTitle}</SectionTitle>
-          </div>
-          <div>
-            {children}
-          </div>
-        </Container>
-      );
-    }}
-  </ViewTypeContext.Consumer>
-);
+  return (
+    <ViewTypeContext.Consumer>
+      {(viewType) => {
+        const title = sidebarTitle(viewMetadata, viewType, viewIsNew);
+
+        return (
+          <Container sidebarIsPinned={sidebarIsPinned}>
+            <div>
+              <Header title={title}>
+                <CenterVertical>
+                  <Title onClick={closeSidebar}>{title}</Title>
+                </CenterVertical>
+                <CenterVertical>
+                  <OverlayToggle sidebarIsPinned={sidebarIsPinned}>
+                    <IconButton onClick={() => toggleSidebarPinning(searchPageLayout, viewType)}
+                                title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
+                                name="thumb-tack" />
+                  </OverlayToggle>
+                </CenterVertical>
+              </Header>
+              <HorizontalRule />
+              <SectionTitle>{sectionTitle}</SectionTitle>
+            </div>
+            <div>
+              {children}
+            </div>
+          </Container>
+        );
+      }}
+    </ViewTypeContext.Consumer>
+  );
+};
 
 export default ContentColumn;
