@@ -56,7 +56,7 @@ public class ClientES7 implements Client {
 
     @Override
     public void createIndex(String index, int shards, int replicas) {
-        LOG.info("Creating index " + index);
+        LOG.debug("Creating index " + index);
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
         createIndexRequest.settings(
                 Settings.builder()
@@ -190,7 +190,7 @@ public class ClientES7 implements Client {
 
     @Override
     public void cleanUp() {
-        LOG.info("Removing indices: " + String.join(",", existingIndices()));
+        LOG.debug("Removing indices: " + String.join(",", existingIndices()));
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();
