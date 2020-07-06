@@ -31,8 +31,8 @@ import java.util.Objects;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = EntitySharePrepareResponse.Builder.class)
-public abstract class EntitySharePrepareResponse {
+@JsonDeserialize(builder = EntityShareResponse.Builder.class)
+public abstract class EntityShareResponse {
     @JsonProperty("entity")
     public abstract String entity();
 
@@ -62,7 +62,7 @@ public abstract class EntitySharePrepareResponse {
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EntitySharePrepareResponse.Builder()
+            return new AutoValue_EntityShareResponse.Builder()
                     .activeShares(Collections.emptySet())
                     .selectedGranteeCapabilities(Collections.emptyMap())
                     .missingDependencies(Collections.emptyMap());
@@ -89,7 +89,7 @@ public abstract class EntitySharePrepareResponse {
         @JsonProperty("missing_dependencies")
         public abstract Builder missingDependencies(Map<GRN, MissingDependency> missingDependencies);
 
-        public abstract EntitySharePrepareResponse build();
+        public abstract EntityShareResponse build();
     }
 
     @AutoValue
@@ -107,7 +107,7 @@ public abstract class EntitySharePrepareResponse {
         public static AvailableGrantee create(@JsonProperty("id") String id,
                                               @JsonProperty("type") String type,
                                               @JsonProperty("title") String title) {
-            return new AutoValue_EntitySharePrepareResponse_AvailableGrantee(id, type, title);
+            return new AutoValue_EntityShareResponse_AvailableGrantee(id, type, title);
         }
     }
 
@@ -122,7 +122,7 @@ public abstract class EntitySharePrepareResponse {
         @JsonCreator
         public static AvailableCapability create(@JsonProperty("id") String id,
                                                  @JsonProperty("title") String title) {
-            return new AutoValue_EntitySharePrepareResponse_AvailableCapability(id, title);
+            return new AutoValue_EntityShareResponse_AvailableCapability(id, title);
         }
     }
 
@@ -141,7 +141,7 @@ public abstract class EntitySharePrepareResponse {
         public static ActiveShare create(@JsonProperty("grant") String grant,
                                          @JsonProperty("grantee") GRN grantee,
                                          @JsonProperty("capability") Capability capability) {
-            return new AutoValue_EntitySharePrepareResponse_ActiveShare(grant, grantee, capability);
+            return new AutoValue_EntityShareResponse_ActiveShare(grant, grantee, capability);
         }
     }
 
@@ -160,7 +160,7 @@ public abstract class EntitySharePrepareResponse {
         public static MissingDependency create(@JsonProperty("id") String id,
                                                @JsonProperty("title") String title,
                                                @JsonProperty("owners") ImmutableSet<String> owners) {
-            return new AutoValue_EntitySharePrepareResponse_MissingDependency(id, Objects.toString(title, "<no title>"), owners);
+            return new AutoValue_EntityShareResponse_MissingDependency(id, Objects.toString(title, "<no title>"), owners);
         }
     }
 }

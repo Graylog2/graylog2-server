@@ -18,14 +18,14 @@ package org.graylog.security.entities;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.security.shares.EntitySharePrepareResponse.MissingDependency;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
+import org.graylog.security.shares.EntityShareResponse.MissingDependency;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.utilities.GRN;
+import org.graylog2.utilities.GRNRegistry;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class EntityDependencyResolver {
         // TODO: Create a method in ContentPackService to only select some exerpts instead of loading all
         final ImmutableMap<GRN, String> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
-                .collect(ImmutableMap.toImmutableMap(e -> GRN.builder().type(e.type().name()).entity(e.id().id()).permissionPrefix(e.type().name()+ ":").build() , EntityExcerpt::title));
+                .collect(ImmutableMap.toImmutableMap(e -> GRN.builder().type(e.type().name()).entity(e.id().id()).permissionPrefix(e.type().name() + ":").build(), EntityExcerpt::title));
 
         final Set<EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(EntityDescriptor.builder()
                 .id(ModelId.of(entityGRN.entity()))

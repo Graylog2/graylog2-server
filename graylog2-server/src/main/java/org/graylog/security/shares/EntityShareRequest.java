@@ -25,28 +25,31 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.security.Capability;
 import org.graylog2.utilities.GRN;
 
-import java.util.Collections;
+import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class EntityShareRequest {
     @JsonProperty("selected_grantee_capabilities")
-    public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
+    public abstract Optional<ImmutableMap<GRN, Capability>> selectedGranteeCapabilities();
 
     public Set<GRN> grantees() {
-        return selectedGranteeCapabilities().keySet();
+        return selectedGranteeCapabilities().map(ImmutableMap::keySet).orElse(ImmutableSet.of());
     }
 
     public Set<Capability> capabilities() {
-        return ImmutableSet.copyOf(selectedGranteeCapabilities().values());
+        return selectedGranteeCapabilities()
+                .map(ImmutableMap::values)
+                .map(ImmutableSet::copyOf)
+                .orElse(ImmutableSet.of());
     }
 
     @JsonCreator
-    public static EntityShareRequest create(@JsonProperty("selected_grantee_capabilities") Map<GRN, Capability> selectedGranteeCapabilities) {
-        return new AutoValue_EntityShareRequest(ImmutableMap.copyOf(firstNonNull(selectedGranteeCapabilities, Collections.emptyMap())));
+    public static EntityShareRequest create(@JsonProperty("selected_grantee_capabilities") @Nullable Map<GRN, Capability> selectedGranteeCapabilities) {
+        final ImmutableMap<GRN, Capability> value = selectedGranteeCapabilities == null ? null : ImmutableMap.copyOf(selectedGranteeCapabilities);
+        return new AutoValue_EntityShareRequest(Optional.ofNullable(value));
     }
 }
