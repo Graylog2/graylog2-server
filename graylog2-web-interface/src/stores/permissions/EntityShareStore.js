@@ -13,17 +13,13 @@ type EntityShareStoreState = {
   state: EntityShareState,
 };
 
-type EntitySharePreparePayload = {|
-  selected_grantee_capabilities?: SelectedGranteeCapabilities,
-|};
-
-type EntityShareUpdatePayload = {|
-  selected_grantee_capabilities?: SelectedGranteeCapabilities,
-|};
+export type EntitySharePayload = {
+  selected_grantee_capabilities: SelectedGranteeCapabilities,
+};
 
 type EntityShareActionsType = RefluxActions<{
-  prepare: (GRN, ?EntitySharePreparePayload) => Promise<EntityShareState>,
-  update: (GRN, EntityShareUpdatePayload) => Promise<EntityShareState>,
+  prepare: (GRN, EntitySharePayload) => Promise<EntityShareState>,
+  update: (GRN, EntitySharePayload) => Promise<EntityShareState>,
 }>;
 
 type EntityShareStoreType = Store<EntityShareStoreState>;
@@ -49,7 +45,7 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       return this._state();
     },
 
-    prepare(entityGRN: GRN, payload: EntitySharePreparePayload = defaultPreparePayload): Promise<EntityShareState> {
+    prepare(entityGRN: GRN, payload: EntitySharePayload = defaultPreparePayload): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
@@ -58,7 +54,7 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    update(entityGRN: GRN, payload: EntityShareUpdatePayload): Promise<EntityShareState> {
+    update(entityGRN: GRN, payload: EntitySharePayload): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 

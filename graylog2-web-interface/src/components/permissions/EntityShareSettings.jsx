@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { EntityShareActions, type EntitySharePayload } from 'stores/permissions/EntityShareStore';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -54,10 +54,11 @@ const EntityShareSettings = ({
 
   const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
     setDisableSubmit(true);
-
-    return EntityShareActions.prepare(entityGRN, {
+    const payload: EntitySharePayload = {
       selected_grantee_capabilities: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
-    }).then((response) => {
+    };
+
+    return EntityShareActions.prepare(entityGRN, payload).then((response) => {
       setDisableSubmit(false);
 
       return response;
@@ -66,10 +67,11 @@ const EntityShareSettings = ({
 
   const _handleDeletion = (granteeId: GRN) => {
     setDisableSubmit(true);
-
-    return EntityShareActions.prepare(entityGRN, {
+    const payload: EntitySharePayload = {
       selected_grantee_capabilities: selectedGranteeCapabilities.remove(granteeId),
-    }).then((response) => {
+    };
+
+    return EntityShareActions.prepare(entityGRN, payload).then((response) => {
       setDisableSubmit(false);
 
       return response;
