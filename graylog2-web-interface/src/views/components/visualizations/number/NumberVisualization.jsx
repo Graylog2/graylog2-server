@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';

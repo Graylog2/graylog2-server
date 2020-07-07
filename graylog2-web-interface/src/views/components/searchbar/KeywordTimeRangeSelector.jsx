@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
 import { connect, Field, useFormikContext } from 'formik';
 

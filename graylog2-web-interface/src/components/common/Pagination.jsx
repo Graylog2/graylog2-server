@@ -6,7 +6,7 @@ import { Pagination as BootstrapPagination } from 'react-bootstrap';
 // $FlowFixMe Need typing for react-ultimate-pagination dependency
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 

@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import View, { type ViewType } from 'views/logic/views/View';
 import type { ThemeInterface } from 'theme';

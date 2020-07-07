@@ -1,6 +1,6 @@
 // @flow strict
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 const ColorPreview: StyledComponent<{ color: string }, void, HTMLDivElement> = styled.div(({ color }) => css`
   height: 2rem;

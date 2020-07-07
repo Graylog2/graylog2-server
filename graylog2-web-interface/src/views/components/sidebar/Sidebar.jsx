@@ -4,7 +4,7 @@ import { useState } from 'react';
 import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';

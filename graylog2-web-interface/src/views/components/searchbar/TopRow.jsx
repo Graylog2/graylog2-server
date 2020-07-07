@@ -1,6 +1,6 @@
 // @flow strict
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { Row } from 'components/graylog';
 

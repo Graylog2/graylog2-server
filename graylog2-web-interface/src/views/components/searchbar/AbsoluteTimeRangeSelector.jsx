@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';

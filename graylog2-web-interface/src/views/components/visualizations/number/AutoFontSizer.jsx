@@ -1,7 +1,7 @@
 // @flow strict
 import React, { type Element, type ElementRef, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 /**
  * This component will calculate the largest possible font size for the provided child.

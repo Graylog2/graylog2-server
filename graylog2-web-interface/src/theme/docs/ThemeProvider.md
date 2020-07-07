@@ -11,8 +11,8 @@ const StyledElement = styled.div(({ theme }) => css`
 Or, if you are using Flow, you can type the component with
 
 ```jsx static
-import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import type { ThemeInterface } from 'theme';
 
 const StyledElement: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`

@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';

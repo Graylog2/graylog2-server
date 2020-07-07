@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import connect from 'stores/connect';

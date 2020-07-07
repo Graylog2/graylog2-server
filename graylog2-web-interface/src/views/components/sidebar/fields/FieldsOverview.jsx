@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { List as ImmutableList } from 'immutable';
 
 import connect from 'stores/connect';

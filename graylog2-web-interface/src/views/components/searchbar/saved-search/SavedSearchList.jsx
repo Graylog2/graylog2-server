@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 // $FlowFixMe should be there
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';

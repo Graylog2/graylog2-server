@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { IconButton } from 'components/common';
 import SearchLink from 'components/search/SearchLink';

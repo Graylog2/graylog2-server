@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { DropdownButton } from 'components/graylog';
 import { Icon } from 'components/common';

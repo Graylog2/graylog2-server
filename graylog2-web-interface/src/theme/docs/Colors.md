@@ -4,7 +4,7 @@ _Click any color block below to copy the color path._
 
 ```jsx noeditor
 import React, { useEffect } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { colors } from 'theme';
 import ColorSwatch, { Swatch } from './Colors';

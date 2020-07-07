@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';

@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type StyledComponent from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { AdditionalContext } from 'views/logic/ActionContext';
