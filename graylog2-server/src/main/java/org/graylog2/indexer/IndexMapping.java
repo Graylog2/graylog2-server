@@ -43,7 +43,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "filter", "lowercase"));
         final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
         final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
-        final Map<String, Object> mappings = ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
+        final Map<String, Object> mappings = mapping(analyzer);
 
         return ImmutableMap.of(
                 "template", template,
@@ -51,6 +51,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "settings", settings,
                 "mappings", mappings
         );
+    }
+
+    protected Map<String, Object> mapping(String analyzer) {
+        return ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
     }
 
     protected Map<String, Object> messageMapping(final String analyzer) {
@@ -79,7 +83,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     abstract Map<String, Object> dynamicStrings();
 
-    protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
+    private Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put("message", analyzedString(analyzer, false))
                 .put("full_message", analyzedString(analyzer, false))
