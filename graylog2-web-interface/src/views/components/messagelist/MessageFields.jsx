@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { MessageDetailsDefinitionList } from 'components/graylog';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -18,7 +18,7 @@ type Props = {
   fields: FieldTypeMappingsList,
 };
 
-const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = styled(MessageDetailsDefinitionList)(({ theme }) => `
+const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = styled(MessageDetailsDefinitionList)(({ theme }) => css`
   color: ${theme.colors.gray[40]};
 
   dd {

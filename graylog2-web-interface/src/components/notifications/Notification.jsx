@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
@@ -9,7 +9,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
-const StyledAlert = styled(Alert)(({ theme }) => `
+const StyledAlert = styled(Alert)(({ theme }) => css`
   margin-top: 10px;
 
   i {
@@ -25,7 +25,7 @@ const NotificationHead = styled.h3`
   margin-bottom: 5px;
 `;
 
-const NotificationTimestamp = styled.span(({ theme }) => `
+const NotificationTimestamp = styled.span(({ theme }) => css`
   margin-left: 3px;
   font-size: ${theme.fonts.size.small};
 `);

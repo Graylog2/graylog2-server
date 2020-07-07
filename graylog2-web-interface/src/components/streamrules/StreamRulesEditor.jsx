@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Button, Col, Panel, Row } from 'components/graylog';

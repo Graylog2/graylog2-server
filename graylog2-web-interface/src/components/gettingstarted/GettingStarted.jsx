@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Grid, Col, Button } from 'components/graylog';
 import { ContentHeadRow, Spinner, Icon } from 'components/common';
@@ -39,7 +39,7 @@ const ContentSection = styled.div`
   -ms-grid-column: 1;
 `;
 
-const GettingStartedIframe = styled.iframe(({ hidden }) => `
+const GettingStartedIframe = styled.iframe(({ hidden }) => css`
   display: ${hidden ? 'none' : 'block'};
   width: 100%;
   height: 100%;

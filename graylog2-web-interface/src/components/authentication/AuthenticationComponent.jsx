@@ -4,7 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
@@ -20,16 +20,16 @@ const AuthenticationActions = ActionsProvider.getActions('Authentication');
 const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const SubNavigationCol = styled(Col)(({ theme }) => `
+const SubNavigationCol = styled(Col)(({ theme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
-const ContentPaneCol = styled(Col)(({ theme }) => `
+const ContentPaneCol = styled(Col)(({ theme }) => css`
   border-left: ${theme.colors.gray[80]} solid 1px;
   margin-left: -1px;
 `);
 
-const NavItemDivider = styled(NavItem)(({ theme }) => `
+const NavItemDivider = styled(NavItem)(({ theme }) => css`
   border-bottom: ${theme.colors.gray[80]} solid 1px;
 `);
 

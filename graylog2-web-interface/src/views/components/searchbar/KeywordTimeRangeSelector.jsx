@@ -23,7 +23,7 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => `
+const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);

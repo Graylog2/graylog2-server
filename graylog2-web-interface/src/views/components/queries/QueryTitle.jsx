@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { MenuItem } from 'components/graylog';
 import { QueriesActions } from 'views/stores/QueriesStore';
@@ -10,7 +10,7 @@ import ViewState from 'views/logic/views/ViewState';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
-const TitleWrap = styled.span(({ active }) => `
+const TitleWrap = styled.span(({ active }) => css`
   padding-right: ${active ? '6px' : '0'};
 `);
 

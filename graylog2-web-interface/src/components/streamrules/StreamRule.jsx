@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/graylog';

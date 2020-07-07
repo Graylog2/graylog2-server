@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';

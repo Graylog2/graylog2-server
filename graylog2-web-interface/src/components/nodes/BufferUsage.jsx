@@ -4,7 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, ProgressBar } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';

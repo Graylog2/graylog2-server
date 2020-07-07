@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {} from 'moment-duration-format';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, Col, Row } from 'components/graylog';
 import { Icon, Pluralize, Timestamp } from 'components/common';
@@ -16,15 +15,16 @@ const DetailTitle = styled.dt`
   clear: left;
 `;
 
-const DetailValue = styled.dd`
+const DetailValue = styled.dd(({ theme }) => css`
   margin-left: 150px;
   word-wrap: break-word;
+
   &:not(:last-child) {
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid ${theme.colors.variant.lightest.default};
     margin-bottom: 5px;
     padding-bottom: 5px;
- }
-`;
+  }
+`);
 
 class EventDefinitionDescription extends React.Component {
   static propTypes = {

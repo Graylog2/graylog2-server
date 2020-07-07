@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 
 import HoverForHelp from './HoverForHelp';
 
-const StyledDescriptionBox = styled.div(({ theme }) => `
+const StyledDescriptionBox = styled.div(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   padding: 10px;
   margin: 5px;

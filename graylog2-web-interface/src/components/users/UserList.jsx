@@ -3,7 +3,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -17,7 +17,7 @@ import UserListStyle from '!style!css!./UserList.css';
 const UsersStore = StoreProvider.getStore('Users');
 const RolesStore = StoreProvider.getStore('Roles');
 
-const ActiveIcon = styled(Icon)(({ theme }) => `
+const ActiveIcon = styled(Icon)(({ theme }) => css`
   color: ${theme.colors.variant.success};
 `);
 

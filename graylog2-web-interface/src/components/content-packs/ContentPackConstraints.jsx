@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Set } from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
 import { Badge } from 'components/graylog';

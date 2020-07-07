@@ -2,7 +2,7 @@
 import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { sortBy, isEmpty } from 'lodash';
 
 import { Button } from 'components/graylog';

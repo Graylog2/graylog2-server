@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
   showTitleOnHover: boolean,
 };
 
-const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   display: none;
   position: absolute;
   padding: 5px 10px;
@@ -27,7 +27,7 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   z-index: 4;
 `);
 
-const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => `
+const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => css`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,7 +41,7 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
   font-size: ${theme.fonts.size.h3};
   color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
   cursor: pointer;
-  
+
   :hover {
     background: ${theme.colors.gray[30]};
     > * {

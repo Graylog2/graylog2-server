@@ -1,6 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Row, Col, Button } from 'components/graylog';
 import PageHeader from 'components/common/PageHeader';

@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Icon from './Icon';
 
-const ScrollBtn = styled.button(({ theme }) => `
+const ScrollBtn = styled.button(({ theme }) => css`
   opacity: 0.3;
   background-color: ${theme.colors.variant.primary};
   width: 40px;
@@ -24,7 +24,7 @@ const ScrollBtn = styled.button(({ theme }) => `
   }
 `);
 
-const ArrowUpIcon = styled(Icon)(({ theme }) => `
+const ArrowUpIcon = styled(Icon)(({ theme }) => css`
   color: ${theme.utils.readableColor(theme.colors.variant.primary)};
   position: absolute;
   top: 50%;

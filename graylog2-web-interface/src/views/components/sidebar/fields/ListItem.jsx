@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 import { List } from 'immutable';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Field from 'views/components/Field';
 
@@ -24,7 +24,7 @@ type Props = {
   style: ListItemStyle,
 };
 
-const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = styled.li(({ theme }) => `
+const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = styled.li(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   display: table-row;
   white-space: nowrap;

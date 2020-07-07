@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { Icon } from 'components/common';

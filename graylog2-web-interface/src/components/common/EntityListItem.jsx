@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
 
 import Icon from './Icon';
 
-const StyledListItem = styled.li(({ theme }) => `
+const StyledListItem = styled.li(({ theme }) => css`
   display: block;
   padding: 15px 0;
 

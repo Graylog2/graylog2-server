@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';

@@ -9,7 +9,7 @@ import connect from 'stores/connect';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/graylog';
 

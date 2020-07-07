@@ -1,7 +1,7 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/graylog';
 import { Icon, SortableList } from 'components/common';

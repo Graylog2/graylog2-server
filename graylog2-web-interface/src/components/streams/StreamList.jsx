@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert } from 'components/graylog';
 import { Icon } from 'components/common';

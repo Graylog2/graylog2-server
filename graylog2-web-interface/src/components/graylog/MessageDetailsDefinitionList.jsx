@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-const MessageDetailsDefinitionList = styled.dl(({ theme }) => `
+const MessageDetailsDefinitionList = styled.dl(({ theme }) => css`
   margin-top: 10px;
   margin-bottom: 0;
 

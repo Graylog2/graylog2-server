@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { isEmpty, get } from 'lodash';
 
 import connect from 'stores/connect';

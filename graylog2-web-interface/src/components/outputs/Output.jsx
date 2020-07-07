@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert, Col, Row, Button } from 'components/graylog';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner, Icon } from 'components/common';
 
-const NodeRow = styled.div(({ theme }) => `
+const NodeRow = styled.div(({ theme }) => css`
   border-bottom: 1px solid ${theme.colors.gray[80]};
   padding-bottom: 8px;
   margin-bottom: 8px;

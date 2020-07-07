@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, Panel, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';

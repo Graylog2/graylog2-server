@@ -30,7 +30,7 @@ class InputDropdown extends React.Component {
 
   _formatStaticInput = (input) => {
     return (
-      <Input id={`${input.type}-select`} type="select" style={{ float: 'left', width: 400, marginRight: 10 }} disabled>
+      <Input id={`${input.type}-select`} type="select" style={{ float: 'left', width: 400, marginRight: 10 /* stylelint-disable-line declaration-colon-space-after */ }} disabled>
         <option>{`${input.title} (${input.type})`}</option>
       </Input>
     );

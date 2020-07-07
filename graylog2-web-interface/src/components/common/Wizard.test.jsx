@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { enzymeFind } from 'styled-components/test-utils';
 
 import { Nav } from 'components/graylog';

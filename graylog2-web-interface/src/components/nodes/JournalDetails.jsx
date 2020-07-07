@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Row, Col, Alert } from 'components/graylog';
 import ProgressBar, { Bar } from 'components/graylog/ProgressBar';

@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import QueryResult from 'views/logic/QueryResult';
 import SearchPageLayoutContext, { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
@@ -32,14 +32,14 @@ const Container = styled.div`
   width: min-content;
 `;
 
-const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const ContentOverlay: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   position: fixed;
   top: 0;
   bottom: 0;
   left: 50px;
   right: 0;
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-  z-index: 2;  
+  z-index: 2;
 `);
 
 const handleToggleSidebar = (initialSectionKey: string, activeSectionKey: ?string, setActiveSectionKey) => {

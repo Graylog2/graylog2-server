@@ -1,20 +1,19 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import Icon from 'components/common/Icon';
 
-const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.button(({ theme }) => `
+const Wrapper: StyledComponent<{}, ThemeInterface, HTMLButtonElement> = styled.button(({ theme }) => css`
   display: inline-flex;
   justify-content: center;
   align-items: center;
-
   height: 25px;
   width: 25px;
-  border: 0
-
+  border: 0;
   background-color: transparent;
   cursor: pointer;
   color: ${theme.colors.gray[70]};

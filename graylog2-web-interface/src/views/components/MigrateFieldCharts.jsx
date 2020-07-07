@@ -1,6 +1,6 @@
 // @flow strict
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { values, isEmpty } from 'lodash';
 import * as Immutable from 'immutable';
 

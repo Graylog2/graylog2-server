@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';

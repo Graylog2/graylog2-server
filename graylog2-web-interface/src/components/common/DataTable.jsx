@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { isEqual } from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { tableCss } from 'components/graylog/Table';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';

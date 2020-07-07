@@ -23,7 +23,7 @@ const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 200px;
 `;
 
-const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => `
+const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
   margin: 0;
   line-height: 34px;
   font-size: ${theme.fonts.size.large};

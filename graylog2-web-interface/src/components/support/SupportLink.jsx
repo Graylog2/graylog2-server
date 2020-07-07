@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-const IconStack = styled.span(({ small, theme }) => `
+const IconStack = styled.span(({ small, theme }) => css`
   font-size: ${small ? theme.fonts.size.body : theme.fonts.size.large};
 `);
 

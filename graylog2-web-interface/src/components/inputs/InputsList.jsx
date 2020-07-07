@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Row, Col } from 'components/graylog';
 import { naturalSortIgnoreCase } from 'util/SortUtils';

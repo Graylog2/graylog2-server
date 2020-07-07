@@ -7,7 +7,7 @@ import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 
 import { createHandlerFor } from './ActionHandler';
 import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
@@ -37,7 +37,7 @@ type FieldElementProps = {
 
 const FieldElement: StyledComponent<FieldElementProps, ThemeInterface, HTMLSpanElement> = styled.span.attrs({
   className: 'field-element',
-})(({ active, disabled, theme }) => `
+})(({ active, disabled, theme }) => css`
   color: ${active ? theme.colors.variant.info : 'currentColor'};
   opacity: ${disabled ? '0.3' : '1'};
 `);
