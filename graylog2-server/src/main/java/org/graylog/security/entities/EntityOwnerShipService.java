@@ -48,6 +48,15 @@ public class EntityOwnerShipService {
         this.userContextFactory = userContextFactory;
     }
 
+    public void registerNewEventDefinition(String id) {
+        final GRN grn = grnRegistry.newGRN(ModelTypes.EVENT_DEFINITION_V1.name(), id);
+        try {
+            registerNewEntity(grn);
+        } catch (UserContextMissingException e) {
+            LOG.error("Failed to register entity ownership", e);
+        }
+    }
+
     public void registerNewView(String id) {
         final GRN grn = grnRegistry.newGRN(ModelTypes.DASHBOARD_V2.name(), id);
         try {

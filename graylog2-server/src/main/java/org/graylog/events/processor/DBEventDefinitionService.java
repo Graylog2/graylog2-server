@@ -60,7 +60,7 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
     @Override
     public EventDefinitionDto save(EventDefinitionDto eventDefinitionDto) {
         final EventDefinitionDto dto = super.save(eventDefinitionDto);
-        entityOwnerShipService.registerNewView(dto.id());
+        entityOwnerShipService.registerNewEventDefinition(dto.id());
         return dto;
     }
 
