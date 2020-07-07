@@ -20,6 +20,22 @@ export type Colors = {
     background: string,
     backgroundAlt: string,
     backgroundHover: string,
+    variant: {
+      danger: string,
+      active: string,
+      info: string,
+      primary: string,
+      success: string,
+      warning: string,
+    },
+    variantHover: {
+      danger: string,
+      active: string,
+      info: string,
+      primary: string,
+      success: string,
+      warning: string,
+    },
   },
   gray: {
     "10": string,
