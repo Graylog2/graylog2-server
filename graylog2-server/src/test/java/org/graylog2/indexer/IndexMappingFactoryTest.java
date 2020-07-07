@@ -73,7 +73,7 @@ public class IndexMappingFactoryTest {
     }
 
     @Test
-    public void createIndexMappingFailsIfElasticsearch6VersionIsTooHigh() throws Exception {
+    public void createIndexMappingFailsIfElasticsearchVersionIsTooHigh() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("9.0.0")));
 
         assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES))
