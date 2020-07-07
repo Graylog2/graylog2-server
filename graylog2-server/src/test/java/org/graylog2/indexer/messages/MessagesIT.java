@@ -14,12 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of Graylog.
+ * <p>
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import joptsimple.internal.Strings;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -39,11 +57,13 @@ import org.junit.Test;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -141,15 +161,45 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {
         final int MESSAGECOUNT = 100;
         final int LARGE_MESSAGECOUNT = 20;
-        final ArrayList<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
         messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
         final List<String> failedItems = this.messages.bulkIndex(messageBatch);
 
         assertThat(failedItems).isEmpty();
 
-        Thread.sleep(2000); // wait for ES to finish indexing
+        client().refreshNode(); // wait for ES to finish indexing
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
+    }
+
+    @Test
+    public void conflictingFieldTypesErrorAreReported() throws Exception {
+        final String fieldName = "_ourcustomfield";
+        final Message message1 = new Message("One message", "loghost-a", now());
+        message1.addField(fieldName, 42);
+        final Message message2 = new Message("Another message", "loghost-b", now());
+        message2.addField(fieldName, "fourty-two");
+
+        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
+                entry(indexSet, message1),
+                entry(indexSet, message2)
+        );
+
+        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+
+        assertThat(failedItems).hasSize(1);
+
+        final List<IndexFailure> failures = this.messages.getIndexFailureQueue().poll(1L, TimeUnit.SECONDS);
+
+        assertThat(failures).hasSize(1);
+    }
+
+    private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {
+        return new AbstractMap.SimpleEntry<>(indexSet, message);
+    }
+
+    private DateTime now() {
+        return DateTime.now(DateTimeZone.UTC);
     }
 
     private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
@@ -157,7 +207,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat('A', size);
         for (int i = 0; i < count; i++) {
-            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", DateTime.now(DateTimeZone.UTC))));
+            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", now())));
         }
         return messageList;
     }
