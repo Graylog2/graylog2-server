@@ -22,12 +22,14 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
+import org.graylog2.storage.providers.CountsAdapterProvider;
 import org.graylog2.storage.providers.EventIndexerAdapterProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
 import org.graylog2.storage.providers.IndexToolsAdapterProvider;
@@ -41,6 +43,7 @@ import org.graylog2.storage.providers.V20170607164210_MigrateReopenedIndicesToAl
 public class VersionAwareStorageModule extends AbstractModule {
     @Override
     protected void configure() {
+        bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
         bind(SearchesAdapter.class).toProvider(SearchesAdapterProvider.class);
         bind(MoreSearchAdapter.class).toProvider(MoreSearchAdapterProvider.class);
