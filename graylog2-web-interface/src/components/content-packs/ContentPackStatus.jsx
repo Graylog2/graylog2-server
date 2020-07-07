@@ -15,7 +15,7 @@ const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
     error: danger,
   };
 
-  return `
+  return css`
     margin-left: 4px;
     background-color: ${statuses[status]};
     color: ${theme.utils.readableColor(statuses[status])};

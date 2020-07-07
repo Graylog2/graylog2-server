@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
@@ -45,7 +46,7 @@ const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   justify-content: center;
 
   :active {
-    background-color: ${theme.colors.gray[90]}
+    background-color: ${theme.colors.gray[90]};
   }
 `);
 

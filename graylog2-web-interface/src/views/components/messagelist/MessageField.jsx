@@ -1,7 +1,8 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import connect from 'stores/connect';

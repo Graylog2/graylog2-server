@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';

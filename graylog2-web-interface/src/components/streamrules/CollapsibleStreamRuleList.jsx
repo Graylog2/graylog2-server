@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Collapse } from 'components/graylog';
 import StreamRuleList from 'components/streamrules/StreamRuleList';

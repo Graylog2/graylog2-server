@@ -5,7 +5,7 @@ import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
 import styled, { css } from 'styled-components';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
@@ -122,7 +122,7 @@ class SourceCodeEditor extends React.Component {
     const { mode } = this.props;
 
     if (mode === 'pipeline') {
-      const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
+      const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
       fetch('GET', url).then((response) => {
         const functions = response.map((res) => res.name).join('|');

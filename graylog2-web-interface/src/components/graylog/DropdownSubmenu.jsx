@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 
@@ -14,7 +15,7 @@ type Props = {
 };
 
 const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.attrs({
-  href: '#',
+  href: '#', /* stylelint-disable-line property-no-unknown */
 })(({ theme }) => css`
   &::after {
     display: block;

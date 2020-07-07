@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
 import { Row, Col, Checkbox } from 'components/graylog';

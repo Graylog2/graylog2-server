@@ -3,7 +3,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type StyledComponent from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -196,10 +197,12 @@ export default class AggregationControls extends React.Component<Props, State> {
               </DescriptionBox>
             )}
             {VisualizationConfigType && (
+              /* eslint-disable react/jsx-pascal-case */
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
                 <VisualizationConfigType.component onChange={this._onVisualizationConfigChange}
                                                    config={visualizationConfig} />
               </DescriptionBox>
+              /* eslint-enable react/jsx-pascal-case */
             )}
           </Col>
           <Col md={10} style={{ height: '100%', paddingLeft: '7px' }}>

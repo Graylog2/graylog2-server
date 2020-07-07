@@ -69,7 +69,7 @@ class InputDropdown extends React.Component {
         <div>
           <Input id="placeholder-select"
                  type="select"
-                 style={{ float: 'left', width: 400, marginRight: 10 }}
+                 style={{ float: 'left', width: 400, marginRight: 10 /* stylelint-disable-line declaration-colon-space-after */ }}
                  value={selectedInput}
                  onChange={this.onSelectedInputChange}
                  placeholder={this.PLACEHOLDER}>

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import jQuery from 'jquery';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import ObjectID from 'bson-objectid';
 
 import { ConfigurationForm } from 'components/configurationforms';

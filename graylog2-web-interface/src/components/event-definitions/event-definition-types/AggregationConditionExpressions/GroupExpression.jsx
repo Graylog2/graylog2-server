@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { cloneDeep } from 'lodash';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Clearfix } from 'components/graylog';
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';

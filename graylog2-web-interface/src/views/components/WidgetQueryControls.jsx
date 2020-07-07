@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Field } from 'formik';
 
 import connect from 'stores/connect';

@@ -1,5 +1,6 @@
 // @flow strict
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 

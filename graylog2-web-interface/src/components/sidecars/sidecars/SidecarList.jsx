@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Button, Alert, Col, Row, Table } from 'components/graylog';
 import { Icon, PaginatedList } from 'components/common';

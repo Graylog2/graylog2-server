@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';

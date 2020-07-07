@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import type StyledComponent from 'styled-components';
 // $FlowFixMe removing in future iteration
 import chroma from 'chroma-js';

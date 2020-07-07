@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { Tabs as BootstrapTabs } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import navTabsStyles from './styles/nav-tabs';
 

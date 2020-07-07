@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { ProgressBar } from 'components/graylog';
 import { LinkToNode, Timestamp, Icon } from 'components/common';

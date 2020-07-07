@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type StyledComponent from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { Icon } from 'components/common';
@@ -19,11 +20,9 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   position: absolute;
   padding: 5px 10px;
   left: 100%;
-
   font-size: ${theme.fonts.size.body};
   color: white;
   background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
-
   z-index: 4;
 `);
 
@@ -40,10 +39,10 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
   cursor: pointer;
   font-size: ${theme.fonts.size.h3};
   color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
-  cursor: pointer;
 
   :hover {
     background: ${theme.colors.gray[30]};
+
     > * {
       display: block;
     }
