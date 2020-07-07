@@ -16,7 +16,7 @@
  */
 package org.graylog.security.entities;
 
-import org.graylog.security.BuiltinRoles;
+import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -78,7 +78,7 @@ public class EntityOwnerShipService {
         }
 
         dbGrantService.create(GrantDTO.builder()
-                .role(BuiltinRoles.ROLE_ENTITY_OWNER)
+                .capability(Capability.OWN)
                 .target(entity)
                 .grantee(grnRegistry.ofUser(user))
                 .build(), user);
