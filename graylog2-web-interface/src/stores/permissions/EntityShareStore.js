@@ -18,7 +18,7 @@ export type EntitySharePayload = {
 };
 
 type EntityShareActionsType = RefluxActions<{
-  prepare: (GRN, EntitySharePayload) => Promise<EntityShareState>,
+  prepare: (GRN, ?EntitySharePayload) => Promise<EntityShareState>,
   update: (GRN, EntitySharePayload) => Promise<EntityShareState>,
 }>;
 
