@@ -48,7 +48,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.security.entities.EntityOwnerShipService;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -123,7 +123,7 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnerShipService.class));
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class));
         eventDefinitionHandler = new EventDefinitionHandler(
                 eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();

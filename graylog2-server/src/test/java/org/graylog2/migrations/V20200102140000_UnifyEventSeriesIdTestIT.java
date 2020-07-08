@@ -24,7 +24,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.graylog.security.entities.EntityOwnerShipService;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -64,7 +64,7 @@ public class V20200102140000_UnifyEventSeriesIdTestIT {
         objectMapper.registerSubtypes(new NamedType(TemplateFieldValueProvider.Config.class, TemplateFieldValueProvider.Config.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, dbEventProcessorStateService, mock(EntityOwnerShipService.class));
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, dbEventProcessorStateService, mock(EntityOwnershipService.class));
 
         migration = new V20200102140000_UnifyEventSeriesId(clusterConfigService, eventDefinitionService, objectMapperProvider);
     }

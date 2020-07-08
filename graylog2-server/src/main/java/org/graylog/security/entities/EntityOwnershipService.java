@@ -32,15 +32,15 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class EntityOwnerShipService {
-    private static final Logger LOG = LoggerFactory.getLogger(EntityOwnerShipService.class);
+public class EntityOwnershipService {
+    private static final Logger LOG = LoggerFactory.getLogger(EntityOwnershipService.class);
 
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
     private final UserContext.Factory userContextFactory;
 
     @Inject
-    public EntityOwnerShipService(DBGrantService dbGrantService,
+    public EntityOwnershipService(DBGrantService dbGrantService,
                                   GRNRegistry grnRegistry,
                                   UserContext.Factory userContextFactory) {
         this.dbGrantService = dbGrantService;

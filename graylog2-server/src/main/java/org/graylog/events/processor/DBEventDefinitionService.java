@@ -18,7 +18,7 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.notifications.EventNotificationConfig;
-import org.graylog.security.entities.EntityOwnerShipService;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -39,13 +39,13 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
     private static final String COLLECTION_NAME = "event_definitions";
 
     private final DBEventProcessorStateService stateService;
-    private final EntityOwnerShipService entityOwnerShipService;
+    private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnerShipService entityOwnerShipService) {
+                                    EntityOwnershipService entityOwnerShipService) {
         super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME);
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;

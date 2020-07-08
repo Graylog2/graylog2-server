@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.views;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
-import org.graylog.security.entities.EntityOwnerShipService;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -45,14 +45,14 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
-    private final EntityOwnerShipService entityOwnerShipService;
+    private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
                           ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
-                          EntityOwnerShipService entityOwnerShipService) {
+                          EntityOwnershipService entityOwnerShipService) {
         super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
