@@ -27,15 +27,17 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
 
     private final ElasticsearchClient client;
     private final long totalHits;
+    private final int limit;
     private final String scroll;
     private final List<String> fields;
     private final String queryHash;
     private String scrollId;
     private SearchResponse initialResult;
     private int chunkId = 0;
+    private int resultCount = 0;
 
     public interface Factory {
-        ScrollResultES7 create(@Assisted SearchResponse initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, @Assisted List<String> fields);
+        ScrollResultES7 create(SearchResponse initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields, int limit);
     }
 
     @AssistedInject
@@ -43,12 +45,14 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
                            @Assisted SearchResponse initialResult,
                            @Assisted("query") String query,
                            @Assisted("scroll") String scroll,
-                           @Assisted List<String> fields) {
+                           @Assisted List<String> fields,
+                           @Assisted int limit) {
         super(query, null, initialResult.getTook().getMillis());
 
         this.client = client;
         this.totalHits = initialResult.getHits().getTotalHits().value;
         checkArgument(initialResult.getScrollId() != null, "Unable to extract scroll id from supplied search result!");
+        this.limit = limit;
         this.scrollId = initialResult.getScrollId();
         this.initialResult = initialResult;
         this.scroll = scroll;
@@ -62,6 +66,11 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
 
     @Override
     public ScrollChunk nextChunk() throws IOException {
+        if (limit != -1 && resultCount >= limit) {
+            LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
+            return null;
+        }
+
         final SearchResponse result = this.initialResult != null ? this.initialResult : nextSearchResult();
         this.initialResult = null;
 
@@ -75,13 +84,21 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
             return null;
         }
 
+        final int remainingResultsForLimit = limit - resultCount;
+
+        final List<ResultMessage> resultMessagesSlice = (limit != -1 && remainingResultsForLimit < resultMessages.size())
+                ? resultMessages.subList(0, remainingResultsForLimit)
+                : resultMessages;
+
+        resultCount += resultMessagesSlice.size();
+
         this.scrollId = result.getScrollId();
 
-        return ScrollChunkES7.create(fields, chunkId++, resultMessages);
+        return ScrollChunkES7.create(fields, chunkId++, resultMessagesSlice);
     }
 
     private SearchResponse nextSearchResult() throws IOException {
-        final SearchScrollRequest scrollRequest = new SearchScrollRequest(initialResult.getScrollId());
+        final SearchScrollRequest scrollRequest = new SearchScrollRequest(this.scrollId);
         scrollRequest.scroll(TimeValue.parseTimeValue(this.scroll, DEFAULT_SCROLL, "scroll time"));
         return client.executeUnsafe((c, requestOptions) -> c.scroll(scrollRequest, requestOptions),
                 "Unable to retrieve next chunk from search: ");

@@ -53,9 +53,9 @@ public class Scroll {
                 .ifPresent(batchSize -> searchQuery.size(Math.toIntExact(batchSize)));
         final SearchRequest request = scrollBuilder(searchQuery, scrollCommand.indices());
 
-        final SearchResponse result = client.search(request, "Unable to perform scroll search");
+        final SearchResponse result = client.singleSearch(request, "Unable to perform scroll search");
 
-        return scrollResultFactory.create(result, searchQuery.toString(), DEFAULT_SCROLLTIME, scrollCommand.fields());
+        return scrollResultFactory.create(result, searchQuery.toString(), DEFAULT_SCROLLTIME, scrollCommand.fields(), scrollCommand.limit().orElse(-1));
     }
 
     private SearchRequest scrollBuilder(SearchSourceBuilder query, Set<String> indices) {
@@ -122,7 +122,7 @@ public class Scroll {
 
     private void applyPaginationIfPresent(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {
         scrollCommand.offset().ifPresent(searchSourceBuilder::from);
-        scrollCommand.limit().ifPresent(searchSourceBuilder::size);
+        scrollCommand.batchSize().ifPresent(batchSize -> searchSourceBuilder.size(Math.toIntExact(batchSize)));
     }
 
     private void applyHighlighting(SearchSourceBuilder searchSourceBuilder, ScrollCommand scrollCommand) {

@@ -17,8 +17,8 @@ public class SearchesES7IT extends SearchesIT {
     }
 
     private SearchesAdapter createSearchesAdapter() {
-        final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields) -> new ScrollResultES7(
-                elasticsearch.elasticsearchClient(), initialResult, query, scroll, fields
+        final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
+                elasticsearch.elasticsearchClient(), initialResult, query, scroll, fields, limit
         );
         final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;

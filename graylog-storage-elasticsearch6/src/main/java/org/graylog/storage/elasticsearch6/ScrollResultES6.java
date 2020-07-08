@@ -55,16 +55,28 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
     private int chunkId = 0;
 
     public interface Factory {
-        ScrollResultES6 create(@Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, @Assisted List<String> fields);
+        ScrollResultES6 create(SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll,
+                               List<String> fields, int limit);
     }
 
     @AssistedInject
-    public ScrollResultES6(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted List<String> fields) {
-        this(jestClient, objectMapper, initialResult, query, DEFAULT_SCROLL, fields);
+    public ScrollResultES6(JestClient jestClient,
+                           ObjectMapper objectMapper,
+                           @Assisted SearchResult initialResult,
+                           @Assisted("query") String query,
+                           @Assisted List<String> fields,
+                           @Assisted int limit) {
+        this(jestClient, objectMapper, initialResult, query, DEFAULT_SCROLL, fields, limit);
     }
 
     @AssistedInject
-    public ScrollResultES6(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, @Assisted List<String> fields) {
+    public ScrollResultES6(JestClient jestClient,
+                           ObjectMapper objectMapper,
+                           @Assisted SearchResult initialResult,
+                           @Assisted("query") String query,
+                           @Assisted("scroll") String scroll,
+                           @Assisted List<String> fields,
+                           @Assisted int limit) {
         super(query, null, initialResult.getJsonObject().path("took").asLong());
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;

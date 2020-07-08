@@ -62,6 +62,10 @@ public class ElasticsearchClient {
         return firstResponseFrom(result, errorMessage);
     }
 
+    public SearchResponse singleSearch(SearchRequest searchRequest, String errorMessage) {
+        return execute((c, requestOptions) -> c.search(searchRequest, requestOptions), errorMessage);
+    }
+
     private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
         checkArgument(result != null);
         checkArgument(result.getResponses().length == 1);
