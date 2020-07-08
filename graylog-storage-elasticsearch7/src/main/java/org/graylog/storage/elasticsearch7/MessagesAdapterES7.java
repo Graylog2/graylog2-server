@@ -96,47 +96,72 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         final List<Messages.IndexingError> indexFailures = new ArrayList<>();
         for (List<IndexingRequest> chunk : chunks) {
 
-            final BulkRequest bulkRequest = new BulkRequest();
-            chunk.forEach(request -> bulkRequest.add(
-                    indexRequestFrom(request)
-            ));
-
-            final BulkResponse result;
-            try {
-                result = this.client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions));
-            } catch (ElasticsearchException e) {
-                for (ElasticsearchException cause : e.guessRootCauses()) {
-                    if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
-                        throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
-                    }
-                }
-                throw new org.graylog2.indexer.ElasticsearchException(e);
-            }
+            final BulkResponse result = runBulkRequest(indexedSuccessfully, chunk);
 
             indexedSuccessfully += chunk.size();
 
-            final List<BulkItemResponse> failures = Arrays.stream(result.getItems())
-                    .filter(BulkItemResponse::isFailed)
-                    .collect(Collectors.toList());
+            final List<BulkItemResponse> failures = extractFailures(result);
+
             indexFailures.addAll(indexingErrorsFrom(failures, messageList));
 
-            if (LOG.isDebugEnabled()) {
-                String chunkInfo = "";
-                if (chunkSize != messageList.size()) {
-                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
-                            (int) Math.ceil((double) messageList.size() / chunkSize), offset);
-                }
-                LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
-                        result.getItems().length, chunkInfo, failures.size());
-            }
-            if (!failures.isEmpty()) {
-                LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
-                        failures.size(), result.buildFailureMessage());
-            }
+            logDebugInfo(messageList, offset, chunkSize, chunkCount, result, failures);
+
+            logFailures(result, failures.size());
+
             chunkCount++;
         }
 
         return indexFailures;
+    }
+
+    private List<BulkItemResponse> extractFailures(BulkResponse result) {
+        return Arrays.stream(result.getItems())
+                        .filter(BulkItemResponse::isFailed)
+                        .collect(Collectors.toList());
+    }
+
+    private void logFailures(BulkResponse result, int failureCount) {
+        if (failureCount > 0) {
+            LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
+                    failureCount, result.buildFailureMessage());
+        }
+    }
+
+    private void logDebugInfo(List<IndexingRequest> messageList, int offset, int chunkSize, int chunkCount, BulkResponse result, List<BulkItemResponse> failures) {
+        if (LOG.isDebugEnabled()) {
+            String chunkInfo = "";
+            if (chunkSize != messageList.size()) {
+                chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
+                        (int) Math.ceil((double) messageList.size() / chunkSize), offset);
+            }
+            LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
+                    result.getItems().length, chunkInfo, failures.size());
+        }
+    }
+
+    private BulkResponse runBulkRequest(int indexedSuccessfully, List<IndexingRequest> chunk) throws ChunkedBulkIndexer.EntityTooLargeException {
+        final BulkRequest bulkRequest = createBulkRequest(chunk);
+
+        final BulkResponse result;
+        try {
+            result = this.client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions));
+        } catch (ElasticsearchException e) {
+            for (ElasticsearchException cause : e.guessRootCauses()) {
+                if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
+                    throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
+                }
+            }
+            throw new org.graylog2.indexer.ElasticsearchException(e);
+        }
+        return result;
+    }
+
+    private BulkRequest createBulkRequest(List<IndexingRequest> chunk) {
+        final BulkRequest bulkRequest = new BulkRequest();
+        chunk.forEach(request -> bulkRequest.add(
+                indexRequestFrom(request)
+        ));
+        return bulkRequest;
     }
 
     private List<Messages.IndexingError> indexingErrorsFrom(List<IndexingRequest> messageList) {
