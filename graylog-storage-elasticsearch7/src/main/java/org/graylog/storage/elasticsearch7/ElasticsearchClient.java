@@ -9,6 +9,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClientBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog2.indexer.IndexNotFoundException;
 
@@ -37,15 +38,19 @@ public class ElasticsearchClient {
                                @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
                                @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
                                @Named("elasticsearch_compression_enabled") boolean compressionEnabled) {
-        this.client = new RestHighLevelClient(RestClient.builder(
-                elasticsearchHosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new)
-        ).setRequestConfigCallback(requestConfig -> requestConfig
-                .setConnectTimeout(Math.toIntExact(elasticsearchConnectTimeout.toMilliseconds()))
-                .setSocketTimeout(Math.toIntExact(elasticsearchSocketTimeout.toMilliseconds()))
-        ).setHttpClientConfigCallback(httpClientConfig -> httpClientConfig
-                .setMaxConnTotal(elasticsearchMaxTotalConnections)
-                .setMaxConnPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
-        ));
+        final HttpHost[] esHosts = elasticsearchHosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
+
+        final RestClientBuilder restClientBuilder = RestClient.builder(esHosts)
+                .setRequestConfigCallback(requestConfig -> requestConfig
+                        .setConnectTimeout(Math.toIntExact(elasticsearchConnectTimeout.toMilliseconds()))
+                        .setSocketTimeout(Math.toIntExact(elasticsearchSocketTimeout.toMilliseconds()))
+                )
+                .setHttpClientConfigCallback(httpClientConfig -> httpClientConfig
+                        .setMaxConnTotal(elasticsearchMaxTotalConnections)
+                        .setMaxConnPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
+                );
+
+        this.client = new RestHighLevelClient(restClientBuilder);
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
