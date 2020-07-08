@@ -99,7 +99,7 @@ const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee:
             {isDeleting ? (
               <Spinner text="" />
             ) : (
-              <IconButton name="trash" onClick={handleDelete} title={`Delete sharing for ${title}`} />
+              <IconButton name="trash" onClick={handleDelete} title={`Remove sharing for ${title}`} />
             )}
           </Actions>
         </Container>

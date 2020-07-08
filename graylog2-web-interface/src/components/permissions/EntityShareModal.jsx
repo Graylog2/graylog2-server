@@ -39,6 +39,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
   return (
     <BootstrapModalConfirm confirmButtonDisabled={disableSubmit}
                            confirmButtonText="Save"
+                           cancelButtonText="Discard changes"
                            onConfirm={_handleSave}
                            onModalClose={onClose}
                            showModal
