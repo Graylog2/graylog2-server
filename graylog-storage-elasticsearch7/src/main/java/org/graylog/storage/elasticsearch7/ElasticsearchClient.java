@@ -66,11 +66,12 @@ public class ElasticsearchClient {
         checkArgument(result != null);
         checkArgument(result.getResponses().length == 1);
 
-        if (result.getResponses()[0].getResponse() == null) {
-            throw exceptionFrom(result.getResponses()[0].getFailure(), errorMessage);
+        final MultiSearchResponse.Item firstResponse = result.getResponses()[0];
+        if (firstResponse.getResponse() == null) {
+            throw exceptionFrom(firstResponse.getFailure(), errorMessage);
         }
 
-        return result.getResponses()[0].getResponse();
+        return firstResponse.getResponse();
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {
