@@ -7,6 +7,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { ButtonToolbar, Button } from 'components/graylog';
 import { PageHeader } from 'components/common';
+import UsersOverview from 'components/users/UsersOverview';
 
 const UsersOverviewPage = () => {
   return (
@@ -31,6 +32,8 @@ const UsersOverviewPage = () => {
 
         </ButtonToolbar>
       </PageHeader>
+
+      <UsersOverview />
     </div>
   );
 };
