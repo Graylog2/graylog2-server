@@ -10,7 +10,6 @@ export type Colors = {
   global: {
     background: string,
     contentBackground: string,
-    inputBackground: string,
     link: string,
     linkHover: string,
     textAlt: string,

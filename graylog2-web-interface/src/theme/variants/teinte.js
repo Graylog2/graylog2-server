@@ -90,10 +90,6 @@ const input = {
   placeholder: gray[60],
 };
 
-/* eslint-disable prefer-destructuring */
-global.inputBackground = global.contentBackground;
-/* eslint-enable prefer-destructuring */
-
 const teinte = {
   brand,
   global,
