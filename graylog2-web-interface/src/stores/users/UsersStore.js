@@ -9,13 +9,14 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import UsersActions from 'actions/users/UsersActions';
 import { singletonStore } from 'views/logic/singleton';
+import User from 'logic/users/User';
 
 type StartPage = {
   id: string,
   type: string,
 };
 
-export type User = {
+export type UserJSON = {
   username: string,
   id: string,
   full_name: string,
@@ -72,7 +73,7 @@ const UsersStore: UsersStoreType = singletonStore(
         .then(
           (response) => {
             const { users } = response;
-            this.list = users;
+            this.list = Immutable.List(users.map((user) => User.fromJSON(user)));
             this._trigger();
 
             return users;
@@ -88,7 +89,7 @@ const UsersStore: UsersStoreType = singletonStore(
       return promise;
     },
 
-    load(username: string): Promise<User> {
+    load(username: string): Promise<UserJSON> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
       const promise = fetch('GET', url);
 
