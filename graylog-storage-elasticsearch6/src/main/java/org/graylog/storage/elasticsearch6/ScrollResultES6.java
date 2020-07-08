@@ -52,7 +52,9 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
     private final long totalHits;
 
     private String scrollId;
+    private final int limit;
     private int chunkId = 0;
+    private int resultCount = 0;
 
     public interface Factory {
         ScrollResultES6 create(SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll,
@@ -85,6 +87,7 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
         this.fields = fields;
         totalHits = initialResult.getTotal();
         scrollId = getScrollIdFromResult(initialResult);
+        this.limit = limit;
 
         final Md5Hash md5Hash = new Md5Hash(getOriginalQuery());
         queryHash = md5Hash.toHex();
@@ -94,34 +97,48 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
 
     @Override
     public ScrollChunk nextChunk() throws IOException {
+        if (limit != -1 && resultCount >= limit) {
+            LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
+            return null;
+        }
 
         final JestResult search;
-        final List<ResultMessage> hits;
+        final List<ResultMessage> resultMessages;
         if (initialResult == null) {
             search = getNextScrollResult();
-            hits = StreamSupport.stream(search.getJsonObject().path("hits").path("hits").spliterator(), false)
+            resultMessages = StreamSupport.stream(search.getJsonObject().path("hits").path("hits").spliterator(), false)
                     .map(hit -> ResultMessage.parseFromSource(hit.path("_id").asText(),
                             hit.path("_index").asText(),
                             objectMapper.convertValue(hit.get("_source"), TypeReferences.MAP_STRING_OBJECT)))
                     .collect(Collectors.toList());
         } else {
-            // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
+            // make sure to return the initial resultMessages, see https://github.com/Graylog2/graylog2-server/issues/2126
             search = initialResult;
-            hits = initialResult.getHits(Map.class, false).stream()
+            resultMessages = initialResult.getHits(Map.class, false).stream()
                 .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
                 .collect(Collectors.toList());
             this.initialResult = null;
         }
 
-        if (hits.size() == 0) {
+        if (resultMessages.size() == 0) {
             // scroll exhausted
             LOG.debug("[{}] Reached end of scroll results for query {}", queryHash, getOriginalQuery());
             return null;
         }
-        LOG.debug("[{}][{}] New scroll id {}, number of hits in chunk: {}", queryHash, chunkId, getScrollIdFromResult(search), hits.size());
+
+        final int remainingResultsForLimit = limit - resultCount;
+
+        final List<ResultMessage> resultMessagesSlice = (limit != -1 && remainingResultsForLimit < resultMessages.size())
+                ? resultMessages.subList(0, remainingResultsForLimit)
+                : resultMessages;
+
+        resultCount += resultMessagesSlice.size();
+
+        LOG.debug("[{}][{}] New scroll id {}, number of resultMessages in chunk: {}", queryHash, chunkId,
+                getScrollIdFromResult(search), resultMessagesSlice.size());
         scrollId = getScrollIdFromResult(search); // save the id for the next request.
 
-        return new ScrollChunkES6(hits, fields, chunkId++);
+        return new ScrollChunkES6(resultMessagesSlice, fields, chunkId++);
     }
 
     private String getScrollIdFromResult(JestResult result) {

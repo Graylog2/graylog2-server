@@ -100,7 +100,8 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 () -> "Unable to perform scroll search",
                 searchQuery,
                 DEFAULT_SCROLLTIME,
-                scrollCommand.fields()
+                scrollCommand.fields(),
+                scrollCommand.limit().orElse(-1)
         );
     }
 

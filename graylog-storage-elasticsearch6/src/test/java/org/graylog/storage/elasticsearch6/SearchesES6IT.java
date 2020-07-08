@@ -21,8 +21,8 @@ public class SearchesES6IT extends SearchesIT {
     }
 
     private SearchesAdapter createSearchesAdapter() {
-        final ScrollResultES6.Factory scrollResultFactory = (initialResult, query, scroll, fields) -> new ScrollResultES6(
-                jestClient(elasticsearch), new ObjectMapper(), initialResult, query, scroll, fields
+        final ScrollResultES6.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES6(
+                jestClient(elasticsearch), new ObjectMapper(), initialResult, query, scroll, fields, limit
         );
 
         return new SearchesAdapterES6(
