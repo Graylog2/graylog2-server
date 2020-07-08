@@ -151,6 +151,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex((x) => x === visualization) >= 0;
     const childrenWithCallback = React.Children.map(children, (child) => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
+    const VisualizationConfigComponent = VisualizationConfigType?.component;
 
     return (
       <Container>
@@ -196,13 +197,11 @@ export default class AggregationControls extends React.Component<Props, State> {
                 <EventListConfiguration enabled={config.eventAnnotation} onChange={this._onSetEventAnnotation} />
               </DescriptionBox>
             )}
-            {VisualizationConfigType && (
-              /* eslint-disable react/jsx-pascal-case */
+            {VisualizationConfigComponent && (
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
-                <VisualizationConfigType.component onChange={this._onVisualizationConfigChange}
-                                                   config={visualizationConfig} />
+                <VisualizationConfigComponent onChange={this._onVisualizationConfigChange}
+                                              config={visualizationConfig} />
               </DescriptionBox>
-              /* eslint-enable react/jsx-pascal-case */
             )}
           </Col>
           <Col md={10} style={{ height: '100%', paddingLeft: '7px' }}>
