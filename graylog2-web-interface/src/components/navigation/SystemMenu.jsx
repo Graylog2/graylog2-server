@@ -113,6 +113,9 @@ const SystemMenu = ({ location }) => {
         <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
       </IfPermitted>
       <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
+      </IfPermitted>
+      <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} description="Authentication" />
       </IfPermitted>
       <IfPermitted permissions={['dashboards:create', 'inputs:create', 'streams:create']}>
