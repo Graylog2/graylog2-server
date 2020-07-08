@@ -21,6 +21,9 @@ type InternalState = {
   external: boolean,
   sessionTimeoutMs: number,
   startpage?: StartPage,
+  sessionActive: boolean,
+  clientAddress: string,
+  lastActivity: string,
 };
 
 export default class User {
@@ -40,6 +43,9 @@ export default class User {
     external: $PropertyType<InternalState, 'external'>,
     sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>,
     startpage: $PropertyType<InternalState, 'startpage'>,
+    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
+    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
+    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
   ) {
     this._value = {
       id,
@@ -54,6 +60,9 @@ export default class User {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     };
   }
 
@@ -105,6 +114,18 @@ export default class User {
     return this._value.startpage;
   }
 
+  get sessionActive() {
+    return this._value.sessionActive;
+  }
+
+  get clientAddress() {
+    return this._value.clientAddress;
+  }
+
+  get lastActivity() {
+    return this._value.lastActivity;
+  }
+
   toBuilder() {
     const {
       id,
@@ -119,6 +140,9 @@ export default class User {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     } = this._value;
 
     // eslint-disable-next-line no-use-before-define
@@ -135,6 +159,9 @@ export default class User {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     }));
   }
 
@@ -152,6 +179,9 @@ export default class User {
     external: $PropertyType<InternalState, 'external'>,
     sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>,
     startpage: $PropertyType<InternalState, 'startpage'>,
+    sessionActive: $PropertyType<InternalState, 'sessionActive'>,
+    clientAddress: $PropertyType<InternalState, 'clientAddress'>,
+    lastActivity: $PropertyType<InternalState, 'lastActivity'>,
   ) {
     return new User(
       id,
@@ -166,6 +196,9 @@ export default class User {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     );
   }
 
@@ -183,6 +216,9 @@ export default class User {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     } = this._value;
 
     return {
@@ -198,6 +234,9 @@ export default class User {
       external,
       session_timeout_ms: sessionTimeoutMs,
       startpage,
+      session_active: sessionActive,
+      client_address: clientAddress,
+      last_activity: lastActivity,
     };
   }
 
@@ -218,6 +257,12 @@ export default class User {
       // eslint-disable-next-line camelcase
       session_timeout_ms,
       startpage,
+      // eslint-disable-next-line camelcase
+      session_active,
+      // eslint-disable-next-line camelcase
+      client_address,
+      // eslint-disable-next-line camelcase
+      last_activity,
     } = value;
 
     return User.create(
@@ -233,7 +278,16 @@ export default class User {
       external,
       session_timeout_ms,
       startpage,
+      session_active,
+      client_address,
+      last_activity,
     );
+  }
+
+  // eslint-disable-next-line no-use-before-define
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
   }
 }
 
@@ -301,6 +355,21 @@ class Builder {
     return new Builder(this.value.set('startpage', value));
   }
 
+  // eslint-disable-next-line no-undef
+  sessionActive(value: $PropertyType<InternalState, 'sessionActive'>) {
+    return new Builder(this.value.set('sessionActive', value));
+  }
+
+  // eslint-disable-next-line no-undef
+  clientAddress(value: $PropertyType<InternalState, 'clientAddress'>) {
+    return new Builder(this.value.set('clientAddress', value));
+  }
+
+  // eslint-disable-next-line no-undef
+  lastActivity(value: $PropertyType<InternalState, 'lastActivity'>) {
+    return new Builder(this.value.set('lastActivity', value));
+  }
+
   build() {
     const {
       id,
@@ -315,6 +384,9 @@ class Builder {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     } = this.value.toObject();
 
     return new User(
@@ -330,6 +402,9 @@ class Builder {
       external,
       sessionTimeoutMs,
       startpage,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     );
   }
 }

@@ -31,6 +31,10 @@ export type UserJSON = {
   session_timeout_ms: number,
 
   startpage?: StartPage,
+
+  session_active: boolean,
+  client_address: string,
+  last_activity: string,
 };
 
 export type Token = {
