@@ -199,25 +199,21 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Test
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
-        final String index = "messages_it_deflector";
-
-        client().putSetting("cluster.info.update.interval", "10s");
-
-        triggerFloodStage(index);
+        triggerFloodStage(INDEX_NAME);
 
         final ExecutorService executor = Executors.newFixedThreadPool(1);
 
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024 * 1024, 50);
         final Future<List<String>> result = executor.submit(() -> this.messages.bulkIndex(messageBatch));
 
-        resetFloodStage(index);
+        resetFloodStage(INDEX_NAME);
 
         final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
         assertThat(failedItems).isEmpty();
 
         client().refreshNode();
 
-        assertThat(messageCount(index)).isEqualTo(50);
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
     }
 
     private void triggerFloodStage(String index) {
