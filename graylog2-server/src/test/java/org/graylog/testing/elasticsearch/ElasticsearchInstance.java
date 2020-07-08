@@ -77,6 +77,7 @@ public abstract class ElasticsearchInstance extends ExternalResource {
                 .withEnv("ES_JAVA_OPTS", "-Xms1024m -Xmx1024m")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", ".watches,.triggered_watches,.watcher-history-*")
+                .withEnv("cluster.info.update.interval", "10s")
                 .withNetwork(network)
                 .withNetworkAliases(NETWORK_ALIAS)
                 .waitingFor(Wait.forHttp("/").forPort(ES_PORT));
