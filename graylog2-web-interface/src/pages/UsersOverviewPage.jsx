@@ -3,11 +3,11 @@ import * as React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { ButtonToolbar, Button } from 'components/graylog';
 import { PageHeader } from 'components/common';
 import UsersOverview from 'components/users/UsersOverview';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 const UsersOverviewPage = () => {
   return (
