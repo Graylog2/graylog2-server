@@ -35,6 +35,7 @@ package org.graylog2.indexer.messages;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import joptsimple.internal.Strings;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexFailure;
@@ -63,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -201,10 +203,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
         triggerFloodStage(INDEX_NAME);
 
-        final ExecutorService executor = Executors.newFixedThreadPool(1);
-
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024 * 1024, 50);
-        final Future<List<String>> result = executor.submit(() -> this.messages.bulkIndex(messageBatch));
+        final Future<List<String>> result = background(() -> this.messages.bulkIndex(messageBatch));
 
         resetFloodStage(INDEX_NAME);
 
@@ -214,6 +214,13 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+    }
+
+    private Future<List<String>> background(Callable<List<String>> task) {
+        final ExecutorService executor = Executors.newFixedThreadPool(1,
+                new ThreadFactoryBuilder().setNameFormat("messages-it-%d").build());
+
+        return executor.submit(task);
     }
 
     private void triggerFloodStage(String index) {
