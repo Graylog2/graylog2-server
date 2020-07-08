@@ -81,6 +81,7 @@ import {
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
+  UsersOverviewPage,
   UsersPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
@@ -212,6 +213,7 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
+              <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
