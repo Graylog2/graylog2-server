@@ -23,6 +23,8 @@ import io.searchbox.client.JestClient;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
+import io.searchbox.indices.CreateIndex;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
 import org.slf4j.Logger;
@@ -33,8 +35,10 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FixtureImporterES6 implements FixtureImporter {
     private static final Logger LOG = LoggerFactory.getLogger(FixtureImporter.class);
@@ -85,6 +89,7 @@ public class FixtureImporterES6 implements FixtureImporter {
          */
         final Bulk.Builder bulkBuilder = new Bulk.Builder();
 
+        final Set<String> indicesToCreate = new HashSet<>();
         for (final JsonNode document : root.path("documents")) {
             final List<JsonNode> indexes = new ArrayList<>();
             Map<String, Object> data = new HashMap<>();
@@ -104,7 +109,9 @@ public class FixtureImporterES6 implements FixtureImporter {
                     throw new IllegalArgumentException("Missing indexName in " + index);
                 }
 
-                indexBuilder.index(index.path("indexName").asText());
+                final String indexName = index.path("indexName").asText();
+                indicesToCreate.add(indexName);
+                indexBuilder.index(indexName);
 
                 if (index.hasNonNull("indexType")) {
                     indexBuilder.type(index.path("indexType").asText());
@@ -116,6 +123,10 @@ public class FixtureImporterES6 implements FixtureImporter {
 
                 bulkBuilder.addAction(indexBuilder.build());
             }
+        }
+
+        for (String indexName : indicesToCreate) {
+            createIndex(indexName);
         }
 
         final BulkResult result = jestClient.execute(bulkBuilder.build());
@@ -143,5 +154,10 @@ public class FixtureImporterES6 implements FixtureImporter {
 
             throw new IllegalStateException(sb.toString());
         }
+    }
+
+    private void createIndex(String indexName) {
+        final CreateIndex.Builder request = new CreateIndex.Builder(indexName);
+        JestUtils.execute(jestClient, request.build(), () -> "Unable to create index for test: " + indexName);
     }
 }
