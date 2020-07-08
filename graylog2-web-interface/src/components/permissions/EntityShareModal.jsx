@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
-import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { EntityShareStore, EntityShareActions, type EntitySharePayload } from 'stores/permissions/EntityShareStore';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import EntityShareSettings from './EntityShareSettings';
@@ -31,10 +31,11 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
 
   const _handleSave = () => {
     setDisableSubmit(true);
-
-    return EntityShareActions.update(entityGRN, {
+    const payload: EntitySharePayload = {
       selected_grantee_capabilities: entityShareState.selectedGranteeCapabilities,
-    }).then(onClose);
+    };
+
+    return EntityShareActions.update(entityGRN, payload).then(onClose);
   };
 
   return (
