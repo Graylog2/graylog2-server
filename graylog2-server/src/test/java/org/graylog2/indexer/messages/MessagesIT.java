@@ -63,6 +63,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -145,7 +148,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         // Check if we can index about 300MB of messages (once the large batch gets split up)
         final int MESSAGECOUNT = 303;
         // Each Message is about 1 MB
-        final ArrayList<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
+        final List<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
         final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
 
         assertThat(failedItems).isEmpty();
@@ -192,6 +195,46 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final List<IndexFailure> failures = this.messages.getIndexFailureQueue().poll(1L, TimeUnit.SECONDS);
 
         assertThat(failures).hasSize(1);
+    }
+
+    @Test
+    public void retryIndexingMessagesDuringFloodStage() throws Exception {
+        final String index = "messages_it_deflector";
+
+        client().putSetting("cluster.info.update.interval", "10s");
+
+        triggerFloodStage(index);
+
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+
+        final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024 * 1024, 50);
+        final Future<List<String>> result = executor.submit(() -> this.messages.bulkIndex(messageBatch));
+
+        Thread.sleep(2000);
+        resetFloodStage(index);
+
+        final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
+        assertThat(failedItems).isEmpty();
+
+        client().refreshNode();
+
+        assertThat(messageCount(index)).isEqualTo(50);
+    }
+
+    private void triggerFloodStage(String index) {
+        client().putSetting("cluster.routing.allocation.disk.watermark.low", "0%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.high", "0%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.flood_stage", "0%");
+
+        client().waitForIndexBlock(index);
+    }
+
+    private void resetFloodStage(String index) {
+        client().putSetting("cluster.routing.allocation.disk.watermark.flood_stage", "95%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.high", "90%");
+        client().putSetting("cluster.routing.allocation.disk.watermark.low", "85%");
+
+        client().resetIndexBlock(index);
     }
 
     private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {

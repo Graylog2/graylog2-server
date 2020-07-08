@@ -40,7 +40,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterES7.class);
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String MAPPER_PARSING_EXCEPTION = "mapper_parsing_exception";
-    static final String INDEX_BLOCK_REASON = "blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];";
+    static final String INDEX_BLOCK_REASON = "blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)";
 
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
@@ -176,7 +176,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         final ParsedElasticsearchException exception = ParsedElasticsearchException.from(item.getFailureMessage());
         switch (exception.type()) {
             case MAPPER_PARSING_EXCEPTION: return Messages.IndexingError.ErrorType.MappingError;
-            case INDEX_BLOCK_ERROR: if (exception.reason().equals(INDEX_BLOCK_REASON)) return Messages.IndexingError.ErrorType.IndexBlocked;
+            case INDEX_BLOCK_ERROR: if (exception.reason().contains(INDEX_BLOCK_REASON)) return Messages.IndexingError.ErrorType.IndexBlocked;
             default: return Messages.IndexingError.ErrorType.Unknown;
         }
     }
