@@ -7,6 +7,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import UsersActions from 'actions/users/UsersActions';
 import { singletonStore } from 'views/logic/singleton';
 
 type StartPage = {
@@ -51,6 +52,9 @@ type UsersStoreType = Store<UsersStoreState>;
 const UsersStore: UsersStoreType = singletonStore(
   'Users',
   () => Reflux.createStore({
+    listenables: [UsersActions],
+    list: undefined,
+
     getInitialState(): UsersStoreState {
       return this._state();
     },
@@ -66,7 +70,13 @@ const UsersStore: UsersStoreType = singletonStore(
       const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
       const promise = fetch('GET', url)
         .then(
-          (response) => response.users,
+          (response) => {
+            const { users } = response;
+            this.list = users;
+            this._trigger();
+
+            return users;
+          },
           (error) => {
             if (error.additional.status !== 404) {
               UserNotification.error(`Loading user list failed with status: ${error}`,
