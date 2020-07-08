@@ -22,7 +22,9 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
+import org.graylog.security.GrantPermissionResolver;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
@@ -73,6 +75,8 @@ public class UserServiceImplTest {
     private InMemoryRolePermissionResolver permissionsResolver;
     @Mock
     private EventBus serverEventBus;
+    @Mock
+    private GrantPermissionResolver grantPermissionResolver;
 
     @Before
     public void setUp() throws Exception {
@@ -81,7 +85,7 @@ public class UserServiceImplTest {
         this.userFactory = new UserImplFactory(configuration);
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
-                                               userFactory, permissionsResolver, serverEventBus);
+                                               userFactory, permissionsResolver, serverEventBus, grantPermissionResolver);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -209,7 +213,7 @@ public class UserServiceImplTest {
         final InMemoryRolePermissionResolver permissionResolver = mock(InMemoryRolePermissionResolver.class);
         final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService,
                                                             accessTokenService,userFactory, permissionResolver,
-                                                            serverEventBus);
+                                                            serverEventBus, grantPermissionResolver);
 
         final UserImplFactory factory = new UserImplFactory(new Configuration());
         final UserImpl user = factory.create(new HashMap<>());
@@ -220,8 +224,9 @@ public class UserServiceImplTest {
         user.setPermissions(Collections.singletonList("hello:world"));
 
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
+        when(grantPermissionResolver.resolvePermissionsForUser("user")).thenReturn(ImmutableSet.of(new WildcardPermission("perm:from:grant")));
 
         assertThat(userService.getPermissionsForUser(user)).containsOnly("users:passwordchange:user", "users:edit:user",
-                "foo:bar", "hello:world", "users:tokenlist:user", "users:tokencreate:user", "users:tokenremove:user");
+                "foo:bar", "hello:world", "perm:from:grant", "users:tokenlist:user", "users:tokencreate:user", "users:tokenremove:user");
     }
 }
