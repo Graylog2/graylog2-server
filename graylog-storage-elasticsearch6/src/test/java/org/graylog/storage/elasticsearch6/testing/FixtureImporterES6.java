@@ -20,10 +20,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
 import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.IndicesExists;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
@@ -126,7 +128,9 @@ public class FixtureImporterES6 implements FixtureImporter {
         }
 
         for (String indexName : indicesToCreate) {
-            createIndex(indexName);
+            if (!indexExists(indexName)) {
+                createIndex(indexName);
+            }
         }
 
         final BulkResult result = jestClient.execute(bulkBuilder.build());
@@ -154,6 +158,13 @@ public class FixtureImporterES6 implements FixtureImporter {
 
             throw new IllegalStateException(sb.toString());
         }
+    }
+
+    private boolean indexExists(String indexName) {
+        final IndicesExists.Builder request = new IndicesExists.Builder(indexName);
+        final JestResult result = JestUtils.execute(jestClient, request.build(), () -> "Unable to check if index exists: " + indexName);
+
+        return result.isSucceeded();
     }
 
     private void createIndex(String indexName) {
