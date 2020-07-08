@@ -210,7 +210,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final List<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024 * 1024, 50);
         final Future<List<String>> result = executor.submit(() -> this.messages.bulkIndex(messageBatch));
 
-        Thread.sleep(2000);
         resetFloodStage(index);
 
         final List<String> failedItems = result.get(3, TimeUnit.MINUTES);
