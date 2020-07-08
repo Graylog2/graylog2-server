@@ -341,6 +341,11 @@ class Builder {
   }
 
   // eslint-disable-next-line no-undef
+  readOnly(value: $PropertyType<InternalState, 'readOnly'>) {
+    return new Builder(this.value.set('readOnly', value));
+  }
+
+  // eslint-disable-next-line no-undef
   external(value: $PropertyType<InternalState, 'external'>) {
     return new Builder(this.value.set('external', value));
   }
