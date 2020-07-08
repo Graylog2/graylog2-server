@@ -16,20 +16,21 @@
  */
 package org.graylog2.indexer;
 
-import java.util.Collections;
-import java.util.List;
+import com.google.common.collect.ImmutableMap;
 
-public class IndexNotFoundException extends ElasticsearchException {
-    public IndexNotFoundException(String message) {
-        super(message);
+import java.util.Map;
+
+public class IndexMapping7 extends IndexMapping {
+    @Override
+    protected Map<String, Object> mapping(String analyzer) {
+        return messageMapping(analyzer);
     }
 
-    public IndexNotFoundException(String message, List<String> errorDetails) {
-        super(message, errorDetails);
+    @Override
+    Map<String, Object> dynamicStrings() {
+        return ImmutableMap.of(
+                "match_mapping_type", "string",
+                "mapping", notAnalyzedString()
+        );
     }
-
-    public static IndexNotFoundException create(String errorMessage, String index) {
-        return new IndexNotFoundException(errorMessage, Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
-    }
-
 }

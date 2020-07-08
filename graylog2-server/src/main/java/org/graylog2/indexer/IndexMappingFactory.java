@@ -47,6 +47,8 @@ public class IndexMappingFactory {
             return new IndexMapping5();
         } else if (elasticsearchVersion.satisfies("^6.0.0")) {
             return new IndexMapping6();
+        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
+            return new IndexMapping7();
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }
