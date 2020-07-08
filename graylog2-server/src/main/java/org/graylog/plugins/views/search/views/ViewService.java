@@ -24,6 +24,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
@@ -138,11 +139,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return super.streamByIds(idSet).map(this::requirementsForView);
     }
 
+    public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
+        final ViewDTO savedObject = save(viewDTO);
+        entityOwnerShipService.registerNewView(savedObject.id(), user);
+        return savedObject;
+    }
+
     @Override
     public ViewDTO save(ViewDTO viewDTO) {
         try {
             final WriteResult<ViewDTO, ObjectId> save = db.insert(requirementsForView(viewDTO));
-            entityOwnerShipService.registerNewView(save.getSavedObject().id());
             return save.getSavedObject();
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");

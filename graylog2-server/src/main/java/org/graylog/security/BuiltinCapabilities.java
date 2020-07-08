@@ -53,7 +53,9 @@ public class BuiltinCapabilities {
                                 RestPermissions.STREAMS_EDIT,
                                 RestPermissions.STREAMS_CHANGESTATE,
                                 RestPermissions.DASHBOARDS_READ,
-                                RestPermissions.DASHBOARDS_EDIT
+                                RestPermissions.DASHBOARDS_EDIT,
+                                RestPermissions.EVENT_DEFINITIONS_READ,
+                                RestPermissions.EVENT_DEFINITIONS_EDIT
                                 // TODO: Add missing collection permissions
                         )
                 ))
@@ -66,7 +68,9 @@ public class BuiltinCapabilities {
                                 RestPermissions.STREAMS_EDIT,
                                 RestPermissions.STREAMS_CHANGESTATE,
                                 RestPermissions.DASHBOARDS_READ,
-                                RestPermissions.DASHBOARDS_EDIT
+                                RestPermissions.DASHBOARDS_EDIT,
+                                RestPermissions.EVENT_DEFINITIONS_READ,
+                                RestPermissions.EVENT_DEFINITIONS_EDIT
                                 // TODO: Add missing collection permissions
                         )
                 ))

@@ -61,6 +61,10 @@ public class UserContext {
                 throw new UserContextMissingException("Cannot retrieve current subject, SecurityContext isn't set.");
             }
         }
+
+        public UserContext create(Subject subject) {
+            return new UserContext((String) subject.getPrincipal(), subject, userService);
+        }
     }
 
     /**
@@ -74,12 +78,28 @@ public class UserContext {
         final Subject subject = new Subject.Builder()
                 .principals(new SimplePrincipalCollection(username, "runAs-context"))
                 .authenticated(true)
+                .sessionCreationEnabled(false)
                 .buildSubject();
 
         return subject.execute(callable);
     }
 
-    private UserContext(String username, Subject subject, UserService userService) {
+    /**
+     * Build a temporary Shiro Subject and run the callable within that context
+     * @param username  The username of the subject
+     * @param runnable  The runnable to be executed
+     */
+    public static void runAs(String username, Runnable runnable) {
+        final Subject subject = new Subject.Builder()
+                .principals(new SimplePrincipalCollection(username, "runAs-context"))
+                .authenticated(true)
+                .sessionCreationEnabled(false)
+                .buildSubject();
+
+        subject.execute(runnable);
+    }
+
+    public UserContext(String username, Subject subject, UserService userService) {
         this.username = username;
         this.subject = subject;
         this.userService = userService;
@@ -97,7 +117,8 @@ public class UserContext {
         return username;
     }
 
-    public Optional<User> getUser() {
-        return Optional.ofNullable(userService.load(username));
+    public User getUser() {
+        return Optional.ofNullable(userService.load(username)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + username + "> from db"));
     }
 }
+

@@ -19,8 +19,6 @@ package org.graylog.security.entities;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
-import org.graylog.security.UserContext;
-import org.graylog.security.UserContextMissingException;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.utilities.GRN;
@@ -37,40 +35,26 @@ public class EntityOwnershipService {
 
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
-    private final UserContext.Factory userContextFactory;
+
 
     @Inject
     public EntityOwnershipService(DBGrantService dbGrantService,
-                                  GRNRegistry grnRegistry,
-                                  UserContext.Factory userContextFactory) {
+                                  GRNRegistry grnRegistry) {
         this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
-        this.userContextFactory = userContextFactory;
     }
 
-    public void registerNewEventDefinition(String id) {
+    public void registerNewEventDefinition(String id, User user) {
         final GRN grn = grnRegistry.newGRN(ModelTypes.EVENT_DEFINITION_V1.name(), id);
-        try {
-            registerNewEntity(grn);
-        } catch (UserContextMissingException e) {
-            LOG.error("Failed to register entity ownership", e);
-        }
+        registerNewEntity(grn, user);
     }
 
-    public void registerNewView(String id) {
+    public void registerNewView(String id, User user) {
         final GRN grn = grnRegistry.newGRN(ModelTypes.DASHBOARD_V2.name(), id);
-        try {
-            registerNewEntity(grn);
-        } catch (UserContextMissingException e) {
-            LOG.error("Failed to register entity ownership", e);
-        }
+        registerNewEntity(grn, user);
     }
 
-    private void registerNewEntity(GRN entity) throws UserContextMissingException {
-        final UserContext userContext = userContextFactory.create();
-        final User user = userContext.getUser().orElseThrow(() ->
-                new UserContextMissingException("Loading the current user <" + userContext.getUsername() + "> failed, this should not happen."));
-
+    private void registerNewEntity(GRN entity, User user) {
         // Don't create ownership grants for the admin user.
         // They can access anything anyhow
         if (user.isLocalAdmin()) {

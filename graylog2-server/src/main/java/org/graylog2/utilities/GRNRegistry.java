@@ -17,6 +17,8 @@
 package org.graylog2.utilities;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.processor.EventDefinition;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Singleton;
@@ -41,6 +43,7 @@ public class GRNRegistry {
     private static final ImmutableSet<GRNType> BUILTIN_TYPES = ImmutableSet.<GRNType>builder()
             .add(GRNType.create("collection", "collections:"))
             .add(GRNType.create("dashboard", "dashboards:"))
+            .add(GRNType.create(ModelTypes.EVENT_DEFINITION_V1.name(), "eventdefinitions:"))
             .add(GRNType.create("grant", "grants:"))
             .add(GRNType.create("role", "roles:"))
             .add(GRNType.create("stream", "streams:"))
@@ -115,6 +118,14 @@ public class GRNRegistry {
 
     public GRN ofUser(User user) {
         return newGRN("user", user.getName());
+    }
+
+    public GRN ofEventDefinition(EventDefinition eventDefinition) {
+        return newGRN(ModelTypes.EVENT_DEFINITION_V1.name(), eventDefinition.id());
+    }
+
+    public boolean isUser(GRN grn) {
+        return grn.type().equals("user");
     }
 
     /**

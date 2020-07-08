@@ -60,7 +60,7 @@ class UserContextTest {
 
             final UserContext userContext = new UserContext.Factory(userService).create();
             assertThat(userContext.getUsername()).isEqualTo(USERNAME);
-            assertThat(userContext.getUser().get()).isEqualTo(user);
+            assertThat(userContext.getUser()).isEqualTo(user);
 
             return null;
         });

@@ -118,7 +118,7 @@ public class EventDefinitionHandlerTest {
                 .notifications(ImmutableList.of())
                 .build();
 
-        final EventDefinitionDto dto = handler.create(newDto);
+        final EventDefinitionDto dto = handler.create(newDto, Optional.empty());
 
         // Handler should create the event definition
         assertThat(eventDefinitionService.get(dto.id())).isPresent();
@@ -169,7 +169,7 @@ public class EventDefinitionHandlerTest {
                 .notifications(ImmutableList.of())
                 .build();
 
-        final EventDefinitionDto dto = handler.createWithoutSchedule(newDto);
+        final EventDefinitionDto dto = handler.createWithoutSchedule(newDto, Optional.empty());
 
         // Handler should create the event definition
         assertThat(eventDefinitionService.get(dto.id())).isPresent();

@@ -68,8 +68,12 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -85,6 +89,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ViewFacadeTest {
     @Rule
@@ -115,6 +120,7 @@ public class ViewFacadeTest {
     private final String newViewId = "5def958063303ae5f68edead";
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
+    private UserService userService;
 
 
     @Before
@@ -136,7 +142,8 @@ public class ViewFacadeTest {
                 new MongoJackObjectMapperProvider(objectMapper));
         viewService = new TestViewService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
-        facade = new SearchFacade(objectMapper, searchDbService, viewService);
+        userService = mock(UserService.class);
+        facade = new SearchFacade(objectMapper, searchDbService, viewService, userService);
     }
 
     @Test
@@ -215,8 +222,10 @@ public class ViewFacadeTest {
         final Entity viewEntity = createViewEntity();
         final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
         nativeEntities.put(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        when(userService.load("testuser")).thenReturn(fakeUser);
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(viewEntity,
-                Collections.emptyMap(), nativeEntities, "admin");
+                Collections.emptyMap(), nativeEntities, "testuser");
 
         assertThat(nativeEntity.descriptor().title()).isEqualTo("title");
         assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.SEARCH_V1);

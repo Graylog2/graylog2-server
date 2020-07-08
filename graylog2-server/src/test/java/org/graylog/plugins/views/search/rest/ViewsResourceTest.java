@@ -123,7 +123,7 @@ public class ViewsResourceTest {
         when(currentUser.getName()).thenReturn("basti");
         when(currentUser.isLocalAdmin()).thenReturn(true);
 
-        this.viewsResource.create(view);
+        this.viewsResource.create(view, null);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
@@ -136,7 +136,7 @@ public class ViewsResourceTest {
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 
-        assertThatThrownBy(() -> this.viewsResource.create(view))
+        assertThatThrownBy(() -> this.viewsResource.create(view, null))
                 .isInstanceOf(ForbiddenException.class);
     }
 

@@ -63,8 +63,12 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -83,6 +87,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EventDefinitionFacadeTest {
@@ -110,6 +116,10 @@ public class EventDefinitionFacadeTest {
     private DBEventDefinitionService eventDefinitionService;
     @Mock
     private EventDefinitionHandler eventDefinitionHandler;
+    @Mock
+    private UserService userService;
+    @Mock
+    private EntityOwnershipService entityOwnershipService;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -123,11 +133,11 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class));
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, entityOwnershipService);
         eventDefinitionHandler = new EventDefinitionHandler(
                 eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService);
+        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService);
     }
 
     @Test
@@ -237,6 +247,9 @@ public class EventDefinitionFacadeTest {
         when(jobSchedulerClock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
+        final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "kmerz"));
+        when(userService.load("kmerz")).thenReturn(kmerzUser);
+
 
         final NativeEntity<EventDefinitionDto> nativeEntity = facade.createNativeEntity(
                 entityV1,
@@ -249,6 +262,8 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto.title()).isEqualTo("title");
         assertThat(eventDefinitionDto.description()).isEqualTo("description");
         assertThat(eventDefinitionDto.config().type()).isEqualTo("aggregation-v1");
+        // verify that ownership was registered for this entity
+        verify(entityOwnershipService, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
     }
 
     @Test

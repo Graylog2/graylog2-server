@@ -45,6 +45,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -56,6 +57,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,6 +66,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class LegacyAlertConditionMigratorTest {
     private static final int CHECK_INTERVAL = 60;
@@ -80,6 +83,7 @@ public class LegacyAlertConditionMigratorTest {
     private EventDefinitionHandler eventDefinitionHandler;
     private DBNotificationService notificationService;
     private NotificationResourceHandler notificationResourceHandler;
+    private UserService userService;
 
     @Mock
     private Map<String, EventNotification.Factory> eventNotificationFactories;
@@ -108,7 +112,10 @@ public class LegacyAlertConditionMigratorTest {
         this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class));
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
         this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, eventNotificationFactories));
-        this.migrator = new LegacyAlertConditionMigrator(mongoConnection, eventDefinitionHandler, notificationResourceHandler, notificationService, CHECK_INTERVAL);
+        this.userService = mock(UserService.class);
+        when(userService.getRootUser()).thenReturn(Optional.empty());
+
+        this.migrator = new LegacyAlertConditionMigrator(mongoConnection, eventDefinitionHandler, notificationResourceHandler, notificationService, userService, CHECK_INTERVAL);
     }
 
     @Test
@@ -139,7 +146,7 @@ public class LegacyAlertConditionMigratorTest {
         });
 
         // Make sure we use the EventDefinitionHandler to create the event definitions
-        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class));
+        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class), any(Optional.class));
 
         // Make sure we use the NotificationResourceHandler to create the notifications
         verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class));
@@ -614,7 +621,7 @@ public class LegacyAlertConditionMigratorTest {
         });
 
         // Make sure we use the EventDefinitionHandler to create the event definitions
-        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class));
+        verify(eventDefinitionHandler, times(migratedConditions)).create(any(EventDefinitionDto.class), any(Optional.class));
 
         // Make sure we use the NotificationResourceHandler to create the notifications
         verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class));

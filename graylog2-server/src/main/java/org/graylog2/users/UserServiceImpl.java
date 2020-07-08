@@ -76,7 +76,8 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final UserImpl.Factory userFactory,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                            final EventBus serverEventBus,
-                           final GrantPermissionResolver grantPermissionResolver) {
+                           final GrantPermissionResolver grantPermissionResolver
+    ) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;

@@ -23,6 +23,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
@@ -57,10 +58,9 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
                 getSortBuilder("asc", sortByField), page, perPage);
     }
 
-    @Override
-    public EventDefinitionDto save(EventDefinitionDto eventDefinitionDto) {
+    public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
         final EventDefinitionDto dto = super.save(eventDefinitionDto);
-        entityOwnerShipService.registerNewEventDefinition(dto.id());
+        entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
         return dto;
     }
 
