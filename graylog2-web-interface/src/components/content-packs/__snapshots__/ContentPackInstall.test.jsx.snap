@@ -858,7 +858,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                                     "isStatic": false,
-                                    "lastClassName": "efDjcv",
+                                    "lastClassName": "lmPeF",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -876,7 +876,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               forwardedRef={null}
                             >
                               <table
-                                className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table scrollable"
+                                className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
                               >
                                 <thead>
                                   <tr>
