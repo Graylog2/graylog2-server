@@ -14,14 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.schema;
+package org.graylog2.storage.providers;
 
-public class AssociatedFields {
-    public static final String ASSOCIATED_CATEGORY = "associated_category";
-    public static final String ASSOCIATED_HASH = "associated_hash";
-    public static final String ASSOCIATED_HOST = "associated_host";
-    public static final String ASSOCIATED_IP = "associated_ip";
-    public static final String ASSOCIATED_MAC = "associated_mac";
-    public static final String ASSOCIATED_USER_ID = "associated_user_id";
-    public static final String ASSOCIATED_USER_NAME = "associated_user_name";
+import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.plugin.Version;
+import org.graylog2.storage.VersionAwareProvider;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import java.util.Map;
+
+public class CountsAdapterProvider extends VersionAwareProvider<CountsAdapter> {
+    @Inject
+    public CountsAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<CountsAdapter>> pluginBindings) {
+        super(elasticsearchMajorVersion, pluginBindings);
+    }
 }

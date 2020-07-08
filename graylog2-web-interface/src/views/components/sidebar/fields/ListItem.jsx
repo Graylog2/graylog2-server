@@ -6,7 +6,8 @@ import { List } from 'immutable';
 import { type ThemeInterface } from 'theme';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Field from 'views/components/Field';
-import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
+
+import FieldTypeIcon from './FieldTypeIcon';
 
 export type ListItemStyle = {
   position: string,
