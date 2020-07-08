@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
+import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
@@ -18,12 +19,10 @@ type Props = {
   onClose: () => void,
 };
 
-const _generateGRN = (id, type) => `grn::::${type}:${id}`;
-
 const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(false);
-  const entityGRN = _generateGRN(entityId, entityType);
+  const entityGRN = createGRN(entityId, entityType);
 
   useEffect(() => {
     EntityShareActions.prepare(entityGRN);
