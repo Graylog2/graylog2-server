@@ -23,7 +23,7 @@ const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => 
                       placement="right"
                       overlay={(
                         <Popover id="session-badge-details" title="Logged in">
-                          <div>Last activity: <Timestamp dateTime={lastActivity} relative /></div>
+                          <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
                           <div>Client address: {clientAddress}</div>
                         </Popover>
                       )}

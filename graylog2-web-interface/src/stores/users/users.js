@@ -41,7 +41,7 @@ export const admin = User.builder()
   .external(true)
   .sessionTimeoutMs(0)
   .sessionActive(true)
-  .clientAddress('127.0.0.1')
+  .clientAddress('192.168.0.1')
   .build();
 
 export const userList = Immutable.List([admin, bob, alice]);
