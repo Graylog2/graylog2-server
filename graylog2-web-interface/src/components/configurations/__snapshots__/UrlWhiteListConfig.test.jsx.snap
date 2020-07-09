@@ -156,14 +156,10 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
         </Table>
       </StyledComponent>
     </Table>
-    <ConnectStoresWrapper[IfPermitted] stores=currentUser
+    <IfPermitted
+      anyPermissions={false}
       permissions="urlwhitelist:write"
-    >
-      <IfPermitted
-        anyPermissions={false}
-        permissions="urlwhitelist:write"
-      />
-    </ConnectStoresWrapper[IfPermitted] stores=currentUser>
+    />
     <BootstrapModalForm
       bsSize="lg"
       cancelButtonText="Cancel"
