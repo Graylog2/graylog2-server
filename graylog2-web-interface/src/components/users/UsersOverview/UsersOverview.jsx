@@ -41,6 +41,14 @@ const UsersOverview = () => {
 
   useEffect(() => {
     UsersActions.loadUsers();
+
+    const unlistenDeleteUser = UsersActions.deleteUser.completed.listen(() => {
+      UsersActions.loadUsers();
+    });
+
+    return () => {
+      unlistenDeleteUser();
+    };
   }, []);
 
   if (!users || !roles) {
