@@ -43,11 +43,12 @@ const UsersOverview = () => {
   return (
     <Row className="content">
       <Col md={12}>
-        <DataTable className="table-hover"
+        <DataTable id="users-overview"
+                   className="table-hover"
                    headers={headers}
                    headerCellFormatter={_headerCellFormatter}
                    sortByKey="fullName"
-                   rows={users}
+                   rows={users.toJS()}
                    filterBy="role"
                   //  filterSuggestions={roles}
                    dataRowFormatter={_userOverviewItem}

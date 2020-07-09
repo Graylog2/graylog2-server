@@ -16,23 +16,35 @@ const ActiveIcon = styled(Icon)(({ theme }) => `
   color: ${theme.colors.variant.success};
 `);
 
-const LoggedInBadge = ({ lastActivity, clientAddress, sessionActive }: Props) => {
-  const popover = (
-    <Popover id="session-badge-details" title="Logged in">
-      <div>Last activity: <Timestamp dateTime={lastActivity} relative /></div>
-      <div>Client address: {clientAddress}</div>
-    </Popover>
-  );
+const DetailsPopover = (
+  {
+    clientAddress,
+    lastActivity,
+  }: {
+    clientAddress: $PropertyType<Props, 'clientAddress'>,
+    lastActivity: $PropertyType<Props, 'lastActivity'>,
+  },
+) => (
+  <Popover id="session-badge-details" title="Logged in">
+    <div>Last activity: <Timestamp dateTime={lastActivity} relative /></div>
+    <div>Client address: {clientAddress}</div>
+  </Popover>
+);
 
-  return (
-    <td className="centered">
-      {sessionActive && (
-        <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-          <ActiveIcon name="circle" />
-        </OverlayTrigger>
-      )}
-    </td>
-  );
-};
+const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => (
+  <td className="centered">
+    {sessionActive && (
+      <OverlayTrigger trigger={['hover', 'focus']}
+                      placement="left"
+                      overlay={(
+                        <DetailsPopover lastActivity={lastActivity}
+                                        clientAddress={clientAddress} />
+                      )}
+                      rootClose>
+        <ActiveIcon name="circle" />
+      </OverlayTrigger>
+    )}
+  </td>
+);
 
-export default LoggedInBadge;
+export default LoggedInCell;
