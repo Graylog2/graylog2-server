@@ -3,6 +3,7 @@ import { type Element } from 'react';
 import { render, type RenderOptionsWithoutCustomQueries } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
+import 'jest-styled-components';
 
 import WrappingContainer from './WrappingContainer';
 
