@@ -16,29 +16,16 @@ const ActiveIcon = styled(Icon)(({ theme }) => `
   color: ${theme.colors.variant.success};
 `);
 
-const DetailsPopover = (
-  {
-    clientAddress,
-    lastActivity,
-  }: {
-    clientAddress: $PropertyType<Props, 'clientAddress'>,
-    lastActivity: $PropertyType<Props, 'lastActivity'>,
-  },
-) => (
-  <Popover id="session-badge-details" title="Logged in">
-    <div>Last activity: <Timestamp dateTime={lastActivity} relative /></div>
-    <div>Client address: {clientAddress}</div>
-  </Popover>
-);
-
 const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => (
   <td className="centered">
     {sessionActive && (
       <OverlayTrigger trigger={['hover', 'focus']}
-                      placement="left"
+                      placement="right"
                       overlay={(
-                        <DetailsPopover lastActivity={lastActivity}
-                                        clientAddress={clientAddress} />
+                        <Popover id="session-badge-details" title="Logged in">
+                          <div>Last activity: <Timestamp dateTime={lastActivity} relative /></div>
+                          <div>Client address: {clientAddress}</div>
+                        </Popover>
                       )}
                       rootClose>
         <ActiveIcon name="circle" />
