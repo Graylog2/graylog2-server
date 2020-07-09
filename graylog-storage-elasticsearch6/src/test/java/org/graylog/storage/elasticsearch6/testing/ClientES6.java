@@ -18,12 +18,17 @@ package org.graylog.storage.elasticsearch6.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableMap;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.State;
+import io.searchbox.cluster.UpdateSettings;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
@@ -49,6 +54,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
@@ -235,5 +242,59 @@ public class ClientES6 implements Client {
 
     private String[] metadataFieldNamesFor(JsonNode result, String templates) {
         return toArray(result.get("metadata").get(templates).fieldNames(), String.class);
+    }
+
+    @Override
+    public void putSetting(String setting, String value) {
+        final UpdateSettings.Builder request = new UpdateSettings.Builder(Collections.singletonMap(
+                "transient", Collections.singletonMap(
+                        setting, value
+                )
+        ));
+        executeWithExpectedSuccess(request.build(), "Unable to update ES cluster setting: " + setting + "=" + value);
+    }
+
+    @Override
+    public void waitForIndexBlock(String index) {
+        waitForResult(() -> indexBlocksPresent(index));
+    }
+
+    @Override
+    public void resetIndexBlock(String index) {
+        final io.searchbox.indices.settings.UpdateSettings.Builder request =
+                new io.searchbox.indices.settings.UpdateSettings.Builder(Collections.singletonMap(
+                        "index.blocks.read_only_allow_delete", null
+                ))
+                .addIndex(index);
+
+        executeWithExpectedSuccess(request.build(), "Unable to reset index block for " + index);
+    }
+
+    private void waitForResult(Callable<Boolean> task) {
+        final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
+                .retryIfResult(result -> result == null || !result)
+                .withStopStrategy(StopStrategies.stopAfterDelay(1, TimeUnit.MINUTES))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .build();
+
+        try {
+            retryer.call(task);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean indexBlocksPresent(String index) {
+        final State.Builder request = new State.Builder()
+                .withBlocks()
+                .indices(index);
+        final JestResult result = executeWithExpectedSuccess(request.build(), "Unable to retrieve index blocks for " + index);
+
+        return result.getJsonObject()
+                .path("blocks")
+                .path("indices")
+                .path(index)
+                .fields()
+                .hasNext();
     }
 }

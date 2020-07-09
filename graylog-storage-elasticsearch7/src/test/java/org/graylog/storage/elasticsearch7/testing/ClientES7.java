@@ -1,16 +1,25 @@
 package org.graylog.storage.elasticsearch7.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.WriteRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
@@ -18,15 +27,23 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetInd
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetaData;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 public class ClientES7 implements Client {
     private final ElasticsearchClient client;
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     public ClientES7(ElasticsearchClient client) {
         this.client = client;
@@ -101,8 +118,12 @@ public class ClientES7 implements Client {
 
     @Override
     public void waitForGreenStatus(String... indices) {
+        waitForStatus(ClusterHealthStatus.GREEN, indices);
+    }
+
+    private void waitForStatus(ClusterHealthStatus status, String... indices) {
         final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(indices);
-        clusterHealthRequest.waitForGreenStatus();
+        clusterHealthRequest.waitForStatus(status);
 
         client.execute((c, requestOptions) -> c.cluster().health(clusterHealthRequest, requestOptions));
     }
@@ -147,5 +168,65 @@ public class ClientES7 implements Client {
         getIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
         final GetIndexResponse result = client.execute((c, requestOptions) -> c.indices().get(getIndexRequest, requestOptions));
         return result.getIndices();
+    }
+
+    @Override
+    public void putSetting(String setting, String value) {
+        final ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest();
+
+        request.persistentSettings(Settings.builder().put(setting, value));
+
+        client.execute((c, requestOptions) -> c.cluster().putSettings(request, requestOptions),
+                "Unable to update ES cluster setting: " + setting + "=" + value);
+    }
+
+    @Override
+    public void waitForIndexBlock(String index) {
+        waitForResult(() -> indexBlocksPresent(index));
+    }
+
+    @Override
+    public void resetIndexBlock(String index) {
+        final UpdateSettingsRequest request = new UpdateSettingsRequest(index)
+                .settings(Collections.singletonMap(
+                        "index.blocks.read_only_allow_delete", null
+                ));
+
+        client.execute((c, requestOptions) -> c.indices().putSettings(request, requestOptions),
+                "Unable to reset index block for " + index);
+    }
+
+    private void waitForResult(Callable<Boolean> task) {
+        final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
+                .retryIfResult(result -> result == null || !result)
+                .withStopStrategy(StopStrategies.stopAfterDelay(1, TimeUnit.MINUTES))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .build();
+
+        try {
+            retryer.call(task);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean indexBlocksPresent(String index) {
+        final Response result = client.execute((c, requestOptions) -> c.getLowLevelClient()
+                .performRequest(new Request("GET", "/" + index)),
+                "Unable to retrieve index blocks for index " + index);
+
+        final JsonNode jsonResult;
+        try {
+            jsonResult = objectMapper.readTree(result.getEntity().getContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        return jsonResult.path(index)
+                .path("settings")
+                .path("index")
+                .path("blocks")
+                .fields()
+                .hasNext();
     }
 }

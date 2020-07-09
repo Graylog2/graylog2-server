@@ -61,4 +61,10 @@ public interface Client {
     void bulkIndex(BulkIndexRequest bulkIndexRequest);
 
     void cleanUp();
+
+    void putSetting(String setting, String value);
+
+    void waitForIndexBlock(String index);
+
+    void resetIndexBlock(String index);
 }
