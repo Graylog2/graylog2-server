@@ -160,9 +160,9 @@ public class FixtureImporterES6 implements FixtureImporter {
         }
     }
 
-    private boolean indexExists(String indexName) {
+    private boolean indexExists(String indexName) throws IOException {
         final IndicesExists.Builder request = new IndicesExists.Builder(indexName);
-        final JestResult result = JestUtils.execute(jestClient, request.build(), () -> "Unable to check if index exists: " + indexName);
+        final JestResult result = jestClient.execute(request.build());
 
         return result.isSucceeded();
     }
