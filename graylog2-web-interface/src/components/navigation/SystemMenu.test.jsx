@@ -59,8 +59,10 @@ describe('SystemMenu', () => {
     ${['outputs:read']}            | ${3}  | ${['Outputs']}
     ${['indices:read']}            | ${3}  | ${['Indices']}
     ${['loggers:read']}            | ${3}  | ${['Logging']}
-    ${['users:list']}              | ${3}  | ${['Authentication']}
-    ${['roles:read']}              | ${3}  | ${['Authentication']}
+    ${['users:list']}              | ${4}  | ${['Authentication']}
+    ${['roles:read']}              | ${4}  | ${['Authentication']}
+    ${['users:list']}              | ${4}  | ${['Users and Teams']}
+    ${['roles:read']}              | ${4}  | ${['Users and Teams']}
     ${['dashboards:create', 'inputs:create', 'streams:create']} | ${4}  | ${['Content Packs']}
     ${['inputs:edit']}             | ${5}  | ${['Grok Patterns', 'Lookup Tables', 'Sidecars']}
     ${['inputs:create']}           | ${3}  | ${['Pipelines']}
