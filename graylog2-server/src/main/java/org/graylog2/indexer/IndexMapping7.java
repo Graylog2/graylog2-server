@@ -33,4 +33,14 @@ public class IndexMapping7 extends IndexMapping {
                 "mapping", notAnalyzedString()
         );
     }
+
+    @Override
+    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
+        return ImmutableMap.of(
+                "index_patterns", template,
+                "order", order,
+                "settings", settings,
+                "mappings", mappings
+        );
+    }
 }

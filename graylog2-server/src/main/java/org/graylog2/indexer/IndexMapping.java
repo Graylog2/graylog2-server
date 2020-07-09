@@ -45,6 +45,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
         final Map<String, Object> mappings = mapping(analyzer);
 
+        return createTemplate(template, order, settings, mappings);
+    }
+
+    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
         return ImmutableMap.of(
                 "template", template,
                 "order", order,
