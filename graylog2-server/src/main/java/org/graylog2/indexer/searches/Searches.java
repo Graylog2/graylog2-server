@@ -118,13 +118,13 @@ public class Searches {
         ScrollCommand.Builder scrollCommandBuilder = ScrollCommand.builder()
                 .query(query)
                 .range(range)
-                .limit(limit)
                 .offset(offset)
                 .fields(fields)
                 .filter(filter)
                 .sorting(sorting)
                 .indices(indexWildcards);
 
+        scrollCommandBuilder = limit != -1 ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
         scrollCommandBuilder = batchSize != -1 ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
 
         final ScrollResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
