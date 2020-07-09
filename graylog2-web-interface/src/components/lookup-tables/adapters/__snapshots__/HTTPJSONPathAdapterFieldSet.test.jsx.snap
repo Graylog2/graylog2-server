@@ -4,10 +4,10 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
 <div>
   <fieldset>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
-        class="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+        class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
         for="url"
       >
         Lookup URL
@@ -16,15 +16,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-<<<<<<< HEAD
-<<<<<<< HEAD
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
-=======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
->>>>>>> 46caba27d0... snapshots
-=======
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
->>>>>>> 99f5c1286e... snapshots
           id="url"
           label="Lookup URL"
           name="url"
@@ -34,7 +26,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
           value="https://example.org/test"
         />
         <span
-          class="HelpBlock-i8is92-0 fSaklp help-block"
+          class="HelpBlock-i8is92-0 kxWRDS help-block"
         >
           
            
@@ -43,10 +35,10 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
-        class="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+        class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
         for="single_value_jsonpath"
       >
         Single value JSONPath
@@ -55,15 +47,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-<<<<<<< HEAD
-<<<<<<< HEAD
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
-=======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
->>>>>>> 46caba27d0... snapshots
-=======
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
->>>>>>> 99f5c1286e... snapshots
           id="single_value_jsonpath"
           label="Single value JSONPath"
           name="single_value_jsonpath"
@@ -76,10 +60,10 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
-        class="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+        class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
         for="multi_value_jsonpath"
       >
         Multi value JSONPath
@@ -88,15 +72,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-<<<<<<< HEAD
-<<<<<<< HEAD
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
-=======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
->>>>>>> 46caba27d0... snapshots
-=======
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
->>>>>>> 99f5c1286e... snapshots
           id="multi_value_jsonpath"
           label="Multi value JSONPath"
           name="multi_value_jsonpath"
@@ -108,10 +84,10 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
-        class="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+        class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
         for="user_agent"
       >
         HTTP User-Agent
@@ -120,15 +96,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-<<<<<<< HEAD
-<<<<<<< HEAD
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
-=======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
->>>>>>> 46caba27d0... snapshots
-=======
-          class="FormControl-sc-1amoaox-0 kmJcge form-control"
->>>>>>> 99f5c1286e... snapshots
           id="user_agent"
           label="HTTP User-Agent"
           name="user_agent"
@@ -138,17 +106,17 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
           value="smith"
         />
         <span
-          class="HelpBlock-i8is92-0 fSaklp help-block"
+          class="HelpBlock-i8is92-0 kxWRDS help-block"
         >
           The User-Agent header to use for the HTTP request.
         </span>
       </div>
     </div>
     <div
-      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
     >
       <label
-        class="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+        class="ControlLabel-sc-1edmum5-0 hCskeX col-sm-3 control-label"
         for="http_headers"
       >
         HTTP Headers
@@ -190,7 +158,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                   </td>
                   <td>
                     <button
-                      class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-danger"
+                      class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-xs btn-danger"
                       type="button"
                     >
                       Delete
@@ -200,20 +168,12 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                 <tr>
                   <td>
                     <div
-                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                     >
                       
                       <span>
                         <input
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
-=======
                           class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
->>>>>>> 46caba27d0... snapshots
-=======
-                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
->>>>>>> 99f5c1286e... snapshots
                           data-testid="newKey"
                           id="newKey"
                           label=""
@@ -228,20 +188,12 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                   </td>
                   <td>
                     <div
-                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                     >
                       
                       <span>
                         <input
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
-=======
                           class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
->>>>>>> 46caba27d0... snapshots
-=======
-                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
->>>>>>> 99f5c1286e... snapshots
                           data-testid="newValue"
                           id="newValue"
                           label=""
@@ -256,7 +208,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                   </td>
                   <td>
                     <button
-                      class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-success"
+                      class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-success"
                       disabled=""
                       type="button"
                     >
@@ -269,7 +221,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
           </div>
         </div>
         <span
-          class="HelpBlock-i8is92-0 fSaklp help-block"
+          class="HelpBlock-i8is92-0 kxWRDS help-block"
         >
           The custom HTTP headers to use for the HTTP request. Multiple values must be comma-separated.
         </span>

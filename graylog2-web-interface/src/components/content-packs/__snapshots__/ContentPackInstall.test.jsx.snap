@@ -416,7 +416,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "eXfwDC",
+                                          "lastClassName": "hBmgnF",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -444,7 +444,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      className="FormControl-sc-1amoaox-0 hBmgnF"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="Comment"
@@ -456,7 +456,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                       value=""
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                                        className="FormControl-sc-1amoaox-0 hBmgnF form-control"
                                         id="comment"
                                         label="Comment"
                                         maxLength={512}
@@ -892,7 +892,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "eXfwDC",
+                                          "lastClassName": "hBmgnF",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -921,7 +921,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 eXfwDC"
+                                      className="FormControl-sc-1amoaox-0 hBmgnF"
                                       componentClass="input"
                                       inputRef={[Function]}
                                       label="A parameter"
@@ -934,7 +934,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                       value="parameter"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                                        className="FormControl-sc-1amoaox-0 hBmgnF form-control"
                                         id="PARAM"
                                         label="A parameter"
                                         maxLength={250}
