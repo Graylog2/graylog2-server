@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
-import type { User, ChangePasswordRequest, Token } from 'stores/users/UsersStore';
+import type { UserJSON as User, ChangePasswordRequest, Token } from 'stores/users/UsersStore';
 
 type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,

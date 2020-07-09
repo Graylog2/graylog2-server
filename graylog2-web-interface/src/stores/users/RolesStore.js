@@ -5,8 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-
-import type { User } from './UsersStore';
+import type { UserJSON as User } from 'stores/users/UsersStore.js';
 
 type Role = {
   name: string,
@@ -79,6 +78,7 @@ const RolesStore = Reflux.createStore({
 
     return promise;
   },
+
   getMembers(rolename: string): Promise<RoleMembership[]> {
     const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(encodeURIComponent(rolename)).url);
     const promise = fetch('GET', url);

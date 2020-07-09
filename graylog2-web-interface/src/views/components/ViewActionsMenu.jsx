@@ -18,7 +18,7 @@ import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as Permissions from 'views/Permissions';
 import View from 'views/logic/views/View';
-import type { User } from 'stores/users/UsersStore';
+import type { UserJSON as User } from 'stores/users/UsersStore.js';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
