@@ -122,9 +122,9 @@ public class Messages {
                 .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        final List<IndexingError> indexFailures = runBulkRequest(indexingRequestList, messageList.size());
+        final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, messageList.size());
 
-        final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexFailures);
+        final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingErrors);
 
         final Set<String> failedIds = remainingErrors.stream()
                 .map(indexingError -> indexingError.message().getId())
