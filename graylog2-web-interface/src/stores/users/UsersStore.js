@@ -68,6 +68,8 @@ const UsersStore: UsersStoreType = singletonStore(
       const url = qualifyUrl(ApiRoutes.UsersApiController.create().url);
       const promise = fetch('POST', url, request);
 
+      UsersActions.create.promise(promise);
+
       return promise;
     },
 
@@ -90,6 +92,8 @@ const UsersStore: UsersStoreType = singletonStore(
           },
         );
 
+      UsersActions.loadUsers.promise(promise);
+
       return promise;
     },
 
@@ -101,6 +105,8 @@ const UsersStore: UsersStoreType = singletonStore(
         UserNotification.error(`Loading user failed with status: ${error}`,
           `Could not load user ${username}`);
       });
+
+      UsersActions.load.promise(promise);
 
       return promise;
     },
@@ -118,12 +124,15 @@ const UsersStore: UsersStoreType = singletonStore(
         }
       });
 
+      UsersActions.deleteUser.promise(promise);
+
       return promise;
     },
 
     changePassword(username: string, request: ChangePasswordRequest): void {
       const url = qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
       const promise = fetch('PUT', url, request);
+      UsersActions.changePassword.promise(promise);
 
       return promise;
     },
@@ -131,6 +140,7 @@ const UsersStore: UsersStoreType = singletonStore(
     update(username: string, request: any): void {
       const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
       const promise = fetch('PUT', url, request);
+      UsersActions.update.promise(promise);
 
       return promise;
     },
@@ -139,6 +149,7 @@ const UsersStore: UsersStoreType = singletonStore(
       const url = qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
         encodeURIComponent(tokenName)).url);
       const promise = fetch('POST', url);
+      UsersActions.createToken.promise(promise);
 
       return promise;
     },
@@ -157,19 +168,21 @@ const UsersStore: UsersStoreType = singletonStore(
         }
       });
 
+      UsersActions.deleteToken.promise(promise);
+
       return promise;
     },
 
     loadTokens(username: string): Promise<Token[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
-      const promise = fetch('GET', url)
-        .then(
-          (response) => response.tokens,
-          (error) => {
-            UserNotification.error(`Loading tokens of user failed with status: ${error}`,
-              `Could not load tokens of user ${username}`);
-          },
-        );
+      const promise = fetch('GET', url).then(
+        (response) => response.tokens,
+        (error) => {
+          UserNotification.error(`Loading tokens of user failed with status: ${error}`,
+            `Could not load tokens of user ${username}`);
+        },
+      );
+      UsersActions.loadTokens.promise(promise);
 
       return promise;
     },

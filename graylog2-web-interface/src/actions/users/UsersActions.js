@@ -2,9 +2,10 @@
 import Reflux from 'reflux';
 
 import { singletonActions } from 'views/logic/singleton';
+import type { RefluxActions } from 'stores/StoreTypes';
 import type { User, ChangePasswordRequest, Token } from 'stores/users/UsersStore';
 
-type UsersActionsType = {
+type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,
   loadUsers: () => Promise<User[]>,
   load: (username: string) => Promise<User>,
@@ -14,7 +15,7 @@ type UsersActionsType = {
   createToken: (username: string, tokenName: string) => Promise<Token>,
   deleteToken: (username: string, tokenId: string, tokenName: string) => Promise<string[]>,
   loadTokens: (username: string) => Promise<Token[]>,
-};
+}>;
 
 const UsersActions: UsersActionsType = singletonActions(
   'Users',
