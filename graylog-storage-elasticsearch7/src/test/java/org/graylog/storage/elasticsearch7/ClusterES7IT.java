@@ -25,18 +25,6 @@ public class ClusterES7IT extends ClusterIT {
     @Rule
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
-    @Test
-    public void getClusterAllocationDiskSettings() {
-        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
-
-        //Default Elasticsearch settings in Elasticsearch 5.6
-        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isEqualTo(95D);
-    }
-
     @Override
     protected ElasticsearchInstance elasticsearch() {
         return this.elasticsearch;

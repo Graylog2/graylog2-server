@@ -20,8 +20,10 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.junit.Before;
@@ -207,5 +209,16 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         final Optional<ClusterHealth> clusterHealth = cluster.clusterHealthStats();
 
         assertThat(clusterHealth).isNotEmpty();
+    }
+
+    @Test
+    public void getDefaultClusterAllocationDiskSettings() {
+        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
+
+        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isEqualTo(95D);
     }
 }
