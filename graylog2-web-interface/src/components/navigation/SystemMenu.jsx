@@ -7,12 +7,12 @@ import naturalSort from 'javascript-natural-sort';
 import { NavDropdown } from 'components/graylog';
 import IfPermitted from 'components/common/IfPermitted';
 import Routes from 'routing/Routes';
-import URLUtils from 'util/URLUtils';
+import { appPrefixed } from 'util/URLUtils';
 
 import NavigationLink from './NavigationLink';
 
 const _isActive = (requestPath, prefix) => {
-  return requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
+  return requestPath.indexOf(appPrefixed(prefix)) === 0;
 };
 
 const _systemTitle = (pathname) => {
@@ -83,7 +83,7 @@ const SystemMenu = ({ location }) => {
   const pluginSystemNavigations = PluginStore.exports('systemnavigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
-      const prefixedPath = URLUtils.appPrefixed(path);
+      const prefixedPath = appPrefixed(path);
       const link = <NavigationLink description={description} path={prefixedPath} />;
 
       if (permissions) {

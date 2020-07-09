@@ -3,8 +3,8 @@ import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import { qualifyUrl } from 'util/URLUtils';
 import type { UserJSON as User } from 'stores/users/UsersStore';
 
 type Role = {
@@ -20,7 +20,7 @@ type RoleMembership = {
 
 const RolesStore = Reflux.createStore({
   loadRoles(): Promise<string[]> {
-    const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
+    const promise = fetch('GET', qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
         (response) => response.roles,
         (error) => {
@@ -35,7 +35,7 @@ const RolesStore = Reflux.createStore({
   },
 
   createRole(role: Role): Promise<Role> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.createRole().url);
+    const url = qualifyUrl(ApiRoutes.RolesApiController.createRole().url);
     const promise = fetch('POST', url, role);
 
     promise.then((newRole) => {
@@ -49,7 +49,7 @@ const RolesStore = Reflux.createStore({
   },
 
   updateRole(rolename: string, role: Role): Promise<Role> {
-    const promise = fetch('PUT', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.updateRole(encodeURIComponent(rolename)).url), role);
+    const promise = fetch('PUT', qualifyUrl(ApiRoutes.RolesApiController.updateRole(encodeURIComponent(rolename)).url), role);
 
     promise.then((newRole) => {
       UserNotification.success(`Role "${newRole.name}" was updated successfully`);
@@ -64,7 +64,7 @@ const RolesStore = Reflux.createStore({
   },
 
   deleteRole(rolename: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.deleteRole(encodeURIComponent(rolename)).url);
+    const url = qualifyUrl(ApiRoutes.RolesApiController.deleteRole(encodeURIComponent(rolename)).url);
     const promise = fetch('DELETE', url);
 
     promise.then(() => {
@@ -80,7 +80,7 @@ const RolesStore = Reflux.createStore({
   },
 
   getMembers(rolename: string): Promise<RoleMembership[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(encodeURIComponent(rolename)).url);
+    const url = qualifyUrl(ApiRoutes.RolesApiController.loadMembers(encodeURIComponent(rolename)).url);
     const promise = fetch('GET', url);
 
     promise.catch((error) => {
