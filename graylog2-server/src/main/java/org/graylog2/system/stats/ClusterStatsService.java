@@ -21,9 +21,7 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.cluster.ClusterAdapter;
-import org.graylog2.indexer.cluster.PendingTasksStats;
-import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.inputs.InputService;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -32,15 +30,12 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
-import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.graylog2.system.stats.mongo.MongoProbe;
 import org.graylog2.system.stats.mongo.MongoStats;
 import org.graylog2.users.RoleService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Singleton
@@ -56,8 +51,8 @@ public class ClusterStatsService {
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final DashboardService dashboardService;
+    private final Cluster cluster;
     private final IndexSetRegistry indexSetRegistry;
-    private final ClusterAdapter clusterAdapter;
 
     @Inject
     public ClusterStatsService(MongoProbe mongoProbe,
@@ -70,9 +65,10 @@ public class ClusterStatsService {
                                RoleService roleService,
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                               DashboardService dashboardService, IndexSetRegistry indexSetRegistry, ClusterAdapter clusterAdapter) {
+                               DashboardService dashboardService,
+                               IndexSetRegistry indexSetRegistry,
+                               Cluster cluster) {
         this.indexSetRegistry = indexSetRegistry;
-        this.clusterAdapter = clusterAdapter;
         this.mongoProbe = mongoProbe;
         this.userService = userService;
         this.inputService = inputService;
@@ -84,6 +80,7 @@ public class ClusterStatsService {
         this.alertService = alertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.dashboardService = dashboardService;
+        this.cluster = cluster;
     }
 
     public ClusterStats clusterStats() {
@@ -112,26 +109,7 @@ public class ClusterStatsService {
     }
 
     public ElasticsearchStats elasticsearchStats() {
-        final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
-        final org.graylog2.system.stats.elasticsearch.ClusterStats clusterStats = clusterAdapter.clusterStats();
-
-        final PendingTasksStats pendingTasksStats = clusterAdapter.pendingTasks();
-
-        final ShardStats shardStats = clusterAdapter.shardStats(indices);
-        final org.graylog2.system.stats.elasticsearch.ClusterHealth clusterHealth = org.graylog2.system.stats.elasticsearch.ClusterHealth.from(
-                shardStats,
-                pendingTasksStats
-        );
-        final HealthStatus healthStatus = clusterAdapter.health(indices).orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
-
-        return ElasticsearchStats.create(
-                clusterStats.clusterName(),
-                clusterStats.clusterVersion(),
-                healthStatus,
-                clusterHealth,
-                clusterStats.nodesStats(),
-                clusterStats.indicesStats()
-        );
+        return cluster.elasticsearchStats();
     }
 
     public MongoStats mongoStats() {

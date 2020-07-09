@@ -23,6 +23,8 @@ import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
+import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
+import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,5 +185,28 @@ public class Cluster {
 
     public Optional<ClusterHealth> clusterHealthStats() {
         return clusterAdapter.clusterHealthStats(allIndexWildcards());
+    }
+
+    public ElasticsearchStats elasticsearchStats() {
+        final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
+        final org.graylog2.system.stats.elasticsearch.ClusterStats clusterStats = clusterAdapter.clusterStats();
+
+        final PendingTasksStats pendingTasksStats = clusterAdapter.pendingTasks();
+
+        final ShardStats shardStats = clusterAdapter.shardStats(indices);
+        final org.graylog2.system.stats.elasticsearch.ClusterHealth clusterHealth = org.graylog2.system.stats.elasticsearch.ClusterHealth.from(
+                shardStats,
+                pendingTasksStats
+        );
+        final HealthStatus healthStatus = clusterAdapter.health(indices).orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
+
+        return ElasticsearchStats.create(
+                clusterStats.clusterName(),
+                clusterStats.clusterVersion(),
+                healthStatus,
+                clusterHealth,
+                clusterStats.nodesStats(),
+                clusterStats.indicesStats()
+        );
     }
 }
