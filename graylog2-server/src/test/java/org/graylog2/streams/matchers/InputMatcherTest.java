@@ -24,15 +24,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class MatchInputTest extends MatcherTest {
+public class InputMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulMatch() {
         StreamRule rule = getSampleRule();
-        rule.setValue("message-id-beef");
+        rule.setValue("input-id-beef");
 
         Message msg = getSampleMessage();
-        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "message-id-beef");
+        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "input-id-beef");
 
         StreamRuleMatcher matcher = getMatcher(rule);
         assertTrue(matcher.match(msg, rule));
@@ -41,10 +41,10 @@ public class MatchInputTest extends MatcherTest {
     @Test
     public void testUnsuccessfulMatch() {
         StreamRule rule = getSampleRule();
-        rule.setValue("message-id-dead");
+        rule.setValue("input-id-dead");
 
         Message msg = getSampleMessage();
-        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "message-id-beef");
+        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "input-id-beef");
 
         StreamRuleMatcher matcher = getMatcher(rule);
         assertFalse(matcher.match(msg, rule));
@@ -53,7 +53,7 @@ public class MatchInputTest extends MatcherTest {
     @Test
     public void testUnsuccessfulMatchWhenMissing() {
         StreamRule rule = getSampleRule();
-        rule.setValue("message-id-dead");
+        rule.setValue("input-id-dead");
 
         Message msg = getSampleMessage();
 
@@ -64,11 +64,11 @@ public class MatchInputTest extends MatcherTest {
     @Test
     public void testSuccessfulMatchInverted() {
         StreamRule rule = getSampleRule();
-        rule.setValue("message-id-beef");
+        rule.setValue("input-id-beef");
         rule.setInverted(true);
 
         Message msg = getSampleMessage();
-        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "message-id-beef");
+        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "input-id-beef");
 
         StreamRuleMatcher matcher = getMatcher(rule);
         assertFalse(matcher.match(msg, rule));
@@ -77,11 +77,11 @@ public class MatchInputTest extends MatcherTest {
     @Test
     public void testUnsuccessfulMatchInverted() {
         StreamRule rule = getSampleRule();
-        rule.setValue("message-id-dead");
+        rule.setValue("input-id-dead");
         rule.setInverted(true);
 
         Message msg = getSampleMessage();
-        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "message-id-beef");
+        msg.addField(Message.FIELD_GL2_SOURCE_INPUT, "input-id-beef");
 
         StreamRuleMatcher matcher = getMatcher(rule);
         assertTrue(matcher.match(msg, rule));
@@ -90,7 +90,7 @@ public class MatchInputTest extends MatcherTest {
     @Test
     public void testUnsuccessfulMatchWhenMissingInverted() {
         StreamRule rule = getSampleRule();
-        rule.setValue("message-id-dead");
+        rule.setValue("input-id-dead");
         rule.setInverted(true);
 
         Message msg = getSampleMessage();

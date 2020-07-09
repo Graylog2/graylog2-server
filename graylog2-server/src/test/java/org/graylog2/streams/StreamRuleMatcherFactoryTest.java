@@ -18,7 +18,7 @@ package org.graylog2.streams;
 
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.matchers.AlwaysMatcher;
-import org.graylog2.streams.matchers.MatchInput;
+import org.graylog2.streams.matchers.InputMatcher;
 import org.graylog2.streams.matchers.ExactMatcher;
 import org.graylog2.streams.matchers.FieldPresenceMatcher;
 import org.graylog2.streams.matchers.GreaterMatcher;
@@ -37,6 +37,6 @@ public class StreamRuleMatcherFactoryTest {
         assertThat(StreamRuleMatcherFactory.build(StreamRuleType.SMALLER)).isInstanceOf(SmallerMatcher.class);
         assertThat(StreamRuleMatcherFactory.build(StreamRuleType.PRESENCE)).isInstanceOf(FieldPresenceMatcher.class);
         assertThat(StreamRuleMatcherFactory.build(StreamRuleType.ALWAYS_MATCH)).isInstanceOf(AlwaysMatcher.class);
-        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.MATCH_INPUT)).isInstanceOf(MatchInput.class);
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.MATCH_INPUT)).isInstanceOf(InputMatcher.class);
     }
 }

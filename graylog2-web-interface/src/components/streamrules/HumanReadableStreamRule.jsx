@@ -10,11 +10,6 @@ class HumanReadableStreamRule extends React.Component {
 
   MATCH_INPUT = 8;
 
-  static propTypes = {
-    streamRule: PropTypes.object.isRequired,
-    streamRuleTypes: PropTypes.array.isRequired,
-  };
-
   _getTypeForInteger = (type, streamRuleTypes) => {
     if (streamRuleTypes) {
       return streamRuleTypes.filter((streamRuleType) => {
@@ -25,7 +20,21 @@ class HumanReadableStreamRule extends React.Component {
     return undefined;
   };
 
+  _inputName = (inputId) => {
+    const { inputs } = this.props;
+
+    return inputs.find((input) => input.id === inputId);
+  }
+
   _formatRuleValue = (streamRule) => {
+    if (String(streamRule.type) === String(this.MATCH_INPUT)) {
+      const input = this._inputName(streamRule.value);
+
+      if (input) {
+        return `${input.title} (${input.name}: ${input.id})`;
+      }
+    }
+
     if (String(streamRule.type) !== String(this.FIELD_PRESENCE_RULE_TYPE)) {
       if (streamRule.value) {
         return streamRule.value;
@@ -68,5 +77,15 @@ class HumanReadableStreamRule extends React.Component {
     );
   }
 }
+
+HumanReadableStreamRule.propTypes = {
+  streamRule: PropTypes.object.isRequired,
+  streamRuleTypes: PropTypes.array.isRequired,
+  inputs: PropTypes.array,
+};
+
+HumanReadableStreamRule.defaultProps = {
+  inputs: [],
+};
 
 export default HumanReadableStreamRule;

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Col, Well } from 'components/graylog';
-import { Input, BootstrapModalForm } from 'components/bootstrap';
-import { TypeAheadFieldInput, Icon } from 'components/common';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Icon, TypeAheadFieldInput } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -184,8 +184,9 @@ class StreamRuleForm extends React.Component<Props, State> {
   };
 
   render() {
-    const { streamRule: { type, inverted, description } } = this.state;
-    const { streamRuleTypes: ruleTypes, title, onClose } = this.props;
+    const { streamRule } = this.state;
+    const { type, inverted, description } = streamRule;
+    const { streamRuleTypes: ruleTypes, title, onClose, inputs } = this.props;
 
     const streamRuleTypes = ruleTypes.map(this._formatStreamRuleType);
     const fieldBox = this.fieldBox();
@@ -213,7 +214,7 @@ class StreamRuleForm extends React.Component<Props, State> {
             <p>
               <strong>Result:</strong>
               {' '}
-              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={ruleTypes} />
+              <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={ruleTypes} inputs={inputs} />
             </p>
           </Col>
           <Col md={4}>

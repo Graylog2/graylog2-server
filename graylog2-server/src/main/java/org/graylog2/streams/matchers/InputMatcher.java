@@ -19,7 +19,7 @@ package org.graylog2.streams.matchers;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
-public class MatchInput implements StreamRuleMatcher {
+public class InputMatcher implements StreamRuleMatcher {
 
     @Override
     public boolean match(Message msg, StreamRule rule) {
