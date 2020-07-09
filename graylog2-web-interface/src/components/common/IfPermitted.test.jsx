@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { mount, shallow } from 'wrappedEnzyme';
 import { viewsManager } from 'fixtures/users';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -11,7 +10,7 @@ import IfPermitted from './IfPermitted';
 jest.mock('stores/connect', () => (x) => x);
 jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 
-describe('SimpleIfPermitted', () => {
+describe('IfPermitted', () => {
   let element;
 
   // We can't use prop types here, they don't work well together with mount and require
@@ -30,7 +29,7 @@ describe('SimpleIfPermitted', () => {
     let wrapper;
 
     afterEach(() => {
-      expect(wrapper.find('SimpleIfPermitted')).toBeEmptyRender();
+      expect(wrapper.find('IfPermitted')).toBeEmptyRender();
     });
 
     it('no user is present', () => {

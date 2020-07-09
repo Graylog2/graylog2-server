@@ -1,9 +1,8 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { admin } from 'fixtures/users';
+import { viewsManager } from 'fixtures/users';
 
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
@@ -24,6 +23,7 @@ jest.mock('util/AppConfig', () => ({
   isFeatureEnabled: jest.fn(() => false),
 }));
 
+const currentUser = viewsManager;
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
@@ -34,7 +34,7 @@ describe('Navigation', () => {
   // We can't use prop types here, they don't work well together with mount and require
   // eslint-disable-next-line react/prop-types
   const SimpleNavigation = ({ component: Component, permissions, ...props }) => (
-    <CurrentUserContext.Provider value={{ ...admin, permissions }}>
+    <CurrentUserContext.Provider value={{ ...currentUser, permissions }}>
       <Component {...props} />
     </CurrentUserContext.Provider>
   );
@@ -47,7 +47,6 @@ describe('Navigation', () => {
   beforeEach(() => {
     // eslint-disable-next-line global-require
     Navigation = require('./Navigation');
-    setTimeout(() => {}, 0);
   });
 
   describe('has common elements', () => {
@@ -68,8 +67,8 @@ describe('Navigation', () => {
     it('contains user menu including correct username', () => {
       const usermenu = wrapper.find('UserMenu');
 
-      expect(usermenu).toHaveProp('loginName', admin.username);
-      expect(usermenu).toHaveProp('fullName', admin.full_name);
+      expect(usermenu).toHaveProp('loginName', currentUser.username);
+      expect(usermenu).toHaveProp('fullName', currentUser.full_name);
     });
 
     it('contains help menu', () => {
@@ -132,7 +131,8 @@ describe('Navigation', () => {
     });
 
     it('contains restricted navigation elements from plugins if permissions are present', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} permissions={['archive:read']} />);
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={['archive:read']} />);
 
       expect(findLink(wrapper, 'Archives')).toExist();
     });
@@ -144,13 +144,16 @@ describe('Navigation', () => {
     });
 
     it('renders dropdown contributed by plugin if permissions are sufficient', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} permissions={['somethingelse', 'completelydifferent']} />);
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={['somethingelse', 'completelydifferent']} />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
     });
 
     it('sets dropdown title based on match', () => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} location={{ pathname: '/somethingelse' }} permissions={['somethingelse', 'completelydifferent']} />);
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              location={{ pathname: '/somethingelse' }}
+                                              permissions={['somethingelse', 'completelydifferent']} />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
     });
@@ -158,7 +161,8 @@ describe('Navigation', () => {
 
   describe('uses correct permissions:', () => {
     const verifyPermissions = ({ permissions, count, links }) => {
-      const wrapper = mount(<SimpleNavigation component={Navigation} permissions={permissions} />);
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={permissions} />);
       const navigationLinks = wrapper.find('NavItem');
 
       expect(navigationLinks).toHaveLength(count);
