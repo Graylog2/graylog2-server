@@ -52,8 +52,8 @@ public abstract class EntityShareResponse {
     @JsonProperty("selected_grantee_capabilities")
     public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
 
-    @JsonProperty("missing_dependencies")
-    public abstract ImmutableMap<GRN, Collection<EntityDependency>> missingDependencies();
+    @JsonProperty("missing_permissions_on_dependencies")
+    public abstract ImmutableMap<GRN, Collection<EntityDependency>> missingPermissionsOnDependencies();
 
     public static Builder builder() {
         return Builder.create();
@@ -66,7 +66,7 @@ public abstract class EntityShareResponse {
             return new AutoValue_EntityShareResponse.Builder()
                     .activeShares(Collections.emptySet())
                     .selectedGranteeCapabilities(Collections.emptyMap())
-                    .missingDependencies(Collections.emptyMap());
+                    .missingPermissionsOnDependencies(Collections.emptyMap());
         }
 
         @JsonProperty("entity")
@@ -87,8 +87,8 @@ public abstract class EntityShareResponse {
         @JsonProperty("selected_grantee_capabilities")
         public abstract Builder selectedGranteeCapabilities(Map<GRN, Capability> selectedGranteeCapabilities);
 
-        @JsonProperty("missing_dependencies")
-        public abstract Builder missingDependencies(Map<GRN, Collection<EntityDependency>> missingDependencies);
+        @JsonProperty("missing_permissions_on_dependencies")
+        public abstract Builder missingPermissionsOnDependencies(Map<GRN, Collection<EntityDependency>> missingDependencies);
 
         public abstract EntityShareResponse build();
     }

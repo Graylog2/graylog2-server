@@ -93,7 +93,7 @@ public class EntitySharesService {
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
-                .missingDependencies(getMissingDependencies(ownedEntity, sharingUserGRN, request))
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
                 .build();
     }
 
@@ -158,7 +158,7 @@ public class EntitySharesService {
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
-                .missingDependencies(getMissingDependencies(ownedEntity, sharingUserGRN, request))
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
                 .build();
     }
 
@@ -190,7 +190,7 @@ public class EntitySharesService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private ImmutableMap<GRN, Collection<EntityDependency>> getMissingDependencies(GRN entity, GRN sharingUser, EntityShareRequest shareRequest) {
+    private ImmutableMap<GRN, Collection<EntityDependency>> checkMissingPermissionsOnDependencies(GRN entity, GRN sharingUser, EntityShareRequest shareRequest) {
         final ImmutableSet<EntityDependency> dependencies = entityDependencyResolver.resolve(entity);
         final ImmutableSet<GRN> selectedGrantees = shareRequest.selectedGranteeCapabilities()
                 .orElse(ImmutableMap.of()).keySet();
