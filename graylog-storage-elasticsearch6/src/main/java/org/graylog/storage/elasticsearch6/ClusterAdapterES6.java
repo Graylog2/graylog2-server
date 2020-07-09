@@ -63,12 +63,7 @@ public class ClusterAdapterES6 implements ClusterAdapter {
 
     private HealthStatus extractHealthStatus(JsonNode node) {
         final String statusString = node.path("status").asText().toLowerCase(Locale.ENGLISH);
-        switch (statusString) {
-            case "red": return HealthStatus.Red;
-            case "yellow": return HealthStatus.Yellow;
-            case "green": return HealthStatus.Green;
-            default: throw new IllegalStateException("Unable to parse health status (known: green/yellow/red): " + statusString);
-        }
+        return HealthStatus.fromString(statusString);
     }
 
     @Override
