@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-import type { User } from 'stores/users/UsersStore';
+import type { UserJSON as User } from 'stores/users/UsersStore.js';
 import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import CombinedProvider from 'injection/CombinedProvider';
