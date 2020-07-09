@@ -16,7 +16,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
           id="url"
           label="Lookup URL"
           name="url"
@@ -47,7 +47,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
           id="single_value_jsonpath"
           label="Single value JSONPath"
           name="single_value_jsonpath"
@@ -72,7 +72,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
           id="multi_value_jsonpath"
           label="Multi value JSONPath"
           name="multi_value_jsonpath"
@@ -96,7 +96,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
         class="col-sm-9"
       >
         <input
-          class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
           id="user_agent"
           label="HTTP User-Agent"
           name="user_agent"
@@ -158,7 +158,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                   </td>
                   <td>
                     <button
-                      class="Button-c9cbmb-0 bNulii btn btn-xs btn-danger"
+                      class="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-xs btn-danger"
                       type="button"
                     >
                       Delete
@@ -173,7 +173,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                       
                       <span>
                         <input
-                          class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
                           data-testid="newKey"
                           id="newKey"
                           label=""
@@ -193,7 +193,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                       
                       <span>
                         <input
-                          class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
                           data-testid="newValue"
                           id="newValue"
                           label=""
@@ -208,7 +208,7 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                   </td>
                   <td>
                     <button
-                      class="Button-c9cbmb-0 bNulii btn btn-sm btn-success"
+                      class="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-sm btn-success"
                       disabled=""
                       type="button"
                     >

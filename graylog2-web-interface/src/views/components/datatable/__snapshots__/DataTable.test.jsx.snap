@@ -172,14 +172,14 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -404,7 +404,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -484,7 +484,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -1068,14 +1068,14 @@ exports[`DataTable should render with empty data 1`] = `
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -1292,14 +1292,14 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -1473,7 +1473,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         timestamp
@@ -1553,7 +1553,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -1633,7 +1633,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -2513,14 +2513,14 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 vYbSS table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -2694,7 +2694,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         timestamp
@@ -2774,7 +2774,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="FieldActions__FieldElement-vd9gu3-0 iehDd field-element"
                                         disabled={false}
                                       >
                                         count()

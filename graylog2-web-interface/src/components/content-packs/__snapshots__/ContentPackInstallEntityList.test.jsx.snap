@@ -160,7 +160,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                 className="table "
               >
                 <table
-                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                  className="DataTable__StyledTable-sc-1c22x1c-0 hEWaaO table "
                 >
                   <thead>
                     <tr>
@@ -380,7 +380,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                 className="table "
               >
                 <table
-                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                  className="DataTable__StyledTable-sc-1c22x1c-0 hEWaaO table "
                 >
                   <thead>
                     <tr>

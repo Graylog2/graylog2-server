@@ -3,34 +3,42 @@
 exports[`<ContentPackUploadControls /> should render 1`] = `
 <ContentPackUploadControls>
   <span>
-    <Button
+    <ForwardRef
       active={false}
       bsStyle="success"
       className="button"
       id="upload-content-pack-button"
       onClick={[Function]}
     >
-      <Button
+      <Button__StyledButton
         active={false}
-        block={false}
-        bsClass="btn"
         bsStyle="success"
-        className="Button-c9cbmb-0 bNulii button"
-        disabled={false}
+        className="button"
         id="upload-content-pack-button"
         onClick={[Function]}
       >
-        <button
-          className="Button-c9cbmb-0 bNulii button btn btn-success"
+        <Button
+          active={false}
+          block={false}
+          bsClass="btn"
+          bsStyle="success"
+          className="Button__StyledButton-c9cbmb-0 jHWfTP button"
           disabled={false}
           id="upload-content-pack-button"
           onClick={[Function]}
-          type="button"
         >
-          Upload
-        </button>
-      </Button>
-    </Button>
+          <button
+            className="Button__StyledButton-c9cbmb-0 jHWfTP button btn btn-success"
+            disabled={false}
+            id="upload-content-pack-button"
+            onClick={[Function]}
+            type="button"
+          >
+            Upload
+          </button>
+        </Button>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       cancelButtonText="Cancel"
       formProps={Object {}}
@@ -60,7 +68,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             autoFocus={true}
             backdrop="static"
             bsClass="modal"
-            className="Modal-nuree8-0 kdCabm"
+            className="Modal-nuree8-0 hMPgsT"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}

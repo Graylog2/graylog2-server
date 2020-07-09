@@ -84,7 +84,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                 className="table "
               >
                 <table
-                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                  className="DataTable__StyledTable-sc-1c22x1c-0 hEWaaO table "
                 >
                   <thead>
                     <tr>
@@ -362,7 +362,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                 className="table "
               >
                 <table
-                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                  className="DataTable__StyledTable-sc-1c22x1c-0 hEWaaO table "
                 >
                   <thead>
                     <tr>
@@ -640,7 +640,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                 className="table "
               >
                 <table
-                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                  className="DataTable__StyledTable-sc-1c22x1c-0 hEWaaO table "
                 >
                   <thead>
                     <tr>

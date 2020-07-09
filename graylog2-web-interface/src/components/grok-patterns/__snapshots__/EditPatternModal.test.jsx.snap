@@ -13,29 +13,34 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
   validPatternName={[Function]}
 >
   <span>
-    <Button
+    <ForwardRef
       bsStyle="success"
       onClick={[Function]}
     >
-      <Button
-        active={false}
-        block={false}
-        bsClass="btn"
+      <Button__StyledButton
         bsStyle="success"
-        className="Button-c9cbmb-0 bNulii"
-        disabled={false}
         onClick={[Function]}
       >
-        <button
-          className="Button-c9cbmb-0 bNulii btn btn-success"
+        <Button
+          active={false}
+          block={false}
+          bsClass="btn"
+          bsStyle="success"
+          className="Button__StyledButton-c9cbmb-0 jHWfTP"
           disabled={false}
           onClick={[Function]}
-          type="button"
         >
-          Create pattern
-        </button>
-      </Button>
-    </Button>
+          <button
+            className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-success"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            Create pattern
+          </button>
+        </Button>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
@@ -69,7 +74,7 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
             backdrop="static"
             bsClass="modal"
             bsSize="large"
-            className="Modal-nuree8-0 kdCabm"
+            className="Modal-nuree8-0 hMPgsT"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}
@@ -140,33 +145,39 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
   validPatternName={[Function]}
 >
   <span>
-    <Button
+    <ForwardRef
       bsSize="xs"
       bsStyle="info"
       onClick={[Function]}
     >
-      <Button
-        active={false}
-        block={false}
-        bsClass="btn"
+      <Button__StyledButton
         bsSize="xs"
         bsStyle="info"
-        className="Button-c9cbmb-0 bNulii"
-        disabled={false}
         onClick={[Function]}
       >
-        <button
-          className="Button-c9cbmb-0 bNulii btn btn-xs btn-info"
+        <Button
+          active={false}
+          block={false}
+          bsClass="btn"
+          bsSize="xs"
+          bsStyle="info"
+          className="Button__StyledButton-c9cbmb-0 jHWfTP"
           disabled={false}
           onClick={[Function]}
-          type="button"
         >
-          <span>
-            Edit
-          </span>
-        </button>
-      </Button>
-    </Button>
+          <button
+            className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-xs btn-info"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            <span>
+              Edit
+            </span>
+          </button>
+        </Button>
+      </Button__StyledButton>
+    </ForwardRef>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
@@ -200,7 +211,7 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
             backdrop="static"
             bsClass="modal"
             bsSize="large"
-            className="Modal-nuree8-0 kdCabm"
+            className="Modal-nuree8-0 hMPgsT"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}

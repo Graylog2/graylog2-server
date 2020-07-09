@@ -101,29 +101,34 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
         }
       }
     >
-      <Button
+      <ForwardRef
         bsStyle="success"
         onClick={[Function]}
       >
-        <Button
-          active={false}
-          block={false}
-          bsClass="btn"
+        <Button__StyledButton
           bsStyle="success"
-          className="Button-c9cbmb-0 bNulii"
-          disabled={false}
           onClick={[Function]}
         >
-          <button
-            className="Button-c9cbmb-0 bNulii btn btn-success"
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="success"
+            className="Button__StyledButton-c9cbmb-0 jHWfTP"
             disabled={false}
             onClick={[Function]}
-            type="button"
           >
-            Done
-          </button>
-        </Button>
-      </Button>
+            <button
+              className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-success"
+              disabled={false}
+              onClick={[Function]}
+              type="button"
+            >
+              Done
+            </button>
+          </Button>
+        </Button__StyledButton>
+      </ForwardRef>
     </div>
   </div>
 </ColumnPivotConfiguration>

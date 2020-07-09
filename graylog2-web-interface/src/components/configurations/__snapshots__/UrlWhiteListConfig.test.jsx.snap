@@ -48,14 +48,14 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 bzdwZS top-margin"
+        className="Table-ztr4bi-0 ldPsnV top-margin"
         condensed={true}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 bzdwZS top-margin table table-striped table-bordered table-condensed"
+          className="Table-ztr4bi-0 ldPsnV top-margin table table-striped table-bordered table-condensed"
         >
           <thead>
             <tr>
@@ -126,10 +126,14 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
         </table>
       </Table>
     </Table>
-    <IfPermitted
-      anyPermissions={false}
+    <ConnectStoresWrapper[IfPermitted] stores=currentUser
       permissions="urlwhitelist:write"
-    />
+    >
+      <IfPermitted
+        anyPermissions={false}
+        permissions="urlwhitelist:write"
+      />
+    </ConnectStoresWrapper[IfPermitted] stores=currentUser>
     <BootstrapModalForm
       bsSize="lg"
       cancelButtonText="Cancel"
@@ -163,7 +167,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
             backdrop="static"
             bsClass="modal"
             bsSize="lg"
-            className="Modal-nuree8-0 kdCabm"
+            className="Modal-nuree8-0 hMPgsT"
             dialogComponentClass={[Function]}
             enforceFocus={true}
             keyboard={true}
