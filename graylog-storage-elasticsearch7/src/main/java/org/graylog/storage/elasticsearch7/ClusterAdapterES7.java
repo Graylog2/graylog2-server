@@ -245,7 +245,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
-    private Optional<ClusterHealthResponse> clusterHealth(Collection<? extends String> indices) {
+    private Optional<ClusterHealthResponse> clusterHealth(Collection<String> indices) {
         final String[] indicesAry = indices.toArray(new String[0]);
         if (!indicesExist(indicesAry)) {
             return Optional.empty();
