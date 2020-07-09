@@ -35,7 +35,7 @@ const UsersOverview = () => {
   const roles = [];
   const currentUser = useContext(CurrentUserContext);
   const filterKeys = ['username', 'fullName', 'email', 'clientAddress'];
-  const headers = ['', 'Username', 'Full name', 'Email Address', 'Client Address', 'Role', 'Actions'];
+  const headers = ['', 'Username', 'Full name', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
   const _userOverviewItem = (user) => <UserOverviewItem user={user} roles={roles} isActive={_isActiveItem(user)} />;
 

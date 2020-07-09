@@ -70,13 +70,15 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
       &nbsp;
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${username}`}>
         <EditTokensAction username={username} wrapperComponent={MenuItem} />
-        <MenuItem id={`delete-user-${username}`}
-                  bsStyle="primary"
-                  bsSize="xs"
-                  title="Delete user"
-                  onClick={_deleteUser}>
-          Delete
-        </MenuItem>
+        <IfPermitted permissions={[`users:edit:${username}`]}>
+          <MenuItem id={`delete-user-${username}`}
+                    bsStyle="primary"
+                    bsSize="xs"
+                    title={`Delete user ${username}`}
+                    onClick={_deleteUser}>
+            Delete
+          </MenuItem>
+        </IfPermitted>
       </DropdownButton>
     </>
   );
