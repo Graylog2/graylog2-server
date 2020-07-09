@@ -81,7 +81,6 @@ const table = {
 const input = {
   background: global.contentBackground,
   backgroundDisabled: darken(global.contentBackground, 0.25),
-  backgroundFocus: darken(global.contentBackground, 0.1),
   border: variant.light.default,
   borderFocus: variant.light.info,
   boxShadow: `inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px ${chroma(variant.light.info).alpha(0.4).css()}`,

@@ -30,7 +30,6 @@ export type Colors = {
   input: {
     background: string,
     backgroundDisabled: string,
-    backgroundFocus: string,
     border: string,
     boxShadow: string,
     color: string,
