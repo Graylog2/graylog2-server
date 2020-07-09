@@ -23,7 +23,7 @@ import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal'
 import ShareViewModal from 'views/components/views/ShareViewModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 
 import SavedSearchForm from './SavedSearchForm';
