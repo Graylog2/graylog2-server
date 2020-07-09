@@ -15,7 +15,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
     return undefined;
   }
 
-  const text = theme.colors.variant[variant];
+  const text = theme.colors.variant.dark[variant];
   const border = theme.colors.variant.lighter[variant];
   const background = theme.colors.variant.lightest[variant];
 
