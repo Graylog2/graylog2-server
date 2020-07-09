@@ -5,7 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 
 type Role = {
   name: string,

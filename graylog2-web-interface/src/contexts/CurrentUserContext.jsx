@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 
 import { singleton } from '../views/logic/singleton';
 

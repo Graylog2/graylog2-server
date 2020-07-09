@@ -17,7 +17,7 @@ import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 
 const RolesStore = StoreProvider.getStore('Roles');
 

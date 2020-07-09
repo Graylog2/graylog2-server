@@ -1,5 +1,5 @@
 // @flow strict
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 
 /* eslint-disable import/prefer-default-export */
 

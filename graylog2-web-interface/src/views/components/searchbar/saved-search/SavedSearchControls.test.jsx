@@ -11,7 +11,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext, { type NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 
 import SavedSearchControls from './SavedSearchControls';

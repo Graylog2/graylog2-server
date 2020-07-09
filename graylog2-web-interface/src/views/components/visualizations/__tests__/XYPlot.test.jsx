@@ -5,7 +5,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { viewsManager } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import XYPlot, { type Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

@@ -3,7 +3,7 @@ import React from 'react';
 import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 import { viewsManager } from 'fixtures/users';
 
-import type { UserJSON as User } from 'stores/users/UsersStore.js';
+import type { UserJSON as User } from 'stores/users/UsersStore';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
