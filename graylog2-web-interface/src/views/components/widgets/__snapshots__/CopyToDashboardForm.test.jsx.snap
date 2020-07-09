@@ -92,10 +92,14 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 <span>
                   <select
 <<<<<<< HEAD
+<<<<<<< HEAD
                     class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
 =======
                     class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
 >>>>>>> 46caba27d0... snapshots
+=======
+                    class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+>>>>>>> 99f5c1286e... snapshots
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -245,10 +249,14 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 <span>
                   <select
 <<<<<<< HEAD
+<<<<<<< HEAD
                     class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
 =======
                     class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
 >>>>>>> 46caba27d0... snapshots
+=======
+                    class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+>>>>>>> 99f5c1286e... snapshots
                     id="page-size"
                     label="Show:"
                     name="page-size"

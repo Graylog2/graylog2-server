@@ -212,12 +212,20 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                   to="/path/to/views"
                 >
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <Button__StyledButton
 =======
                   <ForwardRef
 >>>>>>> 1634bb410f... snapshots
+=======
+                  <Button
+>>>>>>> 99f5c1286e... snapshots
                     action="push"
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="success"
+<<<<<<< HEAD
                     onClick={[Function]}
                     type="submit"
                   >
@@ -226,12 +234,23 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                       bsStyle="success"
 <<<<<<< HEAD
                       className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="submit"
+                  >
+                    <button
+                      action="push"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
+>>>>>>> 99f5c1286e... snapshots
                       disabled={false}
 =======
 >>>>>>> 1634bb410f... snapshots
                       onClick={[Function]}
                       type="submit"
                     >
+<<<<<<< HEAD
                       <StyledComponent
                         action="push"
 <<<<<<< HEAD
@@ -319,6 +338,14 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                 </LinkContainer>
               </div>
             </Col>
+=======
+                      Back
+                    </button>
+                  </Button>
+                </Button__StyledButton>
+              </ForwardRef>
+            </LinkContainer>
+>>>>>>> 99f5c1286e... snapshots
           </div>
         </Row>
       </StyledComponent>

@@ -309,6 +309,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                         type="text"
                                         value="new Title"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                       />
                                     </FormControl>
                                   </FormControl>
@@ -324,6 +327,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                             type="submit"
                           >
                             <Button__StyledButton
+<<<<<<< HEAD
 =======
                                       >
                                         <StyledComponent
@@ -387,6 +391,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                             </Component>
                             <ForwardRef
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                               bsStyle="info"
                               className="button"
                               disabled={false}
@@ -766,6 +772,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                         type="text"
                                         value="new Title"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                       />
                                     </FormControl>
                                   </FormControl>
@@ -780,6 +789,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                             type="submit"
                           >
                             <Button__StyledButton
+<<<<<<< HEAD
 =======
                                       >
                                         <StyledComponent
@@ -843,6 +853,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                             </Component>
                             <ForwardRef
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
@@ -1256,6 +1268,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                         type="text"
                                         value="new Title"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                       />
                                     </FormControl>
                                   </FormControl>
@@ -1270,6 +1285,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                             type="submit"
                           >
                             <Button__StyledButton
+<<<<<<< HEAD
 =======
                                       >
                                         <StyledComponent
@@ -1333,6 +1349,8 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                             </Component>
                             <ForwardRef
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}

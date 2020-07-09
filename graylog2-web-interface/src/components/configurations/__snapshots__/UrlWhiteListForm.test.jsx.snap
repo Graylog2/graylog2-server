@@ -251,6 +251,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   required={true}
                                   type="text"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                 />
                               </FormControl>
                             </FormControl>
@@ -280,6 +283,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 <Component
                   controlId="value-input0"
                   validationState={null}
+<<<<<<< HEAD
 =======
                                 >
                                   <StyledComponent
@@ -373,6 +377,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   required={true}
                   type="text"
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                 >
                   <FormGroup__StyledFormGroup
                     controlId="value-input0"
@@ -424,6 +430,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   required={true}
                                   type="text"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                 />
                               </FormControl>
                             </FormControl>
@@ -450,6 +459,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 <Component
                   controlId="url-input-type-0"
                   validationState={null}
+<<<<<<< HEAD
 =======
                                 >
                                   <StyledComponent
@@ -540,6 +550,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   placeholder=""
                   required={true}
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                 >
                   <FormGroup__StyledFormGroup
                     controlId="url-input-type-0"
@@ -1246,6 +1258,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                     styles={
                                       Object {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                         "clearIndicator": [Function],
                                         "control": [Function],
                                         "dropdownIndicator": [Function],
@@ -1256,6 +1271,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "placeholder": [Function],
                                         "singleValue": [Function],
                                         "valueContainer": [Function],
+<<<<<<< HEAD
 =======
                                         "breakpoints": Object {
                                           "max": Object {
@@ -1439,6 +1455,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "readableColor": [Function],
                                         },
 >>>>>>> 12d5225973... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                                       }
                                     }
                                     tabIndex="0"
@@ -1446,6 +1464,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                     theme={[Function]}
                                     value={
                                       Array [
+<<<<<<< HEAD
                                         Object {
                                           "label": "Regex",
                                           "value": "regex",
@@ -1462,6 +1481,24 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       hasValue={true}
                                       innerProps={
                                         Object {
+=======
+                                        Object {
+                                          "label": "Regex",
+                                          "value": "regex",
+                                        },
+                                      ]
+                                    }
+                                    valueKey="value"
+                                  >
+                                    <SelectContainer
+                                      clearValue={[Function]}
+                                      cx={[Function]}
+                                      getStyles={[Function]}
+                                      getValue={[Function]}
+                                      hasValue={true}
+                                      innerProps={
+                                        Object {
+>>>>>>> 99f5c1286e... snapshots
                                           "id": undefined,
                                           "onKeyDown": [Function],
                                         }
@@ -1567,6 +1604,40 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             },
                                           ],
                                           "valueKey": "value",
+<<<<<<< HEAD
+                                        }
+                                      }
+                                      setValue={[Function]}
+                                      theme={
+                                        Object {
+                                          "borderRadius": 4,
+                                          "colors": Object {
+                                            "danger": "#00427f",
+                                            "dangerLight": "#bdc8e4",
+                                            "neutral0": "#ffffff",
+                                            "neutral10": "#eff2f8",
+                                            "neutral20": "#cdcdcd",
+                                            "neutral30": "#b4b4b4",
+                                            "neutral40": "#9b9b9b",
+                                            "neutral5": "#e6e6e6",
+                                            "neutral50": "#838383",
+                                            "neutral60": "#6a6a6a",
+                                            "neutral70": "#515151",
+                                            "neutral80": "#383838",
+                                            "neutral90": "#1f1f1f",
+                                            "primary": "#7894ce",
+                                            "primary25": "#f3f3f3",
+                                            "primary50": "#d0d0d0",
+                                            "primary75": "#a6a6a6",
+                                          },
+                                          "spacing": Object {
+                                            "baseUnit": 4,
+                                            "controlHeight": 38,
+                                            "menuGutter": 8,
+                                          },
+                                        }
+                                      }
+=======
                                         }
                                       }
                                       setValue={[Function]}
@@ -1599,6 +1670,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           },
                                         }
                                       }
+>>>>>>> 99f5c1286e... snapshots
                                     >
                                       <div
                                         className="css-1pcexqc-container"
@@ -1898,12 +1970,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             >
                                               <div
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                 className="css-1hio1c"
 =======
                                                 className="css-ghr2vn-control"
                                                 onMouseDown={[Function]}
                                                 onTouchEnd={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                className="css-1hio1c"
+>>>>>>> 99f5c1286e... snapshots
                                               >
                                                 <SingleValue
                                                   clearValue={[Function]}
@@ -2053,6 +2129,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   <div
                                                     className="css-1yjw8f2-singleValue"
                                                   >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                     Regex
 =======
@@ -2430,6 +2507,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       </div>
                                                     </Input>
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                    Regex
+>>>>>>> 99f5c1286e... snapshots
                                                   </div>
                                                 </SingleValue>
                                                 <Input
@@ -2570,6 +2650,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     className="css-dg7tyz"
                                                   >
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                                     <AutosizeInput
                                                       aria-autocomplete="list"
                                                       autoCapitalize="none"
@@ -2581,6 +2664,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       injectStyles={true}
                                                       inputRef={[Function]}
                                                       inputStyle={
+<<<<<<< HEAD
                                                         Object {
                                                           "background": 0,
                                                           "border": 0,
@@ -2876,6 +2960,17 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "menuGutter": 8,
                                                           },
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                        Object {
+                                                          "background": 0,
+                                                          "border": 0,
+                                                          "color": "inherit",
+                                                          "fontSize": "inherit",
+                                                          "label": "input",
+                                                          "opacity": 1,
+                                                          "outline": 0,
+                                                          "padding": 0,
+>>>>>>> 99f5c1286e... snapshots
                                                         }
                                                       }
                                                       minWidth={1}
@@ -2892,6 +2987,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         style={
                                                           Object {
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                             "display": "inline-block",
 =======
                                                             ":hover": Object {
@@ -2907,6 +3003,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "transform": false,
                                                             "transition": "color 150ms",
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                            "display": "inline-block",
+>>>>>>> 99f5c1286e... snapshots
                                                           }
                                                         }
                                                       >
@@ -2933,6 +3032,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                               "outline": 0,
                                                               "padding": 0,
                                                               "width": "2px",
+<<<<<<< HEAD
                                                             }
                                                           }
                                                           tabIndex="0"
@@ -2951,12 +3051,33 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                               "whiteSpace": "pre",
                                                             }
                                                           }
+=======
+                                                            }
+                                                          }
+                                                          tabIndex="0"
+                                                          type="text"
+                                                          value=""
+                                                        />
+                                                        <div
+                                                          style={
+                                                            Object {
+                                                              "height": 0,
+                                                              "left": 0,
+                                                              "overflow": "scroll",
+                                                              "position": "absolute",
+                                                              "top": 0,
+                                                              "visibility": "hidden",
+                                                              "whiteSpace": "pre",
+                                                            }
+                                                          }
+>>>>>>> 99f5c1286e... snapshots
                                                         />
                                                       </div>
                                                     </AutosizeInput>
                                                   </div>
                                                 </Input>
                                               </div>
+<<<<<<< HEAD
 <<<<<<< HEAD
                                             </ValueContainer>
                                             <IndicatorsContainer
@@ -3980,6 +4101,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           >
                                             <Control
 >>>>>>> 12d5225973... snapshots
+=======
+                                            </ValueContainer>
+                                            <IndicatorsContainer
+>>>>>>> 99f5c1286e... snapshots
                                               clearValue={[Function]}
                                               cx={[Function]}
                                               getStyles={[Function]}
@@ -4120,12 +4245,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             >
                                               <div
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                 className="css-1wy0on6"
 =======
                                                 className="css-ghr2vn-control"
                                                 onMouseDown={[Function]}
                                                 onTouchEnd={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                className="css-1wy0on6"
+>>>>>>> 99f5c1286e... snapshots
                                               >
                                                 <IndicatorSeparator
                                                   clearValue={[Function]}
@@ -4266,6 +4395,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     }
                                                   }
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                 />
                                                 <DropdownIndicator
@@ -4651,6 +4781,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 </ValueContainer>
                                                 <IndicatorsContainer
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                />
+                                                <DropdownIndicator
+>>>>>>> 99f5c1286e... snapshots
                                                   clearValue={[Function]}
                                                   cx={[Function]}
                                                   getStyles={[Function]}
@@ -4799,6 +4933,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 >
                                                   <div
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                                     aria-hidden="true"
                                                     onMouseDown={[Function]}
                                                     onTouchEnd={[Function]}
@@ -4816,6 +4953,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "padding": "0px",
                                                         "transform": false,
                                                         "transition": "color 150ms",
+<<<<<<< HEAD
 =======
                                                     className="css-1wy0on6"
                                                   >
@@ -5105,6 +5243,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         }
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                                                       }
                                                     }
                                                   >
@@ -5115,6 +5255,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       <FontAwesomeIcon
                                                         icon={
                                                           Object {
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                             "iconName": "caret-down",
                                                             "prefix": "fas",
@@ -5132,6 +5273,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "transform": false,
                                                             "transition": "color 150ms",
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+>>>>>>> 99f5c1286e... snapshots
                                                           }
                                                         }
                                                       >
@@ -5283,6 +5428,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   required={true}
                                   type="text"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                 />
                               </FormControl>
                             </FormControl>
@@ -5312,6 +5460,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 <Component
                   controlId="value-input1"
                   validationState={null}
+<<<<<<< HEAD
 =======
                                 >
                                   <StyledComponent
@@ -5405,6 +5554,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   required={true}
                   type="text"
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                 >
                   <FormGroup__StyledFormGroup
                     controlId="value-input1"
@@ -5456,6 +5607,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   required={true}
                                   type="text"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                 />
                               </FormControl>
                             </FormControl>
@@ -5482,6 +5636,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 <Component
                   controlId="url-input-type-1"
                   validationState={null}
+<<<<<<< HEAD
 =======
                                 >
                                   <StyledComponent
@@ -5572,6 +5727,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   placeholder=""
                   required={true}
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                 >
                   <FormGroup__StyledFormGroup
                     controlId="url-input-type-1"
@@ -6278,6 +6435,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                     styles={
                                       Object {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                         "clearIndicator": [Function],
                                         "control": [Function],
                                         "dropdownIndicator": [Function],
@@ -6288,6 +6448,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "placeholder": [Function],
                                         "singleValue": [Function],
                                         "valueContainer": [Function],
+<<<<<<< HEAD
 =======
                                         "breakpoints": Object {
                                           "max": Object {
@@ -6471,6 +6632,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "readableColor": [Function],
                                         },
 >>>>>>> 12d5225973... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                                       }
                                     }
                                     tabIndex="0"
@@ -9711,12 +9874,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             >
                                               <div
 <<<<<<< HEAD
+<<<<<<< HEAD
                                                 className="css-1wy0on6"
 =======
                                                 className="css-ghr2vn-control"
                                                 onMouseDown={[Function]}
                                                 onTouchEnd={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                className="css-1wy0on6"
+>>>>>>> 99f5c1286e... snapshots
                                               >
                                                 <IndicatorSeparator
                                                   clearValue={[Function]}
@@ -9857,6 +10024,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       },
                                                     }
                                                   }
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                 />
                                                 <DropdownIndicator
@@ -10242,6 +10410,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 </ValueContainer>
                                                 <IndicatorsContainer
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                />
+                                                <DropdownIndicator
+>>>>>>> 99f5c1286e... snapshots
                                                   clearValue={[Function]}
                                                   cx={[Function]}
                                                   getStyles={[Function]}
@@ -10390,6 +10562,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 >
                                                   <div
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 99f5c1286e... snapshots
                                                     aria-hidden="true"
                                                     onMouseDown={[Function]}
                                                     onTouchEnd={[Function]}
@@ -10407,6 +10582,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "padding": "0px",
                                                         "transform": false,
                                                         "transition": "color 150ms",
+<<<<<<< HEAD
 =======
                                                     className="css-1wy0on6"
                                                   >
@@ -10696,6 +10872,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           },
                                                         }
 >>>>>>> 46caba27d0... snapshots
+=======
+>>>>>>> 99f5c1286e... snapshots
                                                       }
                                                     }
                                                   >
@@ -10706,6 +10884,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       <FontAwesomeIcon
                                                         icon={
                                                           Object {
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                             "iconName": "caret-down",
                                                             "prefix": "fas",
@@ -10723,6 +10902,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "transform": false,
                                                             "transition": "color 150ms",
 >>>>>>> 46caba27d0... snapshots
+=======
+                                                            "iconName": "caret-down",
+                                                            "prefix": "fas",
+>>>>>>> 99f5c1286e... snapshots
                                                           }
                                                         }
                                                       >

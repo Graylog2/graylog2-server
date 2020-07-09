@@ -639,6 +639,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -742,6 +743,33 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -749,6 +777,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -793,10 +822,25 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -837,6 +881,45 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Action",
+                    ]
+                  }
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >
@@ -1126,6 +1209,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -1229,6 +1313,33 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -1236,6 +1347,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -1280,10 +1392,25 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -1326,6 +1453,47 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Name",
+                      "Description",
+                      "Value Type",
+                      "Default Value",
+                      "Used",
+                    ]
+                  }
+                  id="parameter-list"
+                  noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                  rowClassName=""
+                  rows={Array []}
+                  sortByKey="title"
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >
@@ -1545,6 +1713,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               <div
                 className="col-sm-6"
               >
+<<<<<<< HEAD
                 <ForwardRef
 >>>>>>> 1634bb410f... snapshots
                   bsStyle="primary"
@@ -1555,10 +1724,26 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     bsStyle="primary"
 <<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="primary"
+                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                  disabled={false}
+                  id="create"
+                  onClick={[Function]}
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
+>>>>>>> 99f5c1286e... snapshots
                     disabled={false}
                     id="create"
                     onClick={[Function]}
+                    type="button"
                   >
+<<<<<<< HEAD
                     <button
                       className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                       disabled={false}
@@ -1619,12 +1804,29 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               <a
                 download="content-pack-dead-beef-1.json"
                 href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22%22%2C%0A%20%20%22summary%22%3A%20%22%22%2C%0A%20%20%22description%22%3A%20%22%22%2C%0A%20%20%22vendor%22%3A%20%22%22%2C%0A%20%20%22url%22%3A%20%22%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
+=======
+                    Create
+                  </button>
+                </Button>
+              </Button__StyledButton>
+            </ForwardRef>
+             
+            <a
+              download="content-pack-dead-beef-1.json"
+              href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22%22%2C%0A%20%20%22summary%22%3A%20%22%22%2C%0A%20%20%22description%22%3A%20%22%22%2C%0A%20%20%22vendor%22%3A%20%22%22%2C%0A%20%20%22url%22%3A%20%22%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
+            >
+              <ForwardRef
+                bsStyle="info"
+                id="download"
+                onClick={[Function]}
+>>>>>>> 99f5c1286e... snapshots
               >
                 <ForwardRef
                   bsStyle="info"
                   id="download"
                   onClick={[Function]}
                 >
+<<<<<<< HEAD
                   <Button__StyledButton
 =======
                       <Button
@@ -1665,10 +1867,26 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       bsStyle="info"
 <<<<<<< HEAD
                       className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="info"
+                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    disabled={false}
+                    id="download"
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info"
+>>>>>>> 99f5c1286e... snapshots
                       disabled={false}
                       id="download"
                       onClick={[Function]}
+                      type="button"
                     >
+<<<<<<< HEAD
                       <button
                         className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info"
                         disabled={false}
@@ -1757,6 +1975,14 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 </a>
               </div>
             </Col>
+=======
+                      Create and Download
+                    </button>
+                  </Button>
+                </Button__StyledButton>
+              </ForwardRef>
+            </a>
+>>>>>>> 99f5c1286e... snapshots
           </div>
         </Row>
       </StyledComponent>
@@ -1852,6 +2078,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               <dl
                                 className="deflist"
                               >
+<<<<<<< HEAD
                                 <dt>
                                   Version:
                                 </dt>
@@ -2020,6 +2247,67 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               No data available.
                             </p>
                           </div>
+=======
+                                http://example.com
+                              </a>
+                               
+                            </dd>
+                            <span>
+                              <dt>
+                                ID:
+                              </dt>
+                               
+                              <dd>
+                                <code>
+                                  dead-beef
+                                </code>
+                              </dd>
+                            </span>
+                            <span>
+                              <dt>
+                                Parameters:
+                              </dt>
+                               
+                              <dd>
+                                0
+                              </dd>
+                            </span>
+                            <span>
+                              <dt>
+                                Entities:
+                              </dt>
+                               
+                              <dd>
+                                0
+                              </dd>
+                            </span>
+                          </dl>
+                        </div>
+                        <div>
+                          <h2>
+                            Description
+                          </h2>
+                          <br />
+                          <Well>
+                            <Well
+                              bsClass="well"
+                              className="Well-sc-19gs1oc-0 YXCuT"
+                            >
+                              <div
+                                className="Well-sc-19gs1oc-0 YXCuT well"
+                              >
+                                <div
+                                  dangerouslySetInnerHTML={
+                                    Object {
+                                      "__html": "<p>descr</p>
+",
+                                    }
+                                  }
+                                />
+                              </div>
+                            </Well>
+                          </Well>
+>>>>>>> 99f5c1286e... snapshots
                         </div>
                       </div>
                     </div>
@@ -2501,6 +2789,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -2604,6 +2893,33 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -2611,6 +2927,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -2655,10 +2972,25 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -2699,6 +3031,45 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Action",
+                    ]
+                  }
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >
@@ -2988,6 +3359,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -3091,6 +3463,33 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -3098,6 +3497,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -3142,10 +3542,25 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -3188,6 +3603,47 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Name",
+                      "Description",
+                      "Value Type",
+                      "Default Value",
+                      "Used",
+                    ]
+                  }
+                  id="parameter-list"
+                  noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                  rowClassName=""
+                  rows={Array []}
+                  sortByKey="title"
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >
@@ -3407,6 +3863,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               <div
                 className="col-sm-6"
               >
+<<<<<<< HEAD
                 <ForwardRef
 >>>>>>> 1634bb410f... snapshots
                   bsStyle="primary"
@@ -3417,10 +3874,26 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     bsStyle="primary"
 <<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="primary"
+                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                  disabled={false}
+                  id="create"
+                  onClick={[Function]}
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
+>>>>>>> 99f5c1286e... snapshots
                     disabled={false}
                     id="create"
                     onClick={[Function]}
+                    type="button"
                   >
+<<<<<<< HEAD
                     <button
                       className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                       disabled={false}
@@ -3481,12 +3954,29 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               <a
                 download="content-pack-dead-beef-1.json"
                 href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
+=======
+                    Create
+                  </button>
+                </Button>
+              </Button__StyledButton>
+            </ForwardRef>
+             
+            <a
+              download="content-pack-dead-beef-1.json"
+              href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
+            >
+              <ForwardRef
+                bsStyle="info"
+                id="download"
+                onClick={[Function]}
+>>>>>>> 99f5c1286e... snapshots
               >
                 <ForwardRef
                   bsStyle="info"
                   id="download"
                   onClick={[Function]}
                 >
+<<<<<<< HEAD
                   <Button__StyledButton
 =======
                       <Button
@@ -3527,10 +4017,26 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       bsStyle="info"
 <<<<<<< HEAD
                       className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="info"
+                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    disabled={false}
+                    id="download"
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info"
+>>>>>>> 99f5c1286e... snapshots
                       disabled={false}
                       id="download"
                       onClick={[Function]}
+                      type="button"
                     >
+<<<<<<< HEAD
                       <button
                         className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info"
                         disabled={false}
@@ -3619,6 +4125,14 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 </a>
               </div>
             </Col>
+=======
+                      Create and Download
+                    </button>
+                  </Button>
+                </Button__StyledButton>
+              </ForwardRef>
+            </a>
+>>>>>>> 99f5c1286e... snapshots
           </div>
         </Row>
       </StyledComponent>

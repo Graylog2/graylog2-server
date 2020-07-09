@@ -101,6 +101,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
@@ -138,6 +139,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="title"
+>>>>>>> 99f5c1286e... snapshots
                             label="Title"
                             maxLength={250}
                             name="title"
@@ -146,6 +152,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -179,6 +186,9 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -275,6 +285,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
@@ -312,6 +323,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="name"
+>>>>>>> 99f5c1286e... snapshots
                             label="Name"
                             maxLength={250}
                             name="name"
@@ -320,6 +336,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -353,6 +370,9 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -449,6 +469,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
@@ -486,6 +507,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="description"
+>>>>>>> 99f5c1286e... snapshots
                             label="Description"
                             maxLength={250}
                             name="description"
@@ -494,6 +520,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -527,6 +554,9 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -626,6 +656,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={false}
 <<<<<<< HEAD
+<<<<<<< HEAD
                             id="type"
 =======
                             forwardedComponent={
@@ -659,6 +690,9 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                            id="type"
+>>>>>>> 99f5c1286e... snapshots
                             label="Value Type"
                             name="type"
                             onChange={[Function]}
@@ -667,6 +701,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             type="select"
                             value="string"
                           >
+<<<<<<< HEAD
 <<<<<<< HEAD
                             <option
                               value="string"
@@ -740,6 +775,29 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                            <option
+                              value="string"
+                            >
+                              String
+                            </option>
+                            <option
+                              value="integer"
+                            >
+                              Integer
+                            </option>
+                            <option
+                              value="double"
+                            >
+                              Double
+                            </option>
+                            <option
+                              value="boolean"
+                            >
+                              Boolean
+                            </option>
+                          </select>
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -833,6 +891,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
@@ -870,6 +929,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="default_value"
+>>>>>>> 99f5c1286e... snapshots
                             label="Default value"
                             maxLength={250}
                             name="default_value"
@@ -877,6 +941,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             placeholder=""
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -908,6 +973,9 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1045,6 +1113,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           value="A parameter title"
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
@@ -1082,6 +1151,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="title"
+>>>>>>> 99f5c1286e... snapshots
                             label="Title"
                             maxLength={250}
                             name="title"
@@ -1090,6 +1164,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             required={true}
                             type="text"
                             value="A parameter title"
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -1123,6 +1198,9 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1219,6 +1297,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           value="A parameter name"
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
@@ -1256,6 +1335,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="name"
+>>>>>>> 99f5c1286e... snapshots
                             label="Name"
                             maxLength={250}
                             name="name"
@@ -1264,6 +1348,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             required={true}
                             type="text"
                             value="A parameter name"
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -1297,6 +1382,9 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1393,6 +1481,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           value="A parameter descriptions"
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
@@ -1430,6 +1519,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="description"
+>>>>>>> 99f5c1286e... snapshots
                             label="Description"
                             maxLength={250}
                             name="description"
@@ -1438,6 +1532,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             required={true}
                             type="text"
                             value="A parameter descriptions"
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -1471,6 +1566,9 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1570,6 +1668,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={true}
 <<<<<<< HEAD
+<<<<<<< HEAD
                             id="type"
 =======
                             forwardedComponent={
@@ -1603,6 +1702,9 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                            id="type"
+>>>>>>> 99f5c1286e... snapshots
                             label="Value Type"
                             name="type"
                             onChange={[Function]}
@@ -1611,6 +1713,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             type="select"
                             value="string"
                           >
+<<<<<<< HEAD
 <<<<<<< HEAD
                             <option
                               value="string"
@@ -1684,6 +1787,29 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                            <option
+                              value="string"
+                            >
+                              String
+                            </option>
+                            <option
+                              value="integer"
+                            >
+                              Integer
+                            </option>
+                            <option
+                              value="double"
+                            >
+                              Double
+                            </option>
+                            <option
+                              value="boolean"
+                            >
+                              Boolean
+                            </option>
+                          </select>
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1777,6 +1903,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           value="test"
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
@@ -1814,6 +1941,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="default_value"
+>>>>>>> 99f5c1286e... snapshots
                             label="Default value"
                             maxLength={250}
                             name="default_value"
@@ -1821,6 +1953,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             placeholder=""
                             type="text"
                             value="test"
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -1852,6 +1985,9 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1970,6 +2106,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
@@ -2007,6 +2144,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="title"
+>>>>>>> 99f5c1286e... snapshots
                             label="Title"
                             maxLength={250}
                             name="title"
@@ -2015,6 +2157,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -2048,6 +2191,9 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -2144,6 +2290,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
@@ -2181,6 +2328,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="name"
+>>>>>>> 99f5c1286e... snapshots
                             label="Name"
                             maxLength={250}
                             name="name"
@@ -2189,6 +2341,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -2222,6 +2375,9 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -2318,6 +2474,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
@@ -2355,6 +2512,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="description"
+>>>>>>> 99f5c1286e... snapshots
                             label="Description"
                             maxLength={250}
                             name="description"
@@ -2363,6 +2525,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -2396,6 +2559,9 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -2495,6 +2661,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={false}
 <<<<<<< HEAD
+<<<<<<< HEAD
                             id="type"
 =======
                             forwardedComponent={
@@ -2528,6 +2695,9 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                            id="type"
+>>>>>>> 99f5c1286e... snapshots
                             label="Value Type"
                             name="type"
                             onChange={[Function]}
@@ -2536,6 +2706,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             type="select"
                             value="string"
                           >
+<<<<<<< HEAD
 <<<<<<< HEAD
                             <option
                               value="string"
@@ -2609,6 +2780,29 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                            <option
+                              value="string"
+                            >
+                              String
+                            </option>
+                            <option
+                              value="integer"
+                            >
+                              Integer
+                            </option>
+                            <option
+                              value="double"
+                            >
+                              Double
+                            </option>
+                            <option
+                              value="boolean"
+                            >
+                              Boolean
+                            </option>
+                          </select>
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -2702,6 +2896,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           value=""
                         >
 <<<<<<< HEAD
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
@@ -2739,6 +2934,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             forwardedRef={null}
                             inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <input
+                            className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            id="default_value"
+>>>>>>> 99f5c1286e... snapshots
                             label="Default value"
                             maxLength={250}
                             name="default_value"
@@ -2746,6 +2946,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             placeholder=""
                             type="text"
                             value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                           />
 =======
@@ -2777,6 +2978,9 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             </FormControl>
                           </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          />
+>>>>>>> 99f5c1286e... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>

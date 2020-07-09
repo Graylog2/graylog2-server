@@ -90,6 +90,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   controlId="comment"
                   validationState={null}
                 >
+<<<<<<< HEAD
                   <FormGroup__StyledFormGroup
                     controlId="comment"
                     validationState={null}
@@ -102,10 +103,26 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     >
                       <div
                         className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+=======
+                  <FormGroup
+                    bsClass="form-group"
+                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                    controlId="comment"
+                    validationState={null}
+                  >
+                    <div
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                    >
+                      <ControlLabel
+                        className="col-sm-3"
+>>>>>>> 99f5c1286e... snapshots
                       >
                         <ControlLabel
-                          className="col-sm-3"
+                          bsClass="control-label"
+                          className="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3"
+                          srOnly={false}
                         >
+<<<<<<< HEAD
                           <ControlLabel
                             bsClass="control-label"
                             className="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3"
@@ -118,8 +135,20 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               Comment
                             </label>
                           </ControlLabel>
+=======
+                          <label
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+                            htmlFor="comment"
+                          >
+                            Comment
+                          </label>
+>>>>>>> 99f5c1286e... snapshots
                         </ControlLabel>
-                        <InputWrapper
+                      </ControlLabel>
+                      <InputWrapper
+                        className="col-sm-7"
+                      >
+                        <div
                           className="col-sm-7"
 =======
       <StyledComponent
@@ -233,6 +262,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           validationState={null}
 >>>>>>> 1634bb410f... snapshots
                         >
+<<<<<<< HEAD
                           <div
                             className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
@@ -280,6 +310,35 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                 inputRef={[Function]}
+=======
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Comment"
+                            maxLength={512}
+                            name="comment"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="text"
+                            value=""
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 kmJcge"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Comment"
+                              maxLength={512}
+                              name="comment"
+                              onChange={[Function]}
+                              placeholder=""
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                id="comment"
+>>>>>>> 99f5c1286e... snapshots
                                 label="Comment"
                                 maxLength={512}
                                 name="comment"
@@ -287,6 +346,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 placeholder=""
                                 type="text"
                                 value=""
+<<<<<<< HEAD
 =======
                               >
                                 <ControlLabel
@@ -424,6 +484,21 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
           </Col>
         </div>
       </Row>
+=======
+                              />
+                            </FormControl>
+                          </FormControl>
+                        </div>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </FormGroup__StyledFormGroup>
+              </Component>
+            </Input>
+          </div>
+        </Col>
+      </div>
+>>>>>>> 99f5c1286e... snapshots
     </Row>
     <Row>
       <Row
@@ -470,6 +545,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   controlId="PARAM"
                   validationState={null}
                 >
+<<<<<<< HEAD
                   <FormGroup__StyledFormGroup
                     controlId="PARAM"
                     validationState={null}
@@ -482,10 +558,26 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     >
                       <div
                         className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+=======
+                  <FormGroup
+                    bsClass="form-group"
+                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                    controlId="PARAM"
+                    validationState={null}
+                  >
+                    <div
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                    >
+                      <ControlLabel
+                        className="col-sm-3"
+>>>>>>> 99f5c1286e... snapshots
                       >
                         <ControlLabel
-                          className="col-sm-3"
+                          bsClass="control-label"
+                          className="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3"
+                          srOnly={false}
                         >
+<<<<<<< HEAD
                           <ControlLabel
                             bsClass="control-label"
                             className="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3"
@@ -498,8 +590,20 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               A parameter
                             </label>
                           </ControlLabel>
+=======
+                          <label
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX col-sm-3 control-label"
+                            htmlFor="PARAM"
+                          >
+                            A parameter
+                          </label>
+>>>>>>> 99f5c1286e... snapshots
                         </ControlLabel>
-                        <InputWrapper
+                      </ControlLabel>
+                      <InputWrapper
+                        className="col-sm-7"
+                      >
+                        <div
                           className="col-sm-7"
 =======
                               </div>
@@ -630,6 +734,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           validationState={null}
 >>>>>>> 1634bb410f... snapshots
                         >
+<<<<<<< HEAD
                           <div
                             className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                           >
@@ -677,6 +782,37 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                 inputRef={[Function]}
+=======
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="A parameter"
+                            maxLength={250}
+                            name="PARAM"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value="parameter"
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 kmJcge"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="A parameter"
+                              maxLength={250}
+                              name="PARAM"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="parameter"
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                id="PARAM"
+>>>>>>> 99f5c1286e... snapshots
                                 label="A parameter"
                                 maxLength={250}
                                 name="PARAM"
@@ -685,6 +821,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 required={true}
                                 type="text"
                                 value="parameter"
+<<<<<<< HEAD
 =======
                               >
                                 <ControlLabel
@@ -826,6 +963,21 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
           </Col>
         </div>
       </Row>
+=======
+                              />
+                            </FormControl>
+                          </FormControl>
+                        </div>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </FormGroup__StyledFormGroup>
+              </Component>
+            </Input>
+          </div>
+        </Col>
+      </div>
+>>>>>>> 99f5c1286e... snapshots
     </Row>
     <Row>
       <Row
@@ -1109,6 +1261,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -1212,6 +1365,33 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -1219,6 +1399,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -1263,10 +1444,25 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -1315,6 +1511,45 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               "@type": "string",
                               "@value": "franz",
                             },
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Action",
+                    ]
+                  }
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={
+                    Array [
+                      Object {
+                        "constraints": Array [],
+                        "data": Object {
+                          "descr": Object {
+                            "@type": "string",
+                            "@value": "hans",
+>>>>>>> 99f5c1286e... snapshots
                           },
                           "id": undefined,
                           "type": Object {
@@ -1339,6 +1574,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             className="data-table table-responsive"
                             id="entity-list"
                           >
+<<<<<<< HEAD
                             <DataTable__StyledTable
                               className="table scrollable"
                             >
@@ -1607,9 +1843,129 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                   bsSize="xs"
                                                   bsStyle="info"
                                                   className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                            <table
+                              className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table scrollable"
+                            >
+                              <thead>
+                                <tr>
+                                  <DataTableElement
+                                    element="Title"
+                                    formatter={[Function]}
+                                    index={0}
+                                    key="header-0"
+                                  >
+                                    <th>
+                                      Title
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Type"
+                                    formatter={[Function]}
+                                    index={1}
+                                    key="header-1"
+                                  >
+                                    <th>
+                                      Type
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Description"
+                                    formatter={[Function]}
+                                    index={2}
+                                    key="header-2"
+                                  >
+                                    <th>
+                                      Description
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Action"
+                                    formatter={[Function]}
+                                    index={3}
+                                    key="header-3"
+                                  >
+                                    <th>
+                                      Action
+                                    </th>
+                                  </DataTableElement>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <DataTableElement
+                                  element={
+                                    Object {
+                                      "constraints": Array [],
+                                      "data": Object {
+                                        "descr": Object {
+                                          "@type": "string",
+                                          "@value": "hans",
+                                        },
+                                        "title": Object {
+                                          "@type": "string",
+                                          "@value": "franz",
+                                        },
+                                      },
+                                      "id": undefined,
+                                      "type": Object {
+                                        "name": "grok_pattern",
+                                        "version": "1",
+                                      },
+                                      "v": undefined,
+                                    }
+                                  }
+                                  formatter={[Function]}
+                                  index={0}
+                                  key="row-0"
+                                >
+                                  <tr>
+                                    <td
+                                      className="bigColumns"
+                                    >
+                                      franz
+                                    </td>
+                                    <td>
+                                      grok_pattern
+                                    </td>
+                                    <td
+                                      className="bigColumns"
+                                    />
+                                    <td>
+                                      <ButtonToolbar
+                                        bsClass="btn-toolbar"
+                                      >
+                                        <div
+                                          className="btn-toolbar"
+                                          role="toolbar"
+                                        >
+                                          <ForwardRef
+                                            bsSize="xs"
+                                            bsStyle="info"
+                                            onClick={[Function]}
+                                          >
+                                            <Button__StyledButton
+                                              bsSize="xs"
+                                              bsStyle="info"
+                                              onClick={[Function]}
+                                            >
+                                              <Button
+                                                active={false}
+                                                block={false}
+                                                bsClass="btn"
+                                                bsSize="xs"
+                                                bsStyle="info"
+                                                className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                disabled={false}
+                                                onClick={[Function]}
+                                              >
+                                                <button
+                                                  className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
+>>>>>>> 99f5c1286e... snapshots
                                                   disabled={false}
                                                   onClick={[Function]}
+                                                  type="button"
                                                 >
+<<<<<<< HEAD
                                                   <button
                                                     className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
                                                     disabled={false}
@@ -1636,20 +1992,59 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                         </ButtonToolbar>
                                       </td>
                                       <BootstrapModalWrapper
+=======
+                                                  Show
+                                                </button>
+                                              </Button>
+                                            </Button__StyledButton>
+                                          </ForwardRef>
+                                        </div>
+                                      </ButtonToolbar>
+                                    </td>
+                                    <BootstrapModalWrapper
+                                      backdrop="static"
+                                      bsSize="large"
+                                      onClose={[Function]}
+                                      onHide={[Function]}
+                                      onOpen={[Function]}
+                                      showModal={false}
+                                    >
+                                      <Modal
+>>>>>>> 99f5c1286e... snapshots
                                         backdrop="static"
                                         bsSize="large"
-                                        onClose={[Function]}
                                         onHide={[Function]}
-                                        onOpen={[Function]}
-                                        showModal={false}
+                                        show={false}
                                       >
                                         <Modal
+                                          animation={true}
+                                          autoFocus={true}
                                           backdrop="static"
+                                          bsClass="modal"
                                           bsSize="large"
+                                          className="Modal-nuree8-0 hMPgsT"
+                                          dialogComponentClass={[Function]}
+                                          enforceFocus={true}
+                                          keyboard={true}
+                                          manager={
+                                            ModalManager {
+                                              "add": [Function],
+                                              "containers": Array [],
+                                              "data": Array [],
+                                              "handleContainerOverflow": true,
+                                              "hideSiblingNodes": true,
+                                              "isTopModal": [Function],
+                                              "modals": Array [],
+                                              "remove": [Function],
+                                            }
+                                          }
                                           onHide={[Function]}
+                                          renderBackdrop={[Function]}
+                                          restoreFocus={true}
                                           show={false}
                                         >
                                           <Modal
+<<<<<<< HEAD
                                             animation={true}
                                             autoFocus={true}
 =======
@@ -1728,6 +2123,13 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
 <<<<<<< HEAD
                                             className="Modal-nuree8-0 hMPgsT"
                                             dialogComponentClass={[Function]}
+=======
+                                            autoFocus={true}
+                                            backdrop="static"
+                                            backdropClassName="modal-backdrop"
+                                            backdropTransition={[Function]}
+                                            containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                                             enforceFocus={true}
                                             keyboard={true}
                                             manager={
@@ -1742,6 +2144,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                 "remove": [Function],
                                               }
                                             }
+<<<<<<< HEAD
                                             onHide={[Function]}
                                             renderBackdrop={[Function]}
                                             restoreFocus={true}
@@ -1785,6 +2188,25 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               </table>
                             </DataTable__StyledTable>
                           </div>
+=======
+                                            onEntering={[Function]}
+                                            onExited={[Function]}
+                                            onHide={[Function]}
+                                            onMouseUp={[Function]}
+                                            renderBackdrop={[Function]}
+                                            restoreFocus={true}
+                                            show={false}
+                                            transition={[Function]}
+                                          />
+                                        </Modal>
+                                      </Modal>
+                                    </BootstrapModalWrapper>
+                                  </tr>
+                                </DataTableElement>
+                              </tbody>
+                            </table>
+                          </DataTable__StyledTable>
+>>>>>>> 99f5c1286e... snapshots
                         </div>
                       </div>
                     </div>

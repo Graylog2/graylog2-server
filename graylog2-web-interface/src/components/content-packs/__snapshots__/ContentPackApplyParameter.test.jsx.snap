@@ -96,6 +96,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     controlId="config_key"
                     validationState={null}
                   >
+<<<<<<< HEAD
                     <FormGroup__StyledFormGroup
                       controlId="config_key"
                       validationState={null}
@@ -122,10 +123,47 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 Config Key
                               </label>
                             </ControlLabel>
+=======
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      controlId="config_key"
+                      validationState={null}
+                    >
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      >
+                        <ControlLabel>
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                              htmlFor="config_key"
+                            >
+                              Config Key
+                            </label>
+>>>>>>> 99f5c1286e... snapshots
                           </ControlLabel>
-                          <InputWrapper>
-                            <span>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
+                              componentClass="select"
+                              inputRef={[Function]}
+                              label="Config Key"
+                              name="config_key"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value=""
+                            >
                               <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="select"
                                 inputRef={[Function]}
                                 label="Config Key"
@@ -136,6 +174,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 type="select"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <FormControl
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 kmJcge"
@@ -283,6 +322,11 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
+=======
+                                <select
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  id="config_key"
+>>>>>>> 99f5c1286e... snapshots
                                   label="Config Key"
                                   name="config_key"
                                   onChange={[Function]}
@@ -291,6 +335,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 kmJcge form-control"
@@ -418,6 +463,51 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               bsClass="col"
               componentClass="div"
               sm={5}
+=======
+                                  <option
+                                    key="EMPTY"
+                                    value=""
+                                  >
+                                    Choose Config Key
+                                  </option>
+                                  <option
+                                    key="configuration.listen_address"
+                                    value="configuration.listen_address"
+                                  >
+                                    configuration.listen_address
+                                  </option>
+                                  <option
+                                    key="name"
+                                    value="name"
+                                  >
+                                    name
+                                  </option>
+                                  <option
+                                    key="title"
+                                    value="title"
+                                  >
+                                    title
+                                  </option>
+                                </select>
+                              </FormControl>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </FormGroup__StyledFormGroup>
+                </Component>
+              </Input>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={5}
+          >
+            <div
+              className="col-sm-5"
+>>>>>>> 99f5c1286e... snapshots
             >
               <div
                 className="col-sm-5"
@@ -440,6 +530,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     controlId="parameter"
                     validationState={null}
                   >
+<<<<<<< HEAD
                     <FormGroup__StyledFormGroup
                       controlId="parameter"
                       validationState={null}
@@ -466,10 +557,47 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 Parameter
                               </label>
                             </ControlLabel>
+=======
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      controlId="parameter"
+                      validationState={null}
+                    >
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      >
+                        <ControlLabel>
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                              htmlFor="parameter"
+                            >
+                              Parameter
+                            </label>
+>>>>>>> 99f5c1286e... snapshots
                           </ControlLabel>
-                          <InputWrapper>
-                            <span>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
+                              componentClass="select"
+                              inputRef={[Function]}
+                              label="Parameter"
+                              name="parameter"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value=""
+                            >
                               <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="select"
                                 inputRef={[Function]}
                                 label="Parameter"
@@ -480,6 +608,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 type="select"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <FormControl
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 kmJcge"
@@ -652,6 +781,11 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
+=======
+                                <select
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  id="parameter"
+>>>>>>> 99f5c1286e... snapshots
                                   label="Parameter"
                                   name="parameter"
                                   onChange={[Function]}
@@ -660,6 +794,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 kmJcge form-control"
@@ -785,6 +920,45 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
             </Col>
           </div>
         </Row>
+=======
+                                  <option
+                                    key="EMPTY"
+                                    value=""
+                                  >
+                                    Choose...
+                                  </option>
+                                  <option
+                                    key="PORT"
+                                    value="PORT"
+                                  >
+                                    Port
+                                     (
+                                    PORT
+                                    )
+                                  </option>
+                                </select>
+                              </FormControl>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </FormGroup__StyledFormGroup>
+                </Component>
+              </Input>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={1}
+          >
+            <div
+              className="col-sm-1"
+            />
+          </Col>
+        </div>
+>>>>>>> 99f5c1286e... snapshots
       </Row>
       <Row>
         <Row
@@ -809,6 +983,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                   disabled={true}
                   type="submit"
                 >
+<<<<<<< HEAD
                   <Button__StyledButton
 =======
                                       <FormControl
@@ -924,10 +1099,18 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                 >
                   <ForwardRef
 >>>>>>> 1634bb410f... snapshots
+=======
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+>>>>>>> 99f5c1286e... snapshots
                     bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 laZUlH"
                     disabled={true}
                     type="submit"
                   >
+<<<<<<< HEAD
                     <Button__StyledButton
                       bsStyle="primary"
 <<<<<<< HEAD
@@ -994,6 +1177,21 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
             </Col>
           </div>
         </Row>
+=======
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
+                      disabled={true}
+                      type="submit"
+                    >
+                      Apply
+                    </button>
+                  </Button>
+                </Button__StyledButton>
+              </ForwardRef>
+            </div>
+          </Col>
+        </div>
+>>>>>>> 99f5c1286e... snapshots
       </Row>
     </form>
     <Row>
@@ -1054,6 +1252,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                         className="data-table table-responsive"
                         id="config-key-list"
                       >
+<<<<<<< HEAD
                         <DataTable__StyledTable
                           className="table "
                         >
@@ -1215,10 +1414,88 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     >
 <<<<<<< HEAD
                                       <Button__StyledButton
+=======
+                        <table
+                          className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                        >
+                          <thead>
+                            <tr>
+                              <DataTableElement
+                                element="Config Key"
+                                formatter={[Function]}
+                                index={0}
+                                key="header-0"
+                              >
+                                <th>
+                                  Config Key
+                                </th>
+                              </DataTableElement>
+                              <DataTableElement
+                                element="Parameter"
+                                formatter={[Function]}
+                                index={1}
+                                key="header-1"
+                              >
+                                <th>
+                                  Parameter
+                                </th>
+                              </DataTableElement>
+                              <DataTableElement
+                                element="Action"
+                                formatter={[Function]}
+                                index={2}
+                                key="header-2"
+                              >
+                                <th>
+                                  Action
+                                </th>
+                              </DataTableElement>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <DataTableElement
+                              element={
+                                Object {
+                                  "configKey": "configuration.port",
+                                  "paramName": "PORT",
+                                }
+                              }
+                              formatter={[Function]}
+                              index={0}
+                              key="row-0"
+                            >
+                              <tr
+                                key="configuration.port"
+                              >
+                                <td>
+                                  configuration.port
+                                </td>
+                                <td>
+                                  PORT
+                                </td>
+                                <td>
+                                  <ForwardRef
+                                    bsSize="small"
+                                    bsStyle="info"
+                                    onClick={[Function]}
+                                  >
+                                    <Button__StyledButton
+                                      bsSize="small"
+                                      bsStyle="info"
+                                      onClick={[Function]}
+                                    >
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
+>>>>>>> 99f5c1286e... snapshots
                                         bsSize="small"
                                         bsStyle="info"
+                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                        disabled={false}
                                         onClick={[Function]}
                                       >
+<<<<<<< HEAD
                                         <Button
                                           active={false}
                                           block={false}
@@ -1284,8 +1561,15 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                         <ForwardRef
                                           bsSize="small"
                                           bsStyle="info"
+=======
+                                        <button
+                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
+                                          disabled={false}
+>>>>>>> 99f5c1286e... snapshots
                                           onClick={[Function]}
+                                          type="button"
                                         >
+<<<<<<< HEAD
                                           <Button__StyledButton
                                             bsSize="small"
                                             bsStyle="info"
@@ -1306,6 +1590,19 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                           </table>
                         </DataTable__StyledTable>
                       </div>
+=======
+                                          Clear
+                                        </button>
+                                      </Button>
+                                    </Button__StyledButton>
+                                  </ForwardRef>
+                                </td>
+                              </tr>
+                            </DataTableElement>
+                          </tbody>
+                        </table>
+                      </DataTable__StyledTable>
+>>>>>>> 99f5c1286e... snapshots
                     </div>
                   </div>
                 </div>
@@ -1482,6 +1779,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                     controlId="config_key"
                     validationState={null}
                   >
+<<<<<<< HEAD
                     <FormGroup__StyledFormGroup
                       controlId="config_key"
                       validationState={null}
@@ -1508,10 +1806,47 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 Config Key
                               </label>
                             </ControlLabel>
+=======
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      controlId="config_key"
+                      validationState={null}
+                    >
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      >
+                        <ControlLabel>
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                              htmlFor="config_key"
+                            >
+                              Config Key
+                            </label>
+>>>>>>> 99f5c1286e... snapshots
                           </ControlLabel>
-                          <InputWrapper>
-                            <span>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
+                              componentClass="select"
+                              inputRef={[Function]}
+                              label="Config Key"
+                              name="config_key"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value=""
+                            >
                               <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="select"
                                 inputRef={[Function]}
                                 label="Config Key"
@@ -1522,6 +1857,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 type="select"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <FormControl
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 kmJcge"
@@ -1669,6 +2005,11 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
+=======
+                                <select
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  id="config_key"
+>>>>>>> 99f5c1286e... snapshots
                                   label="Config Key"
                                   name="config_key"
                                   onChange={[Function]}
@@ -1677,6 +2018,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 kmJcge form-control"
@@ -1810,6 +2152,57 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
               bsClass="col"
               componentClass="div"
               sm={5}
+=======
+                                  <option
+                                    key="EMPTY"
+                                    value=""
+                                  >
+                                    Choose Config Key
+                                  </option>
+                                  <option
+                                    key="configuration.listen_address"
+                                    value="configuration.listen_address"
+                                  >
+                                    configuration.listen_address
+                                  </option>
+                                  <option
+                                    key="configuration.port"
+                                    value="configuration.port"
+                                  >
+                                    configuration.port
+                                  </option>
+                                  <option
+                                    key="name"
+                                    value="name"
+                                  >
+                                    name
+                                  </option>
+                                  <option
+                                    key="title"
+                                    value="title"
+                                  >
+                                    title
+                                  </option>
+                                </select>
+                              </FormControl>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </FormGroup__StyledFormGroup>
+                </Component>
+              </Input>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={5}
+          >
+            <div
+              className="col-sm-5"
+>>>>>>> 99f5c1286e... snapshots
             >
               <div
                 className="col-sm-5"
@@ -1832,6 +2225,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                     controlId="parameter"
                     validationState={null}
                   >
+<<<<<<< HEAD
                     <FormGroup__StyledFormGroup
                       controlId="parameter"
                       validationState={null}
@@ -1858,10 +2252,47 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 Parameter
                               </label>
                             </ControlLabel>
+=======
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      controlId="parameter"
+                      validationState={null}
+                    >
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      >
+                        <ControlLabel>
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                              htmlFor="parameter"
+                            >
+                              Parameter
+                            </label>
+>>>>>>> 99f5c1286e... snapshots
                           </ControlLabel>
-                          <InputWrapper>
-                            <span>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
+                              componentClass="select"
+                              inputRef={[Function]}
+                              label="Parameter"
+                              name="parameter"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value=""
+                            >
                               <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="select"
                                 inputRef={[Function]}
                                 label="Parameter"
@@ -1872,6 +2303,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 type="select"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <FormControl
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 kmJcge"
@@ -2050,6 +2482,11 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
+=======
+                                <select
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  id="parameter"
+>>>>>>> 99f5c1286e... snapshots
                                   label="Parameter"
                                   name="parameter"
                                   onChange={[Function]}
@@ -2058,6 +2495,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 kmJcge form-control"
@@ -2174,6 +2612,36 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
             </Col>
           </div>
         </Row>
+=======
+                                  <option
+                                    key="EMPTY"
+                                    value=""
+                                  >
+                                    Create a parameter first
+                                  </option>
+                                </select>
+                              </FormControl>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </FormGroup__StyledFormGroup>
+                </Component>
+              </Input>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={1}
+          >
+            <div
+              className="col-sm-1"
+            />
+          </Col>
+        </div>
+>>>>>>> 99f5c1286e... snapshots
       </Row>
       <Row>
         <Row
@@ -2198,6 +2666,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                   disabled={true}
                   type="submit"
                 >
+<<<<<<< HEAD
                   <Button__StyledButton
 =======
                                       <FormControl
@@ -2304,10 +2773,18 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                 >
                   <ForwardRef
 >>>>>>> 1634bb410f... snapshots
+=======
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+>>>>>>> 99f5c1286e... snapshots
                     bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 laZUlH"
                     disabled={true}
                     type="submit"
                   >
+<<<<<<< HEAD
                     <Button__StyledButton
                       bsStyle="primary"
 <<<<<<< HEAD
@@ -2435,6 +2912,18 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                   </div>
                 </div>
               </DataTable>
+=======
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
+                      disabled={true}
+                      type="submit"
+                    >
+                      Apply
+                    </button>
+                  </Button>
+                </Button__StyledButton>
+              </ForwardRef>
+>>>>>>> 99f5c1286e... snapshots
             </div>
           </Col>
         </div>
@@ -2661,6 +3150,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                     controlId="config_key"
                     validationState={null}
                   >
+<<<<<<< HEAD
                     <FormGroup__StyledFormGroup
                       controlId="config_key"
                       validationState={null}
@@ -2687,10 +3177,47 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 Config Key
                               </label>
                             </ControlLabel>
+=======
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      controlId="config_key"
+                      validationState={null}
+                    >
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      >
+                        <ControlLabel>
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                              htmlFor="config_key"
+                            >
+                              Config Key
+                            </label>
+>>>>>>> 99f5c1286e... snapshots
                           </ControlLabel>
-                          <InputWrapper>
-                            <span>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
+                              componentClass="select"
+                              inputRef={[Function]}
+                              label="Config Key"
+                              name="config_key"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value=""
+                            >
                               <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="select"
                                 inputRef={[Function]}
                                 label="Config Key"
@@ -2701,6 +3228,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 type="select"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <FormControl
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 kmJcge"
@@ -2848,6 +3376,11 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
+=======
+                                <select
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  id="config_key"
+>>>>>>> 99f5c1286e... snapshots
                                   label="Config Key"
                                   name="config_key"
                                   onChange={[Function]}
@@ -2856,6 +3389,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 kmJcge form-control"
@@ -2983,6 +3517,51 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
               bsClass="col"
               componentClass="div"
               sm={5}
+=======
+                                  <option
+                                    key="EMPTY"
+                                    value=""
+                                  >
+                                    Choose Config Key
+                                  </option>
+                                  <option
+                                    key="configuration.listen_address"
+                                    value="configuration.listen_address"
+                                  >
+                                    configuration.listen_address
+                                  </option>
+                                  <option
+                                    key="name"
+                                    value="name"
+                                  >
+                                    name
+                                  </option>
+                                  <option
+                                    key="title"
+                                    value="title"
+                                  >
+                                    title
+                                  </option>
+                                </select>
+                              </FormControl>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </FormGroup__StyledFormGroup>
+                </Component>
+              </Input>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={5}
+          >
+            <div
+              className="col-sm-5"
+>>>>>>> 99f5c1286e... snapshots
             >
               <div
                 className="col-sm-5"
@@ -3005,6 +3584,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                     controlId="parameter"
                     validationState={null}
                   >
+<<<<<<< HEAD
                     <FormGroup__StyledFormGroup
                       controlId="parameter"
                       validationState={null}
@@ -3031,10 +3611,47 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 Parameter
                               </label>
                             </ControlLabel>
+=======
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      controlId="parameter"
+                      validationState={null}
+                    >
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                      >
+                        <ControlLabel>
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                              htmlFor="parameter"
+                            >
+                              Parameter
+                            </label>
+>>>>>>> 99f5c1286e... snapshots
                           </ControlLabel>
-                          <InputWrapper>
-                            <span>
+                        </ControlLabel>
+                        <InputWrapper>
+                          <span>
+                            <FormControl
+                              componentClass="select"
+                              inputRef={[Function]}
+                              label="Parameter"
+                              name="parameter"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value=""
+                            >
                               <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="select"
                                 inputRef={[Function]}
                                 label="Parameter"
@@ -3045,6 +3662,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 type="select"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <FormControl
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 kmJcge"
@@ -3217,6 +3835,11 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
 <<<<<<< HEAD
 >>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
+=======
+                                <select
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  id="parameter"
+>>>>>>> 99f5c1286e... snapshots
                                   label="Parameter"
                                   name="parameter"
                                   onChange={[Function]}
@@ -3225,6 +3848,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 kmJcge form-control"
@@ -3350,6 +3974,45 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
             </Col>
           </div>
         </Row>
+=======
+                                  <option
+                                    key="EMPTY"
+                                    value=""
+                                  >
+                                    Choose...
+                                  </option>
+                                  <option
+                                    key="PORT"
+                                    value="PORT"
+                                  >
+                                    Port
+                                     (
+                                    PORT
+                                    )
+                                  </option>
+                                </select>
+                              </FormControl>
+                            </FormControl>
+                          </span>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </FormGroup__StyledFormGroup>
+                </Component>
+              </Input>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={1}
+          >
+            <div
+              className="col-sm-1"
+            />
+          </Col>
+        </div>
+>>>>>>> 99f5c1286e... snapshots
       </Row>
       <Row>
         <Row
@@ -3374,6 +4037,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                   disabled={true}
                   type="submit"
                 >
+<<<<<<< HEAD
                   <Button__StyledButton
 =======
                                       <FormControl
@@ -3489,10 +4153,18 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                 >
                   <ForwardRef
 >>>>>>> 1634bb410f... snapshots
+=======
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+>>>>>>> 99f5c1286e... snapshots
                     bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 laZUlH"
                     disabled={true}
                     type="submit"
                   >
+<<<<<<< HEAD
                     <Button__StyledButton
                       bsStyle="primary"
 <<<<<<< HEAD
@@ -3559,6 +4231,21 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
             </Col>
           </div>
         </Row>
+=======
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
+                      disabled={true}
+                      type="submit"
+                    >
+                      Apply
+                    </button>
+                  </Button>
+                </Button__StyledButton>
+              </ForwardRef>
+            </div>
+          </Col>
+        </div>
+>>>>>>> 99f5c1286e... snapshots
       </Row>
     </form>
     <Row>
@@ -3620,6 +4307,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                         className="data-table table-responsive"
                         id="config-key-list"
                       >
+<<<<<<< HEAD
                         <DataTable__StyledTable
                           className="table "
                         >
@@ -3789,6 +4477,73 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                           </table>
                         </DataTable__StyledTable>
                       </div>
+=======
+                        <table
+                          className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
+                        >
+                          <thead>
+                            <tr>
+                              <DataTableElement
+                                element="Config Key"
+                                formatter={[Function]}
+                                index={0}
+                                key="header-0"
+                              >
+                                <th>
+                                  Config Key
+                                </th>
+                              </DataTableElement>
+                              <DataTableElement
+                                element="Parameter"
+                                formatter={[Function]}
+                                index={1}
+                                key="header-1"
+                              >
+                                <th>
+                                  Parameter
+                                </th>
+                              </DataTableElement>
+                              <DataTableElement
+                                element="Action"
+                                formatter={[Function]}
+                                index={2}
+                                key="header-2"
+                              >
+                                <th>
+                                  Action
+                                </th>
+                              </DataTableElement>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <DataTableElement
+                              element={
+                                Object {
+                                  "configKey": "configuration.port",
+                                  "paramName": "PORT",
+                                  "readOnly": true,
+                                }
+                              }
+                              formatter={[Function]}
+                              index={0}
+                              key="row-0"
+                            >
+                              <tr
+                                key="configuration.port"
+                              >
+                                <td>
+                                  configuration.port
+                                </td>
+                                <td>
+                                  PORT
+                                </td>
+                                <td />
+                              </tr>
+                            </DataTableElement>
+                          </tbody>
+                        </table>
+                      </DataTable__StyledTable>
+>>>>>>> 99f5c1286e... snapshots
                     </div>
                   </div>
                 </div>

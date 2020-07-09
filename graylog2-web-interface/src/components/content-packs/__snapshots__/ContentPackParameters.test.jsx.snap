@@ -226,6 +226,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     onClick={[Function]}
                     title="Edit Modal"
                   >
+<<<<<<< HEAD
                     <Button__StyledButton
 =======
                       ],
@@ -268,10 +269,27 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         bsStyle="info"
 <<<<<<< HEAD
                         className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsSize="small"
+                      bsStyle="info"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="Edit Modal"
+                    >
+                      <button
+                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
+>>>>>>> 99f5c1286e... snapshots
                         disabled={false}
                         onClick={[Function]}
                         title="Edit Modal"
+                        type="button"
                       >
+<<<<<<< HEAD
                         <button
                           className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
                           disabled={false}
@@ -330,6 +348,22 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     </Button__StyledButton>
                   </ForwardRef>
                   <BootstrapModalWrapper
+=======
+                        Create parameter
+                      </button>
+                    </Button>
+                  </Button__StyledButton>
+                </ForwardRef>
+                <BootstrapModalWrapper
+                  backdrop="static"
+                  bsSize="large"
+                  onClose={[Function]}
+                  onHide={[Function]}
+                  onOpen={[Function]}
+                  showModal={false}
+                >
+                  <Modal
+>>>>>>> 99f5c1286e... snapshots
                     backdrop="static"
                     bsSize="large"
                     onClose={[Function]}
@@ -338,8 +372,15 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     showModal={false}
                   >
                     <Modal
+<<<<<<< HEAD
+=======
+                      animation={true}
+                      autoFocus={true}
+>>>>>>> 99f5c1286e... snapshots
                       backdrop="static"
+                      bsClass="modal"
                       bsSize="large"
+<<<<<<< HEAD
 =======
                           <Button
                             active={false}
@@ -380,6 +421,35 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
 <<<<<<< HEAD
                         className="Modal-nuree8-0 hMPgsT"
                         dialogComponentClass={[Function]}
+=======
+                      className="Modal-nuree8-0 hMPgsT"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop="static"
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                         enforceFocus={true}
                         keyboard={true}
                         manager={
@@ -394,6 +464,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             "remove": [Function],
                           }
                         }
+<<<<<<< HEAD
 =======
 >>>>>>> 1634bb410f... snapshots
                         onHide={[Function]}
@@ -523,6 +594,50 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     topMargin={15}
                     useLoadingState={false}
                     wrapperClass="search"
+=======
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </Modal>
+                </BootstrapModalWrapper>
+                <span>
+                  <br />
+                  <br />
+                </span>
+                <SearchForm
+                  buttonLeftMargin={5}
+                  focusAfterMount={false}
+                  label={null}
+                  loadingLabel="Loading..."
+                  onQueryChange={[Function]}
+                  onReset={[Function]}
+                  onSearch={[Function]}
+                  placeholder="Enter search query..."
+                  query=""
+                  queryHelpComponent={null}
+                  queryWidth="auto"
+                  resetButtonLabel="Reset"
+                  searchBsStyle="default"
+                  searchButtonLabel="Filter"
+                  topMargin={15}
+                  useLoadingState={false}
+                  wrapperClass="search"
+                >
+                  <div
+                    className="search"
+                    style={
+                      Object {
+                        "marginTop": 15,
+                      }
+                    }
+>>>>>>> 99f5c1286e... snapshots
                   >
                     <div
                       className="search"
@@ -611,6 +726,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -714,6 +830,33 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -721,6 +864,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -765,10 +909,25 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -822,6 +981,58 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Name",
+                      "Description",
+                      "Value Type",
+                      "Default Value",
+                      "Used",
+                      "Action",
+                    ]
+                  }
+                  id="parameter-list"
+                  noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                  rowClassName=""
+                  rows={
+                    Array [
+                      Object {
+                        "default_value": "test",
+                        "description": "A parameter descriptions",
+                        "name": "A parameter name",
+                        "title": "A parameter title",
+                        "type": "string",
+                      },
+                    ]
+                  }
+                  sortByKey="title"
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >
@@ -832,6 +1043,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             className="data-table table-responsive"
                             id="parameter-list"
                           >
+<<<<<<< HEAD
                             <DataTable__StyledTable
                               className="table scrollable"
                             >
@@ -1228,10 +1440,200 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   bsSize="xs"
                                                   bsStyle="primary"
 >>>>>>> 1634bb410f... snapshots
+=======
+                            <table
+                              className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table scrollable"
+                            >
+                              <thead>
+                                <tr>
+                                  <DataTableElement
+                                    element="Title"
+                                    formatter={[Function]}
+                                    index={0}
+                                    key="header-0"
+                                  >
+                                    <th>
+                                      Title
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Name"
+                                    formatter={[Function]}
+                                    index={1}
+                                    key="header-1"
+                                  >
+                                    <th>
+                                      Name
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Description"
+                                    formatter={[Function]}
+                                    index={2}
+                                    key="header-2"
+                                  >
+                                    <th>
+                                      Description
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Value Type"
+                                    formatter={[Function]}
+                                    index={3}
+                                    key="header-3"
+                                  >
+                                    <th>
+                                      Value Type
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Default Value"
+                                    formatter={[Function]}
+                                    index={4}
+                                    key="header-4"
+                                  >
+                                    <th>
+                                      Default Value
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Used"
+                                    formatter={[Function]}
+                                    index={5}
+                                    key="header-5"
+                                  >
+                                    <th>
+                                      Used
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Action"
+                                    formatter={[Function]}
+                                    index={6}
+                                    key="header-6"
+                                  >
+                                    <th>
+                                      Action
+                                    </th>
+                                  </DataTableElement>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <DataTableElement
+                                  element={
+                                    Object {
+                                      "default_value": "test",
+                                      "description": "A parameter descriptions",
+                                      "name": "A parameter name",
+                                      "title": "A parameter title",
+                                      "type": "string",
+                                    }
+                                  }
+                                  formatter={[Function]}
+                                  index={0}
+                                  key="row-0"
+                                >
+                                  <tr
+                                    key="A parameter title"
+                                  >
+                                    <td
+                                      className="bigColumns"
+                                    >
+                                      A parameter title
+                                    </td>
+                                    <td>
+                                      A parameter name
+                                    </td>
+                                    <td
+                                      className="bigColumns"
+                                    >
+                                      A parameter descriptions
+                                    </td>
+                                    <td>
+                                      string
+                                    </td>
+                                    <td>
+                                      test
+                                    </td>
+                                    <td>
+                                      <ForwardRef
+                                        className="failure"
+                                      >
+                                        <Badge__StyledBadge
+                                          className="failure"
+                                        >
+                                          <Badge
+                                            bsClass="badge"
+                                            className="Badge__StyledBadge-sc-4gzqz0-0 fLCUuP failure"
+                                            pullRight={false}
+                                          >
+                                            <span
+                                              className="Badge__StyledBadge-sc-4gzqz0-0 fLCUuP failure badge"
+                                            >
+                                              <Icon
+                                                name="times"
+                                                type="solid"
+                                              >
+                                                <FontAwesomeIcon
+                                                  icon={
+                                                    Object {
+                                                      "iconName": "times",
+                                                      "prefix": "fas",
+                                                    }
+                                                  }
+                                                >
+                                                  <svg
+                                                    className="svg-inline--fa fa-times"
+                                                  />
+                                                </FontAwesomeIcon>
+                                              </Icon>
+                                            </span>
+                                          </Badge>
+                                        </Badge__StyledBadge>
+                                      </ForwardRef>
+                                    </td>
+                                    <td>
+                                      <ButtonToolbar
+                                        bsClass="btn-toolbar"
+                                      >
+                                        <div
+                                          className="btn-toolbar"
+                                          role="toolbar"
+                                        >
+                                          <ForwardRef
+                                            bsSize="xs"
+                                            bsStyle="primary"
+                                            disabled={false}
+                                            onClick={[Function]}
+                                            title="Delete Parameter"
+                                          >
+                                            <Button__StyledButton
+                                              bsSize="xs"
+                                              bsStyle="primary"
+                                              disabled={false}
+                                              onClick={[Function]}
+                                              title="Delete Parameter"
+                                            >
+                                              <Button
+                                                active={false}
+                                                block={false}
+                                                bsClass="btn"
+                                                bsSize="xs"
+                                                bsStyle="primary"
+                                                className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                disabled={false}
+                                                onClick={[Function]}
+                                                title="Delete Parameter"
+                                              >
+                                                <button
+                                                  className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
+>>>>>>> 99f5c1286e... snapshots
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   title="Delete Parameter"
+                                                  type="button"
                                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                   <button
                                                     className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
@@ -1252,17 +1654,37 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button__StyledButton>
                                             </ForwardRef>
                                             <ForwardRef
+=======
+                                                  Delete
+                                                </button>
+                                              </Button>
+                                            </Button__StyledButton>
+                                          </ForwardRef>
+                                          <ForwardRef
+                                            bsSize="xsmall"
+                                            bsStyle="info"
+                                            onClick={[Function]}
+                                            title="Edit Modal"
+                                          >
+                                            <Button__StyledButton
+>>>>>>> 99f5c1286e... snapshots
                                               bsSize="xsmall"
                                               bsStyle="info"
                                               onClick={[Function]}
                                               title="Edit Modal"
                                             >
-                                              <Button__StyledButton
+                                              <Button
+                                                active={false}
+                                                block={false}
+                                                bsClass="btn"
                                                 bsSize="xsmall"
                                                 bsStyle="info"
+                                                className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                disabled={false}
                                                 onClick={[Function]}
                                                 title="Edit Modal"
                                               >
+<<<<<<< HEAD
                                                 <Button
                                                   active={false}
                                                   block={false}
@@ -1349,9 +1771,16 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 <ForwardRef
                                                   bsSize="xsmall"
                                                   bsStyle="info"
+=======
+                                                <button
+                                                  className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
+                                                  disabled={false}
+>>>>>>> 99f5c1286e... snapshots
                                                   onClick={[Function]}
                                                   title="Edit Modal"
+                                                  type="button"
                                                 >
+<<<<<<< HEAD
                                                   <Button__StyledButton
                                                     bsSize="xsmall"
                                                     bsStyle="info"
@@ -1367,20 +1796,56 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button__StyledButton>
                                             </ForwardRef>
                                             <BootstrapModalWrapper
+=======
+                                                  Edit
+                                                </button>
+                                              </Button>
+                                            </Button__StyledButton>
+                                          </ForwardRef>
+                                          <BootstrapModalWrapper
+                                            backdrop="static"
+                                            bsSize="large"
+                                            onClose={[Function]}
+                                            onHide={[Function]}
+                                            onOpen={[Function]}
+                                            showModal={false}
+                                          >
+                                            <Modal
+>>>>>>> 99f5c1286e... snapshots
                                               backdrop="static"
                                               bsSize="large"
-                                              onClose={[Function]}
                                               onHide={[Function]}
-                                              onOpen={[Function]}
-                                              showModal={false}
+                                              show={false}
                                             >
                                               <Modal
+                                                animation={true}
+                                                autoFocus={true}
                                                 backdrop="static"
+                                                bsClass="modal"
                                                 bsSize="large"
+                                                className="Modal-nuree8-0 hMPgsT"
+                                                dialogComponentClass={[Function]}
+                                                enforceFocus={true}
+                                                keyboard={true}
+                                                manager={
+                                                  ModalManager {
+                                                    "add": [Function],
+                                                    "containers": Array [],
+                                                    "data": Array [],
+                                                    "handleContainerOverflow": true,
+                                                    "hideSiblingNodes": true,
+                                                    "isTopModal": [Function],
+                                                    "modals": Array [],
+                                                    "remove": [Function],
+                                                  }
+                                                }
                                                 onHide={[Function]}
+                                                renderBackdrop={[Function]}
+                                                restoreFocus={true}
                                                 show={false}
                                               >
                                                 <Modal
+<<<<<<< HEAD
                                                   animation={true}
                                                   autoFocus={true}
 =======
@@ -1459,6 +1924,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
 <<<<<<< HEAD
                                                   className="Modal-nuree8-0 hMPgsT"
                                                   dialogComponentClass={[Function]}
+=======
+                                                  autoFocus={true}
+                                                  backdrop="static"
+                                                  backdropClassName="modal-backdrop"
+                                                  backdropTransition={[Function]}
+                                                  containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                                                   enforceFocus={true}
                                                   keyboard={true}
                                                   manager={
@@ -1473,6 +1945,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                       "remove": [Function],
                                                     }
                                                   }
+<<<<<<< HEAD
                                                   onHide={[Function]}
                                                   renderBackdrop={[Function]}
                                                   restoreFocus={true}
@@ -1519,6 +1992,28 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               </table>
                             </DataTable__StyledTable>
                           </div>
+=======
+                                                  onEntering={[Function]}
+                                                  onExited={[Function]}
+                                                  onHide={[Function]}
+                                                  onMouseUp={[Function]}
+                                                  renderBackdrop={[Function]}
+                                                  restoreFocus={true}
+                                                  show={false}
+                                                  transition={[Function]}
+                                                />
+                                              </Modal>
+                                            </Modal>
+                                          </BootstrapModalWrapper>
+                                        </div>
+                                      </ButtonToolbar>
+                                    </td>
+                                  </tr>
+                                </DataTableElement>
+                              </tbody>
+                            </table>
+                          </DataTable__StyledTable>
+>>>>>>> 99f5c1286e... snapshots
                         </div>
                       </div>
                     </div>
@@ -1545,6 +2040,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   showModal={false}
                 >
                   <Modal
+<<<<<<< HEAD
                     backdrop="static"
 =======
                                                   onClose={[Function]}
@@ -1700,6 +2196,39 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       bsClass="modal"
                       className="Modal-nuree8-0 hMPgsT"
                       dialogComponentClass={[Function]}
+=======
+                    animation={true}
+                    autoFocus={true}
+                    backdrop="static"
+                    bsClass="modal"
+                    className="Modal-nuree8-0 hMPgsT"
+                    dialogComponentClass={[Function]}
+                    enforceFocus={true}
+                    keyboard={true}
+                    manager={
+                      ModalManager {
+                        "add": [Function],
+                        "containers": Array [],
+                        "data": Array [],
+                        "handleContainerOverflow": true,
+                        "hideSiblingNodes": true,
+                        "isTopModal": [Function],
+                        "modals": Array [],
+                        "remove": [Function],
+                      }
+                    }
+                    onHide={[Function]}
+                    renderBackdrop={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop="static"
+                      backdropClassName="modal-backdrop"
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                       enforceFocus={true}
                       keyboard={true}
                       manager={
@@ -1714,6 +2243,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           "remove": [Function],
                         }
                       }
+<<<<<<< HEAD
 =======
 >>>>>>> 1634bb410f... snapshots
                       onHide={[Function]}
@@ -1874,6 +2404,21 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                 </BootstrapModalConfirm>
               </div>
             </Col>
+=======
+                      onEntering={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      onMouseUp={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </Modal>
+              </BootstrapModalWrapper>
+            </BootstrapModalConfirm>
+>>>>>>> 99f5c1286e... snapshots
           </div>
         </Row>
       </StyledComponent>
@@ -2124,6 +2669,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -2227,6 +2773,33 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -2234,6 +2807,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -2278,10 +2852,25 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -2335,6 +2924,46 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               },
                             },
                             "name": Object {
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Origin",
+                      "Used Parameters",
+                      "Action",
+                    ]
+                  }
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={
+                    Array [
+                      Object {
+                        "constraints": Array [],
+                        "data": Object {
+                          "configuration": Object {
+                            "listen_address": Object {
+>>>>>>> 99f5c1286e... snapshots
                               "@type": "string",
                               "@value": "Input",
                             },
@@ -2493,6 +3122,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                             className="data-table table-responsive"
                             id="entity-list"
                           >
+<<<<<<< HEAD
                             <DataTable__StyledTable
                               className="table scrollable"
                             >
@@ -2710,9 +3340,191 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   bsSize="xs"
                                                   bsStyle="primary"
                                                   className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                            <table
+                              className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table scrollable"
+                            >
+                              <thead>
+                                <tr>
+                                  <DataTableElement
+                                    element="Title"
+                                    formatter={[Function]}
+                                    index={0}
+                                    key="header-0"
+                                  >
+                                    <th>
+                                      Title
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Type"
+                                    formatter={[Function]}
+                                    index={1}
+                                    key="header-1"
+                                  >
+                                    <th>
+                                      Type
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Description"
+                                    formatter={[Function]}
+                                    index={2}
+                                    key="header-2"
+                                  >
+                                    <th>
+                                      Description
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Origin"
+                                    formatter={[Function]}
+                                    index={3}
+                                    key="header-3"
+                                  >
+                                    <th>
+                                      Origin
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Used Parameters"
+                                    formatter={[Function]}
+                                    index={4}
+                                    key="header-4"
+                                  >
+                                    <th>
+                                      Used Parameters
+                                    </th>
+                                  </DataTableElement>
+                                  <DataTableElement
+                                    element="Action"
+                                    formatter={[Function]}
+                                    index={5}
+                                    key="header-5"
+                                  >
+                                    <th>
+                                      Action
+                                    </th>
+                                  </DataTableElement>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <DataTableElement
+                                  element={
+                                    Object {
+                                      "constraints": Array [],
+                                      "data": Object {
+                                        "configuration": Object {
+                                          "listen_address": Object {
+                                            "@type": "string",
+                                            "@value": "1.2.3.4",
+                                          },
+                                          "port": Object {
+                                            "@type": "integer",
+                                            "@value": "23",
+                                          },
+                                        },
+                                        "name": Object {
+                                          "@type": "string",
+                                          "@value": "Input",
+                                        },
+                                        "title": Object {
+                                          "@type": "string",
+                                          "@value": "A good input",
+                                        },
+                                      },
+                                      "id": "111-beef",
+                                      "type": Object {
+                                        "name": "input",
+                                        "version": "1",
+                                      },
+                                      "v": "1.0",
+                                    }
+                                  }
+                                  formatter={[Function]}
+                                  index={0}
+                                  key="row-0"
+                                >
+                                  <tr
+                                    key="111-beef"
+                                  >
+                                    <td
+                                      className="bigColumns"
+                                    >
+                                      A good input
+                                    </td>
+                                    <td>
+                                      input
+                                    </td>
+                                    <td
+                                      className="bigColumns"
+                                    />
+                                    <td>
+                                      <span>
+                                        <Icon
+                                          className="contentPackEntity"
+                                          name="archive"
+                                          title="Content Pack"
+                                          type="solid"
+                                        >
+                                          <FontAwesomeIcon
+                                            className="contentPackEntity"
+                                            icon={
+                                              Object {
+                                                "iconName": "archive",
+                                                "prefix": "fas",
+                                              }
+                                            }
+                                            title="Content Pack"
+                                          >
+                                            <svg
+                                              className="svg-inline--fa fa-archive"
+                                            />
+                                          </FontAwesomeIcon>
+                                        </Icon>
+                                      </span>
+                                    </td>
+                                    <td>
+                                      0
+                                    </td>
+                                    <td>
+                                      <ButtonToolbar
+                                        bsClass="btn-toolbar"
+                                      >
+                                        <div
+                                          className="btn-toolbar"
+                                          role="toolbar"
+                                        >
+                                          <ForwardRef
+                                            bsSize="xs"
+                                            bsStyle="primary"
+                                            disabled={false}
+                                            onClick={[Function]}
+                                          >
+                                            <Button__StyledButton
+                                              bsSize="xs"
+                                              bsStyle="primary"
+                                              disabled={false}
+                                              onClick={[Function]}
+                                            >
+                                              <Button
+                                                active={false}
+                                                block={false}
+                                                bsClass="btn"
+                                                bsSize="xs"
+                                                bsStyle="primary"
+                                                className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                disabled={false}
+                                                onClick={[Function]}
+                                              >
+                                                <button
+                                                  className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
+>>>>>>> 99f5c1286e... snapshots
                                                   disabled={false}
                                                   onClick={[Function]}
+                                                  type="button"
                                                 >
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                   <button
                                                     className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
@@ -2732,15 +3544,34 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               </Button__StyledButton>
                                             </ForwardRef>
                                             <ForwardRef
+=======
+                                                  Edit
+                                                </button>
+                                              </Button>
+                                            </Button__StyledButton>
+                                          </ForwardRef>
+                                          <ForwardRef
+                                            bsSize="xs"
+                                            bsStyle="info"
+                                            onClick={[Function]}
+                                          >
+                                            <Button__StyledButton
+>>>>>>> 99f5c1286e... snapshots
                                               bsSize="xs"
                                               bsStyle="info"
                                               onClick={[Function]}
                                             >
-                                              <Button__StyledButton
+                                              <Button
+                                                active={false}
+                                                block={false}
+                                                bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="info"
+                                                className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                disabled={false}
                                                 onClick={[Function]}
                                               >
+<<<<<<< HEAD
                                                 <Button
                                                   active={false}
                                                   block={false}
@@ -2748,9 +3579,15 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   bsSize="xs"
                                                   bsStyle="info"
                                                   className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                                                <button
+                                                  className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
+>>>>>>> 99f5c1286e... snapshots
                                                   disabled={false}
                                                   onClick={[Function]}
+                                                  type="button"
                                                 >
+<<<<<<< HEAD
                                                   <button
                                                     className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
                                                     disabled={false}
@@ -2842,20 +3679,59 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         </ButtonToolbar>
                                       </td>
                                       <BootstrapModalWrapper
+=======
+                                                  Show
+                                                </button>
+                                              </Button>
+                                            </Button__StyledButton>
+                                          </ForwardRef>
+                                        </div>
+                                      </ButtonToolbar>
+                                    </td>
+                                    <BootstrapModalWrapper
+                                      backdrop="static"
+                                      bsSize="large"
+                                      onClose={[Function]}
+                                      onHide={[Function]}
+                                      onOpen={[Function]}
+                                      showModal={false}
+                                    >
+                                      <Modal
+>>>>>>> 99f5c1286e... snapshots
                                         backdrop="static"
                                         bsSize="large"
-                                        onClose={[Function]}
                                         onHide={[Function]}
-                                        onOpen={[Function]}
-                                        showModal={false}
+                                        show={false}
                                       >
                                         <Modal
+                                          animation={true}
+                                          autoFocus={true}
                                           backdrop="static"
+                                          bsClass="modal"
                                           bsSize="large"
+                                          className="Modal-nuree8-0 hMPgsT"
+                                          dialogComponentClass={[Function]}
+                                          enforceFocus={true}
+                                          keyboard={true}
+                                          manager={
+                                            ModalManager {
+                                              "add": [Function],
+                                              "containers": Array [],
+                                              "data": Array [],
+                                              "handleContainerOverflow": true,
+                                              "hideSiblingNodes": true,
+                                              "isTopModal": [Function],
+                                              "modals": Array [],
+                                              "remove": [Function],
+                                            }
+                                          }
                                           onHide={[Function]}
+                                          renderBackdrop={[Function]}
+                                          restoreFocus={true}
                                           show={false}
                                         >
                                           <Modal
+<<<<<<< HEAD
                                             animation={true}
                                             autoFocus={true}
 =======
@@ -2934,6 +3810,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
 <<<<<<< HEAD
                                             className="Modal-nuree8-0 hMPgsT"
                                             dialogComponentClass={[Function]}
+=======
+                                            autoFocus={true}
+                                            backdrop="static"
+                                            backdropClassName="modal-backdrop"
+                                            backdropTransition={[Function]}
+                                            containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                                             enforceFocus={true}
                                             keyboard={true}
                                             manager={
@@ -2948,6 +3831,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 "remove": [Function],
                                               }
                                             }
+<<<<<<< HEAD
                                             onHide={[Function]}
                                             renderBackdrop={[Function]}
                                             restoreFocus={true}
@@ -2983,23 +3867,63 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               transition={[Function]}
                                             />
                                           </Modal>
+=======
+                                            onEntering={[Function]}
+                                            onExited={[Function]}
+                                            onHide={[Function]}
+                                            onMouseUp={[Function]}
+                                            renderBackdrop={[Function]}
+                                            restoreFocus={true}
+                                            show={false}
+                                            transition={[Function]}
+                                          />
+>>>>>>> 99f5c1286e... snapshots
                                         </Modal>
-                                      </BootstrapModalWrapper>
-                                      <BootstrapModalWrapper
+                                      </Modal>
+                                    </BootstrapModalWrapper>
+                                    <BootstrapModalWrapper
+                                      backdrop="static"
+                                      bsSize="large"
+                                      onClose={[Function]}
+                                      onHide={[Function]}
+                                      onOpen={[Function]}
+                                      showModal={false}
+                                    >
+                                      <Modal
                                         backdrop="static"
                                         bsSize="large"
-                                        onClose={[Function]}
                                         onHide={[Function]}
-                                        onOpen={[Function]}
-                                        showModal={false}
+                                        show={false}
                                       >
                                         <Modal
+                                          animation={true}
+                                          autoFocus={true}
                                           backdrop="static"
+                                          bsClass="modal"
                                           bsSize="large"
+                                          className="Modal-nuree8-0 hMPgsT"
+                                          dialogComponentClass={[Function]}
+                                          enforceFocus={true}
+                                          keyboard={true}
+                                          manager={
+                                            ModalManager {
+                                              "add": [Function],
+                                              "containers": Array [],
+                                              "data": Array [],
+                                              "handleContainerOverflow": true,
+                                              "hideSiblingNodes": true,
+                                              "isTopModal": [Function],
+                                              "modals": Array [],
+                                              "remove": [Function],
+                                            }
+                                          }
                                           onHide={[Function]}
+                                          renderBackdrop={[Function]}
+                                          restoreFocus={true}
                                           show={false}
                                         >
                                           <Modal
+<<<<<<< HEAD
                                             animation={true}
                                             autoFocus={true}
 =======
@@ -3122,6 +4046,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
 <<<<<<< HEAD
                                             className="Modal-nuree8-0 hMPgsT"
                                             dialogComponentClass={[Function]}
+=======
+                                            autoFocus={true}
+                                            backdrop="static"
+                                            backdropClassName="modal-backdrop"
+                                            backdropTransition={[Function]}
+                                            containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                                             enforceFocus={true}
                                             keyboard={true}
                                             manager={
@@ -3136,6 +4067,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 "remove": [Function],
                                               }
                                             }
+<<<<<<< HEAD
                                             onHide={[Function]}
                                             renderBackdrop={[Function]}
                                             restoreFocus={true}
@@ -3179,6 +4111,25 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               </table>
                             </DataTable__StyledTable>
                           </div>
+=======
+                                            onEntering={[Function]}
+                                            onExited={[Function]}
+                                            onHide={[Function]}
+                                            onMouseUp={[Function]}
+                                            renderBackdrop={[Function]}
+                                            restoreFocus={true}
+                                            show={false}
+                                            transition={[Function]}
+                                          />
+                                        </Modal>
+                                      </Modal>
+                                    </BootstrapModalWrapper>
+                                  </tr>
+                                </DataTableElement>
+                              </tbody>
+                            </table>
+                          </DataTable__StyledTable>
+>>>>>>> 99f5c1286e... snapshots
                         </div>
                       </div>
                     </div>
@@ -3379,6 +4330,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     onClick={[Function]}
                     title="Edit Modal"
                   >
+<<<<<<< HEAD
                     <Button__StyledButton
 =======
       <StyledComponent
@@ -3454,10 +4406,27 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         bsStyle="info"
 <<<<<<< HEAD
                         className="Button__StyledButton-c9cbmb-0 laZUlH"
+=======
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsSize="small"
+                      bsStyle="info"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="Edit Modal"
+                    >
+                      <button
+                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
+>>>>>>> 99f5c1286e... snapshots
                         disabled={false}
                         onClick={[Function]}
                         title="Edit Modal"
+                        type="button"
                       >
+<<<<<<< HEAD
                         <button
                           className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
                           disabled={false}
@@ -3516,6 +4485,22 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     </Button__StyledButton>
                   </ForwardRef>
                   <BootstrapModalWrapper
+=======
+                        Create parameter
+                      </button>
+                    </Button>
+                  </Button__StyledButton>
+                </ForwardRef>
+                <BootstrapModalWrapper
+                  backdrop="static"
+                  bsSize="large"
+                  onClose={[Function]}
+                  onHide={[Function]}
+                  onOpen={[Function]}
+                  showModal={false}
+                >
+                  <Modal
+>>>>>>> 99f5c1286e... snapshots
                     backdrop="static"
                     bsSize="large"
                     onClose={[Function]}
@@ -3524,8 +4509,15 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     showModal={false}
                   >
                     <Modal
+<<<<<<< HEAD
+=======
+                      animation={true}
+                      autoFocus={true}
+>>>>>>> 99f5c1286e... snapshots
                       backdrop="static"
+                      bsClass="modal"
                       bsSize="large"
+<<<<<<< HEAD
 =======
                           <Button
                             active={false}
@@ -3566,6 +4558,35 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
 <<<<<<< HEAD
                         className="Modal-nuree8-0 hMPgsT"
                         dialogComponentClass={[Function]}
+=======
+                      className="Modal-nuree8-0 hMPgsT"
+                      dialogComponentClass={[Function]}
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        ModalManager {
+                          "add": [Function],
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "isTopModal": [Function],
+                          "modals": Array [],
+                          "remove": [Function],
+                        }
+                      }
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                    >
+                      <Modal
+                        autoFocus={true}
+                        backdrop="static"
+                        backdropClassName="modal-backdrop"
+                        backdropTransition={[Function]}
+                        containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                         enforceFocus={true}
                         keyboard={true}
                         manager={
@@ -3580,6 +4601,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                             "remove": [Function],
                           }
                         }
+<<<<<<< HEAD
 =======
 >>>>>>> 1634bb410f... snapshots
                         onHide={[Function]}
@@ -3709,6 +4731,50 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     topMargin={15}
                     useLoadingState={false}
                     wrapperClass="search"
+=======
+                        onEntering={[Function]}
+                        onExited={[Function]}
+                        onHide={[Function]}
+                        onMouseUp={[Function]}
+                        renderBackdrop={[Function]}
+                        restoreFocus={true}
+                        show={false}
+                        transition={[Function]}
+                      />
+                    </Modal>
+                  </Modal>
+                </BootstrapModalWrapper>
+                <span>
+                  <br />
+                  <br />
+                </span>
+                <SearchForm
+                  buttonLeftMargin={5}
+                  focusAfterMount={false}
+                  label={null}
+                  loadingLabel="Loading..."
+                  onQueryChange={[Function]}
+                  onReset={[Function]}
+                  onSearch={[Function]}
+                  placeholder="Enter search query..."
+                  query=""
+                  queryHelpComponent={null}
+                  queryWidth="auto"
+                  resetButtonLabel="Reset"
+                  searchBsStyle="default"
+                  searchButtonLabel="Filter"
+                  topMargin={15}
+                  useLoadingState={false}
+                  wrapperClass="search"
+                >
+                  <div
+                    className="search"
+                    style={
+                      Object {
+                        "marginTop": 15,
+                      }
+                    }
+>>>>>>> 99f5c1286e... snapshots
                   >
                     <div
                       className="search"
@@ -3797,6 +4863,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -3900,6 +4967,33 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -3907,6 +5001,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -3951,10 +5046,25 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -3998,6 +5108,48 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Name",
+                      "Description",
+                      "Value Type",
+                      "Default Value",
+                      "Used",
+                      "Action",
+                    ]
+                  }
+                  id="parameter-list"
+                  noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                  rowClassName=""
+                  rows={Array []}
+                  sortByKey="title"
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >
@@ -4038,6 +5190,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   showModal={false}
                 >
                   <Modal
+<<<<<<< HEAD
                     backdrop="static"
 =======
                               <Button__StyledButton
@@ -4187,6 +5340,39 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       bsClass="modal"
                       className="Modal-nuree8-0 hMPgsT"
                       dialogComponentClass={[Function]}
+=======
+                    animation={true}
+                    autoFocus={true}
+                    backdrop="static"
+                    bsClass="modal"
+                    className="Modal-nuree8-0 hMPgsT"
+                    dialogComponentClass={[Function]}
+                    enforceFocus={true}
+                    keyboard={true}
+                    manager={
+                      ModalManager {
+                        "add": [Function],
+                        "containers": Array [],
+                        "data": Array [],
+                        "handleContainerOverflow": true,
+                        "hideSiblingNodes": true,
+                        "isTopModal": [Function],
+                        "modals": Array [],
+                        "remove": [Function],
+                      }
+                    }
+                    onHide={[Function]}
+                    renderBackdrop={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop="static"
+                      backdropClassName="modal-backdrop"
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+>>>>>>> 99f5c1286e... snapshots
                       enforceFocus={true}
                       keyboard={true}
                       manager={
@@ -4201,6 +5387,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           "remove": [Function],
                         }
                       }
+<<<<<<< HEAD
 =======
 >>>>>>> 1634bb410f... snapshots
                       onHide={[Function]}
@@ -4311,6 +5498,24 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
           </Col>
         </div>
       </Row>
+=======
+                      onEntering={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      onMouseUp={[Function]}
+                      renderBackdrop={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </Modal>
+              </BootstrapModalWrapper>
+            </BootstrapModalConfirm>
+          </div>
+        </Col>
+      </div>
+>>>>>>> 99f5c1286e... snapshots
     </Row>
     <Row>
       <Row
@@ -4518,6 +5723,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           <div
                             className="form-group has-feedback"
                           >
+<<<<<<< HEAD
                             <input
                               autoComplete="off"
                               autoFocus={false}
@@ -4621,6 +5827,33 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                             Object {
                               "marginLeft": 5,
                             }
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                              disabled={false}
+                              type="submit"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                                disabled={false}
+                                type="submit"
+                              >
+                                Filter
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                      <div
+                        className="form-group"
+                        style={
+                          Object {
+                            "marginLeft": 5,
+>>>>>>> 99f5c1286e... snapshots
                           }
                         >
                           <ForwardRef
@@ -4628,6 +5861,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                             onClick={[Function]}
                             type="reset"
                           >
+<<<<<<< HEAD
                             <Button__StyledButton
 =======
                                   <Button
@@ -4672,10 +5906,25 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 bsClass="btn"
                                 bsStyle="default"
                                 className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+=======
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              <button
+                                className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+>>>>>>> 99f5c1286e... snapshots
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
+<<<<<<< HEAD
                                 <button
                                   className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                                   disabled={false}
@@ -4718,6 +5967,47 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     useResponsiveTable={true}
                   >
                     <div>
+=======
+                                Reset
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
+                      </div>
+                    </form>
+                  </div>
+                </SearchForm>
+                <DataTable
+                  className="scrollable"
+                  dataRowFormatter={[Function]}
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterLabel="Filter"
+                  filterSuggestions={Array []}
+                  headerCellFormatter={[Function]}
+                  headers={
+                    Array [
+                      "Title",
+                      "Type",
+                      "Description",
+                      "Origin",
+                      "Used Parameters",
+                      "Action",
+                    ]
+                  }
+                  id="entity-list"
+                  noDataText="No data available."
+                  rowClassName=""
+                  rows={Array []}
+                  sortBy={[Function]}
+                  useResponsiveTable={true}
+                >
+                  <div>
+                    <div
+                      className="row "
+                    >
+>>>>>>> 99f5c1286e... snapshots
                       <div
                         className="row "
                       >

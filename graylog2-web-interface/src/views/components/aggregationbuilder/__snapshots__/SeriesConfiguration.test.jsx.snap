@@ -55,6 +55,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 value="count()"
               >
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <input
                   className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                   onChange={[Function]}
@@ -113,6 +114,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                   </FormControl>
                 </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                <input
+                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                  onChange={[Function]}
+                  type="text"
+                  value="count()"
+                />
+>>>>>>> 99f5c1286e... snapshots
               </FormControl>
             </FormControl>
             <HelpBlock>

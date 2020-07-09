@@ -99,6 +99,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                     <input
                       autoComplete="off"
 <<<<<<< HEAD
+<<<<<<< HEAD
                       className="FormControl-sc-1amoaox-0 kmJcge form-control"
                       id="pattern-selector"
 =======
@@ -134,6 +135,10 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                       forwardedRef={null}
                       inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                      id="pattern-selector"
+>>>>>>> 99f5c1286e... snapshots
                       label="Filter pattern"
                       name="pattern-selector"
                       onChange={[Function]}
@@ -141,6 +146,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                       placeholder=""
                       type="text"
                       value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                     />
 =======
@@ -174,6 +180,9 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                       </FormControl>
                     </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                    />
+>>>>>>> 99f5c1286e... snapshots
                   </FormControl>
                 </FormControl>
               </span>
@@ -513,6 +522,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                     <input
                       autoComplete="off"
 <<<<<<< HEAD
+<<<<<<< HEAD
                       className="FormControl-sc-1amoaox-0 kmJcge form-control"
                       id="pattern-selector"
 =======
@@ -548,6 +558,10 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                       forwardedRef={null}
                       inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                      id="pattern-selector"
+>>>>>>> 99f5c1286e... snapshots
                       label="Filter pattern"
                       name="pattern-selector"
                       onChange={[Function]}
@@ -555,6 +569,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                       placeholder=""
                       type="text"
                       value=""
+<<<<<<< HEAD
 <<<<<<< HEAD
                     />
 =======
@@ -588,6 +603,9 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                       </FormControl>
                     </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                    />
+>>>>>>> 99f5c1286e... snapshots
                   </FormControl>
                 </FormControl>
               </span>

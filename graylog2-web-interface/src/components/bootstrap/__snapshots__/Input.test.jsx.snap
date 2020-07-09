@@ -58,6 +58,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                         type="text"
                       >
 <<<<<<< HEAD
+<<<<<<< HEAD
                         <input
                           className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                           id="inputWithAddon"
@@ -95,10 +96,16 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                           forwardedRef={null}
                           inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                        <input
+                          className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                          id="inputWithAddon"
+>>>>>>> 99f5c1286e... snapshots
                           label=""
                           name="inputWithAddon"
                           placeholder=""
                           type="text"
+<<<<<<< HEAD
 <<<<<<< HEAD
                         />
 =======
@@ -124,6 +131,9 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                           </FormControl>
                         </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                        />
+>>>>>>> 99f5c1286e... snapshots
                       </FormControl>
                     </FormControl>
                     <Addon
@@ -135,6 +145,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                         <StyledBootstrapInputAddon
                           className="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                         >
+<<<<<<< HEAD
 <<<<<<< HEAD
                           <InputGroupAddon
                             bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
@@ -195,6 +206,21 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                     </span>
                   </InputGroup>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <InputGroupAddon
+                            bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                          >
+                            <span
+                              className="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                            >
+                              .00
+                            </span>
+                          </InputGroupAddon>
+                        </StyledBootstrapInputAddon>
+                      </InputGroup__StyledAddon>
+                    </Addon>
+                  </span>
+>>>>>>> 99f5c1286e... snapshots
                 </InputGroup>
               </InputGroup>
             </span>
@@ -264,6 +290,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         type="text"
                       >
 <<<<<<< HEAD
+<<<<<<< HEAD
                         <input
                           className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                           id="inputWithButton"
@@ -301,10 +328,16 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                           forwardedRef={null}
                           inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                        <input
+                          className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                          id="inputWithButton"
+>>>>>>> 99f5c1286e... snapshots
                           label=""
                           name="inputWithButton"
                           placeholder=""
                           type="text"
+<<<<<<< HEAD
 <<<<<<< HEAD
                         />
 =======
@@ -330,6 +363,9 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                           </FormControl>
                         </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                        />
+>>>>>>> 99f5c1286e... snapshots
                       </FormControl>
                     </FormControl>
                     <Button
@@ -436,6 +472,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                         type="text"
                       >
 <<<<<<< HEAD
+<<<<<<< HEAD
                         <input
                           className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                           id="inputWithCheckboxAddon"
@@ -473,10 +510,16 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                           forwardedRef={null}
                           inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                        <input
+                          className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                          id="inputWithCheckboxAddon"
+>>>>>>> 99f5c1286e... snapshots
                           label=""
                           name="inputWithCheckboxAddon"
                           placeholder=""
                           type="text"
+<<<<<<< HEAD
 <<<<<<< HEAD
                         />
 =======
@@ -502,6 +545,9 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                           </FormControl>
                         </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                        />
+>>>>>>> 99f5c1286e... snapshots
                       </FormControl>
                     </FormControl>
                     <Addon
@@ -513,6 +559,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                         <StyledBootstrapInputAddon
                           className="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                         >
+<<<<<<< HEAD
 <<<<<<< HEAD
                           <InputGroupAddon
                             bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
@@ -581,6 +628,25 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                     </span>
                   </InputGroup>
 >>>>>>> 46caba27d0... snapshots
+=======
+                          <InputGroupAddon
+                            bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                          >
+                            <span
+                              className="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                            >
+                              <input
+                                aria-label="..."
+                                id="addonCheckbox"
+                                type="checkbox"
+                              />
+                            </span>
+                          </InputGroupAddon>
+                        </StyledBootstrapInputAddon>
+                      </InputGroup__StyledAddon>
+                    </Addon>
+                  </span>
+>>>>>>> 99f5c1286e... snapshots
                 </InputGroup>
               </InputGroup>
             </span>
@@ -642,6 +708,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                   type="text"
                 >
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <input
                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                     id="inputWithoutNameProp"
@@ -679,10 +746,16 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                     forwardedRef={null}
                     inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                  <input
+                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                    id="inputWithoutNameProp"
+>>>>>>> 99f5c1286e... snapshots
                     label=""
                     name="inputWithNameProp"
                     placeholder=""
                     type="text"
+<<<<<<< HEAD
 <<<<<<< HEAD
                   />
 =======
@@ -708,6 +781,9 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                     </FormControl>
                   </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                  />
+>>>>>>> 99f5c1286e... snapshots
                 </FormControl>
               </FormControl>
             </span>
@@ -768,6 +844,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                   type="text"
                 >
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <input
                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                     id="inputWithoutNameProp"
@@ -805,10 +882,16 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                     forwardedRef={null}
                     inputRef={[Function]}
 >>>>>>> 46caba27d0... snapshots
+=======
+                  <input
+                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                    id="inputWithoutNameProp"
+>>>>>>> 99f5c1286e... snapshots
                     label=""
                     name="inputWithoutNameProp"
                     placeholder=""
                     type="text"
+<<<<<<< HEAD
 <<<<<<< HEAD
                   />
 =======
@@ -834,6 +917,9 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                     </FormControl>
                   </StyledComponent>
 >>>>>>> 46caba27d0... snapshots
+=======
+                  />
+>>>>>>> 99f5c1286e... snapshots
                 </FormControl>
               </FormControl>
             </span>

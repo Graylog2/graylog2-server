@@ -17,10 +17,14 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       >
         <input
 <<<<<<< HEAD
+<<<<<<< HEAD
           class="FormControl-sc-1amoaox-0 kmJcge form-control"
 =======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
 >>>>>>> 46caba27d0... snapshots
+=======
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
+>>>>>>> 99f5c1286e... snapshots
           id="url"
           label="Lookup URL"
           name="url"
@@ -52,10 +56,14 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       >
         <input
 <<<<<<< HEAD
+<<<<<<< HEAD
           class="FormControl-sc-1amoaox-0 kmJcge form-control"
 =======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
 >>>>>>> 46caba27d0... snapshots
+=======
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
+>>>>>>> 99f5c1286e... snapshots
           id="single_value_jsonpath"
           label="Single value JSONPath"
           name="single_value_jsonpath"
@@ -81,10 +89,14 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       >
         <input
 <<<<<<< HEAD
+<<<<<<< HEAD
           class="FormControl-sc-1amoaox-0 kmJcge form-control"
 =======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
 >>>>>>> 46caba27d0... snapshots
+=======
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
+>>>>>>> 99f5c1286e... snapshots
           id="multi_value_jsonpath"
           label="Multi value JSONPath"
           name="multi_value_jsonpath"
@@ -109,10 +121,14 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
       >
         <input
 <<<<<<< HEAD
+<<<<<<< HEAD
           class="FormControl-sc-1amoaox-0 kmJcge form-control"
 =======
           class="FormControl-sc-1amoaox-0 hBmgnF form-control"
 >>>>>>> 46caba27d0... snapshots
+=======
+          class="FormControl-sc-1amoaox-0 kmJcge form-control"
+>>>>>>> 99f5c1286e... snapshots
           id="user_agent"
           label="HTTP User-Agent"
           name="user_agent"
@@ -190,10 +206,14 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                       <span>
                         <input
 <<<<<<< HEAD
+<<<<<<< HEAD
                           class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
 =======
                           class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
 >>>>>>> 46caba27d0... snapshots
+=======
+                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+>>>>>>> 99f5c1286e... snapshots
                           data-testid="newKey"
                           id="newKey"
                           label=""
@@ -214,10 +234,14 @@ exports[`HTTPJSONPathAdapterFieldSet should render the field set 1`] = `
                       <span>
                         <input
 <<<<<<< HEAD
+<<<<<<< HEAD
                           class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
 =======
                           class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
 >>>>>>> 46caba27d0... snapshots
+=======
+                          class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+>>>>>>> 99f5c1286e... snapshots
                           data-testid="newValue"
                           id="newValue"
                           label=""
