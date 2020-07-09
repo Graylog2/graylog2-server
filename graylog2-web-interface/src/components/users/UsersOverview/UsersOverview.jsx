@@ -49,7 +49,7 @@ const UsersOverview = () => {
 
   return (
     <Row className="content">
-      <Col>
+      <Col xs={12}>
         <TableWrapper>
           <DataTable id="users-overview"
                      className="table-hover"
