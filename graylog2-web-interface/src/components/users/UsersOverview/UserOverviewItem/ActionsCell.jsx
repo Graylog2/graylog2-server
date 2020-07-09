@@ -1,9 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import type { ThemeInterface } from 'theme';
 import User from 'logic/users/User';
 import UsersActions from 'actions/users/UsersActions';
 import Routes from 'routing/Routes';
@@ -15,8 +14,9 @@ type Props = {
   username: $PropertyType<User, 'username'>,
 };
 
-const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
-  width: 180px;
+const ActtionsWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
 `;
 
 const EditTokensAction = ({
@@ -40,15 +40,13 @@ const ReadOnlyActions = ({ username }: { username: $PropertyType<Props, 'usernam
   const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
 
   return (
-    <span>
+    <>
       <OverlayTrigger placement="left" overlay={tooltip}>
-        <span>
-          <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
-        </span>
+        <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
       </OverlayTrigger>
       &nbsp;
       <EditTokensAction username={username} wrapperComponent={Button} />
-    </span>
+    </>
   );
 };
 
@@ -61,7 +59,7 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
   };
 
   return (
-    <div>
+    <>
       <IfPermitted permissions={[`users:edit:${username}`]}>
         <LinkContainer to={Routes.SYSTEM.USERS.edit(encodeURIComponent(username))}>
           <Button id={`edit-user-${username}`} bsStyle="info" bsSize="xs" title={`Edit user ${username}`}>
@@ -80,19 +78,21 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
           Delete
         </MenuItem>
       </DropdownButton>
-    </div>
+    </>
   );
 };
 
 const ActionsCell = ({ username, readOnly }: Props) => {
   return (
-    <Td>
-      {readOnly ? (
-        <ReadOnlyActions username={username} />
-      ) : (
-        <EditActions username={username} />
-      )}
-    </Td>
+    <td>
+      <ActtionsWrapper>
+        {readOnly ? (
+          <ReadOnlyActions username={username} />
+        ) : (
+          <EditActions username={username} />
+        )}
+      </ActtionsWrapper>
+    </td>
   );
 };
 
