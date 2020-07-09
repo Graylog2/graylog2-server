@@ -16,7 +16,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 kdCabm in modal"
+      class="fade Modal-nuree8-0 hMPgsT in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -29,7 +29,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
           role="document"
         >
           <div
-            class="Modal__Body-nuree8-4 lcHrgF modal-body"
+            class="modal-body"
           >
             <div
               class="search"
@@ -57,7 +57,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -91,7 +91,11 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+<<<<<<< HEAD
+                    class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+=======
+                    class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
+>>>>>>> 46caba27d0... snapshots
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -126,17 +130,17 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
             />
           </div>
           <div
-            class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
+            class="modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 bNulii btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button-c9cbmb-0 bNulii btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
               type="button"
             >
               Cancel
@@ -165,7 +169,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 kdCabm in modal"
+      class="fade Modal-nuree8-0 hMPgsT in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -178,7 +182,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
           role="document"
         >
           <div
-            class="Modal__Body-nuree8-4 lcHrgF modal-body"
+            class="modal-body"
           >
             <div
               class="search"
@@ -206,7 +210,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -217,7 +221,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -240,7 +244,11 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+<<<<<<< HEAD
+                    class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+=======
+                    class="FormControl-sc-1amoaox-0 hBmgnF form-control input-sm"
+>>>>>>> 46caba27d0... snapshots
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -302,17 +310,17 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
             />
           </div>
           <div
-            class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
+            class="modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 bNulii btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button-c9cbmb-0 bNulii btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
               type="button"
             >
               Cancel

@@ -139,6 +139,38 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 bsClass="form-control"
                                 className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
+<<<<<<< HEAD
+=======
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hBmgnF",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                 inputRef={[Function]}
                                 label="Comment"
                                 maxLength={512}
@@ -148,9 +180,17 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 type="text"
                                 value=""
                               >
+<<<<<<< HEAD
                                 <input
                                   className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   id="comment"
+=======
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 hBmgnF"
+                                  componentClass="input"
+                                  inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                   label="Comment"
                                   maxLength={512}
                                   name="comment"
@@ -158,8 +198,25 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   placeholder=""
                                   type="text"
                                   value=""
+<<<<<<< HEAD
                                 />
                               </FormControl>
+=======
+                                >
+                                  <input
+                                    className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                    id="comment"
+                                    label="Comment"
+                                    maxLength={512}
+                                    name="comment"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                             </FormControl>
                           </div>
                         </InputWrapper>
@@ -269,6 +326,38 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 bsClass="form-control"
                                 className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
+<<<<<<< HEAD
+=======
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hBmgnF",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                 inputRef={[Function]}
                                 label="A parameter"
                                 maxLength={250}
@@ -279,9 +368,17 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 type="text"
                                 value="parameter"
                               >
+<<<<<<< HEAD
                                 <input
                                   className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   id="PARAM"
+=======
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 hBmgnF"
+                                  componentClass="input"
+                                  inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                   label="A parameter"
                                   maxLength={250}
                                   name="PARAM"
@@ -290,8 +387,26 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   required={true}
                                   type="text"
                                   value="parameter"
+<<<<<<< HEAD
                                 />
                               </FormControl>
+=======
+                                >
+                                  <input
+                                    className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                    id="PARAM"
+                                    label="A parameter"
+                                    maxLength={250}
+                                    name="PARAM"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value="parameter"
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                             </FormControl>
                           </div>
                         </InputWrapper>

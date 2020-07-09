@@ -358,21 +358,75 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         bsClass="form-control"
                                         className="FormControl-sc-1amoaox-0 fKSsjP"
                                         componentClass="input"
+<<<<<<< HEAD
+=======
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "Feedback": [Function],
+                                            "SIZES": Array [
+                                              "small",
+                                              "large",
+                                            ],
+                                            "Static": [Function],
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "FormControl-sc-1amoaox-0",
+                                              "isStatic": false,
+                                              "lastClassName": "hBmgnF",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "FormControl",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                         inputRef={[Function]}
                                         label="Filter"
                                         name="content-packs-filter"
                                         placeholder=""
                                         type="text"
                                       >
+<<<<<<< HEAD
                                         <input
                                           className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                           id="content-packs-filter"
+=======
+                                        <FormControl
+                                          bsClass="form-control"
+                                          className="FormControl-sc-1amoaox-0 hBmgnF"
+                                          componentClass="input"
+                                          inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                           label="Filter"
                                           name="content-packs-filter"
                                           placeholder=""
                                           type="text"
+<<<<<<< HEAD
                                         />
                                       </FormControl>
+=======
+                                        >
+                                          <input
+                                            className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                            id="content-packs-filter"
+                                            label="Filter"
+                                            name="content-packs-filter"
+                                            placeholder=""
+                                            type="text"
+                                          />
+                                        </FormControl>
+                                      </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                                     </FormControl>
                                   </div>
                                 </InputWrapper>
@@ -11416,21 +11470,75 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                         bsClass="form-control"
                                         className="FormControl-sc-1amoaox-0 fKSsjP"
                                         componentClass="input"
+<<<<<<< HEAD
+=======
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "Feedback": [Function],
+                                            "SIZES": Array [
+                                              "small",
+                                              "large",
+                                            ],
+                                            "Static": [Function],
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "FormControl-sc-1amoaox-0",
+                                              "isStatic": false,
+                                              "lastClassName": "hBmgnF",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "FormControl",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                         inputRef={[Function]}
                                         label="Filter"
                                         name="content-packs-filter"
                                         placeholder=""
                                         type="text"
                                       >
+<<<<<<< HEAD
                                         <input
                                           className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                           id="content-packs-filter"
+=======
+                                        <FormControl
+                                          bsClass="form-control"
+                                          className="FormControl-sc-1amoaox-0 hBmgnF"
+                                          componentClass="input"
+                                          inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                           label="Filter"
                                           name="content-packs-filter"
                                           placeholder=""
                                           type="text"
+<<<<<<< HEAD
                                         />
                                       </FormControl>
+=======
+                                        >
+                                          <input
+                                            className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                            id="content-packs-filter"
+                                            label="Filter"
+                                            name="content-packs-filter"
+                                            placeholder=""
+                                            type="text"
+                                          />
+                                        </FormControl>
+                                      </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                                     </FormControl>
                                   </div>
                                 </InputWrapper>

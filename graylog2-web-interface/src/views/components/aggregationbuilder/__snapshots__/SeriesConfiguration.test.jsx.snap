@@ -54,12 +54,65 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 type="text"
                 value="count()"
               >
+<<<<<<< HEAD
                 <input
                   className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                   onChange={[Function]}
                   type="text"
                   value="count()"
                 />
+=======
+                <StyledComponent
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "Feedback": [Function],
+                      "SIZES": Array [
+                        "small",
+                        "large",
+                      ],
+                      "Static": [Function],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "FormControl-sc-1amoaox-0",
+                        "isStatic": false,
+                        "lastClassName": "hBmgnF",
+                        "rules": Array [
+                          [Function],
+                        ],
+                      },
+                      "displayName": "FormControl",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onChange={[Function]}
+                  type="text"
+                  value="count()"
+                >
+                  <FormControl
+                    bsClass="form-control"
+                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                    componentClass="input"
+                    onChange={[Function]}
+                    type="text"
+                    value="count()"
+                  >
+                    <input
+                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                      onChange={[Function]}
+                      type="text"
+                      value="count()"
+                    />
+                  </FormControl>
+                </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
               </FormControl>
             </FormControl>
             <HelpBlock>

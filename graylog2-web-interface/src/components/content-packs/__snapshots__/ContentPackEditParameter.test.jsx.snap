@@ -100,9 +100,44 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Title"
                             maxLength={250}
                             name="title"
@@ -111,7 +146,39 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Title"
+                              maxLength={250}
+                              name="title"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="title"
+                                label="Title"
+                                maxLength={250}
+                                name="title"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -207,9 +274,44 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Name"
                             maxLength={250}
                             name="name"
@@ -218,7 +320,39 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Name"
+                              maxLength={250}
+                              name="name"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="name"
+                                label="Name"
+                                maxLength={250}
+                                name="name"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -314,9 +448,44 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Description"
                             maxLength={250}
                             name="description"
@@ -325,7 +494,39 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Description"
+                              maxLength={250}
+                              name="description"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="description"
+                                label="Description"
+                                maxLength={250}
+                                name="description"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -424,7 +625,40 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           <select
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={false}
+<<<<<<< HEAD
                             id="type"
+=======
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Value Type"
                             name="type"
                             onChange={[Function]}
@@ -433,6 +667,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             type="select"
                             value="string"
                           >
+<<<<<<< HEAD
                             <option
                               value="string"
                             >
@@ -454,6 +689,57 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                               Boolean
                             </option>
                           </select>
+=======
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="select"
+                              disabled={false}
+                              inputRef={[Function]}
+                              label="Value Type"
+                              name="type"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value="string"
+                            >
+                              <select
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                disabled={false}
+                                id="type"
+                                label="Value Type"
+                                name="type"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="select"
+                                value="string"
+                              >
+                                <option
+                                  value="string"
+                                >
+                                  String
+                                </option>
+                                <option
+                                  value="integer"
+                                >
+                                  Integer
+                                </option>
+                                <option
+                                  value="double"
+                                >
+                                  Double
+                                </option>
+                                <option
+                                  value="boolean"
+                                >
+                                  Boolean
+                                </option>
+                              </select>
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -546,9 +832,44 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Default value"
                             maxLength={250}
                             name="default_value"
@@ -556,7 +877,37 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                             placeholder=""
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Default value"
+                              maxLength={250}
+                              name="default_value"
+                              onChange={[Function]}
+                              placeholder=""
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="default_value"
+                                label="Default value"
+                                maxLength={250}
+                                name="default_value"
+                                onChange={[Function]}
+                                placeholder=""
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -693,9 +1044,44 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           type="text"
                           value="A parameter title"
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Title"
                             maxLength={250}
                             name="title"
@@ -704,7 +1090,39 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             required={true}
                             type="text"
                             value="A parameter title"
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Title"
+                              maxLength={250}
+                              name="title"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="A parameter title"
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="title"
+                                label="Title"
+                                maxLength={250}
+                                name="title"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="A parameter title"
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -800,9 +1218,44 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           type="text"
                           value="A parameter name"
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Name"
                             maxLength={250}
                             name="name"
@@ -811,7 +1264,39 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             required={true}
                             type="text"
                             value="A parameter name"
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Name"
+                              maxLength={250}
+                              name="name"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="A parameter name"
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="name"
+                                label="Name"
+                                maxLength={250}
+                                name="name"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="A parameter name"
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -907,9 +1392,44 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           type="text"
                           value="A parameter descriptions"
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Description"
                             maxLength={250}
                             name="description"
@@ -918,7 +1438,39 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             required={true}
                             type="text"
                             value="A parameter descriptions"
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Description"
+                              maxLength={250}
+                              name="description"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="A parameter descriptions"
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="description"
+                                label="Description"
+                                maxLength={250}
+                                name="description"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="A parameter descriptions"
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1017,7 +1569,40 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           <select
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={true}
+<<<<<<< HEAD
                             id="type"
+=======
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Value Type"
                             name="type"
                             onChange={[Function]}
@@ -1026,6 +1611,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             type="select"
                             value="string"
                           >
+<<<<<<< HEAD
                             <option
                               value="string"
                             >
@@ -1047,6 +1633,57 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                               Boolean
                             </option>
                           </select>
+=======
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="select"
+                              disabled={true}
+                              inputRef={[Function]}
+                              label="Value Type"
+                              name="type"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value="string"
+                            >
+                              <select
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                disabled={true}
+                                id="type"
+                                label="Value Type"
+                                name="type"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="select"
+                                value="string"
+                              >
+                                <option
+                                  value="string"
+                                >
+                                  String
+                                </option>
+                                <option
+                                  value="integer"
+                                >
+                                  Integer
+                                </option>
+                                <option
+                                  value="double"
+                                >
+                                  Double
+                                </option>
+                                <option
+                                  value="boolean"
+                                >
+                                  Boolean
+                                </option>
+                              </select>
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1139,9 +1776,44 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           type="text"
                           value="test"
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Default value"
                             maxLength={250}
                             name="default_value"
@@ -1149,7 +1821,37 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                             placeholder=""
                             type="text"
                             value="test"
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Default value"
+                              maxLength={250}
+                              name="default_value"
+                              onChange={[Function]}
+                              placeholder=""
+                              type="text"
+                              value="test"
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="default_value"
+                                label="Default value"
+                                maxLength={250}
+                                name="default_value"
+                                onChange={[Function]}
+                                placeholder=""
+                                type="text"
+                                value="test"
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1267,9 +1969,44 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Title"
                             maxLength={250}
                             name="title"
@@ -1278,7 +2015,39 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Title"
+                              maxLength={250}
+                              name="title"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="title"
+                                label="Title"
+                                maxLength={250}
+                                name="title"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1374,9 +2143,44 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Name"
                             maxLength={250}
                             name="name"
@@ -1385,7 +2189,39 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Name"
+                              maxLength={250}
+                              name="name"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="name"
+                                label="Name"
+                                maxLength={250}
+                                name="name"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1481,9 +2317,44 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Description"
                             maxLength={250}
                             name="description"
@@ -1492,7 +2363,39 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             required={true}
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Description"
+                              maxLength={250}
+                              name="description"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="description"
+                                label="Description"
+                                maxLength={250}
+                                name="description"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1591,7 +2494,40 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           <select
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={false}
+<<<<<<< HEAD
                             id="type"
+=======
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Value Type"
                             name="type"
                             onChange={[Function]}
@@ -1600,6 +2536,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             type="select"
                             value="string"
                           >
+<<<<<<< HEAD
                             <option
                               value="string"
                             >
@@ -1621,6 +2558,57 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                               Boolean
                             </option>
                           </select>
+=======
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="select"
+                              disabled={false}
+                              inputRef={[Function]}
+                              label="Value Type"
+                              name="type"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="select"
+                              value="string"
+                            >
+                              <select
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                disabled={false}
+                                id="type"
+                                label="Value Type"
+                                name="type"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="select"
+                                value="string"
+                              >
+                                <option
+                                  value="string"
+                                >
+                                  String
+                                </option>
+                                <option
+                                  value="integer"
+                                >
+                                  Integer
+                                </option>
+                                <option
+                                  value="double"
+                                >
+                                  Double
+                                </option>
+                                <option
+                                  value="boolean"
+                                >
+                                  Boolean
+                                </option>
+                              </select>
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>
@@ -1713,9 +2701,44 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           type="text"
                           value=""
                         >
+<<<<<<< HEAD
                           <input
                             className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
+=======
+                          <StyledComponent
+                            componentClass="input"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "Feedback": [Function],
+                                "SIZES": Array [
+                                  "small",
+                                  "large",
+                                ],
+                                "Static": [Function],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormControl-sc-1amoaox-0",
+                                  "isStatic": false,
+                                  "lastClassName": "hBmgnF",
+                                  "rules": Array [
+                                    [Function],
+                                  ],
+                                },
+                                "displayName": "FormControl",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
+                            inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                             label="Default value"
                             maxLength={250}
                             name="default_value"
@@ -1723,7 +2746,37 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                             placeholder=""
                             type="text"
                             value=""
+<<<<<<< HEAD
                           />
+=======
+                          >
+                            <FormControl
+                              bsClass="form-control"
+                              className="FormControl-sc-1amoaox-0 hBmgnF"
+                              componentClass="input"
+                              inputRef={[Function]}
+                              label="Default value"
+                              maxLength={250}
+                              name="default_value"
+                              onChange={[Function]}
+                              placeholder=""
+                              type="text"
+                              value=""
+                            >
+                              <input
+                                className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                id="default_value"
+                                label="Default value"
+                                maxLength={250}
+                                name="default_value"
+                                onChange={[Function]}
+                                placeholder=""
+                                type="text"
+                                value=""
+                              />
+                            </FormControl>
+                          </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                         </FormControl>
                       </FormControl>
                       <HelpBlock>

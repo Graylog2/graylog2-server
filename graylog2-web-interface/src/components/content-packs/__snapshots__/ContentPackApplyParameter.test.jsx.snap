@@ -139,6 +139,38 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
+<<<<<<< HEAD
+=======
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "Feedback": [Function],
+                                      "SIZES": Array [
+                                        "small",
+                                        "large",
+                                      ],
+                                      "Static": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormControl-sc-1amoaox-0",
+                                        "isStatic": false,
+                                        "lastClassName": "hBmgnF",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "FormControl",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
                                   label="Config Key"
                                   name="config_key"
@@ -148,9 +180,17 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="config_key"
+=======
+                                  <FormControl
+                                    bsClass="form-control"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                                    componentClass="select"
+                                    inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                     label="Config Key"
                                     name="config_key"
                                     onChange={[Function]}
@@ -159,8 +199,20 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     type="select"
                                     value=""
                                   >
+<<<<<<< HEAD
                                     <option
                                       key="EMPTY"
+=======
+                                    <select
+                                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                      id="config_key"
+                                      label="Config Key"
+                                      name="config_key"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="select"
+>>>>>>> 46caba27d0... snapshots
                                       value=""
                                     >
                                       Choose Config Key
@@ -265,6 +317,38 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
+<<<<<<< HEAD
+=======
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "Feedback": [Function],
+                                      "SIZES": Array [
+                                        "small",
+                                        "large",
+                                      ],
+                                      "Static": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormControl-sc-1amoaox-0",
+                                        "isStatic": false,
+                                        "lastClassName": "hBmgnF",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "FormControl",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
                                   label="Parameter"
                                   name="parameter"
@@ -274,9 +358,17 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="parameter"
+=======
+                                  <FormControl
+                                    bsClass="form-control"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                                    componentClass="select"
+                                    inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                     label="Parameter"
                                     name="parameter"
                                     onChange={[Function]}
@@ -285,8 +377,20 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     type="select"
                                     value=""
                                   >
+<<<<<<< HEAD
                                     <option
                                       key="EMPTY"
+=======
+                                    <select
+                                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                      id="parameter"
+                                      label="Parameter"
+                                      name="parameter"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="select"
+>>>>>>> 46caba27d0... snapshots
                                       value=""
                                     >
                                       Choose...
@@ -659,6 +763,38 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
+<<<<<<< HEAD
+=======
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "Feedback": [Function],
+                                      "SIZES": Array [
+                                        "small",
+                                        "large",
+                                      ],
+                                      "Static": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormControl-sc-1amoaox-0",
+                                        "isStatic": false,
+                                        "lastClassName": "hBmgnF",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "FormControl",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
                                   label="Config Key"
                                   name="config_key"
@@ -668,9 +804,17 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="config_key"
+=======
+                                  <FormControl
+                                    bsClass="form-control"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                                    componentClass="select"
+                                    inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                     label="Config Key"
                                     name="config_key"
                                     onChange={[Function]}
@@ -679,8 +823,20 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                     type="select"
                                     value=""
                                   >
+<<<<<<< HEAD
                                     <option
                                       key="EMPTY"
+=======
+                                    <select
+                                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                      id="config_key"
+                                      label="Config Key"
+                                      name="config_key"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="select"
+>>>>>>> 46caba27d0... snapshots
                                       value=""
                                     >
                                       Choose Config Key
@@ -791,6 +947,38 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
+<<<<<<< HEAD
+=======
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "Feedback": [Function],
+                                      "SIZES": Array [
+                                        "small",
+                                        "large",
+                                      ],
+                                      "Static": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormControl-sc-1amoaox-0",
+                                        "isStatic": false,
+                                        "lastClassName": "hBmgnF",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "FormControl",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
                                   label="Parameter"
                                   name="parameter"
@@ -800,9 +988,17 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="parameter"
+=======
+                                  <FormControl
+                                    bsClass="form-control"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                                    componentClass="select"
+                                    inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                     label="Parameter"
                                     name="parameter"
                                     onChange={[Function]}
@@ -811,8 +1007,20 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                     type="select"
                                     value=""
                                   >
+<<<<<<< HEAD
                                     <option
                                       key="EMPTY"
+=======
+                                    <select
+                                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                      id="parameter"
+                                      label="Parameter"
+                                      name="parameter"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="select"
+>>>>>>> 46caba27d0... snapshots
                                       value=""
                                     >
                                       Create a parameter first
@@ -1096,6 +1304,38 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
+<<<<<<< HEAD
+=======
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "Feedback": [Function],
+                                      "SIZES": Array [
+                                        "small",
+                                        "large",
+                                      ],
+                                      "Static": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormControl-sc-1amoaox-0",
+                                        "isStatic": false,
+                                        "lastClassName": "hBmgnF",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "FormControl",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
                                   label="Config Key"
                                   name="config_key"
@@ -1105,9 +1345,17 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="config_key"
+=======
+                                  <FormControl
+                                    bsClass="form-control"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                                    componentClass="select"
+                                    inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                     label="Config Key"
                                     name="config_key"
                                     onChange={[Function]}
@@ -1116,8 +1364,20 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                     type="select"
                                     value=""
                                   >
+<<<<<<< HEAD
                                     <option
                                       key="EMPTY"
+=======
+                                    <select
+                                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                      id="config_key"
+                                      label="Config Key"
+                                      name="config_key"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="select"
+>>>>>>> 46caba27d0... snapshots
                                       value=""
                                     >
                                       Choose Config Key
@@ -1222,6 +1482,38 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   bsClass="form-control"
                                   className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
+<<<<<<< HEAD
+=======
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "Feedback": [Function],
+                                      "SIZES": Array [
+                                        "small",
+                                        "large",
+                                      ],
+                                      "Static": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "FormControl-sc-1amoaox-0",
+                                        "isStatic": false,
+                                        "lastClassName": "hBmgnF",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "FormControl",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "FormControl-sc-1amoaox-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                   inputRef={[Function]}
                                   label="Parameter"
                                   name="parameter"
@@ -1231,9 +1523,17 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   type="select"
                                   value=""
                                 >
+<<<<<<< HEAD
                                   <select
                                     className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="parameter"
+=======
+                                  <FormControl
+                                    bsClass="form-control"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF"
+                                    componentClass="select"
+                                    inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                     label="Parameter"
                                     name="parameter"
                                     onChange={[Function]}
@@ -1242,8 +1542,20 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                     type="select"
                                     value=""
                                   >
+<<<<<<< HEAD
                                     <option
                                       key="EMPTY"
+=======
+                                    <select
+                                      className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                      id="parameter"
+                                      label="Parameter"
+                                      name="parameter"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="select"
+>>>>>>> 46caba27d0... snapshots
                                       value=""
                                     >
                                       Choose...

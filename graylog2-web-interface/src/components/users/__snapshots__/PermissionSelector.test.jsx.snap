@@ -369,9 +369,73 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         name="filter-streams-data-filter"
                                                                         placeholder=""
                                                                         type="text"
+<<<<<<< HEAD
                                                                       />
                                                                     </FormControl>
                                                                   </FormControl>
+=======
+                                                                      >
+                                                                        <StyledComponent
+                                                                          componentClass="input"
+                                                                          forwardedComponent={
+                                                                            Object {
+                                                                              "$$typeof": Symbol(react.forward_ref),
+                                                                              "Feedback": [Function],
+                                                                              "SIZES": Array [
+                                                                                "small",
+                                                                                "large",
+                                                                              ],
+                                                                              "Static": [Function],
+                                                                              "attrs": Array [],
+                                                                              "componentStyle": ComponentStyle {
+                                                                                "componentId": "FormControl-sc-1amoaox-0",
+                                                                                "isStatic": false,
+                                                                                "lastClassName": "hBmgnF",
+                                                                                "rules": Array [
+                                                                                  [Function],
+                                                                                ],
+                                                                              },
+                                                                              "displayName": "FormControl",
+                                                                              "foldedComponentIds": Array [],
+                                                                              "render": [Function],
+                                                                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                                              "target": [Function],
+                                                                              "toString": [Function],
+                                                                              "warnTooManyClasses": [Function],
+                                                                              "withComponent": [Function],
+                                                                            }
+                                                                          }
+                                                                          forwardedRef={null}
+                                                                          inputRef={[Function]}
+                                                                          label="Filter Streams"
+                                                                          name="filter-streams-data-filter"
+                                                                          placeholder=""
+                                                                          type="text"
+                                                                        >
+                                                                          <FormControl
+                                                                            bsClass="form-control"
+                                                                            className="FormControl-sc-1amoaox-0 hBmgnF"
+                                                                            componentClass="input"
+                                                                            inputRef={[Function]}
+                                                                            label="Filter Streams"
+                                                                            name="filter-streams-data-filter"
+                                                                            placeholder=""
+                                                                            type="text"
+                                                                          >
+                                                                            <input
+                                                                              className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                                                              id="filter-streams-data-filter"
+                                                                              label="Filter Streams"
+                                                                              name="filter-streams-data-filter"
+                                                                              placeholder=""
+                                                                              type="text"
+                                                                            />
+                                                                          </FormControl>
+                                                                        </StyledComponent>
+                                                                      </FormControl>
+                                                                    </div>
+                                                                  </InputWrapper>
+>>>>>>> 46caba27d0... snapshots
                                                                 </div>
                                                               </InputWrapper>
                                                             </div>
@@ -1110,9 +1174,73 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                         name="filter-dashboards-data-filter"
                                                                         placeholder=""
                                                                         type="text"
+<<<<<<< HEAD
                                                                       />
                                                                     </FormControl>
                                                                   </FormControl>
+=======
+                                                                      >
+                                                                        <StyledComponent
+                                                                          componentClass="input"
+                                                                          forwardedComponent={
+                                                                            Object {
+                                                                              "$$typeof": Symbol(react.forward_ref),
+                                                                              "Feedback": [Function],
+                                                                              "SIZES": Array [
+                                                                                "small",
+                                                                                "large",
+                                                                              ],
+                                                                              "Static": [Function],
+                                                                              "attrs": Array [],
+                                                                              "componentStyle": ComponentStyle {
+                                                                                "componentId": "FormControl-sc-1amoaox-0",
+                                                                                "isStatic": false,
+                                                                                "lastClassName": "hBmgnF",
+                                                                                "rules": Array [
+                                                                                  [Function],
+                                                                                ],
+                                                                              },
+                                                                              "displayName": "FormControl",
+                                                                              "foldedComponentIds": Array [],
+                                                                              "render": [Function],
+                                                                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                                              "target": [Function],
+                                                                              "toString": [Function],
+                                                                              "warnTooManyClasses": [Function],
+                                                                              "withComponent": [Function],
+                                                                            }
+                                                                          }
+                                                                          forwardedRef={null}
+                                                                          inputRef={[Function]}
+                                                                          label="Filter Dashboards"
+                                                                          name="filter-dashboards-data-filter"
+                                                                          placeholder=""
+                                                                          type="text"
+                                                                        >
+                                                                          <FormControl
+                                                                            bsClass="form-control"
+                                                                            className="FormControl-sc-1amoaox-0 hBmgnF"
+                                                                            componentClass="input"
+                                                                            inputRef={[Function]}
+                                                                            label="Filter Dashboards"
+                                                                            name="filter-dashboards-data-filter"
+                                                                            placeholder=""
+                                                                            type="text"
+                                                                          >
+                                                                            <input
+                                                                              className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                                                              id="filter-dashboards-data-filter"
+                                                                              label="Filter Dashboards"
+                                                                              name="filter-dashboards-data-filter"
+                                                                              placeholder=""
+                                                                              type="text"
+                                                                            />
+                                                                          </FormControl>
+                                                                        </StyledComponent>
+                                                                      </FormControl>
+                                                                    </div>
+                                                                  </InputWrapper>
+>>>>>>> 46caba27d0... snapshots
                                                                 </div>
                                                               </InputWrapper>
                                                             </div>
@@ -2046,9 +2174,73 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         name="filter-streams-data-filter"
                                                                         placeholder=""
                                                                         type="text"
+<<<<<<< HEAD
                                                                       />
                                                                     </FormControl>
                                                                   </FormControl>
+=======
+                                                                      >
+                                                                        <StyledComponent
+                                                                          componentClass="input"
+                                                                          forwardedComponent={
+                                                                            Object {
+                                                                              "$$typeof": Symbol(react.forward_ref),
+                                                                              "Feedback": [Function],
+                                                                              "SIZES": Array [
+                                                                                "small",
+                                                                                "large",
+                                                                              ],
+                                                                              "Static": [Function],
+                                                                              "attrs": Array [],
+                                                                              "componentStyle": ComponentStyle {
+                                                                                "componentId": "FormControl-sc-1amoaox-0",
+                                                                                "isStatic": false,
+                                                                                "lastClassName": "hBmgnF",
+                                                                                "rules": Array [
+                                                                                  [Function],
+                                                                                ],
+                                                                              },
+                                                                              "displayName": "FormControl",
+                                                                              "foldedComponentIds": Array [],
+                                                                              "render": [Function],
+                                                                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                                              "target": [Function],
+                                                                              "toString": [Function],
+                                                                              "warnTooManyClasses": [Function],
+                                                                              "withComponent": [Function],
+                                                                            }
+                                                                          }
+                                                                          forwardedRef={null}
+                                                                          inputRef={[Function]}
+                                                                          label="Filter Streams"
+                                                                          name="filter-streams-data-filter"
+                                                                          placeholder=""
+                                                                          type="text"
+                                                                        >
+                                                                          <FormControl
+                                                                            bsClass="form-control"
+                                                                            className="FormControl-sc-1amoaox-0 hBmgnF"
+                                                                            componentClass="input"
+                                                                            inputRef={[Function]}
+                                                                            label="Filter Streams"
+                                                                            name="filter-streams-data-filter"
+                                                                            placeholder=""
+                                                                            type="text"
+                                                                          >
+                                                                            <input
+                                                                              className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                                                              id="filter-streams-data-filter"
+                                                                              label="Filter Streams"
+                                                                              name="filter-streams-data-filter"
+                                                                              placeholder=""
+                                                                              type="text"
+                                                                            />
+                                                                          </FormControl>
+                                                                        </StyledComponent>
+                                                                      </FormControl>
+                                                                    </div>
+                                                                  </InputWrapper>
+>>>>>>> 46caba27d0... snapshots
                                                                 </div>
                                                               </InputWrapper>
                                                             </div>
@@ -2787,9 +2979,73 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                         name="filter-dashboards-data-filter"
                                                                         placeholder=""
                                                                         type="text"
+<<<<<<< HEAD
                                                                       />
                                                                     </FormControl>
                                                                   </FormControl>
+=======
+                                                                      >
+                                                                        <StyledComponent
+                                                                          componentClass="input"
+                                                                          forwardedComponent={
+                                                                            Object {
+                                                                              "$$typeof": Symbol(react.forward_ref),
+                                                                              "Feedback": [Function],
+                                                                              "SIZES": Array [
+                                                                                "small",
+                                                                                "large",
+                                                                              ],
+                                                                              "Static": [Function],
+                                                                              "attrs": Array [],
+                                                                              "componentStyle": ComponentStyle {
+                                                                                "componentId": "FormControl-sc-1amoaox-0",
+                                                                                "isStatic": false,
+                                                                                "lastClassName": "hBmgnF",
+                                                                                "rules": Array [
+                                                                                  [Function],
+                                                                                ],
+                                                                              },
+                                                                              "displayName": "FormControl",
+                                                                              "foldedComponentIds": Array [],
+                                                                              "render": [Function],
+                                                                              "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                                              "target": [Function],
+                                                                              "toString": [Function],
+                                                                              "warnTooManyClasses": [Function],
+                                                                              "withComponent": [Function],
+                                                                            }
+                                                                          }
+                                                                          forwardedRef={null}
+                                                                          inputRef={[Function]}
+                                                                          label="Filter Dashboards"
+                                                                          name="filter-dashboards-data-filter"
+                                                                          placeholder=""
+                                                                          type="text"
+                                                                        >
+                                                                          <FormControl
+                                                                            bsClass="form-control"
+                                                                            className="FormControl-sc-1amoaox-0 hBmgnF"
+                                                                            componentClass="input"
+                                                                            inputRef={[Function]}
+                                                                            label="Filter Dashboards"
+                                                                            name="filter-dashboards-data-filter"
+                                                                            placeholder=""
+                                                                            type="text"
+                                                                          >
+                                                                            <input
+                                                                              className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                                                              id="filter-dashboards-data-filter"
+                                                                              label="Filter Dashboards"
+                                                                              name="filter-dashboards-data-filter"
+                                                                              placeholder=""
+                                                                              type="text"
+                                                                            />
+                                                                          </FormControl>
+                                                                        </StyledComponent>
+                                                                      </FormControl>
+                                                                    </div>
+                                                                  </InputWrapper>
+>>>>>>> 46caba27d0... snapshots
                                                                 </div>
                                                               </InputWrapper>
                                                             </div>

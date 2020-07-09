@@ -102,8 +102,40 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 fKSsjP"
+                              className="FormControl-sc-1amoaox-0 kmJcge"
                               componentClass="textarea"
+<<<<<<< HEAD
+=======
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": false,
+                                    "lastClassName": "hBmgnF",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                               inputRef={[Function]}
                               label="Pattern"
                               name="pattern-input"
@@ -114,9 +146,17 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               type="textarea"
                               value=""
                             >
+<<<<<<< HEAD
                               <textarea
-                                className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                 id="pattern-input"
+=======
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hBmgnF"
+                                componentClass="textarea"
+                                inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                 label="Pattern"
                                 name="pattern-input"
                                 onChange={[Function]}
@@ -125,8 +165,26 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                 rows={9}
                                 type="textarea"
                                 value=""
+<<<<<<< HEAD
                               />
                             </FormControl>
+=======
+                              >
+                                <textarea
+                                  className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                  id="pattern-input"
+                                  label="Pattern"
+                                  name="pattern-input"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  rows={9}
+                                  type="textarea"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                           </FormControl>
                           <HelpBlock>
                             <HelpBlock
@@ -241,8 +299,40 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <FormControl
                                 autoComplete="off"
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 fKSsjP"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="input"
+<<<<<<< HEAD
+=======
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hBmgnF",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                 inputRef={[Function]}
                                 label="Filter pattern"
                                 name="pattern-selector"
@@ -254,8 +344,15 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               >
                                 <input
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+<<<<<<< HEAD
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                   id="pattern-selector"
+=======
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 hBmgnF"
+                                  componentClass="input"
+                                  inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                   label="Filter pattern"
                                   name="pattern-selector"
                                   onChange={[Function]}
@@ -263,8 +360,26 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   placeholder=""
                                   type="text"
                                   value=""
+<<<<<<< HEAD
                                 />
                               </FormControl>
+=======
+                                >
+                                  <input
+                                    autoComplete="off"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                    id="pattern-selector"
+                                    label="Filter pattern"
+                                    name="pattern-selector"
+                                    onChange={[Function]}
+                                    onKeyDown={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                             </FormControl>
                           </span>
                         </InputWrapper>
@@ -322,31 +437,37 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <span
                                 className="addButton"
                               >
-                                <Button
+                                <ForwardRef
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
+                                  <Button__StyledButton
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 bNulii"
-                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <button
-                                      className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="xsmall"
+                                      bsStyle="primary"
+                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                                       disabled={false}
                                       onClick={[Function]}
-                                      type="button"
                                     >
-                                      Add
-                                    </button>
-                                  </Button>
-                                </Button>
+                                      <button
+                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Add
+                                      </button>
+                                    </Button>
+                                  </Button__StyledButton>
+                                </ForwardRef>
                               </span>
                             </p>
                           </span>
@@ -393,31 +514,37 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <span
                                 className="addButton"
                               >
-                                <Button
+                                <ForwardRef
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
+                                  <Button__StyledButton
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 bNulii"
-                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <button
-                                      className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="xsmall"
+                                      bsStyle="primary"
+                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                                       disabled={false}
                                       onClick={[Function]}
-                                      type="button"
                                     >
-                                      Add
-                                    </button>
-                                  </Button>
-                                </Button>
+                                      <button
+                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Add
+                                      </button>
+                                    </Button>
+                                  </Button__StyledButton>
+                                </ForwardRef>
                               </span>
                             </p>
                           </span>
@@ -464,31 +591,37 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <span
                                 className="addButton"
                               >
-                                <Button
+                                <ForwardRef
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
+                                  <Button__StyledButton
                                     bsSize="xsmall"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 bNulii"
-                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <button
-                                      className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="xsmall"
+                                      bsStyle="primary"
+                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                                       disabled={false}
                                       onClick={[Function]}
-                                      type="button"
                                     >
-                                      Add
-                                    </button>
-                                  </Button>
-                                </Button>
+                                      <button
+                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Add
+                                      </button>
+                                    </Button>
+                                  </Button__StyledButton>
+                                </ForwardRef>
                               </span>
                             </p>
                           </span>
@@ -594,8 +727,40 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                           >
                             <FormControl
                               bsClass="form-control"
-                              className="FormControl-sc-1amoaox-0 fKSsjP"
+                              className="FormControl-sc-1amoaox-0 kmJcge"
                               componentClass="textarea"
+<<<<<<< HEAD
+=======
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": false,
+                                    "lastClassName": "hBmgnF",
+                                    "rules": Array [
+                                      [Function],
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                               inputRef={[Function]}
                               label="Pattern"
                               name="pattern-input"
@@ -606,9 +771,17 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               type="textarea"
                               value=""
                             >
+<<<<<<< HEAD
                               <textarea
-                                className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                 id="pattern-input"
+=======
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hBmgnF"
+                                componentClass="textarea"
+                                inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                 label="Pattern"
                                 name="pattern-input"
                                 onChange={[Function]}
@@ -617,8 +790,26 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                 rows={9}
                                 type="textarea"
                                 value=""
+<<<<<<< HEAD
                               />
                             </FormControl>
+=======
+                              >
+                                <textarea
+                                  className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                  id="pattern-input"
+                                  label="Pattern"
+                                  name="pattern-input"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  rows={9}
+                                  type="textarea"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                           </FormControl>
                           <HelpBlock>
                             <HelpBlock
@@ -718,8 +909,40 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               <FormControl
                                 autoComplete="off"
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 fKSsjP"
+                                className="FormControl-sc-1amoaox-0 kmJcge"
                                 componentClass="input"
+<<<<<<< HEAD
+=======
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hBmgnF",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+>>>>>>> 46caba27d0... snapshots
                                 inputRef={[Function]}
                                 label="Filter pattern"
                                 name="pattern-selector"
@@ -731,8 +954,15 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               >
                                 <input
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+<<<<<<< HEAD
+                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                   id="pattern-selector"
+=======
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 hBmgnF"
+                                  componentClass="input"
+                                  inputRef={[Function]}
+>>>>>>> 46caba27d0... snapshots
                                   label="Filter pattern"
                                   name="pattern-selector"
                                   onChange={[Function]}
@@ -740,8 +970,26 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   placeholder=""
                                   type="text"
                                   value=""
+<<<<<<< HEAD
                                 />
                               </FormControl>
+=======
+                                >
+                                  <input
+                                    autoComplete="off"
+                                    className="FormControl-sc-1amoaox-0 hBmgnF form-control"
+                                    id="pattern-selector"
+                                    label="Filter pattern"
+                                    name="pattern-selector"
+                                    onChange={[Function]}
+                                    onKeyDown={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+>>>>>>> 46caba27d0... snapshots
                             </FormControl>
                           </span>
                         </InputWrapper>
