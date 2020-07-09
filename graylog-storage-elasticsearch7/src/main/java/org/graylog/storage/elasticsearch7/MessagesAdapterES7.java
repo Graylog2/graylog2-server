@@ -54,7 +54,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     }
 
     @Override
-    public ResultMessage get(String messageId, String index) throws IOException, DocumentNotFoundException {
+    public ResultMessage get(String messageId, String index) throws DocumentNotFoundException {
         final GetRequest getRequest = new GetRequest(index, messageId);
 
         final GetResponse result = this.client.execute((c, requestOptions) -> c.get(getRequest, requestOptions));
@@ -67,7 +67,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     }
 
     @Override
-    public List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException {
+    public List<String> analyze(String toAnalyze, String index, String analyzer) {
         final AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(index, analyzer, toAnalyze);
 
         final AnalyzeResponse result = client.execute((c, requestOptions) -> c.indices().analyze(analyzeRequest, requestOptions));
