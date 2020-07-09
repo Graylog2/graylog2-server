@@ -18,7 +18,6 @@ package org.graylog.security.entities;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.security.shares.EntityShareResponse.MissingDependency;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -41,7 +40,7 @@ public class EntityDependencyResolver {
         this.grnRegistry = grnRegistry;
     }
 
-    public ImmutableSet<MissingDependency> resolve(GRN entityGRN) {
+    public ImmutableSet<EntityDependency> resolve(GRN entityGRN) {
         // TODO: Create a method in ContentPackService to only select some exerpts instead of loading all
         final ImmutableMap<GRN, String> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
@@ -56,7 +55,7 @@ public class EntityDependencyResolver {
         return descriptors.stream()
                 .map(descriptor -> grnRegistry.newGRN(descriptor.type().name(), descriptor.id().id()))
                 .filter(grn -> !entityGRN.equals(grn))
-                .map(grn -> MissingDependency.create(grn.toString(), entityExcerpts.get(grn), ImmutableSet.of()))
+                .map(grn -> EntityDependency.create(grn, entityExcerpts.get(grn), ImmutableSet.of()))
                 .collect(ImmutableSet.toImmutableSet());
     }
 }

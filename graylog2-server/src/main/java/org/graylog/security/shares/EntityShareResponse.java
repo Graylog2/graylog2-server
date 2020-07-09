@@ -23,11 +23,12 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.security.Capability;
+import org.graylog.security.entities.EntityDependency;
 import org.graylog2.utilities.GRN;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 @AutoValue
@@ -52,7 +53,7 @@ public abstract class EntityShareResponse {
     public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
 
     @JsonProperty("missing_dependencies")
-    public abstract ImmutableMap<GRN, MissingDependency> missingDependencies();
+    public abstract ImmutableMap<GRN, Collection<EntityDependency>> missingDependencies();
 
     public static Builder builder() {
         return Builder.create();
@@ -87,7 +88,7 @@ public abstract class EntityShareResponse {
         public abstract Builder selectedGranteeCapabilities(Map<GRN, Capability> selectedGranteeCapabilities);
 
         @JsonProperty("missing_dependencies")
-        public abstract Builder missingDependencies(Map<GRN, MissingDependency> missingDependencies);
+        public abstract Builder missingDependencies(Map<GRN, Collection<EntityDependency>> missingDependencies);
 
         public abstract EntityShareResponse build();
     }
@@ -142,25 +143,6 @@ public abstract class EntityShareResponse {
                                          @JsonProperty("grantee") GRN grantee,
                                          @JsonProperty("capability") Capability capability) {
             return new AutoValue_EntityShareResponse_ActiveShare(grant, grantee, capability);
-        }
-    }
-
-    @AutoValue
-    public static abstract class MissingDependency {
-        @JsonProperty("id")
-        public abstract String id();
-
-        @JsonProperty("title")
-        public abstract String title();
-
-        @JsonProperty("owners")
-        public abstract ImmutableSet<String> owners();
-
-        @JsonCreator
-        public static MissingDependency create(@JsonProperty("id") String id,
-                                               @JsonProperty("title") String title,
-                                               @JsonProperty("owners") ImmutableSet<String> owners) {
-            return new AutoValue_EntityShareResponse_MissingDependency(id, Objects.toString(title, "<no title>"), owners);
         }
     }
 }

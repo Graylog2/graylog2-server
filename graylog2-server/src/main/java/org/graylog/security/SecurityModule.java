@@ -16,6 +16,7 @@
  */
 package org.graylog.security;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
@@ -26,6 +27,8 @@ public class SecurityModule extends PluginModule {
     protected void configure() {
 
         bind(BuiltinCapabilities.class).asEagerSingleton();
+
+        install(new FactoryModuleBuilder().implement(UserAuthorizer.class, UserAuthorizer.class).build(UserAuthorizer.Factory.class));
 
         OptionalBinder.newOptionalBinder(binder(), GrantPermissionResolver.class)
                 .setDefault().to(DefaultGrantPermissionResolver.class);
