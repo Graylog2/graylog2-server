@@ -198,6 +198,7 @@ public class UsersResource extends RestResource {
     @Timed
     @Path("/paginated")
     @ApiOperation(value = "Get paginated list of users")
+    @RequiresPermissions(RestPermissions.USERS_LIST)
     @Produces(MediaType.APPLICATION_JSON)
     public UserPageListResponse getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
