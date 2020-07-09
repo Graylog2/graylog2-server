@@ -86,7 +86,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     private List<NodeResponse> nodes() {
-        return client.execute(catApi::nodes);
+        return catApi.nodes();
     }
 
     @Override
@@ -128,7 +128,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
             return Optional.empty();
         }
         final Request request = new Request("GET", "/_nodes/" + nodeId);
-        return Optional.of(client.execute((c, requestOptions) -> jsonApi.perform(c, request, requestOptions)))
+        return Optional.of(jsonApi.perform(request, "Unable to retrieve node information for node id " + nodeId))
                 .map(jsonNode -> jsonNode.path("nodes").path(nodeId))
                 .filter(node -> !node.isMissingNode());
     }
@@ -175,8 +175,7 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     public PendingTasksStats pendingTasks() {
         final Request request = new Request("GET", "/_cluster/pending_tasks");
 
-        final JsonNode response = client.execute((c, requestOptions) -> jsonApi.perform(c, request, requestOptions),
-                "Couldn't read Elasticsearch pending cluster tasks");
+        final JsonNode response = jsonApi.perform(request, "Couldn't read Elasticsearch pending cluster tasks");
 
         final JsonNode pendingClusterTasks = response.path("tasks");
         final int pendingTasksSize = pendingClusterTasks.size();
@@ -194,8 +193,8 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     public ClusterStats clusterStats() {
         final Request request = new Request("GET", "/_cluster/stats/nodes");
 
-        final JsonNode clusterStatsResponseJson = client.execute((c, requestOptions) -> jsonApi.perform(c, request, requestOptions),
-        "Couldn't read Elasticsearch cluster stats");
+        final JsonNode clusterStatsResponseJson = jsonApi.perform(request,
+            "Couldn't read Elasticsearch cluster stats");
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
 
         String clusterVersion = null;

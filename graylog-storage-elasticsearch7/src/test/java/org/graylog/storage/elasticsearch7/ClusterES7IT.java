@@ -10,16 +10,11 @@ import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
-import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
-import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
-import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClusterES7IT extends ClusterIT {
     @Rule
@@ -35,8 +30,8 @@ public class ClusterES7IT extends ClusterIT {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         return new ClusterAdapterES7(elasticsearch.elasticsearchClient(),
                 timeout,
-                new CatApi(objectMapper),
-                new PlainJsonApi(objectMapper));
+                new CatApi(objectMapper, elasticsearch.elasticsearchClient()),
+                new PlainJsonApi(objectMapper, elasticsearch.elasticsearchClient()));
     }
 
     @Override
@@ -45,7 +40,7 @@ public class ClusterES7IT extends ClusterIT {
     }
 
     private NodeResponse currentNode() {
-        final List<NodeResponse> nodes = elasticsearch.elasticsearchClient().execute(catApi()::nodes);
+        final List<NodeResponse> nodes = catApi().nodes();
         return nodes.get(0);
     }
 
@@ -61,7 +56,7 @@ public class ClusterES7IT extends ClusterIT {
     }
 
     private CatApi catApi() {
-        return new CatApi(new ObjectMapperProvider().get());
+        return new CatApi(new ObjectMapperProvider().get(), elasticsearch.elasticsearchClient());
     }
 
     private MainResponse info() {
