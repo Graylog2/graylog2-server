@@ -664,7 +664,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -687,12 +687,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA submit-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -744,7 +744,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -768,13 +768,13 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA reset-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -858,7 +858,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                                     "isStatic": false,
-                                    "lastClassName": "lmPeF",
+                                    "lastClassName": "ioeTLv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -876,7 +876,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               forwardedRef={null}
                             >
                               <table
-                                className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
+                                className="DataTable__StyledTable-sc-1c22x1c-0 ioeTLv table scrollable"
                               >
                                 <thead>
                                   <tr>
@@ -1003,7 +1003,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "jVYrA",
+                                                        "lastClassName": "hpBclA",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1027,12 +1027,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                     bsClass="btn"
                                                     bsSize="xs"
                                                     bsStyle="info"
-                                                    className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                                    className="Button__StyledButton-c9cbmb-0 hpBclA"
                                                     disabled={false}
                                                     onClick={[Function]}
                                                   >
                                                     <button
-                                                      className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-xs btn-info"
+                                                      className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-xs btn-info"
                                                       disabled={false}
                                                       onClick={[Function]}
                                                       type="button"
