@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useContext } from 'react';
+import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import UsersStore from 'stores/users/UsersStore';
@@ -11,6 +12,12 @@ import { Col, Row } from 'components/graylog';
 
 import UserOverviewItem from './UserOverviewItem';
 import ClientAddressHead from './ClientAddressHead';
+
+const TableWrapper = styled.div`
+  .data-table {
+    overflow-x: visible;
+  }
+`;
 
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
@@ -42,18 +49,20 @@ const UsersOverview = () => {
 
   return (
     <Row className="content">
-      <Col md={12}>
-        <DataTable id="users-overview"
-                   className="table-hover"
-                   headers={headers}
-                   headerCellFormatter={_headerCellFormatter}
-                   sortByKey="fullName"
-                   rows={users.toJS()}
-                   filterBy="role"
-                  //  filterSuggestions={roles}
-                   dataRowFormatter={_userOverviewItem}
-                   filterKeys={filterKeys}
-                   filterLabel="Filter Users" />
+      <Col>
+        <TableWrapper>
+          <DataTable id="users-overview"
+                     className="table-hover"
+                     headers={headers}
+                     headerCellFormatter={_headerCellFormatter}
+                     sortByKey="fullName"
+                     rows={users.toJS()}
+                     filterBy="role"
+                     // filterSuggestions={roles}
+                     dataRowFormatter={_userOverviewItem}
+                     filterKeys={filterKeys}
+                     filterLabel="Filter Users" />
+        </TableWrapper>
       </Col>
     </Row>
   );
