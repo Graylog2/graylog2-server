@@ -1,10 +1,13 @@
-import React from 'react';
+import * as React from 'react';
+import PropTypes from 'prop-types';
 import { mount } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import mockComponent from 'helpers/mocking/MockComponent';
+import { admin } from 'fixtures/users';
 
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
+import CurrentUserContext from 'contexts/CurrentUserContext';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
@@ -26,30 +29,32 @@ const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="$
 jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 
 describe('Navigation', () => {
-  let currentUser;
   let Navigation;
 
-  beforeEach(() => {
-    currentUser = { permissions: [] };
-    const CurrentUserStore = {
-      getInitialState: jest.fn(() => ({ currentUser })),
-      listen: jest.fn(),
-      get: jest.fn(),
-    };
+  // We can't use prop types here, they don't work well together with mount and require
+  // eslint-disable-next-line react/prop-types
+  const SimpleNavigation = ({ component: Component, permissions, ...props }) => (
+    <CurrentUserContext.Provider value={{ ...admin, permissions }}>
+      <Component {...props} />
+    </CurrentUserContext.Provider>
+  );
 
-    jest.doMock('injection/StoreProvider', () => ({ getStore: () => CurrentUserStore }));
+  SimpleNavigation.defaultProps = {
+    location: { pathname: '/' },
+    permissions: [],
+  };
+
+  beforeEach(() => {
     // eslint-disable-next-line global-require
     Navigation = require('./Navigation');
+    setTimeout(() => {}, 0);
   });
 
   describe('has common elements', () => {
     let wrapper;
 
     beforeEach(() => {
-      wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+      wrapper = mount(<SimpleNavigation component={Navigation} />);
     });
 
     it('contains brand icon', () => {
@@ -63,8 +68,8 @@ describe('Navigation', () => {
     it('contains user menu including correct username', () => {
       const usermenu = wrapper.find('UserMenu');
 
-      expect(usermenu).toHaveProp('loginName', 'slowry');
-      expect(usermenu).toHaveProp('fullName', 'Sam Lowry');
+      expect(usermenu).toHaveProp('loginName', admin.username);
+      expect(usermenu).toHaveProp('fullName', admin.full_name);
     });
 
     it('contains help menu', () => {
@@ -108,66 +113,44 @@ describe('Navigation', () => {
     });
 
     it('contains top-level navigation element', () => {
-      const wrapper = mount(<Navigation permissions={[]}
-                                        fullName="Sam Lowry"
-                                        location={{ pathname: '/' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toExist();
     });
 
     it('prefix plugin navigation item paths with app prefix', () => {
       AppConfig.gl2AppPathPrefix.mockReturnValue('/my/crazy/prefix');
-      const wrapper = mount(<Navigation permissions={[]}
-                                        fullName="Sam Lowry"
-                                        location={{ pathname: '/' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
 
       expect(findLink(wrapper, 'Perpetuum Mobile')).toHaveProp('path', '/my/crazy/prefix/something');
     });
 
     it('does not contain navigation elements from plugins where permissions are missing', () => {
-      const wrapper = mount(<Navigation permissions={[]}
-                                        fullName="Sam Lowry"
-                                        location={{ pathname: '/' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
 
       expect(findLink(wrapper, 'Archives')).not.toExist();
     });
 
     it('contains restricted navigation elements from plugins if permissions are present', () => {
-      currentUser.permissions = ['archive:read'];
-      const wrapper = mount(<Navigation permissions={[]}
-                                        fullName="Sam Lowry"
-                                        location={{ pathname: '/' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} permissions={['archive:read']} />);
 
       expect(findLink(wrapper, 'Archives')).toExist();
     });
 
     it('does not render dropdown contributed by plugin if permissions for all elements are missing', () => {
-      const wrapper = mount(<Navigation permissions={[]}
-                                        fullName="Sam Lowry"
-                                        location={{ pathname: '/' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).not.toExist();
     });
 
     it('renders dropdown contributed by plugin if permissions are sufficient', () => {
-      currentUser.permissions = ['somethingelse', 'completelydifferent'];
-      const wrapper = mount(<Navigation fullName="Sam Lowry"
-                                        location={{ pathname: '/' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} permissions={['somethingelse', 'completelydifferent']} />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff"]')).toExist();
     });
 
     it('sets dropdown title based on match', () => {
-      currentUser.permissions = ['somethingelse', 'completelydifferent'];
-      const wrapper = mount(<Navigation fullName="Sam Lowry"
-                                        location={{ pathname: '/somethingelse' }}
-                                        loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} location={{ pathname: '/somethingelse' }} permissions={['somethingelse', 'completelydifferent']} />);
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
     });
@@ -175,8 +158,7 @@ describe('Navigation', () => {
 
   describe('uses correct permissions:', () => {
     const verifyPermissions = ({ permissions, count, links }) => {
-      currentUser.permissions = permissions;
-      const wrapper = mount(<Navigation location={{ pathname: '/' }} fullName="Sam Lowry" loginName="slowry" />);
+      const wrapper = mount(<SimpleNavigation component={Navigation} permissions={permissions} />);
       const navigationLinks = wrapper.find('NavItem');
 
       expect(navigationLinks).toHaveLength(count);
