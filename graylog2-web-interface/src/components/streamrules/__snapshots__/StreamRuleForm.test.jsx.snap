@@ -80,7 +80,7 @@ Object {
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -144,7 +144,7 @@ Object {
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -190,7 +190,7 @@ Object {
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -415,7 +415,7 @@ Object {
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -479,7 +479,7 @@ Object {
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -525,7 +525,7 @@ Object {
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
+                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
