@@ -17,7 +17,7 @@ const TooltipButton = styled(Button)`
 
 const ClientAddressHead = ({ title }: Props) => {
   const popover = (
-    <Popover>
+    <Popover id="client-address-help">
       <p>
         The address of the client used to initially establish the session, not necessarily its current address.
       </p>
