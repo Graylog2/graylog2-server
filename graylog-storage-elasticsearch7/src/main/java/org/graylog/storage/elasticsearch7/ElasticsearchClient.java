@@ -90,14 +90,14 @@ public class ElasticsearchClient {
         return RequestOptions.DEFAULT;
     }
 
-    private org.graylog2.indexer.ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
+    private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof ElasticsearchException) {
             final ElasticsearchException elasticsearchException = (ElasticsearchException)e;
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
         }
-        return new org.graylog2.indexer.ElasticsearchException(errorMessage, e);
+        return new ElasticsearchException(errorMessage, e);
     }
 
     private boolean isIndexNotFoundException(ElasticsearchException e) {
