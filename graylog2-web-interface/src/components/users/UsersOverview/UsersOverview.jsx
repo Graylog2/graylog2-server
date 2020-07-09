@@ -17,7 +17,7 @@ const _headerCellFormatter = (header) => {
     case 'client address':
       return <ClientAddressHead title={header} />;
     case 'actions':
-      return <th className="actions">{header}</th>;
+      return <th className="actions text-right">{header}</th>;
     default:
       return <th>{header}</th>;
   }
