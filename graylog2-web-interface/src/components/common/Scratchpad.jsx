@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
 
-import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
+import { Alert, Button, MenuItem, SplitButton, OverlayTrigger, Tooltip } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import { ScratchpadContext } from 'providers/ScratchpadProvider';
 /* NOTE: common components are cyclical dependencies, so they need to be directly imported */
@@ -20,17 +20,12 @@ const ContentArea = styled.div`
   height: 100%;
 `;
 
-const Description = styled.p(({ theme }) => css`
-  color: ${theme.colors.global.textAlt};
-  margin: 9px 0 6px;
-`);
-
 const Textarea = styled.textarea(({ copied, theme }) => css`
   width: 100%;
   padding: 3px;
   resize: none;
   flex: 1;
-  margin-bottom: 15px;
+  margin: 15px 0 7px;
   border: 1px solid ${copied ? theme.colors.variant.success : theme.colors.gray[80]};
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px ${chroma(copied ? theme.colors.variant.success : theme.colors.gray[80]).alpha(0.4).css()};
@@ -58,11 +53,12 @@ const AlertNote = styled.em`
   flex: 1;
 `;
 
-const Footer = styled.footer`
+const Footer = styled.footer(({ theme }) => css`
   display: flex;
   align-items: center;
-  padding-bottom: 9px;
-`;
+  padding: 7px 0 9px;
+  border-top: 1px solid ${theme.colors.gray[80]};
+`);
 
 const SavingMessage = styled.span(({ theme, visible }) => css`
   flex: 1;
@@ -173,8 +169,6 @@ const Scratchpad = () => {
                        size={size}
                        position={position}>
       <ContentArea>
-        <Description>You can use this space to store personal notes and other information while interacting with Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.</Description>
-
         {!isSecurityWarningConfirmed && (
           <StyledAlert bsStyle="warning" bsSize="sm">
             <Icon name="exclamation-triangle" size="lg" />
@@ -192,7 +186,12 @@ const Scratchpad = () => {
                   spellCheck={false} />
 
         <Footer>
+          <OverlayTrigger placement="right" trigger={['click', 'focus']} overlay={<Tooltip id="scratchpad-help">You can use this space to store personal notes and other information while interacting with Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.</Tooltip>}>
+            <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
+          </OverlayTrigger>
+
           <SavingMessage visible={recentlySaved}><Icon name="hdd" type="regular" /> Saved!</SavingMessage>
+
           <SplitButton title={CopyWithIcon}
                        bsStyle="info"
                        data-clipboard-button
