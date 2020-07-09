@@ -78,11 +78,6 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     @Override
-    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        return health(indices);
-    }
-
-    @Override
     public Set<NodeFileDescriptorStats> fileDescriptorStats() {
         final List<NodeResponse> result = nodes();
         return result.stream()

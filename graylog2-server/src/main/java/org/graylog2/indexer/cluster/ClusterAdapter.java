@@ -31,8 +31,6 @@ import java.util.Set;
 public interface ClusterAdapter {
     Optional<HealthStatus> health(Collection<String> indices);
 
-    Optional<HealthStatus> deflectorHealth(Collection<String> indices);
-
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 
     Set<NodeDiskUsageStats> diskUsageStats();

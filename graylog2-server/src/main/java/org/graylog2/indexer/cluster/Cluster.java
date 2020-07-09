@@ -81,7 +81,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<HealthStatus> deflectorHealth() {
-        return clusterAdapter.deflectorHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases()));
+        return clusterAdapter.health(Arrays.asList(indexSetRegistry.getWriteIndexAliases()));
     }
 
     public Set<NodeFileDescriptorStats> getFileDescriptorStats() {

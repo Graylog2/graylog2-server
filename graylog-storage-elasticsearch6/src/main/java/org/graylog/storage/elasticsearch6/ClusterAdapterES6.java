@@ -72,11 +72,6 @@ public class ClusterAdapterES6 implements ClusterAdapter {
     }
 
     @Override
-    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
-        return health(indices);
-    }
-
-    @Override
     public Set<NodeFileDescriptorStats> fileDescriptorStats() {
         final JsonNode nodes = catNodes("name", "host", "ip", "fileDescriptorMax");
         final ImmutableSet.Builder<NodeFileDescriptorStats> setBuilder = ImmutableSet.builder();
