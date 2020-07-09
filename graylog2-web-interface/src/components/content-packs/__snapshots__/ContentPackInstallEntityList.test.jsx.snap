@@ -159,138 +159,111 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
               <DataTable__StyledTable
                 className="table "
               >
-                <StyledComponent
-                  className="table "
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
-                        "isStatic": false,
-                        "lastClassName": "ioeTLv",
-                        "rules": Array [
-                          [Function],
-                        ],
-                      },
-                      "displayName": "DataTable__StyledTable",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
-                      "target": "table",
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
+                <table
+                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
                 >
-                  <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 ioeTLv table "
-                  >
-                    <thead>
-                      <tr>
-                        <DataTableElement
-                          element="Title"
-                          formatter={[Function]}
-                          index={0}
-                          key="header-0"
-                        >
-                          <th>
-                            Title
-                          </th>
-                        </DataTableElement>
-                        <DataTableElement
-                          element="Type"
-                          formatter={[Function]}
-                          index={1}
-                          key="header-1"
-                        >
-                          <th>
-                            Type
-                          </th>
-                        </DataTableElement>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <thead>
+                    <tr>
                       <DataTableElement
-                        element={
-                          Object {
-                            "content_pack_entity_id": "5ac762873d274666e34eca80",
-                            "id": "5bdc4f4b3d27461ce46816cf",
-                            "title": "Threat Intel Uncached Adapters",
-                            "type": Object {
-                              "name": "lookup_cache",
-                              "version": "1",
-                            },
-                          }
-                        }
+                        element="Title"
                         formatter={[Function]}
                         index={0}
-                        key="row-0"
+                        key="header-0"
                       >
-                        <tr>
-                          <td>
-                            Threat Intel Uncached Adapters
-                          </td>
-                          <td>
-                            lookup_cache
-                          </td>
-                        </tr>
+                        <th>
+                          Title
+                        </th>
                       </DataTableElement>
                       <DataTableElement
-                        element={
-                          Object {
-                            "content_pack_entity_id": "5ac762873d274666e34eca87",
-                            "id": "5bdc4f4b3d27461ce46816d1",
-                            "title": "Tor Exit Node",
-                            "type": Object {
-                              "name": "lookup_adapter",
-                              "version": "1",
-                            },
-                          }
-                        }
+                        element="Type"
                         formatter={[Function]}
                         index={1}
-                        key="row-1"
+                        key="header-1"
                       >
-                        <tr>
-                          <td>
-                            Tor Exit Node
-                          </td>
-                          <td>
-                            lookup_adapter
-                          </td>
-                        </tr>
+                        <th>
+                          Type
+                        </th>
                       </DataTableElement>
-                      <DataTableElement
-                        element={
-                          Object {
-                            "content_pack_entity_id": "5ac762873d274666e34eca8c",
-                            "id": "5bdc4f4b3d27461ce46816d4",
-                            "title": "Tor Exit Node List",
-                            "type": Object {
-                              "name": "lookup_table",
-                              "version": "1",
-                            },
-                          }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <DataTableElement
+                      element={
+                        Object {
+                          "content_pack_entity_id": "5ac762873d274666e34eca80",
+                          "id": "5bdc4f4b3d27461ce46816cf",
+                          "title": "Threat Intel Uncached Adapters",
+                          "type": Object {
+                            "name": "lookup_cache",
+                            "version": "1",
+                          },
                         }
-                        formatter={[Function]}
-                        index={2}
-                        key="row-2"
-                      >
-                        <tr>
-                          <td>
-                            Tor Exit Node List
-                          </td>
-                          <td>
-                            lookup_table
-                          </td>
-                        </tr>
-                      </DataTableElement>
-                    </tbody>
-                  </table>
-                </StyledComponent>
+                      }
+                      formatter={[Function]}
+                      index={0}
+                      key="row-0"
+                    >
+                      <tr>
+                        <td>
+                          Threat Intel Uncached Adapters
+                        </td>
+                        <td>
+                          lookup_cache
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                    <DataTableElement
+                      element={
+                        Object {
+                          "content_pack_entity_id": "5ac762873d274666e34eca87",
+                          "id": "5bdc4f4b3d27461ce46816d1",
+                          "title": "Tor Exit Node",
+                          "type": Object {
+                            "name": "lookup_adapter",
+                            "version": "1",
+                          },
+                        }
+                      }
+                      formatter={[Function]}
+                      index={1}
+                      key="row-1"
+                    >
+                      <tr>
+                        <td>
+                          Tor Exit Node
+                        </td>
+                        <td>
+                          lookup_adapter
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                    <DataTableElement
+                      element={
+                        Object {
+                          "content_pack_entity_id": "5ac762873d274666e34eca8c",
+                          "id": "5bdc4f4b3d27461ce46816d4",
+                          "title": "Tor Exit Node List",
+                          "type": Object {
+                            "name": "lookup_table",
+                            "version": "1",
+                          },
+                        }
+                      }
+                      formatter={[Function]}
+                      index={2}
+                      key="row-2"
+                    >
+                      <tr>
+                        <td>
+                          Tor Exit Node List
+                        </td>
+                        <td>
+                          lookup_table
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                  </tbody>
+                </table>
               </DataTable__StyledTable>
             </div>
           </div>
@@ -406,138 +379,111 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
               <DataTable__StyledTable
                 className="table "
               >
-                <StyledComponent
-                  className="table "
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
-                        "isStatic": false,
-                        "lastClassName": "ioeTLv",
-                        "rules": Array [
-                          [Function],
-                        ],
-                      },
-                      "displayName": "DataTable__StyledTable",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
-                      "target": "table",
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
+                <table
+                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
                 >
-                  <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 ioeTLv table "
-                  >
-                    <thead>
-                      <tr>
-                        <DataTableElement
-                          element="Title"
-                          formatter={[Function]}
-                          index={0}
-                          key="header-0"
-                        >
-                          <th>
-                            Title
-                          </th>
-                        </DataTableElement>
-                        <DataTableElement
-                          element="Type"
-                          formatter={[Function]}
-                          index={1}
-                          key="header-1"
-                        >
-                          <th>
-                            Type
-                          </th>
-                        </DataTableElement>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <thead>
+                    <tr>
                       <DataTableElement
-                        element={
-                          Object {
-                            "content_pack_entity_id": "5ac762873d274666e34eca80",
-                            "id": "5bdc4f4b3d27461ce46816cf",
-                            "title": "Threat Intel Uncached Adapters",
-                            "type": Object {
-                              "name": "lookup_cache",
-                              "version": "1",
-                            },
-                          }
-                        }
+                        element="Title"
                         formatter={[Function]}
                         index={0}
-                        key="row-0"
+                        key="header-0"
                       >
-                        <tr>
-                          <td>
-                            Threat Intel Uncached Adapters
-                          </td>
-                          <td>
-                            lookup_cache
-                          </td>
-                        </tr>
+                        <th>
+                          Title
+                        </th>
                       </DataTableElement>
                       <DataTableElement
-                        element={
-                          Object {
-                            "content_pack_entity_id": "5ac762873d274666e34eca87",
-                            "id": "5bdc4f4b3d27461ce46816d1",
-                            "title": "Tor Exit Node",
-                            "type": Object {
-                              "name": "lookup_adapter",
-                              "version": "1",
-                            },
-                          }
-                        }
+                        element="Type"
                         formatter={[Function]}
                         index={1}
-                        key="row-1"
+                        key="header-1"
                       >
-                        <tr>
-                          <td>
-                            Tor Exit Node
-                          </td>
-                          <td>
-                            lookup_adapter
-                          </td>
-                        </tr>
+                        <th>
+                          Type
+                        </th>
                       </DataTableElement>
-                      <DataTableElement
-                        element={
-                          Object {
-                            "content_pack_entity_id": "5ac762873d274666e34eca8c",
-                            "id": "5bdc4f4b3d27461ce46816d4",
-                            "title": "Tor Exit Node List",
-                            "type": Object {
-                              "name": "lookup_table",
-                              "version": "1",
-                            },
-                          }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <DataTableElement
+                      element={
+                        Object {
+                          "content_pack_entity_id": "5ac762873d274666e34eca80",
+                          "id": "5bdc4f4b3d27461ce46816cf",
+                          "title": "Threat Intel Uncached Adapters",
+                          "type": Object {
+                            "name": "lookup_cache",
+                            "version": "1",
+                          },
                         }
-                        formatter={[Function]}
-                        index={2}
-                        key="row-2"
-                      >
-                        <tr>
-                          <td>
-                            Tor Exit Node List
-                          </td>
-                          <td>
-                            lookup_table
-                          </td>
-                        </tr>
-                      </DataTableElement>
-                    </tbody>
-                  </table>
-                </StyledComponent>
+                      }
+                      formatter={[Function]}
+                      index={0}
+                      key="row-0"
+                    >
+                      <tr>
+                        <td>
+                          Threat Intel Uncached Adapters
+                        </td>
+                        <td>
+                          lookup_cache
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                    <DataTableElement
+                      element={
+                        Object {
+                          "content_pack_entity_id": "5ac762873d274666e34eca87",
+                          "id": "5bdc4f4b3d27461ce46816d1",
+                          "title": "Tor Exit Node",
+                          "type": Object {
+                            "name": "lookup_adapter",
+                            "version": "1",
+                          },
+                        }
+                      }
+                      formatter={[Function]}
+                      index={1}
+                      key="row-1"
+                    >
+                      <tr>
+                        <td>
+                          Tor Exit Node
+                        </td>
+                        <td>
+                          lookup_adapter
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                    <DataTableElement
+                      element={
+                        Object {
+                          "content_pack_entity_id": "5ac762873d274666e34eca8c",
+                          "id": "5bdc4f4b3d27461ce46816d4",
+                          "title": "Tor Exit Node List",
+                          "type": Object {
+                            "name": "lookup_table",
+                            "version": "1",
+                          },
+                        }
+                      }
+                      formatter={[Function]}
+                      index={2}
+                      key="row-2"
+                    >
+                      <tr>
+                        <td>
+                          Tor Exit Node List
+                        </td>
+                        <td>
+                          lookup_table
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                  </tbody>
+                </table>
               </DataTable__StyledTable>
             </div>
           </div>

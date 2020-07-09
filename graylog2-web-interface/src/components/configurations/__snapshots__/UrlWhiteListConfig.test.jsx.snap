@@ -45,116 +45,86 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
       condensed={true}
       striped={true}
     >
-      <StyledComponent
+      <Table
         bordered={true}
-        className="top-margin"
+        bsClass="table"
+        className="Table-ztr4bi-0 bzdwZS top-margin"
         condensed={true}
-        forwardedComponent={
-          Object {
-            "$$typeof": Symbol(react.forward_ref),
-            "attrs": Array [],
-            "componentStyle": ComponentStyle {
-              "componentId": "Table-ztr4bi-0",
-              "isStatic": false,
-              "lastClassName": "jAdnZd",
-              "rules": Array [
-                [Function],
-              ],
-            },
-            "displayName": "Table",
-            "foldedComponentIds": Array [],
-            "render": [Function],
-            "styledComponentId": "Table-ztr4bi-0",
-            "target": [Function],
-            "toString": [Function],
-            "warnTooManyClasses": [Function],
-            "withComponent": [Function],
-          }
-        }
-        forwardedRef={null}
+        hover={false}
+        responsive={false}
         striped={true}
       >
-        <Table
-          bordered={true}
-          bsClass="table"
-          className="Table-ztr4bi-0 jAdnZd top-margin"
-          condensed={true}
-          hover={false}
-          responsive={false}
-          striped={true}
+        <table
+          className="Table-ztr4bi-0 bzdwZS top-margin table table-striped table-bordered table-condensed"
         >
-          <table
-            className="Table-ztr4bi-0 jAdnZd top-margin table table-striped table-bordered table-condensed"
-          >
-            <thead>
-              <tr>
-                <th>
-                  #
-                </th>
-                <th>
-                  Title
-                </th>
-                <th>
-                  URL
-                </th>
-                <th>
-                  Type
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                key="f7033f1f-d50f-4323-96df-294ede41d951"
-              >
-                <td>
-                  1
-                </td>
-                <td>
-                  testam
-                </td>
-                <td>
-                  http://localhost:8080/system/
-                </td>
-                <td>
-                  Regex
-                </td>
-              </tr>
-              <tr
-                key="636a2d40-c4c5-40b9-ab3a-48cf7978e9af"
-              >
-                <td>
-                  2
-                </td>
-                <td>
-                  test
-                </td>
-                <td>
-                  http://localhost:8080/system/
-                </td>
-                <td>
-                  Regex
-                </td>
-              </tr>
-              <tr
-                key="f28fd891-5f2d-4128-9a94-e97c1ab07a1f"
-              >
-                <td>
-                  3
-                </td>
-                <td>
-                  test
-                </td>
-                <td>
-                  http://localhost:8080/system/
-                </td>
-                <td>
-                  Exact match
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </Table>
-      </StyledComponent>
+          <thead>
+            <tr>
+              <th>
+                #
+              </th>
+              <th>
+                Title
+              </th>
+              <th>
+                URL
+              </th>
+              <th>
+                Type
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              key="f7033f1f-d50f-4323-96df-294ede41d951"
+            >
+              <td>
+                1
+              </td>
+              <td>
+                testam
+              </td>
+              <td>
+                http://localhost:8080/system/
+              </td>
+              <td>
+                Regex
+              </td>
+            </tr>
+            <tr
+              key="636a2d40-c4c5-40b9-ab3a-48cf7978e9af"
+            >
+              <td>
+                2
+              </td>
+              <td>
+                test
+              </td>
+              <td>
+                http://localhost:8080/system/
+              </td>
+              <td>
+                Regex
+              </td>
+            </tr>
+            <tr
+              key="f28fd891-5f2d-4128-9a94-e97c1ab07a1f"
+            >
+              <td>
+                3
+              </td>
+              <td>
+                test
+              </td>
+              <td>
+                http://localhost:8080/system/
+              </td>
+              <td>
+                Exact match
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </Table>
     </Table>
     <IfPermitted
       anyPermissions={false}
@@ -187,54 +157,39 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
           onHide={[Function]}
           show={false}
         >
-          <StyledComponent
+          <Modal
+            animation={true}
+            autoFocus={true}
             backdrop="static"
+            bsClass="modal"
             bsSize="lg"
-            forwardedComponent={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "BACKDROP_TRANSITION_DURATION": 150,
-                "Body": [Function],
-                "Dialog": [Function],
-                "Footer": [Function],
-                "Header": [Function],
-                "SIZES": Array [
-                  "large",
-                  "small",
-                ],
-                "TRANSITION_DURATION": 300,
-                "Title": [Function],
-                "attrs": Array [],
-                "componentStyle": ComponentStyle {
-                  "componentId": "Modal-nuree8-0",
-                  "isStatic": false,
-                  "lastClassName": "eNmkew",
-                  "rules": Array [
-                    [Function],
-                  ],
-                },
-                "displayName": "Modal",
-                "foldedComponentIds": Array [],
-                "render": [Function],
-                "styledComponentId": "Modal-nuree8-0",
-                "target": [Function],
-                "toString": [Function],
-                "warnTooManyClasses": [Function],
-                "withComponent": [Function],
+            className="Modal-nuree8-0 hMPgsT"
+            dialogComponentClass={[Function]}
+            enforceFocus={true}
+            keyboard={true}
+            manager={
+              ModalManager {
+                "add": [Function],
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "isTopModal": [Function],
+                "modals": Array [],
+                "remove": [Function],
               }
             }
-            forwardedRef={null}
             onHide={[Function]}
+            renderBackdrop={[Function]}
+            restoreFocus={true}
             show={false}
           >
             <Modal
-              animation={true}
               autoFocus={true}
               backdrop="static"
-              bsClass="modal"
-              bsSize="lg"
-              className="Modal-nuree8-0 eNmkew"
-              dialogComponentClass={[Function]}
+              backdropClassName="modal-backdrop"
+              backdropTransition={[Function]}
+              containerClassName="modal-open"
               enforceFocus={true}
               keyboard={true}
               manager={
@@ -249,42 +204,16 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
                   "remove": [Function],
                 }
               }
+              onEntering={[Function]}
+              onExited={[Function]}
               onHide={[Function]}
+              onMouseUp={[Function]}
               renderBackdrop={[Function]}
               restoreFocus={true}
               show={false}
-            >
-              <Modal
-                autoFocus={true}
-                backdrop="static"
-                backdropClassName="modal-backdrop"
-                backdropTransition={[Function]}
-                containerClassName="modal-open"
-                enforceFocus={true}
-                keyboard={true}
-                manager={
-                  ModalManager {
-                    "add": [Function],
-                    "containers": Array [],
-                    "data": Array [],
-                    "handleContainerOverflow": true,
-                    "hideSiblingNodes": true,
-                    "isTopModal": [Function],
-                    "modals": Array [],
-                    "remove": [Function],
-                  }
-                }
-                onEntering={[Function]}
-                onExited={[Function]}
-                onHide={[Function]}
-                onMouseUp={[Function]}
-                renderBackdrop={[Function]}
-                restoreFocus={true}
-                show={false}
-                transition={[Function]}
-              />
-            </Modal>
-          </StyledComponent>
+              transition={[Function]}
+            />
+          </Modal>
         </Modal>
       </BootstrapModalWrapper>
     </BootstrapModalForm>

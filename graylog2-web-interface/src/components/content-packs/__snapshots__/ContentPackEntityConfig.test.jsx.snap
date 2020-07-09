@@ -76,117 +76,90 @@ exports[`<ContentPackEntityConfig /> should render with a entity 1`] = `
               <DataTable__StyledTable
                 className="table "
               >
-                <StyledComponent
-                  className="table "
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
-                        "isStatic": false,
-                        "lastClassName": "ioeTLv",
-                        "rules": Array [
-                          [Function],
-                        ],
-                      },
-                      "displayName": "DataTable__StyledTable",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
-                      "target": "table",
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
+                <table
+                  className="DataTable__StyledTable-sc-1c22x1c-0 jHoVvF table "
                 >
-                  <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 ioeTLv table "
-                  >
-                    <thead>
-                      <tr>
-                        <DataTableElement
-                          element="Config Key"
-                          formatter={[Function]}
-                          index={0}
-                          key="header-0"
-                        >
-                          <th>
-                            Config Key
-                          </th>
-                        </DataTableElement>
-                        <DataTableElement
-                          element="Type"
-                          formatter={[Function]}
-                          index={1}
-                          key="header-1"
-                        >
-                          <th>
-                            Type
-                          </th>
-                        </DataTableElement>
-                        <DataTableElement
-                          element="Value"
-                          formatter={[Function]}
-                          index={2}
-                          key="header-2"
-                        >
-                          <th>
-                            Value
-                          </th>
-                        </DataTableElement>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <thead>
+                    <tr>
                       <DataTableElement
-                        element="descr"
+                        element="Config Key"
                         formatter={[Function]}
                         index={0}
-                        key="row-0"
+                        key="header-0"
                       >
-                        <tr
-                          key="descr"
-                        >
-                          <td>
-                            descr
-                          </td>
-                          <td>
-                            <b>
-                              parameter (string)
-                            </b>
-                          </td>
-                          <td>
-                            <b>
-                              descrParam
-                            </b>
-                          </td>
-                        </tr>
+                        <th>
+                          Config Key
+                        </th>
                       </DataTableElement>
                       <DataTableElement
-                        element="title"
+                        element="Type"
                         formatter={[Function]}
                         index={1}
-                        key="row-1"
+                        key="header-1"
                       >
-                        <tr
-                          key="title"
-                        >
-                          <td>
-                            title
-                          </td>
-                          <td>
-                            string
-                          </td>
-                          <td>
-                            franz
-                          </td>
-                        </tr>
+                        <th>
+                          Type
+                        </th>
                       </DataTableElement>
-                    </tbody>
-                  </table>
-                </StyledComponent>
+                      <DataTableElement
+                        element="Value"
+                        formatter={[Function]}
+                        index={2}
+                        key="header-2"
+                      >
+                        <th>
+                          Value
+                        </th>
+                      </DataTableElement>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <DataTableElement
+                      element="descr"
+                      formatter={[Function]}
+                      index={0}
+                      key="row-0"
+                    >
+                      <tr
+                        key="descr"
+                      >
+                        <td>
+                          descr
+                        </td>
+                        <td>
+                          <b>
+                            parameter (string)
+                          </b>
+                        </td>
+                        <td>
+                          <b>
+                            descrParam
+                          </b>
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                    <DataTableElement
+                      element="title"
+                      formatter={[Function]}
+                      index={1}
+                      key="row-1"
+                    >
+                      <tr
+                        key="title"
+                      >
+                        <td>
+                          title
+                        </td>
+                        <td>
+                          string
+                        </td>
+                        <td>
+                          franz
+                        </td>
+                      </tr>
+                    </DataTableElement>
+                  </tbody>
+                </table>
               </DataTable__StyledTable>
             </div>
           </div>
