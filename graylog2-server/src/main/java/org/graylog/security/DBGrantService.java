@@ -35,7 +35,9 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -127,5 +129,13 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 DBQuery.is(GrantDTO.FIELD_TARGET, target.toString()),
                 DBQuery.notEquals(GrantDTO.FIELD_GRANTEE, grantee.toString())
         )).toArray();
+    }
+
+    public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
+        return db.find(DBQuery.in(GrantDTO.FIELD_TARGET, targets)).toArray().stream()
+                .collect(Collectors.groupingBy(
+                        GrantDTO::target,
+                        Collectors.mapping(GrantDTO::grantee, Collectors.toSet())
+                ));
     }
 }

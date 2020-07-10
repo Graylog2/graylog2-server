@@ -19,44 +19,73 @@ package org.graylog.security.entities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
+import org.graylog.grn.GRNDescriptorService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
+import org.graylog.security.DBGrantService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class EntityDependencyResolver {
     private final ContentPackService contentPackService;
     private final GRNRegistry grnRegistry;
+    private final GRNDescriptorService descriptorService;
+    private final DBGrantService grantService;
 
     @Inject
-    public EntityDependencyResolver(ContentPackService contentPackService, GRNRegistry grnRegistry) {
+    public EntityDependencyResolver(ContentPackService contentPackService,
+                                    GRNRegistry grnRegistry,
+                                    GRNDescriptorService descriptorService,
+                                    DBGrantService grantService) {
         this.contentPackService = contentPackService;
         this.grnRegistry = grnRegistry;
+        this.descriptorService = descriptorService;
+        this.grantService = grantService;
     }
 
-    public ImmutableSet<EntityDependency> resolve(GRN entityGRN) {
-        // TODO: Create a method in ContentPackService to only select some exerpts instead of loading all
+    public ImmutableSet<EntityDependency> resolve(GRN entity) {
+        // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
         final ImmutableMap<GRN, String> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
                 .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(), EntityExcerpt::title));
 
         final Set<EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(EntityDescriptor.builder()
-                .id(ModelId.of(entityGRN.entity()))
-                .type(ModelType.of(entityGRN.type(), "2")) // TODO: Any way of NOT hardcoding the version here?
+                .id(ModelId.of(entity.entity()))
+                .type(ModelType.of(entity.type(), "2")) // TODO: Any way of NOT hardcoding the version here?
                 .build()));
 
-        // TODO: Resolve owners for the missing dependencies
-        return descriptors.stream()
+        final ImmutableSet<GRN> dependencies = descriptors.stream()
                 .map(descriptor -> grnRegistry.newGRN(descriptor.type().name(), descriptor.id().id()))
-                .filter(grn -> !entityGRN.equals(grn))
-                .map(grn -> EntityDependency.create(grn, entityExcerpts.get(grn), ImmutableSet.of()))
+                .filter(dependency -> !entity.equals(dependency)) // Don't include the given entity in dependencies
                 .collect(ImmutableSet.toImmutableSet());
+
+        final Map<GRN, Set<GRN>> targetOwners = grantService.getOwnersForTargets(dependencies);
+
+        return dependencies.stream()
+                .map(dependency -> EntityDependency.create(
+                        dependency,
+                        entityExcerpts.get(dependency),
+                        getOwners(targetOwners.get(dependency))
+                ))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    private Set<EntityDependency.Owner> getOwners(@Nullable Set<GRN> owners) {
+        return firstNonNull(owners, Collections.<GRN>emptySet()).stream()
+                .map(descriptorService::getDescriptor)
+                .map(descriptor -> EntityDependency.Owner.create(descriptor.grn(), descriptor.title()))
+                .collect(Collectors.toSet());
     }
 }

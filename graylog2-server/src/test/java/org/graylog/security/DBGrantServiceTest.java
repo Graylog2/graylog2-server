@@ -18,6 +18,7 @@ package org.graylog.security;
 
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -52,7 +53,7 @@ public class DBGrantServiceTest {
     @Test
     @MongoDBFixtures("grants.json")
     public void test() {
-        assertThat(dbService.streamAll().collect(Collectors.toSet()).size()).isEqualTo(4);
+        assertThat(dbService.streamAll().collect(Collectors.toSet()).size()).isEqualTo(6);
     }
 
     @Test
@@ -61,8 +62,8 @@ public class DBGrantServiceTest {
         final GRN jane = grnRegistry.newGRN("user", "jane");
         final GRN john = grnRegistry.newGRN("user", "john");
 
-        assertThat(dbService.getForGranteesOrGlobal(Collections.singleton(jane))).hasSize(3);
-        assertThat(dbService.getForGranteesOrGlobal(Collections.singleton(john))).hasSize(2);
+        assertThat(dbService.getForGranteesOrGlobal(Collections.singleton(jane))).hasSize(4);
+        assertThat(dbService.getForGranteesOrGlobal(Collections.singleton(john))).hasSize(3);
     }
 
     @Test
@@ -82,5 +83,19 @@ public class DBGrantServiceTest {
         final GRN grantee = grnRegistry.parse("grn::::user:john");
 
         assertThat(dbService.getForTargetExcludingGrantee(stream, grantee)).hasSize(2);
+    }
+    @Test
+    @MongoDBFixtures("grants.json")
+    public void getOwnersForTargets() {
+        final GRN jane = grnRegistry.parse("grn::::user:jane");
+        final GRN john = grnRegistry.parse("grn::::user:john");
+
+        final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
+        final GRN dashboard2 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0001");
+
+        assertThat(dbService.getOwnersForTargets(ImmutableSet.of(dashboard1, dashboard2))).satisfies(result -> {
+            assertThat(result.get(dashboard1)).containsExactlyInAnyOrder(jane);
+            assertThat(result.get(dashboard2)).containsExactlyInAnyOrder(john);
+        });
     }
 }
