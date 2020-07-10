@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render, fireEvent, wait } from 'wrappedTestingLibrary';
 import PropTypes from 'prop-types';
-import { StoreMock as MockStore, CombinedProviderMock as MockCombinedProvider } from 'helpers/mocking';
+import { StoreMock as MockStore } from 'helpers/mocking';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
