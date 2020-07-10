@@ -93,7 +93,7 @@ public class JestUtils {
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
                 case "index_not_found_exception":
                     final String indexName = rootCause.path("resource.id").asText();
-                    return buildIndexNotFoundException(errorMessage, indexName);
+                    return IndexNotFoundException.create(errorMessage.get(), indexName);
                 case "illegal_argument_exception":
                     final String reasonText = reason.asText();
                     if (reasonText.startsWith("Expected numeric type on field")) {
@@ -128,10 +128,6 @@ public class JestUtils {
         final String index = rootCause.path("index").asText(null);
 
         return new QueryParsingException(errorMessage.get(), line, column, index, reasons);
-    }
-
-    private static IndexNotFoundException buildIndexNotFoundException(Supplier<String> errorMessage, String index) {
-        return new IndexNotFoundException(errorMessage.get(), Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
     }
 
     public static Optional<ElasticsearchException> checkForFailedShards(JestResult result) {
