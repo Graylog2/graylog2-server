@@ -31,7 +31,7 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
   align-items: center;
   justify-content: center;
   position: relative;
-
+  z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;
 

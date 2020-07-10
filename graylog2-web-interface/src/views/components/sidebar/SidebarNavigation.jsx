@@ -17,7 +17,7 @@ type Props = {
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   background: ${theme.colors.gray[10]};
-  color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
+  color: ${theme.colors.gray[80]};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
   width: 50px;
   height: 100%;
@@ -27,12 +27,13 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
     content: '';
     position: absolute;
     top: 0px;
-    right: -4px;
-    height: 4px;
-    width: 4px;
+    right: -6px;
+    height: 6px;
+    width: 6px;
     border-top-left-radius: 50%;
     background: transparent;
-    box-shadow: -4px -4px 0px 4px ${theme.colors.gray[10]};
+    box-shadow: -6px -6px 0px 6px ${theme.colors.gray[10]};
+    z-index: 4; /* to render over Sidebar ContentColumn */
   }
 `);
 
