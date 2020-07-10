@@ -10,7 +10,6 @@ import RolesCell from './RolesCell';
 type Props = {
   user: User,
   isActive: boolean,
-  roles: any,
 };
 
 const UsersOverviewItem = ({
@@ -22,8 +21,8 @@ const UsersOverviewItem = ({
     sessionActive,
     username,
     readOnly,
+    roles,
   },
-  roles,
   isActive,
 }: Props) => {
   return (

@@ -52,11 +52,10 @@ const UsersOverview = () => {
       pagination: { page, perPage, query, total },
     },
   } = useStore(UsersStore);
-  const roles = [];
   const currentUser = useContext(CurrentUserContext);
   const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
-  const _userOverviewItem = (user) => <UserOverviewItem user={user} roles={roles} isActive={_isActiveItem(user)} />;
+  const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
   useEffect(() => {
     UsersActions.searchPaginated(page, perPage, query);
@@ -70,7 +69,7 @@ const UsersOverview = () => {
     };
   }, []);
 
-  if (!users || !roles) {
+  if (!users) {
     return <Spinner />;
   }
 
@@ -90,7 +89,6 @@ const UsersOverview = () => {
                          headerCellFormatter={_headerCellFormatter}
                          sortByKey="fullName"
                          rows={[adminUser]}
-                         filterBy="role"
                          dataRowFormatter={_userOverviewItem}
                          filterKeys={[]}
                          filterLabel="Filter Users" />
@@ -112,7 +110,6 @@ const UsersOverview = () => {
                          headerCellFormatter={_headerCellFormatter}
                          sortByKey="fullName"
                          rows={users.toJS()}
-                         filterBy="role"
                          customFilter={<Filter perPage={perPage} />}
                          dataRowFormatter={_userOverviewItem}
                          filterKeys={[]}
