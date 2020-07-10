@@ -12,11 +12,21 @@ const mockUsers = Immutable.List([alice, bob, admin]);
 
 jest.mock('stores/users/UsersStore', () => ({
   listen: jest.fn(),
-  getInitialState: jest.fn(() => ({ list: mockUsers })),
+  getInitialState: jest.fn(() => ({
+    paginatedList: {
+      list: mockUsers,
+      pagination: {
+        page: 1,
+        perPage: 10,
+        total: mockUsers.size,
+      },
+      adminUser: undefined,
+    },
+  })),
 }));
 
 jest.mock('actions/users/UsersActions', () => ({
-  loadUsers: jest.fn(),
+  searchPaginated: jest.fn(),
   deleteUser: jest.fn(),
 }));
 

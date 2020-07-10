@@ -7,7 +7,7 @@ import type { UserJSON as User, ChangePasswordRequest, Token } from 'stores/user
 
 type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,
-  loadUsers: (page: number, perPage: number, query: string) => Promise<User[]>,
+  loadUsers: () => Promise<User[]>,
   searchPaginated: (page: number, perPage: number, query: string) => Promise<User[]>,
   load: (username: string) => Promise<User>,
   deleteUser: (username: string) => Promise<string[]>,

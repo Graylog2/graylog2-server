@@ -32,6 +32,15 @@ exports[`<ContentPackInstallEntityList /> should render with empty entities 1`] 
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={Array []}
+        />
         <div
           className="row "
         >
@@ -146,6 +155,45 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca80",
+                "id": "5bdc4f4b3d27461ce46816cf",
+                "title": "Threat Intel Uncached Adapters",
+                "type": Object {
+                  "name": "lookup_cache",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca87",
+                "id": "5bdc4f4b3d27461ce46816d1",
+                "title": "Tor Exit Node",
+                "type": Object {
+                  "name": "lookup_adapter",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca8c",
+                "id": "5bdc4f4b3d27461ce46816d4",
+                "title": "Tor Exit Node List",
+                "type": Object {
+                  "name": "lookup_table",
+                  "version": "1",
+                },
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -168,7 +216,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                         "isStatic": false,
-                        "lastClassName": "lmPeF",
+                        "lastClassName": "kOzPPq",
                         "rules": Array [
                           [Function],
                         ],
@@ -186,7 +234,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table "
+                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table "
                   >
                     <thead>
                       <tr>
@@ -393,6 +441,45 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca80",
+                "id": "5bdc4f4b3d27461ce46816cf",
+                "title": "Threat Intel Uncached Adapters",
+                "type": Object {
+                  "name": "lookup_cache",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca87",
+                "id": "5bdc4f4b3d27461ce46816d1",
+                "title": "Tor Exit Node",
+                "type": Object {
+                  "name": "lookup_adapter",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca8c",
+                "id": "5bdc4f4b3d27461ce46816d4",
+                "title": "Tor Exit Node List",
+                "type": Object {
+                  "name": "lookup_table",
+                  "version": "1",
+                },
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -415,7 +502,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                         "isStatic": false,
-                        "lastClassName": "lmPeF",
+                        "lastClassName": "kOzPPq",
                         "rules": Array [
                           [Function],
                         ],
@@ -433,7 +520,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table "
+                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table "
                   >
                     <thead>
                       <tr>

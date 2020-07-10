@@ -201,6 +201,15 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >
@@ -492,6 +501,15 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >
@@ -785,6 +803,15 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >
@@ -1252,6 +1279,15 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >
@@ -1543,6 +1579,15 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >
@@ -1836,6 +1881,15 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >

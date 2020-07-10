@@ -836,6 +836,37 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={
+                        Array [
+                          Object {
+                            "constraints": Array [],
+                            "data": Object {
+                              "descr": Object {
+                                "@type": "string",
+                                "@value": "hans",
+                              },
+                              "title": Object {
+                                "@type": "string",
+                                "@value": "franz",
+                              },
+                            },
+                            "id": undefined,
+                            "type": Object {
+                              "name": "grok_pattern",
+                              "version": "1",
+                            },
+                            "v": undefined,
+                          },
+                        ]
+                      }
+                    />
                     <div
                       className="row "
                     >
@@ -858,7 +889,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                                     "isStatic": false,
-                                    "lastClassName": "lmPeF",
+                                    "lastClassName": "kOzPPq",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -876,7 +907,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               forwardedRef={null}
                             >
                               <table
-                                className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
+                                className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table scrollable"
                               >
                                 <thead>
                                   <tr>

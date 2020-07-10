@@ -593,6 +593,25 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={
+                        Array [
+                          Object {
+                            "default_value": "test",
+                            "description": "A parameter descriptions",
+                            "name": "A parameter name",
+                            "title": "A parameter title",
+                            "type": "string",
+                          },
+                        ]
+                      }
+                    />
                     <div
                       className="row "
                     >
@@ -615,7 +634,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                                     "isStatic": false,
-                                    "lastClassName": "lmPeF",
+                                    "lastClassName": "kOzPPq",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -633,7 +652,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               forwardedRef={null}
                             >
                               <table
-                                className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
+                                className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table scrollable"
                               >
                                 <thead>
                                   <tr>
@@ -1595,6 +1614,47 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={
+                        Array [
+                          Object {
+                            "constraints": Array [],
+                            "data": Object {
+                              "configuration": Object {
+                                "listen_address": Object {
+                                  "@type": "string",
+                                  "@value": "1.2.3.4",
+                                },
+                                "port": Object {
+                                  "@type": "integer",
+                                  "@value": "23",
+                                },
+                              },
+                              "name": Object {
+                                "@type": "string",
+                                "@value": "Input",
+                              },
+                              "title": Object {
+                                "@type": "string",
+                                "@value": "A good input",
+                              },
+                            },
+                            "id": "111-beef",
+                            "type": Object {
+                              "name": "input",
+                              "version": "1",
+                            },
+                            "v": "1.0",
+                          },
+                        ]
+                      }
+                    />
                     <div
                       className="row "
                     >
@@ -1617,7 +1677,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
                                     "isStatic": false,
-                                    "lastClassName": "lmPeF",
+                                    "lastClassName": "kOzPPq",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1635,7 +1695,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                               forwardedRef={null}
                             >
                               <table
-                                className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
+                                className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table scrollable"
                               >
                                 <thead>
                                   <tr>
@@ -2682,6 +2742,15 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >
@@ -3110,6 +3179,15 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={Array []}
+                    />
                     <div
                       className="row "
                     >

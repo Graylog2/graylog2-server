@@ -57,14 +57,6 @@ export type ChangePasswordRequest = {
   password: string,
 };
 
-type PaginationTypeJSON = {
-  count: number,
-  total: number,
-  page: number,
-  per_page: number,
-  query: string,
-};
-
 type PaginationType = {
   count: number,
   total: number,
