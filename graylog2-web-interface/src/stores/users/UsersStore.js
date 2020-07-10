@@ -140,7 +140,7 @@ const UsersStore: UsersStoreType = singletonStore(
       return promise;
     },
 
-    searchPaginated(page, perPage, query): Promise<UserJSON[]> {
+    searchPaginated(page: number, perPage: number, query: string): Promise<UserJSON[]> {
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))

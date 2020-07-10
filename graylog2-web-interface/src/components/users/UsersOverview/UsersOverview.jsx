@@ -19,6 +19,18 @@ const TableWrapper = styled.div`
   }
 `;
 
+const Filter = ({ perPage }: { perPage: number }) => {
+  const handleSearch = (newQuery, resetLoading) => UsersActions.searchPaginated(1, perPage, newQuery).then(resetLoading);
+  const handleReset = () => UsersActions.searchPaginated(1, perPage, '');
+
+  return (
+    <SearchForm onSearch={handleSearch}
+                onReset={handleReset}
+                useLoadingState
+                topMargin={0} />
+  );
+};
+
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
     case 'client address':
@@ -62,8 +74,6 @@ const UsersOverview = () => {
     return <Spinner />;
   }
 
-  const Filter = <SearchForm onSearch={(newQuery, resetLoading) => UsersActions.searchPaginated(1, perPage, newQuery).then(resetLoading)} onReset={() => UsersActions.searchPaginated(1, perPage, '')} useLoadingState topMargin={0} />;
-
   return (
     <>
       {adminUser && (
@@ -103,7 +113,7 @@ const UsersOverview = () => {
                          sortByKey="fullName"
                          rows={users.toJS()}
                          filterBy="role"
-                         customFilter={Filter}
+                         customFilter={<Filter perPage={perPage} />}
                          dataRowFormatter={_userOverviewItem}
                          filterKeys={[]}
                          filterLabel="Filter Users" />
