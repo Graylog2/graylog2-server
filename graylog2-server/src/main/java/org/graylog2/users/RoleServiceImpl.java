@@ -21,8 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -47,7 +45,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mongojack.DBQuery.and;
@@ -165,10 +162,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Map<String, Role> findIdMap(Set<String> roleIds) throws NotFoundException {
-        final DBObject query = BasicDBObjectBuilder.start()
-                .push(ID)
-                .append("$in", roleIds.stream().map(ObjectId::new).collect(Collectors.toSet()))
-                .get();
+        final DBQuery.Query query = DBQuery.in(ID, roleIds);
         try (DBCursor<RoleImpl> rolesCursor = dbCollection.find(query)) {
             ImmutableSet<Role> roles = ImmutableSet.copyOf((Iterable<? extends Role>) rolesCursor);
             return Maps.uniqueIndex(roles, new Function<Role, String>() {

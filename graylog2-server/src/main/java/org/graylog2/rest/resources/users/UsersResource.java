@@ -34,6 +34,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.models.users.requests.ChangeUserRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
@@ -44,7 +45,6 @@ import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
-import org.graylog2.rest.resources.users.responses.UserPageListResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -57,10 +57,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.StreamImpl;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
-import org.graylog2.users.UserDTO;
+import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,9 +122,9 @@ public class UsersResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put(UserDTO.FIELD_USERNAME, SearchQueryField.create(UserDTO.FIELD_USERNAME))
-            .put(UserDTO.FIELD_FULL_NAME, SearchQueryField.create(UserDTO.FIELD_FULL_NAME))
-            .put(UserDTO.FIELD_EMAIL, SearchQueryField.create(UserDTO.FIELD_EMAIL))
+            .put(UserOverviewDTO.FIELD_USERNAME, SearchQueryField.create(UserOverviewDTO.FIELD_USERNAME))
+            .put(UserOverviewDTO.FIELD_FULL_NAME, SearchQueryField.create(UserOverviewDTO.FIELD_FULL_NAME))
+            .put(UserOverviewDTO.FIELD_EMAIL, SearchQueryField.create(UserOverviewDTO.FIELD_EMAIL))
             .build();
 
     @Inject
@@ -139,7 +138,7 @@ public class UsersResource extends RestResource {
         this.roleService = roleService;
         this.sessionService = sessionService;
         this.paginatedUserService = paginatedUserService;
-        this.searchQueryParser = new SearchQueryParser(UserDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -178,7 +177,6 @@ public class UsersResource extends RestResource {
         final Collection<MongoDbSession> sessions = sessionService.loadAll();
 
         // among all active sessions, find the last recently used for each user
-        //noinspection OptionalGetWithoutIsPresent
         final Map<String, Optional<MongoDbSession>> lastSessionForUser = getLastSessionForUser(sessions);
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userService.getRootUser().ifPresent(adminUser ->
@@ -200,15 +198,15 @@ public class UsersResource extends RestResource {
     @ApiOperation(value = "Get paginated list of users")
     @RequiresPermissions(RestPermissions.USERS_LIST)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserPageListResponse getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                        @ApiParam(name = "sort",
+    public PaginatedResponse<UserOverviewDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                      @ApiParam(name = "sort",
                                                 value = "The field to sort the result on",
                                                 required = true,
                                                 allowableValues = "title,description")
-                                            @DefaultValue(StreamImpl.FIELD_TITLE) @QueryParam("sort") String sort,
-                                        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                            @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
+                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                             @DefaultValue("asc") @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
@@ -220,10 +218,10 @@ public class UsersResource extends RestResource {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
 
-        final PaginatedList<UserDTO> result = paginatedUserService
+        final PaginatedList<UserOverviewDTO> result = paginatedUserService
                 .findPaginated(searchQuery, page, perPage, sort, order);
         final Set<String> allRoleIds = result.stream().flatMap(userDTO -> {
-            if (Optional.ofNullable(userDTO.roles()).isPresent()) {
+            if (userDTO.roles() != null) {
                 return userDTO.roles().stream();
             }
             return Stream.empty();
@@ -236,28 +234,20 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find roles: " + e.getMessage());
         }
 
-        final UserDTO adminUser = getAdminUserDTO(lastSessionForUser, roleNameMap);
+        final UserOverviewDTO adminUser = getAdminUserDTO(lastSessionForUser);
 
-        List<UserDTO> users = result.stream().map(userDTO -> {
-            UserDTO.Builder builder = userDTO.toBuilder()
+        List<UserOverviewDTO> users = result.stream().map(userDTO -> {
+            UserOverviewDTO.Builder builder = userDTO.toBuilder()
                     .fillSession(lastSessionForUser.getOrDefault(userDTO.username(), Optional.empty()));
-            if (Optional.ofNullable(userDTO.roles()).isPresent()) {
+            if (userDTO.roles() != null) {
                 builder.roles(userDTO.roles().stream().map(roleNameMap::get).collect(Collectors.toSet()));
             }
             return builder.build();
         }).collect(Collectors.toList());
 
-        final PaginatedList<UserDTO> userDTOS = new PaginatedList<>(users, result.pagination().total(),
+        final PaginatedList<UserOverviewDTO> userOverviewDTOS = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
-        return UserPageListResponse.builder()
-                .query(query)
-                .users(users)
-                .total(result.pagination().total())
-                .order(order)
-                .sort(sort)
-                .paginationInfo(result.pagination())
-                .adminUser(adminUser)
-                .build();
+        return PaginatedResponse.create("users", userOverviewDTOS, query, Collections.singletonMap("admin_user", adminUser));
     }
 
     @POST
@@ -647,6 +637,7 @@ public class UsersResource extends RestResource {
     }
 
     private Map<String, Optional<MongoDbSession>> getLastSessionForUser(Collection<MongoDbSession> sessions) {
+        //noinspection OptionalGetWithoutIsPresent
         return sessions.stream()
                 .filter(s -> s.getUsernameAttribute().isPresent())
                 .collect(groupingBy(s -> s.getUsernameAttribute().get(),
@@ -660,20 +651,21 @@ public class UsersResource extends RestResource {
         return result;
     }
 
-    private UserDTO getAdminUserDTO(Map<String, Optional<MongoDbSession>> lastSessionMap, Map<String, String> roleNameMap) {
-        final User admin = userService.getRootUser()
-                .orElseThrow(() -> new NotFoundException("Could not find admin user"));
+    private UserOverviewDTO getAdminUserDTO(Map<String, Optional<MongoDbSession>> lastSessionMap) {
+        final Optional<User> optionalAdmin = userService.getRootUser();
+        if (!optionalAdmin.isPresent()) {
+            return null;
+        }
+        final User admin = optionalAdmin.get();
         final Set<String> adminRoles = userService.getRoleNames(admin);
         final Optional<MongoDbSession> lastSession = lastSessionMap.getOrDefault(admin.getName(), Optional.empty());
-        return UserDTO.builder()
+        return UserOverviewDTO.builder()
                 .username(admin.getName())
                 .fullName(admin.getFullName())
                 .email(admin.getEmail())
-                .external(admin.isExternalUser())
-                .preferences(admin.getPreferences())
+                .externalUser(admin.isExternalUser())
                 .readOnly(admin.isReadOnly())
                 .id(admin.getId())
-                .timezone(admin.getTimeZone())
                 .fillSession(lastSession)
                 .roles(adminRoles)
                 .build();
