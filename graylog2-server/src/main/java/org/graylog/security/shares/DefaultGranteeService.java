@@ -17,10 +17,10 @@
 package org.graylog.security.shares;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.shares.EntityShareResponse.AvailableGrantee;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.utilities.GRNRegistry;
 
 import javax.inject.Inject;
 

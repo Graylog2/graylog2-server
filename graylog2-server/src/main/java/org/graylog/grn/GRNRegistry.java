@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.utilities;
-
-import com.google.common.collect.ImmutableSet;
+package org.graylog.grn;
 
 import javax.inject.Singleton;
 import java.util.Collection;
@@ -34,19 +32,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Singleton
 public class GRNRegistry {
     public static final String GLOBAL_USER_GRN = "grn::::builtin-team:everyone"; // TODO: Find a better name for the "everyone" grantee GRN type
-
-    // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
-    // TODO find a way to unify these
-    private static final ImmutableSet<GRNType> BUILTIN_TYPES = ImmutableSet.<GRNType>builder()
-            .add(GRNType.create("collection", "collections:"))
-            .add(GRNType.create("dashboard", "dashboards:"))
-            .add(GRNType.create("grant", "grants:"))
-            .add(GRNType.create("role", "roles:"))
-            .add(GRNType.create("stream", "streams:"))
-            .add(GRNType.create("user", "users:"))
-            .add(GRNType.create("team", "teams:"))
-            .add(GRNType.create("builtin-team", "XXX-NOT-A-REAL-TYPE-XXX:"))
-            .build();
 
     private final ConcurrentMap<String, GRNType> REGISTRY = new ConcurrentHashMap<>();
 
@@ -69,7 +54,7 @@ public class GRNRegistry {
      * @return the registry
      */
     public static GRNRegistry createWithBuiltinTypes() {
-        return createWithTypes(BUILTIN_TYPES);
+        return createWithTypes(GRNTypes.builtinTypes());
     }
 
     /**

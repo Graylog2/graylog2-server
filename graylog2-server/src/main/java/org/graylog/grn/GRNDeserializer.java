@@ -15,26 +15,29 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.utilities;
+package org.graylog.grn;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 
-// TODO Not sure why this is needed
-public class GRNKeyDeserializer extends KeyDeserializer {
+/**
+ * Converts GRN strings format into a {@link GRN} object.
+ */
+public class GRNDeserializer extends StdDeserializer<GRN> {
     private final GRNRegistry grnRegistry;
 
-    public GRNKeyDeserializer(GRNRegistry grnRegistry) {
-        super();
+    public GRNDeserializer(GRNRegistry grnRegistry) {
+        super(GRN.class);
         this.grnRegistry = grnRegistry;
     }
 
     @Override
-    public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-        return grnRegistry.parse(key);
+    public GRN deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        return grnRegistry.parse(p.getValueAsString());
     }
-
 }
 

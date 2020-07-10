@@ -23,12 +23,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 import org.mongojack.DBQuery;
 
 import javax.annotation.Nullable;

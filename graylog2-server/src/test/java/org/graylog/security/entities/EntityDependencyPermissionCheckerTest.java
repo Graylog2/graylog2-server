@@ -18,10 +18,10 @@ package org.graylog.security.entities;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.UserAuthorizer;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

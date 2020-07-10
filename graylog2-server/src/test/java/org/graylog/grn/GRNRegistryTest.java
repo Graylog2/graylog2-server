@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.utilities;
+package org.graylog.grn;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,7 @@ class GRNRegistryTest {
                 assertThat(grn.cluster()).isEmpty();
                 assertThat(grn.type()).isEqualTo("test");
                 assertThat(grn.entity()).isEqualTo("123");
-                assertThat(grn.permissionPrefix()).isEqualTo("tests:");
+                assertThat(grn.grnType().permissionPrefix()).isEqualTo("tests:");
             });
         }
 

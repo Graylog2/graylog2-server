@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRN;
 import org.graylog.security.Capability;
 import org.graylog.security.entities.EntityDependency;
-import org.graylog2.utilities.GRN;
 
 import java.util.Collection;
 import java.util.Collections;

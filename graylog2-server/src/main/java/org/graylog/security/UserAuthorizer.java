@@ -20,7 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.graylog2.utilities.GRN;
+import org.graylog.grn.GRN;
 
 import javax.inject.Inject;
 

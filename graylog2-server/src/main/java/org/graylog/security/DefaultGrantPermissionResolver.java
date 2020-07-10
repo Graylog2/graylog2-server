@@ -19,10 +19,10 @@ package org.graylog.security;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

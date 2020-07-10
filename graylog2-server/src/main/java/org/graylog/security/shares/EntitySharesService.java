@@ -19,6 +19,8 @@ package org.graylog.security.shares;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -29,8 +31,6 @@ import org.graylog.security.entities.EntityDependencyResolver;
 import org.graylog.security.shares.EntityShareResponse.ActiveShare;
 import org.graylog.security.shares.EntityShareResponse.AvailableCapability;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 
 import javax.inject.Inject;
 import java.time.ZoneOffset;
