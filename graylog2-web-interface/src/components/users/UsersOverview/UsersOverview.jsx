@@ -1,35 +1,26 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { useStore } from 'stores/connect';
 import UsersStore from 'stores/users/UsersStore';
 import UsersActions from 'actions/users/UsersActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { DataTable, Spinner, PaginatedList, SearchForm } from 'components/common';
+import { DataTable, Spinner, PaginatedList } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import UserOverviewItem from './UserOverviewItem';
+import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
+import SystemAdministrator from './SystemAdministratorOverview';
 
-const TableWrapper = styled.div`
+const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
     overflow-x: visible;
   }
 `;
-
-const Filter = ({ perPage }: { perPage: number }) => {
-  const handleSearch = (newQuery, resetLoading) => UsersActions.searchPaginated(1, perPage, newQuery).then(resetLoading);
-  const handleReset = () => UsersActions.searchPaginated(1, perPage, '');
-
-  return (
-    <SearchForm onSearch={handleSearch}
-                onReset={handleReset}
-                useLoadingState
-                topMargin={0} />
-  );
-};
 
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
@@ -74,27 +65,12 @@ const UsersOverview = () => {
   }
 
   return (
-    <>
+    <Container>
       {adminUser && (
-        <Row className="content">
-          <Col xs={12}>
-            <h2>System Administrator</h2>
-            <p className="description">
-              The system administrator can only be edit in the graylog configuration file.
-            </p>
-            <TableWrapper>
-              <DataTable id="users-overview"
-                         className="table-hover"
-                         headers={headers}
-                         headerCellFormatter={_headerCellFormatter}
-                         sortByKey="fullName"
-                         rows={[adminUser]}
-                         dataRowFormatter={_userOverviewItem}
-                         filterKeys={[]}
-                         filterLabel="Filter Users" />
-            </TableWrapper>
-          </Col>
-        </Row>
+        <SystemAdministrator adminUser={adminUser}
+                             dataRowFormatter={_userOverviewItem}
+                             headerCellFormatter={_headerCellFormatter}
+                             headers={headers} />
       )}
       <Row className="content">
         <Col xs={12}>
@@ -103,22 +79,20 @@ const UsersOverview = () => {
             Found {total} registered users on the system.
           </p>
           <PaginatedList onChange={_onPageChange(query)} totalItems={total} activePage={page}>
-            <TableWrapper>
-              <DataTable id="users-overview"
-                         className="table-hover"
-                         headers={headers}
-                         headerCellFormatter={_headerCellFormatter}
-                         sortByKey="fullName"
-                         rows={users.toJS()}
-                         customFilter={<Filter perPage={perPage} />}
-                         dataRowFormatter={_userOverviewItem}
-                         filterKeys={[]}
-                         filterLabel="Filter Users" />
-            </TableWrapper>
+            <DataTable id="users-overview"
+                       className="table-hover"
+                       headers={headers}
+                       headerCellFormatter={_headerCellFormatter}
+                       sortByKey="fullName"
+                       rows={users.toJS()}
+                       customFilter={<UsersFilter perPage={perPage} />}
+                       dataRowFormatter={_userOverviewItem}
+                       filterKeys={[]}
+                       filterLabel="Filter Users" />
           </PaginatedList>
         </Col>
       </Row>
-    </>
+    </Container>
   );
 };
 
