@@ -7,7 +7,7 @@ import { useStore } from 'stores/connect';
 import UsersStore from 'stores/users/UsersStore';
 import UsersActions from 'actions/users/UsersActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { DataTable, Spinner } from 'components/common';
+import { DataTable, Spinner, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import UserOverviewItem from './UserOverviewItem';
@@ -30,20 +30,28 @@ const _headerCellFormatter = (header) => {
   }
 };
 
+const _onPageChange = (query) => (page, perPage) => UsersActions.searchPaginated(page, perPage, query);
+
 const UsersOverview = () => {
-  const { list: users } = useStore(UsersStore);
+  const {
+    paginatedList: {
+      adminUser,
+      list: users,
+      pagination: { page, perPage, query, total, count },
+    },
+  } = useStore(UsersStore);
   const roles = [];
   const currentUser = useContext(CurrentUserContext);
   const filterKeys = ['username', 'fullName', 'email', 'clientAddress'];
-  const headers = ['', 'Username', 'Full name', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+  const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
   const _userOverviewItem = (user) => <UserOverviewItem user={user} roles={roles} isActive={_isActiveItem(user)} />;
 
   useEffect(() => {
-    UsersActions.loadUsers();
+    UsersActions.searchPaginated(page, perPage, query);
 
     const unlistenDeleteUser = UsersActions.deleteUser.completed.listen(() => {
-      UsersActions.loadUsers();
+      UsersActions.searchPaginated(page, perPage, query);
     });
 
     return () => {
@@ -55,22 +63,27 @@ const UsersOverview = () => {
     return <Spinner />;
   }
 
+  const Filter = <SearchForm onSearch={(newQuery) => UsersActions.searchPaginated(1, perPage, newQuery)} onReset={() => UsersActions.searchPaginated(page, perPage, '')} useLoadingState />;
+
   return (
     <Row className="content">
       <Col xs={12}>
-        <TableWrapper>
-          <DataTable id="users-overview"
-                     className="table-hover"
-                     headers={headers}
-                     headerCellFormatter={_headerCellFormatter}
-                     sortByKey="fullName"
-                     rows={users.toJS()}
-                     filterBy="role"
+        <PaginatedList onChange={_onPageChange(query)} totalItems={total} activePage={page}>
+          <TableWrapper>
+            <DataTable id="users-overview"
+                       className="table-hover"
+                       headers={headers}
+                       headerCellFormatter={_headerCellFormatter}
+                       sortByKey="fullName"
+                       rows={users.toJS()}
+                       filterBy="role"
+                       customFilter={Filter}
                      // filterSuggestions={roles}
-                     dataRowFormatter={_userOverviewItem}
-                     filterKeys={filterKeys}
-                     filterLabel="Filter Users" />
-        </TableWrapper>
+                       dataRowFormatter={_userOverviewItem}
+                       filterKeys={filterKeys}
+                       filterLabel="Filter Users" />
+          </TableWrapper>
+        </PaginatedList>
       </Col>
     </Row>
   );

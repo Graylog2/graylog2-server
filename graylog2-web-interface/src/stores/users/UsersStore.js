@@ -16,7 +16,7 @@ const DEFAULT_PAGINATION = {
   count: undefined,
   total: undefined,
   page: 1,
-  perPage: 20,
+  perPage: 10,
   query: '',
 };
 
@@ -143,7 +143,7 @@ const UsersStore: UsersStoreType = singletonStore(
     searchPaginated(page, perPage, query): Promise<UserJSON[]> {
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
-      return fetch('GET', qualifyUrl(url))
+      const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedResponse) => {
           this.paginatedList = {
             adminUser: User.fromJSON(response.context.admin_user),
@@ -165,6 +165,10 @@ const UsersStore: UsersStoreType = singletonStore(
           UserNotification.error(`Loading user list failed with status: ${errorThrown}`,
             'Could not load user list');
         });
+
+      UsersActions.searchPaginated.promise(promise);
+
+      return promise;
     },
 
     load(username: string): Promise<UserJSON> {
@@ -260,6 +264,7 @@ const UsersStore: UsersStoreType = singletonStore(
     _state(): UsersStoreState {
       return {
         list: this.list,
+        paginatedList: this.paginatedList,
       };
     },
 

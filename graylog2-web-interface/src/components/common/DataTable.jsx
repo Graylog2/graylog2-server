@@ -23,6 +23,8 @@ class DataTable extends React.Component {
     children: PropTypes.node,
     /** Adds a custom class to the table element. */
     className: PropTypes.string,
+    /** Overrides the defalt filter. */
+    customFilter: PropTypes.node,
     /** Adds a custom class to the row element. */
     rowClassName: PropTypes.string,
     /** Object key that should be used to display data in the data filter input. */
@@ -68,6 +70,7 @@ class DataTable extends React.Component {
   };
 
   static defaultProps = {
+    customFilter: undefined,
     children: undefined,
     className: '',
     filterBy: '',
@@ -146,6 +149,7 @@ class DataTable extends React.Component {
   render() {
     let filter;
     const {
+      customFilter,
       filterKeys,
       id,
       filterLabel,
@@ -162,23 +166,27 @@ class DataTable extends React.Component {
     const effectiveRows = this._getEffectiveRows();
 
     if (filterKeys.length !== 0) {
-      filter = (
-        <div className="row">
-          <div className="col-md-8">
-            <TypeAheadDataFilter id={`${id}-data-filter`}
-                                 label={filterLabel}
-                                 data={rows}
-                                 displayKey={displayKey}
-                                 filterBy={filterBy}
-                                 filterSuggestions={filterSuggestions}
-                                 searchInKeys={filterKeys}
-                                 onDataFiltered={this.filterDataRows} />
+      if (customFilter) {
+        filter = customFilter;
+      } else {
+        filter = (
+          <div className="row">
+            <div className="col-md-8">
+              <TypeAheadDataFilter id={`${id}-data-filter`}
+                                   label={filterLabel}
+                                   data={rows}
+                                   displayKey={displayKey}
+                                   filterBy={filterBy}
+                                   filterSuggestions={filterSuggestions}
+                                   searchInKeys={filterKeys}
+                                   onDataFiltered={this.filterDataRows} />
+            </div>
+            <div className="col-md-4">
+              {children}
+            </div>
           </div>
-          <div className="col-md-4">
-            {children}
-          </div>
-        </div>
-      );
+        );
+      }
     }
 
     let data;
