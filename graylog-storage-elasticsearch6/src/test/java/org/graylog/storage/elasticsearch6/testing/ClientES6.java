@@ -18,12 +18,17 @@ package org.graylog.storage.elasticsearch6.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableMap;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.State;
+import io.searchbox.cluster.UpdateSettings;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.Index;
@@ -38,18 +43,19 @@ import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
@@ -65,49 +71,20 @@ public class ClientES6 implements Client {
     }
 
     @Override
-    public void createIndex(String index) {
-        createIndex(index, 1, 0);
-    }
-
-    @Override
     public void createIndex(String index, int shards, int replicas) {
-        createIndex(index, shards, replicas, Collections.emptyMap());
-    }
-
-    private void createIndex(String index, int shards, int replicas, Map<String, Object> indexSettings) {
-        final Map<String, Object> settings = new HashMap<>();
-        settings.put("number_of_shards", shards);
-        settings.put("number_of_replicas", replicas);
-
-        if (indexSettings.containsKey("settings")) {
-            @SuppressWarnings("unchecked") final Map<String, Object> customSettings = (Map<String, Object>) indexSettings.get("settings");
-            settings.putAll(customSettings);
-        }
-
-        final Map<String, Object> mappings = new HashMap<>();
-        if (indexSettings.containsKey("mappings")) {
-            @SuppressWarnings("unchecked") final Map<String, Object> customMappings = (Map<String, Object>) indexSettings.get("mappings");
-            mappings.putAll(customMappings);
-        }
+        final Map<String, Object> settings = ImmutableMap.of(
+                "number_of_shards", shards,
+                "number_of_replicas", replicas
+        );
 
         final ImmutableMap<String, Map<String, Object>> finalSettings = ImmutableMap.of(
                 "settings", settings,
-                "mappings", mappings);
+                "mappings", Collections.emptyMap());
         final CreateIndex createIndex = new CreateIndex.Builder(index)
                 .settings(finalSettings)
                 .build();
 
         executeWithExpectedSuccess(createIndex, "failed to create index " + index);
-    }
-
-    @Override
-    public String createRandomIndex(String prefix) {
-        final String indexName = prefix + System.nanoTime();
-
-        createIndex(indexName);
-        waitForGreenStatus(indexName);
-
-        return indexName;
     }
 
     @Override
@@ -158,11 +135,6 @@ public class ClientES6 implements Client {
                 executeWithExpectedSuccess(templateRequest, "failed to get template " + templateName);
 
         return templateResponse.getJsonObject();
-    }
-
-    @Override
-    public JsonNode getTemplates() {
-        return getTemplate("");
     }
 
     @Override
@@ -270,5 +242,59 @@ public class ClientES6 implements Client {
 
     private String[] metadataFieldNamesFor(JsonNode result, String templates) {
         return toArray(result.get("metadata").get(templates).fieldNames(), String.class);
+    }
+
+    @Override
+    public void putSetting(String setting, String value) {
+        final UpdateSettings.Builder request = new UpdateSettings.Builder(Collections.singletonMap(
+                "transient", Collections.singletonMap(
+                        setting, value
+                )
+        ));
+        executeWithExpectedSuccess(request.build(), "Unable to update ES cluster setting: " + setting + "=" + value);
+    }
+
+    @Override
+    public void waitForIndexBlock(String index) {
+        waitForResult(() -> indexBlocksPresent(index));
+    }
+
+    @Override
+    public void resetIndexBlock(String index) {
+        final io.searchbox.indices.settings.UpdateSettings.Builder request =
+                new io.searchbox.indices.settings.UpdateSettings.Builder(Collections.singletonMap(
+                        "index.blocks.read_only_allow_delete", null
+                ))
+                .addIndex(index);
+
+        executeWithExpectedSuccess(request.build(), "Unable to reset index block for " + index);
+    }
+
+    private void waitForResult(Callable<Boolean> task) {
+        final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
+                .retryIfResult(result -> result == null || !result)
+                .withStopStrategy(StopStrategies.stopAfterDelay(1, TimeUnit.MINUTES))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .build();
+
+        try {
+            retryer.call(task);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean indexBlocksPresent(String index) {
+        final State.Builder request = new State.Builder()
+                .withBlocks()
+                .indices(index);
+        final JestResult result = executeWithExpectedSuccess(request.build(), "Unable to retrieve index blocks for " + index);
+
+        return result.getJsonObject()
+                .path("blocks")
+                .path("indices")
+                .path(index)
+                .fields()
+                .hasNext();
     }
 }

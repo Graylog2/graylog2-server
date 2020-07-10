@@ -251,7 +251,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           "componentStyle": ComponentStyle {
             "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "efRfDO",
+            "lastClassName": "dGFyzQ",
             "rules": Array [
               [Function],
               "margin-top:10px;",
@@ -275,14 +275,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 efRfDO"
+        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 dGFyzQ"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 efRfDO table table-striped table-bordered"
+          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 dGFyzQ table table-striped table-bordered"
         >
           <thead>
             <tr>
@@ -775,6 +775,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "background": "#fafafa",
                                             "backgroundAlt": "#f0f0f0",
                                             "backgroundHover": "#f5f5f5",
+                                            "variant": Object {
+                                              "active": "#e6e6e6",
+                                              "danger": "#eddddd",
+                                              "info": "#dde2f0",
+                                              "primary": "#e4dee7",
+                                              "success": "#ddeddf",
+                                              "warning": "#fff5dd",
+                                            },
+                                            "variantHover": Object {
+                                              "active": "#d0d0d0",
+                                              "danger": "#debdbd",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
+                                            },
                                           },
                                           "variant": Object {
                                             "danger": "#ad0707",
@@ -2908,6 +2924,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "background": "#fafafa",
                                             "backgroundAlt": "#f0f0f0",
                                             "backgroundHover": "#f5f5f5",
+                                            "variant": Object {
+                                              "active": "#e6e6e6",
+                                              "danger": "#eddddd",
+                                              "info": "#dde2f0",
+                                              "primary": "#e4dee7",
+                                              "success": "#ddeddf",
+                                              "warning": "#fff5dd",
+                                            },
+                                            "variantHover": Object {
+                                              "active": "#d0d0d0",
+                                              "danger": "#debdbd",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
+                                            },
                                           },
                                           "variant": Object {
                                             "danger": "#ad0707",
@@ -5041,6 +5073,22 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "background": "#fafafa",
                                             "backgroundAlt": "#f0f0f0",
                                             "backgroundHover": "#f5f5f5",
+                                            "variant": Object {
+                                              "active": "#e6e6e6",
+                                              "danger": "#eddddd",
+                                              "info": "#dde2f0",
+                                              "primary": "#e4dee7",
+                                              "success": "#ddeddf",
+                                              "warning": "#fff5dd",
+                                            },
+                                            "variantHover": Object {
+                                              "active": "#d0d0d0",
+                                              "danger": "#debdbd",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
+                                            },
                                           },
                                           "variant": Object {
                                             "danger": "#ad0707",

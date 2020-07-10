@@ -84,6 +84,14 @@ const Routes = {
         provider: (name) => `/system/authentication/config/${name}`,
       },
     },
+    USERS: {
+      CREATE: '/system/users/new',
+      edit: (username) => `/system/users/edit/${username}`,
+      TOKENS: {
+        edit: (username) => `/system/users/tokens/${username}`,
+      },
+      OVERVIEW: '/system/users',
+    },
     LOOKUPTABLES: {
       OVERVIEW: '/system/lookuptables',
       CREATE: '/system/lookuptables/create',

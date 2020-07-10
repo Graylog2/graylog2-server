@@ -7,8 +7,8 @@ import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
-import URLUtils from 'util/URLUtils';
 import Routes from 'routing/Routes';
+import { appPrefixed } from 'util/URLUtils';
 import {
   AlertConditionsPage,
   AlertNotificationsPage,
@@ -81,6 +81,7 @@ import {
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
+  UsersOverviewPage,
   UsersPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
@@ -90,21 +91,21 @@ const AppRouter = () => {
   const pluginRoutesWithNullParent = pluginRoutes.filter((route) => (route.parentComponent === null)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={URLUtils.appPrefixed(pluginRoute.path)}
+             path={appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
   const pluginRoutesWithParent = pluginRoutes.filter((route) => route.parentComponent).map((pluginRoute) => (
     <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
            component={pluginRoute.parentComponent}>
-      <Route path={URLUtils.appPrefixed(pluginRoute.path)}
+      <Route path={appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     </Route>
   ));
   const standardPluginRoutes = pluginRoutes.filter((route) => (route.parentComponent === undefined)).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-             path={URLUtils.appPrefixed(pluginRoute.path)}
+             path={appPrefixed(pluginRoute.path)}
              component={pluginRoute.component} />
     );
   });
@@ -212,6 +213,7 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
+              <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />

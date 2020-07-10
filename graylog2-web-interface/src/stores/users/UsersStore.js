@@ -1,17 +1,22 @@
 // @flow strict
 import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
+import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import UsersActions from 'actions/users/UsersActions';
+import { singletonStore } from 'views/logic/singleton';
+import User from 'logic/users/User';
 
 type StartPage = {
   id: string,
   type: string,
 };
 
-export type User = {
+export type UserJSON = {
   username: string,
   id: string,
   full_name: string,
@@ -26,123 +31,172 @@ export type User = {
   session_timeout_ms: number,
 
   startpage?: StartPage,
+
+  session_active: boolean,
+  client_address: string,
+  last_activity: string,
 };
 
-type Token = {
+export type Token = {
   token_name: string,
   token: string,
   last_access: string,
 };
 
-type ChangePasswordRequest = {
+export type ChangePasswordRequest = {
   old_password: string,
   password: string,
 };
 
-const UsersStore = Reflux.createStore({
-  create(request: any): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.create().url);
-    const promise = fetch('POST', url, request);
+type UsersStoreState = {
+  list: Immutable.List<User>,
+};
 
-    return promise;
-  },
+type UsersStoreType = Store<UsersStoreState>;
 
-  loadUsers(): Promise<User[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list().url);
-    const promise = fetch('GET', url)
-      .then(
-        (response) => response.users,
-        (error) => {
-          if (error.additional.status !== 404) {
-            UserNotification.error(`Loading user list failed with status: ${error}`,
-              'Could not load user list');
-          }
-        },
-      );
+const UsersStore: UsersStoreType = singletonStore(
+  'Users',
+  () => Reflux.createStore({
+    listenables: [UsersActions],
+    list: undefined,
 
-    return promise;
-  },
+    getInitialState(): UsersStoreState {
+      return this._state();
+    },
 
-  load(username: string): Promise<User> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
-    const promise = fetch('GET', url);
+    create(request: any): Promise<string[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.create().url);
+      const promise = fetch('POST', url, request);
 
-    promise.catch((error) => {
-      UserNotification.error(`Loading user failed with status: ${error}`,
-        `Could not load user ${username}`);
-    });
+      UsersActions.create.promise(promise);
 
-    return promise;
-  },
+      return promise;
+    },
 
-  deleteUser(username: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(username)).url);
-    const promise = fetch('DELETE', url);
+    loadUsers(): Promise<User[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
+      const promise = fetch('GET', url)
+        .then(
+          (response) => {
+            const { users } = response;
+            this.list = Immutable.List(users.map((user) => User.fromJSON(user)));
+            this._trigger();
 
-    promise.then(() => {
-      UserNotification.success(`User "${username}" was deleted successfully`);
-    }, (error) => {
-      if (error.additional.status !== 404) {
-        UserNotification.error(`Delete user failed with status: ${error}`,
-          'Could not delete user');
-      }
-    });
+            return users;
+          },
+          (error) => {
+            if (error.additional.status !== 404) {
+              UserNotification.error(`Loading user list failed with status: ${error}`,
+                'Could not load user list');
+            }
+          },
+        );
 
-    return promise;
-  },
+      UsersActions.loadUsers.promise(promise);
 
-  changePassword(username: string, request: ChangePasswordRequest): void {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
-    const promise = fetch('PUT', url, request);
+      return promise;
+    },
 
-    return promise;
-  },
+    load(username: string): Promise<UserJSON> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
+      const promise = fetch('GET', url);
 
-  update(username: string, request: any): void {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
-    const promise = fetch('PUT', url, request);
+      promise.catch((error) => {
+        UserNotification.error(`Loading user failed with status: ${error}`,
+          `Could not load user ${username}`);
+      });
 
-    return promise;
-  },
+      UsersActions.load.promise(promise);
 
-  createToken(username: string, tokenName: string): Promise<Token> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
-      encodeURIComponent(tokenName)).url);
-    const promise = fetch('POST', url);
+      return promise;
+    },
 
-    return promise;
-  },
+    deleteUser(username: string): Promise<string[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(username)).url);
+      const promise = fetch('DELETE', url);
 
-  deleteToken(username: string, tokenId: string, tokenName: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
-      encodeURIComponent(tokenId)).url, {});
-    const promise = fetch('DELETE', url);
+      promise.then(() => {
+        UserNotification.success(`User "${username}" was deleted successfully`);
+      }, (error) => {
+        if (error.additional.status !== 404) {
+          UserNotification.error(`Delete user failed with status: ${error}`,
+            'Could not delete user');
+        }
+      });
 
-    promise.then(() => {
-      UserNotification.success(`Token "${tokenName}" of user "${username}" was deleted successfully`);
-    }, (error) => {
-      if (error.additional.status !== 404) {
-        UserNotification.error(`Delete token "${tokenName}" of user failed with status: ${error}`,
-          'Could not delete token.');
-      }
-    });
+      UsersActions.deleteUser.promise(promise);
 
-    return promise;
-  },
+      return promise;
+    },
 
-  loadTokens(username: string): Promise<Token[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
-    const promise = fetch('GET', url)
-      .then(
+    changePassword(username: string, request: ChangePasswordRequest): void {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
+      const promise = fetch('PUT', url, request);
+      UsersActions.changePassword.promise(promise);
+
+      return promise;
+    },
+
+    update(username: string, request: any): void {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
+      const promise = fetch('PUT', url, request);
+      UsersActions.update.promise(promise);
+
+      return promise;
+    },
+
+    createToken(username: string, tokenName: string): Promise<Token> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
+        encodeURIComponent(tokenName)).url);
+      const promise = fetch('POST', url);
+      UsersActions.createToken.promise(promise);
+
+      return promise;
+    },
+
+    deleteToken(username: string, tokenId: string, tokenName: string): Promise<string[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
+        encodeURIComponent(tokenId)).url, {});
+      const promise = fetch('DELETE', url);
+
+      promise.then(() => {
+        UserNotification.success(`Token "${tokenName}" of user "${username}" was deleted successfully`);
+      }, (error) => {
+        if (error.additional.status !== 404) {
+          UserNotification.error(`Delete token "${tokenName}" of user failed with status: ${error}`,
+            'Could not delete token.');
+        }
+      });
+
+      UsersActions.deleteToken.promise(promise);
+
+      return promise;
+    },
+
+    loadTokens(username: string): Promise<Token[]> {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
+      const promise = fetch('GET', url).then(
         (response) => response.tokens,
         (error) => {
           UserNotification.error(`Loading tokens of user failed with status: ${error}`,
             `Could not load tokens of user ${username}`);
         },
       );
+      UsersActions.loadTokens.promise(promise);
 
-    return promise;
-  },
-});
+      return promise;
+    },
+
+    _state(): UsersStoreState {
+      return {
+        list: this.list,
+      };
+    },
+
+    _trigger() {
+      this.trigger(this._state());
+    },
+  }),
+);
 
 export default UsersStore;

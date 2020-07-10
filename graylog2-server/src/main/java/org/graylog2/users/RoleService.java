@@ -35,6 +35,8 @@ public interface RoleService {
 
     Map<String, Role> loadAllIdMap() throws NotFoundException;
 
+    Map<String, Role> findIdMap(Set<String> roleIds) throws NotFoundException;
+
     Map<String, Role> loadAllLowercaseNameMap() throws NotFoundException;
 
     Role save(Role role) throws ValidationException;
