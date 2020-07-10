@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import Icon from './Icon';
 
-const SubnavigationCol = styled(Col)(({ theme }) => `
+const SubnavigationCol = styled(Col)(({ theme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 

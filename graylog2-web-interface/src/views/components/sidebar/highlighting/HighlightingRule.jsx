@@ -1,9 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -35,7 +36,7 @@ export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = s
   }
 `;
 
-const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => `
+const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   width: 2rem;
   height: 2rem;
   margin-left: 0.4rem;
@@ -45,7 +46,7 @@ const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   justify-content: center;
 
   :active {
-    background-color: ${theme.colors.gray[90]}
+    background-color: ${theme.colors.gray[90]};
   }
 `);
 

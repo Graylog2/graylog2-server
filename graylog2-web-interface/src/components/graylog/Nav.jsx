@@ -46,7 +46,7 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       }
     }
 
-    ${navTabsStyles};
+    ${navTabsStyles}
   }
 `);
 

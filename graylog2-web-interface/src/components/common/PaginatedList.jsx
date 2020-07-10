@@ -17,8 +17,10 @@ type PageSizeSelectProps = {
   onChange: (event: SyntheticInputEvent<HTMLLinkElement>) => void,
 };
 
+const pageFormStyle = { float: 'right' /* stylelint-disable-line declaration-colon-space-after */ };
+
 const PageSizeSelect = ({ pageSizes, pageSize, onChange }: PageSizeSelectProps) => (
-  <div className="form-inline page-size" style={{ float: 'right' }}>
+  <div className="form-inline page-size" style={pageFormStyle}>
     <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={onChange}>
       {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
     </Input>

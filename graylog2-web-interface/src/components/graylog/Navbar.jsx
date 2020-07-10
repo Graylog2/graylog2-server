@@ -184,7 +184,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &,
         &:hover,
         &:focus {
-          color: ${chroma(theme.colors.global.textDefault).brighten(0.50)};
+          color: ${chroma(theme.colors.global.textDefault).brighten(0.5)};
           background-color: transparent;
         }
       }
@@ -232,7 +232,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
             &,
             &:hover,
             &:focus {
-              color: ${chroma(theme.colors.global.textDefault).brighten(0.50)};
+              color: ${chroma(theme.colors.global.textDefault).brighten(0.5)};
               background-color: transparent;
             }
           }
@@ -278,7 +278,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${chroma(theme.colors.global.textDefault).brighten(0.50)};
+          color: ${chroma(theme.colors.global.textDefault).brighten(0.5)};
         }
       }
     }

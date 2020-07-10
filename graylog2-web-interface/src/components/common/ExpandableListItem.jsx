@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Checkbox } from 'components/graylog';
 
 import Icon from './Icon';
 
-const ItemWrap = styled.li(({ padded }) => `
+const ItemWrap = styled.li(({ padded }) => css`
   padding: ${padded ? '10px 5px' : ''};
 `);
 
-const Container = styled.div(({ theme }) => `
+const Container = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   line-height: 20px;
 
@@ -31,7 +31,7 @@ const Toggle = styled.div`
   margin-right: 5px;
 `;
 
-const IconStack = styled.div(({ theme }) => `
+const IconStack = styled.div(({ theme }) => css`
   &.fa-stack {
     cursor: pointer;
     font-size: ${theme.fonts.size.large};
@@ -55,7 +55,7 @@ const IconStack = styled.div(({ theme }) => `
   }
 `);
 
-const HeaderWrap = styled.span(({ theme }) => `
+const HeaderWrap = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 `);
 
@@ -66,13 +66,13 @@ const Header = styled.button`
   background: transparent;
 `;
 
-const Subheader = styled.span(({ theme }) => `
+const Subheader = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
   margin-left: 0.5em;
   color: ${theme.colors.gray[70]};
 `);
 
-const ExpandableContent = styled.div(({ theme }) => `
+const ExpandableContent = styled.div(({ theme }) => css`
   border-left: 1px ${theme.colors.gray[90]} solid;
   margin-left: 35px;
   margin-top: 10px;

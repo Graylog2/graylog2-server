@@ -1,8 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 
 import NavItem from './NavItem';
 import { type SidebarSection } from './sidebarSections';
@@ -14,7 +15,7 @@ type Props = {
   toggleSidebar: () => void,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   background: ${theme.colors.gray[10]};
   color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);

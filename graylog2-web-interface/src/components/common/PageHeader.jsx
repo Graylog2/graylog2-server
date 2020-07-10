@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
 import ContentHeadRow from 'components/common/ContentHeadRow';
 import SupportLink from 'components/support/SupportLink';
 
-const LifecycleIndicator = styled.span(({ theme }) => `
+const LifecycleIndicator = styled.span(({ theme }) => css`
   cursor: help;
   margin-left: 5px;
   font-size: ${theme.fonts.size.body};

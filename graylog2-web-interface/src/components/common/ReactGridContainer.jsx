@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import { isEqual } from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -18,7 +18,7 @@ const WidthProvidedGridLayout = (props) => {
 WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
 WidthProvidedGridLayout.defaultProps = { width: undefined };
 
-const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }) => `
+const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }) => css`
   &.locked {
     .widget-drag-handle {
       display: none;

@@ -3,7 +3,8 @@ import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
 import { connect, Field, useFormikContext } from 'formik';
 
@@ -23,7 +24,7 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => `
+const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);

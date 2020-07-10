@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Table } from 'components/graylog';
 import { SystemMessage } from 'components/systemmessages';
 
-const SystemMessagesTable = styled(Table)(({ theme }) => `
+const SystemMessagesTable = styled(Table)(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
 
   a {
