@@ -281,6 +281,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   color: rgb(88,73,5);
 }
 
+<<<<<<< HEAD
 .c4.nav > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
@@ -304,6 +305,26 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 .c4.nav .open > a:hover,
 .c4.nav .open > a:focus {
   background-color: #f3f3f3;
+=======
+.c4.nav > li > a:hover,
+.c4.nav > li > a:focus {
+  background-color: #e6e6e6;
+}
+
+.c4.nav > li.disabled > a {
+  color: #9b9b9b;
+}
+
+.c4.nav > li.disabled > a:hover,
+.c4.nav > li.disabled > a:focus {
+  color: #9b9b9b;
+}
+
+.c4.nav .open > a,
+.c4.nav .open > a:hover,
+.c4.nav .open > a:focus {
+  background-color: #e6e6e6;
+>>>>>>> 1634bb410f... snapshots
   border-color: #702785;
 }
 
@@ -322,12 +343,17 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c4.nav .nav-tabs > li > a:hover {
+<<<<<<< HEAD
   background-color: #f3f3f3;
   color: #1f1f1f;
+=======
+  background-color: #cdcdcd;
+  color: rgb(46,46,46);
+>>>>>>> 1634bb410f... snapshots
 }
 
 .c4.nav .nav-tabs > li.active > a,
@@ -394,6 +420,10 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
         "baseHash": -110015796,
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
+<<<<<<< HEAD
+=======
+        "lastClassName": "c4",
+>>>>>>> 1634bb410f... snapshots
         "rules": Array [
           [Function],
         ],
@@ -444,6 +474,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   <Row
     className="content"
   >
+<<<<<<< HEAD
     <Row
       bsClass="row"
       className="c0 content"
@@ -463,10 +494,80 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
           >
             <div
               className="c1 col-sm-12"
+=======
+    <StyledComponent
+      className="content"
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Row-sc-3iisrt-0",
+            "isStatic": false,
+            "lastClassName": "c0",
+            "rules": Array [
+              "&.content{",
+              [Function],
+              "}",
+            ],
+          },
+          "displayName": "Row",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Row-sc-3iisrt-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <Row
+        bsClass="row"
+        className="c0 content"
+        componentClass="div"
+      >
+        <div
+          className="c0 content row"
+        >
+          <Wizard__HorizontalCol
+            sm={12}
+          >
+            <StyledComponent
+              forwardedComponent={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "attrs": Array [],
+                  "componentStyle": ComponentStyle {
+                    "componentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+                    "isStatic": false,
+                    "lastClassName": "c1",
+                    "rules": Array [
+                      "margin-bottom:15px;",
+                    ],
+                  },
+                  "displayName": "Wizard__HorizontalCol",
+                  "foldedComponentIds": Array [],
+                  "render": [Function],
+                  "styledComponentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+                  "target": [Function],
+                  "toString": [Function],
+                  "warnTooManyClasses": [Function],
+                  "withComponent": [Function],
+                }
+              }
+              forwardedRef={null}
+              sm={12}
+>>>>>>> 1634bb410f... snapshots
             >
-              <div
-                className="pull-right"
+              <Col
+                bsClass="col"
+                className="c1"
+                componentClass="div"
+                sm={12}
               >
+<<<<<<< HEAD
                 <Wizard__HorizontalButtonToolbar>
                   <ButtonToolbar
                     bsClass="btn-toolbar"
@@ -476,89 +577,241 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                       className="c2 btn-toolbar"
                       role="toolbar"
                     >
-                      <Button
+                      <ForwardRef
                         bsSize="xsmall"
                         bsStyle="info"
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="xsmall"
                           bsStyle="info"
-                          className="c3"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c3 btn btn-xs btn-info"
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            className="c3"
                             disabled={true}
                             onClick={[Function]}
-                            type="button"
                           >
-                            <Icon
-                              name="caret-left"
-                              type="solid"
+                            <button
+                              className="c3 btn btn-xs btn-info"
+=======
+                <div
+                  className="c1 col-sm-12"
+                >
+                  <div
+                    className="pull-right"
+                  >
+                    <Wizard__HorizontalButtonToolbar>
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                              "isStatic": false,
+                              "lastClassName": "c2",
+                              "rules": Array [
+                                "padding:7px;",
+                              ],
+                            },
+                            "displayName": "Wizard__HorizontalButtonToolbar",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                      >
+                        <ButtonToolbar
+                          bsClass="btn-toolbar"
+                          className="c2"
+                        >
+                          <div
+                            className="c2 btn-toolbar"
+                            role="toolbar"
+                          >
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                              disabled={true}
+                              onClick={[Function]}
+                              type="button"
                             >
-                              <FontAwesomeIcon
-                                icon={
-                                  Object {
-                                    "iconName": "caret-left",
-                                    "prefix": "fas",
-                                  }
-                                }
+<<<<<<< HEAD
+                              <Icon
+                                name="caret-left"
+                                type="solid"
                               >
-                                <svg
-                                  className="svg-inline--fa fa-caret-left"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button>
-                      <Button
+                                <FontAwesomeIcon
+                                  icon={
+                                    Object {
+                                      "iconName": "caret-left",
+                                      "prefix": "fas",
+                                    }
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-caret-left"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button__StyledButton>
+                      </ForwardRef>
+                      <ForwardRef
                         bsSize="xsmall"
                         bsStyle="info"
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="xsmall"
                           bsStyle="info"
-                          className="c3"
-                          disabled={false}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c3 btn btn-xs btn-info"
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            className="c3"
                             disabled={false}
                             onClick={[Function]}
-                            type="button"
                           >
-                            <Icon
-                              name="caret-right"
-                              type="solid"
-                            >
-                              <FontAwesomeIcon
-                                icon={
-                                  Object {
-                                    "iconName": "caret-right",
-                                    "prefix": "fas",
-                                  }
-                                }
+                            <button
+                              className="c3 btn btn-xs btn-info"
+                              disabled={false}
+=======
+                              <Button__StyledButton
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                disabled={true}
+                                onClick={[Function]}
                               >
-                                <svg
-                                  className="svg-inline--fa fa-caret-right"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button>
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="info"
+                                  disabled={true}
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "c3",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="info"
+                                    className="c3"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="c3 btn btn-xs btn-info"
+                                      disabled={true}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      <Icon
+                                        name="caret-left"
+                                        type="solid"
+                                      >
+                                        <FontAwesomeIcon
+                                          icon={
+                                            Object {
+                                              "iconName": "caret-left",
+                                              "prefix": "fas",
+                                            }
+                                          }
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-caret-left"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                              onClick={[Function]}
+                              type="button"
+                            >
+<<<<<<< HEAD
+                              <Icon
+                                name="caret-right"
+                                type="solid"
+                              >
+                                <FontAwesomeIcon
+                                  icon={
+                                    Object {
+                                      "iconName": "caret-right",
+                                      "prefix": "fas",
+                                    }
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-caret-right"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button__StyledButton>
+                      </ForwardRef>
                     </div>
                   </ButtonToolbar>
                 </Wizard__HorizontalButtonToolbar>
@@ -689,6 +942,260 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
         </Col>
       </div>
     </Row>
+=======
+                              <Button__StyledButton
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="info"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "c3",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="info"
+                                    className="c3"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="c3 btn btn-xs btn-info"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      <Icon
+                                        name="caret-right"
+                                        type="solid"
+                                      >
+                                        <FontAwesomeIcon
+                                          icon={
+                                            Object {
+                                              "iconName": "caret-right",
+                                              "prefix": "fas",
+                                            }
+                                          }
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-caret-right"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                          </div>
+                        </ButtonToolbar>
+                      </StyledComponent>
+                    </Wizard__HorizontalButtonToolbar>
+                  </div>
+                  <Nav
+                    activeKey="Key1"
+                    bsStyle="pills"
+                    justified={false}
+                    onSelect={[Function]}
+                  >
+                    <StyledComponent
+                      activeKey="Key1"
+                      bsStyle="pills"
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "tabs",
+                            "pills",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Nav-dzawzr-0",
+                            "isStatic": false,
+                            "lastClassName": "c4",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Nav",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Nav-dzawzr-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      justified={false}
+                      onSelect={[Function]}
+                    >
+                      <Nav
+                        activeKey="Key1"
+                        bsClass="nav"
+                        bsStyle="pills"
+                        className="c4"
+                        justified={false}
+                        onSelect={[Function]}
+                        pullLeft={false}
+                        pullRight={false}
+                        stacked={false}
+                      >
+                        <ul
+                          className="c4 nav nav-pills"
+                          role={null}
+                        >
+                          <NavItem
+                            active={true}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key1"
+                            key=".$Key1"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className="active"
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title1
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key2"
+                            key=".$Key2"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key3"
+                            key=".$Key3"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title3
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                        </ul>
+                      </Nav>
+                    </StyledComponent>
+                  </Nav>
+                </div>
+              </Col>
+            </StyledComponent>
+          </Wizard__HorizontalCol>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={12}
+          >
+            <div
+              className="col-md-12"
+            >
+              <div>
+                Component1
+              </div>
+            </div>
+          </Col>
+        </div>
+      </Row>
+    </StyledComponent>
+>>>>>>> 1634bb410f... snapshots
   </Row>
 </Wizard>
 `;
@@ -974,6 +1481,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   color: rgb(88,73,5);
 }
 
+<<<<<<< HEAD
 .c4.nav > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
@@ -997,6 +1505,26 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 .c4.nav .open > a:hover,
 .c4.nav .open > a:focus {
   background-color: #f3f3f3;
+=======
+.c4.nav > li > a:hover,
+.c4.nav > li > a:focus {
+  background-color: #e6e6e6;
+}
+
+.c4.nav > li.disabled > a {
+  color: #9b9b9b;
+}
+
+.c4.nav > li.disabled > a:hover,
+.c4.nav > li.disabled > a:focus {
+  color: #9b9b9b;
+}
+
+.c4.nav .open > a,
+.c4.nav .open > a:hover,
+.c4.nav .open > a:focus {
+  background-color: #e6e6e6;
+>>>>>>> 1634bb410f... snapshots
   border-color: #702785;
 }
 
@@ -1015,12 +1543,17 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c4.nav .nav-tabs > li > a:hover {
+<<<<<<< HEAD
   background-color: #f3f3f3;
   color: #1f1f1f;
+=======
+  background-color: #cdcdcd;
+  color: rgb(46,46,46);
+>>>>>>> 1634bb410f... snapshots
 }
 
 .c4.nav .nav-tabs > li.active > a,
@@ -1087,6 +1620,10 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
         "baseHash": -110015796,
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
+<<<<<<< HEAD
+=======
+        "lastClassName": "c4",
+>>>>>>> 1634bb410f... snapshots
         "rules": Array [
           [Function],
         ],
@@ -1137,6 +1674,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   <Row
     className="content"
   >
+<<<<<<< HEAD
     <Row
       bsClass="row"
       className="c0 content"
@@ -1156,10 +1694,80 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
           >
             <div
               className="c1 col-sm-12"
+=======
+    <StyledComponent
+      className="content"
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Row-sc-3iisrt-0",
+            "isStatic": false,
+            "lastClassName": "c0",
+            "rules": Array [
+              "&.content{",
+              [Function],
+              "}",
+            ],
+          },
+          "displayName": "Row",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Row-sc-3iisrt-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <Row
+        bsClass="row"
+        className="c0 content"
+        componentClass="div"
+      >
+        <div
+          className="c0 content row"
+        >
+          <Wizard__HorizontalCol
+            sm={12}
+          >
+            <StyledComponent
+              forwardedComponent={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "attrs": Array [],
+                  "componentStyle": ComponentStyle {
+                    "componentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+                    "isStatic": false,
+                    "lastClassName": "c1",
+                    "rules": Array [
+                      "margin-bottom:15px;",
+                    ],
+                  },
+                  "displayName": "Wizard__HorizontalCol",
+                  "foldedComponentIds": Array [],
+                  "render": [Function],
+                  "styledComponentId": "Wizard__HorizontalCol-sc-1jnediy-1",
+                  "target": [Function],
+                  "toString": [Function],
+                  "warnTooManyClasses": [Function],
+                  "withComponent": [Function],
+                }
+              }
+              forwardedRef={null}
+              sm={12}
+>>>>>>> 1634bb410f... snapshots
             >
-              <div
-                className="pull-right"
+              <Col
+                bsClass="col"
+                className="c1"
+                componentClass="div"
+                sm={12}
               >
+<<<<<<< HEAD
                 <Wizard__HorizontalButtonToolbar>
                   <ButtonToolbar
                     bsClass="btn-toolbar"
@@ -1169,89 +1777,241 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                       className="c2 btn-toolbar"
                       role="toolbar"
                     >
-                      <Button
+                      <ForwardRef
                         bsSize="xsmall"
                         bsStyle="info"
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="xsmall"
                           bsStyle="info"
-                          className="c3"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c3 btn btn-xs btn-info"
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            className="c3"
                             disabled={true}
                             onClick={[Function]}
-                            type="button"
                           >
-                            <Icon
-                              name="caret-left"
-                              type="solid"
+                            <button
+                              className="c3 btn btn-xs btn-info"
+=======
+                <div
+                  className="c1 col-sm-12"
+                >
+                  <div
+                    className="pull-right"
+                  >
+                    <Wizard__HorizontalButtonToolbar>
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                              "isStatic": false,
+                              "lastClassName": "c2",
+                              "rules": Array [
+                                "padding:7px;",
+                              ],
+                            },
+                            "displayName": "Wizard__HorizontalButtonToolbar",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "Wizard__HorizontalButtonToolbar-sc-1jnediy-2",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                      >
+                        <ButtonToolbar
+                          bsClass="btn-toolbar"
+                          className="c2"
+                        >
+                          <div
+                            className="c2 btn-toolbar"
+                            role="toolbar"
+                          >
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                              disabled={true}
+                              onClick={[Function]}
+                              type="button"
                             >
-                              <FontAwesomeIcon
-                                icon={
-                                  Object {
-                                    "iconName": "caret-left",
-                                    "prefix": "fas",
-                                  }
-                                }
+<<<<<<< HEAD
+                              <Icon
+                                name="caret-left"
+                                type="solid"
                               >
-                                <svg
-                                  className="svg-inline--fa fa-caret-left"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button>
-                      <Button
+                                <FontAwesomeIcon
+                                  icon={
+                                    Object {
+                                      "iconName": "caret-left",
+                                      "prefix": "fas",
+                                    }
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-caret-left"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button__StyledButton>
+                      </ForwardRef>
+                      <ForwardRef
                         bsSize="xsmall"
                         bsStyle="info"
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Button__StyledButton
                           bsSize="xsmall"
                           bsStyle="info"
-                          className="c3"
-                          disabled={false}
                           onClick={[Function]}
                         >
-                          <button
-                            className="c3 btn btn-xs btn-info"
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsSize="xsmall"
+                            bsStyle="info"
+                            className="c3"
                             disabled={false}
                             onClick={[Function]}
-                            type="button"
                           >
-                            <Icon
-                              name="caret-right"
-                              type="solid"
-                            >
-                              <FontAwesomeIcon
-                                icon={
-                                  Object {
-                                    "iconName": "caret-right",
-                                    "prefix": "fas",
-                                  }
-                                }
+                            <button
+                              className="c3 btn btn-xs btn-info"
+                              disabled={false}
+=======
+                              <Button__StyledButton
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                disabled={true}
+                                onClick={[Function]}
                               >
-                                <svg
-                                  className="svg-inline--fa fa-caret-right"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button>
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="info"
+                                  disabled={true}
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "c3",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="info"
+                                    className="c3"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="c3 btn btn-xs btn-info"
+                                      disabled={true}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      <Icon
+                                        name="caret-left"
+                                        type="solid"
+                                      >
+                                        <FontAwesomeIcon
+                                          icon={
+                                            Object {
+                                              "iconName": "caret-left",
+                                              "prefix": "fas",
+                                            }
+                                          }
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-caret-left"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                              onClick={[Function]}
+                              type="button"
+                            >
+<<<<<<< HEAD
+                              <Icon
+                                name="caret-right"
+                                type="solid"
+                              >
+                                <FontAwesomeIcon
+                                  icon={
+                                    Object {
+                                      "iconName": "caret-right",
+                                      "prefix": "fas",
+                                    }
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-caret-right"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button__StyledButton>
+                      </ForwardRef>
                     </div>
                   </ButtonToolbar>
                 </Wizard__HorizontalButtonToolbar>
@@ -1395,6 +2155,273 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
         </Col>
       </div>
     </Row>
+=======
+                              <Button__StyledButton
+                                bsSize="xsmall"
+                                bsStyle="info"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="info"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "c3",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button__StyledButton",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="info"
+                                    className="c3"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="c3 btn btn-xs btn-info"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      <Icon
+                                        name="caret-right"
+                                        type="solid"
+                                      >
+                                        <FontAwesomeIcon
+                                          icon={
+                                            Object {
+                                              "iconName": "caret-right",
+                                              "prefix": "fas",
+                                            }
+                                          }
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-caret-right"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button__StyledButton>
+                            </ForwardRef>
+                          </div>
+                        </ButtonToolbar>
+                      </StyledComponent>
+                    </Wizard__HorizontalButtonToolbar>
+                  </div>
+                  <Nav
+                    activeKey="Key1"
+                    bsStyle="pills"
+                    justified={false}
+                    onSelect={[Function]}
+                  >
+                    <StyledComponent
+                      activeKey="Key1"
+                      bsStyle="pills"
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "tabs",
+                            "pills",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Nav-dzawzr-0",
+                            "isStatic": false,
+                            "lastClassName": "c4",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Nav",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Nav-dzawzr-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      justified={false}
+                      onSelect={[Function]}
+                    >
+                      <Nav
+                        activeKey="Key1"
+                        bsClass="nav"
+                        bsStyle="pills"
+                        className="c4"
+                        justified={false}
+                        onSelect={[Function]}
+                        pullLeft={false}
+                        pullRight={false}
+                        stacked={false}
+                      >
+                        <ul
+                          className="c4 nav nav-pills"
+                          role={null}
+                        >
+                          <NavItem
+                            active={true}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key1"
+                            key=".$Key1"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className="active"
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title1
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key2"
+                            key=".$Key2"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key3"
+                            key=".$Key3"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title3
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                        </ul>
+                      </Nav>
+                    </StyledComponent>
+                  </Nav>
+                </div>
+              </Col>
+            </StyledComponent>
+          </Wizard__HorizontalCol>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={7}
+          >
+            <div
+              className="col-md-7"
+            >
+              <div>
+                Component1
+              </div>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={5}
+          >
+            <div
+              className="col-md-5"
+            >
+              <span>
+                Preview
+              </span>
+            </div>
+          </Col>
+        </div>
+      </Row>
+    </StyledComponent>
+>>>>>>> 1634bb410f... snapshots
   </Row>
 </Wizard>
 `;
@@ -1680,6 +2707,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   color: rgb(88,73,5);
 }
 
+<<<<<<< HEAD
 .c2.nav > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
@@ -1703,6 +2731,26 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 .c2.nav .open > a:hover,
 .c2.nav .open > a:focus {
   background-color: #f3f3f3;
+=======
+.c2.nav > li > a:hover,
+.c2.nav > li > a:focus {
+  background-color: #e6e6e6;
+}
+
+.c2.nav > li.disabled > a {
+  color: #9b9b9b;
+}
+
+.c2.nav > li.disabled > a:hover,
+.c2.nav > li.disabled > a:focus {
+  color: #9b9b9b;
+}
+
+.c2.nav .open > a,
+.c2.nav .open > a:hover,
+.c2.nav .open > a:focus {
+  background-color: #e6e6e6;
+>>>>>>> 1634bb410f... snapshots
   border-color: #702785;
 }
 
@@ -1721,12 +2769,17 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c2.nav .nav-tabs > li > a:hover {
+<<<<<<< HEAD
   background-color: #f3f3f3;
   color: #1f1f1f;
+=======
+  background-color: #cdcdcd;
+  color: rgb(46,46,46);
+>>>>>>> 1634bb410f... snapshots
 }
 
 .c2.nav .nav-tabs > li.active > a,
@@ -1789,6 +2842,10 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
         "baseHash": -110015796,
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
+<<<<<<< HEAD
+=======
+        "lastClassName": "c2",
+>>>>>>> 1634bb410f... snapshots
         "rules": Array [
           [Function],
         ],
@@ -1839,6 +2896,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   <Row
     className="content"
   >
+<<<<<<< HEAD
     <Row
       bsClass="row"
       className="c0 content"
@@ -1858,14 +2916,80 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
           >
             <div
               className="c1 col-md-2"
+=======
+    <StyledComponent
+      className="content"
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Row-sc-3iisrt-0",
+            "isStatic": false,
+            "lastClassName": "c0",
+            "rules": Array [
+              "&.content{",
+              [Function],
+              "}",
+            ],
+          },
+          "displayName": "Row",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Row-sc-3iisrt-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <Row
+        bsClass="row"
+        className="c0 content"
+        componentClass="div"
+      >
+        <div
+          className="c0 content row"
+        >
+          <Wizard__SubnavigationCol
+            md={2}
+          >
+            <StyledComponent
+              forwardedComponent={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "attrs": Array [],
+                  "componentStyle": ComponentStyle {
+                    "componentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                    "isStatic": false,
+                    "lastClassName": "c1",
+                    "rules": Array [
+                      [Function],
+                    ],
+                  },
+                  "displayName": "Wizard__SubnavigationCol",
+                  "foldedComponentIds": Array [],
+                  "render": [Function],
+                  "styledComponentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                  "target": [Function],
+                  "toString": [Function],
+                  "warnTooManyClasses": [Function],
+                  "withComponent": [Function],
+                }
+              }
+              forwardedRef={null}
+              md={2}
+>>>>>>> 1634bb410f... snapshots
             >
-              <Nav
-                activeKey="Key1"
-                bsStyle="pills"
-                justified={false}
-                onSelect={[Function]}
-                stacked={true}
+              <Col
+                bsClass="col"
+                className="c1"
+                componentClass="div"
+                md={2}
               >
+<<<<<<< HEAD
                 <Nav
                   activeKey="Key1"
                   bsClass="nav"
@@ -1986,32 +3110,236 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                       <div
                         className="col-xs-6"
                       >
-                        <Button
+                        <ForwardRef
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
+                          <Button__StyledButton
                             bsSize="small"
                             bsStyle="info"
-                            className="c3"
                             disabled={true}
                             onClick={[Function]}
                           >
-                            <button
-                              className="c3 btn btn-sm btn-info"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c3"
                               disabled={true}
                               onClick={[Function]}
-                              type="button"
                             >
-                              Previous
-                            </button>
-                          </Button>
-                        </Button>
+                              <button
+                                className="c3 btn btn-sm btn-info"
+=======
+                <div
+                  className="c1 col-md-2"
+                >
+                  <Nav
+                    activeKey="Key1"
+                    bsStyle="pills"
+                    justified={false}
+                    onSelect={[Function]}
+                    stacked={true}
+                  >
+                    <StyledComponent
+                      activeKey="Key1"
+                      bsStyle="pills"
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "tabs",
+                            "pills",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Nav-dzawzr-0",
+                            "isStatic": false,
+                            "lastClassName": "c2",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Nav",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Nav-dzawzr-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      justified={false}
+                      onSelect={[Function]}
+                      stacked={true}
+                    >
+                      <Nav
+                        activeKey="Key1"
+                        bsClass="nav"
+                        bsStyle="pills"
+                        className="c2"
+                        justified={false}
+                        onSelect={[Function]}
+                        pullLeft={false}
+                        pullRight={false}
+                        stacked={true}
+                      >
+                        <ul
+                          className="c2 nav nav-pills nav-stacked"
+                          role={null}
+                        >
+                          <NavItem
+                            active={true}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key1"
+                            key=".$Key1"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className="active"
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title1
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key2"
+                            key=".$Key2"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key3"
+                            key=".$Key3"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title3
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                        </ul>
+                      </Nav>
+                    </StyledComponent>
+                  </Nav>
+                  <br />
+                  <Row>
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Row-sc-3iisrt-0",
+                            "isStatic": false,
+                            "lastClassName": "c0",
+                            "rules": Array [
+                              "&.content{",
+                              [Function],
+                              "}",
+                            ],
+                          },
+                          "displayName": "Row",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Row-sc-3iisrt-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                    >
+                      <Row
+                        bsClass="row"
+                        className="c0"
+                        componentClass="div"
+                      >
+                        <div
+                          className="c0 row"
+                        >
+                          <Col
+                            bsClass="col"
+                            componentClass="div"
+                            xs={6}
+                          >
+                            <div
+                              className="col-xs-6"
+                            >
+                              <ForwardRef
+                                bsSize="small"
+                                bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+<<<<<<< HEAD
+                                Previous
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
                       </div>
                     </Col>
                     <Col
@@ -2023,31 +3351,124 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                       <div
                         className="text-right col-xs-6"
                       >
-                        <Button
+                        <ForwardRef
                           bsSize="small"
                           bsStyle="info"
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
+                          <Button__StyledButton
                             bsSize="small"
                             bsStyle="info"
-                            className="c3"
-                            disabled={false}
                             onClick={[Function]}
                           >
-                            <button
-                              className="c3 btn btn-sm btn-info"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c3"
                               disabled={false}
                               onClick={[Function]}
-                              type="button"
                             >
-                              Next
-                            </button>
-                          </Button>
-                        </Button>
+                              <button
+                                className="c3 btn btn-sm btn-info"
+                                disabled={false}
+=======
+                                <Button__StyledButton
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    bsStyle="info"
+                                    disabled={true}
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "c3",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button__StyledButton",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    onClick={[Function]}
+                                  >
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="small"
+                                      bsStyle="info"
+                                      className="c3"
+                                      disabled={true}
+                                      onClick={[Function]}
+                                    >
+                                      <button
+                                        className="c3 btn btn-sm btn-info"
+                                        disabled={true}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Previous
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button__StyledButton>
+                              </ForwardRef>
+                            </div>
+                          </Col>
+                          <Col
+                            bsClass="col"
+                            className="text-right"
+                            componentClass="div"
+                            xs={6}
+                          >
+                            <div
+                              className="text-right col-xs-6"
+                            >
+                              <ForwardRef
+                                bsSize="small"
+                                bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                                onClick={[Function]}
+                              >
+<<<<<<< HEAD
+                                Next
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
                       </div>
                     </Col>
                   </div>
@@ -2071,6 +3492,103 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
         </Col>
       </div>
     </Row>
+=======
+                                <Button__StyledButton
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  onClick={[Function]}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    bsStyle="info"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "c3",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button__StyledButton",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    onClick={[Function]}
+                                  >
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="small"
+                                      bsStyle="info"
+                                      className="c3"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                    >
+                                      <button
+                                        className="c3 btn btn-sm btn-info"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Next
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button__StyledButton>
+                              </ForwardRef>
+                            </div>
+                          </Col>
+                        </div>
+                      </Row>
+                    </StyledComponent>
+                  </Row>
+                </div>
+              </Col>
+            </StyledComponent>
+          </Wizard__SubnavigationCol>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={10}
+          >
+            <div
+              className="col-md-10"
+            >
+              <div>
+                Component1
+              </div>
+            </div>
+          </Col>
+        </div>
+      </Row>
+    </StyledComponent>
+>>>>>>> 1634bb410f... snapshots
   </Row>
 </Wizard>
 `;
@@ -2356,6 +3874,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   color: rgb(88,73,5);
 }
 
+<<<<<<< HEAD
 .c2.nav > li > a {
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
@@ -2379,6 +3898,26 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 .c2.nav .open > a:hover,
 .c2.nav .open > a:focus {
   background-color: #f3f3f3;
+=======
+.c2.nav > li > a:hover,
+.c2.nav > li > a:focus {
+  background-color: #e6e6e6;
+}
+
+.c2.nav > li.disabled > a {
+  color: #9b9b9b;
+}
+
+.c2.nav > li.disabled > a:hover,
+.c2.nav > li.disabled > a:focus {
+  color: #9b9b9b;
+}
+
+.c2.nav .open > a,
+.c2.nav .open > a:hover,
+.c2.nav .open > a:focus {
+  background-color: #e6e6e6;
+>>>>>>> 1634bb410f... snapshots
   border-color: #702785;
 }
 
@@ -2397,12 +3936,17 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c2.nav .nav-tabs > li > a:hover {
+<<<<<<< HEAD
   background-color: #f3f3f3;
   color: #1f1f1f;
+=======
+  background-color: #cdcdcd;
+  color: rgb(46,46,46);
+>>>>>>> 1634bb410f... snapshots
 }
 
 .c2.nav .nav-tabs > li.active > a,
@@ -2465,6 +4009,10 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
         "baseHash": -110015796,
         "componentId": "Nav-dzawzr-0",
         "isStatic": false,
+<<<<<<< HEAD
+=======
+        "lastClassName": "c2",
+>>>>>>> 1634bb410f... snapshots
         "rules": Array [
           [Function],
         ],
@@ -2515,6 +4063,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   <Row
     className="content"
   >
+<<<<<<< HEAD
     <Row
       bsClass="row"
       className="c0 content"
@@ -2534,14 +4083,80 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
           >
             <div
               className="c1 col-md-2"
+=======
+    <StyledComponent
+      className="content"
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Row-sc-3iisrt-0",
+            "isStatic": false,
+            "lastClassName": "c0",
+            "rules": Array [
+              "&.content{",
+              [Function],
+              "}",
+            ],
+          },
+          "displayName": "Row",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Row-sc-3iisrt-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <Row
+        bsClass="row"
+        className="c0 content"
+        componentClass="div"
+      >
+        <div
+          className="c0 content row"
+        >
+          <Wizard__SubnavigationCol
+            md={2}
+          >
+            <StyledComponent
+              forwardedComponent={
+                Object {
+                  "$$typeof": Symbol(react.forward_ref),
+                  "attrs": Array [],
+                  "componentStyle": ComponentStyle {
+                    "componentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                    "isStatic": false,
+                    "lastClassName": "c1",
+                    "rules": Array [
+                      [Function],
+                    ],
+                  },
+                  "displayName": "Wizard__SubnavigationCol",
+                  "foldedComponentIds": Array [],
+                  "render": [Function],
+                  "styledComponentId": "Wizard__SubnavigationCol-sc-1jnediy-0",
+                  "target": [Function],
+                  "toString": [Function],
+                  "warnTooManyClasses": [Function],
+                  "withComponent": [Function],
+                }
+              }
+              forwardedRef={null}
+              md={2}
+>>>>>>> 1634bb410f... snapshots
             >
-              <Nav
-                activeKey="Key1"
-                bsStyle="pills"
-                justified={false}
-                onSelect={[Function]}
-                stacked={true}
+              <Col
+                bsClass="col"
+                className="c1"
+                componentClass="div"
+                md={2}
               >
+<<<<<<< HEAD
                 <Nav
                   activeKey="Key1"
                   bsClass="nav"
@@ -2662,32 +4277,236 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                       <div
                         className="col-xs-6"
                       >
-                        <Button
+                        <ForwardRef
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
+                          <Button__StyledButton
                             bsSize="small"
                             bsStyle="info"
-                            className="c3"
                             disabled={true}
                             onClick={[Function]}
                           >
-                            <button
-                              className="c3 btn btn-sm btn-info"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c3"
                               disabled={true}
                               onClick={[Function]}
-                              type="button"
                             >
-                              Previous
-                            </button>
-                          </Button>
-                        </Button>
+                              <button
+                                className="c3 btn btn-sm btn-info"
+=======
+                <div
+                  className="c1 col-md-2"
+                >
+                  <Nav
+                    activeKey="Key1"
+                    bsStyle="pills"
+                    justified={false}
+                    onSelect={[Function]}
+                    stacked={true}
+                  >
+                    <StyledComponent
+                      activeKey="Key1"
+                      bsStyle="pills"
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "tabs",
+                            "pills",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Nav-dzawzr-0",
+                            "isStatic": false,
+                            "lastClassName": "c2",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Nav",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Nav-dzawzr-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                      justified={false}
+                      onSelect={[Function]}
+                      stacked={true}
+                    >
+                      <Nav
+                        activeKey="Key1"
+                        bsClass="nav"
+                        bsStyle="pills"
+                        className="c2"
+                        justified={false}
+                        onSelect={[Function]}
+                        pullLeft={false}
+                        pullRight={false}
+                        stacked={true}
+                      >
+                        <ul
+                          className="c2 nav nav-pills nav-stacked"
+                          role={null}
+                        >
+                          <NavItem
+                            active={true}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key1"
+                            key=".$Key1"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className="active"
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title1
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key2"
+                            key=".$Key2"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                          <NavItem
+                            active={false}
+                            activeKey="Key1"
+                            disabled={false}
+                            eventKey="Key3"
+                            key=".$Key3"
+                            onSelect={[Function]}
+                          >
+                            <li
+                              className=""
+                              role="presentation"
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  Title3
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </NavItem>
+                        </ul>
+                      </Nav>
+                    </StyledComponent>
+                  </Nav>
+                  <br />
+                  <Row>
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Row-sc-3iisrt-0",
+                            "isStatic": false,
+                            "lastClassName": "c0",
+                            "rules": Array [
+                              "&.content{",
+                              [Function],
+                              "}",
+                            ],
+                          },
+                          "displayName": "Row",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Row-sc-3iisrt-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                    >
+                      <Row
+                        bsClass="row"
+                        className="c0"
+                        componentClass="div"
+                      >
+                        <div
+                          className="c0 row"
+                        >
+                          <Col
+                            bsClass="col"
+                            componentClass="div"
+                            xs={6}
+                          >
+                            <div
+                              className="col-xs-6"
+                            >
+                              <ForwardRef
+                                bsSize="small"
+                                bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                                disabled={true}
+                                onClick={[Function]}
+                              >
+<<<<<<< HEAD
+                                Previous
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
                       </div>
                     </Col>
                     <Col
@@ -2699,31 +4518,124 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                       <div
                         className="text-right col-xs-6"
                       >
-                        <Button
+                        <ForwardRef
                           bsSize="small"
                           bsStyle="info"
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
+                          <Button__StyledButton
                             bsSize="small"
                             bsStyle="info"
-                            className="c3"
-                            disabled={false}
                             onClick={[Function]}
                           >
-                            <button
-                              className="c3 btn btn-sm btn-info"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsSize="small"
+                              bsStyle="info"
+                              className="c3"
                               disabled={false}
                               onClick={[Function]}
-                              type="button"
                             >
-                              Next
-                            </button>
-                          </Button>
-                        </Button>
+                              <button
+                                className="c3 btn btn-sm btn-info"
+                                disabled={false}
+=======
+                                <Button__StyledButton
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    bsStyle="info"
+                                    disabled={true}
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "c3",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button__StyledButton",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    onClick={[Function]}
+                                  >
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="small"
+                                      bsStyle="info"
+                                      className="c3"
+                                      disabled={true}
+                                      onClick={[Function]}
+                                    >
+                                      <button
+                                        className="c3 btn btn-sm btn-info"
+                                        disabled={true}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Previous
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button__StyledButton>
+                              </ForwardRef>
+                            </div>
+                          </Col>
+                          <Col
+                            bsClass="col"
+                            className="text-right"
+                            componentClass="div"
+                            xs={6}
+                          >
+                            <div
+                              className="text-right col-xs-6"
+                            >
+                              <ForwardRef
+                                bsSize="small"
+                                bsStyle="info"
+>>>>>>> 1634bb410f... snapshots
+                                onClick={[Function]}
+                              >
+<<<<<<< HEAD
+                                Next
+                              </button>
+                            </Button>
+                          </Button__StyledButton>
+                        </ForwardRef>
                       </div>
                     </Col>
                   </div>
@@ -2760,6 +4672,116 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
         </Col>
       </div>
     </Row>
+=======
+                                <Button__StyledButton
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  onClick={[Function]}
+                                >
+                                  <StyledComponent
+                                    bsSize="small"
+                                    bsStyle="info"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "c3",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button__StyledButton",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    onClick={[Function]}
+                                  >
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsSize="small"
+                                      bsStyle="info"
+                                      className="c3"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                    >
+                                      <button
+                                        className="c3 btn btn-sm btn-info"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Next
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button__StyledButton>
+                              </ForwardRef>
+                            </div>
+                          </Col>
+                        </div>
+                      </Row>
+                    </StyledComponent>
+                  </Row>
+                </div>
+              </Col>
+            </StyledComponent>
+          </Wizard__SubnavigationCol>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={7}
+          >
+            <div
+              className="col-md-7"
+            >
+              <div>
+                Component1
+              </div>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={3}
+          >
+            <div
+              className="col-md-3"
+            >
+              <span>
+                Preview
+              </span>
+            </div>
+          </Col>
+        </div>
+      </Row>
+    </StyledComponent>
+>>>>>>> 1634bb410f... snapshots
   </Row>
 </Wizard>
 `;
