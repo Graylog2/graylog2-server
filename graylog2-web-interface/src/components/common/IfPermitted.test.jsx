@@ -13,7 +13,7 @@ jest.mock('injection/StoreProvider', () => ({ getStore: () => {} }));
 describe('IfPermitted', () => {
   let element;
 
-  // We can't use prop types here, they don't work well together with mount and require
+  // We can't use prop types here, they are not compatible with mount and require in this case
   // eslint-disable-next-line react/prop-types
   const SimpleIfPermitted = ({ children, currentUser, ...props }) => (
     <CurrentUserContext.Provider value={{ ...viewsManager, ...currentUser }}>
