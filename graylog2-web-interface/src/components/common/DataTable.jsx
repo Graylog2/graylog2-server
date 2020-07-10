@@ -12,6 +12,45 @@ const StyledTable = styled.table`
   ${tableCss}
 `;
 
+const Filter = ({
+  children,
+  customFilter,
+  displayKey,
+  filterBy,
+  filterKeys,
+  filterSuggestions,
+  id,
+  label,
+  onDataFiltered,
+  rows,
+}) => {
+  if (customFilter) {
+    return customFilter;
+  }
+
+  if (filterKeys.length !== 0) {
+    return (
+      <div className="row">
+        <div className="col-md-8">
+          <TypeAheadDataFilter id={`${id}-data-filter`}
+                               label={label}
+                               data={rows}
+                               displayKey={displayKey}
+                               filterBy={filterBy}
+                               filterSuggestions={filterSuggestions}
+                               searchInKeys={filterKeys}
+                               onDataFiltered={onDataFiltered} />
+        </div>
+        <div className="col-md-4">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 /**
  * Component that renders a data table, letting consumers of the component to
  * decide exactly how the data should be rendered. It optionally adds a filter
@@ -147,7 +186,6 @@ class DataTable extends React.Component {
   };
 
   render() {
-    let filter;
     const {
       customFilter,
       filterKeys,
@@ -164,30 +202,6 @@ class DataTable extends React.Component {
       rows,
     } = this.props;
     const effectiveRows = this._getEffectiveRows();
-
-    if (filterKeys.length !== 0) {
-      if (customFilter) {
-        filter = customFilter;
-      } else {
-        filter = (
-          <div className="row">
-            <div className="col-md-8">
-              <TypeAheadDataFilter id={`${id}-data-filter`}
-                                   label={filterLabel}
-                                   data={rows}
-                                   displayKey={displayKey}
-                                   filterBy={filterBy}
-                                   filterSuggestions={filterSuggestions}
-                                   searchInKeys={filterKeys}
-                                   onDataFiltered={this.filterDataRows} />
-            </div>
-            <div className="col-md-4">
-              {children}
-            </div>
-          </div>
-        );
-      }
-    }
 
     let data;
 
@@ -210,7 +224,16 @@ class DataTable extends React.Component {
 
     return (
       <div>
-        {filter}
+        <Filter customFilter={customFilter}
+                label={filterLabel}
+                rows={rows}
+                displayKey={displayKey}
+                filterBy={filterBy}
+                filterSuggestions={filterSuggestions}
+                filterKeys={filterKeys}
+                onDataFiltered={this.filterDataRows}>
+          {children}
+        </Filter>
         <div className={`row ${rowClassName}`}>
           <div className="col-md-12">
             <div id={id} className={`data-table ${useResponsiveTable ? 'table-responsive' : ''}`}>

@@ -37,12 +37,11 @@ const UsersOverview = () => {
     paginatedList: {
       adminUser,
       list: users,
-      pagination: { page, perPage, query, total, count },
+      pagination: { page, perPage, query, total },
     },
   } = useStore(UsersStore);
   const roles = [];
   const currentUser = useContext(CurrentUserContext);
-  const filterKeys = ['username', 'fullName', 'email', 'clientAddress'];
   const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
   const _userOverviewItem = (user) => <UserOverviewItem user={user} roles={roles} isActive={_isActiveItem(user)} />;
@@ -63,29 +62,56 @@ const UsersOverview = () => {
     return <Spinner />;
   }
 
-  const Filter = <SearchForm onSearch={(newQuery) => UsersActions.searchPaginated(1, perPage, newQuery)} onReset={() => UsersActions.searchPaginated(page, perPage, '')} useLoadingState />;
+  const Filter = <SearchForm onSearch={(newQuery, resetLoading) => UsersActions.searchPaginated(1, perPage, newQuery).then(resetLoading)} onReset={() => UsersActions.searchPaginated(1, perPage, '')} useLoadingState topMargin={0} />;
 
   return (
-    <Row className="content">
-      <Col xs={12}>
-        <PaginatedList onChange={_onPageChange(query)} totalItems={total} activePage={page}>
-          <TableWrapper>
-            <DataTable id="users-overview"
-                       className="table-hover"
-                       headers={headers}
-                       headerCellFormatter={_headerCellFormatter}
-                       sortByKey="fullName"
-                       rows={users.toJS()}
-                       filterBy="role"
-                       customFilter={Filter}
-                     // filterSuggestions={roles}
-                       dataRowFormatter={_userOverviewItem}
-                       filterKeys={filterKeys}
-                       filterLabel="Filter Users" />
-          </TableWrapper>
-        </PaginatedList>
-      </Col>
-    </Row>
+    <>
+      {adminUser && (
+        <Row className="content">
+          <Col xs={12}>
+            <h2>System Administrator</h2>
+            <p className="description">
+              The system administrator can only be edit in the graylog configuration file.
+            </p>
+            <TableWrapper>
+              <DataTable id="users-overview"
+                         className="table-hover"
+                         headers={headers}
+                         headerCellFormatter={_headerCellFormatter}
+                         sortByKey="fullName"
+                         rows={[adminUser]}
+                         filterBy="role"
+                         dataRowFormatter={_userOverviewItem}
+                         filterKeys={[]}
+                         filterLabel="Filter Users" />
+            </TableWrapper>
+          </Col>
+        </Row>
+      )}
+      <Row className="content">
+        <Col xs={12}>
+          <h2>Users</h2>
+          <p className="description">
+            Found {total} registered users on the system.
+          </p>
+          <PaginatedList onChange={_onPageChange(query)} totalItems={total} activePage={page}>
+            <TableWrapper>
+              <DataTable id="users-overview"
+                         className="table-hover"
+                         headers={headers}
+                         headerCellFormatter={_headerCellFormatter}
+                         sortByKey="fullName"
+                         rows={users.toJS()}
+                         filterBy="role"
+                         customFilter={Filter}
+                         dataRowFormatter={_userOverviewItem}
+                         filterKeys={[]}
+                         filterLabel="Filter Users" />
+            </TableWrapper>
+          </PaginatedList>
+        </Col>
+      </Row>
+    </>
   );
 };
 
