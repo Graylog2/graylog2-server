@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useContext } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
@@ -15,13 +15,22 @@ import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
-import LoggedInCell from './UserOverviewItem/LoggedInCell';
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
     overflow-x: visible;
   }
 `;
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LoadingSpinner = styled(Spinner)(({ theme }) => `
+  margin-left: 10px;
+  font-size: ${theme.fonts.size.h3};
+`);
 
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
@@ -34,7 +43,11 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _onPageChange = (query) => (page, perPage) => UsersActions.searchPaginated(page, perPage, query);
+const _onPageChange = (query, setLoading) => (page, perPage) => {
+  setLoading(true);
+
+  return UsersActions.searchPaginated(page, perPage, query).then(setLoading(false));
+};
 
 const UsersOverview = () => {
   const {
@@ -44,6 +57,7 @@ const UsersOverview = () => {
       pagination: { page, perPage, query, total },
     },
   } = useStore(UsersStore);
+  const [loading, setLoading] = useState(false);
   const currentUser = useContext(CurrentUserContext);
   const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
@@ -75,11 +89,14 @@ const UsersOverview = () => {
       )}
       <Row className="content">
         <Col xs={12}>
-          <h2>Users</h2>
+          <Header>
+            <h2>Users</h2>
+            {loading && <LoadingSpinner text="" delay={0} />}
+          </Header>
           <p className="description">
             Found {total} registered users on the system.
           </p>
-          <PaginatedList onChange={_onPageChange(query)} totalItems={total} activePage={page}>
+          <PaginatedList onChange={_onPageChange(query, setLoading)} totalItems={total} activePage={page}>
             <DataTable id="users-overview"
                        className="table-hover"
                        headers={headers}
