@@ -31,161 +31,194 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
     }
   >
     <Row
-      bsClass="row"
       className="content"
-      componentClass="div"
     >
-      <div
-        className="content row"
+      <StyledComponent
+        className="content"
+        forwardedComponent={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "attrs": Array [],
+            "componentStyle": ComponentStyle {
+              "componentId": "Row-sc-3iisrt-0",
+              "isStatic": false,
+              "lastClassName": "bRJRJg",
+              "rules": Array [
+                "&.content{",
+                [Function],
+                "}",
+              ],
+            },
+            "displayName": "Row",
+            "foldedComponentIds": Array [],
+            "render": [Function],
+            "styledComponentId": "Row-sc-3iisrt-0",
+            "target": [Function],
+            "toString": [Function],
+            "warnTooManyClasses": [Function],
+            "withComponent": [Function],
+          }
+        }
+        forwardedRef={null}
       >
-        <Col
-          bsClass="col"
-          className="bootstrapHeading"
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 bRJRJg content"
           componentClass="div"
-          md={6}
-          mdOffset={3}
         >
           <div
-            className="bootstrapHeading col-md-6 col-md-offset-3"
+            className="Row-sc-3iisrt-0 bRJRJg content row"
           >
-            <h1>
-              View: 
-              <em />
-            </h1>
-            <p>
-              Unfortunately executing this view is not possible. It uses the following capabilities which are not available:
-            </p>
-            <ul>
-              <li
-                key="timetravel"
-              >
-                <strong>
-                  timetravel
-                </strong>
-                 - included in 
-                <a
-                  href="https://www.graylog.org"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Pandora's Box
-                </a>
-              </li>
-              <li
-                key="hyperspeed"
-              >
-                <strong>
-                  hyperspeed
-                </strong>
-                 - included in 
-                <a
-                  href="https://www.graylog.org"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Pandora's Box
-                </a>
-              </li>
-            </ul>
-          </div>
-        </Col>
-        <Col
-          bsClass="col"
-          componentClass="div"
-          md={1}
-          mdOffset={8}
-        >
-          <div
-            className="col-md-1 col-md-offset-8"
-          >
-            <LinkContainer
-              action="push"
-              onlyActiveOnIndex={false}
-              to="/path/to/views"
+            <Col
+              bsClass="col"
+              className="bootstrapHeading"
+              componentClass="div"
+              md={6}
+              mdOffset={3}
             >
-              <ForwardRef
-                action="push"
-                bsStyle="success"
-                onClick={[Function]}
-                type="submit"
+              <div
+                className="bootstrapHeading col-md-6 col-md-offset-3"
               >
-                <Button__StyledButton
+                <h1>
+                  View: 
+                  <em />
+                </h1>
+                <p>
+                  Unfortunately executing this view is not possible. It uses the following capabilities which are not available:
+                </p>
+                <ul>
+                  <li
+                    key="timetravel"
+                  >
+                    <strong>
+                      timetravel
+                    </strong>
+                     - included in 
+                    <a
+                      href="https://www.graylog.org"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Pandora's Box
+                    </a>
+                  </li>
+                  <li
+                    key="hyperspeed"
+                  >
+                    <strong>
+                      hyperspeed
+                    </strong>
+                     - included in 
+                    <a
+                      href="https://www.graylog.org"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Pandora's Box
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              md={1}
+              mdOffset={8}
+            >
+              <div
+                className="col-md-1 col-md-offset-8"
+              >
+                <LinkContainer
                   action="push"
-                  bsStyle="success"
-                  onClick={[Function]}
-                  type="submit"
+                  onlyActiveOnIndex={false}
+                  to="/path/to/views"
                 >
-                  <StyledComponent
+                  <ForwardRef
                     action="push"
                     bsStyle="success"
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                          "xsmall",
-                        ],
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                          "default",
-                          "primary",
-                          "link",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Button__StyledButton-c9cbmb-0",
-                          "isStatic": false,
-                          "lastClassName": "hpBclA",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Button__StyledButton",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
                     onClick={[Function]}
                     type="submit"
                   >
-                    <Button
+                    <Button__StyledButton
                       action="push"
-                      active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="success"
-                      className="Button__StyledButton-c9cbmb-0 hpBclA"
-                      disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
-                      <button
+                      <StyledComponent
                         action="push"
-                        className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-success"
-                        disabled={false}
+                        bsStyle="success"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                              "xsmall",
+                            ],
+                            "STYLES": Array [
+                              "success",
+                              "warning",
+                              "danger",
+                              "info",
+                              "default",
+                              "primary",
+                              "link",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "Button__StyledButton-c9cbmb-0",
+                              "isStatic": false,
+                              "lastClassName": "hpBclA",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "Button__StyledButton",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                         onClick={[Function]}
                         type="submit"
                       >
-                        Back
-                      </button>
-                    </Button>
-                  </StyledComponent>
-                </Button__StyledButton>
-              </ForwardRef>
-            </LinkContainer>
+                        <Button
+                          action="push"
+                          active={false}
+                          block={false}
+                          bsClass="btn"
+                          bsStyle="success"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="submit"
+                        >
+                          <button
+                            action="push"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-success"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="submit"
+                          >
+                            Back
+                          </button>
+                        </Button>
+                      </StyledComponent>
+                    </Button__StyledButton>
+                  </ForwardRef>
+                </LinkContainer>
+              </div>
+            </Col>
           </div>
-        </Col>
-      </div>
+        </Row>
+      </StyledComponent>
     </Row>
   </MissingRequirements>
 </Component>

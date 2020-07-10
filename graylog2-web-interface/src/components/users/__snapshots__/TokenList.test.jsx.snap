@@ -14,227 +14,258 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
       <div
         className="form-group"
       >
-        <Row
-          bsClass="row"
-          componentClass="div"
-        >
-          <div
-            className="row"
+        <Row>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Row-sc-3iisrt-0",
+                  "isStatic": false,
+                  "lastClassName": "bRJRJg",
+                  "rules": Array [
+                    "&.content{",
+                    [Function],
+                    "}",
+                  ],
+                },
+                "displayName": "Row",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Row-sc-3iisrt-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
           >
-            <Col
-              bsClass="col"
+            <Row
+              bsClass="row"
+              className="Row-sc-3iisrt-0 bRJRJg"
               componentClass="div"
-              sm={2}
             >
               <div
-                className="col-sm-2"
+                className="Row-sc-3iisrt-0 bRJRJg row"
               >
-                <ControlLabel
-                  className="tokenNewNameLabel"
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  sm={2}
                 >
-                  <StyledComponent
-                    className="tokenNewNameLabel"
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": false,
-                          "lastClassName": "hCskeX",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "ControlLabel",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <div
+                    className="col-sm-2"
                   >
                     <ControlLabel
-                      bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel"
-                      srOnly={false}
+                      className="tokenNewNameLabel"
                     >
-                      <label
-                        className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel control-label"
+                      <StyledComponent
+                        className="tokenNewNameLabel"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ControlLabel-sc-1edmum5-0",
+                              "isStatic": false,
+                              "lastClassName": "hCskeX",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "ControlLabel",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                       >
-                        Token Name
-                      </label>
+                        <ControlLabel
+                          bsClass="control-label"
+                          className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel"
+                          srOnly={false}
+                        >
+                          <label
+                            className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel control-label"
+                          >
+                            Token Name
+                          </label>
+                        </ControlLabel>
+                      </StyledComponent>
                     </ControlLabel>
-                  </StyledComponent>
-                </ControlLabel>
-              </div>
-            </Col>
-            <Col
-              bsClass="col"
-              componentClass="div"
-              sm={4}
-            >
-              <div
-                className="col-sm-4"
-              >
-                <FormControl
-                  id="create-token-input"
-                  onChange={[Function]}
-                  placeholder="e.g ServiceName"
-                  type="text"
-                  value=""
+                  </div>
+                </Col>
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  sm={4}
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "Feedback": [Function],
-                        "SIZES": Array [
-                          "small",
-                          "large",
-                        ],
-                        "Static": [Function],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": false,
-                          "lastClassName": "eXfwDC",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "FormControl",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "FormControl-sc-1amoaox-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
-                    id="create-token-input"
-                    onChange={[Function]}
-                    placeholder="e.g ServiceName"
-                    type="text"
-                    value=""
+                  <div
+                    className="col-sm-4"
                   >
                     <FormControl
-                      bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 eXfwDC"
-                      componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
                       placeholder="e.g ServiceName"
                       type="text"
                       value=""
                     >
-                      <input
-                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "Feedback": [Function],
+                            "SIZES": Array [
+                              "small",
+                              "large",
+                            ],
+                            "Static": [Function],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormControl-sc-1amoaox-0",
+                              "isStatic": false,
+                              "lastClassName": "eXfwDC",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "FormControl",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
                         type="text"
                         value=""
-                      />
+                      >
+                        <FormControl
+                          bsClass="form-control"
+                          className="FormControl-sc-1amoaox-0 eXfwDC"
+                          componentClass="input"
+                          id="create-token-input"
+                          onChange={[Function]}
+                          placeholder="e.g ServiceName"
+                          type="text"
+                          value=""
+                        >
+                          <input
+                            className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            id="create-token-input"
+                            onChange={[Function]}
+                            placeholder="e.g ServiceName"
+                            type="text"
+                            value=""
+                          />
+                        </FormControl>
+                      </StyledComponent>
                     </FormControl>
-                  </StyledComponent>
-                </FormControl>
-              </div>
-            </Col>
-            <Col
-              bsClass="col"
-              componentClass="div"
-              sm={2}
-            >
-              <div
-                className="col-sm-2"
-              >
-                <ForwardRef
-                  bsStyle="primary"
-                  disabled={true}
-                  id="create-token"
-                  type="submit"
+                  </div>
+                </Col>
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  sm={2}
                 >
-                  <Button__StyledButton
-                    bsStyle="primary"
-                    disabled={true}
-                    id="create-token"
-                    type="submit"
+                  <div
+                    className="col-sm-2"
                   >
-                    <StyledComponent
+                    <ForwardRef
                       bsStyle="primary"
                       disabled={true}
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                            "xsmall",
-                          ],
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                            "default",
-                            "primary",
-                            "link",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "Button__StyledButton-c9cbmb-0",
-                            "isStatic": false,
-                            "lastClassName": "hpBclA",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "Button__StyledButton",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       id="create-token"
                       type="submit"
                     >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
+                      <Button__StyledButton
                         bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
-                        <button
-                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
+                        <StyledComponent
+                          bsStyle="primary"
                           disabled={true}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "hpBclA",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
                           id="create-token"
                           type="submit"
                         >
-                          Create Token
-                        </button>
-                      </Button>
-                    </StyledComponent>
-                  </Button__StyledButton>
-                </ForwardRef>
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="primary"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA"
+                            disabled={true}
+                            id="create-token"
+                            type="submit"
+                          >
+                            <button
+                              className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
+                              disabled={true}
+                              id="create-token"
+                              type="submit"
+                            >
+                              Create Token
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
+                    </ForwardRef>
+                  </div>
+                </Col>
               </div>
-            </Col>
-          </div>
+            </Row>
+          </StyledComponent>
         </Row>
       </div>
       <hr />
@@ -258,194 +289,163 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
       titleKey="name"
     >
       <div>
-        <Row
-          bsClass="row"
-          componentClass="div"
-        >
-          <div
-            className="row"
+        <Row>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Row-sc-3iisrt-0",
+                  "isStatic": false,
+                  "lastClassName": "bRJRJg",
+                  "rules": Array [
+                    "&.content{",
+                    [Function],
+                    "}",
+                  ],
+                },
+                "displayName": "Row",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Row-sc-3iisrt-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
           >
-            <Col
-              bsClass="col"
+            <Row
+              bsClass="row"
+              className="Row-sc-3iisrt-0 bRJRJg"
               componentClass="div"
-              md={12}
             >
               <div
-                className="col-md-12"
+                className="Row-sc-3iisrt-0 bRJRJg row"
               >
-                <TypeAheadDataFilter
-                  data={Array []}
-                  displayKey="value"
-                  filterBy=""
-                  filterSuggestionAccessor=""
-                  filterSuggestions={Array []}
-                  id="filter-data-filter"
-                  label="Filter"
-                  onDataFiltered={[Function]}
-                  searchInKeys={
-                    Array [
-                      "name",
-                      "token",
-                    ]
-                  }
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  md={12}
                 >
                   <div
-                    className="filter"
+                    className="col-md-12"
                   >
-                    <form
-                      className="form-inline"
-                      onSubmit={[Function]}
-                      style={
-                        Object {
-                          "display": "inline",
-                        }
+                    <TypeAheadDataFilter
+                      data={Array []}
+                      displayKey="value"
+                      filterBy=""
+                      filterSuggestionAccessor=""
+                      filterSuggestions={Array []}
+                      id="filter-data-filter"
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      searchInKeys={
+                        Array [
+                          "name",
+                          "token",
+                        ]
                       }
                     >
-                      <TypeAheadInput
-                        displayKey="value"
-                        id="filter-data-filter"
-                        label="Filter"
-                        onSuggestionSelected={[Function]}
-                        suggestionText="Filter by : "
-                        suggestions={Array []}
+                      <div
+                        className="filter"
                       >
-                        <Input
-                          addonAfter={null}
-                          bsStyle={null}
-                          buttonAfter={null}
-                          help=""
-                          id="filter-data-filter"
-                          label="Filter"
-                          placeholder=""
-                          type="text"
-                          wrapperClassName="typeahead-wrapper"
+                        <form
+                          className="form-inline"
+                          onSubmit={[Function]}
+                          style={
+                            Object {
+                              "display": "inline",
+                            }
+                          }
                         >
-                          <Component
-                            controlId="filter-data-filter"
-                            validationState={null}
+                          <TypeAheadInput
+                            displayKey="value"
+                            id="filter-data-filter"
+                            label="Filter"
+                            onSuggestionSelected={[Function]}
+                            suggestionText="Filter by : "
+                            suggestions={Array []}
                           >
-                            <FormGroup__StyledFormGroup
-                              controlId="filter-data-filter"
-                              validationState={null}
+                            <Input
+                              addonAfter={null}
+                              bsStyle={null}
+                              buttonAfter={null}
+                              help=""
+                              id="filter-data-filter"
+                              label="Filter"
+                              placeholder=""
+                              type="text"
+                              wrapperClassName="typeahead-wrapper"
                             >
-                              <StyledComponent
+                              <Component
                                 controlId="filter-data-filter"
-                                forwardedComponent={
-                                  Object {
-                                    "$$typeof": Symbol(react.forward_ref),
-                                    "SIZES": Array [
-                                      "large",
-                                      "small",
-                                    ],
-                                    "attrs": Array [],
-                                    "componentStyle": ComponentStyle {
-                                      "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                      "isStatic": false,
-                                      "lastClassName": "gcTkZc",
-                                      "rules": Array [
-                                        [Function],
-                                      ],
-                                    },
-                                    "displayName": "FormGroup__StyledFormGroup",
-                                    "foldedComponentIds": Array [],
-                                    "render": [Function],
-                                    "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                    "target": [Function],
-                                    "toString": [Function],
-                                    "warnTooManyClasses": [Function],
-                                    "withComponent": [Function],
-                                  }
-                                }
-                                forwardedRef={null}
                                 validationState={null}
                               >
-                                <FormGroup
-                                  bsClass="form-group"
-                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                                <FormGroup__StyledFormGroup
                                   controlId="filter-data-filter"
                                   validationState={null}
                                 >
-                                  <div
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                                  <StyledComponent
+                                    controlId="filter-data-filter"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                          "isStatic": false,
+                                          "lastClassName": "gcTkZc",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormGroup__StyledFormGroup",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    validationState={null}
                                   >
-                                    <ControlLabel>
-                                      <StyledComponent
-                                        forwardedComponent={
-                                          Object {
-                                            "$$typeof": Symbol(react.forward_ref),
-                                            "attrs": Array [],
-                                            "componentStyle": ComponentStyle {
-                                              "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": false,
-                                              "lastClassName": "hCskeX",
-                                              "rules": Array [
-                                                [Function],
-                                              ],
-                                            },
-                                            "displayName": "ControlLabel",
-                                            "foldedComponentIds": Array [],
-                                            "render": [Function],
-                                            "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                            "target": [Function],
-                                            "toString": [Function],
-                                            "warnTooManyClasses": [Function],
-                                            "withComponent": [Function],
-                                          }
-                                        }
-                                        forwardedRef={null}
-                                      >
-                                        <ControlLabel
-                                          bsClass="control-label"
-                                          className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                          srOnly={false}
-                                        >
-                                          <label
-                                            className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                            htmlFor="filter-data-filter"
-                                          >
-                                            Filter
-                                          </label>
-                                        </ControlLabel>
-                                      </StyledComponent>
-                                    </ControlLabel>
-                                    <InputWrapper
-                                      className="typeahead-wrapper"
+                                    <FormGroup
+                                      bsClass="form-group"
+                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                                      controlId="filter-data-filter"
+                                      validationState={null}
                                     >
                                       <div
-                                        className="typeahead-wrapper"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                       >
-                                        <FormControl
-                                          componentClass="input"
-                                          inputRef={[Function]}
-                                          label="Filter"
-                                          name="filter-data-filter"
-                                          placeholder=""
-                                          type="text"
-                                        >
+                                        <ControlLabel>
                                           <StyledComponent
-                                            componentClass="input"
                                             forwardedComponent={
                                               Object {
                                                 "$$typeof": Symbol(react.forward_ref),
-                                                "Feedback": [Function],
-                                                "SIZES": Array [
-                                                  "small",
-                                                  "large",
-                                                ],
-                                                "Static": [Function],
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
-                                                  "componentId": "FormControl-sc-1amoaox-0",
+                                                  "componentId": "ControlLabel-sc-1edmum5-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "eXfwDC",
+                                                  "lastClassName": "hCskeX",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
                                                 },
-                                                "displayName": "FormControl",
+                                                "displayName": "ControlLabel",
                                                 "foldedComponentIds": Array [],
                                                 "render": [Function],
-                                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                "styledComponentId": "ControlLabel-sc-1edmum5-0",
                                                 "target": [Function],
                                                 "toString": [Function],
                                                 "warnTooManyClasses": [Function],
@@ -453,15 +453,28 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               }
                                             }
                                             forwardedRef={null}
-                                            inputRef={[Function]}
-                                            label="Filter"
-                                            name="filter-data-filter"
-                                            placeholder=""
-                                            type="text"
+                                          >
+                                            <ControlLabel
+                                              bsClass="control-label"
+                                              className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                              srOnly={false}
+                                            >
+                                              <label
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                                htmlFor="filter-data-filter"
+                                              >
+                                                Filter
+                                              </label>
+                                            </ControlLabel>
+                                          </StyledComponent>
+                                        </ControlLabel>
+                                        <InputWrapper
+                                          className="typeahead-wrapper"
+                                        >
+                                          <div
+                                            className="typeahead-wrapper"
                                           >
                                             <FormControl
-                                              bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 eXfwDC"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -469,80 +482,74 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               placeholder=""
                                               type="text"
                                             >
-                                              <input
-                                                className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                                id="filter-data-filter"
+                                              <StyledComponent
+                                                componentClass="input"
+                                                forwardedComponent={
+                                                  Object {
+                                                    "$$typeof": Symbol(react.forward_ref),
+                                                    "Feedback": [Function],
+                                                    "SIZES": Array [
+                                                      "small",
+                                                      "large",
+                                                    ],
+                                                    "Static": [Function],
+                                                    "attrs": Array [],
+                                                    "componentStyle": ComponentStyle {
+                                                      "componentId": "FormControl-sc-1amoaox-0",
+                                                      "isStatic": false,
+                                                      "lastClassName": "eXfwDC",
+                                                      "rules": Array [
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "displayName": "FormControl",
+                                                    "foldedComponentIds": Array [],
+                                                    "render": [Function],
+                                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                    "target": [Function],
+                                                    "toString": [Function],
+                                                    "warnTooManyClasses": [Function],
+                                                    "withComponent": [Function],
+                                                  }
+                                                }
+                                                forwardedRef={null}
+                                                inputRef={[Function]}
                                                 label="Filter"
                                                 name="filter-data-filter"
                                                 placeholder=""
                                                 type="text"
-                                              />
+                                              >
+                                                <FormControl
+                                                  bsClass="form-control"
+                                                  className="FormControl-sc-1amoaox-0 eXfwDC"
+                                                  componentClass="input"
+                                                  inputRef={[Function]}
+                                                  label="Filter"
+                                                  name="filter-data-filter"
+                                                  placeholder=""
+                                                  type="text"
+                                                >
+                                                  <input
+                                                    className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                                                    id="filter-data-filter"
+                                                    label="Filter"
+                                                    name="filter-data-filter"
+                                                    placeholder=""
+                                                    type="text"
+                                                  />
+                                                </FormControl>
+                                              </StyledComponent>
                                             </FormControl>
-                                          </StyledComponent>
-                                        </FormControl>
+                                          </div>
+                                        </InputWrapper>
                                       </div>
-                                    </InputWrapper>
-                                  </div>
-                                </FormGroup>
-                              </StyledComponent>
-                            </FormGroup__StyledFormGroup>
-                          </Component>
-                        </Input>
-                      </TypeAheadInput>
-                      <ForwardRef
-                        style={
-                          Object {
-                            "marginLeft": 5,
-                          }
-                        }
-                        type="submit"
-                      >
-                        <Button__StyledButton
-                          style={
-                            Object {
-                              "marginLeft": 5,
-                            }
-                          }
-                          type="submit"
-                        >
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "hpBclA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
+                                    </FormGroup>
+                                  </StyledComponent>
+                                </FormGroup__StyledFormGroup>
+                              </Component>
+                            </Input>
+                          </TypeAheadInput>
+                          <ForwardRef
                             style={
                               Object {
                                 "marginLeft": 5,
@@ -550,13 +557,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             }
                             type="submit"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hpBclA"
-                              disabled={false}
+                            <Button__StyledButton
                               style={
                                 Object {
                                   "marginLeft": 5,
@@ -564,9 +565,44 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               }
                               type="submit"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
-                                disabled={false}
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hpBclA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 style={
                                   Object {
                                     "marginLeft": 5,
@@ -574,71 +610,38 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 }
                                 type="submit"
                               >
-                                Filter
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                      <ForwardRef
-                        disabled={true}
-                        onClick={[Function]}
-                        style={
-                          Object {
-                            "marginLeft": 5,
-                          }
-                        }
-                        type="button"
-                      >
-                        <Button__StyledButton
-                          disabled={true}
-                          onClick={[Function]}
-                          style={
-                            Object {
-                              "marginLeft": 5,
-                            }
-                          }
-                          type="button"
-                        >
-                          <StyledComponent
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsStyle="default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA"
+                                  disabled={false}
+                                  style={
+                                    Object {
+                                      "marginLeft": 5,
+                                    }
+                                  }
+                                  type="submit"
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                                    disabled={false}
+                                    style={
+                                      Object {
+                                        "marginLeft": 5,
+                                      }
+                                    }
+                                    type="submit"
+                                  >
+                                    Filter
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
                             disabled={true}
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "hpBclA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             onClick={[Function]}
                             style={
                               Object {
@@ -647,12 +650,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             }
                             type="button"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hpBclA"
+                            <Button__StyledButton
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -662,9 +660,45 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               }
                               type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                              <StyledComponent
                                 disabled={true}
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hpBclA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 onClick={[Function]}
                                 style={
                                   Object {
@@ -673,23 +707,51 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 }
                                 type="button"
                               >
-                                Reset
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                    </form>
-                    <ul
-                      className="pill-list"
-                    >
-                      <Component />
-                    </ul>
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsStyle="default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                  style={
+                                    Object {
+                                      "marginLeft": 5,
+                                    }
+                                  }
+                                  type="button"
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                    style={
+                                      Object {
+                                        "marginLeft": 5,
+                                      }
+                                    }
+                                    type="button"
+                                  >
+                                    Reset
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </form>
+                        <ul
+                          className="pill-list"
+                        >
+                          <Component />
+                        </ul>
+                      </div>
+                    </TypeAheadDataFilter>
                   </div>
-                </TypeAheadDataFilter>
+                </Col>
               </div>
-            </Col>
-          </div>
+            </Row>
+          </StyledComponent>
         </Row>
         <ControlledTableList>
           <div>
@@ -928,227 +990,258 @@ exports[`<TokenList /> should render with tokens 1`] = `
       <div
         className="form-group"
       >
-        <Row
-          bsClass="row"
-          componentClass="div"
-        >
-          <div
-            className="row"
+        <Row>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Row-sc-3iisrt-0",
+                  "isStatic": false,
+                  "lastClassName": "bRJRJg",
+                  "rules": Array [
+                    "&.content{",
+                    [Function],
+                    "}",
+                  ],
+                },
+                "displayName": "Row",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Row-sc-3iisrt-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
           >
-            <Col
-              bsClass="col"
+            <Row
+              bsClass="row"
+              className="Row-sc-3iisrt-0 bRJRJg"
               componentClass="div"
-              sm={2}
             >
               <div
-                className="col-sm-2"
+                className="Row-sc-3iisrt-0 bRJRJg row"
               >
-                <ControlLabel
-                  className="tokenNewNameLabel"
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  sm={2}
                 >
-                  <StyledComponent
-                    className="tokenNewNameLabel"
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": false,
-                          "lastClassName": "hCskeX",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "ControlLabel",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <div
+                    className="col-sm-2"
                   >
                     <ControlLabel
-                      bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel"
-                      srOnly={false}
+                      className="tokenNewNameLabel"
                     >
-                      <label
-                        className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel control-label"
+                      <StyledComponent
+                        className="tokenNewNameLabel"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "ControlLabel-sc-1edmum5-0",
+                              "isStatic": false,
+                              "lastClassName": "hCskeX",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "ControlLabel",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                       >
-                        Token Name
-                      </label>
+                        <ControlLabel
+                          bsClass="control-label"
+                          className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel"
+                          srOnly={false}
+                        >
+                          <label
+                            className="ControlLabel-sc-1edmum5-0 hCskeX tokenNewNameLabel control-label"
+                          >
+                            Token Name
+                          </label>
+                        </ControlLabel>
+                      </StyledComponent>
                     </ControlLabel>
-                  </StyledComponent>
-                </ControlLabel>
-              </div>
-            </Col>
-            <Col
-              bsClass="col"
-              componentClass="div"
-              sm={4}
-            >
-              <div
-                className="col-sm-4"
-              >
-                <FormControl
-                  id="create-token-input"
-                  onChange={[Function]}
-                  placeholder="e.g ServiceName"
-                  type="text"
-                  value=""
+                  </div>
+                </Col>
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  sm={4}
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "Feedback": [Function],
-                        "SIZES": Array [
-                          "small",
-                          "large",
-                        ],
-                        "Static": [Function],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": false,
-                          "lastClassName": "eXfwDC",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "FormControl",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "FormControl-sc-1amoaox-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
-                    id="create-token-input"
-                    onChange={[Function]}
-                    placeholder="e.g ServiceName"
-                    type="text"
-                    value=""
+                  <div
+                    className="col-sm-4"
                   >
                     <FormControl
-                      bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 eXfwDC"
-                      componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
                       placeholder="e.g ServiceName"
                       type="text"
                       value=""
                     >
-                      <input
-                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "Feedback": [Function],
+                            "SIZES": Array [
+                              "small",
+                              "large",
+                            ],
+                            "Static": [Function],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormControl-sc-1amoaox-0",
+                              "isStatic": false,
+                              "lastClassName": "eXfwDC",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "FormControl",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
                         type="text"
                         value=""
-                      />
+                      >
+                        <FormControl
+                          bsClass="form-control"
+                          className="FormControl-sc-1amoaox-0 eXfwDC"
+                          componentClass="input"
+                          id="create-token-input"
+                          onChange={[Function]}
+                          placeholder="e.g ServiceName"
+                          type="text"
+                          value=""
+                        >
+                          <input
+                            className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            id="create-token-input"
+                            onChange={[Function]}
+                            placeholder="e.g ServiceName"
+                            type="text"
+                            value=""
+                          />
+                        </FormControl>
+                      </StyledComponent>
                     </FormControl>
-                  </StyledComponent>
-                </FormControl>
-              </div>
-            </Col>
-            <Col
-              bsClass="col"
-              componentClass="div"
-              sm={2}
-            >
-              <div
-                className="col-sm-2"
-              >
-                <ForwardRef
-                  bsStyle="primary"
-                  disabled={true}
-                  id="create-token"
-                  type="submit"
+                  </div>
+                </Col>
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  sm={2}
                 >
-                  <Button__StyledButton
-                    bsStyle="primary"
-                    disabled={true}
-                    id="create-token"
-                    type="submit"
+                  <div
+                    className="col-sm-2"
                   >
-                    <StyledComponent
+                    <ForwardRef
                       bsStyle="primary"
                       disabled={true}
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                            "xsmall",
-                          ],
-                          "STYLES": Array [
-                            "success",
-                            "warning",
-                            "danger",
-                            "info",
-                            "default",
-                            "primary",
-                            "link",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "Button__StyledButton-c9cbmb-0",
-                            "isStatic": false,
-                            "lastClassName": "hpBclA",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "Button__StyledButton",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       id="create-token"
                       type="submit"
                     >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
+                      <Button__StyledButton
                         bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
-                        <button
-                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
+                        <StyledComponent
+                          bsStyle="primary"
                           disabled={true}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "hpBclA",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
                           id="create-token"
                           type="submit"
                         >
-                          Create Token
-                        </button>
-                      </Button>
-                    </StyledComponent>
-                  </Button__StyledButton>
-                </ForwardRef>
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="primary"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA"
+                            disabled={true}
+                            id="create-token"
+                            type="submit"
+                          >
+                            <button
+                              className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
+                              disabled={true}
+                              id="create-token"
+                              type="submit"
+                            >
+                              Create Token
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
+                    </ForwardRef>
+                  </div>
+                </Col>
               </div>
-            </Col>
-          </div>
+            </Row>
+          </StyledComponent>
         </Row>
       </div>
       <hr />
@@ -1185,207 +1278,176 @@ exports[`<TokenList /> should render with tokens 1`] = `
       titleKey="name"
     >
       <div>
-        <Row
-          bsClass="row"
-          componentClass="div"
-        >
-          <div
-            className="row"
+        <Row>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Row-sc-3iisrt-0",
+                  "isStatic": false,
+                  "lastClassName": "bRJRJg",
+                  "rules": Array [
+                    "&.content{",
+                    [Function],
+                    "}",
+                  ],
+                },
+                "displayName": "Row",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Row-sc-3iisrt-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
           >
-            <Col
-              bsClass="col"
+            <Row
+              bsClass="row"
+              className="Row-sc-3iisrt-0 bRJRJg"
               componentClass="div"
-              md={12}
             >
               <div
-                className="col-md-12"
+                className="Row-sc-3iisrt-0 bRJRJg row"
               >
-                <TypeAheadDataFilter
-                  data={
-                    Array [
-                      Object {
-                        "id": "abc1",
-                        "name": "Acme",
-                        "token": "beef2001",
-                      },
-                      Object {
-                        "id": "abc2",
-                        "name": "Hamfred",
-                        "token": "beef2002",
-                      },
-                    ]
-                  }
-                  displayKey="value"
-                  filterBy=""
-                  filterSuggestionAccessor=""
-                  filterSuggestions={Array []}
-                  id="filter-data-filter"
-                  label="Filter"
-                  onDataFiltered={[Function]}
-                  searchInKeys={
-                    Array [
-                      "name",
-                      "token",
-                    ]
-                  }
+                <Col
+                  bsClass="col"
+                  componentClass="div"
+                  md={12}
                 >
                   <div
-                    className="filter"
+                    className="col-md-12"
                   >
-                    <form
-                      className="form-inline"
-                      onSubmit={[Function]}
-                      style={
-                        Object {
-                          "display": "inline",
-                        }
+                    <TypeAheadDataFilter
+                      data={
+                        Array [
+                          Object {
+                            "id": "abc1",
+                            "name": "Acme",
+                            "token": "beef2001",
+                          },
+                          Object {
+                            "id": "abc2",
+                            "name": "Hamfred",
+                            "token": "beef2002",
+                          },
+                        ]
+                      }
+                      displayKey="value"
+                      filterBy=""
+                      filterSuggestionAccessor=""
+                      filterSuggestions={Array []}
+                      id="filter-data-filter"
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      searchInKeys={
+                        Array [
+                          "name",
+                          "token",
+                        ]
                       }
                     >
-                      <TypeAheadInput
-                        displayKey="value"
-                        id="filter-data-filter"
-                        label="Filter"
-                        onSuggestionSelected={[Function]}
-                        suggestionText="Filter by : "
-                        suggestions={Array []}
+                      <div
+                        className="filter"
                       >
-                        <Input
-                          addonAfter={null}
-                          bsStyle={null}
-                          buttonAfter={null}
-                          help=""
-                          id="filter-data-filter"
-                          label="Filter"
-                          placeholder=""
-                          type="text"
-                          wrapperClassName="typeahead-wrapper"
+                        <form
+                          className="form-inline"
+                          onSubmit={[Function]}
+                          style={
+                            Object {
+                              "display": "inline",
+                            }
+                          }
                         >
-                          <Component
-                            controlId="filter-data-filter"
-                            validationState={null}
+                          <TypeAheadInput
+                            displayKey="value"
+                            id="filter-data-filter"
+                            label="Filter"
+                            onSuggestionSelected={[Function]}
+                            suggestionText="Filter by : "
+                            suggestions={Array []}
                           >
-                            <FormGroup__StyledFormGroup
-                              controlId="filter-data-filter"
-                              validationState={null}
+                            <Input
+                              addonAfter={null}
+                              bsStyle={null}
+                              buttonAfter={null}
+                              help=""
+                              id="filter-data-filter"
+                              label="Filter"
+                              placeholder=""
+                              type="text"
+                              wrapperClassName="typeahead-wrapper"
                             >
-                              <StyledComponent
+                              <Component
                                 controlId="filter-data-filter"
-                                forwardedComponent={
-                                  Object {
-                                    "$$typeof": Symbol(react.forward_ref),
-                                    "SIZES": Array [
-                                      "large",
-                                      "small",
-                                    ],
-                                    "attrs": Array [],
-                                    "componentStyle": ComponentStyle {
-                                      "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                      "isStatic": false,
-                                      "lastClassName": "gcTkZc",
-                                      "rules": Array [
-                                        [Function],
-                                      ],
-                                    },
-                                    "displayName": "FormGroup__StyledFormGroup",
-                                    "foldedComponentIds": Array [],
-                                    "render": [Function],
-                                    "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                    "target": [Function],
-                                    "toString": [Function],
-                                    "warnTooManyClasses": [Function],
-                                    "withComponent": [Function],
-                                  }
-                                }
-                                forwardedRef={null}
                                 validationState={null}
                               >
-                                <FormGroup
-                                  bsClass="form-group"
-                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                                <FormGroup__StyledFormGroup
                                   controlId="filter-data-filter"
                                   validationState={null}
                                 >
-                                  <div
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                                  <StyledComponent
+                                    controlId="filter-data-filter"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                          "isStatic": false,
+                                          "lastClassName": "gcTkZc",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormGroup__StyledFormGroup",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    validationState={null}
                                   >
-                                    <ControlLabel>
-                                      <StyledComponent
-                                        forwardedComponent={
-                                          Object {
-                                            "$$typeof": Symbol(react.forward_ref),
-                                            "attrs": Array [],
-                                            "componentStyle": ComponentStyle {
-                                              "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": false,
-                                              "lastClassName": "hCskeX",
-                                              "rules": Array [
-                                                [Function],
-                                              ],
-                                            },
-                                            "displayName": "ControlLabel",
-                                            "foldedComponentIds": Array [],
-                                            "render": [Function],
-                                            "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                            "target": [Function],
-                                            "toString": [Function],
-                                            "warnTooManyClasses": [Function],
-                                            "withComponent": [Function],
-                                          }
-                                        }
-                                        forwardedRef={null}
-                                      >
-                                        <ControlLabel
-                                          bsClass="control-label"
-                                          className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                          srOnly={false}
-                                        >
-                                          <label
-                                            className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                            htmlFor="filter-data-filter"
-                                          >
-                                            Filter
-                                          </label>
-                                        </ControlLabel>
-                                      </StyledComponent>
-                                    </ControlLabel>
-                                    <InputWrapper
-                                      className="typeahead-wrapper"
+                                    <FormGroup
+                                      bsClass="form-group"
+                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                                      controlId="filter-data-filter"
+                                      validationState={null}
                                     >
                                       <div
-                                        className="typeahead-wrapper"
+                                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                                       >
-                                        <FormControl
-                                          componentClass="input"
-                                          inputRef={[Function]}
-                                          label="Filter"
-                                          name="filter-data-filter"
-                                          placeholder=""
-                                          type="text"
-                                        >
+                                        <ControlLabel>
                                           <StyledComponent
-                                            componentClass="input"
                                             forwardedComponent={
                                               Object {
                                                 "$$typeof": Symbol(react.forward_ref),
-                                                "Feedback": [Function],
-                                                "SIZES": Array [
-                                                  "small",
-                                                  "large",
-                                                ],
-                                                "Static": [Function],
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
-                                                  "componentId": "FormControl-sc-1amoaox-0",
+                                                  "componentId": "ControlLabel-sc-1edmum5-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "eXfwDC",
+                                                  "lastClassName": "hCskeX",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
                                                 },
-                                                "displayName": "FormControl",
+                                                "displayName": "ControlLabel",
                                                 "foldedComponentIds": Array [],
                                                 "render": [Function],
-                                                "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                "styledComponentId": "ControlLabel-sc-1edmum5-0",
                                                 "target": [Function],
                                                 "toString": [Function],
                                                 "warnTooManyClasses": [Function],
@@ -1393,15 +1455,28 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               }
                                             }
                                             forwardedRef={null}
-                                            inputRef={[Function]}
-                                            label="Filter"
-                                            name="filter-data-filter"
-                                            placeholder=""
-                                            type="text"
+                                          >
+                                            <ControlLabel
+                                              bsClass="control-label"
+                                              className="ControlLabel-sc-1edmum5-0 hCskeX"
+                                              srOnly={false}
+                                            >
+                                              <label
+                                                className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                                                htmlFor="filter-data-filter"
+                                              >
+                                                Filter
+                                              </label>
+                                            </ControlLabel>
+                                          </StyledComponent>
+                                        </ControlLabel>
+                                        <InputWrapper
+                                          className="typeahead-wrapper"
+                                        >
+                                          <div
+                                            className="typeahead-wrapper"
                                           >
                                             <FormControl
-                                              bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 eXfwDC"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -1409,80 +1484,74 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               placeholder=""
                                               type="text"
                                             >
-                                              <input
-                                                className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                                id="filter-data-filter"
+                                              <StyledComponent
+                                                componentClass="input"
+                                                forwardedComponent={
+                                                  Object {
+                                                    "$$typeof": Symbol(react.forward_ref),
+                                                    "Feedback": [Function],
+                                                    "SIZES": Array [
+                                                      "small",
+                                                      "large",
+                                                    ],
+                                                    "Static": [Function],
+                                                    "attrs": Array [],
+                                                    "componentStyle": ComponentStyle {
+                                                      "componentId": "FormControl-sc-1amoaox-0",
+                                                      "isStatic": false,
+                                                      "lastClassName": "eXfwDC",
+                                                      "rules": Array [
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "displayName": "FormControl",
+                                                    "foldedComponentIds": Array [],
+                                                    "render": [Function],
+                                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                                    "target": [Function],
+                                                    "toString": [Function],
+                                                    "warnTooManyClasses": [Function],
+                                                    "withComponent": [Function],
+                                                  }
+                                                }
+                                                forwardedRef={null}
+                                                inputRef={[Function]}
                                                 label="Filter"
                                                 name="filter-data-filter"
                                                 placeholder=""
                                                 type="text"
-                                              />
+                                              >
+                                                <FormControl
+                                                  bsClass="form-control"
+                                                  className="FormControl-sc-1amoaox-0 eXfwDC"
+                                                  componentClass="input"
+                                                  inputRef={[Function]}
+                                                  label="Filter"
+                                                  name="filter-data-filter"
+                                                  placeholder=""
+                                                  type="text"
+                                                >
+                                                  <input
+                                                    className="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                                                    id="filter-data-filter"
+                                                    label="Filter"
+                                                    name="filter-data-filter"
+                                                    placeholder=""
+                                                    type="text"
+                                                  />
+                                                </FormControl>
+                                              </StyledComponent>
                                             </FormControl>
-                                          </StyledComponent>
-                                        </FormControl>
+                                          </div>
+                                        </InputWrapper>
                                       </div>
-                                    </InputWrapper>
-                                  </div>
-                                </FormGroup>
-                              </StyledComponent>
-                            </FormGroup__StyledFormGroup>
-                          </Component>
-                        </Input>
-                      </TypeAheadInput>
-                      <ForwardRef
-                        style={
-                          Object {
-                            "marginLeft": 5,
-                          }
-                        }
-                        type="submit"
-                      >
-                        <Button__StyledButton
-                          style={
-                            Object {
-                              "marginLeft": 5,
-                            }
-                          }
-                          type="submit"
-                        >
-                          <StyledComponent
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "hpBclA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
+                                    </FormGroup>
+                                  </StyledComponent>
+                                </FormGroup__StyledFormGroup>
+                              </Component>
+                            </Input>
+                          </TypeAheadInput>
+                          <ForwardRef
                             style={
                               Object {
                                 "marginLeft": 5,
@@ -1490,13 +1559,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             }
                             type="submit"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hpBclA"
-                              disabled={false}
+                            <Button__StyledButton
                               style={
                                 Object {
                                   "marginLeft": 5,
@@ -1504,9 +1567,44 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               }
                               type="submit"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
-                                disabled={false}
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hpBclA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 style={
                                   Object {
                                     "marginLeft": 5,
@@ -1514,71 +1612,38 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 }
                                 type="submit"
                               >
-                                Filter
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                      <ForwardRef
-                        disabled={true}
-                        onClick={[Function]}
-                        style={
-                          Object {
-                            "marginLeft": 5,
-                          }
-                        }
-                        type="button"
-                      >
-                        <Button__StyledButton
-                          disabled={true}
-                          onClick={[Function]}
-                          style={
-                            Object {
-                              "marginLeft": 5,
-                            }
-                          }
-                          type="button"
-                        >
-                          <StyledComponent
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsStyle="default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA"
+                                  disabled={false}
+                                  style={
+                                    Object {
+                                      "marginLeft": 5,
+                                    }
+                                  }
+                                  type="submit"
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                                    disabled={false}
+                                    style={
+                                      Object {
+                                        "marginLeft": 5,
+                                      }
+                                    }
+                                    type="submit"
+                                  >
+                                    Filter
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
                             disabled={true}
-                            forwardedComponent={
-                              Object {
-                                "$$typeof": Symbol(react.forward_ref),
-                                "SIZES": Array [
-                                  "large",
-                                  "small",
-                                  "xsmall",
-                                ],
-                                "STYLES": Array [
-                                  "success",
-                                  "warning",
-                                  "danger",
-                                  "info",
-                                  "default",
-                                  "primary",
-                                  "link",
-                                ],
-                                "attrs": Array [],
-                                "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
-                                  "isStatic": false,
-                                  "lastClassName": "hpBclA",
-                                  "rules": Array [
-                                    [Function],
-                                  ],
-                                },
-                                "displayName": "Button__StyledButton",
-                                "foldedComponentIds": Array [],
-                                "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                "target": [Function],
-                                "toString": [Function],
-                                "warnTooManyClasses": [Function],
-                                "withComponent": [Function],
-                              }
-                            }
-                            forwardedRef={null}
                             onClick={[Function]}
                             style={
                               Object {
@@ -1587,12 +1652,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             }
                             type="button"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hpBclA"
+                            <Button__StyledButton
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -1602,9 +1662,45 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               }
                               type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                              <StyledComponent
                                 disabled={true}
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hpBclA",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button__StyledButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 onClick={[Function]}
                                 style={
                                   Object {
@@ -1613,23 +1709,51 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 }
                                 type="button"
                               >
-                                Reset
-                              </button>
-                            </Button>
-                          </StyledComponent>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                    </form>
-                    <ul
-                      className="pill-list"
-                    >
-                      <Component />
-                    </ul>
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsStyle="default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA"
+                                  disabled={true}
+                                  onClick={[Function]}
+                                  style={
+                                    Object {
+                                      "marginLeft": 5,
+                                    }
+                                  }
+                                  type="button"
+                                >
+                                  <button
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                                    disabled={true}
+                                    onClick={[Function]}
+                                    style={
+                                      Object {
+                                        "marginLeft": 5,
+                                      }
+                                    }
+                                    type="button"
+                                  >
+                                    Reset
+                                  </button>
+                                </Button>
+                              </StyledComponent>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </form>
+                        <ul
+                          className="pill-list"
+                        >
+                          <Component />
+                        </ul>
+                      </div>
+                    </TypeAheadDataFilter>
                   </div>
-                </TypeAheadDataFilter>
+                </Col>
               </div>
-            </Col>
-          </div>
+            </Row>
+          </StyledComponent>
         </Row>
         <ControlledTableList>
           <div>
