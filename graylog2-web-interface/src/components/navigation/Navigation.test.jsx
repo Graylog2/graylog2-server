@@ -31,7 +31,7 @@ jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
 describe('Navigation', () => {
   let Navigation;
 
-  // We can't use prop types here, they don't work well together with mount and require
+  // We can't use prop types here, they are not compatible with mount and require in this case
   // eslint-disable-next-line react/prop-types
   const SimpleNavigation = ({ component: Component, permissions, ...props }) => (
     <CurrentUserContext.Provider value={{ ...currentUser, permissions }}>
