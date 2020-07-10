@@ -21,6 +21,19 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.di
   box-shadow: 3px 0 3px rgba(0, 0, 0, 0.25);
   width: 50px;
   height: 100%;
+  position:relative;
+
+  ::before {
+    content: '';
+    position: absolute;
+    top: 0px;
+    right: -4px;
+    height: 4px;
+    width: 4px;
+    border-top-left-radius: 50%;
+    background: transparent;
+    box-shadow: -4px -4px 0px 4px ${theme.colors.gray[10]};
+  }
 `);
 
 const SectionList = styled.div`
