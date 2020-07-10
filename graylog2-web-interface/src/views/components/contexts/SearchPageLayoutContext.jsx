@@ -11,7 +11,7 @@ type SearchPageLayoutConfig = {
 
 export type SearchPageLayout = {
   config: SearchPageLayoutConfig,
-  actions: {toggleSidebarPinning: () => void },
+  actions: { toggleSidebarPinning: () => void },
 };
 
 const SearchPageLayoutContext = React.createContext<?SearchPageLayout>();

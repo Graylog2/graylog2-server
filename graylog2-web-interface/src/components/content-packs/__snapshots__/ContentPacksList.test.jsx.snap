@@ -684,223 +684,316 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={2}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={2}
             >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={2}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
+              <UltimatePaginationComponent
+                boundaryPagesRange={1}
+                currentPage={1}
+                data-testid="graylog-pagination"
+                disabled={false}
+                hideEllipsis={false}
+                hideFirstAndLastPageLinks={false}
+                hidePreviousAndNextPageLinks={false}
+                onChange={[Function]}
+                siblingPagesRange={1}
+                totalPages={2}
               >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
+                <Pagination__StyledBootstrapPagination
+                  data-testid="graylog-pagination"
                 >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
+                  <StyledComponent
+                    data-testid="graylog-pagination"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "Ellipsis": [Function],
+                        "First": [Function],
+                        "Item": [Function],
+                        "Last": [Function],
+                        "Next": [Function],
+                        "Prev": [Function],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                          "isStatic": false,
+                          "lastClassName": "flIvuU",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Pagination__StyledBootstrapPagination",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
                   >
-                    <li
-                      className="disabled"
+                    <Pagination
+                      bsClass="pagination"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU"
+                      data-testid="graylog-pagination"
                     >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
+                      <ul
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU pagination"
+                        data-testid="graylog-pagination"
                       >
-                        <a
-                          href="#"
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-3"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="FIRST_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="First"
+                          <First
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="First"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-double-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-double-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-double-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </First>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-4"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="PREVIOUS_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="Previous"
+                          <Prev
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={true}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={1}
-                    key="1"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="active"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="Prev"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </Prev>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="1"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={1}
                         >
-                          1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    key="2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          <span
-                            aria-label="Next"
+                          <PaginationItem
+                            active={true}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              className="active"
+                            >
+                              <span
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                1
+                                <span
+                                  className="sr-only"
+                                >
+                                  (current)
+                                </span>
+                              </span>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="2"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={2}
                         >
-                          <span
-                            aria-label="Last"
+                          <PaginationItem
+                            active={false}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
+                            <li
+                              className=""
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-5"
+                          onClick={[Function]}
+                          type="NEXT_PAGE_LINK"
+                          value={2}
+                        >
+                          <Next
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Next"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Next>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-6"
+                          onClick={[Function]}
+                          type="LAST_PAGE_LINK"
+                          value={2}
+                        >
+                          <Last
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Last"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-double-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-double-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-double-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Last>
+                        </Component>
+                      </ul>
+                    </Pagination>
+                  </StyledComponent>
+                </Pagination__StyledBootstrapPagination>
+              </UltimatePaginationComponent>
             </Pagination>
           </div>
         </Col>
@@ -8808,223 +8901,316 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={2}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={2}
             >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={2}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
+              <UltimatePaginationComponent
+                boundaryPagesRange={1}
+                currentPage={1}
+                data-testid="graylog-pagination"
+                disabled={false}
+                hideEllipsis={false}
+                hideFirstAndLastPageLinks={false}
+                hidePreviousAndNextPageLinks={false}
+                onChange={[Function]}
+                siblingPagesRange={1}
+                totalPages={2}
               >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
+                <Pagination__StyledBootstrapPagination
+                  data-testid="graylog-pagination"
                 >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
+                  <StyledComponent
+                    data-testid="graylog-pagination"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "Ellipsis": [Function],
+                        "First": [Function],
+                        "Item": [Function],
+                        "Last": [Function],
+                        "Next": [Function],
+                        "Prev": [Function],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                          "isStatic": false,
+                          "lastClassName": "flIvuU",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Pagination__StyledBootstrapPagination",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
                   >
-                    <li
-                      className="disabled"
+                    <Pagination
+                      bsClass="pagination"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU"
+                      data-testid="graylog-pagination"
                     >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
+                      <ul
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU pagination"
+                        data-testid="graylog-pagination"
                       >
-                        <a
-                          href="#"
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-3"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="FIRST_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="First"
+                          <First
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="First"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-double-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-double-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-double-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </First>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-4"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="PREVIOUS_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="Previous"
+                          <Prev
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={true}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={1}
-                    key="1"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="active"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="Prev"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </Prev>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="1"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={1}
                         >
-                          1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    key="2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          <span
-                            aria-label="Next"
+                          <PaginationItem
+                            active={true}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              className="active"
+                            >
+                              <span
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                1
+                                <span
+                                  className="sr-only"
+                                >
+                                  (current)
+                                </span>
+                              </span>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="2"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={2}
                         >
-                          <span
-                            aria-label="Last"
+                          <PaginationItem
+                            active={false}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
+                            <li
+                              className=""
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-5"
+                          onClick={[Function]}
+                          type="NEXT_PAGE_LINK"
+                          value={2}
+                        >
+                          <Next
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Next"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Next>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-6"
+                          onClick={[Function]}
+                          type="LAST_PAGE_LINK"
+                          value={2}
+                        >
+                          <Last
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Last"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-double-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-double-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-double-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Last>
+                        </Component>
+                      </ul>
+                    </Pagination>
+                  </StyledComponent>
+                </Pagination__StyledBootstrapPagination>
+              </UltimatePaginationComponent>
             </Pagination>
           </div>
         </Col>
@@ -9514,182 +9700,16 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={0}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
-            >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={0}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
-              >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
-                >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="First"
-                          >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Previous"
-                          >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Next"
-                          >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Last"
-                          >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
-            </Pagination>
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={0}
+            />
           </div>
         </Col>
         <Col
@@ -9754,182 +9774,16 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={0}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
-            >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={0}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
-              >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
-                >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="First"
-                          >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Previous"
-                          >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Next"
-                          >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Last"
-                          >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
-            </Pagination>
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={0}
+            />
           </div>
         </Col>
         <Col

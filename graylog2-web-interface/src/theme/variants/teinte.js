@@ -60,6 +60,22 @@ const table = {
   background: lighten(variant.default, 0.95),
   backgroundAlt: lighten(variant.default, 0.85),
   backgroundHover: lighten(variant.default, 0.9),
+  variant: {
+    danger: lighten(variant.danger, 0.75),
+    active: lighten(variant.default, 0.75),
+    info: lighten(variant.info, 0.75),
+    primary: lighten(variant.primary, 0.75),
+    success: lighten(variant.success, 0.75),
+    warning: lighten(variant.warning, 0.75),
+  },
+  variantHover: {
+    danger: variant.lighter.danger,
+    active: variant.lighter.default,
+    info: variant.lighter.info,
+    primary: variant.lighter.primary,
+    success: variant.lighter.success,
+    warning: variant.lighter.warning,
+  },
 };
 
 /* eslint-disable prefer-destructuring */

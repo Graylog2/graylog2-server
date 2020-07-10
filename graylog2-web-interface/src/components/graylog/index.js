@@ -17,7 +17,6 @@ import Modal from './Modal';
 import Nav from './Nav';
 import Navbar from './Navbar';
 import NavDropdown from './NavDropdown';
-import Pagination from './Pagination';
 import Panel from './Panel';
 import Popover from './Popover';
 import ProgressBar from './ProgressBar';
@@ -48,7 +47,6 @@ export {
   Nav,
   Navbar,
   NavDropdown,
-  Pagination,
   Panel,
   Popover,
   ProgressBar,
