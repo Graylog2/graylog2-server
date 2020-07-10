@@ -32,7 +32,7 @@ export const defaultLayoutConfig = (currentUser: ?User, userPreferences?: UserPr
     dashboardSidebarIsPinned = Store.get('dashboardSidebarIsPinned');
   } else if (!isEmpty(userPreferences)) {
     searchSidebarIsPinned = userPreferences.searchSidebarIsPinned;
-    dashboardSidebarIsPinned = userPreferences.searchSidebarIsPinned;
+    dashboardSidebarIsPinned = userPreferences.dashboardSidebarIsPinned;
   }
 
   return {
