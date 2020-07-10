@@ -73,6 +73,7 @@ const tableCss = css(({ theme }) => css`
     }
 
     > thead > tr > th {
+      white-space: nowrap;
       border-bottom-color: ${theme.colors.table.backgroundAlt};
     }
 
