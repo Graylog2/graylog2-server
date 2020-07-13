@@ -7,9 +7,9 @@ import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
@@ -54,7 +53,7 @@ public class MessagesES6IT extends MessagesIT {
 
     @Test
     public void getResultDoesNotContainJestMetadataFields() throws Exception {
-        final String index = UUID.randomUUID().toString();
+        final String index = client().createRandomIndex("random");
         final Map<String, Object> source = new HashMap<>();
         source.put("message", "message");
         source.put("source", "source");
