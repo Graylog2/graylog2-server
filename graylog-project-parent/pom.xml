@@ -718,6 +718,7 @@
                 <configuration>
                     <forkCount>1</forkCount>
                     <skip>false</skip>
+                    <argLine>-Djava.awt.headless=true</argLine>
                 </configuration>
                 <executions>
                     <execution>
