@@ -61,6 +61,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -125,41 +127,20 @@ public class LdapResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test LDAP configuration")
     public LdapTestConfigResponse testLdapConfiguration(@ApiParam(name = "Configuration to test", required = true)
-                                                        @Valid @NotNull LdapTestConfigRequest request) {
-        final LdapConnectionConfig config = new LdapConnectionConfig();
-        final URI ldapUri = request.ldapUri();
-        config.setLdapHost(ldapUri.getHost());
-        config.setLdapPort(ldapUri.getPort());
-        config.setUseSsl(ldapUri.getScheme().startsWith("ldaps"));
-        config.setUseTls(request.useStartTls());
+                                                        @Valid @NotNull LdapTestConfigRequest request) throws KeyStoreException, NoSuchAlgorithmException {
 
-        if (request.trustAllCertificates()) {
-            config.setTrustManagers(new TrustAllX509TrustManager());
-        }
-
-        if (!isNullOrEmpty(request.systemUsername())) {
-            config.setName(request.systemUsername());
-
-            if (!isNullOrEmpty(request.systemPassword())) {
-                // Use the given password for the connection test
-                config.setCredentials(request.systemPassword());
-            } else {
-                // If the config request has a username but no password set, we have to use the password from the database.
-                // This is because we don't expose the plain-text password through the API anymore and the settings form
-                // doesn't submit a password.
-                final LdapSettings ldapSettings = ldapSettingsService.load();
-                if (ldapSettings != null && !isNullOrEmpty(ldapSettings.getSystemPassword())) {
-                    config.setCredentials(ldapSettings.getSystemPassword());
-                }
-            }
-        }
+        final LdapConnectionConfig config = ldapConnector.createConfig(request);
 
         LdapNetworkConnection connection = null;
         try {
             try {
                 connection = ldapConnector.connect(config);
-            } catch (LdapException e) {
-                return LdapTestConfigResponse.create(false, false, false, Collections.<String, String>emptyMap(), Collections.<String>emptySet(), e.getMessage());
+            } catch (Exception e) {
+                Throwable rootCause = e;
+                while (rootCause.getCause() != null && rootCause.getCause().getMessage() != null) {
+                    rootCause = rootCause.getCause();
+                }
+                return createFailureResponse(rootCause.getMessage());
             }
 
             if (null == connection) {
@@ -215,6 +196,10 @@ public class LdapResource extends RestResource {
                 }
             }
         }
+    }
+
+    private LdapTestConfigResponse createFailureResponse(String message) {
+        return LdapTestConfigResponse.create(false, false, false, Collections.<String, String>emptyMap(), Collections.<String>emptySet(), message);
     }
 
     @PUT

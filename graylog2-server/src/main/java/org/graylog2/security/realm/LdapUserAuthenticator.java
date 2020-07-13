@@ -32,7 +32,6 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapEntry;
@@ -48,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -142,17 +143,8 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         return null;
     }
 
-    protected LdapNetworkConnection openLdapConnection(LdapSettings ldapSettings) throws LdapException {
-        final LdapConnectionConfig config = new LdapConnectionConfig();
-        config.setLdapHost(ldapSettings.getUri().getHost());
-        config.setLdapPort(ldapSettings.getUri().getPort());
-        config.setUseSsl(ldapSettings.getUri().getScheme().startsWith("ldaps"));
-        config.setUseTls(ldapSettings.isUseStartTls());
-        if (ldapSettings.isTrustAllCertificates()) {
-            config.setTrustManagers(new TrustAllX509TrustManager());
-        }
-        config.setName(ldapSettings.getSystemUserName());
-        config.setCredentials(ldapSettings.getSystemPassword());
+    protected LdapNetworkConnection openLdapConnection(LdapSettings ldapSettings) throws LdapException, KeyStoreException, NoSuchAlgorithmException {
+        final LdapConnectionConfig config = ldapConnector.createConfig(ldapSettings);
         return ldapConnector.connect(config);
     }
 
