@@ -832,6 +832,24 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <forkCount>1</forkCount>
+                    <skip>false</skip>
+                    <!-- prevent ForkedBooter from stealing window focus on Mac OS -->
+                    <argLine>-Djava.awt.headless=true</argLine>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -986,36 +1004,6 @@
                                     <outputDirectory>${project.basedir}/../graylog2-web-interface/test/bin</outputDirectory>
                                     <md5>22e07d7f108fcf6cb3e296d9802a9897</md5>
                                 </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>integration-tests-elasticsearch</id>
-            <activation>
-                <property>
-                    <name>it.es</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <forkCount>1</forkCount>
-                            <skip>false</skip>
-                            <!-- prevent ForkedBooter from stealing window focus on Mac OS -->
-                            <argLine>-Djava.awt.headless=true</argLine>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
                             </execution>
                         </executions>
                     </plugin>
