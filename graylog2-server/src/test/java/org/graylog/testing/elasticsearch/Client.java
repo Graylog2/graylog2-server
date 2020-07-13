@@ -16,8 +16,6 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.Map;
 
 public interface Client {
@@ -44,11 +42,7 @@ public interface Client {
 
     void addAliasMapping(String indexName, String alias);
 
-    JsonNode getTemplate(String templateName);
-
-    default JsonNode getTemplates() {
-        return getTemplate("*");
-    }
+    boolean templateExists(String templateName);
 
     void putTemplate(String templateName, Map<String, Object> source);
 

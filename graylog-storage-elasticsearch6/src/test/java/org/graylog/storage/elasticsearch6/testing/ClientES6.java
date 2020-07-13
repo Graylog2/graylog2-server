@@ -128,13 +128,20 @@ public class ClientES6 implements Client {
         return response.getJsonObject();
     }
 
-    @Override
     public JsonNode getTemplate(String templateName) {
         final GetTemplate templateRequest = new GetTemplate.Builder(templateName).build();
         final JestResult templateResponse =
                 executeWithExpectedSuccess(templateRequest, "failed to get template " + templateName);
 
         return templateResponse.getJsonObject();
+    }
+
+    @Override
+    public boolean templateExists(String templateName) {
+        final GetTemplate templateRequest = new GetTemplate.Builder(templateName).build();
+        final JestResult templateResponse = execute(templateRequest, "failed to get template " + templateName);
+
+        return templateResponse.isSucceeded();
     }
 
     @Override

@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,20 @@ public class CatApi {
                 .filter(index -> status.isEmpty() || status.contains(index.path("status").asText()))
                 .map(index -> index.path("index").asText())
                 .collect(Collectors.toSet());
+    }
+
+    public Optional<String> indexState(String indexName, String errorMessage) {
+        final Request request = request("GET", "indices/" + indexName);
+        request.addParameter("h", "index,status");
+        request.addParameter("expand_wildcards", "all");
+        request.addParameter("s", "index,status");
+
+        final JsonNode jsonResponse = perform(request, new TypeReference<JsonNode>() {}, errorMessage);
+
+        return Streams.stream(jsonResponse.elements())
+                .filter(index -> index.path("index").asText().equals(indexName))
+                .map(index -> index.path("status").asText())
+                .findFirst();
     }
 
     private <R> R perform(Request request, TypeReference<R> responseClass, String errorMessage) {

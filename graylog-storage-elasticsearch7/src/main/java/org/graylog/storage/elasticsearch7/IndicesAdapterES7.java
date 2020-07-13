@@ -38,7 +38,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
-import org.graylog.storage.elasticsearch7.state.StateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -59,6 +58,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -70,17 +70,14 @@ import static java.util.stream.Collectors.toList;
 public class IndicesAdapterES7 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES7.class);
     private final ElasticsearchClient client;
-    private final StateApi stateApi;
     private final StatsApi statsApi;
     private final CatApi catApi;
 
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
-                             StateApi stateApi,
                              StatsApi statsApi,
                              CatApi catApi) {
         this.client = client;
-        this.stateApi = stateApi;
         this.statsApi = statsApi;
         this.catApi = catApi;
     }
@@ -429,16 +426,35 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public boolean isOpen(String index) {
-        return indexState(index).equals(StateApi.State.Open);
+        return indexState(index)
+                .map(state -> state.equals(State.Open))
+                .orElseThrow(() -> new IndexNotFoundException("Unable to determine state for absent index " + index));
     }
 
     @Override
     public boolean isClosed(String index) {
-        return indexState(index).equals(StateApi.State.Closed);
+        return indexState(index)
+                .map(state -> state.equals(State.Closed))
+                .orElseThrow(() -> new IndexNotFoundException("Unable to determine state for absent index " + index));
     }
 
-    private StateApi.State indexState(String index) {
-        return client.execute((c, options) -> stateApi.indexState(c, index),
-                "Unable to retrieve index stats for " + index);
+    private Optional<State> indexState(String index) {
+        final Optional<String> result = catApi.indexState(index, "Unable to retrieve index stats for " + index);
+
+        return result.map((State::parse));
+    }
+
+    enum State {
+        Open,
+        Closed;
+
+        static State parse(String state) {
+            switch (state.toLowerCase(Locale.ENGLISH)) {
+                case "open": return Open;
+                case "close": return Closed;
+            }
+
+            throw new IllegalStateException("Unable to parse invalid index state: " + state);
+        }
     }
 }

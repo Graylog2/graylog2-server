@@ -6,6 +6,7 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -26,8 +27,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetInd
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetaData;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
@@ -43,13 +42,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ClientES7 implements Client {
     private final ElasticsearchClient client;
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper;
 
     public ClientES7(ElasticsearchClient client) {
         this.client = client;
+        this.objectMapper = new ObjectMapperProvider().get();
     }
 
     @Override
@@ -99,26 +100,42 @@ public class ClientES7 implements Client {
 
     @Override
     public boolean isSourceEnabled(String testIndexName) {
-        final GetMappingsResponse mapping = getMapping(testIndexName);
+        // TODO: implement
         return true;
     }
 
     @Override
-    public String fieldType(String testIndexName, String source) {
-        final GetMappingsResponse mapping = getMapping(testIndexName);
-        return mapping.mappings().get("source").type();
+    public String fieldType(String testIndexName, String field) {
+        return getMapping(testIndexName).get(field);
     }
 
-    private GetMappingsResponse getMapping(String... indices) {
-        final GetMappingsRequest request = new GetMappingsRequest().indices(indices);
-        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions));
+    private Map<String, String> getMapping(String index) {
+        final Request request = new Request("GET", "/" + index + "/_mapping");
+        final Response result = client.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+            return c.getLowLevelClient().performRequest(request);
+        });
+
+        final JsonNode response;
+        try {
+            response = objectMapper.readTree(result.getEntity().getContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return Streams.stream(response.path(index)
+                .path("mappings")
+                .path("properties")
+                .fields())
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().path("type").asText()));
     }
 
     @Override
-    public JsonNode getTemplate(String templateName) {
-        final GetIndexTemplatesRequest request = new GetIndexTemplatesRequest(templateName);
+    public boolean templateExists(String templateName) {
+        final GetIndexTemplatesRequest request = new GetIndexTemplatesRequest("*");
         final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return null;
+        return result.getIndexTemplates()
+                .stream()
+                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
     }
 
     @Override
@@ -173,6 +190,7 @@ public class ClientES7 implements Client {
     public void cleanUp() {
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
+        refreshNode();
     }
 
     private String[] existingTemplates() {
