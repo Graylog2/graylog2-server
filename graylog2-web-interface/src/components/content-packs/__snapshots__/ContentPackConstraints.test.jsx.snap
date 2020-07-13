@@ -70,6 +70,30 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="content-packs-constraints"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "fulfilled": false,
+                "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                "type": "plugin-version",
+                "version": ">=3.0.0-alpha.2",
+              },
+              Object {
+                "fulfilled": true,
+                "type": "server-version",
+                "version": ">=3.0.0-alpha.2+af8d8e0",
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -90,9 +114,9 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "lmPeF",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -100,7 +124,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -110,7 +134,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>
@@ -487,6 +511,30 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="content-packs-constraints"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "fulfilled": true,
+                "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                "type": "plugin-version",
+                "version": ">=3.0.0-alpha.2",
+              },
+              Object {
+                "fulfilled": true,
+                "type": "server-version",
+                "version": ">=3.0.0-alpha.2+af8d8e0",
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -507,9 +555,9 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "lmPeF",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -517,7 +565,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -527,7 +575,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>
@@ -904,6 +952,30 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="content-packs-constraints"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "fulfilled": undefined,
+                "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                "type": "plugin-version",
+                "version": ">=3.0.0-alpha.2",
+              },
+              Object {
+                "fulfilled": undefined,
+                "type": "server-version",
+                "version": ">=3.0.0-alpha.2+af8d8e0",
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -924,9 +996,9 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "lmPeF",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -934,7 +1006,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -944,7 +1016,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>

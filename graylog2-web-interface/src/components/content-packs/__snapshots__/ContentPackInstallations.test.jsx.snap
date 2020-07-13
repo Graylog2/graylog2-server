@@ -85,6 +85,44 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
     useResponsiveTable={true}
   >
     <div>
+      <Filter
+        displayKey="value"
+        filterBy=""
+        filterKeys={Array []}
+        filterSuggestions={Array []}
+        id="content-packs-versions"
+        label="Filter"
+        onDataFiltered={[Function]}
+        rows={
+          Array [
+            Object {
+              "_id": "5b55b8b73d274645e49f7eec",
+              "comment": "The fake input",
+              "content_pack_id": "82d59d98-7440-ab74-9857-36b2f1b7ab8a",
+              "content_pack_revision": 1,
+              "created_at": "2018-07-23T11:15:03.871Z",
+              "created_by": "kmerz",
+              "entities": Array [
+                Object {
+                  "content_pack_entity_id": "5b6d973d3d274645572a4318",
+                  "id": "5ba38df33d274660f0b94118",
+                  "title": "hulud.net",
+                  "type": Object {
+                    "name": "input",
+                    "version": "1",
+                  },
+                },
+              ],
+              "parameters": Object {
+                "SOURCE": Object {
+                  "name": "string",
+                  "value": "hulud.com.uk",
+                },
+              },
+            },
+          ]
+        }
+      />
       <div
         className="row "
       >
@@ -105,9 +143,9 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                     "$$typeof": Symbol(react.forward_ref),
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "isStatic": false,
-                      "lastClassName": "lmPeF",
+                      "lastClassName": "gweZGk",
                       "rules": Array [
                         [Function],
                       ],
@@ -115,7 +153,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                     "displayName": "DataTable__StyledTable",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                    "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                     "target": "table",
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -125,7 +163,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                 forwardedRef={null}
               >
                 <table
-                  className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table "
+                  className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                 >
                   <thead>
                     <tr>
@@ -525,6 +563,16 @@ exports[`<ContentPackInstallations /> should render with empty installations 1`]
     useResponsiveTable={true}
   >
     <div>
+      <Filter
+        displayKey="value"
+        filterBy=""
+        filterKeys={Array []}
+        filterSuggestions={Array []}
+        id="content-packs-versions"
+        label="Filter"
+        onDataFiltered={[Function]}
+        rows={Array []}
+      />
       <div
         className="row "
       >
@@ -575,6 +623,16 @@ exports[`<ContentPackInstallations /> should render without installations 1`] = 
     useResponsiveTable={true}
   >
     <div>
+      <Filter
+        displayKey="value"
+        filterBy=""
+        filterKeys={Array []}
+        filterSuggestions={Array []}
+        id="content-packs-versions"
+        label="Filter"
+        onDataFiltered={[Function]}
+        rows={Array []}
+      />
       <div
         className="row "
       >

@@ -1,16 +1,15 @@
 // @flow strict
 import * as React from 'react';
 
-import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
 
 import ActionsCell from './ActionsCell';
 import LoggedInCell from './LoggedInCell';
 import RolesCell from './RolesCell';
 
 type Props = {
-  user: User,
+  user: UserOverview,
   isActive: boolean,
-  roles: any,
 };
 
 const UsersOverviewItem = ({
@@ -22,8 +21,8 @@ const UsersOverviewItem = ({
     sessionActive,
     username,
     readOnly,
+    roles,
   },
-  roles,
   isActive,
 }: Props) => {
   return (

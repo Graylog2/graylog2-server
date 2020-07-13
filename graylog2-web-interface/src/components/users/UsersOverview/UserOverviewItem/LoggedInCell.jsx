@@ -1,23 +1,29 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
-import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
+import type { ThemeInterface } from 'theme';
 import { OverlayTrigger, Popover } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
 
 type Props = {
-  lastActivity: $PropertyType<User, 'lastActivity'>,
-  clientAddress: $PropertyType<User, 'clientAddress'>,
-  sessionActive: $PropertyType<User, 'sessionActive'>,
+  lastActivity: $PropertyType<UserOverview, 'lastActivity'>,
+  clientAddress: $PropertyType<UserOverview, 'clientAddress'>,
+  sessionActive: $PropertyType<UserOverview, 'sessionActive'>,
 };
+
+const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
+  width: 35px;
+  text-align: right;
+`;
 
 const ActiveIcon = styled(Icon)(({ theme }) => `
   color: ${theme.colors.variant.success};
 `);
 
 const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => (
-  <td className="centered">
+  <Td>
     {sessionActive && (
       <OverlayTrigger trigger={['hover', 'focus']}
                       placement="right"
@@ -31,7 +37,7 @@ const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => 
         <ActiveIcon name="circle" />
       </OverlayTrigger>
     )}
-  </td>
+  </Td>
 );
 
 export default LoggedInCell;

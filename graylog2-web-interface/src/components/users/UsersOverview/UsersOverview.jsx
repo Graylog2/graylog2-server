@@ -1,23 +1,36 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import { useEffect, useContext, useState } from 'react';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { useStore } from 'stores/connect';
 import UsersStore from 'stores/users/UsersStore';
 import UsersActions from 'actions/users/UsersActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import { DataTable, Spinner } from 'components/common';
+import { DataTable, Spinner, PaginatedList } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 import UserOverviewItem from './UserOverviewItem';
+import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
+import SystemAdministrator from './SystemAdministratorOverview';
 
-const TableWrapper = styled.div`
+const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
     overflow-x: visible;
   }
 `;
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LoadingSpinner = styled(Spinner)(({ theme }) => `
+  margin-left: 10px;
+  font-size: ${theme.fonts.size.h3};
+`);
 
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
@@ -30,20 +43,31 @@ const _headerCellFormatter = (header) => {
   }
 };
 
+const _onPageChange = (query, setLoading) => (page, perPage) => {
+  setLoading(true);
+
+  return UsersActions.searchPaginated(page, perPage, query).then(() => setLoading(false));
+};
+
 const UsersOverview = () => {
-  const { list: users } = useStore(UsersStore);
-  const roles = [];
+  const {
+    paginatedList: {
+      adminUser,
+      list: users,
+      pagination: { page, perPage, query, total },
+    },
+  } = useStore(UsersStore);
+  const [loading, setLoading] = useState(false);
   const currentUser = useContext(CurrentUserContext);
-  const filterKeys = ['username', 'fullName', 'email', 'clientAddress'];
-  const headers = ['', 'Username', 'Full name', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+  const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
-  const _userOverviewItem = (user) => <UserOverviewItem user={user} roles={roles} isActive={_isActiveItem(user)} />;
+  const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
   useEffect(() => {
-    UsersActions.loadUsers();
+    UsersActions.searchPaginated(page, perPage, query);
 
     const unlistenDeleteUser = UsersActions.deleteUser.completed.listen(() => {
-      UsersActions.loadUsers();
+      UsersActions.searchPaginated(page, perPage, query);
     });
 
     return () => {
@@ -51,28 +75,42 @@ const UsersOverview = () => {
     };
   }, []);
 
-  if (!users || !roles) {
+  if (!users) {
     return <Spinner />;
   }
 
   return (
-    <Row className="content">
-      <Col xs={12}>
-        <TableWrapper>
-          <DataTable id="users-overview"
-                     className="table-hover"
-                     headers={headers}
-                     headerCellFormatter={_headerCellFormatter}
-                     sortByKey="fullName"
-                     rows={users.toJS()}
-                     filterBy="role"
-                     // filterSuggestions={roles}
-                     dataRowFormatter={_userOverviewItem}
-                     filterKeys={filterKeys}
-                     filterLabel="Filter Users" />
-        </TableWrapper>
-      </Col>
-    </Row>
+    <Container>
+      {adminUser && (
+        <SystemAdministrator adminUser={adminUser}
+                             dataRowFormatter={_userOverviewItem}
+                             headerCellFormatter={_headerCellFormatter}
+                             headers={headers} />
+      )}
+      <Row className="content">
+        <Col xs={12}>
+          <Header>
+            <h2>Users</h2>
+            {loading && <LoadingSpinner text="" delay={0} />}
+          </Header>
+          <p className="description">
+            Found {total} registered users on the system.
+          </p>
+          <PaginatedList onChange={_onPageChange(query, setLoading)} totalItems={total} activePage={page}>
+            <DataTable id="users-overview"
+                       className="table-hover"
+                       headers={headers}
+                       headerCellFormatter={_headerCellFormatter}
+                       sortByKey="fullName"
+                       rows={users.toJS()}
+                       customFilter={<UsersFilter perPage={perPage} />}
+                       dataRowFormatter={_userOverviewItem}
+                       filterKeys={[]}
+                       filterLabel="Filter Users" />
+          </PaginatedList>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

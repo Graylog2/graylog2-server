@@ -220,7 +220,7 @@ class SearchForm extends React.Component {
                     type="submit"
                     disabled={isLoading}
                     className="submit-button">
-              {isLoading ? <Spinner text={loadingLabel} /> : searchButtonLabel}
+              {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
             </Button>
           </div>
           {onReset

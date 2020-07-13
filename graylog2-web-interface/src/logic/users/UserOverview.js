@@ -3,46 +3,30 @@ import * as Immutable from 'immutable';
 
 import type { UserJSON } from 'stores/users/UsersStore';
 
-type StartPage = {
-  id: string,
-  type: string,
-};
-
 type InternalState = {
   id: string,
   username: string,
   fullName: string,
   email: string,
-  permissions: Immutable.List<string>,
-  timezone: string,
-  preferences?: any,
   roles: Immutable.List<string>,
   readOnly: boolean,
   external: boolean,
-  sessionTimeoutMs: number,
-  startpage?: StartPage,
   sessionActive: boolean,
   clientAddress: string,
   lastActivity: string,
 };
 
-export default class User {
+export default class UserOverview {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     id: $PropertyType<InternalState, 'id'>,
     username: $PropertyType<InternalState, 'username'>,
     fullName: $PropertyType<InternalState, 'fullName'>,
     email: $PropertyType<InternalState, 'email'>,
-    permissions: $PropertyType<InternalState, 'permissions'>,
-    timezone: $PropertyType<InternalState, 'timezone'>,
-    preferences: $PropertyType<InternalState, 'preferences'>,
     roles: $PropertyType<InternalState, 'roles'>,
     readOnly: $PropertyType<InternalState, 'readOnly'>,
     external: $PropertyType<InternalState, 'external'>,
-    sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>,
-    startpage: $PropertyType<InternalState, 'startpage'>,
     sessionActive: $PropertyType<InternalState, 'sessionActive'>,
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
@@ -52,14 +36,9 @@ export default class User {
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,
@@ -82,18 +61,6 @@ export default class User {
     return this._value.email;
   }
 
-  get permissions() {
-    return this._value.permissions;
-  }
-
-  get timezone() {
-    return this._value.timezone;
-  }
-
-  get preferences() {
-    return this._value.preferences;
-  }
-
   get roles() {
     return this._value.roles;
   }
@@ -104,14 +71,6 @@ export default class User {
 
   get external() {
     return this._value.external;
-  }
-
-  get sessionTimeoutMs() {
-    return this._value.sessionTimeoutMs;
-  }
-
-  get startpage() {
-    return this._value.startpage;
   }
 
   get sessionActive() {
@@ -132,14 +91,9 @@ export default class User {
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,
@@ -151,51 +105,35 @@ export default class User {
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,
     }));
   }
 
-  // eslint-disable-next-line no-undef
   static create(
     id: $PropertyType<InternalState, 'id'>,
     username: $PropertyType<InternalState, 'username'>,
     fullName: $PropertyType<InternalState, 'fullName'>,
     email: $PropertyType<InternalState, 'email'>,
-    permissions: $PropertyType<InternalState, 'permissions'>,
-    timezone: $PropertyType<InternalState, 'timezone'>,
-    preferences: $PropertyType<InternalState, 'preferences'>,
     roles: $PropertyType<InternalState, 'roles'>,
     readOnly: $PropertyType<InternalState, 'readOnly'>,
     external: $PropertyType<InternalState, 'external'>,
-    sessionTimeoutMs: $PropertyType<InternalState, 'sessionTimeoutMs'>,
-    startpage: $PropertyType<InternalState, 'startpage'>,
     sessionActive: $PropertyType<InternalState, 'sessionActive'>,
     clientAddress: $PropertyType<InternalState, 'clientAddress'>,
     lastActivity: $PropertyType<InternalState, 'lastActivity'>,
   ) {
-    return new User(
+    return new UserOverview(
       id,
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,
@@ -208,14 +146,9 @@ export default class User {
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,
@@ -226,14 +159,14 @@ export default class User {
       username,
       full_name: fullName,
       email,
-      permissions: permissions.toArray(),
-      timezone,
-      preferences,
+      permissions: [],
+      timezone: '',
+      preferences: undefined,
       roles: roles.toArray(),
       read_only: readOnly,
       external,
-      session_timeout_ms: sessionTimeoutMs,
-      startpage,
+      session_timeout_ms: 0,
+      startpage: undefined,
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
@@ -244,43 +177,27 @@ export default class User {
     const {
       id,
       username,
-      // eslint-disable-next-line camelcase
-      full_name,
+      full_name: fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
-      // eslint-disable-next-line camelcase
-      read_only,
+      read_only: readOnly,
       external,
-      // eslint-disable-next-line camelcase
-      session_timeout_ms,
-      startpage,
-      // eslint-disable-next-line camelcase
-      session_active,
-      // eslint-disable-next-line camelcase
-      client_address,
-      // eslint-disable-next-line camelcase
-      last_activity,
+      session_active: sessionActive,
+      client_address: clientAddress,
+      last_activity: lastActivity,
     } = value;
 
-    return User.create(
+    return UserOverview.create(
       id,
       username,
-      full_name,
+      fullName,
       email,
-      Immutable.List(permissions),
-      timezone,
-      preferences,
       Immutable.List(roles),
-      read_only,
+      readOnly,
       external,
-      session_timeout_ms,
-      startpage,
-      session_active,
-      client_address,
-      last_activity,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     );
   }
 
@@ -300,77 +217,42 @@ class Builder {
     this.value = value;
   }
 
-  // eslint-disable-next-line no-undef
   id(value: $PropertyType<InternalState, 'id'>) {
     return new Builder(this.value.set('id', value));
   }
 
-  // eslint-disable-next-line no-undef
   username(value: $PropertyType<InternalState, 'username'>) {
     return new Builder(this.value.set('username', value));
   }
 
-  // eslint-disable-next-line no-undef
   fullName(value: $PropertyType<InternalState, 'fullName'>) {
     return new Builder(this.value.set('fullName', value));
   }
 
-  // eslint-disable-next-line no-undef
   email(value: $PropertyType<InternalState, 'email'>) {
     return new Builder(this.value.set('email', value));
   }
 
-  // eslint-disable-next-line no-undef
-  permissions(value: $PropertyType<InternalState, 'permissions'>) {
-    return new Builder(this.value.set('permissions', value));
-  }
-
-  // eslint-disable-next-line no-undef
-  timezone(value: $PropertyType<InternalState, 'timezone'>) {
-    return new Builder(this.value.set('timezone', value));
-  }
-
-  // eslint-disable-next-line no-undef
-  preferences(value: $PropertyType<InternalState, 'preferences'>) {
-    return new Builder(this.value.set('preferences', value));
-  }
-
-  // eslint-disable-next-line no-undef
   roles(value: $PropertyType<InternalState, 'roles'>) {
     return new Builder(this.value.set('roles', value));
   }
 
-  // eslint-disable-next-line no-undef
   readOnly(value: $PropertyType<InternalState, 'readOnly'>) {
     return new Builder(this.value.set('readOnly', value));
   }
 
-  // eslint-disable-next-line no-undef
   external(value: $PropertyType<InternalState, 'external'>) {
     return new Builder(this.value.set('external', value));
   }
 
-  // eslint-disable-next-line no-undef
-  sessionTimeoutMs(value: $PropertyType<InternalState, 'sessionTimeoutMs'>) {
-    return new Builder(this.value.set('sessionTimoutMs', value));
-  }
-
-  // eslint-disable-next-line no-undef
-  startpage(value: $PropertyType<InternalState, 'startpage'>) {
-    return new Builder(this.value.set('startpage', value));
-  }
-
-  // eslint-disable-next-line no-undef
   sessionActive(value: $PropertyType<InternalState, 'sessionActive'>) {
     return new Builder(this.value.set('sessionActive', value));
   }
 
-  // eslint-disable-next-line no-undef
   clientAddress(value: $PropertyType<InternalState, 'clientAddress'>) {
     return new Builder(this.value.set('clientAddress', value));
   }
 
-  // eslint-disable-next-line no-undef
   lastActivity(value: $PropertyType<InternalState, 'lastActivity'>) {
     return new Builder(this.value.set('lastActivity', value));
   }
@@ -381,32 +263,22 @@ class Builder {
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,
     } = this.value.toObject();
 
-    return new User(
+    return new UserOverview(
       id,
       username,
       fullName,
       email,
-      permissions,
-      timezone,
-      preferences,
       roles,
       readOnly,
       external,
-      sessionTimeoutMs,
-      startpage,
       sessionActive,
       clientAddress,
       lastActivity,

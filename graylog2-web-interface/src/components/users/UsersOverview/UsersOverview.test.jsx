@@ -2,21 +2,31 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, cleanup } from 'wrappedTestingLibrary';
+import { alice, bob, adminUser } from 'fixtures/users';
 
 import UsersActions from 'actions/users/UsersActions';
-import { alice, bob, admin } from 'stores/users/users';
 
 import UsersOverview from './UsersOverview';
 
-const mockUsers = Immutable.List([alice, bob, admin]);
+const mockUsers = Immutable.List([alice, bob, adminUser]);
 
 jest.mock('stores/users/UsersStore', () => ({
   listen: jest.fn(),
-  getInitialState: jest.fn(() => ({ list: mockUsers })),
+  getInitialState: jest.fn(() => ({
+    paginatedList: {
+      list: mockUsers,
+      pagination: {
+        page: 1,
+        perPage: 10,
+        total: mockUsers.size,
+      },
+      adminUser: undefined,
+    },
+  })),
 }));
 
 jest.mock('actions/users/UsersActions', () => ({
-  loadUsers: jest.fn(),
+  searchPaginated: jest.fn(),
   deleteUser: jest.fn(),
 }));
 
@@ -63,7 +73,7 @@ describe('UsersOverview', () => {
       user     | username
       ${alice} | ${alice.username}
       ${bob}   | ${bob.username}
-      ${admin} | ${admin.username}
+      ${adminUser} | ${adminUser.username}
     `('$username', displaysUserAttributes);
   });
 

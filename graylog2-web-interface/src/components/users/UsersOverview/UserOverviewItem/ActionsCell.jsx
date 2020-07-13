@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
 import UsersActions from 'actions/users/UsersActions';
 import Routes from 'routing/Routes';
 import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
@@ -11,7 +11,7 @@ import { IfPermitted } from 'components/common';
 
 type Props = {
   readOnly: boolean,
-  username: $PropertyType<User, 'username'>,
+  username: $PropertyType<UserOverview, 'username'>,
 };
 
 const ActtionsWrapper = styled.div`

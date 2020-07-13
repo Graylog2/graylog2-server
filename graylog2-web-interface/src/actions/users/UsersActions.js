@@ -8,6 +8,7 @@ import type { UserJSON as User, ChangePasswordRequest, Token } from 'stores/user
 type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,
   loadUsers: () => Promise<User[]>,
+  searchPaginated: (page: number, perPage: number, query: string) => Promise<User[]>,
   load: (username: string) => Promise<User>,
   deleteUser: (username: string) => Promise<string[]>,
   changePassword: (username: string, request: ChangePasswordRequest) => void,
@@ -22,6 +23,7 @@ const UsersActions: UsersActionsType = singletonActions(
   () => Reflux.createActions({
     create: { asyncResult: true },
     loadUsers: { asyncResult: true },
+    searchPaginated: { asyncResult: true },
     load: { asyncResult: true },
     deleteUser: { asyncResult: true },
     changePassword: { asyncResult: true },

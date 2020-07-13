@@ -9,7 +9,16 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import UsersActions from 'actions/users/UsersActions';
 import { singletonStore } from 'views/logic/singleton';
-import User from 'logic/users/User';
+import PaginationURL from 'util/PaginationURL';
+import UserOverview from 'logic/users/UserOverview';
+
+const DEFAULT_PAGINATION = {
+  count: undefined,
+  total: undefined,
+  page: 1,
+  perPage: 10,
+  query: '',
+};
 
 type StartPage = {
   id: string,
@@ -48,8 +57,32 @@ export type ChangePasswordRequest = {
   password: string,
 };
 
+type PaginationType = {
+  count: number,
+  total: number,
+  page: number,
+  perPage: number,
+  query: string,
+};
+
+type PaginatedResponse = {
+  count: number,
+  total: number,
+  page: number,
+  per_page: number,
+  query: string,
+  users: Array<UserJSON>,
+  context: {
+    admin_user: UserJSON,
+  },
+};
+
 type UsersStoreState = {
-  list: Immutable.List<User>,
+  paginatedList: {
+    adminUser: ?UserOverview,
+    list: ?Immutable.List<UserOverview>,
+    pagination: PaginationType,
+  },
 };
 
 type UsersStoreType = Store<UsersStoreState>;
@@ -58,7 +91,11 @@ const UsersStore: UsersStoreType = singletonStore(
   'Users',
   () => Reflux.createStore({
     listenables: [UsersActions],
-    list: undefined,
+    paginatedList: {
+      adminUser: undefined,
+      list: undefined,
+      pagination: DEFAULT_PAGINATION,
+    },
 
     getInitialState(): UsersStoreState {
       return this._state();
@@ -73,14 +110,12 @@ const UsersStore: UsersStoreType = singletonStore(
       return promise;
     },
 
-    loadUsers(): Promise<User[]> {
+    loadUsers(): Promise<UserJSON[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
       const promise = fetch('GET', url)
         .then(
           (response) => {
             const { users } = response;
-            this.list = Immutable.List(users.map((user) => User.fromJSON(user)));
-            this._trigger();
 
             return users;
           },
@@ -93,6 +128,37 @@ const UsersStore: UsersStoreType = singletonStore(
         );
 
       UsersActions.loadUsers.promise(promise);
+
+      return promise;
+    },
+
+    searchPaginated(page: number, perPage: number, query: string): Promise<UserJSON[]> {
+      const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
+
+      const promise = fetch('GET', qualifyUrl(url))
+        .then((response: PaginatedResponse) => {
+          this.paginatedList = {
+            adminUser: UserOverview.fromJSON(response.context.admin_user),
+            list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+            pagination: {
+              count: response.count,
+              total: response.total,
+              page: response.page,
+              perPage: response.per_page,
+              query: response.query,
+            },
+          };
+
+          this._trigger();
+
+          return response.users;
+        })
+        .catch((errorThrown) => {
+          UserNotification.error(`Loading user list failed with status: ${errorThrown}`,
+            'Could not load user list');
+        });
+
+      UsersActions.searchPaginated.promise(promise);
 
       return promise;
     },
@@ -190,6 +256,7 @@ const UsersStore: UsersStoreType = singletonStore(
     _state(): UsersStoreState {
       return {
         list: this.list,
+        paginatedList: this.paginatedList,
       };
     },
 

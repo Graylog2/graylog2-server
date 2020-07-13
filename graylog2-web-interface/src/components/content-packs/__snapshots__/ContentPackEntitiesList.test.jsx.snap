@@ -263,6 +263,16 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="entity-list"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={Array []}
+        />
         <div
           className="row "
         >
@@ -688,6 +698,73 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="entity-list"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "constraints": Array [],
+                "data": Object {
+                  "configuration": Object {
+                    "listen_address": Object {
+                      "@type": "string",
+                      "@value": "1.2.3.4",
+                    },
+                    "port": Object {
+                      "@type": "integer",
+                      "@value": "23",
+                    },
+                  },
+                  "title": Object {
+                    "@type": "parameter",
+                    "@value": "TITLE",
+                  },
+                },
+                "id": "111-beef",
+                "type": Object {
+                  "name": "Input",
+                  "version": "1",
+                },
+                "v": "1.0",
+              },
+              Object {
+                "constraints": Array [],
+                "data": Object {
+                  "configuration": Object {
+                    "listen_address": Object {
+                      "@type": "string",
+                      "@value": "1.2.3.4",
+                    },
+                    "port": Object {
+                      "@type": "integer",
+                      "@value": "22",
+                    },
+                  },
+                  "name": Object {
+                    "@type": "string",
+                    "@value": "BadInput",
+                  },
+                  "title": Object {
+                    "@type": "string",
+                    "@value": "A bad input",
+                  },
+                },
+                "id": "121-beef",
+                "type": Object {
+                  "name": "Input",
+                  "version": "1",
+                },
+                "v": "1.0",
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -708,9 +785,9 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "lmPeF",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -718,7 +795,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -728,7 +805,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table scrollable"
                   >
                     <thead>
                       <tr>

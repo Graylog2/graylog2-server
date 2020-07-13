@@ -836,6 +836,38 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   useResponsiveTable={true}
                 >
                   <div>
+                    <Filter
+                      displayKey="value"
+                      filterBy=""
+                      filterKeys={Array []}
+                      filterSuggestions={Array []}
+                      id="entity-list"
+                      label="Filter"
+                      onDataFiltered={[Function]}
+                      rows={
+                        Array [
+                          Object {
+                            "constraints": Array [],
+                            "data": Object {
+                              "descr": Object {
+                                "@type": "string",
+                                "@value": "hans",
+                              },
+                              "title": Object {
+                                "@type": "string",
+                                "@value": "franz",
+                              },
+                            },
+                            "id": undefined,
+                            "type": Object {
+                              "name": "grok_pattern",
+                              "version": "1",
+                            },
+                            "v": undefined,
+                          },
+                        ]
+                      }
+                    />
                     <div
                       className="row "
                     >
@@ -856,9 +888,9 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "$$typeof": Symbol(react.forward_ref),
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
-                                    "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                    "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                                     "isStatic": false,
-                                    "lastClassName": "lmPeF",
+                                    "lastClassName": "gweZGk",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -866,7 +898,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "displayName": "DataTable__StyledTable",
                                   "foldedComponentIds": Array [],
                                   "render": [Function],
-                                  "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                  "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                                   "target": "table",
                                   "toString": [Function],
                                   "warnTooManyClasses": [Function],
@@ -876,7 +908,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               forwardedRef={null}
                             >
                               <table
-                                className="DataTable__StyledTable-sc-1c22x1c-0 lmPeF table scrollable"
+                                className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table scrollable"
                               >
                                 <thead>
                                   <tr>
