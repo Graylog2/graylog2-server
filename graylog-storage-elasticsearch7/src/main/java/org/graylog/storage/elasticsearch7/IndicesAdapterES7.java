@@ -37,6 +37,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.state.StateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -71,14 +72,17 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final ElasticsearchClient client;
     private final StateApi stateApi;
     private final StatsApi statsApi;
+    private final CatApi catApi;
 
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StateApi stateApi,
-                             StatsApi statsApi) {
+                             StatsApi statsApi,
+                             CatApi catApi) {
         this.client = client;
         this.stateApi = stateApi;
         this.statsApi = statsApi;
+        this.catApi = catApi;
     }
 
     @Override
@@ -306,8 +310,8 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String id) {
-        return null;
+    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
+        return catApi.indices(indexWildcard, status, "Couldn't get index list for index set <" + indexSetId + ">");
     }
 
     @Override

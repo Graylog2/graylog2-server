@@ -1,6 +1,7 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.state.StateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
@@ -22,6 +23,9 @@ public class IndicesES7IT extends IndicesIT {
     @Override
     protected IndicesAdapter indicesAdapter() {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new IndicesAdapterES7(elasticsearch.elasticsearchClient(), new StateApi(objectMapper), new StatsApi(objectMapper));
+        return new IndicesAdapterES7(elasticsearch.elasticsearchClient(),
+                new StateApi(objectMapper),
+                new StatsApi(objectMapper),
+                new CatApi(objectMapper));
     }
 }
