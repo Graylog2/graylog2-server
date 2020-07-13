@@ -46,7 +46,7 @@ const _headerCellFormatter = (header) => {
 const _onPageChange = (query, setLoading) => (page, perPage) => {
   setLoading(true);
 
-  return UsersActions.searchPaginated(page, perPage, query).then(setLoading(false));
+  return UsersActions.searchPaginated(page, perPage, query).then(() => setLoading(false));
 };
 
 const UsersOverview = () => {
