@@ -100,7 +100,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     public void setUp() {
         //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
-        final Node node = new Node(mock(NodeAdapter.class));
+        final Node node = new Node(createNodeAdapter());
         indexMappingFactory = new IndexMappingFactory(node);
         indicesAdapter = indicesAdapter();
         indices = new Indices(
@@ -111,6 +111,8 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 indicesAdapter
         );
     }
+
+    protected abstract NodeAdapter createNodeAdapter();
 
     @Test
     public void testDelete() {
@@ -237,8 +239,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
                 "_source", ImmutableMap.of("enabled", false),
                 "properties", ImmutableMap.of("message",
                         ImmutableMap.of(
-                                "type", "string",
-                                "index", "not_analyzed")));
+                                "type", "text")));
 
         final Map<String, Object> templateSource = ImmutableMap.of(
                 "template", indexSet.getIndexWildcard(),
