@@ -46,6 +46,7 @@ import io.searchbox.indices.template.PutTemplate;
 import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
+import org.graylog2.indexer.IndexMapping;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -226,7 +227,7 @@ public class ClientES6 implements Client {
     private Index createBulkIndexAction(String indexName, Map<String, Object> source) {
         return new Index.Builder(source)
                 .index(indexName)
-                .type("test")
+                .type(IndexMapping.TYPE_MESSAGE)
                 .refresh(true)
                 .build();
     }
