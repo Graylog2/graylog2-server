@@ -279,6 +279,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="parameter-list"
           label="Filter"
           onDataFiltered={[Function]}
           rows={Array []}
@@ -782,6 +783,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="parameter-list"
           label="Filter"
           onDataFiltered={[Function]}
           rows={Array []}
@@ -1105,6 +1107,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="parameter-list"
           label="Filter"
           onDataFiltered={[Function]}
           rows={
@@ -1139,9 +1142,9 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "kOzPPq",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -1149,7 +1152,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -1159,7 +1162,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table scrollable"
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table scrollable"
                   >
                     <thead>
                       <tr>
@@ -1836,6 +1839,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="parameter-list"
           label="Filter"
           onDataFiltered={[Function]}
           rows={
@@ -1870,9 +1874,9 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "kOzPPq",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -1880,7 +1884,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -1890,7 +1894,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table scrollable"
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table scrollable"
                   >
                     <thead>
                       <tr>

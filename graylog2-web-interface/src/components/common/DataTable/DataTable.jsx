@@ -4,52 +4,13 @@ import { isEqual } from 'lodash';
 import styled from 'styled-components';
 
 import { tableCss } from 'components/graylog/Table';
-import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
+import Filter from './Filter';
 import DataTableElement from './DataTableElement';
 
 const StyledTable = styled.table`
   ${tableCss}
 `;
-
-const Filter = ({
-  children,
-  customFilter,
-  displayKey,
-  filterBy,
-  filterKeys,
-  filterSuggestions,
-  id,
-  label,
-  onDataFiltered,
-  rows,
-}) => {
-  if (customFilter) {
-    return customFilter;
-  }
-
-  if (filterKeys.length !== 0) {
-    return (
-      <div className="row">
-        <div className="col-md-8">
-          <TypeAheadDataFilter id={`${id}-data-filter`}
-                               label={label}
-                               data={rows}
-                               displayKey={displayKey}
-                               filterBy={filterBy}
-                               filterSuggestions={filterSuggestions}
-                               searchInKeys={filterKeys}
-                               onDataFiltered={onDataFiltered} />
-        </div>
-        <div className="col-md-4">
-          {children}
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-};
 
 /**
  * Component that renders a data table, letting consumers of the component to
@@ -226,6 +187,7 @@ class DataTable extends React.Component {
       <div>
         <Filter customFilter={customFilter}
                 label={filterLabel}
+                id={id}
                 rows={rows}
                 displayKey={displayKey}
                 filterBy={filterBy}

@@ -37,6 +37,7 @@ exports[`<ContentPackInstallEntityList /> should render with empty entities 1`] 
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="installed-entities"
           label="Filter"
           onDataFiltered={[Function]}
           rows={Array []}
@@ -160,6 +161,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="installed-entities"
           label="Filter"
           onDataFiltered={[Function]}
           rows={
@@ -214,9 +216,9 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "kOzPPq",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -224,7 +226,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -234,7 +236,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>
@@ -446,6 +448,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="installed-entities"
           label="Filter"
           onDataFiltered={[Function]}
           rows={
@@ -500,9 +503,9 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "kOzPPq",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -510,7 +513,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -520,7 +523,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>

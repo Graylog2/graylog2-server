@@ -662,6 +662,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                   filterBy=""
                   filterKeys={Array []}
                   filterSuggestions={Array []}
+                  id="config-key-list"
                   label="Filter"
                   onDataFiltered={[Function]}
                   rows={
@@ -693,9 +694,9 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               "$$typeof": Symbol(react.forward_ref),
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
-                                "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                                 "isStatic": false,
-                                "lastClassName": "kOzPPq",
+                                "lastClassName": "gweZGk",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -703,7 +704,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               "displayName": "DataTable__StyledTable",
                               "foldedComponentIds": Array [],
                               "render": [Function],
-                              "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                              "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                               "target": "table",
                               "toString": [Function],
                               "warnTooManyClasses": [Function],
@@ -713,7 +714,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                           forwardedRef={null}
                         >
                           <table
-                            className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table "
+                            className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                           >
                             <thead>
                               <tr>
@@ -1501,6 +1502,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                   filterBy=""
                   filterKeys={Array []}
                   filterSuggestions={Array []}
+                  id="config-key-list"
                   label="Filter"
                   onDataFiltered={[Function]}
                   rows={Array []}
@@ -2195,6 +2197,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                   filterBy=""
                   filterKeys={Array []}
                   filterSuggestions={Array []}
+                  id="config-key-list"
                   label="Filter"
                   onDataFiltered={[Function]}
                   rows={
@@ -2227,9 +2230,9 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               "$$typeof": Symbol(react.forward_ref),
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
-                                "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                                 "isStatic": false,
-                                "lastClassName": "kOzPPq",
+                                "lastClassName": "gweZGk",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -2237,7 +2240,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               "displayName": "DataTable__StyledTable",
                               "foldedComponentIds": Array [],
                               "render": [Function],
-                              "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                              "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                               "target": "table",
                               "toString": [Function],
                               "warnTooManyClasses": [Function],
@@ -2247,7 +2250,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                           forwardedRef={null}
                         >
                           <table
-                            className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table "
+                            className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                           >
                             <thead>
                               <tr>

@@ -268,6 +268,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="entity-list"
           label="Filter"
           onDataFiltered={[Function]}
           rows={Array []}
@@ -702,6 +703,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
           filterBy=""
           filterKeys={Array []}
           filterSuggestions={Array []}
+          id="entity-list"
           label="Filter"
           onDataFiltered={[Function]}
           rows={
@@ -783,9 +785,9 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "kOzPPq",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -793,7 +795,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -803,7 +805,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 kOzPPq table scrollable"
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table scrollable"
                   >
                     <thead>
                       <tr>
