@@ -59,7 +59,7 @@ public class EventIndexer {
 
         // Pre-load all write index targets of all events to avoid looking them up for every event when building the bulk request
         final Set<String> streamIds = streamIdsForEvents(eventsWithContext);
-        final Map<String, IndexSet> streamIndices = indexAliasesForStreams(streamIds);
+        final Map<String, IndexSet> streamIndices = indexSetsForStreams(streamIds);
         final List<IndexingRequest> requests = eventsWithContext.stream()
                 .map(EventWithContext::event)
                 // Collect a set of indices for the event to avoid writing to the same index set twice if
@@ -70,7 +70,7 @@ public class EventIndexer {
         messages.bulkIndexRequests(requests, true);
     }
 
-    private Map<String, IndexSet> indexAliasesForStreams(Set<String> streamIds) {
+    private Map<String, IndexSet> indexSetsForStreams(Set<String> streamIds) {
         return streamService.loadByIds(streamIds).stream()
             .collect(Collectors.toMap(Persisted::getId, org.graylog2.plugin.streams.Stream::getIndexSet));
     }
