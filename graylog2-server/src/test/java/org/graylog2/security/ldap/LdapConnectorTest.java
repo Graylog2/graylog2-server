@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(transports = {
@@ -97,7 +98,7 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
         config.setName(ADMIN_DN);
         config.setCredentials(ADMIN_PASSWORD);
 
-        connector = new LdapConnector(10000);
+        connector = new LdapConnector(10000, mock(LdapSettingsService.class));
         connection = connector.connect(config);
     }
 
