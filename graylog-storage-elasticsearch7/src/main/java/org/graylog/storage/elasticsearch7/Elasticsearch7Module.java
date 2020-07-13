@@ -2,6 +2,7 @@ package org.graylog.storage.elasticsearch7;
 
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.plugin.VersionAwareModule;
@@ -14,6 +15,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterES7.class);
+        bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterES7.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
