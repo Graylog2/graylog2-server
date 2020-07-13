@@ -41,6 +41,7 @@ class IndexerFailuresComponent extends React.Component {
     if (count === 0) {
       return 'No failed indexing attempts in the last 24 hours.';
     }
+
     return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
   };
 
@@ -48,11 +49,13 @@ class IndexerFailuresComponent extends React.Component {
     if (count === 0) {
       return 'check-circle';
     }
+
     return 'ambulance';
   };
 
   render() {
     let content;
+
     if (this.state.total === undefined) {
       content = <Spinner />;
     } else {

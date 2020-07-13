@@ -39,6 +39,7 @@ class AggregationForm extends React.Component {
   propagateConfigChange = (update) => {
     const { eventDefinition, onChange } = this.props;
     const nextConfig = { ...eventDefinition.config, ...update };
+
     onChange('config', nextConfig);
   };
 

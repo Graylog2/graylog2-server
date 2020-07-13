@@ -1,12 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
+import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { ColorPickerPopover, Icon } from 'components/common';
 
 import ColorPreview from './ColorPreview';
@@ -14,9 +15,9 @@ import ColorPreview from './ColorPreview';
 export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: grid;
   display: -ms-grid;
-  margin-top: 5px;
   grid-template-columns: max-content 1fr max-content;
   -ms-grid-columns: max-content 1fr max-content;
+  margin-top: 10px;
   word-break: break-word;
 
   > *:nth-child(1) {
@@ -35,7 +36,7 @@ export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = s
   }
 `;
 
-const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => `
+const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   width: 2rem;
   height: 2rem;
   margin-left: 0.4rem;
@@ -45,7 +46,7 @@ const DeleteIcon: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.
   justify-content: center;
 
   :active {
-    background-color: ${theme.colors.gray[90]}
+    background-color: ${theme.colors.gray[90]};
   }
 `);
 
@@ -55,11 +56,13 @@ type Props = {
 
 const updateColor = (rule, newColor, hidePopover) => {
   const newRule = rule.toBuilder().color(newColor).build();
+
   return HighlightingRulesActions.update(newRule).then(hidePopover);
 };
 
 const onDelete = (e, rule) => {
   e.preventDefault();
+
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
     HighlightingRulesActions.remove(rule);
@@ -68,6 +71,7 @@ const onDelete = (e, rule) => {
 
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color } = rule;
+
   return (
     <HighlightingRuleGrid>
       <ColorPickerPopover id="formatting-rule-color"

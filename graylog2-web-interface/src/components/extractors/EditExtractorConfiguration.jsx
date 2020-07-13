@@ -44,6 +44,7 @@ class EditExtractorConfiguration extends React.Component {
                                       onChange={this.props.onChange}
                                       onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       case ExtractorUtils.ExtractorTypes.JSON:
         extractorConfiguration = (
@@ -52,6 +53,7 @@ class EditExtractorConfiguration extends React.Component {
                                       onChange={this.props.onChange}
                                       onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       case ExtractorUtils.ExtractorTypes.REGEX:
         extractorConfiguration = (
@@ -60,6 +62,7 @@ class EditExtractorConfiguration extends React.Component {
                                        onChange={this.props.onChange}
                                        onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       case ExtractorUtils.ExtractorTypes.REGEX_REPLACE:
         extractorConfiguration = (
@@ -68,6 +71,7 @@ class EditExtractorConfiguration extends React.Component {
                                               onChange={this.props.onChange}
                                               onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       case ExtractorUtils.ExtractorTypes.SUBSTRING:
         extractorConfiguration = (
@@ -76,6 +80,7 @@ class EditExtractorConfiguration extends React.Component {
                                            onChange={this.props.onChange}
                                            onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       case ExtractorUtils.ExtractorTypes.SPLIT_AND_INDEX:
         extractorConfiguration = (
@@ -84,6 +89,7 @@ class EditExtractorConfiguration extends React.Component {
                                                onChange={this.props.onChange}
                                                onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       case ExtractorUtils.ExtractorTypes.LOOKUP_TABLE:
         extractorConfiguration = (
@@ -92,6 +98,7 @@ class EditExtractorConfiguration extends React.Component {
                                              onChange={this.props.onChange}
                                              onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
         );
+
         break;
       default:
         console.warn(`Unsupported extractor type ${this.props.extractorType}`);

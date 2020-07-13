@@ -28,6 +28,7 @@ class RegexExtractorConfiguration extends React.Component {
     return (event) => {
       this.props.onExtractorPreviewLoad(undefined);
       const newConfig = this.props.configuration;
+
       newConfig[key] = FormUtils.getValueFromInput(event.target);
       this.props.onChange(newConfig);
     };
@@ -37,18 +38,22 @@ class RegexExtractorConfiguration extends React.Component {
     this.setState({ trying: true });
 
     const promise = ToolsStore.testRegex(this.props.configuration.regex_value, this.props.exampleMessage);
+
     promise.then((result) => {
       if (!result.matched) {
         UserNotification.warning('Regular expression did not match.');
+
         return;
       }
 
       if (!result.match) {
         UserNotification.warning('Regular expression does not contain any matcher group to extract.');
+
         return;
       }
 
       const preview = (result.match.match ? <samp>{result.match.match}</samp> : '');
+
       this.props.onExtractorPreviewLoad(preview);
     });
 

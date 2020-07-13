@@ -26,6 +26,7 @@ class ClosedIndexDetails extends React.Component {
 
   render() {
     const { indexRange } = this.props;
+
     return (
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />

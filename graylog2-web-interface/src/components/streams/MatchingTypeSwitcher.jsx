@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
@@ -8,7 +8,7 @@ import UserNotification from 'util/UserNotification';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 
-const StreamRuleConnector = styled.div(({ theme }) => `
+const StreamRuleConnector = styled.div(({ theme }) => css`
   margin-top: 10px;
   margin-bottom: 13px;
 
@@ -52,6 +52,7 @@ class MatchingTypeSwitcher extends React.Component {
     if (window.confirm('You are about to change how rules are applied to this stream, do you want to continue? Changes will take effect immediately.')) {
       StreamsStore.update(stream.id, { matching_type: newValue }, (response) => {
         onChange();
+
         UserNotification.success(`Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
           'Success');
 

@@ -1,9 +1,10 @@
 // @flow strict
 import React from 'react';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -42,7 +43,9 @@ const _tooltip = (fieldName: string, newDirection: Direction) => {
 
 const _changeSort = (nextDirection: Direction, config: MessagesWidgetConfig, fieldName: string, onSortChange: (SortConfig[]) => Promise<void>, setLoadingState: (loading: boolean) => void) => {
   const newSort = [new SortConfig(SortConfig.PIVOT_TYPE, fieldName, nextDirection)];
+
   setLoadingState(true);
+
   onSortChange(newSort).then(() => {
     setLoadingState(false);
   });
@@ -75,6 +78,7 @@ const DirectionStrategyNoSort: DirectionStrategy = {
 
 const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => {
   const fieldSortDirection = _isFieldSortActive(config, fieldName) ? config.sort[0].direction.direction : null;
+
   switch (fieldSortDirection) {
     case Direction.Ascending.direction:
       return DirectionStrategyAsc;
@@ -88,6 +92,7 @@ const _directionStrategy = (config: MessagesWidgetConfig, fieldName: string) => 
 const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Props) => {
   const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, config, fieldName, onSortChange, setLoadingState);
   const { sortActive, tooltip, handleSortChange, icon }: DirectionStrategy = _directionStrategy(config, fieldName);
+
   return (
     <SortIcon sortActive={sortActive}
               title={tooltip(fieldName)}

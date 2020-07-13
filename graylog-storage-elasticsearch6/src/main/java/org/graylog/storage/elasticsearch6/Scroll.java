@@ -3,7 +3,7 @@ package org.graylog.storage.elasticsearch6;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.results.ScrollResult;
 
 import javax.inject.Inject;

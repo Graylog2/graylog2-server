@@ -57,12 +57,14 @@ const SavedSearchesStore = singletonStore(
       const promise = fetch('GET', `${savedSearchesUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
           this.searches = response.views;
+
           this.pagination = {
             total: response.total,
             count: response.count,
             page: response.page,
             perPage: response.per_page,
           };
+
           this.trigger({
             list: this.searches,
             pagination: this.pagination,
@@ -74,6 +76,7 @@ const SavedSearchesStore = singletonStore(
           UserNotification.error(`Fetching saved searches failed with status: ${error}`,
             'Could not retrieve saved searches');
         });
+
       SavedSearchesActions.search.promise(promise);
     },
   }),

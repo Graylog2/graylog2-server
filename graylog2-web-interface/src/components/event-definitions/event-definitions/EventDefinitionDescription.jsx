@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import {} from 'moment-duration-format';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, Col, Row } from 'components/graylog';
 import { Icon, Pluralize, Timestamp } from 'components/common';
@@ -16,15 +16,16 @@ const DetailTitle = styled.dt`
   clear: left;
 `;
 
-const DetailValue = styled.dd`
+const DetailValue = styled.dd(({ theme }) => css`
   margin-left: 150px;
   word-wrap: break-word;
+
   &:not(:last-child) {
-    border-bottom: 1px solid #ececec;
+    border-bottom: 1px solid ${theme.colors.variant.lightest.default};
     margin-bottom: 5px;
     padding-bottom: 5px;
- }
-`;
+  }
+`);
 
 class EventDefinitionDescription extends React.Component {
   static propTypes = {
@@ -38,6 +39,7 @@ class EventDefinitionDescription extends React.Component {
 
   constructor() {
     super();
+
     this.state = {
       showDetails: false,
     };
@@ -45,18 +47,22 @@ class EventDefinitionDescription extends React.Component {
 
   renderSchedulingInformation = (definition) => {
     let schedulingInformation = 'Not scheduled.';
+
     if (definition.config.search_within_ms && definition.config.execute_every_ms) {
       const executeEveryFormatted = moment.duration(definition.config.execute_every_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false });
       const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+
       schedulingInformation = `Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
     }
+
     return schedulingInformation;
   };
 
   renderNotificationsInformation = (definition) => {
     let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
+
     if (definition.notifications.length > 0) {
       notificationsInformation = (
         <span>
@@ -65,6 +71,7 @@ class EventDefinitionDescription extends React.Component {
         </span>
       );
     }
+
     return notificationsInformation;
   };
 
@@ -82,9 +89,11 @@ class EventDefinitionDescription extends React.Component {
     }
 
     let timerange = null;
+
     if (lodash.get(scheduleCtx, 'data.type', null) === 'event-processor-execution-v1') {
       const from = scheduleCtx.data.timerange_from;
       const to = scheduleCtx.data.timerange_to;
+
       timerange = (
         <>
           <DetailTitle>Next timerange:</DetailTitle>
@@ -120,6 +129,7 @@ class EventDefinitionDescription extends React.Component {
 
   handleDetailsToggle = () => {
     const { showDetails } = this.state;
+
     this.setState({ showDetails: !showDetails });
   };
 

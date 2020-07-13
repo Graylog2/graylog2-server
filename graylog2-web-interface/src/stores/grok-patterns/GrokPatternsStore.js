@@ -27,16 +27,20 @@ const GrokPatternsStore = Reflux.createStore({
       UserNotification.error(`Loading Grok patterns failed with status: ${error.message}`,
         'Could not load Grok patterns');
     };
+
     // get the current list of patterns and sort it by name
     return fetch('GET', this.URL)
       .then(
         (resp: any) => {
           const { patterns } = resp;
+
           patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
             return pattern1.name.toLowerCase()
               .localeCompare(pattern2.name.toLowerCase());
           });
+
           callback(patterns);
+
           return resp;
         },
         failCallback,
@@ -47,9 +51,11 @@ const GrokPatternsStore = Reflux.createStore({
     const failCallback = (error) => {
       let errorMessage = error.message;
       const errorBody = error.additional.body;
+
       if (errorBody && errorBody.message) {
         errorMessage = error.additional.body.message;
       }
+
       errCallback(errorMessage);
     };
 
@@ -65,6 +71,7 @@ const GrokPatternsStore = Reflux.createStore({
       .then(
         (response) => {
           callback(response);
+
           return response;
         },
         failCallback,
@@ -75,9 +82,11 @@ const GrokPatternsStore = Reflux.createStore({
     const failCallback = (error) => {
       let errorMessage = error.message;
       const errorBody = error.additional.body;
+
       if (errorBody && errorBody.message) {
         errorMessage = error.additional.body.message;
       }
+
       UserNotification.error(`Testing Grok pattern "${pattern.name}" failed with status: ${errorMessage}`,
         'Could not test Grok pattern');
     };
@@ -91,19 +100,23 @@ const GrokPatternsStore = Reflux.createStore({
 
     let url = this.URL;
     let method;
+
     if (pattern.id === '') {
       method = 'POST';
     } else {
       url += `/${pattern.id}`;
       method = 'PUT';
     }
+
     fetch(method, url, requestPattern)
       .then(
         (response) => {
           callback();
           const action = pattern.id === '' ? 'created' : 'updated';
           const message = `Grok pattern "${pattern.name}" successfully ${action}`;
+
           UserNotification.success(message);
+
           return response;
         },
         failCallback,
@@ -115,11 +128,13 @@ const GrokPatternsStore = Reflux.createStore({
       UserNotification.error(`Deleting Grok pattern "${pattern.name}" failed with status: ${error.message}`,
         'Could not delete Grok pattern');
     };
+
     fetch('DELETE', `${this.URL}/${pattern.id}`)
       .then(
         (response) => {
           callback();
           UserNotification.success(`Grok pattern "${pattern.name}" successfully deleted`);
+
           return response;
         },
         failCallback,
@@ -130,14 +145,17 @@ const GrokPatternsStore = Reflux.createStore({
     const failCallback = (error) => {
       let errorMessage = error.message;
       const errorBody = error.additional.body;
+
       if (errorBody && errorBody.validation_errors && errorBody.validation_errors._) {
         errorMessage = '';
         const errors = errorBody.validation_errors._;
+
         // eslint-disable-next-line no-plusplus
         for (let i = 0, len = errors.length; i < len; i++) {
           errorMessage = errorMessage.concat(errors[i].error);
         }
       }
+
       UserNotification.error(`Importing Grok pattern file failed with status: ${errorMessage}`,
         'Could not load Grok patterns');
     };

@@ -21,4 +21,6 @@ import org.testcontainers.containers.Network;
 
 public interface ElasticsearchInstanceFactory {
     ElasticsearchInstance create(Network network);
+
+    String version();
 }

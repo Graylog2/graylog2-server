@@ -52,6 +52,7 @@ class ContentPackEditParameter extends React.Component {
     const realDefaultValue = ContentPackUtils.convertValue(this.state.newParameter.type,
       this.state.newParameter.default_value);
     const updatedParameter = ObjectUtils.clone(this.state.newParameter);
+
     updatedParameter.default_value = realDefaultValue;
     this.props.onUpdateParameter(updatedParameter);
 
@@ -61,6 +62,7 @@ class ContentPackEditParameter extends React.Component {
 
   _updateField = (name, value) => {
     const updatedParameter = ObjectUtils.clone(this.state.newParameter);
+
     updatedParameter[name] = value;
     this.setState({ newParameter: updatedParameter });
   };
@@ -71,22 +73,29 @@ class ContentPackEditParameter extends React.Component {
 
   _validateParameter() {
     const param = this.state.newParameter;
+
     if (!param.name) {
       this.setState({ nameError: 'Name must be set.' });
+
       return false;
     }
+
     this.setState({ nameError: undefined });
 
     if (!param.title) {
       this.setState({ titleError: 'Title must be set.' });
+
       return false;
     }
+
     this.setState({ titleError: undefined });
 
     if (!param.description) {
       this.setState({ descrError: 'Description must be set.' });
+
       return false;
     }
+
     this.setState({ descrError: undefined });
 
     return this._validateDefaultValue() && this._validateName();
@@ -94,57 +103,74 @@ class ContentPackEditParameter extends React.Component {
 
   _validateName = () => {
     const value = this.state.newParameter.name;
+
     if (value.match(/\W/)) {
       this.setState({ nameError: 'The parameter name must only contain A-Z, a-z, 0-9 and _' });
+
       return false;
     }
 
     if ((this.props.parameterToEdit || {}).name !== value
       && this.props.parameters.findIndex((parameter) => { return parameter.name === value; }) >= 0) {
       this.setState({ nameError: 'The parameter name must be unique.' });
+
       return false;
     }
 
     this.setState({ nameError: undefined });
+
     return true;
   };
 
   _validateDefaultValue = () => {
     const value = this.state.newParameter.default_value;
+
     if (value) {
       switch (this.state.newParameter.type) {
         case 'integer': {
           if (`${parseInt(value, 10)}` !== value) {
             this.setState({ defaultValueError: 'This is not an integer value.' });
+
             return false;
           }
+
           break;
         }
+
         case 'double': {
           if (isNaN(value)) {
             this.setState({ defaultValueError: 'This is not a double value.' });
+
             return false;
           }
+
           break;
         }
+
         case 'boolean': {
           if (value !== 'true' && value !== 'false') {
             this.setState({ defaultValueError: 'This is not a boolean value. It must be either true or false.' });
+
             return false;
           }
+
           break;
         }
+
         default:
           break;
       }
     }
+
     this.setState({ defaultValueError: undefined });
+
     return true;
   };
 
   render() {
     const header = this.props.parameterToEdit ? 'Edit parameter' : 'Create parameter';
     const disableType = !!this.props.parameterToEdit;
+
     return (
       <div>
         <h2>{header}</h2>

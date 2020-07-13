@@ -15,7 +15,9 @@ describe('ViewManagementStore', () => {
     const CurrentUserStore = {
       reload: jest.fn(),
     };
+
     StoreProvider.getStore.mockReturnValue(CurrentUserStore);
+
     return ViewManagementActions.create(view).then(() => {
       expect(CurrentUserStore.reload).toHaveBeenCalled();
     });

@@ -1,0 +1,19 @@
+:local(.fieldList) {
+    padding: 0;
+    overflow-y: auto;
+}
+
+:local(.fieldListItem) {
+    font-size: 12px;
+    display: table-row;
+    white-space: nowrap;
+}
+
+:local(.filterContainer) {
+    display: flex;
+}
+
+:local(.filterInputContainer) {
+    flex-grow: 1;
+    margin-right: 5px;
+}

@@ -109,9 +109,11 @@ class SortableListItem extends React.Component {
   render() {
     const { content, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
     const classes = [SortableListItemStyle.listGroupItem];
+
     if (isDragging) {
       classes.push('dragging');
     }
+
     if (isOver) {
       classes.push('over');
     }

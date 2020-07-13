@@ -86,6 +86,7 @@ const CollectorForm = createReactClass({
 
     return (nextValue) => {
       const nextFormData = lodash.cloneDeep(formData);
+
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
@@ -102,6 +103,7 @@ const CollectorForm = createReactClass({
 
   _onNameChange(event) {
     const nextName = event.target.value;
+
     this._formDataUpdate('name')(nextName);
   },
 
@@ -122,6 +124,7 @@ const CollectorForm = createReactClass({
 
   _formatServiceTypes() {
     const options = [];
+
     options.push({ value: 'exec', label: 'Foreground execution' });
     options.push({ value: 'svc', label: 'Windows service' });
 
@@ -130,6 +133,7 @@ const CollectorForm = createReactClass({
 
   _formatOperatingSystems() {
     const options = [];
+
     options.push({ value: 'linux', label: 'Linux' });
     options.push({ value: 'windows', label: 'Windows' });
 
@@ -162,9 +166,11 @@ const CollectorForm = createReactClass({
 
     let validationParameters = '';
     let executeParameters = '';
+
     if (formData.validation_parameters) {
       validationParameters = formData.validation_parameters;
     }
+
     if (formData.execute_parameters) {
       executeParameters = formData.execute_parameters;
     }

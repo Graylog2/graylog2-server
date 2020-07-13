@@ -24,6 +24,7 @@ class LUTTablesPage extends React.Component {
   componentDidUpdate(prevProps) {
     const { location: { pathname } } = this.props;
     const { location: { pathname: prevPathname } } = prevProps;
+
     if (pathname !== prevPathname) {
       this._loadData(this.props);
     }
@@ -35,14 +36,19 @@ class LUTTablesPage extends React.Component {
 
   _startErrorStatesTimer = () => {
     const { tables, dataAdapters } = this.props;
+
     this._stopErrorStatesTimer();
+
     this.errorStatesTimer = setInterval(() => {
       let tableNames = null;
+
       if (tables) {
         tableNames = tables.map((t) => t.name);
       }
+
       if (tableNames) {
         const adapterNames = Object.values(dataAdapters).map((a) => a.name);
+
         LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
       }
     }, this.errorStatesInterval);
@@ -57,7 +63,9 @@ class LUTTablesPage extends React.Component {
 
   _loadData = (props) => {
     const { pagination } = this.props;
+
     this._stopErrorStatesTimer();
+
     if (props.params && props.params.tableName) {
       LookupTablesActions.get(props.params.tableName);
     } else if (this._isCreating(props)) {
@@ -180,6 +188,7 @@ LUTTablesPage.propTypes = {
   errorStates: PropTypes.object,
   route: PropTypes.object.isRequired,
 };
+
 LUTTablesPage.defaultProps = {
   errorStates: null,
   validationErrors: {},

@@ -3,7 +3,8 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -73,6 +74,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     super(props);
 
     const { config } = props;
+
     this.state = {
       config,
     };
@@ -88,6 +90,7 @@ export default class AggregationControls extends React.Component<Props, State> {
 
   _onSeriesChange = (series: $PropertyType<$PropertyType<Props, 'config'>, 'series'>) => {
     this._setAndPropagate((state) => ({ config: state.config.toBuilder().series(series).build() }));
+
     return true;
   };
 
@@ -124,6 +127,7 @@ export default class AggregationControls extends React.Component<Props, State> {
   _propagateState() {
     const { config } = this.state;
     const { onChange } = this.props;
+
     onChange(config);
   }
 
@@ -147,6 +151,8 @@ export default class AggregationControls extends React.Component<Props, State> {
     const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex((x) => x === visualization) >= 0;
     const childrenWithCallback = React.Children.map(children, (child) => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
+    const VisualizationConfigComponent = VisualizationConfigType?.component;
+
     return (
       <Container>
         <TopRow>
@@ -191,10 +197,10 @@ export default class AggregationControls extends React.Component<Props, State> {
                 <EventListConfiguration enabled={config.eventAnnotation} onChange={this._onSetEventAnnotation} />
               </DescriptionBox>
             )}
-            {VisualizationConfigType && (
+            {VisualizationConfigComponent && (
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
-                <VisualizationConfigType.component onChange={this._onVisualizationConfigChange}
-                                                   config={visualizationConfig} />
+                <VisualizationConfigComponent onChange={this._onVisualizationConfigChange}
+                                              config={visualizationConfig} />
               </DescriptionBox>
             )}
           </Col>

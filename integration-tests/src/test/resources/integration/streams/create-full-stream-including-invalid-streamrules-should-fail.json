@@ -1,9 +1,0 @@
-{
-  "title": "A full Test Stream",
-  "description" : "This is a full test stream including stream rules.",
-  "index_set_id": "582f3c4e43761335e4859f72",
-  "rules" : [
-    {"type" : 1, "field" : "action", "inverted" : false, "description": ""},
-    {"type" : 5, "value": "", "field" : "controller", "inverted" : false, "description": ""}
-  ]
-}

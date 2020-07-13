@@ -67,8 +67,9 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -143,8 +144,9 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
     }
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -201,7 +203,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                         "componentStyle": ComponentStyle {
                           "componentId": "MessagesTable__StyledTable-ptthov-1",
                           "isStatic": false,
-                          "lastClassName": "dOoSCk",
+                          "lastClassName": "blgxUT",
                           "rules": Array [
                             [Function],
                             [Function],
@@ -224,14 +226,14 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                     <Table
                       bordered={false}
                       bsClass="table"
-                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk"
+                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT"
                       condensed={true}
                       hover={false}
                       responsive={false}
                       striped={false}
                     >
                       <table
-                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk table table-condensed"
+                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT table table-condensed"
                       >
                         <thead>
                           <Headers
@@ -469,7 +471,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -487,7 +489,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               count()
@@ -581,7 +583,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -599,7 +601,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               count()
@@ -1125,8 +1127,9 @@ exports[`DataTable should render with empty data 1`] = `
   data={Object {}}
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -1157,8 +1160,9 @@ exports[`DataTable should render with empty data 1`] = `
     data={Object {}}
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -1215,7 +1219,7 @@ exports[`DataTable should render with empty data 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "MessagesTable__StyledTable-ptthov-1",
                           "isStatic": false,
-                          "lastClassName": "dOoSCk",
+                          "lastClassName": "blgxUT",
                           "rules": Array [
                             [Function],
                             [Function],
@@ -1238,14 +1242,14 @@ exports[`DataTable should render with empty data 1`] = `
                     <Table
                       bordered={false}
                       bsClass="table"
-                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk"
+                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT"
                       condensed={true}
                       hover={false}
                       responsive={false}
                       striped={false}
                     >
                       <table
-                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk table table-condensed"
+                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT table table-condensed"
                       >
                         <thead>
                           <Headers
@@ -1350,8 +1354,9 @@ exports[`DataTable should render with filled data with rollup 1`] = `
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -1435,8 +1440,9 @@ exports[`DataTable should render with filled data with rollup 1`] = `
     }
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -1493,7 +1499,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "MessagesTable__StyledTable-ptthov-1",
                           "isStatic": false,
-                          "lastClassName": "dOoSCk",
+                          "lastClassName": "blgxUT",
                           "rules": Array [
                             [Function],
                             [Function],
@@ -1516,14 +1522,14 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                     <Table
                       bordered={false}
                       bsClass="table"
-                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk"
+                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT"
                       condensed={true}
                       hover={false}
                       responsive={false}
                       striped={false}
                     >
                       <table
-                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk table table-condensed"
+                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT table table-condensed"
                       >
                         <thead>
                           <Headers
@@ -1710,7 +1716,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1728,7 +1734,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               timestamp
@@ -1822,7 +1828,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1840,7 +1846,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               count()
@@ -1934,7 +1940,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1952,7 +1958,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               count()
@@ -2721,8 +2727,9 @@ exports[`DataTable should render with filled data without rollup 1`] = `
   }
   effectiveTimerange={
     Object {
-      "range": 300,
-      "type": "relative",
+      "from": "2020-01-10T13:23:42.000Z",
+      "to": "2020-01-10T14:23:42.000Z",
+      "type": "absolute",
     }
   }
   fields={Immutable.List []}
@@ -2806,8 +2813,9 @@ exports[`DataTable should render with filled data without rollup 1`] = `
     }
     effectiveTimerange={
       Object {
-        "range": 300,
-        "type": "relative",
+        "from": "2020-01-10T13:23:42.000Z",
+        "to": "2020-01-10T14:23:42.000Z",
+        "type": "absolute",
       }
     }
     fields={Immutable.List []}
@@ -2864,7 +2872,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "MessagesTable__StyledTable-ptthov-1",
                           "isStatic": false,
-                          "lastClassName": "dOoSCk",
+                          "lastClassName": "blgxUT",
                           "rules": Array [
                             [Function],
                             [Function],
@@ -2887,14 +2895,14 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                     <Table
                       bordered={false}
                       bsClass="table"
-                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk"
+                      className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT"
                       condensed={true}
                       hover={false}
                       responsive={false}
                       striped={false}
                     >
                       <table
-                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 dOoSCk table table-condensed"
+                        className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 blgxUT table table-condensed"
                       >
                         <thead>
                           <Headers
@@ -3081,7 +3089,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -3099,7 +3107,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               timestamp
@@ -3193,7 +3201,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FieldActions__FieldElement-vd9gu3-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "bgKTLs",
+                                                  "lastClassName": "bOaXSH",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -3211,7 +3219,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                             forwardedRef={null}
                                           >
                                             <span
-                                              className="FieldActions__FieldElement-vd9gu3-0 bgKTLs field-element"
+                                              className="FieldActions__FieldElement-vd9gu3-0 bOaXSH field-element"
                                               disabled={false}
                                             >
                                               count()

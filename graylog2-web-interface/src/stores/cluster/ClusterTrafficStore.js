@@ -11,9 +11,11 @@ const ClusterTrafficStore = Reflux.createStore({
 
   traffic() {
     const promise = fetch('GET', URLUtils.qualifyUrl('/system/cluster/traffic'));
+
     promise.then((response) => {
       this.trigger(response);
     });
+
     return promise;
   },
 

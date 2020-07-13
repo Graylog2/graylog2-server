@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import ClipboardJS from 'clipboard';
 
 import { Tooltip } from 'components/graylog';
@@ -18,9 +18,11 @@ const Value = styled.span`
 `;
 
 const StyledTooltip = styled(Tooltip).attrs((props) => ({
+  /* stylelint-disable property-no-unknown */
   className: props.opened ? 'in' : '',
-}))(({ opened }) => `
-  display: ${opened ? 'block' : 'none'}
+  /* stylelint-enable property-no-unknown */
+}))(({ opened }) => css`
+  display: ${opened ? 'block' : 'none'};
 `);
 
 const Wrapped = styled.div`
@@ -28,12 +30,11 @@ const Wrapped = styled.div`
   position: relative;
 `;
 
-const Swatch = styled.button(({ color, theme }) => `
+const Swatch = styled.button(({ color, theme }) => css`
   height: 60px;
   background-color: ${color};
   border: 1px solid #222;
   color: ${theme.utils.readableColor(color)};
-  padding: 3px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -59,6 +60,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
 
       clipboard.on('success', () => {
         setOpened(true);
+
         setTimeout(() => {
           setOpened(false);
         }, 1000);

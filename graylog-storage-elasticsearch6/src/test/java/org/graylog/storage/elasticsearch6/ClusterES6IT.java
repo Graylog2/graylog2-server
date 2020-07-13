@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
-import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.junit.Rule;
 
 import static org.assertj.core.api.Assertions.assertThat;

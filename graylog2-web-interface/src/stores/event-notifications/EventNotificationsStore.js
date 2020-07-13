@@ -45,6 +45,7 @@ const EventNotificationsStore = Reflux.createStore({
   eventNotificationsUrl({ segments = [], query = {} }) {
     const uri = new URI(this.sourceUrl);
     const nextSegments = lodash.concat(uri.segment(), segments);
+
     uri.segmentCoded(nextSegments);
     uri.query(query);
 
@@ -55,6 +56,7 @@ const EventNotificationsStore = Reflux.createStore({
     if (this.all) {
       this.listAll();
     }
+
     if (this.pagination.page) {
       this.listPaginated({
         query: this.query,
@@ -70,6 +72,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then((response) => {
       this.all = response.notifications;
       this.propagateChanges();
+
       return response;
     });
 
@@ -88,6 +91,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then((response) => {
       this.notifications = response.notifications;
       this.query = response.query;
+
       this.pagination = {
         count: response.count,
         page: response.page,
@@ -95,7 +99,9 @@ const EventNotificationsStore = Reflux.createStore({
         total: response.total,
         grandTotal: response.grand_total,
       };
+
       this.propagateChanges();
+
       return response;
     });
 
@@ -104,21 +110,25 @@ const EventNotificationsStore = Reflux.createStore({
 
   get(notificationId) {
     const promise = fetch('GET', this.eventNotificationsUrl({ segments: [notificationId] }));
+
     promise.catch((error) => {
       if (error.status === 404) {
         UserNotification.error(`Unable to find Event Notification with id <${notificationId}>, please ensure it wasn't deleted.`,
           'Could not retrieve Event Notification');
       }
     });
+
     EventNotificationsActions.get.promise(promise);
   },
 
   create(notification) {
     const promise = fetch('POST', this.eventNotificationsUrl({}), notification);
+
     promise.then(
       (response) => {
         UserNotification.success('Notification created successfully', `Notification "${notification.title}" was created successfully.`);
         this.refresh();
+
         return response;
       },
       (error) => {
@@ -128,15 +138,18 @@ const EventNotificationsStore = Reflux.createStore({
         }
       },
     );
+
     EventNotificationsActions.create.promise(promise);
   },
 
   update(notificationId, notification) {
     const promise = fetch('PUT', this.eventNotificationsUrl({ segments: [notificationId] }), notification);
+
     promise.then(
       (response) => {
         UserNotification.success('Notification updated successfully', `Notification "${notification.title}" was updated successfully.`);
         this.refresh();
+
         return response;
       },
       (error) => {
@@ -146,6 +159,7 @@ const EventNotificationsStore = Reflux.createStore({
         }
       },
     );
+
     EventNotificationsActions.update.promise(promise);
   },
 
@@ -168,11 +182,13 @@ const EventNotificationsStore = Reflux.createStore({
 
   test(notification) {
     const promise = fetch('POST', this.eventNotificationsUrl({ segments: ['test'] }), notification);
+
     EventNotificationsActions.test.promise(promise);
   },
 
   testPersisted(notification) {
     const promise = fetch('POST', this.eventNotificationsUrl({ segments: [notification.id, 'test'] }));
+
     EventNotificationsActions.testPersisted.promise(promise);
   },
 
@@ -182,6 +198,7 @@ const EventNotificationsStore = Reflux.createStore({
     promise.then((response) => {
       this.allLegacyTypes = response.types;
       this.propagateChanges();
+
       return response;
     });
 

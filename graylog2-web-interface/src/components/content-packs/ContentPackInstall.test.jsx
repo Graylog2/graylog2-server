@@ -38,6 +38,7 @@ describe('<ContentPackInstall />', () => {
 
   it('should render a install', () => {
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -49,8 +50,10 @@ describe('<ContentPackInstall />', () => {
     });
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
+
     wrapper.find('input#comment').simulate('change', { target: { value: 'Test' } });
     wrapper.instance().onInstall();
+
     expect(installFn.mock.calls.length).toBe(1);
   });
 
@@ -58,8 +61,10 @@ describe('<ContentPackInstall />', () => {
     const installFn = jest.fn();
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
+
     wrapper.find('input').at(1).simulate('change', { target: { value: '' } });
     wrapper.instance().onInstall();
+
     expect(installFn.mock.calls.length).toBe(0);
   });
 });

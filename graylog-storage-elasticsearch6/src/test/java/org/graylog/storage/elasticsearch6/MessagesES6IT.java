@@ -8,7 +8,8 @@ import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
+import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.indexer.results.ResultMessage;
@@ -36,15 +37,15 @@ public class MessagesES6IT extends MessagesIT {
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry);
+        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry, new ChunkedBulkIndexer());
     }
 
     @Override
-    protected Double messageCount(String indexName) {
+    protected long messageCount(String indexName) {
         final Count count = new Count.Builder().addIndex(indexName).build();
 
         final CountResult result = JestUtils.execute(jestClient(elasticsearch), count, () -> "Unable to count documents");
-        return result.getCount();
+        return result.getCount().longValue();
     }
 
     @Test
@@ -64,7 +65,8 @@ public class MessagesES6IT extends MessagesIT {
         assertThat(message.hasField(JestResult.ES_METADATA_VERSION)).isFalse();
     }
 
-    private boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id) {
+    @Override
+    protected boolean indexMessage(String index, Map<String, Object> source, @SuppressWarnings("SameParameterValue") String id) {
         final Index indexRequest = indexingHelper.prepareIndexRequest(index, source, id);
         final DocumentResult indexResponse = JestUtils.execute(jestClient(elasticsearch), indexRequest, () -> "Unable to index message");
 

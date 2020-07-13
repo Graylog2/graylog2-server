@@ -13,9 +13,11 @@ describe('<TimeUnitInput />', () => {
 
     const wrapper = mount(<TimeUnitInput update={onUpdate} />);
     const checkbox = wrapper.find('input[type="checkbox"]');
+
     expect(checkbox.prop('checked')).toBe(false);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
     expect(wrapper.find('li.active a').prop('children')).toBe('seconds');
+
     checkbox.simulate('click');
   });
 
@@ -28,8 +30,10 @@ describe('<TimeUnitInput />', () => {
 
     const wrapper = mount(<TimeUnitInput update={onUpdate} defaultValue={42} defaultEnabled />);
     const checkbox = wrapper.find('input[type="checkbox"]');
+
     expect(checkbox.prop('checked')).toBe(true);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(42);
+
     checkbox.simulate('click');
   });
 
@@ -42,9 +46,11 @@ describe('<TimeUnitInput />', () => {
 
     const wrapper = mount(<TimeUnitInput update={onUpdate} unit="DAYS" defaultEnabled />);
     const checkbox = wrapper.find('input[type="checkbox"]');
+
     expect(checkbox.prop('checked')).toBe(true);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(1);
     expect(wrapper.find('li.active a').prop('children')).toBe('days');
+
     wrapper.find('input[type="number"]').simulate('change', { target: { value: 42, type: 'number' } });
   });
 
@@ -57,8 +63,10 @@ describe('<TimeUnitInput />', () => {
 
     const wrapper = mount(<TimeUnitInput update={onUpdate} value={124} defaultValue={42} enabled={false} defaultEnabled />);
     const checkbox = wrapper.find('input[type="checkbox"]');
+
     expect(checkbox.prop('checked')).toBe(false);
     expect(wrapper.find('input[type="number"]').prop('value')).toBe(124);
+
     checkbox.simulate('click');
   });
 
@@ -70,28 +78,34 @@ describe('<TimeUnitInput />', () => {
     };
 
     const wrapper = mount(<TimeUnitInput update={onUpdate} required enabled={false} defaultEnabled={false} />);
+
     expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
+
     wrapper.find('input[type="number"]').simulate('change', { target: { value: 42, type: 'number' } });
   });
 
   it('should disable all inputs when disabled', () => {
     const wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} />);
+
     expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
     expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
   });
 
   it('should not display checkbox when hideCheckbox is set', () => {
     const wrapper = mount(<TimeUnitInput update={() => {}} hideCheckbox />);
+
     expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
   });
 
   it('should use required and enabled when hideCheckbox is set', () => {
     let wrapper = mount(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
+
     expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
     expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeFalsy();
     expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeFalsy();
 
     wrapper = mount(<TimeUnitInput update={() => {}} enabled={false} defaultEnabled={false} hideCheckbox />);
+
     expect(wrapper.find('input[type="checkbox"]').length).toBe(0);
     expect(wrapper.find('input[type="number"]').getDOMNode().disabled).toBeTruthy();
     expect(wrapper.find('button.dropdown-toggle').getDOMNode().disabled).toBeTruthy();
@@ -105,6 +119,7 @@ describe('<TimeUnitInput />', () => {
     };
 
     const wrapper = mount(<TimeUnitInput update={handleUpdate} defaultEnabled value={9} defaultValue={42} />);
+
     wrapper.find('input[type="number"]').simulate('change', { target: { value: '', type: 'number' } });
   });
 
@@ -116,6 +131,7 @@ describe('<TimeUnitInput />', () => {
     };
 
     const wrapper = mount(<TimeUnitInput update={handleUpdate} defaultEnabled value={9} defaultValue={42} />);
+
     wrapper.find('input[type="number"]').simulate('change', { target: { value: 'adsasd', type: 'number' } });
   });
 
@@ -130,6 +146,7 @@ describe('<TimeUnitInput />', () => {
       const wrapper = mount(
         <TimeUnitInput update={handleUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
       );
+
       wrapper.find('input[type="number"]').simulate('change', { target: { value: '', type: 'number' } });
     });
 
@@ -143,6 +160,7 @@ describe('<TimeUnitInput />', () => {
       const wrapper = mount(
         <TimeUnitInput update={handleUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
       );
+
       wrapper.find('input[type="number"]').simulate('change', { target: { value: 'adsasd', type: 'number' } });
     });
 
@@ -150,6 +168,7 @@ describe('<TimeUnitInput />', () => {
       const wrapper = mount(
         <TimeUnitInput update={() => {}} defaultEnabled clearable value={undefined} defaultValue={42} />,
       );
+
       expect(wrapper.find('input[type="number"]').prop('value')).toBe('');
     });
   });

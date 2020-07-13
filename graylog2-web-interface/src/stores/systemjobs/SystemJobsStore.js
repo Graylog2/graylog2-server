@@ -23,6 +23,7 @@ const SystemJobsStore = Reflux.createStore({
 
       return response;
     });
+
     SystemJobsActions.list.promise(promise);
   },
   getJob(jobId) {
@@ -35,9 +36,11 @@ const SystemJobsStore = Reflux.createStore({
     }, () => {
       // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
       const { [jobId]: currentJob, ...rest } = this.jobsById;
+
       this.jobsById = rest;
       this.trigger({ jobsById: this.jobsById });
     });
+
     SystemJobsActions.getJob.promise(promise);
   },
   cancelJob(jobId) {

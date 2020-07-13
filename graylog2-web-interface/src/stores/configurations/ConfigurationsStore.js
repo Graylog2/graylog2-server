@@ -3,12 +3,13 @@ import Reflux from 'reflux';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
-const urlPrefix = '/system/cluster_config';
+const urlPrefix = ApiRoutes.ClusterConfigResource.config().url;
 export type Url = {
   id: string,
   value: string,
@@ -20,6 +21,7 @@ export type WhiteListConfig = {
   entries: Array<Url>,
   disabled: boolean,
 };
+
 const ConfigurationsStore = Reflux.createStore({
   listenables: [ConfigurationActions],
 
@@ -48,9 +50,11 @@ const ConfigurationsStore = Reflux.createStore({
 
   list(configType) {
     const promise = fetch('GET', this._url(`/${configType}`));
+
     promise.then((response) => {
       this.configuration = { ...this.configuration, [configType]: response };
       this.propagateChanges();
+
       return response;
     });
 
@@ -61,6 +65,7 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then((response) => {
       this.searchesClusterConfig = response;
       this.propagateChanges();
+
       return response;
     });
 
@@ -71,6 +76,7 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
       this.configuration = { ...this.configuration, [configType]: response };
       this.propagateChanges();
+
       return response;
     });
 
@@ -81,6 +87,7 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('GET', qualifyUrl('/system/urlwhitelist')).then((response) => {
       this.configuration = { ...this.configuration, [configType]: response };
       this.propagateChanges();
+
       return response;
     });
 
@@ -91,6 +98,7 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
       this.eventsClusterConfig = response;
       this.propagateChanges();
+
       return response;
     });
 
@@ -105,6 +113,7 @@ const ConfigurationsStore = Reflux.createStore({
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
         UserNotification.success('Configuration updated successfully');
+
         return response;
       },
       (error) => {
@@ -123,6 +132,7 @@ const ConfigurationsStore = Reflux.createStore({
         this.configuration = { ...this.configuration, [configType]: config };
         this.propagateChanges();
         UserNotification.success('Url Whitelist Configuration updated successfully');
+
         return config;
       },
       (error) => {
@@ -141,6 +151,7 @@ const ConfigurationsStore = Reflux.createStore({
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
         UserNotification.success('Configuration updated successfully');
+
         return response;
       },
       (error) => {

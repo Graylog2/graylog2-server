@@ -8,7 +8,7 @@ import org.graylog.testing.PropertyLoader;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.elasticsearch.FixtureImporter;
-import org.graylog2.bindings.providers.JestClientProvider;
+import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,7 +12,9 @@ type Props = {
 
 const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
+
   useEffect(() => onRenderComplete(), [onRenderComplete]);
+
   return (
     <Alert bsStyle="danger">
       <Icon name="exclamation-circle" /> Widget Visualization (<i>{widgetClassName}</i>) not found.

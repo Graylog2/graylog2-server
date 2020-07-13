@@ -29,6 +29,7 @@ class EmailNotificationFormContainer extends React.Component {
 
   loadUsers = () => {
     const { currentUser } = this.props;
+
     if (PermissionsMixin.isPermitted(currentUser.permissions, 'users:list')) {
       UsersStore.loadUsers()
         .then((users) => {
@@ -45,6 +46,7 @@ class EmailNotificationFormContainer extends React.Component {
     if (!users) {
       return <p><Spinner text="Loading Notification information..." /></p>;
     }
+
     return <EmailNotificationForm {...this.props} users={users} />;
   }
 }

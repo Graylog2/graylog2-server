@@ -24,12 +24,14 @@ class LegacyNotificationForm extends React.Component {
   propagateMultiChange = (newValues) => {
     const { config, onChange } = this.props;
     const nextConfig = { ...config, ...newValues };
+
     onChange(nextConfig);
   };
 
   propagateChange = (key, value) => {
     const { config } = this.props;
     const nextConfiguration = { ...config.configuration, [key]: value };
+
     this.propagateMultiChange({ configuration: nextConfiguration });
   };
 
@@ -42,6 +44,7 @@ class LegacyNotificationForm extends React.Component {
     const { legacyTypes } = this.props;
     const { configuration } = legacyTypes[legacyNotificationType];
     const defaultConfiguration = {};
+
     Object.keys(configuration).forEach((configKey) => {
       defaultConfiguration[configKey] = configuration[configKey].default_value;
     });
@@ -90,6 +93,7 @@ class LegacyNotificationForm extends React.Component {
     const typeData = legacyTypes[callbackType];
 
     let content;
+
     if (typeData) {
       content = this.renderNotificationForm(config, typeData);
     } else if (callbackType) {

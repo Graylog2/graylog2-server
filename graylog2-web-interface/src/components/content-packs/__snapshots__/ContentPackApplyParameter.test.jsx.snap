@@ -109,10 +109,9 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                             "isStatic": false,
-                            "lastClassName": "ekazNr",
+                            "lastClassName": "gcTkZc",
                             "rules": Array [
                               [Function],
-                              ";",
                             ],
                           },
                           "displayName": "FormGroup__StyledFormGroup",
@@ -130,12 +129,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                         controlId="config_key"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                         >
                           <ControlLabel>
                             <StyledComponent
@@ -205,7 +204,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormControl-sc-1amoaox-0",
                                         "isStatic": false,
-                                        "lastClassName": "fdBWEX",
+                                        "lastClassName": "eXfwDC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -232,7 +231,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                                    className="FormControl-sc-1amoaox-0 eXfwDC"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Config Key"
@@ -244,7 +243,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     value=""
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                       id="config_key"
                                       label="Config Key"
                                       name="config_key"
@@ -335,10 +334,9 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                             "isStatic": false,
-                            "lastClassName": "ekazNr",
+                            "lastClassName": "gcTkZc",
                             "rules": Array [
                               [Function],
-                              ";",
                             ],
                           },
                           "displayName": "FormGroup__StyledFormGroup",
@@ -356,12 +354,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                         controlId="parameter"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                         >
                           <ControlLabel>
                             <StyledComponent
@@ -431,7 +429,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormControl-sc-1amoaox-0",
                                         "isStatic": false,
-                                        "lastClassName": "fdBWEX",
+                                        "lastClassName": "eXfwDC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -458,7 +456,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                                    className="FormControl-sc-1amoaox-0 eXfwDC"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Parameter"
@@ -470,7 +468,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     value=""
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                       id="parameter"
                                       label="Parameter"
                                       name="parameter"
@@ -570,7 +568,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "jVYrA",
+                          "lastClassName": "hpBclA",
                           "rules": Array [
                             [Function],
                           ],
@@ -593,12 +591,12 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -669,144 +667,175 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       className="data-table table-responsive"
                       id="config-key-list"
                     >
-                      <table
+                      <DataTable__StyledTable
                         className="table "
                       >
-                        <thead>
-                          <tr>
-                            <DataTableElement
-                              element="Config Key"
-                              formatter={[Function]}
-                              index={0}
-                              key="header-0"
-                            >
-                              <th>
-                                Config Key
-                              </th>
-                            </DataTableElement>
-                            <DataTableElement
-                              element="Parameter"
-                              formatter={[Function]}
-                              index={1}
-                              key="header-1"
-                            >
-                              <th>
-                                Parameter
-                              </th>
-                            </DataTableElement>
-                            <DataTableElement
-                              element="Action"
-                              formatter={[Function]}
-                              index={2}
-                              key="header-2"
-                            >
-                              <th>
-                                Action
-                              </th>
-                            </DataTableElement>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <DataTableElement
-                            element={
-                              Object {
-                                "configKey": "configuration.port",
-                                "paramName": "PORT",
-                              }
+                        <StyledComponent
+                          className="table "
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                "isStatic": false,
+                                "lastClassName": "ioeTLv",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "DataTable__StyledTable",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                              "target": "table",
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
                             }
-                            formatter={[Function]}
-                            index={0}
-                            key="row-0"
+                          }
+                          forwardedRef={null}
+                        >
+                          <table
+                            className="DataTable__StyledTable-sc-1c22x1c-0 ioeTLv table "
                           >
-                            <tr
-                              key="configuration.port"
-                            >
-                              <td>
-                                configuration.port
-                              </td>
-                              <td>
-                                PORT
-                              </td>
-                              <td>
-                                <ForwardRef
-                                  bsSize="small"
-                                  bsStyle="info"
-                                  onClick={[Function]}
+                            <thead>
+                              <tr>
+                                <DataTableElement
+                                  element="Config Key"
+                                  formatter={[Function]}
+                                  index={0}
+                                  key="header-0"
                                 >
-                                  <Button__StyledButton
-                                    bsSize="small"
-                                    bsStyle="info"
-                                    onClick={[Function]}
-                                  >
-                                    <StyledComponent
+                                  <th>
+                                    Config Key
+                                  </th>
+                                </DataTableElement>
+                                <DataTableElement
+                                  element="Parameter"
+                                  formatter={[Function]}
+                                  index={1}
+                                  key="header-1"
+                                >
+                                  <th>
+                                    Parameter
+                                  </th>
+                                </DataTableElement>
+                                <DataTableElement
+                                  element="Action"
+                                  formatter={[Function]}
+                                  index={2}
+                                  key="header-2"
+                                >
+                                  <th>
+                                    Action
+                                  </th>
+                                </DataTableElement>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <DataTableElement
+                                element={
+                                  Object {
+                                    "configKey": "configuration.port",
+                                    "paramName": "PORT",
+                                  }
+                                }
+                                formatter={[Function]}
+                                index={0}
+                                key="row-0"
+                              >
+                                <tr
+                                  key="configuration.port"
+                                >
+                                  <td>
+                                    configuration.port
+                                  </td>
+                                  <td>
+                                    PORT
+                                  </td>
+                                  <td>
+                                    <ForwardRef
                                       bsSize="small"
                                       bsStyle="info"
-                                      forwardedComponent={
-                                        Object {
-                                          "$$typeof": Symbol(react.forward_ref),
-                                          "SIZES": Array [
-                                            "large",
-                                            "small",
-                                            "xsmall",
-                                          ],
-                                          "STYLES": Array [
-                                            "success",
-                                            "warning",
-                                            "danger",
-                                            "info",
-                                            "default",
-                                            "primary",
-                                            "link",
-                                          ],
-                                          "attrs": Array [],
-                                          "componentStyle": ComponentStyle {
-                                            "componentId": "Button__StyledButton-c9cbmb-0",
-                                            "isStatic": false,
-                                            "lastClassName": "jVYrA",
-                                            "rules": Array [
-                                              [Function],
-                                            ],
-                                          },
-                                          "displayName": "Button__StyledButton",
-                                          "foldedComponentIds": Array [],
-                                          "render": [Function],
-                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                          "target": [Function],
-                                          "toString": [Function],
-                                          "warnTooManyClasses": [Function],
-                                          "withComponent": [Function],
-                                        }
-                                      }
-                                      forwardedRef={null}
                                       onClick={[Function]}
                                     >
-                                      <Button
-                                        active={false}
-                                        block={false}
-                                        bsClass="btn"
+                                      <Button__StyledButton
                                         bsSize="small"
                                         bsStyle="info"
-                                        className="Button__StyledButton-c9cbmb-0 jVYrA"
-                                        disabled={false}
                                         onClick={[Function]}
                                       >
-                                        <button
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
-                                          disabled={false}
+                                        <StyledComponent
+                                          bsSize="small"
+                                          bsStyle="info"
+                                          forwardedComponent={
+                                            Object {
+                                              "$$typeof": Symbol(react.forward_ref),
+                                              "SIZES": Array [
+                                                "large",
+                                                "small",
+                                                "xsmall",
+                                              ],
+                                              "STYLES": Array [
+                                                "success",
+                                                "warning",
+                                                "danger",
+                                                "info",
+                                                "default",
+                                                "primary",
+                                                "link",
+                                              ],
+                                              "attrs": Array [],
+                                              "componentStyle": ComponentStyle {
+                                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                                "isStatic": false,
+                                                "lastClassName": "hpBclA",
+                                                "rules": Array [
+                                                  [Function],
+                                                ],
+                                              },
+                                              "displayName": "Button__StyledButton",
+                                              "foldedComponentIds": Array [],
+                                              "render": [Function],
+                                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                              "target": [Function],
+                                              "toString": [Function],
+                                              "warnTooManyClasses": [Function],
+                                              "withComponent": [Function],
+                                            }
+                                          }
+                                          forwardedRef={null}
                                           onClick={[Function]}
-                                          type="button"
                                         >
-                                          Clear
-                                        </button>
-                                      </Button>
-                                    </StyledComponent>
-                                  </Button__StyledButton>
-                                </ForwardRef>
-                              </td>
-                            </tr>
-                          </DataTableElement>
-                        </tbody>
-                      </table>
+                                          <Button
+                                            active={false}
+                                            block={false}
+                                            bsClass="btn"
+                                            bsSize="small"
+                                            bsStyle="info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA"
+                                            disabled={false}
+                                            onClick={[Function]}
+                                          >
+                                            <button
+                                              className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
+                                              disabled={false}
+                                              onClick={[Function]}
+                                              type="button"
+                                            >
+                                              Clear
+                                            </button>
+                                          </Button>
+                                        </StyledComponent>
+                                      </Button__StyledButton>
+                                    </ForwardRef>
+                                  </td>
+                                </tr>
+                              </DataTableElement>
+                            </tbody>
+                          </table>
+                        </StyledComponent>
+                      </DataTable__StyledTable>
                     </div>
                   </div>
                 </div>
@@ -913,10 +942,9 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                             "isStatic": false,
-                            "lastClassName": "ekazNr",
+                            "lastClassName": "gcTkZc",
                             "rules": Array [
                               [Function],
-                              ";",
                             ],
                           },
                           "displayName": "FormGroup__StyledFormGroup",
@@ -934,12 +962,12 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                         controlId="config_key"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                         >
                           <ControlLabel>
                             <StyledComponent
@@ -1009,7 +1037,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormControl-sc-1amoaox-0",
                                         "isStatic": false,
-                                        "lastClassName": "fdBWEX",
+                                        "lastClassName": "eXfwDC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1036,7 +1064,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                                    className="FormControl-sc-1amoaox-0 eXfwDC"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Config Key"
@@ -1048,7 +1076,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                     value=""
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                       id="config_key"
                                       label="Config Key"
                                       name="config_key"
@@ -1145,10 +1173,9 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                             "isStatic": false,
-                            "lastClassName": "ekazNr",
+                            "lastClassName": "gcTkZc",
                             "rules": Array [
                               [Function],
-                              ";",
                             ],
                           },
                           "displayName": "FormGroup__StyledFormGroup",
@@ -1166,12 +1193,12 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                         controlId="parameter"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                         >
                           <ControlLabel>
                             <StyledComponent
@@ -1241,7 +1268,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormControl-sc-1amoaox-0",
                                         "isStatic": false,
-                                        "lastClassName": "fdBWEX",
+                                        "lastClassName": "eXfwDC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1268,7 +1295,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                                    className="FormControl-sc-1amoaox-0 eXfwDC"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Parameter"
@@ -1280,7 +1307,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                     value=""
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                       id="parameter"
                                       label="Parameter"
                                       name="parameter"
@@ -1371,7 +1398,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "jVYrA",
+                          "lastClassName": "hpBclA",
                           "rules": Array [
                             [Function],
                           ],
@@ -1394,12 +1421,12 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -1589,10 +1616,9 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                             "isStatic": false,
-                            "lastClassName": "ekazNr",
+                            "lastClassName": "gcTkZc",
                             "rules": Array [
                               [Function],
-                              ";",
                             ],
                           },
                           "displayName": "FormGroup__StyledFormGroup",
@@ -1610,12 +1636,12 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                         controlId="config_key"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                         >
                           <ControlLabel>
                             <StyledComponent
@@ -1685,7 +1711,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormControl-sc-1amoaox-0",
                                         "isStatic": false,
-                                        "lastClassName": "fdBWEX",
+                                        "lastClassName": "eXfwDC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1712,7 +1738,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                                    className="FormControl-sc-1amoaox-0 eXfwDC"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Config Key"
@@ -1724,7 +1750,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                     value=""
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                       id="config_key"
                                       label="Config Key"
                                       name="config_key"
@@ -1815,10 +1841,9 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                             "isStatic": false,
-                            "lastClassName": "ekazNr",
+                            "lastClassName": "gcTkZc",
                             "rules": Array [
                               [Function],
-                              ";",
                             ],
                           },
                           "displayName": "FormGroup__StyledFormGroup",
@@ -1836,12 +1861,12 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                         controlId="parameter"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                         >
                           <ControlLabel>
                             <StyledComponent
@@ -1911,7 +1936,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "FormControl-sc-1amoaox-0",
                                         "isStatic": false,
-                                        "lastClassName": "fdBWEX",
+                                        "lastClassName": "eXfwDC",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1938,7 +1963,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                                    className="FormControl-sc-1amoaox-0 eXfwDC"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Parameter"
@@ -1950,7 +1975,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                     value=""
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                       id="parameter"
                                       label="Parameter"
                                       name="parameter"
@@ -2050,7 +2075,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "jVYrA",
+                          "lastClassName": "hpBclA",
                           "rules": Array [
                             [Function],
                           ],
@@ -2073,12 +2098,12 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
@@ -2150,70 +2175,101 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       className="data-table table-responsive"
                       id="config-key-list"
                     >
-                      <table
+                      <DataTable__StyledTable
                         className="table "
                       >
-                        <thead>
-                          <tr>
-                            <DataTableElement
-                              element="Config Key"
-                              formatter={[Function]}
-                              index={0}
-                              key="header-0"
-                            >
-                              <th>
-                                Config Key
-                              </th>
-                            </DataTableElement>
-                            <DataTableElement
-                              element="Parameter"
-                              formatter={[Function]}
-                              index={1}
-                              key="header-1"
-                            >
-                              <th>
-                                Parameter
-                              </th>
-                            </DataTableElement>
-                            <DataTableElement
-                              element="Action"
-                              formatter={[Function]}
-                              index={2}
-                              key="header-2"
-                            >
-                              <th>
-                                Action
-                              </th>
-                            </DataTableElement>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <DataTableElement
-                            element={
-                              Object {
-                                "configKey": "configuration.port",
-                                "paramName": "PORT",
-                                "readOnly": true,
-                              }
+                        <StyledComponent
+                          className="table "
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                "isStatic": false,
+                                "lastClassName": "ioeTLv",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "DataTable__StyledTable",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                              "target": "table",
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
                             }
-                            formatter={[Function]}
-                            index={0}
-                            key="row-0"
+                          }
+                          forwardedRef={null}
+                        >
+                          <table
+                            className="DataTable__StyledTable-sc-1c22x1c-0 ioeTLv table "
                           >
-                            <tr
-                              key="configuration.port"
-                            >
-                              <td>
-                                configuration.port
-                              </td>
-                              <td>
-                                PORT
-                              </td>
-                              <td />
-                            </tr>
-                          </DataTableElement>
-                        </tbody>
-                      </table>
+                            <thead>
+                              <tr>
+                                <DataTableElement
+                                  element="Config Key"
+                                  formatter={[Function]}
+                                  index={0}
+                                  key="header-0"
+                                >
+                                  <th>
+                                    Config Key
+                                  </th>
+                                </DataTableElement>
+                                <DataTableElement
+                                  element="Parameter"
+                                  formatter={[Function]}
+                                  index={1}
+                                  key="header-1"
+                                >
+                                  <th>
+                                    Parameter
+                                  </th>
+                                </DataTableElement>
+                                <DataTableElement
+                                  element="Action"
+                                  formatter={[Function]}
+                                  index={2}
+                                  key="header-2"
+                                >
+                                  <th>
+                                    Action
+                                  </th>
+                                </DataTableElement>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <DataTableElement
+                                element={
+                                  Object {
+                                    "configKey": "configuration.port",
+                                    "paramName": "PORT",
+                                    "readOnly": true,
+                                  }
+                                }
+                                formatter={[Function]}
+                                index={0}
+                                key="row-0"
+                              >
+                                <tr
+                                  key="configuration.port"
+                                >
+                                  <td>
+                                    configuration.port
+                                  </td>
+                                  <td>
+                                    PORT
+                                  </td>
+                                  <td />
+                                </tr>
+                              </DataTableElement>
+                            </tbody>
+                          </table>
+                        </StyledComponent>
+                      </DataTable__StyledTable>
                     </div>
                   </div>
                 </div>

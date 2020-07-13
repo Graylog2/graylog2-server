@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Popover } from 'components/graylog';
 import { Icon } from 'components/common';
 
 import HoverForHelp from './HoverForHelp';
 
-const StyledDescriptionBox = styled.div(({ theme }) => `
+const StyledDescriptionBox = styled.div(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   padding: 10px;
   margin: 5px;
@@ -38,6 +38,7 @@ class DescriptionBox extends React.Component {
 
   onToggleConfig = () => {
     const { configOpen } = this.state;
+
     this.setState({ configOpen: !configOpen });
   };
 
@@ -68,6 +69,7 @@ class DescriptionBox extends React.Component {
 
   configCaret = () => {
     const { configurableOptions } = this.props;
+
     if (configurableOptions) {
       return (
         <ConfigButton ref={(node) => { this.target = node; }}
@@ -76,11 +78,13 @@ class DescriptionBox extends React.Component {
         </ConfigButton>
       );
     }
+
     return null;
   };
 
   render() {
     const { description, children, help, style: inlineStyle } = this.props;
+
     return (
       <StyledDescriptionBox style={inlineStyle}>
         <div className="description">

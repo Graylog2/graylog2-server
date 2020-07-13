@@ -2,9 +2,10 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
+import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
-import { fonts } from 'theme';
+import { themePropTypes, type ThemeInterface } from 'theme';
 
 import Icon from './Icon';
 
@@ -26,6 +27,7 @@ const DropdownIndicator = (props) => {
     innerProps: { ref, ...restInnerProps },
     /* eslint-enable react/prop-types */
   } = props;
+
   return (
     <div style={getStyles('dropdownIndicator', props)}
          ref={ref}
@@ -42,6 +44,7 @@ type CustomOptionProps = {
 const CustomOption = (optionRenderer: (Option) => React.Node) => (
   (props: CustomOptionProps): React.Element<Components.Option> => {
     const { data, ...rest } = props;
+
     return (
       <Components.Option {...rest}>
         {optionRenderer(data)}
@@ -72,28 +75,23 @@ const clearIndicator = (base) => ({
   padding: '5px',
 });
 
-const multiValue = (base) => ({
+const multiValue = ({ theme }) => (base) => ({
   ...base,
-  backgroundColor: '#ebf5ff',
-  color: '#007eff',
-  border: '1px solid rgba(0,126,255,.24)',
+  border: `1px solid ${theme.colors.variant.lighter.info}`,
 });
 
-const multiValueLabel = (base) => ({
+const multiValueLabel = ({ theme }) => (base) => ({
   ...base,
-  color: 'unset',
-  paddingLeft: '5px',
-  paddingRight: '5px',
+  padding: '2px 5px',
+  fontSize: theme.fonts.size.small,
 });
 
-const multiValueRemove = (base) => ({
+const multiValueRemove = ({ theme }) => (base) => ({
   ...base,
-  borderLeft: '1px solid rgba(0,126,255,.24)',
+  borderLeft: `1px solid ${theme.colors.variant.lighter.info}`,
   paddingLeft: '5px',
   paddingRight: '5px',
-  ':hover': {
-    backgroundColor: 'rgba(0,113,230,.08)',
-  },
+  borderRadius: '0',
 });
 
 const controlSmall = {
@@ -108,26 +106,22 @@ const controlNormal = {
 const menu = (base) => ({
   ...base,
   zIndex: 5,
-  border: '1px solid rgba(102, 175, 233, 0.5)',
-  boxShadow: '0 0 4px rgba(102, 175, 233, 0.3)',
 });
 
-const singleValueAndPlaceholder = (base) => ({
+const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: fonts.family.body,
-  fontSize: '14px',
+  fontFamily: theme.fonts.family.body,
+  fontSize: theme.fonts.size.body,
   fontWeight: 400,
-  color: '#666',
 });
 
-const placeholder = (base) => ({
+const placeholder = ({ theme }) => (base) => ({
   ...base,
   lineHeight: '28px',
-  fontFamily: fonts.family.body,
-  fontSize: '14px',
+  fontFamily: theme.fonts.family.body,
+  fontSize: theme.fonts.size.body,
   fontWeight: 400,
-  color: '#999',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
@@ -135,23 +129,19 @@ const placeholder = (base) => ({
   paddingRight: '20px',
 });
 
-const controlFocus = (props) => (base, { isFocused }) => {
-  const { size } = props;
-
-  const borderColor = isFocused ? '#66afe9' : base.borderColor;
+const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
   const borderWidth = isFocused ? 1 : base.borderWidth;
   const outline = isFocused ? 0 : base.outline;
-  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : 'inset 0 1px 1px rgba(0, 0, 0, 0.075)';
-
+  const defaultBoxShadow = `inset 0 1px 1px ${theme.colors.variant.lightest.default}`;
+  const boxShadow = isFocused ? `${defaultBoxShadow}, 0 0 8px ${theme.colors.variant.lighter.info}` : defaultBoxShadow;
   const controlSize = size === 'small' ? controlSmall : controlNormal;
 
   return {
     ...base,
     ...controlSize,
-    borderColor,
     borderWidth,
-    outline,
     boxShadow,
+    outline,
     alignItems: 'center',
   };
 };
@@ -161,34 +151,44 @@ const valueContainer = (base) => ({
   padding: '2px 12px',
 });
 
-const _components: { [string]: React.ComponentType<any> } = {
+type OverriddenComponents = {|
+  DropdownIndicator: React.ComponentType<any>,
+  MultiValueRemove: React.ComponentType<any>,
+  IndicatorSeparator: React.ComponentType<any>,
+|};
+
+const _components: OverriddenComponents = {
   DropdownIndicator,
   MultiValueRemove,
   IndicatorSeparator,
 };
 
-const _styles = (props) => ({
+const _styles = ({ size, theme }) => ({
   dropdownIndicator,
   clearIndicator,
-  multiValue,
-  multiValueLabel,
-  multiValueRemove,
+  multiValue: multiValue({ theme }),
+  multiValueLabel: multiValueLabel({ theme }),
+  multiValueRemove: multiValueRemove({ theme }),
   menu,
-  singleValue: singleValueAndPlaceholder,
-  placeholder,
-  control: controlFocus(props),
+  singleValue: singleValueAndPlaceholder({ theme }),
+  placeholder: placeholder({ theme }),
+  control: controlFocus({ size, theme }),
   valueContainer,
 });
+
+type ComponentsProp = {|
+  MultiValueLabel?: React.ComponentType<any>,
+|};
 
 type Props = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
   clearable?: boolean,
-  components: ?{| [string]: React.ComponentType<any> |},
+  components?: ?ComponentsProp,
   delimiter?: string,
   disabled?: boolean,
-  displayKey?: string,
+  displayKey: string,
   ignoreAccents?: boolean,
   inputProps?: { [string]: any },
   matchProp?: 'any' | 'label' | 'value',
@@ -199,13 +199,20 @@ type Props = {
   options: Array<Option>,
   placeholder: string,
   size?: 'normal' | 'small',
+  theme: ThemeInterface,
   value?: string,
-  valueKey?: string,
+  valueKey: string,
   valueRenderer?: (Option) => React.Node,
 };
 
+type CustomComponents = {|
+  Input?: React.ComponentType<any>,
+  Option?: React.ComponentType<any>,
+  SingleValue?: React.ComponentType<any>,
+|};
+
 type State = {
-  customComponents?: {| [string]: React.ComponentType<any> |},
+  customComponents: CustomComponents,
   value: any,
 };
 
@@ -254,6 +261,8 @@ class Select extends React.Component<Props, State> {
     optionRenderer: PropTypes.func,
     /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
+    /** @ignore */
+    theme: themePropTypes.isRequired,
     /**
      * String containing the selected value. If `multi` is enabled, it must
      * be a string containing all values separated by the `delimiter`.
@@ -289,6 +298,7 @@ class Select extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const { inputProps, optionRenderer, value, valueRenderer } = props;
+
     this.state = {
       customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer),
       value,
@@ -298,9 +308,11 @@ class Select extends React.Component<Props, State> {
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps = (nextProps: Props) => {
     const { inputProps, optionRenderer, value, valueRenderer } = this.props;
+
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
+
     if (inputProps !== nextProps.inputProps
       || optionRenderer !== nextProps.optionRenderer
       || valueRenderer !== nextProps.valueRenderer) {
@@ -311,20 +323,25 @@ class Select extends React.Component<Props, State> {
   getCustomComponents = (inputProps?: { [string]: any }, optionRenderer?: (Option) => React.Node,
     valueRenderer?: (Option) => React.Node): any => {
     const customComponents = {};
+
     if (inputProps) {
       customComponents.Input = CustomInput(inputProps);
     }
+
     if (optionRenderer) {
       customComponents.Option = CustomOption(optionRenderer);
     }
+
     if (valueRenderer) {
       customComponents.SingleValue = CustomSingleValue(valueRenderer);
     }
+
     return customComponents;
   };
 
   getValue = () => {
     const { value } = this.state;
+
     return value;
   };
 
@@ -338,11 +355,13 @@ class Select extends React.Component<Props, State> {
     if (option) {
       return multi ? option.map((i) => i[valueKey]).join(delimiter) : option[valueKey || ''];
     }
+
     return '';
   };
 
   _onChange = (selectedOption: Option) => {
     const value = this._extractOptionValue(selectedOption);
+
     this.setState({ value: value });
 
     // eslint-disable-next-line no-unused-vars
@@ -354,7 +373,8 @@ class Select extends React.Component<Props, State> {
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: string): Array<Option> => {
-    const { options, displayKey = '', valueKey = '', delimiter } = this.props;
+    const { options, displayKey, valueKey, delimiter } = this.props;
+
     return value.split(delimiter).map((v: string) => {
       const predicate: Option = {
         [valueKey]: v,
@@ -364,6 +384,34 @@ class Select extends React.Component<Props, State> {
 
       return option || predicate;
     });
+  };
+
+  _selectTheme = (defaultTheme: {[string]: any}) => {
+    const { theme } = this.props;
+
+    return {
+      ...defaultTheme,
+      colors: {
+        ...defaultTheme.colors,
+        primary: theme.colors.variant.light.info,
+        primary75: theme.colors.variant.light.default,
+        primary50: theme.colors.variant.lighter.default,
+        primary25: theme.colors.variant.lightest.default,
+        danger: theme.colors.variant.darker.info,
+        dangerLight: theme.colors.variant.lighter.info,
+        neutral0: theme.colors.gray[100],
+        neutral5: theme.colors.gray[90],
+        neutral10: theme.colors.variant.lightest.info,
+        neutral20: theme.colors.gray[80],
+        neutral30: theme.colors.gray[70],
+        neutral40: theme.colors.gray[60],
+        neutral50: theme.colors.gray[50],
+        neutral60: theme.colors.gray[40],
+        neutral70: theme.colors.gray[30],
+        neutral80: theme.colors.gray[20],
+        neutral90: theme.colors.gray[10],
+      },
+    };
   };
 
   createCustomFilter = (stringify: (any) => string) => {
@@ -387,6 +435,7 @@ class Select extends React.Component<Props, State> {
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
     let formattedValue = value;
+
     if (value && allowCreate) {
       formattedValue = this._formatInputValue(value);
     } else {
@@ -407,11 +456,12 @@ class Select extends React.Component<Props, State> {
     const stringify = (option) => option[matchProp];
     const customFilter = this.createCustomFilter(stringify);
 
-    const mergedComponents: { [string]: React.ComponentType<any> } = {
+    const mergedComponents = {
       ..._components,
       ...components,
       ...customComponents,
     };
+
     return (
       <SelectComponent {...rest}
                        onChange={onReactSelectChange || this._onChange}
@@ -423,12 +473,11 @@ class Select extends React.Component<Props, State> {
                        filterOption={customFilter}
                        components={mergedComponents}
                        isOptionDisabled={(option) => !!option.disabled}
-                       styles={{
-                         ..._styles(this.props),
-                       }}
+                       styles={_styles(this.props)}
+                       theme={this._selectTheme}
                        value={formattedValue} />
     );
   }
 }
 
-export default Select;
+export default withTheme(Select);

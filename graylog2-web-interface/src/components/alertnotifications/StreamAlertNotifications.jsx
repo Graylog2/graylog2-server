@@ -27,6 +27,7 @@ class StreamAlertNotifications extends React.Component {
 
   _loadData = () => {
     AlertNotificationsActions.available();
+
     AlarmCallbacksActions.list(this.props.stream.id)
       .then((callbacks) => this.setState({ conditionNotifications: callbacks }));
   };
@@ -45,6 +46,7 @@ class StreamAlertNotifications extends React.Component {
     const notifications = this.state.conditionNotifications.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';
       const t2 = a2.title || 'Untitled';
+
       return naturalSort(t1.toLowerCase(), t2.toLowerCase());
     });
 

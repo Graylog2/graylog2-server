@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Link } from 'react-router';
 
 import { StyledBadge } from 'components/graylog/Badge';
@@ -15,7 +15,7 @@ const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
     error: danger,
   };
 
-  return `
+  return css`
     margin-left: 4px;
     background-color: ${statuses[status]};
     color: ${theme.utils.readableColor(statuses[status])};

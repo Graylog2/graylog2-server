@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, Col, Panel, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -14,7 +14,7 @@ const { LdapGroupsActions } = CombinedProvider.get('LdapGroups');
 const { LdapStore } = CombinedProvider.get('Ldap');
 const { RolesStore } = CombinedProvider.get('Roles');
 
-const StyledLegend = styled.legend(({ theme }) => `
+const StyledLegend = styled.legend(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 `);
 
@@ -38,6 +38,7 @@ class LdapGroupsComponent extends React.Component {
 
   componentDidMount() {
     LdapGroupsActions.loadMapping().then((mapping) => this.setState({ mapping: Immutable.Map(mapping) }));
+
     LdapGroupsActions.loadGroups()
       .then(
         (groups) => this.setState({ groups: Immutable.Set(groups) }),
@@ -47,6 +48,7 @@ class LdapGroupsComponent extends React.Component {
           }
         },
       );
+
     RolesStore.loadRoles().then((roles) => this.setState({ roles: Immutable.Set(roles) }));
   }
 
@@ -115,6 +117,7 @@ class LdapGroupsComponent extends React.Component {
     if (this._isLoading()) {
       return <Spinner />;
     }
+
     const { groups, groupsErrorMessage, mapping, roles } = this.state;
     const { onCancel } = this.props;
 

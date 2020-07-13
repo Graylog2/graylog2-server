@@ -13,6 +13,7 @@ const SystemStore = Reflux.createStore({
       this.trigger({ system: response });
       this.system = response;
     });
+
     this.systemLocales().then((response) => {
       this.trigger({ locales: response });
       this.locales = response.locales;

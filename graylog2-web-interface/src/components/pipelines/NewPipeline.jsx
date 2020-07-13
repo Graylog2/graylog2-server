@@ -7,7 +7,6 @@ import Routes from 'routing/Routes';
 
 import PipelineDetails from './PipelineDetails';
 
-
 class NewPipeline extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,

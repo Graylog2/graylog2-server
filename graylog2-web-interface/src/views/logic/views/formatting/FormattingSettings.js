@@ -27,6 +27,7 @@ export default class FormattingSettings {
 
   toBuilder() {
     const { highlighting } = this._value;
+
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ highlighting }));
   }
@@ -50,6 +51,7 @@ export default class FormattingSettings {
 
   static fromJSON(value: FormattingSettingsJSON) {
     const { highlighting = [] } = value;
+
     return FormattingSettings.create(highlighting.map((rule) => HighlightingRule.fromJSON(rule)));
   }
 }
@@ -67,6 +69,7 @@ class Builder {
 
   build() {
     const { highlighting } = this.value.toObject();
+
     return new FormattingSettings(highlighting);
   }
 }

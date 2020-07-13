@@ -7,6 +7,7 @@ class StreamLink extends React.Component {
   render() {
     const { stream } = this.props;
     const route = Routes.stream_search(stream.id);
+
     return <Link to={route}>{stream.title}</Link>;
   }
 }

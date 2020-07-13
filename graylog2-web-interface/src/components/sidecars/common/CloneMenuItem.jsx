@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { MenuItem } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
-const StyledMenuItem = styled(MenuItem)(({ theme }) => `
+const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
   /**
   * Bootstrap styling breaks here, since the component needs to be wrapped around another element.
   * This style replicates Bootstrap's making the menu item look normal.

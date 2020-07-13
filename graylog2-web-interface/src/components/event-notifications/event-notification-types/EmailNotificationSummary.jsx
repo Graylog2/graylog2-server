@@ -19,6 +19,7 @@ class EmailNotificationSummary extends React.Component {
 
   render() {
     const { notification } = this.props;
+
     return (
       <CommonNotificationSummary {...this.props}>
         <>

@@ -32,10 +32,9 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               "componentStyle": ComponentStyle {
                 "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                 "isStatic": false,
-                "lastClassName": "ekazNr",
+                "lastClassName": "gcTkZc",
                 "rules": Array [
                   [Function],
-                  ";",
                 ],
               },
               "displayName": "FormGroup__StyledFormGroup",
@@ -53,11 +52,11 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
         >
           <FormGroup
             bsClass="form-group"
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
             validationState={null}
           >
             <div
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
             >
               <ControlLabel>
                 <StyledComponent
@@ -117,7 +116,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "FormControl-sc-1amoaox-0",
                         "isStatic": false,
-                        "lastClassName": "fdBWEX",
+                        "lastClassName": "eXfwDC",
                         "rules": Array [
                           [Function],
                         ],
@@ -139,14 +138,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <FormControl
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 fdBWEX"
+                    className="FormControl-sc-1amoaox-0 eXfwDC"
                     componentClass="input"
                     onChange={[Function]}
                     type="text"
                     value="count()"
                   >
                     <input
-                      className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                       onChange={[Function]}
                       type="text"
                       value="count()"
@@ -239,7 +238,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Button__StyledButton-c9cbmb-0",
                   "isStatic": false,
-                  "lastClassName": "jVYrA",
+                  "lastClassName": "hpBclA",
                   "rules": Array [
                     [Function],
                   ],
@@ -262,12 +261,12 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               block={false}
               bsClass="btn"
               bsStyle="success"
-              className="Button__StyledButton-c9cbmb-0 jVYrA"
+              className="Button__StyledButton-c9cbmb-0 hpBclA"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-success"
+                className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-success"
                 disabled={false}
                 onClick={[Function]}
                 type="button"

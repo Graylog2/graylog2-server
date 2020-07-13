@@ -11,11 +11,13 @@ import Styles from './ConfigSummary.css';
 
 const Cache = ({ cache }) => {
   const plugins = {};
+
   PluginStore.exports('lookupTableCaches').forEach((p) => {
     plugins[p.type] = p;
   });
 
   const plugin = plugins[cache.config.type];
+
   if (!plugin) {
     return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
   }

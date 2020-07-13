@@ -44,16 +44,16 @@ import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
 import org.apache.http.client.config.RequestConfig;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.FieldSortBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.sort.SortBuilders;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
@@ -84,7 +84,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
+import static org.graylog.shaded.elasticsearch5.org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
 
 public class IndicesAdapterES6 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterES6.class);

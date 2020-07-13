@@ -3,7 +3,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -17,7 +17,7 @@ import UserListStyle from '!style!css!./UserList.css';
 const UsersStore = StoreProvider.getStore('Users');
 const RolesStore = StoreProvider.getStore('Roles');
 
-const ActiveIcon = styled(Icon)(({ theme }) => `
+const ActiveIcon = styled(Icon)(({ theme }) => css`
   color: ${theme.colors.variant.success};
 `);
 
@@ -40,6 +40,7 @@ const UserList = createReactClass({
 
   componentDidMount() {
     this.loadUsers();
+
     RolesStore.loadRoles().done((roles) => {
       this.setState({ roles: roles.map((role) => role.name) });
     });
@@ -47,6 +48,7 @@ const UserList = createReactClass({
 
   loadUsers() {
     const promise = UsersStore.loadUsers();
+
     promise.done((users) => {
       this.setState({
         users: users,
@@ -81,6 +83,7 @@ const UserList = createReactClass({
       case '':
         formattedHeaderCell = <th className="user-type">{header}</th>;
         break;
+
       case 'client address': {
         const popover = (
           <Popover id="decorators-help" className={UserListStyle.sessionBadgeDetails}>
@@ -98,8 +101,10 @@ const UserList = createReactClass({
             </OverlayTrigger>
           </th>
         );
+
         break;
       }
+
       case 'actions':
         formattedHeaderCell = <th className="actions">{header}</th>;
         break;
@@ -115,6 +120,7 @@ const UserList = createReactClass({
     const rowClass = user.username === currentUsername ? 'active' : null;
 
     let userBadge = null;
+
     if (user.session_active) {
       const popover = (
         <Popover id="session-badge-details" title="Logged in" className={UserListStyle.sessionBadgeDetails}>
@@ -122,6 +128,7 @@ const UserList = createReactClass({
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
+
       userBadge = (
         <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
           <ActiveIcon name="circle" />
@@ -132,6 +139,7 @@ const UserList = createReactClass({
     const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
 
     let actions = null;
+
     if (user.read_only) {
       const editTokensAction = (
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(user.username))}>
@@ -142,6 +150,7 @@ const UserList = createReactClass({
       );
 
       const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
+
       actions = (
         <span>
           <OverlayTrigger placement="left" overlay={tooltip}>

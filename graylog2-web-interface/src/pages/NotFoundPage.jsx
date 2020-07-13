@@ -9,6 +9,7 @@ const NotFoundPage = () => {
       <p>Oh, party gorilla! How we miss you! Will we ever see you again?</p>
     </>
   );
+
   return (<ErrorPage title="Page not found" description={description} />);
 };
 

@@ -23,6 +23,7 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
       ...paginationState,
       query,
     });
+
     setSelectedDashboard(null);
   }, [paginationState, setSelectedDashboard, setPaginationState]);
 
@@ -34,6 +35,7 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
       page,
       perPage,
     });
+
     setSelectedDashboard(null);
   }, [paginationState, setSelectedDashboard, setPaginationState]);
 

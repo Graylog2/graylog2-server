@@ -327,10 +327,9 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                   "isStatic": false,
-                                  "lastClassName": "ekazNr",
+                                  "lastClassName": "gcTkZc",
                                   "rules": Array [
                                     [Function],
-                                    ";",
                                   ],
                                 },
                                 "displayName": "FormGroup__StyledFormGroup",
@@ -348,12 +347,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                               >
                                 <ControlLabel>
                                   <StyledComponent
@@ -424,7 +423,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "fdBWEX",
+                                              "lastClassName": "eXfwDC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -448,7 +447,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 fdBWEX"
+                                          className="FormControl-sc-1amoaox-0 eXfwDC"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -457,7 +456,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -477,7 +476,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     </Input>
                   </TypeAheadInput>
                   <ForwardRef
-                    bsStyle="default"
                     style={
                       Object {
                         "marginLeft": 5,
@@ -486,7 +484,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     type="submit"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       style={
                         Object {
                           "marginLeft": 5,
@@ -495,7 +492,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       type="submit"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -517,7 +513,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -545,7 +541,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           style={
                             Object {
@@ -555,7 +551,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           type="submit"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             style={
                               Object {
@@ -571,7 +567,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     disabled={true}
                     onClick={[Function]}
                     style={
@@ -582,7 +577,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     type="button"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -593,7 +587,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       type="button"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         disabled={true}
                         forwardedComponent={
                           Object {
@@ -616,7 +609,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -645,7 +638,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -656,7 +649,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           type="button"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -691,223 +684,316 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={2}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={2}
             >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={2}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
+              <UltimatePaginationComponent
+                boundaryPagesRange={1}
+                currentPage={1}
+                data-testid="graylog-pagination"
+                disabled={false}
+                hideEllipsis={false}
+                hideFirstAndLastPageLinks={false}
+                hidePreviousAndNextPageLinks={false}
+                onChange={[Function]}
+                siblingPagesRange={1}
+                totalPages={2}
               >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
+                <Pagination__StyledBootstrapPagination
+                  data-testid="graylog-pagination"
                 >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
+                  <StyledComponent
+                    data-testid="graylog-pagination"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "Ellipsis": [Function],
+                        "First": [Function],
+                        "Item": [Function],
+                        "Last": [Function],
+                        "Next": [Function],
+                        "Prev": [Function],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                          "isStatic": false,
+                          "lastClassName": "flIvuU",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Pagination__StyledBootstrapPagination",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
                   >
-                    <li
-                      className="disabled"
+                    <Pagination
+                      bsClass="pagination"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU"
+                      data-testid="graylog-pagination"
                     >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
+                      <ul
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU pagination"
+                        data-testid="graylog-pagination"
                       >
-                        <a
-                          href="#"
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-3"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="FIRST_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="First"
+                          <First
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="First"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-double-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-double-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-double-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </First>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-4"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="PREVIOUS_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="Previous"
+                          <Prev
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={true}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={1}
-                    key="1"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="active"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="Prev"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </Prev>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="1"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={1}
                         >
-                          1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    key="2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          <span
-                            aria-label="Next"
+                          <PaginationItem
+                            active={true}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              className="active"
+                            >
+                              <span
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                1
+                                <span
+                                  className="sr-only"
+                                >
+                                  (current)
+                                </span>
+                              </span>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="2"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={2}
                         >
-                          <span
-                            aria-label="Last"
+                          <PaginationItem
+                            active={false}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
+                            <li
+                              className=""
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-5"
+                          onClick={[Function]}
+                          type="NEXT_PAGE_LINK"
+                          value={2}
+                        >
+                          <Next
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Next"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Next>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-6"
+                          onClick={[Function]}
+                          type="LAST_PAGE_LINK"
+                          value={2}
+                        >
+                          <Last
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Last"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-double-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-double-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-double-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Last>
+                        </Component>
+                      </ul>
+                    </Pagination>
+                  </StyledComponent>
+                </Pagination__StyledBootstrapPagination>
+              </UltimatePaginationComponent>
             </Pagination>
           </div>
         </Col>
@@ -963,26 +1049,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
                           "isStatic": false,
-                          "lastClassName": "ikiWPo",
+                          "lastClassName": "gomqxo",
                           "rules": Array [
                             [Function],
                           ],
                         },
                         "displayName": "ControlledTableListHeader__StyledListGroupItem",
                         "foldedComponentIds": Array [],
-                        "propTypes": Object {
-                          "bsStyle": [Function],
-                        },
                         "render": [Function],
                         "styledComponentId": "ControlledTableListHeader__StyledListGroupItem-tr2y34-0",
                         "target": Object {
                           "$$typeof": Symbol(react.forward_ref),
-                          "defaultProps": Object {
-                            "bsStyle": undefined,
-                          },
-                          "propTypes": Object {
-                            "bsStyle": [Function],
-                          },
                           "render": [Function],
                         },
                         "toString": [Function],
@@ -993,13 +1070,13 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     forwardedRef={null}
                   >
                     <ForwardRef
-                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
+                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gomqxo"
                     >
                       <ListGroupItem__StyledListGroupItem
-                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
+                        className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gomqxo"
                       >
                         <StyledComponent
-                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
+                          className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gomqxo"
                           forwardedComponent={
                             Object {
                               "$$typeof": Symbol(react.forward_ref),
@@ -1013,7 +1090,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "iEzmJe",
+                                "lastClassName": "XtBNB",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1032,11 +1109,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gomqxo"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe ControlledTableListHeader__StyledListGroupItem-tr2y34-0 ikiWPo list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gomqxo list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <StyledComponent
@@ -1096,7 +1173,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -1115,11 +1192,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -1183,7 +1260,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eYvbcA",
+                                                        "lastClassName": "iUJAet",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -1206,12 +1283,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 iUJAet"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA badge"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 iUJAet badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -1272,7 +1349,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1296,12 +1373,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -1429,21 +1506,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-1"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-1"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -1451,7 +1525,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1473,21 +1547,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-1"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-1"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-1"
                                               innerRef={null}
                                               pullRight={true}
@@ -1495,7 +1566,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-1"
                                                 onToggle={[Function]}
@@ -1505,20 +1575,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-1"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -1534,7 +1602,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-1"
                                                         onClick={[Function]}
@@ -1544,7 +1612,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-1"
                                                           onClick={[Function]}
@@ -1928,7 +1996,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -1947,11 +2015,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -2015,7 +2083,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "ContentPackStatus__StatusBadge-sc-1rzjx64-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "eYvbcA",
+                                                        "lastClassName": "iUJAet",
                                                         "rules": Array [
                                                           [Function],
                                                           [Function],
@@ -2038,12 +2106,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge"
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 iUJAet"
                                                     pullRight={false}
                                                     status="installed"
                                                   >
                                                     <span
-                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 eYvbcA badge"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 iUJAet badge"
                                                       status="installed"
                                                     >
                                                       installed
@@ -2104,7 +2172,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2128,12 +2196,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -2261,21 +2329,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-2"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-2"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -2283,7 +2348,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2305,21 +2370,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-2"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-2"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-2"
                                               innerRef={null}
                                               pullRight={true}
@@ -2327,7 +2389,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-2"
                                                 onToggle={[Function]}
@@ -2337,20 +2398,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-2"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -2366,7 +2425,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-2"
                                                         onClick={[Function]}
@@ -2376,7 +2435,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-2"
                                                           onClick={[Function]}
@@ -2760,7 +2819,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -2779,11 +2838,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -2872,7 +2931,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -2896,12 +2955,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -3029,21 +3088,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-3"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-3"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -3051,7 +3107,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3073,21 +3129,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-3"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-3"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-3"
                                               innerRef={null}
                                               pullRight={true}
@@ -3095,7 +3148,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-3"
                                                 onToggle={[Function]}
@@ -3105,20 +3157,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-3"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -3134,7 +3184,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-3"
                                                         onClick={[Function]}
@@ -3144,7 +3194,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-3"
                                                           onClick={[Function]}
@@ -3527,7 +3577,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -3546,11 +3596,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -3639,7 +3689,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3663,12 +3713,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -3796,21 +3846,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-4"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-4"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -3818,7 +3865,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -3840,21 +3887,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-4"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-4"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-4"
                                               innerRef={null}
                                               pullRight={true}
@@ -3862,7 +3906,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-4"
                                                 onToggle={[Function]}
@@ -3872,20 +3915,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-4"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -3901,7 +3942,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-4"
                                                         onClick={[Function]}
@@ -3911,7 +3952,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-4"
                                                           onClick={[Function]}
@@ -4295,7 +4336,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -4314,11 +4355,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -4407,7 +4448,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4431,12 +4472,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -4564,21 +4605,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-5"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-5"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -4586,7 +4624,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4608,21 +4646,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-5"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-5"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-5"
                                               innerRef={null}
                                               pullRight={true}
@@ -4630,7 +4665,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-5"
                                                 onToggle={[Function]}
@@ -4640,20 +4674,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-5"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -4669,7 +4701,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-5"
                                                         onClick={[Function]}
@@ -4679,7 +4711,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-5"
                                                           onClick={[Function]}
@@ -5063,7 +5095,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -5082,11 +5114,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -5175,7 +5207,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5199,12 +5231,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -5332,21 +5364,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-6"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-6"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -5354,7 +5383,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5376,21 +5405,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-6"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-6"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-6"
                                               innerRef={null}
                                               pullRight={true}
@@ -5398,7 +5424,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-6"
                                                 onToggle={[Function]}
@@ -5408,20 +5433,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-6"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -5437,7 +5460,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-6"
                                                         onClick={[Function]}
@@ -5447,7 +5470,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-6"
                                                           onClick={[Function]}
@@ -5831,7 +5854,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -5850,11 +5873,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -5943,7 +5966,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -5967,12 +5990,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -6100,21 +6123,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-7"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-7"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -6122,7 +6142,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6144,21 +6164,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-7"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-7"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-7"
                                               innerRef={null}
                                               pullRight={true}
@@ -6166,7 +6183,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-7"
                                                 onToggle={[Function]}
@@ -6176,20 +6192,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-7"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -6205,7 +6219,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-7"
                                                         onClick={[Function]}
@@ -6215,7 +6229,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-7"
                                                           onClick={[Function]}
@@ -6599,7 +6613,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -6618,11 +6632,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -6711,7 +6725,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6735,12 +6749,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -6868,21 +6882,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-8"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-8"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -6890,7 +6901,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -6912,21 +6923,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-8"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-8"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-8"
                                               innerRef={null}
                                               pullRight={true}
@@ -6934,7 +6942,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-8"
                                                 onToggle={[Function]}
@@ -6944,20 +6951,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-8"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -6973,7 +6978,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-8"
                                                         onClick={[Function]}
@@ -6983,7 +6988,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-8"
                                                           onClick={[Function]}
@@ -7366,7 +7371,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -7385,11 +7390,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -7478,7 +7483,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7502,12 +7507,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -7635,21 +7640,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-9"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-9"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -7657,7 +7659,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -7679,21 +7681,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-9"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-9"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-9"
                                               innerRef={null}
                                               pullRight={true}
@@ -7701,7 +7700,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-9"
                                                 onToggle={[Function]}
@@ -7711,20 +7709,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-9"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -7740,7 +7736,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-9"
                                                         onClick={[Function]}
@@ -7750,7 +7746,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-9"
                                                           onClick={[Function]}
@@ -8134,7 +8130,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "iEzmJe",
+                            "lastClassName": "XtBNB",
                             "rules": Array [
                               [Function],
                             ],
@@ -8153,11 +8149,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                         >
                           <Row
                             bsClass="row"
@@ -8246,7 +8242,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVYrA",
+                                              "lastClassName": "hpBclA",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8270,12 +8266,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
+                                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -8403,21 +8399,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                    
                                   <ForwardRef
                                     bsSize="small"
-                                    bsStyle="default"
                                     id="more-actions-10"
                                     pullRight={true}
                                     title="More Actions"
                                   >
                                     <DropdownButton__StyledDropdownButton
                                       bsSize="small"
-                                      bsStyle="default"
                                       id="more-actions-10"
                                       pullRight={true}
                                       title="More Actions"
                                     >
                                       <StyledComponent
                                         bsSize="small"
-                                        bsStyle="default"
                                         forwardedComponent={
                                           Object {
                                             "$$typeof": Symbol(react.forward_ref),
@@ -8425,7 +8418,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                               "isStatic": false,
-                                              "lastClassName": "gPsjMO",
+                                              "lastClassName": "bLGhtq",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -8447,21 +8440,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <DropdownButton
                                           bsSize="small"
-                                          bsStyle="default"
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                           id="more-actions-10"
                                           pullRight={true}
                                           title="More Actions"
                                         >
                                           <ForwardRef
                                             bsSize="small"
-                                            bsStyle="default"
                                             id="more-actions-10"
                                             pullRight={true}
                                           >
                                             <Uncontrolled(Dropdown)
                                               bsSize="small"
-                                              bsStyle="default"
                                               id="more-actions-10"
                                               innerRef={null}
                                               pullRight={true}
@@ -8469,7 +8459,6 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               <Dropdown
                                                 bsClass="dropdown"
                                                 bsSize="small"
-                                                bsStyle="default"
                                                 componentClass={[Function]}
                                                 id="more-actions-10"
                                                 onToggle={[Function]}
@@ -8479,20 +8468,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   block={false}
                                                   bsClass="btn-group"
                                                   bsSize="small"
-                                                  bsStyle="default"
                                                   className="dropdown"
                                                   justified={false}
                                                   vertical={false}
                                                 >
                                                   <div
-                                                    className="dropdown btn-group btn-group-sm btn-group-default"
+                                                    className="dropdown btn-group btn-group-sm"
                                                   >
                                                     <DropdownToggle
                                                       bsClass="dropdown-toggle"
                                                       bsRole="toggle"
                                                       bsSize="small"
-                                                      bsStyle="default"
-                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                                       id="more-actions-10"
                                                       key=".0"
                                                       onClick={[Function]}
@@ -8508,7 +8495,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         bsClass="btn"
                                                         bsSize="small"
                                                         bsStyle="default"
-                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                                         disabled={false}
                                                         id="more-actions-10"
                                                         onClick={[Function]}
@@ -8518,7 +8505,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                         <button
                                                           aria-expanded={false}
                                                           aria-haspopup={true}
-                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-sm btn-default"
+                                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-sm btn-default"
                                                           disabled={false}
                                                           id="more-actions-10"
                                                           onClick={[Function]}
@@ -8914,223 +8901,316 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={2}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={2}
             >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={2}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
+              <UltimatePaginationComponent
+                boundaryPagesRange={1}
+                currentPage={1}
+                data-testid="graylog-pagination"
+                disabled={false}
+                hideEllipsis={false}
+                hideFirstAndLastPageLinks={false}
+                hidePreviousAndNextPageLinks={false}
+                onChange={[Function]}
+                siblingPagesRange={1}
+                totalPages={2}
               >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
+                <Pagination__StyledBootstrapPagination
+                  data-testid="graylog-pagination"
                 >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
+                  <StyledComponent
+                    data-testid="graylog-pagination"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "Ellipsis": [Function],
+                        "First": [Function],
+                        "Item": [Function],
+                        "Last": [Function],
+                        "Next": [Function],
+                        "Prev": [Function],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                          "isStatic": false,
+                          "lastClassName": "flIvuU",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Pagination__StyledBootstrapPagination",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Pagination__StyledBootstrapPagination-aj0t2h-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
                   >
-                    <li
-                      className="disabled"
+                    <Pagination
+                      bsClass="pagination"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU"
+                      data-testid="graylog-pagination"
                     >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
+                      <ul
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU pagination"
+                        data-testid="graylog-pagination"
                       >
-                        <a
-                          href="#"
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-3"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="FIRST_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="First"
+                          <First
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="First"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-double-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-double-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-double-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </First>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="-4"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
+                          type="PREVIOUS_PAGE_LINK"
+                          value={1}
                         >
-                          <span
-                            aria-label="Previous"
+                          <Prev
+                            disabled={true}
+                            onClick={[Function]}
                           >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={true}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={1}
-                    key="1"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="active"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              aria-label="Prev"
+                              className="disabled"
+                              onClick={[Function]}
+                            >
+                              <span>
+                                <Icon
+                                  name="angle-left"
+                                  type="solid"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={
+                                      Object {
+                                        "iconName": "angle-left",
+                                        "prefix": "fas",
+                                      }
+                                    }
+                                  >
+                                    <svg
+                                      className="svg-inline--fa fa-angle-left"
+                                    />
+                                  </FontAwesomeIcon>
+                                </Icon>
+                              </span>
+                            </li>
+                          </Prev>
+                        </Component>
+                        <Component
+                          isActive={true}
+                          isDisabled={false}
+                          key="1"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={1}
                         >
-                          1
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    key="2"
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          2
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                        >
-                          <span
-                            aria-label="Next"
+                          <PaginationItem
+                            active={true}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={false}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className=""
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={false}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
+                            <li
+                              className="active"
+                            >
+                              <span
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                1
+                                <span
+                                  className="sr-only"
+                                >
+                                  (current)
+                                </span>
+                              </span>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="2"
                           onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
+                          type="PAGE"
+                          value={2}
                         >
-                          <span
-                            aria-label="Last"
+                          <PaginationItem
+                            active={false}
+                            activeLabel="(current)"
+                            disabled={false}
+                            onClick={[Function]}
                           >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
+                            <li
+                              className=""
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  2
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </PaginationItem>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-5"
+                          onClick={[Function]}
+                          type="NEXT_PAGE_LINK"
+                          value={2}
+                        >
+                          <Next
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Next"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Next>
+                        </Component>
+                        <Component
+                          isActive={false}
+                          isDisabled={false}
+                          key="-6"
+                          onClick={[Function]}
+                          type="LAST_PAGE_LINK"
+                          value={2}
+                        >
+                          <Last
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <li
+                              aria-label="Last"
+                              className=""
+                              onClick={[Function]}
+                            >
+                              <SafeAnchor
+                                componentClass="a"
+                              >
+                                <a
+                                  href="#"
+                                  onClick={[Function]}
+                                  onKeyDown={[Function]}
+                                  role="button"
+                                >
+                                  <Icon
+                                    name="angle-double-right"
+                                    type="solid"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        Object {
+                                          "iconName": "angle-double-right",
+                                          "prefix": "fas",
+                                        }
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-angle-double-right"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </a>
+                              </SafeAnchor>
+                            </li>
+                          </Last>
+                        </Component>
+                      </ul>
+                    </Pagination>
+                  </StyledComponent>
+                </Pagination__StyledBootstrapPagination>
+              </UltimatePaginationComponent>
             </Pagination>
           </div>
         </Col>
@@ -9263,10 +9343,9 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
                                   "isStatic": false,
-                                  "lastClassName": "ekazNr",
+                                  "lastClassName": "gcTkZc",
                                   "rules": Array [
                                     [Function],
-                                    ";",
                                   ],
                                 },
                                 "displayName": "FormGroup__StyledFormGroup",
@@ -9284,12 +9363,12 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
                               >
                                 <ControlLabel>
                                   <StyledComponent
@@ -9360,7 +9439,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": false,
-                                              "lastClassName": "fdBWEX",
+                                              "lastClassName": "eXfwDC",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -9384,7 +9463,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 fdBWEX"
+                                          className="FormControl-sc-1amoaox-0 eXfwDC"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -9393,7 +9472,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -9413,7 +9492,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     </Input>
                   </TypeAheadInput>
                   <ForwardRef
-                    bsStyle="default"
                     style={
                       Object {
                         "marginLeft": 5,
@@ -9422,7 +9500,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     type="submit"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       style={
                         Object {
                           "marginLeft": 5,
@@ -9431,7 +9508,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       type="submit"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -9453,7 +9529,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -9481,7 +9557,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           style={
                             Object {
@@ -9491,7 +9567,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           type="submit"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             style={
                               Object {
@@ -9507,7 +9583,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     disabled={true}
                     onClick={[Function]}
                     style={
@@ -9518,7 +9593,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     type="button"
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -9529,7 +9603,6 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       type="button"
                     >
                       <StyledComponent
-                        bsStyle="default"
                         disabled={true}
                         forwardedComponent={
                           Object {
@@ -9552,7 +9625,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -9581,7 +9654,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -9592,7 +9665,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           type="button"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -9627,182 +9700,16 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={0}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
-            >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={0}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
-              >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
-                >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="First"
-                          >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Previous"
-                          >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Next"
-                          >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Last"
-                          >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
-            </Pagination>
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={0}
+            />
           </div>
         </Col>
         <Col
@@ -9867,182 +9774,16 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             className="col-md-5"
           >
             <Pagination
-              activePage={1}
-              bsSize="small"
-              bsStyle="pagination pager"
-              first={true}
-              items={0}
-              last={true}
-              maxButtons={10}
-              next={true}
-              onSelect={[Function]}
-              prev={true}
-            >
-              <Pagination
-                activePage={1}
-                boundaryLinks={false}
-                bsClass="pagination"
-                bsSize="small"
-                bsStyle="pagination pager"
-                ellipsis={true}
-                first={true}
-                items={0}
-                last={true}
-                maxButtons={10}
-                next={true}
-                onSelect={[Function]}
-                prev={true}
-              >
-                <ul
-                  className="pagination pagination-sm pagination-pagination pager"
-                >
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={1}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="First"
-                          >
-                            «
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Previous"
-                          >
-                            ‹
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={2}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Next"
-                          >
-                            ›
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                  <PaginationButton
-                    active={false}
-                    componentClass={[Function]}
-                    disabled={true}
-                    eventKey={0}
-                    onSelect={[Function]}
-                  >
-                    <li
-                      className="disabled"
-                    >
-                      <SafeAnchor
-                        componentClass="a"
-                        disabled={true}
-                        onClick={[Function]}
-                      >
-                        <a
-                          href="#"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          style={
-                            Object {
-                              "pointerEvents": "none",
-                            }
-                          }
-                          tabIndex={-1}
-                        >
-                          <span
-                            aria-label="Last"
-                          >
-                            »
-                          </span>
-                        </a>
-                      </SafeAnchor>
-                    </li>
-                  </PaginationButton>
-                </ul>
-              </Pagination>
-            </Pagination>
+              boundaryPagesRange={1}
+              currentPage={1}
+              disabled={false}
+              hideEllipsis={false}
+              hideFirstAndLastPageLinks={false}
+              hidePreviousAndNextPageLinks={false}
+              onChange={[Function]}
+              siblingPagesRange={1}
+              totalPages={0}
+            />
           </div>
         </Col>
         <Col

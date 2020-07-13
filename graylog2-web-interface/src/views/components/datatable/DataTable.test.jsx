@@ -2,7 +2,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -13,8 +12,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-
-jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
@@ -48,8 +45,9 @@ describe('DataTable', () => {
                data={{}}
                fields={Immutable.List([])}
                effectiveTimerange={{
-                 type: 'relative',
-                 range: 300,
+                 from: '2020-01-10T13:23:42.000Z',
+                 to: '2020-01-10T14:23:42.000Z',
+                 type: 'absolute',
                }}
                toggleEdit={() => {}}
                onChange={() => {}}
@@ -68,6 +66,7 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -82,6 +81,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={data} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -97,6 +97,7 @@ describe('DataTable', () => {
 
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }} />);
+
     expect(wrapper).toIncludeText('hulud.net');
   });
 
@@ -111,6 +112,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={data} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -140,6 +142,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={protocolData} />);
+
     expect(wrapper.children()).toMatchSnapshot();
   });
 
@@ -223,11 +226,13 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
     const onRenderComplete = jest.fn();
+
     mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedDataTable config={config} />
       </RenderCompletionCallback.Provider>
     ));
+
     expect(onRenderComplete).toHaveBeenCalled();
   });
 });

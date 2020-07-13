@@ -1,13 +1,15 @@
 import React from 'react';
 
+import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import AppRouter from 'routing/AppRouter';
-
-import CurrentUserPreferencesProvider from '../contexts/CurrentUserPreferencesProvider';
+import CurrentUserProvider from 'contexts/CurrentUserProvider';
 
 const LoggedInPage = () => (
-  <CurrentUserPreferencesProvider>
-    <AppRouter />
-  </CurrentUserPreferencesProvider>
+  <CurrentUserProvider>
+    <CurrentUserPreferencesProvider>
+      <AppRouter />
+    </CurrentUserPreferencesProvider>
+  </CurrentUserProvider>
 );
 
 export default LoggedInPage;

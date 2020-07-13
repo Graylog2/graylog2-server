@@ -50,6 +50,7 @@ class NewUserForm extends React.Component {
   _onSubmit = (evt) => {
     evt.preventDefault();
     const result = {};
+
     Object.keys(this.inputs).forEach((ref) => {
       if (ref !== 'password_repeat') {
         result[ref] = (this.inputs[ref].getValue ? this.inputs[ref].getValue() : this.inputs[ref].value);
@@ -61,6 +62,7 @@ class NewUserForm extends React.Component {
 
   _onValueChange = (newRoles) => {
     const roles = newRoles.split(',');
+
     this.setState({ newRoles: roles });
   };
 
@@ -74,6 +76,7 @@ class NewUserForm extends React.Component {
     );
     const roles = this.state.newRoles;
     let rolesAlert = null;
+
     if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
       rolesAlert = (
         <Alert bsStyle="danger" role="alert">
@@ -81,6 +84,7 @@ class NewUserForm extends React.Component {
         </Alert>
       );
     }
+
     return (
       <form id="create-user-form" className="form-horizontal" onSubmit={this._onSubmit}>
         <Input ref={(elem) => { this.inputs.username = elem; }}

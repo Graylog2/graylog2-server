@@ -15,7 +15,7 @@ type Props = {
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
-  target: any,
+  target: ?Button,
 };
 
 const stopEvent = (e) => {

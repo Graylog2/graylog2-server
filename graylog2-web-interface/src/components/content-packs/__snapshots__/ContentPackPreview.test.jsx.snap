@@ -342,7 +342,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -365,12 +365,12 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA submit-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -390,19 +390,16 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                         }
                       >
                         <ForwardRef
-                          bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
                           type="reset"
                         >
                           <Button__StyledButton
-                            bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
                             type="reset"
                           >
                             <StyledComponent
-                              bsStyle="default"
                               className="reset-button"
                               forwardedComponent={
                                 Object {
@@ -425,7 +422,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -449,13 +446,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA reset-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -636,7 +633,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -659,12 +656,12 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA submit-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -684,19 +681,16 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                         }
                       >
                         <ForwardRef
-                          bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
                           type="reset"
                         >
                           <Button__StyledButton
-                            bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
                             type="reset"
                           >
                             <StyledComponent
-                              bsStyle="default"
                               className="reset-button"
                               forwardedComponent={
                                 Object {
@@ -719,7 +713,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -743,13 +737,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA reset-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -863,7 +857,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "jVYrA",
+                        "lastClassName": "hpBclA",
                         "rules": Array [
                           [Function],
                         ],
@@ -887,13 +881,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     block={false}
                     bsClass="btn"
                     bsStyle="primary"
-                    className="Button__StyledButton-c9cbmb-0 jVYrA"
+                    className="Button__StyledButton-c9cbmb-0 hpBclA"
                     disabled={false}
                     id="create"
                     onClick={[Function]}
                   >
                     <button
-                      className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                       disabled={false}
                       id="create"
                       onClick={[Function]}
@@ -943,7 +937,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "jVYrA",
+                          "lastClassName": "hpBclA",
                           "rules": Array [
                             [Function],
                           ],
@@ -967,13 +961,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="info"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA"
                       disabled={false}
                       id="download"
                       onClick={[Function]}
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-info"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-info"
                         disabled={false}
                         id="download"
                         onClick={[Function]}
@@ -1399,7 +1393,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1422,12 +1416,12 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA submit-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1447,19 +1441,16 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                         }
                       >
                         <ForwardRef
-                          bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
                           type="reset"
                         >
                           <Button__StyledButton
-                            bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
                             type="reset"
                           >
                             <StyledComponent
-                              bsStyle="default"
                               className="reset-button"
                               forwardedComponent={
                                 Object {
@@ -1482,7 +1473,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1506,13 +1497,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA reset-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -1693,7 +1684,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1716,12 +1707,12 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA submit-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA submit-button"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1741,19 +1732,16 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                         }
                       >
                         <ForwardRef
-                          bsStyle="default"
                           className="reset-button"
                           onClick={[Function]}
                           type="reset"
                         >
                           <Button__StyledButton
-                            bsStyle="default"
                             className="reset-button"
                             onClick={[Function]}
                             type="reset"
                           >
                             <StyledComponent
-                              bsStyle="default"
                               className="reset-button"
                               forwardedComponent={
                                 Object {
@@ -1776,7 +1764,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button__StyledButton-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "jVYrA",
+                                    "lastClassName": "hpBclA",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1800,13 +1788,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 jVYrA reset-button"
+                                className="Button__StyledButton-c9cbmb-0 hpBclA reset-button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                                  className="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -1920,7 +1908,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "jVYrA",
+                        "lastClassName": "hpBclA",
                         "rules": Array [
                           [Function],
                         ],
@@ -1944,13 +1932,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     block={false}
                     bsClass="btn"
                     bsStyle="primary"
-                    className="Button__StyledButton-c9cbmb-0 jVYrA"
+                    className="Button__StyledButton-c9cbmb-0 hpBclA"
                     disabled={false}
                     id="create"
                     onClick={[Function]}
                   >
                     <button
-                      className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                       disabled={false}
                       id="create"
                       onClick={[Function]}
@@ -2000,7 +1988,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "jVYrA",
+                          "lastClassName": "hpBclA",
                           "rules": Array [
                             [Function],
                           ],
@@ -2024,13 +2012,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="info"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 hpBclA"
                       disabled={false}
                       id="download"
                       onClick={[Function]}
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-info"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-info"
                         disabled={false}
                         id="download"
                         onClick={[Function]}

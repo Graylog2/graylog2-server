@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Tab, Tabs, Col, Row } from 'components/graylog';
 import QueryTitle from 'views/components/queries/QueryTitle';
@@ -12,7 +12,7 @@ import Query from 'views/logic/queries/Query';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import ViewState from 'views/logic/views/ViewState';
 
-const StyledQueryTabs = styled(Tabs)(({ theme }) => `
+const StyledQueryTabs = styled(Tabs)(({ theme }) => css`
   .tab-pane {
     display: none;
   }
@@ -47,7 +47,7 @@ type Props = {
 };
 
 class QueryTabs extends React.Component<Props> {
-  queryTitleEditModal: ?QueryTitleEditModal
+  queryTitleEditModal: ?QueryTitleEditModal;
 
   static propTypes = {
     children: PropTypes.node,
@@ -89,6 +89,7 @@ class QueryTabs extends React.Component<Props> {
                     openEditModal={this.openTitleEditModal}
                     title={title} />
       );
+
       return (
         <Tab eventKey={id}
              key={id}

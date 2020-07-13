@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
@@ -17,7 +17,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
 
-const StyledJumbotron = styled(Jumbotron)(({ theme }) => `
+const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
     border: 1px solid ${theme.colors.gray[80]};
     border-top-left-radius: 0;
@@ -30,6 +30,7 @@ const MAXIMUM_GRID_SIZE = 12;
 
 const _onPositionsChange = (positions) => {
   const newPositions = Immutable.Map(positions.map(({ col, height, row, width, id }) => [id, new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width)])).toJS();
+
   CurrentViewStateActions.widgetPositions(newPositions);
 };
 
@@ -55,11 +56,13 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
 
     if (!widgetData || widgetData.length === 0) {
       const queryErrors = results.errors.filter((e) => e.type === 'query');
+
       if (queryErrors.length > 0) {
         errors[widget.id] = errors[widget.id] ? [].concat(errors[widget.id], queryErrors) : queryErrors;
       }
     }
   });
+
   return (
     <InteractiveContext.Consumer>
       {(interactive) => (
@@ -107,7 +110,6 @@ const EmptyDashboardInfo = () => (
   </StyledJumbotron>
 );
 
-
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
@@ -115,6 +117,7 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
 
   if (results) {
     const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
+
     return (<span>{content}</span>);
   }
 

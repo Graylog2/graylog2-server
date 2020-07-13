@@ -45,12 +45,14 @@ const SidecarsAdministrationStore = Reflux.createStore({
         this.sidecars = response.sidecars;
         this.query = response.query;
         this.filters = response.filters;
+
         this.pagination = {
           total: response.pagination.total,
           count: response.pagination.count,
           page: response.pagination.page,
           pageSize: response.pagination.per_page,
         };
+
         this.propagateChanges();
 
         return response;
@@ -84,6 +86,7 @@ const SidecarsAdministrationStore = Reflux.createStore({
     promise.then(
       (response) => {
         UserNotification.success('', `${lodash.upperFirst(action)} for ${formattedCollectors.length} collectors requested`);
+
         return response;
       },
       (error) => {

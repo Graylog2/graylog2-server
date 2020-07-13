@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Row, Col, Panel, Button } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -26,10 +26,9 @@ const LoginResultPanel = styled(Panel)`
   }
 `;
 
-const StatusIcon = styled(Icon)(({ status, theme }) => `
+const StatusIcon = styled(Icon)(({ status, theme }) => css`
   color: ${theme.colors.variant[status]};
 `);
-
 
 class TestLdapLogin extends React.Component {
   static propTypes = {
@@ -54,6 +53,7 @@ class TestLdapLogin extends React.Component {
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { ldapSettings } = this.props;
+
     // Reset login status if ldapSettings changed
     if (JSON.stringify(ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({ loginStatus: {} });
@@ -113,6 +113,7 @@ class TestLdapLogin extends React.Component {
     const style = loginStatus.error ? 'danger' : 'success';
 
     let userFound;
+
     if (ObjectUtils.isEmpty(loginStatus.result.entry)) {
       userFound = <StatusIcon status="danger" name="times" />;
     } else {
@@ -120,6 +121,7 @@ class TestLdapLogin extends React.Component {
     }
 
     let loginCheck;
+
     if (loginStatus.result.login_authenticated) {
       loginCheck = <StatusIcon status="success" name="check" />;
     } else if (loginPassword === '') {
@@ -129,6 +131,7 @@ class TestLdapLogin extends React.Component {
     }
 
     let serverResponse;
+
     if (loginStatus.result.exception) {
       serverResponse = <pre>{loginStatus.result.exception}</pre>;
     }
@@ -221,6 +224,5 @@ class TestLdapLogin extends React.Component {
     );
   }
 }
-
 
 export default TestLdapLogin;

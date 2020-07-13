@@ -33,6 +33,7 @@ const DashboardSearchForm = ({ initialValues, onSubmit, children }: Props) => {
     timerange: timerange ? onInitializingTimerange(timerange) : timerange,
     queryString,
   };
+
   return (
     <Formik initialValues={_initialValues}
             enableReinitialize

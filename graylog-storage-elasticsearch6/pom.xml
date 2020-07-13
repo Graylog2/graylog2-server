@@ -17,7 +17,9 @@
     <description>Graylog Storage Module for Elasticsearch 6</description>
 
     <properties>
-        <it.es.version>5.6.12</it.es.version>
+        <it.es.version>6.8.0</it.es.version>
+        <elasticsearch.version>5.6.12</elasticsearch.version>
+        <jest.version>2.4.15+jackson</jest.version>
     </properties>
 
     <dependencies>
@@ -32,6 +34,48 @@
             <version>${guava.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>elasticsearch5</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.jest</groupId>
+            <artifactId>jest</artifactId>
+            <version>${jest.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
@@ -108,6 +152,21 @@
                     <execution>
                         <goals>
                             <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>assembly.xml</descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>

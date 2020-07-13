@@ -19,13 +19,15 @@ const FormUtils = {
     const { input } = urlInput;
     const tracker = input._valueTracker;
     const event = createEvent('change');
+
     event.simulated = true;
+
     if (tracker) {
       tracker.setValue('');
     }
+
     input.dispatchEvent(event);
   },
 };
-
 
 export default FormUtils;

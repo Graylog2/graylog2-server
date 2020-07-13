@@ -53,15 +53,19 @@ export const SearchExecutionStateStore = singletonStore(
       this.executionState = defaultExecutionState;
       this.trigger(this.executionState);
       SearchExecutionStateActions.clear.promise(Promise.resolve(this.executionState));
+
       return this.executionState;
     },
 
     replace(executionState: SearchExecutionState, trigger?: boolean = true): SearchExecutionState {
       this.executionState = executionState;
+
       if (trigger) {
         this.trigger(this.executionState);
       }
+
       SearchExecutionStateActions.replace.promise(Promise.resolve(executionState));
+
       return this.executionState;
     },
 
@@ -71,9 +75,11 @@ export const SearchExecutionStateStore = singletonStore(
       parameterMap.forEach((value, parameterName) => {
         parameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(value));
       });
+
       this.executionState = this.executionState.toBuilder().parameterBindings(parameterBindings).build();
       this.trigger(this.executionState);
       SearchExecutionStateActions.setParameterValues.promise(Promise.resolve(this.executionState));
+
       return this.executionState;
     },
 
@@ -81,8 +87,10 @@ export const SearchExecutionStateStore = singletonStore(
       this.executionState = this.executionState.toBuilder()
         .parameterBindings(this.executionState.parameterBindings.set(parameterName, ParameterBinding.forValue(value)))
         .build();
+
       this.trigger(this.executionState);
       SearchExecutionStateActions.bindParameterValue.promise(Promise.resolve(this.executionState));
+
       return this.executionState;
     },
 
@@ -90,8 +98,10 @@ export const SearchExecutionStateStore = singletonStore(
       this.executionState = this.executionState.toBuilder()
         .globalOverride(newGlobalOverride)
         .build();
+
       this.trigger(this.executionState);
       SearchExecutionStateActions.globalOverride.promise(Promise.resolve(this.executionState));
+
       return this.executionState;
     },
   }),

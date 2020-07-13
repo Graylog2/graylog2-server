@@ -1,6 +1,7 @@
 // @flow strict
 import React, { type Element, type ElementRef, useEffect, useRef, useState } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 /**
  * This component will calculate the largest possible font size for the provided child.
@@ -49,11 +50,13 @@ const useAutoFontSize = (target, _container, height, width) => {
 
     const contentElement = containerChildren[0];
     const multiplier = _multiplierForElement(contentElement, width, height);
+
     if (Math.abs(1 - multiplier) <= TOLERANCE) {
       return;
     }
 
     const newFontSize = Math.floor(fontSize * multiplier);
+
     if (newFontSize !== fontSize && isValidFontSize(newFontSize)) {
       setFontSize(newFontSize);
     }

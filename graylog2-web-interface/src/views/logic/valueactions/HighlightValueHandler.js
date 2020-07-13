@@ -14,6 +14,7 @@ const HighlightValueHandler: ValueActionHandler = ({ field, value }) => {
   if (value === undefined) {
     return Promise.reject(new Error('Unable to add highlighting for missing value.'));
   }
+
   return HighlightingRulesActions.add(
     HighlightingRule.builder()
       .field(field)
@@ -25,6 +26,7 @@ const HighlightValueHandler: ValueActionHandler = ({ field, value }) => {
 
 const isEnabled: ActionHandlerCondition = ({ field, value }) => {
   const highlightingRules = HighlightingRulesStore.getInitialState();
+
   return highlightingRules.find(({ field: f, value: v }) => (field === f && value === v)) === undefined;
 };
 

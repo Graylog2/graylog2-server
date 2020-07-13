@@ -36,6 +36,7 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   onHTTPHeaderUpdate = (headers: Headers) => {
     const { config, updateConfig } = this.props;
     const configChange = ObjectUtils.clone(config);
+
     configChange.headers = headers;
     updateConfig(configChange);
   };

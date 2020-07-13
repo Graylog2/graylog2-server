@@ -45,6 +45,7 @@ const GrokPatterns = createReactClass({
     this.loadPromise = GrokPatternsStore.loadPatterns((patterns) => {
       if (!this.loadPromise.isCancelled()) {
         this.loadPromise = undefined;
+
         this.setState({
           patterns: patterns,
         });
@@ -93,6 +94,7 @@ const GrokPatterns = createReactClass({
 
   _patternFormatter(pattern) {
     const patterns = this.state.patterns.filter((p) => p.name !== pattern.name);
+
     return (
       <tr key={pattern.id}>
         <td>{pattern.name}</td>

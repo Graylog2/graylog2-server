@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 
+import Select from 'views/components/Select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
@@ -11,12 +11,7 @@ type Props = {
   onChange: (Direction) => any,
 };
 
-const valueContainer = (base) => ({
-  ...base,
-  minHeight: '35px',
-});
-
-const SortDirectionSelect = ({ direction, disabled, onChange }: Props): Select => (
+const SortDirectionSelect = ({ direction, disabled, onChange }: Props) => (
   <Select isDisabled={disabled}
           isClearable={false}
           isSearchable={false}
@@ -26,8 +21,7 @@ const SortDirectionSelect = ({ direction, disabled, onChange }: Props): Select =
           ]}
           onChange={({ value }) => onChange(Direction.fromString(value))}
           placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-          styles={{ valueContainer }}
-          value={direction && { label: direction, value: direction }} />
+          value={(direction && { label: direction, value: direction }) ?? null} />
 );
 
 SortDirectionSelect.propTypes = {

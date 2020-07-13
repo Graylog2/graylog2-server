@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar } from 'components/graylog';
 import Routes from 'routing/Routes';
@@ -13,12 +13,12 @@ import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 import style from './SidecarRow.css';
 
-const SidecarTR = styled.tr(({ inactive, theme }) => `
-  color: ${inactive ? theme.utils.contrastingColor(theme.colors.global.tableBackground, 'AA') : 'currentColor'};
+const SidecarTR = styled.tr(({ inactive, theme }) => css`
+  color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.background, 'AA') : 'currentColor'};
   opacity: ${inactive ? 0.9 : 1};
 
   &:nth-of-type(2n+1) {
-    color: ${inactive ? theme.utils.contrastingColor(theme.colors.global.tableBackgroundAlt, 'AA') : 'currentColor'};
+    color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.backgroundAlt, 'AA') : 'currentColor'};
   }
 
   td:not(:last-child) {

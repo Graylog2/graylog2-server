@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
@@ -48,7 +48,7 @@ const ContentWrap = styled.strong`
   }
 `;
 
-const ThroughputData = styled.span(({ dataIn, theme }) => `
+const ThroughputData = styled.span(({ dataIn, theme }) => css`
   font-size: ${theme.fonts.size.small};
   line-height: 13px;
   grid-area: ${dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};

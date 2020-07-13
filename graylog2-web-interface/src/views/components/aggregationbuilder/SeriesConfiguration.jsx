@@ -33,6 +33,7 @@ export default class SeriesConfiguration extends React.Component {
     if (newName && newName !== effectiveName) {
       const newConfig = config.toBuilder().name(newName).build();
       const newSeries = series.toBuilder().config(newConfig).build();
+
       onClose(newSeries);
     } else {
       onClose(series);
@@ -46,6 +47,7 @@ export default class SeriesConfiguration extends React.Component {
     const { usedNames = [] } = this.props;
     const isValid = !usedNames.includes(trim(name));
     const validationHint = isValid ? null : <> <strong>Name must be unique.</strong></>;
+
     return (
       <span>
         <FormGroup validationState={isValid ? null : 'error'}>

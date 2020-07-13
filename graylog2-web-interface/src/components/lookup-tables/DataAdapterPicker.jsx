@@ -22,6 +22,7 @@ class DataAdapterPicker extends React.Component {
 
   render() {
     const adapterPlugins = {};
+
     PluginStore.exports('lookupTableAdapters').forEach((p) => {
       adapterPlugins[p.type] = p;
     });

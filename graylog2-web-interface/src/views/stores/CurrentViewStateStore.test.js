@@ -14,19 +14,23 @@ describe('CurrentViewStateStore', () => {
   const viewState = ViewState.create();
   const viewId = 'beef-1000';
   const viewStateMap = {};
+
   viewStateMap[viewId] = viewState;
   const statesMap = Immutable.Map(viewStateMap);
+
   PluginStore.exports = () => {
     return [{ type: 'MESSAGES', defaultHeight: 5, defaultWidth: 6 }];
   };
 
   it('should set empty widgets', async () => {
     const updateFn = mockAction(jest.fn(() => Promise.resolve(viewState)));
+
     ViewStatesActions.update = updateFn;
 
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
     await CurrentViewStateStore.widgets(Immutable.List());
+
     expect(updateFn).toHaveBeenCalledTimes(1);
     expect(updateFn).toHaveBeenCalledWith(viewId, viewState);
   });
@@ -38,11 +42,13 @@ describe('CurrentViewStateStore', () => {
       .widgets([MessagesWidget.builder().id(oldWidgetId).build()])
       .build();
     const updateFn = mockAction(jest.fn(() => Promise.resolve(expectedViewState)));
+
     ViewStatesActions.update = updateFn;
 
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
     await CurrentViewStateStore.widgets(expectedViewState.widgets);
+
     expect(updateFn).toHaveBeenCalledTimes(1);
     expect(updateFn).toHaveBeenCalledWith(viewId, expectedViewState);
   });
@@ -77,11 +83,13 @@ describe('CurrentViewStateStore', () => {
       .build();
 
     const updateFn = mockAction(jest.fn(() => Promise.resolve(expectedViewState)));
+
     ViewStatesActions.update = updateFn;
 
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: oldViewState });
     CurrentViewStateStore.onViewStatesStoreChange(sMap);
     await CurrentViewStateStore.widgets(expectedWidgets);
+
     expect(updateFn).toHaveBeenCalledTimes(1);
     expect(updateFn).toHaveBeenCalledWith(viewId, expectedViewState);
   });
@@ -109,11 +117,13 @@ describe('CurrentViewStateStore', () => {
       .widgets(expectedWidgets)
       .build();
     const updateFn = mockAction(jest.fn(() => Promise.resolve(expectedViewState)));
+
     ViewStatesActions.update = updateFn;
 
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: existingViewState });
     CurrentViewStateStore.onViewStatesStoreChange(sMap);
     await CurrentViewStateStore.widgets(expectedWidgets);
+
     expect(updateFn).toHaveBeenCalledTimes(1);
     expect(updateFn).toHaveBeenCalledWith(viewId, expectedViewState);
   });

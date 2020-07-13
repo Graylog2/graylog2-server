@@ -1,4 +1,3 @@
-
 import AppConfig from './AppConfig';
 
 export const DEPRECATION_NOTICE = 'Graylog Deprecation Notice:';

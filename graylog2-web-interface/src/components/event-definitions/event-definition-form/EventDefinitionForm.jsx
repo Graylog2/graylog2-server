@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, ButtonToolbar, Col, Nav, Row } from 'components/graylog';
@@ -13,7 +13,7 @@ import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
-const StyledNav = styled(Nav)(({ theme }) => `
+const StyledNav = styled(Nav)(({ theme }) => css`
   &.nav {
     > li {
       border: 1px solid ${theme.colors.gray[80]};
@@ -109,6 +109,7 @@ class EventDefinitionForm extends React.Component {
 
     if (activeStep === lodash.last(STEP_KEYS)) {
       const { onSubmit } = this.props;
+
       onSubmit();
     }
   };
@@ -117,12 +118,14 @@ class EventDefinitionForm extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
   renderButtons = (activeStep) => {
     if (activeStep === lodash.last(STEP_KEYS)) {
       const { onCancel } = this.props;
+
       return (
         <div className="pull-right">
           <ButtonToolbar>

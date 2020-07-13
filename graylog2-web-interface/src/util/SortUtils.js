@@ -10,10 +10,12 @@ export function sortByDate(d1, d2, sortOrder) {
   if (effectiveSortOrder === 'asc') {
     return (d1Time.isBefore(d2Time) ? -1 : d2Time.isBefore(d1Time) ? 1 : 0);
   }
+
   return (d2Time.isBefore(d1Time) ? -1 : d1Time.isBefore(d2Time) ? 1 : 0);
 }
 
 export function naturalSortIgnoreCase(s1, s2, sortOrder) {
   const effectiveSortOrder = sortOrder || 'asc';
+
   return (effectiveSortOrder === 'asc' ? naturalSort(s1.toLowerCase(), s2.toLowerCase()) : naturalSort(s2.toLowerCase(), s1.toLowerCase()));
 }

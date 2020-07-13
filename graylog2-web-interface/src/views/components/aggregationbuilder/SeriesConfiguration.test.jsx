@@ -9,16 +9,19 @@ import SeriesConfiguration from './SeriesConfiguration';
 describe('SeriesConfiguration', () => {
   const createNewSeries = (series = Series.forFunction('count()'), name) => {
     const newConfig = series.config.toBuilder().name(name).build();
+
     return series.toBuilder().config(newConfig).build();
   };
 
   it('renders the configuration dialog', () => {
     const wrapper = mount(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('renders an input to change the series name', () => {
     const wrapper = mount(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
+
     expect(wrapper.find('input')).toHaveProp('value', 'count()');
   });
 
@@ -28,6 +31,7 @@ describe('SeriesConfiguration', () => {
       .config(SeriesConfig.empty().toBuilder().name('Average Request Time').build())
       .build();
     const wrapper = mount(<SeriesConfiguration series={series} onClose={() => {}} />);
+
     expect(wrapper.find('input')).toHaveProp('value', 'Average Request Time');
   });
 
@@ -58,6 +62,7 @@ describe('SeriesConfiguration', () => {
     submit.simulate('click');
 
     const newSeries = createNewSeries(series, 'Some other value');
+
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledWith(newSeries);
   });
@@ -74,6 +79,7 @@ describe('SeriesConfiguration', () => {
 
     wrapper.update();
     const submit = wrapper.find('button');
+
     expect(submit).toBeDisabled();
     expect(wrapper).toIncludeText('Name must be unique');
   });
@@ -92,6 +98,7 @@ describe('SeriesConfiguration', () => {
     submit.simulate('click');
 
     const newSeries = createNewSeries(series, 'count()');
+
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledWith(newSeries);
   });

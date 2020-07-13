@@ -14,10 +14,10 @@ const StyledAlert = styled(Alert)`
   min-width: 200px;
   top: 60px;
   left: 50%;
-  margin-left: -100px; /* half of the element width */
+  transform: translateX(-50%);
   padding: 5px 20px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 2000;
 `;
 

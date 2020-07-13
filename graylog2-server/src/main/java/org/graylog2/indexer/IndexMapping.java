@@ -43,8 +43,12 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "filter", "lowercase"));
         final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
         final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
-        final Map<String, Object> mappings = ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
+        final Map<String, Object> mappings = mapping(analyzer);
 
+        return createTemplate(template, order, settings, mappings);
+    }
+
+    Map<String, Object> createTemplate(String template, int order, Map<String, Object> settings, Map<String, Object> mappings) {
         return ImmutableMap.of(
                 "template", template,
                 "order", order,
@@ -53,7 +57,11 @@ public abstract class IndexMapping implements IndexMappingTemplate {
         );
     }
 
-    private Map<String, Object> messageMapping(final String analyzer) {
+    protected Map<String, Object> mapping(String analyzer) {
+        return ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
+    }
+
+    protected Map<String, Object> messageMapping(final String analyzer) {
         return ImmutableMap.of(
                 "properties", fieldProperties(analyzer),
                 "dynamic_templates", dynamicTemplate(),
@@ -105,13 +113,13 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "fielddata", fieldData);
     }
 
-    private Map<String, Object> typeTimeWithMillis() {
+    protected Map<String, Object> typeTimeWithMillis() {
         return ImmutableMap.of(
                 "type", "date",
                 "format", Tools.ES_DATE_FORMAT);
     }
 
-    private Map<String, Object> typeLong() {
+    protected Map<String, Object> typeLong() {
         return ImmutableMap.of("type", "long");
     }
 

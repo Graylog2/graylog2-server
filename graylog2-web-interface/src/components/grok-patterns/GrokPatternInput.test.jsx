@@ -13,11 +13,13 @@ describe('<GrokPatternInput />', () => {
 
   it('should render grok pattern input without patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={[]} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should render grok pattern input with patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={grokPatterns} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -26,14 +28,19 @@ describe('<GrokPatternInput />', () => {
       expect(pattern).toEqual('%{COMMONMAC}');
     });
     const wrapper = mount(<GrokPatternInput patterns={grokPatterns} onPatternChange={changeFn} />);
+
     wrapper.find('button[children="Add"]').at(0).simulate('click');
+
     expect(changeFn.mock.calls.length).toBe(1);
   });
 
   it('should filter the grok patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={grokPatterns} />);
+
     expect(wrapper.find('button[children="Add"]').length).toBe(3);
+
     wrapper.find('input#pattern-selector').simulate('change', { target: { value: 'COMMON' } });
+
     expect(wrapper.find('button[children="Add"]').length).toBe(1);
   });
 });

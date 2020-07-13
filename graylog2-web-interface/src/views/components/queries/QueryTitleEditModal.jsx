@@ -29,6 +29,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       titleDraft: '',
     };
@@ -38,12 +39,14 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     this.setState({
       titleDraft: activeQueryTitle,
     });
+
     this.modal.open();
   }
 
   _onDraftSave = () => {
     const { titleDraft } = this.state;
     const { onTitleChange } = this.props;
+
     onTitleChange(titleDraft);
     this.modal.close();
   };
@@ -54,6 +57,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
 
   render() {
     const { titleDraft } = this.state;
+
     return (
       <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
                           title="Editing dashboard page title"

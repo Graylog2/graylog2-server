@@ -20,13 +20,16 @@ describe('FieldSortSelect', () => {
   const sort = [new SortConfig('pivot', 'http_method', Direction.Ascending)];
 
   afterEach(cleanup);
+
   it('should display current sort as selected option', () => {
     const { getByText } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
+
     expect(getByText('http_method')).not.toBeNull();
   });
 
   it('should open menu when focused', async () => {
     const { getByText, container } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
+
     fireEvent.focus(container.getElementsByTagName('input')[0]);
     await waitForElement(() => getByText(/2 results available./));
   });

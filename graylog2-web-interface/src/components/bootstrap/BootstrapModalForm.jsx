@@ -51,6 +51,7 @@ class BootstrapModalForm extends React.Component {
 
   onModalCancel = () => {
     const { onCancel } = this.props;
+
     onCancel();
     this.close();
   };
@@ -66,17 +67,20 @@ class BootstrapModalForm extends React.Component {
     if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())
       || (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
       event.preventDefault();
+
       return;
     }
 
     // Check custom validation for plugin fields
     if (!validate(formDOMNode)) {
       event.preventDefault();
+
       return;
     }
 
     // If function is not given, let the browser continue propagating the submit event
     const { onSubmitForm } = this.props;
+
     if (typeof onSubmitForm === 'function') {
       event.preventDefault();
       onSubmitForm(event);

@@ -86,15 +86,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -116,7 +113,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -139,12 +136,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -172,7 +169,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -181,7 +177,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -190,7 +185,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -198,7 +192,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -222,8 +216,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -232,17 +225,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -250,19 +240,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -277,7 +265,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -287,7 +275,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -694,15 +682,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -724,7 +709,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -747,12 +732,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -780,7 +765,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -789,7 +773,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -798,7 +781,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -806,7 +788,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -830,8 +812,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -840,17 +821,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -858,19 +836,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -885,7 +861,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -895,7 +871,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -1302,15 +1278,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -1332,7 +1305,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -1355,12 +1328,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -1388,7 +1361,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -1408,7 +1380,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -1428,7 +1399,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -1436,7 +1406,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -1471,8 +1441,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -1492,17 +1461,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -1510,19 +1476,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -1537,7 +1501,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -1547,7 +1511,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -1967,15 +1931,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -1997,7 +1958,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2020,12 +1981,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -2053,7 +2014,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -2073,7 +2033,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -2093,7 +2052,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -2101,7 +2059,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2136,8 +2094,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -2157,17 +2114,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -2175,19 +2129,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -2202,7 +2154,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -2212,7 +2164,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -2632,15 +2584,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -2662,7 +2611,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2685,12 +2634,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -2718,7 +2667,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -2738,7 +2686,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -2758,7 +2705,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -2766,7 +2712,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -2801,8 +2747,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -2822,17 +2767,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -2840,19 +2782,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -2867,7 +2807,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -2877,7 +2817,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -3297,15 +3237,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -3327,7 +3264,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -3350,12 +3287,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -3383,7 +3320,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -3403,7 +3339,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -3423,7 +3358,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -3431,7 +3365,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -3466,8 +3400,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -3487,17 +3420,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -3505,19 +3435,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -3532,7 +3460,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -3542,7 +3470,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -3962,15 +3890,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -3992,7 +3917,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4015,12 +3940,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -4048,7 +3973,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -4068,7 +3992,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -4088,7 +4011,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -4096,7 +4018,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4131,8 +4053,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -4152,17 +4073,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -4170,19 +4088,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -4197,7 +4113,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -4207,7 +4123,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -4627,15 +4543,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -4657,7 +4570,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4680,12 +4593,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -4713,7 +4626,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -4733,7 +4645,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -4753,7 +4664,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -4761,7 +4671,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -4796,8 +4706,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -4817,17 +4726,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -4835,19 +4741,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -4862,7 +4766,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -4872,7 +4776,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}
@@ -5292,15 +5196,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 eAWkfW btn-group"
                 >
                   <ForwardRef
-                    bsStyle="default"
                     onClick={[Function]}
                   >
                     <Button__StyledButton
-                      bsStyle="default"
                       onClick={[Function]}
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -5322,7 +5223,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVYrA",
+                              "lastClassName": "hpBclA",
                               "rules": Array [
                                 [Function],
                               ],
@@ -5345,12 +5246,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 jVYrA"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -5378,7 +5279,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
-                    bsStyle="default"
                     id="refresh-options-dropdown"
                     title={
                       <RefreshControls__ButtonLabel>
@@ -5398,7 +5298,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                     }
                   >
                     <DropdownButton__StyledDropdownButton
-                      bsStyle="default"
                       id="refresh-options-dropdown"
                       title={
                         <RefreshControls__ButtonLabel>
@@ -5418,7 +5317,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                       }
                     >
                       <StyledComponent
-                        bsStyle="default"
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
@@ -5426,7 +5324,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             "componentStyle": ComponentStyle {
                               "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                               "isStatic": false,
-                              "lastClassName": "gPsjMO",
+                              "lastClassName": "bLGhtq",
                               "rules": Array [
                                 [Function],
                               ],
@@ -5461,8 +5359,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                         }
                       >
                         <DropdownButton
-                          bsStyle="default"
-                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                           id="refresh-options-dropdown"
                           title={
                             <RefreshControls__ButtonLabel>
@@ -5482,17 +5379,14 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                           }
                         >
                           <ForwardRef
-                            bsStyle="default"
                             id="refresh-options-dropdown"
                           >
                             <Uncontrolled(Dropdown)
-                              bsStyle="default"
                               id="refresh-options-dropdown"
                               innerRef={null}
                             >
                               <Dropdown
                                 bsClass="dropdown"
-                                bsStyle="default"
                                 componentClass={[Function]}
                                 id="refresh-options-dropdown"
                                 onToggle={[Function]}
@@ -5500,19 +5394,17 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <ButtonGroup
                                   block={false}
                                   bsClass="btn-group"
-                                  bsStyle="default"
                                   className="dropdown"
                                   justified={false}
                                   vertical={false}
                                 >
                                   <div
-                                    className="dropdown btn-group btn-group-default"
+                                    className="dropdown btn-group"
                                   >
                                     <DropdownToggle
                                       bsClass="dropdown-toggle"
                                       bsRole="toggle"
-                                      bsStyle="default"
-                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO"
+                                      className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq"
                                       id="refresh-options-dropdown"
                                       key=".0"
                                       onClick={[Function]}
@@ -5527,7 +5419,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         block={false}
                                         bsClass="btn"
                                         bsStyle="default"
-                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle"
+                                        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle"
                                         disabled={false}
                                         id="refresh-options-dropdown"
                                         onClick={[Function]}
@@ -5537,7 +5429,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                         <button
                                           aria-expanded={false}
                                           aria-haspopup={true}
-                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO dropdown-toggle btn btn-default"
+                                          className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq dropdown-toggle btn btn-default"
                                           disabled={false}
                                           id="refresh-options-dropdown"
                                           onClick={[Function]}

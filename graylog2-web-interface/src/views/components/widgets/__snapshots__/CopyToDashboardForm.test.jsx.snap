@@ -57,7 +57,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -81,7 +81,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               style="float: right;"
             >
               <div
-                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
               >
                 <label
                   class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -91,7 +91,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -123,89 +123,20 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
             </span>
             <div
               class="text-center pagination-wrapper"
-            >
-              <ul
-                class="pagination pagination-sm"
-              >
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="First"
-                    >
-                      «
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Previous"
-                    >
-                      ‹
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Next"
-                    >
-                      ›
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Last"
-                    >
-                      »
-                    </span>
-                  </a>
-                </li>
-              </ul>
-            </div>
+            />
           </div>
           <div
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
               type="button"
             >
               Cancel
@@ -275,7 +206,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA submit-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 hpBclA submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -286,7 +217,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 jVYrA reset-button btn btn-default"
+                    class="Button__StyledButton-c9cbmb-0 hpBclA reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -299,7 +230,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               style="float: right;"
             >
               <div
-                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
+                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
               >
                 <label
                   class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
@@ -309,7 +240,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fdBWEX form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 eXfwDC form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -340,7 +271,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="list-group"
             >
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                 type="button"
               >
                 <h4
@@ -353,7 +284,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 />
               </button>
               <button
-                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 iEzmJe list-group-item"
+                class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 XtBNB list-group-item"
                 type="button"
               >
                 <h4
@@ -368,99 +299,20 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
             </div>
             <div
               class="text-center pagination-wrapper"
-            >
-              <ul
-                class="pagination pagination-sm"
-              >
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="First"
-                    >
-                      «
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Previous"
-                    >
-                      ‹
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="active"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                  >
-                    1
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Next"
-                    >
-                      ›
-                    </span>
-                  </a>
-                </li>
-                <li
-                  class="disabled"
-                >
-                  <a
-                    href="#"
-                    role="button"
-                    style="pointer-events: none;"
-                    tabindex="-1"
-                  >
-                    <span
-                      aria-label="Last"
-                    >
-                      »
-                    </span>
-                  </a>
-                </li>
-              </ul>
-            </div>
+            />
           </div>
           <div
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+              class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
               disabled=""
               type="button"
             >
               Select
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
               type="button"
             >
               Cancel

@@ -46,6 +46,7 @@ class RuleHelper extends React.Component {
   _toggleFunctionDetail = (functionName) => {
     const { expanded } = this.state;
     const newState = ObjectUtils.clone(expanded);
+
     newState[functionName] = !newState[functionName];
 
     this.setState({ expanded: newState });
@@ -53,6 +54,7 @@ class RuleHelper extends React.Component {
 
   _functionSignature = (descriptor) => {
     const args = descriptor.params.map((p) => (p.optional ? `[${p.name}]` : p.name));
+
     return `${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`;
   }
 
@@ -78,6 +80,7 @@ class RuleHelper extends React.Component {
 
     return descriptors.map((d) => {
       let details = null;
+
       if (expanded[d.name]) {
         details = (
           <tr>
@@ -130,11 +133,13 @@ class RuleHelper extends React.Component {
         currentPage: pageBeforeFilter || 1,
         pageBeforeFilter: undefined,
       });
+
       return;
     }
 
     const filteredDescriptiors = functionDescriptors.filter((descriptor) => {
       const regexp = RegExp(filter);
+
       return regexp.test(this._functionSignature(descriptor)) || regexp.test(descriptor.description);
     });
 

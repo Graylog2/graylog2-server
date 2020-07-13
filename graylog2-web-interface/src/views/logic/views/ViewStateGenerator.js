@@ -56,6 +56,7 @@ const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
 
 export default async (type: ViewType, streamId: ?string) => {
   const { titles, widgets, positions } = await _defaultWidgets[type](streamId);
+
   return ViewState.create()
     .toBuilder()
     .titles(titles)

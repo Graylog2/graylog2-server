@@ -3,7 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 // $FlowFixMe should be there
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
@@ -12,7 +13,7 @@ import connect from 'stores/connect';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
 import { Icon, PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
@@ -73,6 +74,7 @@ class SavedSearchList extends React.Component<Props, State> {
 
   execSearch = () => {
     const { query, page, perPage } = this.state;
+
     SavedSearchesActions.search(query, page, perPage);
   };
 
@@ -90,12 +92,15 @@ class SavedSearchList extends React.Component<Props, State> {
 
   onLoad = (selectedSavedSearch, loadFunc) => {
     const { toggleModal } = this.props;
+
     if (!selectedSavedSearch || !loadFunc) {
       return;
     }
+
     loadFunc(selectedSavedSearch).then(() => {
       browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedSavedSearch));
     });
+
     toggleModal();
   };
 
@@ -107,6 +112,7 @@ class SavedSearchList extends React.Component<Props, State> {
 
     if (list) {
       const viewIndex = list.findIndex((v) => v.id === selectedSavedSearch);
+
       if (viewIndex < 0) {
         return;
       }

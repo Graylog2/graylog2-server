@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 import { Table } from 'components/graylog';
@@ -10,7 +10,7 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)(({ theme }) => `
+const StyledTable = styled(Table)(({ theme }) => css`
   position: relative;
   font-size: ${theme.fonts.size.small};
   margin-top: 15px;
@@ -119,7 +119,7 @@ const StyledTable = styled(Table)(({ theme }) => `
   th i.sort-order-item {
     margin-right: 2px;
     color: ${theme.colors.gray[10]};
-    visiblity: hidden;
+    visibility: hidden;
   }
 
   th i.sort-order-active,

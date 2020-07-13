@@ -24,30 +24,38 @@ describe('QueryTitle', () => {
       })).build(),
     }))
     .build();
+
   it('returns actual name of first tab', () => {
     expect(queryTitle(view, 'foo')).toEqual('The Fabulous Foo Tab');
   });
+
   it('returns generated name of nameless second tab', () => {
     expect(queryTitle(view, 'bar')).toEqual('Page#2');
   });
+
   it('returns actual name of third tab', () => {
     expect(queryTitle(view, 'baz')).toEqual('The Incredible Other Tab');
   });
+
   it('returns `undefined` for missing tab', () => {
     expect(queryTitle(view, 'qux')).toEqual(undefined);
   });
+
   it('returns `undefined` if query id is `undefined`', () => {
     // $FlowFixMe: passing invalid values on purpose
     expect(queryTitle(view, undefined)).toEqual(undefined);
   });
+
   it('returns `undefined` if view is `undefined`', () => {
     // $FlowFixMe: passing invalid values on purpose
     expect(queryTitle(undefined, undefined)).toEqual(undefined);
   });
+
   it('returns `undefined` if search is `undefined`', () => {
     // $FlowFixMe: passing invalid values on purpose
     expect(queryTitle(View.create(), undefined)).toEqual(undefined);
   });
+
   it('returns `undefined` if queries are `undefined`', () => {
     expect(queryTitle(View.create()
       .toBuilder()

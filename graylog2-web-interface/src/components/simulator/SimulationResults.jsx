@@ -22,6 +22,7 @@ const VIEW_OPTIONS = {
 class SimulationResults extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       viewOption: VIEW_OPTIONS.SIMULATION_SUMMARY,
     };
@@ -37,6 +38,7 @@ class SimulationResults extends React.Component {
 
   _changeViewOptions = (eventKey) => {
     const selectedOption = Object.keys(VIEW_OPTIONS).find((key) => VIEW_OPTIONS[key] === eventKey);
+
     this.setState({ viewOption: VIEW_OPTIONS[selectedOption] });
   };
 
@@ -48,6 +50,7 @@ class SimulationResults extends React.Component {
 
   _getViewOptionsMenuItem = (option, text) => {
     const { viewOption } = this.state;
+
     return (
       <MenuItem key={option} eventKey={option} active={viewOption === option}>
         {text}
@@ -57,11 +60,13 @@ class SimulationResults extends React.Component {
 
   _getViewComponent = (streams) => {
     const { simulationResults, isLoading, originalMessage } = this.props;
+
     if (isLoading || !simulationResults) {
       return <Spinner />;
     }
 
     const { viewOption } = this.state;
+
     switch (viewOption) {
       case VIEW_OPTIONS.SIMULATION_PREVIEW:
         return <SimulationPreview simulationResults={simulationResults} streams={streams} />;
@@ -81,6 +86,7 @@ class SimulationResults extends React.Component {
 
   render() {
     const { stream, simulationResults, isLoading, error, originalMessage } = this.props;
+
     if (!originalMessage && !simulationResults) {
       return null;
     }

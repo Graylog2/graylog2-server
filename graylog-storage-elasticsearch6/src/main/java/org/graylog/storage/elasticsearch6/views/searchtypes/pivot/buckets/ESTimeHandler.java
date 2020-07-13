@@ -18,11 +18,11 @@ package org.graylog.storage.elasticsearch6.views.searchtypes.pivot.buckets;
 
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.shaded.elasticsearch5.org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.storage.elasticsearch6.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch6.views.searchtypes.pivot.ESPivot;

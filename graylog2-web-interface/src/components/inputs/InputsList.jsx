@@ -94,6 +94,7 @@ const InputsList = createReactClass({
       globalInputs: globalInputs,
       localInputs: localInputs,
     });
+
     this._onFilterInputs(this.state.filter);
   },
 
@@ -118,6 +119,7 @@ const InputsList = createReactClass({
       if (resetLoadingState) {
         resetLoadingState();
       }
+
       return;
     }
 
@@ -127,22 +129,27 @@ const InputsList = createReactClass({
         filteredLocalInputs: localInputs,
         filter: undefined,
       });
+
       if (resetLoadingState) {
         resetLoadingState();
       }
+
       return;
     }
 
     const filterMethod = (input) => {
       return regExp.test(input.title);
     };
+
     const filteredGlobalInputs = this.state.globalInputs.filter(filterMethod);
     const filteredLocalInputs = this.state.localInputs.filter(filterMethod);
+
     this.setState({
       filteredGlobalInputs: filteredGlobalInputs,
       filteredLocalInputs: filteredLocalInputs,
       filter: filter,
     });
+
     if (resetLoadingState) {
       resetLoadingState();
     }
@@ -150,6 +157,7 @@ const InputsList = createReactClass({
 
   _onFilterReset() {
     const { globalInputs, localInputs } = this.state;
+
     this.setState({
       filteredGlobalInputs: globalInputs,
       filteredLocalInputs: localInputs,

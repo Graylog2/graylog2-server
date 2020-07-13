@@ -9,38 +9,38 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 describe('Field', () => {
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive) => ({ children, ...props }) => (
+    const component = (interactive) => (props) => (
       <InteractiveContext.Provider value={interactive}>
-        <Field {...props}>
-          {children}
-        </Field>
+        <Field {...props} />
       </InteractiveContext.Provider>
     );
-    it('does not show value actions if interactive context is `false`', () => {
+
+    it('does not show value actions for field if interactive context is `false`', () => {
       const NoninteractiveComponent = component(false);
-      const wrapper = mount((
-        <NoninteractiveComponent name="foo"
+      const wrapper = mount(
+        <NoninteractiveComponent name="Field name"
                                  queryId="someQueryId"
                                  type={FieldType.Unknown}>
-          Foo
-        </NoninteractiveComponent>
-      ));
+          Field options like sorting
+        </NoninteractiveComponent>,
+      );
       const fieldActions = wrapper.find('FieldActions');
+
       expect(fieldActions).not.toExist();
-      expect(wrapper).toHaveText('Foo');
+      expect(wrapper).toHaveText('Field name Field options like sorting');
     });
-    it('shows value actions if interactive context is `true`', () => {
+
+    it('shows value actions for field if interactive context is `true`', () => {
       const InteractiveComponent = component(true);
-      const wrapper = mount((
-        <InteractiveComponent name="foo"
+      const wrapper = mount(
+        <InteractiveComponent name="Field name"
                               queryId="someQueryId"
-                              type={FieldType.Unknown}>
-          Foo
-        </InteractiveComponent>
-      ));
+                              type={FieldType.Unknown} />,
+      );
       const fieldActions = wrapper.find('FieldActions');
+
       expect(fieldActions).toExist();
-      expect(wrapper).toHaveText('Foo');
+      expect(wrapper).toHaveText('Field name');
     });
   });
 });

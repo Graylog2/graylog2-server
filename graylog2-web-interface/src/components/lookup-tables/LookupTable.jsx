@@ -35,6 +35,7 @@ class LookupTable extends React.Component {
 
   _onPurgeKey = (e) => {
     e.preventDefault();
+
     if (this.state.purgeKey && this.state.purgeKey.length > 0) {
       LookupTablesActions.purgeKey(this.props.table, this.state.purgeKey);
     }
@@ -47,6 +48,7 @@ class LookupTable extends React.Component {
 
   _lookupKey = (e) => {
     e.preventDefault();
+
     LookupTablesActions.lookup(this.props.table.name, this.state.lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });

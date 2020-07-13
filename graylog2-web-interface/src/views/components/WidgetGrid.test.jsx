@@ -11,6 +11,7 @@ import WidgetGrid from './WidgetGrid';
 jest.mock('./widgets/Widget', () => () => 'widget');
 // eslint-disable-next-line react/prop-types
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <react-grid-container-mock>{children}</react-grid-container-mock>);
+
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
     exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
@@ -40,6 +41,7 @@ describe('<WidgetGrid />', () => {
                   widgets={{}}
                   fields={Immutable.List()} />
     ));
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -67,6 +69,7 @@ describe('<WidgetGrid />', () => {
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
+
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 
@@ -93,6 +96,7 @@ describe('<WidgetGrid />', () => {
                   fields={Immutable.List()}
                   onPositionsChange={() => {}} />
     ));
+
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 });

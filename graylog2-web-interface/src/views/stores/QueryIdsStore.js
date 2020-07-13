@@ -18,6 +18,7 @@ export const QueryIdsStore = singletonStore(
     },
     onQueriesStoreUpdate(queries) {
       const newState = queries.keySeq().toList();
+
       if (!isEqual(this.state, newState)) {
         this.state = newState;
         this._trigger();

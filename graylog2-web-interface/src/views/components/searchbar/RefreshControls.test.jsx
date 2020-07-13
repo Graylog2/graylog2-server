@@ -9,6 +9,7 @@ import RefreshControls from './RefreshControls';
 jest.useFakeTimers();
 
 jest.mock('stores/connect', () => (Component) => (props) => <Component {...({ ...props })} />);
+
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
     enable: jest.fn(),
@@ -17,11 +18,11 @@ jest.mock('views/stores/RefreshStore', () => ({
   RefreshStore: {},
 }));
 
-
 describe('RefreshControls', () => {
   describe('rendering', () => {
     const verifyRendering = ({ enabled, interval }) => {
       const wrapper = mount(<RefreshControls refreshConfig={{ enabled, interval }} />);
+
       expect(wrapper).toMatchSnapshot();
     };
 
@@ -41,13 +42,17 @@ describe('RefreshControls', () => {
 
   it('should start the interval', () => {
     const wrapper = mount(<RefreshControls refreshConfig={{ enabled: false, interval: 1000 }} />);
+
     wrapper.find('svg.fa-play').simulate('click');
+
     expect(RefreshActions.enable).toHaveBeenCalled();
   });
 
   it('should stop the interval', () => {
     const wrapper = mount(<RefreshControls refreshConfig={{ enabled: true, interval: 1000 }} />);
+
     wrapper.find('svg.fa-pause').simulate('click');
+
     expect(RefreshActions.disable).toHaveBeenCalled();
   });
 });
