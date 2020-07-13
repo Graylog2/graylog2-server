@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { UserJSON } from 'stores/users/UsersStore.js';
+import type { UserJSON } from 'stores/users/UsersStore';
 
 type InternalState = {
   id: string,
@@ -19,7 +19,6 @@ type InternalState = {
 export default class UserOverview {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     id: $PropertyType<InternalState, 'id'>,
     username: $PropertyType<InternalState, 'username'>,
@@ -115,7 +114,6 @@ export default class UserOverview {
     }));
   }
 
-  // eslint-disable-next-line no-undef
   static create(
     id: $PropertyType<InternalState, 'id'>,
     username: $PropertyType<InternalState, 'username'>,
@@ -179,32 +177,27 @@ export default class UserOverview {
     const {
       id,
       username,
-      // eslint-disable-next-line camelcase
-      full_name,
+      full_name: fullName,
       email,
       roles,
-      // eslint-disable-next-line camelcase
-      read_only,
+      read_only: readOnly,
       external,
-      // eslint-disable-next-line camelcase
-      session_active,
-      // eslint-disable-next-line camelcase
-      client_address,
-      // eslint-disable-next-line camelcase
-      last_activity,
+      session_active: sessionActive,
+      client_address: clientAddress,
+      last_activity: lastActivity,
     } = value;
 
     return UserOverview.create(
       id,
       username,
-      full_name,
+      fullName,
       email,
       Immutable.List(roles),
-      read_only,
+      readOnly,
       external,
-      session_active,
-      client_address,
-      last_activity,
+      sessionActive,
+      clientAddress,
+      lastActivity,
     );
   }
 
@@ -224,52 +217,42 @@ class Builder {
     this.value = value;
   }
 
-  // eslint-disable-next-line no-undef
   id(value: $PropertyType<InternalState, 'id'>) {
     return new Builder(this.value.set('id', value));
   }
 
-  // eslint-disable-next-line no-undef
   username(value: $PropertyType<InternalState, 'username'>) {
     return new Builder(this.value.set('username', value));
   }
 
-  // eslint-disable-next-line no-undef
   fullName(value: $PropertyType<InternalState, 'fullName'>) {
     return new Builder(this.value.set('fullName', value));
   }
 
-  // eslint-disable-next-line no-undef
   email(value: $PropertyType<InternalState, 'email'>) {
     return new Builder(this.value.set('email', value));
   }
 
-  // eslint-disable-next-line no-undef
   roles(value: $PropertyType<InternalState, 'roles'>) {
     return new Builder(this.value.set('roles', value));
   }
 
-  // eslint-disable-next-line no-undef
   readOnly(value: $PropertyType<InternalState, 'readOnly'>) {
     return new Builder(this.value.set('readOnly', value));
   }
 
-  // eslint-disable-next-line no-undef
   external(value: $PropertyType<InternalState, 'external'>) {
     return new Builder(this.value.set('external', value));
   }
 
-  // eslint-disable-next-line no-undef
   sessionActive(value: $PropertyType<InternalState, 'sessionActive'>) {
     return new Builder(this.value.set('sessionActive', value));
   }
 
-  // eslint-disable-next-line no-undef
   clientAddress(value: $PropertyType<InternalState, 'clientAddress'>) {
     return new Builder(this.value.set('clientAddress', value));
   }
 
-  // eslint-disable-next-line no-undef
   lastActivity(value: $PropertyType<InternalState, 'lastActivity'>) {
     return new Builder(this.value.set('lastActivity', value));
   }

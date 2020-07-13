@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { UserJSON } from 'stores/users/UsersStore.js';
+import type { UserJSON } from 'stores/users/UsersStore';
 
 type StartPage = {
   id: string,
