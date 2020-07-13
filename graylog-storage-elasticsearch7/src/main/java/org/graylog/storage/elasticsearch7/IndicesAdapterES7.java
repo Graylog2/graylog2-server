@@ -58,6 +58,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -272,9 +273,9 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    // TODO: needs implementation
     public Set<String> closedIndices(Collection<String> indices) {
-        return null;
+        return catApi.indices(indices, Collections.singleton("close"),
+                "Unable to retrieve list of closed indices for " + indices);
     }
 
     @Override

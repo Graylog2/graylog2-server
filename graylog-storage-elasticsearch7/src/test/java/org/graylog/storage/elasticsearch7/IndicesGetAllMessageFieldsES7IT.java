@@ -22,7 +22,7 @@ public class IndicesGetAllMessageFieldsES7IT extends IndicesGetAllMessageFieldsI
         return new IndicesAdapterES7(
                 elasticsearch.elasticsearchClient(),
                 new StatsApi(objectMapper),
-                new CatApi(objectMapper),
+                new CatApi(objectMapper, elasticsearch.elasticsearchClient()),
                 new ClusterStateApi(objectMapper)
         );
     }

@@ -11,6 +11,7 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,8 +35,13 @@ public class CatApi {
         return perform(request, new TypeReference<List<NodeResponse>>() {}, "Unable to retrieve nodes list");
     }
 
-    public Set<String> indices(String indexPattern, Collection<String> status, String errorMessage) {
-        final Request request = request("GET", "indices/" + indexPattern);
+    public Set<String> indices(String index, Collection<String> status, String errorMessage) {
+        return indices(Collections.singleton(index), status, errorMessage);
+    }
+
+    public Set<String> indices(Collection<String> indices, Collection<String> status, String errorMessage) {
+        final String joinedIndices = String.join(",", indices);
+        final Request request = request("GET", "indices/" + joinedIndices);
         request.addParameter("h", "index,status");
         request.addParameter("expand_wildcards", "all");
         request.addParameter("s", "index,status");

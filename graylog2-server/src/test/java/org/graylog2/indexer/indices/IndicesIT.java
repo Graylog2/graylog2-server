@@ -129,6 +129,18 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void testClosedIndices() {
+        final String index1 = client().createRandomIndex("indices_it_");
+        client().closeIndex(index1);
+        final String index2 = client().createRandomIndex("otherindices_it_");
+        client().closeIndex(index2);
+
+        final Set<String> closedIndices = indices.getClosedIndices(Collections.singleton("*"));
+
+        assertThat(closedIndices).containsExactlyInAnyOrder(index1, index2);
+    }
+
+    @Test
     public void testAliasExists() {
         final String index = client().createRandomIndex("indices_it_");
         final String alias = "graylog_alias_exists";
