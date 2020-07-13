@@ -62,7 +62,7 @@ class DataTable extends React.Component {
     children: PropTypes.node,
     /** Adds a custom class to the table element. */
     className: PropTypes.string,
-    /** Overrides the defalt filter. */
+    /** Overrides the default filter. */
     customFilter: PropTypes.node,
     /** Adds a custom class to the row element. */
     rowClassName: PropTypes.string,
