@@ -6,9 +6,10 @@ import { Spinner } from 'components/common';
 import { Col, Row } from 'components/graylog';
 import User from 'logic/users/User';
 
-import SectionComponent from '../SectionComponent';
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
+
+import SectionComponent from '../SectionComponent';
 
 const MainDetails = styled(Row)`
   margin-bottom: 0;

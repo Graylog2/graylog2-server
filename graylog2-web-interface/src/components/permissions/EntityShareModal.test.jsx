@@ -75,7 +75,7 @@ describe('EntityShareModal', () => {
     const onClose = jest.fn();
     const { getByText } = render(<SimpleEntityShareModal onClose={onClose} />);
 
-    const cancelButton = getByText('Cancel');
+    const cancelButton = getByText('Discard changes');
 
     fireEvent.click(cancelButton);
 
@@ -237,7 +237,7 @@ describe('EntityShareModal', () => {
       const deleteGrantee = async ({ grantee }) => {
         const { getByTitle } = render(<SimpleEntityShareModal />);
 
-        const deleteButton = getByTitle(`Delete sharing for ${grantee.title}`);
+        const deleteButton = getByTitle(`Remove sharing for ${grantee.title}`);
 
         fireEvent.click(deleteButton);
 

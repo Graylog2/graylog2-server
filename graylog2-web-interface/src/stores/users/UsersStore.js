@@ -137,28 +137,28 @@ const UsersStore: UsersStoreType = singletonStore(
     searchPaginated(page: number, perPage: number, query: string): Promise<UserJSON[]> {
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
-      const promise = fetch('GET', qualifyUrl(url));
+      const promise = fetch('GET', qualifyUrl(url))
+        .then((response: PaginatedResponse) => {
+          this.paginatedList = {
+            adminUser: UserOverview.fromJSON(response.context.admin_user),
+            list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+            pagination: {
+              count: response.count,
+              total: response.total,
+              page: response.page,
+              perPage: response.per_page,
+              query: response.query,
+            },
+          };
 
-      promise.then((response: PaginatedResponse) => {
-        this.paginatedList = {
-          adminUser: UserOverview.fromJSON(response.context.admin_user),
-          list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
-          pagination: {
-            count: response.count,
-            total: response.total,
-            page: response.page,
-            perPage: response.per_page,
-            query: response.query,
-          },
-        };
+          this._trigger();
 
-        this._trigger();
-
-        return response.users;
-      }).catch((errorThrown) => {
-        UserNotification.error(`Loading user list failed with status: ${errorThrown}`,
-          'Could not load user list');
-      });
+          return response.users;
+        })
+        .catch((errorThrown) => {
+          UserNotification.error(`Loading user list failed with status: ${errorThrown}`,
+            'Could not load user list');
+        });
 
       UsersActions.searchPaginated.promise(promise);
 
