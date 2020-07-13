@@ -115,9 +115,7 @@ const UsersStore: UsersStoreType = singletonStore(
 
     loadUsers(): Promise<UserJSON[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
-      const promise = fetch('GET', url);
-
-      promise.then(
+      const promise = fetch('GET', url).then(
         (response) => {
           const { users } = response;
 
