@@ -1,6 +1,8 @@
 // @flow strict
 import * as React from 'react';
+import { Link } from 'react-router';
 
+import Routes from 'routing/Routes';
 import UserOverview from 'logic/users/UserOverview';
 
 import ActionsCell from './ActionsCell';
@@ -30,7 +32,11 @@ const UsersOverviewItem = ({
       <LoggedInCell lastActivity={lastActivity}
                     clientAddress={clientAddress}
                     sessionActive={sessionActive} />
-      <td className="limited">{fullName}</td>
+      <td className="limited">
+        <Link to={Routes.SYSTEM.USERS.show(username)}>
+          {fullName}
+        </Link>
+      </td>
       <td className="limited">{username}</td>
       <td className="limited">{email}</td>
       <td className="limited">{clientAddress}</td>

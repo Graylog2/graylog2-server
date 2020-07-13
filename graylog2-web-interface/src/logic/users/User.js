@@ -110,6 +110,46 @@ export default class User {
     return this._value.sessionTimeoutMs;
   }
 
+  get sessionTimeout() {
+    if (!this.sessionTimeoutMs) {
+      return undefined;
+    }
+
+    const MS_DAY = 24 * 60 * 60 * 1000;
+    const MS_HOUR = 60 * 60 * 1000;
+    const MS_MINUTE = 60 * 1000;
+    const MS_SECOND = 1000;
+
+    const _estimateUnit = (value) => {
+      if (value === 0) {
+        return [MS_SECOND, 'Seconds'];
+      }
+
+      if (value % MS_DAY === 0) {
+        return [MS_DAY, 'Days'];
+      }
+
+      if (value % MS_HOUR === 0) {
+        return [MS_HOUR, 'Hours'];
+      }
+
+      if (value % MS_MINUTE === 0) {
+        return [MS_MINUTE, 'Minutes'];
+      }
+
+      return [MS_SECOND, 'Seconds'];
+    };
+
+    const unit = _estimateUnit(this.sessionTimeoutMs);
+    const value = Math.floor(this.sessionTimeoutMs / unit[0]);
+
+    return {
+      value,
+      unitMS: unit[0],
+      unitString: unit[1],
+    };
+  }
+
   get startpage() {
     return this._value.startpage;
   }

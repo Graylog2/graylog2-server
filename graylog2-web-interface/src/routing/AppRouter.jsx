@@ -81,6 +81,7 @@ import {
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
+  UserDetailsPage,
   UsersOverviewPage,
   UsersPage,
 } from 'pages';
@@ -214,6 +215,7 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
               <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
+              <Route path={Routes.SYSTEM.USERS.show(':username')} component={UserDetailsPage} />
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
