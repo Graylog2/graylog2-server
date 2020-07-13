@@ -20,7 +20,6 @@ import org.graylog.plugins.views.search.views.DashboardService;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.inputs.InputService;
 import org.graylog2.security.ldap.LdapSettingsService;
@@ -52,7 +51,6 @@ public class ClusterStatsService {
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final DashboardService dashboardService;
     private final Cluster cluster;
-    private final IndexSetRegistry indexSetRegistry;
 
     @Inject
     public ClusterStatsService(MongoProbe mongoProbe,
@@ -66,9 +64,7 @@ public class ClusterStatsService {
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                DashboardService dashboardService,
-                               IndexSetRegistry indexSetRegistry,
                                Cluster cluster) {
-        this.indexSetRegistry = indexSetRegistry;
         this.mongoProbe = mongoProbe;
         this.userService = userService;
         this.inputService = inputService;
