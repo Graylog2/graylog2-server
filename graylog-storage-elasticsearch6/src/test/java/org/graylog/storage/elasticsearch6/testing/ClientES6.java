@@ -128,14 +128,6 @@ public class ClientES6 implements Client {
         return response.getJsonObject();
     }
 
-    public JsonNode getTemplate(String templateName) {
-        final GetTemplate templateRequest = new GetTemplate.Builder(templateName).build();
-        final JestResult templateResponse =
-                executeWithExpectedSuccess(templateRequest, "failed to get template " + templateName);
-
-        return templateResponse.getJsonObject();
-    }
-
     @Override
     public boolean templateExists(String templateName) {
         final GetTemplate templateRequest = new GetTemplate.Builder(templateName).build();
@@ -249,14 +241,6 @@ public class ClientES6 implements Client {
 
     private String[] metadataFieldNamesFor(JsonNode result, String templates) {
         return toArray(result.get("metadata").get(templates).fieldNames(), String.class);
-    }
-
-    @Override
-    public boolean isSourceEnabled(String testIndexName) {
-        final JsonNode indexMappings = getMapping(testIndexName);
-        final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
-
-        return mapping.path("_source").path("enabled").asBoolean();
     }
 
     @Override

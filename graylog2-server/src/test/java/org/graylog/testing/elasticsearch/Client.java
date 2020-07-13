@@ -56,8 +56,6 @@ public interface Client {
 
     void cleanUp();
 
-    boolean isSourceEnabled(String testIndexName);
-
     String fieldType(String testIndexName, String source);
 
     void putSetting(String setting, String value);
