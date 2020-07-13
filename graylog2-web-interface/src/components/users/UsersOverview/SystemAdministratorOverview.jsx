@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 
-import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
 import { DataTable } from 'components/common';
 import { Col, Row } from 'components/graylog';
 
 type Props = {
-  adminUser: User,
-  dataRowFormatter: (user: User) => React.Node,
+  adminUser: UserOverview,
+  dataRowFormatter: (user: UserOverview) => React.Node,
   headerCellFormatter: (header: string) => React.Node,
   headers: Array<string>,
 };

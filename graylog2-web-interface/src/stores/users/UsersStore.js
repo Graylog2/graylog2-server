@@ -10,7 +10,7 @@ import UserNotification from 'util/UserNotification';
 import UsersActions from 'actions/users/UsersActions';
 import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
-import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
 
 const DEFAULT_PAGINATION = {
   count: undefined,
@@ -79,8 +79,8 @@ type PaginatedResponse = {
 
 type UsersStoreState = {
   paginatedList: {
-    adminUser: ?User,
-    list: ?Immutable.List<User>,
+    adminUser: ?UserOverview,
+    list: ?Immutable.List<UserOverview>,
     pagination: PaginationType,
   },
 };
@@ -138,8 +138,8 @@ const UsersStore: UsersStoreType = singletonStore(
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedResponse) => {
           this.paginatedList = {
-            adminUser: User.fromJSON(response.context.admin_user),
-            list: Immutable.List(response.users.map((user) => User.fromJSON(user))),
+            adminUser: UserOverview.fromJSON(response.context.admin_user),
+            list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
             pagination: {
               count: response.count,
               total: response.total,

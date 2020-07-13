@@ -2,15 +2,15 @@
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
 import type { ThemeInterface } from 'theme';
 import { OverlayTrigger, Popover } from 'components/graylog';
 import { Timestamp, Icon } from 'components/common';
 
 type Props = {
-  lastActivity: $PropertyType<User, 'lastActivity'>,
-  clientAddress: $PropertyType<User, 'clientAddress'>,
-  sessionActive: $PropertyType<User, 'sessionActive'>,
+  lastActivity: $PropertyType<UserOverview, 'lastActivity'>,
+  clientAddress: $PropertyType<UserOverview, 'clientAddress'>,
+  sessionActive: $PropertyType<UserOverview, 'sessionActive'>,
 };
 
 const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
