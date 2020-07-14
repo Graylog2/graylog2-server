@@ -47,6 +47,7 @@ public abstract class AuthzRoleDTO {
     public abstract String name();
 
     @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
     public abstract String description();
 
     @JsonProperty(FIELD_PERMISSIONS)
@@ -90,4 +91,3 @@ public abstract class AuthzRoleDTO {
         public abstract AuthzRoleDTO build();
     }
 }
-
