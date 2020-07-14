@@ -12,6 +12,7 @@ describe('ViewTypeLabel', () => {
 
     expect(getByText('search')).not.toBe(null);
   });
+
   it('should create correct label for view type dasboard', () => {
     const { getByText } = render(<ViewTypeLabel type={View.Type.Dashboard} />);
 

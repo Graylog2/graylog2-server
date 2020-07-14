@@ -70,6 +70,7 @@ describe('FieldSortIcon', () => {
     expect(setLoadingStateStub).toHaveBeenCalledWith(true);
 
     await waitFor(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
+
     expect(setLoadingStateStub).toHaveBeenCalledTimes(2);
   });
 });

@@ -40,6 +40,7 @@ describe('ShowMessagePage', () => {
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
 
     await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
+
     expect(container).toMatchSnapshot();
   });
 
@@ -49,6 +50,7 @@ describe('ShowMessagePage', () => {
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'gl-events_0', messageId: '01DFZQ64CMGV30NT7DW2P7HQX2' }} />);
 
     await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
+
     expect(container).toMatchSnapshot();
   });
 });

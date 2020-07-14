@@ -112,6 +112,7 @@ describe('MigrateFieldCharts', () => {
       const { queryByText } = renderAndMigrate();
 
       await waitFor(() => expect(queryByText('Migrate existing search page charts')).toBeNull());
+
       expect(Store.set).toHaveBeenCalledWith('pinned-field-charts-migrated', 'finished');
     });
 
@@ -129,6 +130,7 @@ describe('MigrateFieldCharts', () => {
       const actionMock = asMock(ViewStatesActions.update);
 
       await waitFor(() => expect(actionMock.mock.calls[0][1].widgets.size).toEqual(3));
+
       expect(getNewWidgetPos(actionMock)).toEqual(expWidgetPos);
     });
 
@@ -146,6 +148,7 @@ describe('MigrateFieldCharts', () => {
       Store.get.mockImplementation(mockStoreGet({ interval: 'month' }));
       renderAndMigrate();
       await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).rowPivots[0].config).toEqual(expPivotConfig));
+
       expect(getNewWidgetConfig(ViewStatesActions.update).rowPivots[0].config).toEqual(expPivotConfig);
     });
 
@@ -197,6 +200,7 @@ describe('MigrateFieldCharts', () => {
       Store.get.mockImplementation(mockStoreGet({ renderer: 'bar' }));
       renderAndMigrate();
       await waitFor(() => expect(getNewWidgetConfig(ViewStatesActions.update).visualizationConfig).toEqual(undefined));
+
       expect(getNewWidgetConfig(ViewStatesActions.update).visualization).toEqual('bar');
     });
 

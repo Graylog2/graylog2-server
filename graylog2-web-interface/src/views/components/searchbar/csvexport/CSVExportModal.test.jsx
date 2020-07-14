@@ -201,6 +201,7 @@ describe('CSVExportModal', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(exportSearchTypeMessagesAction).toHaveBeenCalledTimes(1));
+
     expect(exportSearchTypeMessagesAction).toHaveBeenCalledWith(
       {
         ...payload,
@@ -240,6 +241,7 @@ describe('CSVExportModal', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => expect(exportSearchMessagesAction).toHaveBeenCalledTimes(1));
+
       expect(exportSearchMessagesAction).toHaveBeenCalledWith(
         {
           ...payload,
@@ -272,6 +274,7 @@ describe('CSVExportModal', () => {
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
+
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
 
@@ -306,6 +309,7 @@ describe('CSVExportModal', () => {
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
+
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
   });
@@ -378,6 +382,7 @@ describe('CSVExportModal', () => {
 
       fireEvent.click(submitButton);
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
+
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(payload, 'search-id', 'search-type-id-1', 'Widget-1-search-result');
     });
   });

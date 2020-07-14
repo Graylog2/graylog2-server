@@ -54,6 +54,7 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
+
     expect(getByText('Something went wrong.')).not.toBeNull();
     expect(getByText('The error message')).not.toBeNull();
   });
@@ -67,6 +68,7 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
+
     expect(getByText('Page not found')).not.toBeNull();
     expect(getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull();
   });
@@ -80,6 +82,7 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
+
     expect(getByText('Something went wrong')).not.toBeNull();
     expect(getByText(/The error message/)).not.toBeNull();
   });
@@ -93,6 +96,7 @@ describe('ReportedErrorBoundary', () => {
     });
 
     await waitFor(() => expect(queryByText('Hello World!')).toBeNull());
+
     expect(getByText('Missing Permissions')).not.toBeNull();
     expect(getByText(/The request error message/)).not.toBeNull();
   });

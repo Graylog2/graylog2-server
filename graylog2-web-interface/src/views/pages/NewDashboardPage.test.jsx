@@ -64,6 +64,7 @@ describe('NewDashboardPage', () => {
     ));
 
     await findByText('Extended search page');
+
     expect(loedViewMock).toHaveBeenCalledTimes(1);
     expect(loedViewMock.mock.calls[0][0].type).toStrictEqual(View.Type.Dashboard);
   });
@@ -86,6 +87,7 @@ describe('NewDashboardPage', () => {
     ));
 
     await findByText('Extended search page');
+
     expect(processHooksAction).toBeCalledTimes(1);
     expect(processHooksAction.mock.calls[0][3]).toStrictEqual({ q: '', rangetype: 'relative', relative: '300' });
   });
@@ -101,6 +103,7 @@ describe('NewDashboardPage', () => {
     ));
 
     await findByText('Extended search page');
+
     expect(ViewActions.load).toHaveBeenCalledTimes(0);
   });
 });

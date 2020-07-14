@@ -55,6 +55,7 @@ describe('DashboardSearchBar', () => {
     expect(getByText('Search in last five minutes')).toBeVisible();
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', range: 300 }, ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 
@@ -100,6 +101,7 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'keyword', keyword: 'Last five minutes' }, ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 
@@ -118,6 +120,7 @@ describe('DashboardSearchBar', () => {
     fireEvent.click(searchButton);
 
     await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, ''));
+
     expect(onExecute).toHaveBeenCalled();
   });
 });

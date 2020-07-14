@@ -334,6 +334,7 @@ describe('<Widget />', () => {
         .id('new-id').type(View.Type.Dashboard)
         .build());
     });
+
     const renderAndClick = () => {
       const { getByText, getByTestId } = render(<DummyWidget />);
       const actionToggle = getByTestId('widgetActionDropDown');
@@ -353,18 +354,21 @@ describe('<Widget />', () => {
     it('should get dashboard from backend', async () => {
       renderAndClick();
       await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+
       expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
     });
 
     it('should get corresponding search to dashboard', async () => {
       renderAndClick();
       await waitFor(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
+
       expect(SearchActions.get).toHaveBeenCalledWith('search-1');
     });
 
     it('should create new search for dashboard', async () => {
       renderAndClick();
       await waitFor(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
+
       expect(SearchActions.create).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
         .build());
     });
@@ -372,6 +376,7 @@ describe('<Widget />', () => {
     it('should update dashboard with new search and widget', async () => {
       renderAndClick();
       await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
+
       expect(ViewManagementActions.update).toHaveBeenCalledWith(
         View.builder()
           .search(Search.builder().id('search-1').build())
@@ -383,6 +388,7 @@ describe('<Widget />', () => {
     it('should redirect to updated dashboard', async () => {
       renderAndClick();
       await waitFor(() => expect(browserHistory.push).toHaveBeenCalledTimes(1));
+
       expect(browserHistory.push).toHaveBeenCalledWith('DASHBOARDS_VIEWID-view-1');
     });
   });
