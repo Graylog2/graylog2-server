@@ -80,7 +80,7 @@ public abstract class AuthzRoleDTO {
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_DESCRIPTION)
-        public abstract Builder description(String description);
+        public abstract Builder description(@Nullable String description);
 
         @JsonProperty(FIELD_PERMISSIONS)
         public abstract Builder permissions(Set<String> permissions);
