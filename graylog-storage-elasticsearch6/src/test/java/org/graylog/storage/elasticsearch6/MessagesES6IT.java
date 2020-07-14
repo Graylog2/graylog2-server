@@ -1,25 +1,26 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog.storage.elasticsearch6.testing.ElasticsearchInstanceES6;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog.storage.elasticsearch6.jest.JestUtils;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
@@ -27,6 +28,8 @@ import static org.graylog.storage.elasticsearch6.testing.TestUtils.jestClient;
 public class MessagesES6IT extends MessagesIT {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
+
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Override
     protected ElasticsearchInstance elasticsearch() {
@@ -37,7 +40,7 @@ public class MessagesES6IT extends MessagesIT {
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry, new ChunkedBulkIndexer());
+        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry, new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override
@@ -50,7 +53,7 @@ public class MessagesES6IT extends MessagesIT {
 
     @Test
     public void getResultDoesNotContainJestMetadataFields() throws Exception {
-        final String index = UUID.randomUUID().toString();
+        final String index = client().createRandomIndex("random");
         final Map<String, Object> source = new HashMap<>();
         source.put("message", "message");
         source.put("source", "source");

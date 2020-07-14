@@ -122,7 +122,11 @@ public class Messages {
                 .map(entry -> IndexingRequest.create(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, messageList.size());
+        return bulkIndexRequests(indexingRequestList, isSystemTraffic);
+    }
+
+    public List<String> bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic) {
+        final List<IndexingError> indexingErrors = runBulkRequest(indexingRequestList, indexingRequestList.size());
 
         final Set<IndexingError> remainingErrors = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingErrors);
 
@@ -208,7 +212,7 @@ public class Messages {
     private void accountTotalMessageSizes(List<IndexingRequest> requests, boolean isSystemTraffic) {
         final long totalSizeOfIndexedMessages = requests.stream()
                 .map(IndexingRequest::message)
-                .mapToLong(Message::getSize)
+                .mapToLong(Indexable::getSize)
                 .sum();
 
         if (isSystemTraffic) {
@@ -220,7 +224,7 @@ public class Messages {
 
     private void recordTimestamp(List<IndexingRequest> messageList) {
         for (final IndexingRequest entry : messageList) {
-            final Message message = entry.message();
+            final Indexable message = entry.message();
 
             processingStatusRecorder.updatePostIndexingReceiveTime(message.getReceiveTime());
         }
@@ -258,21 +262,21 @@ public class Messages {
             MappingError,
             Unknown;
         }
-        public abstract Message message();
+        public abstract Indexable message();
         public abstract String index();
         public abstract ErrorType errorType();
         public abstract String errorMessage();
 
-        public static IndexingError create(Message message, String index, ErrorType errorType, String errorMessage) {
+        public static IndexingError create(Indexable message, String index, ErrorType errorType, String errorMessage) {
             return new AutoValue_Messages_IndexingError(message, index, errorType, errorMessage);
         }
 
-        public static IndexingError create(Message message, String index) {
+        public static IndexingError create(Indexable message, String index) {
             return create(message, index, ErrorType.Unknown, "");
         }
 
         public IndexFailure toIndexFailure() {
-            final Message message = this.message();
+            final Indexable message = this.message();
             final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
                     .put("letter_id", message.getId())
                     .put("index", this.index())

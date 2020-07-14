@@ -2,8 +2,6 @@ package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.MainResponse;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
@@ -57,9 +55,5 @@ public class ClusterES7IT extends ClusterIT {
 
     private CatApi catApi() {
         return new CatApi(new ObjectMapperProvider().get(), elasticsearch.elasticsearchClient());
-    }
-
-    private MainResponse info() {
-        return elasticsearch.elasticsearchClient().execute(RestHighLevelClient::info);
     }
 }

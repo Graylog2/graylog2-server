@@ -1,14 +1,21 @@
 package org.graylog.storage.elasticsearch7.cat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CatApi {
     private final ObjectMapper objectMapper;
@@ -28,6 +35,40 @@ public class CatApi {
         return perform(request, new TypeReference<List<NodeResponse>>() {}, "Unable to retrieve nodes list");
     }
 
+    public Set<String> indices(String index, Collection<String> status, String errorMessage) {
+        return indices(Collections.singleton(index), status, errorMessage);
+    }
+
+    public Set<String> indices(Collection<String> indices, Collection<String> status, String errorMessage) {
+        final String joinedIndices = String.join(",", indices);
+        final JsonNode jsonResponse = requestIndices(joinedIndices, errorMessage);
+
+        //noinspection UnstableApiUsage
+        return Streams.stream(jsonResponse.elements())
+                .filter(index -> status.isEmpty() || status.contains(index.path("status").asText()))
+                .map(index -> index.path("index").asText())
+                .collect(Collectors.toSet());
+    }
+
+    public Optional<String> indexState(String indexName, String errorMessage) {
+        final JsonNode jsonResponse = requestIndices(indexName, errorMessage);
+
+        //noinspection UnstableApiUsage
+        return Streams.stream(jsonResponse.elements())
+                .filter(index -> index.path("index").asText().equals(indexName))
+                .map(index -> index.path("status").asText())
+                .findFirst();
+    }
+
+    private JsonNode requestIndices(String indexName, String errorMessage) {
+        final Request request = request("GET", "indices/" + indexName);
+        request.addParameter("h", "index,status");
+        request.addParameter("expand_wildcards", "all");
+        request.addParameter("s", "index,status");
+
+        return perform(request, new TypeReference<JsonNode>() {}, errorMessage);
+    }
+
     private <R> R perform(Request request, TypeReference<R> responseClass, String errorMessage) {
         return client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
@@ -41,7 +82,7 @@ public class CatApi {
         return objectMapper.readValue(response.getEntity().getContent(), responseClass);
     }
 
-    private Request request(String method, String endpoint) {
+    private Request request(@SuppressWarnings("SameParameterValue") String method, String endpoint) {
         final Request request = new Request(method, "/_cat/" + endpoint);
         request.addParameter("format", "json");
 
