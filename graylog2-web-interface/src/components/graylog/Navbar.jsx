@@ -26,7 +26,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   .navbar-nav {
     > li > a,
     > li > .btn-link {
-      color: ${theme.colors.variant.dark.info};
+      color: ${theme.colors.variant.darker.info};
 
       &:hover,
       &:focus {

@@ -20,62 +20,66 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   position: absolute;
   padding: 5px 10px;
   left: 100%;
+  top: 5px;
+  height: 30px;
   font-size: ${theme.fonts.size.body};
   color: white;
   background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
   z-index: 4;
 `);
 
-const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => css`
+const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   display: flex;
+  width: 100%;
+  height: 100%;
   align-items: center;
   justify-content: center;
+  position: relative;
+`);
+
+const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
   height: 40px;
-
   text-align: center;
   cursor: pointer;
   font-size: ${theme.fonts.size.h3};
-  color: ${isSelected ? theme.colors.variant.light.danger : 'inherit'};
+  color: ${isSelected ? theme.colors.variant.dark.primary : theme.colors.variant.darker.info};
+  background: ${isSelected ? theme.colors.variant.lighter.info : 'transparent'};
 
   :hover {
-    background: ${theme.colors.gray[30]};
+    background: ${isSelected ? theme.colors.variant.lighter.info : theme.colors.variant.lightest.info};
 
-    > * {
-      display: block;
+    ${Title} {
+      display: ${(!isSelected && showTitleOnHover) ? 'block' : 'none'};
+    }
+
+    ${IconWrap}::after {
+      display: ${(showTitleOnHover) ? 'block' : 'none'};
     }
   }
 
   :active {
-    background: ${theme.colors.gray[20]};
+    background: ${theme.colors.variant.lighter.info};
   }
 
-  &::after {
-    content: ' ';
-    display: ${isSelected ? 'block' : 'none'};
-    position: absolute;
-    right: 0;
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-right: 10px solid white;
-    border-bottom: 10px solid transparent;
+  ${IconWrap} {
+    overflow: ${isSelected ? 'unset' : 'hidden'};
+
+    ::after {
+      content: ' ';
+      display: ${isSelected ? 'block' : 'none'};
+      position: absolute;
+      right: -8px;
+      top: calc(50% - 8px);
+      width: 16px;
+      height: 16px;
+      transform: rotate(45deg);
+      box-shadow: ${isSelected ? 'inset 3px -3px 2px 0px rgba(0,0,0,0.25)' : 'none'};
+      background-color: ${isSelected ? theme.colors.global.contentBackground : theme.colors.variant.light.info};
+    }
   }
-
-  ${((!isSelected && showTitleOnHover) ? `
-    :hover::after {
-      display: block;
-      border-right-color: currentColor;
-    }
-
-    :active {
-      &::after, > div {
-        display: none;
-      }
-    }
-  ` : '')}
 `);
 
 const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
@@ -85,7 +89,7 @@ const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) 
                onClick={onClick}
                showTitleOnHover={showTitleOnHover}
                title={showTitleOnHover ? '' : title}>
-      <Icon name={icon} />
+      <IconWrap><Icon name={icon} /></IconWrap>
       {(showTitleOnHover && !isSelected) && <Title>{title}</Title>}
     </Container>
   );
