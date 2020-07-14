@@ -13,7 +13,7 @@ import history from 'util/History';
 import StoreProvider from 'injection/StoreProvider';
 import { Button, Row, Col, Alert, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import TimeoutInput from 'components/users/TimeoutInput';
+import LegacyTimeoutInput from 'components/users/LegacyTimeoutInput';
 import EditRolesForm from 'components/users/EditRolesForm';
 import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
@@ -314,11 +314,11 @@ const UserForm = createReactClass({
                   </span>
                 </IfPermitted>
                 <IfPermitted permissions="*">
-                  <TimeoutInput ref={(session_timeout_ms) => { this.inputs.session_timeout_ms = session_timeout_ms; }}
-                                value={user.session_timeout_ms}
-                                labelSize={3}
-                                controlSize={9}
-                                onChange={this._onFieldChange('session_timeout_ms')} />
+                  <LegacyTimeoutInput ref={(session_timeout_ms) => { this.inputs.session_timeout_ms = session_timeout_ms; }}
+                                      value={user.session_timeout_ms}
+                                      labelSize={3}
+                                      controlSize={9}
+                                      onChange={this._onFieldChange('session_timeout_ms')} />
                 </IfPermitted>
 
                 <Input id="timezone-select"
