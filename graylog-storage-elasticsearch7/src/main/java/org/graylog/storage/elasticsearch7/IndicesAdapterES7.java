@@ -430,7 +430,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    // TODO: Should this be moved to ClusterAdapter?
     public HealthStatus waitForRecovery(String index) {
         final ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest(index);
         clusterHealthRequest.waitForGreenStatus();
