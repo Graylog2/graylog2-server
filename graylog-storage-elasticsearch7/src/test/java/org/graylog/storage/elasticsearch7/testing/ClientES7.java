@@ -36,8 +36,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -113,17 +111,12 @@ public class ClientES7 implements Client {
 
     private Map<String, String> getMapping(String index) {
         final Request request = new Request("GET", "/" + index + "/_mapping");
-        final Response result = client.execute((c, requestOptions) -> {
+        final JsonNode response = client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-            return c.getLowLevelClient().performRequest(request);
+            final Response result = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(result.getEntity().getContent());
         });
 
-        final JsonNode response;
-        try {
-            response = objectMapper.readTree(result.getEntity().getContent());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
         return Streams.stream(response.path(index)
                 .path("mappings")
                 .path("properties")
@@ -209,17 +202,11 @@ public class ClientES7 implements Client {
         request.addParameter("format", "json");
         request.addParameter("h", "index");
 
-        final Response response = client.execute((c, requestOptions) -> {
+        final JsonNode jsonResponse = client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-            return c.getLowLevelClient().performRequest(request);
+             final Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
         });
-
-        final JsonNode jsonResponse;
-        try {
-            jsonResponse = objectMapper.readTree(response.getEntity().getContent());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
 
         return Streams.stream(jsonResponse.elements())
                 .map(index -> index.path("index").asText())
@@ -268,16 +255,11 @@ public class ClientES7 implements Client {
     }
 
     private boolean indexBlocksPresent(String index) {
-        final Response result = client.execute((c, requestOptions) -> c.getLowLevelClient()
-                .performRequest(new Request("GET", "/" + index)),
-                "Unable to retrieve index blocks for index " + index);
-
-        final JsonNode jsonResult;
-        try {
-            jsonResult = objectMapper.readTree(result.getEntity().getContent());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        final JsonNode jsonResult = client.execute((c, requestOptions) -> {
+            final Response result = c.getLowLevelClient()
+                    .performRequest(new Request("GET", "/" + index));
+            return objectMapper.readTree(result.getEntity().getContent());
+        }, "Unable to retrieve index blocks for index " + index);
 
         return jsonResult.path(index)
                 .path("settings")
