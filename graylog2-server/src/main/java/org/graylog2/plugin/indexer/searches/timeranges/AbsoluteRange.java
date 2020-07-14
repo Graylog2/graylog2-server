@@ -21,13 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-
-import java.util.Map;
 
 @AutoValue
 @JsonTypeName(value = AbsoluteRange.ABSOLUTE)
@@ -72,14 +69,6 @@ public abstract class AbsoluteRange extends TimeRange {
     @Override
     public DateTime getTo() {
         return to();
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>of(
-            "type", ABSOLUTE,
-            "from", getFrom(),
-            "to", getTo());
     }
 
     @AutoValue.Builder
