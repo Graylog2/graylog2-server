@@ -303,6 +303,7 @@ const ApiRoutes = {
     changePassword: (username) => { return { url: `/users/${username}/password` }; },
     create: () => { return { url: '/users' }; },
     list: () => { return { url: '/users' }; },
+    paginated: () => { return { url: '/users/paginated' }; },
     load: (username) => { return { url: `/users/${username}` }; },
     delete: (username) => { return { url: `/users/${username}` }; },
     update: (username) => { return { url: `/users/${username}` }; },

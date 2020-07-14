@@ -248,10 +248,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     margin-left: 125px;
   }
 
-  #user-list th.user-type {
-    width: 50px;
-  }
-
   td.centered {
     text-align: center;
   }

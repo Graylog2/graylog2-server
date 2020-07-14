@@ -32,6 +32,16 @@ exports[`<ContentPackInstallEntityList /> should render with empty entities 1`] 
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="installed-entities"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={Array []}
+        />
         <div
           className="row "
         >
@@ -146,6 +156,46 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="installed-entities"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca80",
+                "id": "5bdc4f4b3d27461ce46816cf",
+                "title": "Threat Intel Uncached Adapters",
+                "type": Object {
+                  "name": "lookup_cache",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca87",
+                "id": "5bdc4f4b3d27461ce46816d1",
+                "title": "Tor Exit Node",
+                "type": Object {
+                  "name": "lookup_adapter",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca8c",
+                "id": "5bdc4f4b3d27461ce46816d4",
+                "title": "Tor Exit Node List",
+                "type": Object {
+                  "name": "lookup_table",
+                  "version": "1",
+                },
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -166,9 +216,9 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "efDjcv",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -176,7 +226,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -186,7 +236,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>
@@ -393,6 +443,46 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
       useResponsiveTable={true}
     >
       <div>
+        <Filter
+          displayKey="value"
+          filterBy=""
+          filterKeys={Array []}
+          filterSuggestions={Array []}
+          id="installed-entities"
+          label="Filter"
+          onDataFiltered={[Function]}
+          rows={
+            Array [
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca80",
+                "id": "5bdc4f4b3d27461ce46816cf",
+                "title": "Threat Intel Uncached Adapters",
+                "type": Object {
+                  "name": "lookup_cache",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca87",
+                "id": "5bdc4f4b3d27461ce46816d1",
+                "title": "Tor Exit Node",
+                "type": Object {
+                  "name": "lookup_adapter",
+                  "version": "1",
+                },
+              },
+              Object {
+                "content_pack_entity_id": "5ac762873d274666e34eca8c",
+                "id": "5bdc4f4b3d27461ce46816d4",
+                "title": "Tor Exit Node List",
+                "type": Object {
+                  "name": "lookup_table",
+                  "version": "1",
+                },
+              },
+            ]
+          }
+        />
         <div
           className="row "
         >
@@ -413,9 +503,9 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                       "$$typeof": Symbol(react.forward_ref),
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                        "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "efDjcv",
+                        "lastClassName": "gweZGk",
                         "rules": Array [
                           [Function],
                         ],
@@ -423,7 +513,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                       "displayName": "DataTable__StyledTable",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                      "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                       "target": "table",
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -433,7 +523,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                   >
                     <thead>
                       <tr>

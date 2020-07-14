@@ -4,8 +4,8 @@ import { isEqual } from 'lodash';
 import styled from 'styled-components';
 
 import { tableCss } from 'components/graylog/Table';
-import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
+import Filter from './Filter';
 import DataTableElement from './DataTableElement';
 
 const StyledTable = styled.table`
@@ -23,6 +23,8 @@ class DataTable extends React.Component {
     children: PropTypes.node,
     /** Adds a custom class to the table element. */
     className: PropTypes.string,
+    /** Overrides the default filter. */
+    customFilter: PropTypes.node,
     /** Adds a custom class to the row element. */
     rowClassName: PropTypes.string,
     /** Object key that should be used to display data in the data filter input. */
@@ -68,6 +70,7 @@ class DataTable extends React.Component {
   };
 
   static defaultProps = {
+    customFilter: undefined,
     children: undefined,
     className: '',
     filterBy: '',
@@ -144,8 +147,8 @@ class DataTable extends React.Component {
   };
 
   render() {
-    let filter;
     const {
+      customFilter,
       filterKeys,
       id,
       filterLabel,
@@ -160,26 +163,6 @@ class DataTable extends React.Component {
       rows,
     } = this.props;
     const effectiveRows = this._getEffectiveRows();
-
-    if (filterKeys.length !== 0) {
-      filter = (
-        <div className="row">
-          <div className="col-md-8">
-            <TypeAheadDataFilter id={`${id}-data-filter`}
-                                 label={filterLabel}
-                                 data={rows}
-                                 displayKey={displayKey}
-                                 filterBy={filterBy}
-                                 filterSuggestions={filterSuggestions}
-                                 searchInKeys={filterKeys}
-                                 onDataFiltered={this.filterDataRows} />
-          </div>
-          <div className="col-md-4">
-            {children}
-          </div>
-        </div>
-      );
-    }
 
     let data;
 
@@ -202,7 +185,17 @@ class DataTable extends React.Component {
 
     return (
       <div>
-        {filter}
+        <Filter customFilter={customFilter}
+                label={filterLabel}
+                id={id}
+                rows={rows}
+                displayKey={displayKey}
+                filterBy={filterBy}
+                filterSuggestions={filterSuggestions}
+                filterKeys={filterKeys}
+                onDataFiltered={this.filterDataRows}>
+          {children}
+        </Filter>
         <div className={`row ${rowClassName}`}>
           <div className="col-md-12">
             <div id={id} className={`data-table ${useResponsiveTable ? 'table-responsive' : ''}`}>

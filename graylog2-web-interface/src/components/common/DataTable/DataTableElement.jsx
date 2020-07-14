@@ -19,8 +19,15 @@ class DataTableElement extends React.Component {
     index: PropTypes.number,
   };
 
+  static defaultProps = {
+    element: undefined,
+    index: undefined,
+  }
+
   render() {
-    return this.props.formatter(this.props.element, this.props.index);
+    const { formatter, element, index } = this.props;
+
+    return formatter(element, index);
   }
 }
 

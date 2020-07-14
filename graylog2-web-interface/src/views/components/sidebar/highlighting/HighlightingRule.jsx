@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
+import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { ColorPickerPopover, Icon } from 'components/common';
 
 import ColorPreview from './ColorPreview';
@@ -14,9 +14,9 @@ import ColorPreview from './ColorPreview';
 export const HighlightingRuleGrid: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: grid;
   display: -ms-grid;
-  margin-top: 5px;
   grid-template-columns: max-content 1fr max-content;
   -ms-grid-columns: max-content 1fr max-content;
+  margin-top: 10px;
   word-break: break-word;
 
   > *:nth-child(1) {

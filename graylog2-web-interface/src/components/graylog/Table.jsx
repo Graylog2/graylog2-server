@@ -3,28 +3,29 @@ import { Table as BootstrapTable } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 const variantRowStyles = css(({ theme }) => {
+  const { table } = theme.colors;
   let styles = '';
 
   const variants = {
     active: {
-      background: theme.colors.variant.light.default,
-      hover: theme.colors.variant.lighter.default,
+      background: table.variant.active,
+      hover: table.variantHover.active,
     },
     success: {
-      background: theme.colors.variant.lighter.success,
-      hover: theme.colors.variant.lightest.success,
+      background: table.variant.success,
+      hover: table.variantHover.success,
     },
     info: {
-      background: theme.colors.variant.lighter.info,
-      hover: theme.colors.variant.lightest.info,
+      background: table.variant.info,
+      hover: table.variantHover.info,
     },
     warning: {
-      background: theme.colors.variant.lighter.warning,
-      hover: theme.colors.variant.lightest.warning,
+      background: table.variant.warning,
+      hover: table.variantHover.warning,
     },
     danger: {
-      background: theme.colors.variant.lighter.danger,
-      hover: theme.colors.variant.lightest.danger,
+      background: table.variant.danger,
+      hover: table.variantHover.danger,
     },
   };
 
@@ -72,6 +73,7 @@ const tableCss = css(({ theme }) => css`
     }
 
     > thead > tr > th {
+      white-space: nowrap;
       border-bottom-color: ${theme.colors.table.backgroundAlt};
     }
 

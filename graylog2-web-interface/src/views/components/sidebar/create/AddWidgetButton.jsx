@@ -9,6 +9,9 @@ import { Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 
+import SectionInfo from '../SectionInfo';
+import SectionSubheadline from '../SectionSubheadline';
+
 const Group = styled.div`
   margin-bottom: 20px;
 
@@ -17,18 +20,14 @@ const Group = styled.div`
   }
 `;
 
-const GroupHeadline = styled.h4`
-  margin-bottom: 10px;
-`;
-
 const CreateButton = styled(Button)`
   display: block;
   margin: 5px 0;
+  width: 100%;
 `;
 
 type Props = {
   onClick: () => void,
-  toggleAutoClose: () => void,
 };
 
 type State = {
@@ -54,26 +53,30 @@ type CreatorComponentProps = {
 
 type ComponentCreator = {|
   component: React.ComponentType<CreatorComponentProps>,
+  condition?: () => boolean,
   title: string,
   type: CreatorType,
-  condition?: () => boolean,
 |};
 
 type Creator = ComponentCreator | FunctionalCreator;
 
 class AddWidgetButton extends React.Component<Props, State> {
-  state = {
-    overflowingComponents: {},
-  };
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      overflowingComponents: {},
+    };
+  }
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
-    const { onClick, toggleAutoClose } = this.props;
+    const { onClick } = this.props;
     const { view } = ViewStore.getInitialState();
 
     if (creator.func) {
       return () => {
         onClick();
-        toggleAutoClose();
+
         creator.func({ view });
       };
     }
@@ -87,8 +90,8 @@ class AddWidgetButton extends React.Component<Props, State> {
           const { overflowingComponents } = state;
 
           delete overflowingComponents[id];
+
           onClick();
-          toggleAutoClose();
 
           return { overflowingComponents };
         });
@@ -100,8 +103,6 @@ class AddWidgetButton extends React.Component<Props, State> {
           overflowingComponents[id] = renderedComponent;
 
           return { overflowingComponents };
-        }, () => {
-          toggleAutoClose();
         });
       };
     }
@@ -134,17 +135,18 @@ class AddWidgetButton extends React.Component<Props, State> {
 
     return (
       <>
+        <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
         <Group>
-          <GroupHeadline>Generic</GroupHeadline>
+          <SectionSubheadline>Generic</SectionSubheadline>
           {generic}
         </Group>
         <Group>
-          <GroupHeadline>Predefined Aggregation</GroupHeadline>
+          <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
           {presets}
         </Group>
         {!isEmpty(components) && (
           <Group>
-            <GroupHeadline>Other</GroupHeadline>
+            <SectionSubheadline>Other</SectionSubheadline>
             {components}
           </Group>
         )}

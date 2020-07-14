@@ -66,17 +66,21 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
 };
 
 const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, availableCapabilities, selectedGrantees, className, title }: Props) => {
-  const pageSizes = [10, 50, 100];
-  const [pageSize, setPageSize] = useState(pageSizes[0]);
+  const initialPageSize = PageSizeSelect.defaultPageSizes[0];
+  const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
   const paginatedGrantees = _paginatedGrantees(selectedGrantees, pageSize, currentPage);
-  const numberPages = Math.ceil(selectedGrantees.size / pageSize);
+  const totalGrantees = selectedGrantees.size;
+  const totalPages = Math.ceil(totalGrantees / pageSize);
+  const showPageSizeSelect = totalGrantees > initialPageSize;
 
   return (
     <div className={className}>
       <Header>
         <h5>{title}</h5>
-        <StyledPageSizeSelect onChange={(event) => setPageSize(Number(event.target.value))} pageSize={pageSize} pageSizes={pageSizes} />
+        {showPageSizeSelect && (
+          <StyledPageSizeSelect onChange={(event) => setPageSize(Number(event.target.value))} pageSize={pageSize} />
+        )}
       </Header>
       <List>
         {paginatedGrantees.map((grantee) => {
@@ -94,7 +98,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, a
         })}
       </List>
       <PaginationWrapper>
-        <StyledPagination totalPages={numberPages}
+        <StyledPagination totalPages={totalPages}
                           currentPage={currentPage}
                           onChange={setCurrentPage} />
       </PaginationWrapper>

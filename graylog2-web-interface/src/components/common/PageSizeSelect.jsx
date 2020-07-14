@@ -1,7 +1,10 @@
 // @flow strict
 import * as React from 'react';
+import PropTypes from 'prop-types';
 
 import { Input } from 'components/bootstrap';
+
+const PAGE_SIZES = [10, 50, 100];
 
 type Props = {
   className?: string,
@@ -18,8 +21,18 @@ const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => 
   </div>
 );
 
+PageSizeSelect.propTypes = {
+  className: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  pageSize: PropTypes.number.isRequired,
+  pageSizes: PropTypes.arrayOf(PropTypes.number),
+};
+
 PageSizeSelect.defaultProps = {
   className: undefined,
+  pageSizes: PAGE_SIZES,
 };
+
+PageSizeSelect.defaultPageSizes = PAGE_SIZES;
 
 export default PageSizeSelect;

@@ -657,6 +657,23 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               useResponsiveTable={true}
             >
               <div>
+                <Filter
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterSuggestions={Array []}
+                  id="config-key-list"
+                  label="Filter"
+                  onDataFiltered={[Function]}
+                  rows={
+                    Array [
+                      Object {
+                        "configKey": "configuration.port",
+                        "paramName": "PORT",
+                      },
+                    ]
+                  }
+                />
                 <div
                   className="row "
                 >
@@ -677,9 +694,9 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               "$$typeof": Symbol(react.forward_ref),
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
-                                "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                                 "isStatic": false,
-                                "lastClassName": "efDjcv",
+                                "lastClassName": "gweZGk",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -687,7 +704,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               "displayName": "DataTable__StyledTable",
                               "foldedComponentIds": Array [],
                               "render": [Function],
-                              "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                              "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                               "target": "table",
                               "toString": [Function],
                               "warnTooManyClasses": [Function],
@@ -697,7 +714,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                           forwardedRef={null}
                         >
                           <table
-                            className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
+                            className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                           >
                             <thead>
                               <tr>
@@ -1480,6 +1497,16 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
               useResponsiveTable={true}
             >
               <div>
+                <Filter
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterSuggestions={Array []}
+                  id="config-key-list"
+                  label="Filter"
+                  onDataFiltered={[Function]}
+                  rows={Array []}
+                />
                 <div
                   className="row "
                 >
@@ -2165,6 +2192,24 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
               useResponsiveTable={true}
             >
               <div>
+                <Filter
+                  displayKey="value"
+                  filterBy=""
+                  filterKeys={Array []}
+                  filterSuggestions={Array []}
+                  id="config-key-list"
+                  label="Filter"
+                  onDataFiltered={[Function]}
+                  rows={
+                    Array [
+                      Object {
+                        "configKey": "configuration.port",
+                        "paramName": "PORT",
+                        "readOnly": true,
+                      },
+                    ]
+                  }
+                />
                 <div
                   className="row "
                 >
@@ -2185,9 +2230,9 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               "$$typeof": Symbol(react.forward_ref),
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
-                                "componentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                                "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                                 "isStatic": false,
-                                "lastClassName": "efDjcv",
+                                "lastClassName": "gweZGk",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -2195,7 +2240,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               "displayName": "DataTable__StyledTable",
                               "foldedComponentIds": Array [],
                               "render": [Function],
-                              "styledComponentId": "DataTable__StyledTable-sc-1c22x1c-0",
+                              "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
                               "target": "table",
                               "toString": [Function],
                               "warnTooManyClasses": [Function],
@@ -2205,7 +2250,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                           forwardedRef={null}
                         >
                           <table
-                            className="DataTable__StyledTable-sc-1c22x1c-0 efDjcv table "
+                            className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
                           >
                             <thead>
                               <tr>
