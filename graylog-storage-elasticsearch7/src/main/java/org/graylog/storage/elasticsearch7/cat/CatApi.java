@@ -53,6 +53,7 @@ public class CatApi {
     public Optional<String> indexState(String indexName, String errorMessage) {
         final JsonNode jsonResponse = requestIndices(indexName, errorMessage);
 
+        //noinspection UnstableApiUsage
         return Streams.stream(jsonResponse.elements())
                 .filter(index -> index.path("index").asText().equals(indexName))
                 .map(index -> index.path("status").asText())
