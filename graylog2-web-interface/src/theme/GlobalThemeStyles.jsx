@@ -98,10 +98,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     }
   }
 
-  label {
-    font-size: ${theme.fonts.size.large};
-  }
-
   legend small {
     color: ${theme.colors.gray[60]};
     margin-left: 5px;

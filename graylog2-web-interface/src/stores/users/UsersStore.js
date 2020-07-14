@@ -11,6 +11,7 @@ import UsersActions from 'actions/users/UsersActions';
 import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
+import User from 'logic/users/User';
 
 const DEFAULT_PAGINATION = {
   count: undefined,
@@ -83,6 +84,7 @@ type UsersStoreState = {
     list: ?Immutable.List<UserOverview>,
     pagination: PaginationType,
   },
+  loadedUser: ?User,
 };
 
 type UsersStoreType = Store<UsersStoreState>;
@@ -96,6 +98,7 @@ const UsersStore: UsersStoreType = singletonStore(
       list: undefined,
       pagination: DEFAULT_PAGINATION,
     },
+    loadedUser: undefined,
 
     getInitialState(): UsersStoreState {
       return this._state();
@@ -112,20 +115,19 @@ const UsersStore: UsersStoreType = singletonStore(
 
     loadUsers(): Promise<UserJSON[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
-      const promise = fetch('GET', url)
-        .then(
-          (response) => {
-            const { users } = response;
+      const promise = fetch('GET', url).then(
+        (response) => {
+          const { users } = response;
 
-            return users;
-          },
-          (error) => {
-            if (error.additional.status !== 404) {
-              UserNotification.error(`Loading user list failed with status: ${error}`,
-                'Could not load user list');
-            }
-          },
-        );
+          return users;
+        },
+        (error) => {
+          if (error.additional.status !== 404) {
+            UserNotification.error(`Loading user list failed with status: ${error}`,
+              'Could not load user list');
+          }
+        },
+      );
 
       UsersActions.loadUsers.promise(promise);
 
@@ -167,7 +169,10 @@ const UsersStore: UsersStoreType = singletonStore(
       const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
       const promise = fetch('GET', url);
 
-      promise.catch((error) => {
+      promise.then((loadedUser) => {
+        this.loadedUser = User.fromJSON(loadedUser);
+        this._trigger();
+      }).catch((error) => {
         UserNotification.error(`Loading user failed with status: ${error}`,
           `Could not load user ${username}`);
       });
@@ -257,6 +262,7 @@ const UsersStore: UsersStoreType = singletonStore(
       return {
         list: this.list,
         paginatedList: this.paginatedList,
+        loadedUser: this.loadedUser,
       };
     },
 

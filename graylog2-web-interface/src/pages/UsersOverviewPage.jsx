@@ -22,14 +22,12 @@ const UsersOverviewPage = () => {
         </span>
 
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info" className="active">Users</Button>
+          <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+            <Button bsStyle="success">Create User</Button>
           </LinkContainer>
-
           <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info">Teams</Button>
+            <Button bsStyle="info" className="active">Users Overview</Button>
           </LinkContainer>
-
         </ButtonToolbar>
       </PageHeader>
 
