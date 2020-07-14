@@ -41,10 +41,6 @@ public class MongoDBTestService implements AutoCloseable {
     private final MongoDBContainer container;
     private MongoConnectionImpl mongoConnection;
 
-    public static String defaultVersion() {
-        return MongoDBContainer.DEFAULT_VERSION;
-    }
-
     /**
      * Create service instance with default settings.
      *
