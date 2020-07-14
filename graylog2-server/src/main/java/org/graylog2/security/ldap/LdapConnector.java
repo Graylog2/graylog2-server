@@ -57,6 +57,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
@@ -458,12 +459,10 @@ public class LdapConnector {
                 .getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init((KeyStore) null);
 
-        for (TrustManager tm : tmf.getTrustManagers()) {
-            if (tm instanceof X509TrustManager) {
-                return tm;
-            }
-        }
-        throw new IllegalStateException("Unable to initialize default X509 trust manager.");
+        return Arrays.stream(tmf.getTrustManagers())
+                .filter(trustManager -> trustManager instanceof X509TrustManager)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to initialize default X509 trust manager."));
     }
 
     public LdapConnectionConfig createConfig(LdapSettings ldapSettings) throws KeyStoreException, NoSuchAlgorithmException {
