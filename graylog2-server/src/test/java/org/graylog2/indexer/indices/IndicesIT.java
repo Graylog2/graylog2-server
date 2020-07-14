@@ -361,9 +361,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     public void retrievesCreationTimeOfIndex() {
         final String index = client().createRandomIndex("foo");
 
-        final Optional<DateTime> storeSizeInBytes = indices.indexCreationDate(index);
+        final Optional<DateTime> creationDate = indices.indexCreationDate(index);
 
-        assertThat(storeSizeInBytes).isNotEmpty();
+        assertThat(creationDate).isNotEmpty();
     }
 
     @Test
