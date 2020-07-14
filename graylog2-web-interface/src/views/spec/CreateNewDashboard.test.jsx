@@ -77,10 +77,10 @@ describe('Create a new dashboard', () => {
     const { findByText, findAllByText } = render(<SimpleAppRouter />);
     history.push(Routes.DASHBOARDS);
 
-    const buttons = await findAllByText('Create new dashboard', { timeout: 15000 });
+    const buttons = await findAllByText('Create new dashboard', {}, { timeout: 15000 });
 
     fireEvent.click(buttons[0]);
-    await findByText(/This dashboard has no widgets yet/, { timeout: 15000 });
+    await findByText(/This dashboard has no widgets yet/, {}, { timeout: 15000 });
   });
 
   it('by going to the new dashboards endpoint', async () => {
@@ -88,6 +88,6 @@ describe('Create a new dashboard', () => {
 
     history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await findByText(/This dashboard has no widgets yet/, { timeout: 15000 });
+    await findByText(/This dashboard has no widgets yet/, {}, { timeout: 15000 });
   });
 });
