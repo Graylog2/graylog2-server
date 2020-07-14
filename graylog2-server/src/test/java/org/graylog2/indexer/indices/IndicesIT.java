@@ -135,6 +135,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         client().closeIndex(index1);
         final String index2 = client().createRandomIndex("otherindices_it_");
         client().closeIndex(index2);
+        final String index3 = client().createRandomIndex("evenmoreindices_it_");
 
         final Set<String> closedIndices = indices.getClosedIndices(Collections.singleton("*"));
 
