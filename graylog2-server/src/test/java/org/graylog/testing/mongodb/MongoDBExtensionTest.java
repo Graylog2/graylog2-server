@@ -43,8 +43,7 @@ class MongoDBExtensionTest {
 
         @Test
         void withoutFixtures(MongoDBTestService mongodb) {
-            assertEmptyCollection(mongodb, "test_1");
-            assertEmptyCollection(mongodb, "test_2");
+            assertThat(mongodb.mongoDatabase().listCollections()).isEmpty();
         }
     }
 
@@ -72,8 +71,7 @@ class MongoDBExtensionTest {
 
         @Test
         void withoutFixtures(MongoDBTestService mongodb) {
-            assertEmptyCollection(mongodb, "test_1");
-            assertEmptyCollection(mongodb, "test_2");
+            assertThat(mongodb.mongoDatabase().listCollections()).isEmpty();
         }
     }
 
