@@ -33,11 +33,12 @@ public class IndicesES7IT extends IndicesIT {
     @Override
     protected IndicesAdapter indicesAdapter() {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
         return new IndicesAdapterES7(
-                elasticsearch.elasticsearchClient(),
+                client,
                 new StatsApi(objectMapper),
-                new CatApi(objectMapper, elasticsearch.elasticsearchClient()),
-                new ClusterStateApi(objectMapper)
+                new CatApi(objectMapper, client),
+                new ClusterStateApi(objectMapper, client)
         );
     }
 

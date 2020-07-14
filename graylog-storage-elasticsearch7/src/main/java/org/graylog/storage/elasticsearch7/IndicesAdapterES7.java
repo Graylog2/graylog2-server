@@ -269,8 +269,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public Map<String, Set<String>> fieldsInIndices(String[] writeIndexWildcards) {
         final List<String> indexWildCards = Arrays.asList(writeIndexWildcards);
-        return client.execute((c, requestOptions) -> clusterStateApi.fields(c, requestOptions, indexWildCards),
-                "Unable to retrieve fields from indices: " + indexWildCards);
+        return clusterStateApi.fields(indexWildCards);
     }
 
     @Override
