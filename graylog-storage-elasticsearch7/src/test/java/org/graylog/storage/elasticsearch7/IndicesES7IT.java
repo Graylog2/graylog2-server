@@ -36,7 +36,7 @@ public class IndicesES7IT extends IndicesIT {
         final ElasticsearchClient client = elasticsearch.elasticsearchClient();
         return new IndicesAdapterES7(
                 client,
-                new StatsApi(objectMapper),
+                new StatsApi(objectMapper, client),
                 new CatApi(objectMapper, client),
                 new ClusterStateApi(objectMapper, client)
         );

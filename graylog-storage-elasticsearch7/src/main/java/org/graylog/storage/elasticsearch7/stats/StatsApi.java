@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -16,22 +15,25 @@ import java.util.function.Consumer;
 
 public class StatsApi {
     private final ObjectMapper objectMapper;
+    private final ElasticsearchClient client;
 
     @Inject
-    public StatsApi(ObjectMapper objectMapper) {
+    public StatsApi(ObjectMapper objectMapper,
+                    ElasticsearchClient client) {
         this.objectMapper = objectMapper;
+        this.client = client;
     }
 
-    public JsonNode indexStats(RestHighLevelClient client, String index) throws IOException {
-        return stats(client, index);
+    public JsonNode indexStats(String index) {
+        return stats(index);
     }
 
-    public JsonNode indexStatsWithShardLevel(RestHighLevelClient client, String index) throws IOException {
-        return indexStatsWithShardLevel(client, Collections.singleton(index)).path(index);
+    public JsonNode indexStatsWithShardLevel(String index) {
+        return indexStatsWithShardLevel(Collections.singleton(index)).path(index);
     }
 
-    public JsonNode indexStatsWithShardLevel(RestHighLevelClient client, Collection<String> indices) throws IOException {
-        final JsonNode stats = stats(client, indices, request -> {
+    public JsonNode indexStatsWithShardLevel(Collection<String> indices) {
+        final JsonNode stats = stats(indices, request -> {
             request.addParameter("level", "shards");
             request.addParameter("ignore_unavailable", "true");
         });
@@ -39,14 +41,14 @@ public class StatsApi {
         return stats.path("indices");
     }
 
-    public JsonNode indexStatsWithDocsAndStore(RestHighLevelClient client, Collection<String> indices) throws IOException {
-        final JsonNode stats = stats(client, indices, ImmutableSet.of("store", "docs"));
+    public JsonNode indexStatsWithDocsAndStore(Collection<String> indices) {
+        final JsonNode stats = stats(indices, ImmutableSet.of("store", "docs"));
 
         return stats.path("indices");
     }
 
-    public Optional<Long> storeSizes(RestHighLevelClient client, String index) throws IOException {
-        final JsonNode stats = stats(client, Collections.singleton(index), Collections.singleton("store"));
+    public Optional<Long> storeSizes(String index) {
+        final JsonNode stats = stats(Collections.singleton(index), Collections.singleton("store"));
         final JsonNode sizeInBytes = stats.path("indices")
                 .path(index)
                 .path("primaries")
@@ -55,26 +57,23 @@ public class StatsApi {
         return Optional.of(sizeInBytes).filter(JsonNode::isNumber).map(JsonNode::asLong);
     }
 
-    private JsonNode stats(RestHighLevelClient client, String index) throws IOException {
-        return stats(client, Collections.singleton(index), Collections.emptySet(), (request) -> {});
+    private JsonNode stats(String index) {
+        return stats(Collections.singleton(index), Collections.emptySet(), (request) -> {});
     }
 
-    private JsonNode stats(RestHighLevelClient client,
-                           Collection<String> indices,
-                           Collection<String> metrics) throws IOException {
-        return stats(client, indices, metrics, (request) -> {});
+    private JsonNode stats(Collection<String> indices,
+                           Collection<String> metrics) {
+        return stats(indices, metrics, (request) -> {});
     }
 
-    private JsonNode stats(RestHighLevelClient client,
-                           Collection<String> indices,
-                           Consumer<Request> fn) throws IOException {
-        return stats(client, indices, Collections.emptySet(), fn);
-            }
+    private JsonNode stats(Collection<String> indices,
+                           Consumer<Request> fn) {
+        return stats(indices, Collections.emptySet(), fn);
+    }
 
-    private JsonNode stats(RestHighLevelClient client,
-                           Collection<String> indices,
+    private JsonNode stats(Collection<String> indices,
                            Collection<String> metrics,
-                           Consumer<Request> fn) throws IOException {
+                           Consumer<Request> fn) {
         final StringBuilder endpoint = new StringBuilder();
         if (!indices.isEmpty()) {
             final String joinedIndices = String.join(",", indices);
@@ -90,8 +89,10 @@ public class StatsApi {
 
         final Request request = new Request("GET", endpoint.toString());
         fn.accept(request);
-        final Response response = client.getLowLevelClient().performRequest(request);
-
-        return objectMapper.readTree(response.getEntity().getContent());
+        return client.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+            final Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
+        }, "Unable to retrieve index stats for " + String.join(",", indices));
     }
 }

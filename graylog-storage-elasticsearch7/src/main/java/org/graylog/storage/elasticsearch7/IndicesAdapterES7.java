@@ -229,8 +229,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public long numberOfMessages(String index) {
-        final JsonNode result = client.execute((c, requestOptions) -> statsApi.indexStats(c, index),
-                "Unable to retrieve index stats for " + index);
+        final JsonNode result = statsApi.indexStats(index);
         return result.path("primaries").path("docs").path("count").asLong();
     }
 
@@ -282,8 +281,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     public Set<IndexStatistics> indicesStats(Collection<String> indices) {
         final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
 
-        final JsonNode allWithShardLevel = client.execute((c, requestOptions) -> statsApi.indexStatsWithShardLevel(c, indices),
-                "Unable to retrieve index stats for " + indices);
+        final JsonNode allWithShardLevel = statsApi.indexStatsWithShardLevel(indices);
         final Iterator<Map.Entry<String, JsonNode>> fields = allWithShardLevel.fields();
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> entry = fields.next();
@@ -299,8 +297,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public Optional<IndexStatistics> getIndexStats(String index) {
-        final JsonNode indexStats = client.execute((c, requestOptions) -> statsApi.indexStatsWithShardLevel(c, index),
-                "Unable to retrieve index stats for " + index);
+        final JsonNode indexStats = statsApi.indexStatsWithShardLevel(index);
         return indexStats.isMissingNode()
                 ? Optional.empty()
                 : Optional.of(IndexStatistics.create(index, indexStats));
@@ -308,8 +305,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
-        final JsonNode result = client.execute((c, requestOptions) -> statsApi.indexStatsWithDocsAndStore(c, indices),
-                "Couldn't check stats of indices " + indices);
+        final JsonNode result = statsApi.indexStatsWithDocsAndStore(indices);
 
         return result.path("indices");
     }
@@ -333,8 +329,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public Optional<Long> storeSizeInBytes(String index) {
-        return client.execute((c, options) -> statsApi.storeSizes(c, index),
-                "Unable to retrieve store size for " + index);
+        return statsApi.storeSizes(index);
     }
 
     @Override
