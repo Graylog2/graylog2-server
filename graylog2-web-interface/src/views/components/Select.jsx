@@ -7,7 +7,7 @@ import { Overlay } from 'react-overlays';
 import { withTheme } from 'styled-components';
 import { createFilter } from 'react-select/lib/filters';
 
-import { themePropTypes } from 'theme';
+import { themePropTypes, type ThemeInterface } from 'theme';
 
 const MultiValueRemove = (props) => {
   return (
@@ -78,6 +78,7 @@ type Props = {
   styles: { [string]: any },
   ignoreAccents: boolean,
   ignoreCase: boolean,
+  theme: ThemeInterface,
 };
 
 const ValueWithTitle = (props: { data: { label: string } }) => {
@@ -106,7 +107,15 @@ const MenuOverlay = (selectRef) => (props) => {
   );
 };
 
-const Select = ({ components, styles, ignoreCase, ignoreAccents, allowOptionCreation, theme, ...rest }: Props) => {
+const Select = ({
+  components,
+  styles,
+  ignoreCase = true,
+  ignoreAccents = false,
+  allowOptionCreation = false,
+  theme,
+  ...rest
+}: Props) => {
   const selectRef = useRef(null);
   const Component = allowOptionCreation ? CreatableSelect : ReactSelect;
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
