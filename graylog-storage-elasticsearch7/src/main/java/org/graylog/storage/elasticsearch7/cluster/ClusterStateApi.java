@@ -10,13 +10,11 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import javax.inject.Inject;
 import java.util.AbstractMap;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 
@@ -32,7 +30,7 @@ public class ClusterStateApi {
     }
 
     public Map<String, Set<String>> fields(Collection<String> indices) {
-        final Request request = request(Collections.singleton("metadata"), indices);
+        final Request request = request(indices);
 
         final JsonNode jsonResponse = client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
@@ -60,10 +58,8 @@ public class ClusterStateApi {
                 .map(field -> new AbstractMap.SimpleEntry<>(indexName, field.getKey()));
     }
 
-    private Request request(Collection<String> metrics, Collection<String> indices) {
-        checkArgument(!metrics.isEmpty(), "At least one metric must be provided.");
-        final String joinedMetrics = String.join(",", metrics);
-        final StringBuilder apiEndpoint = new StringBuilder("/_cluster/state/").append(joinedMetrics);
+    private Request request(Collection<String> indices) {
+        final StringBuilder apiEndpoint = new StringBuilder("/_cluster/state/metadata");
         if (!indices.isEmpty()) {
             final String joinedIndices = String.join(",", indices);
             apiEndpoint.append("/");
