@@ -4,7 +4,7 @@ import React from 'react';
 import { Alert, Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';
-import TimeoutInput from 'components/users/TimeoutInput';
+import LegacyTimeoutInput from 'components/users/LegacyTimeoutInput';
 import { TimezoneSelect } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ValidationsUtils from 'util/ValidationsUtils';
@@ -167,7 +167,7 @@ class NewUserForm extends React.Component {
           </span>
         </Input>
 
-        <TimeoutInput ref={(elem) => { this.inputs.session_timeout_ms = elem; }} />
+        <LegacyTimeoutInput ref={(elem) => { this.inputs.session_timeout_ms = elem; }} />
 
         <Input id="timezone-select"
                label="Time Zone"
