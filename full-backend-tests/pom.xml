@@ -68,6 +68,19 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-elasticsearch7</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-elasticsearch7</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Logging dependencies -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -181,4 +194,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>full-backend-integration-tests</id>
+            <activation>
+                <property>
+                    <name>it.es</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
