@@ -120,7 +120,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public void start() {
         service.start();
         if (fixtureImporter != null) {
-            fixtureImporter.importResources(service.mongoConnection().getMongoDatabase());
+            fixtureImporter.importResources(service.mongoDatabase());
         }
     }
 

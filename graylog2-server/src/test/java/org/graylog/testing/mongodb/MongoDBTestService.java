@@ -17,6 +17,7 @@
 package org.graylog.testing.mongodb;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
@@ -120,21 +121,30 @@ public class MongoDBTestService implements AutoCloseable {
     }
 
     /**
+     * Returns the database object for the current connection.
+     *
+     * @return the database object
+     */
+    public MongoDatabase mongoDatabase() {
+        return mongoConnection().getMongoDatabase();
+    }
+
+    /**
      * Returns the collection object for the given collection name.
      *
      * @param name the collection name
      * @return the collection object
      */
     public MongoCollection<Document> mongoCollection(String name) {
-        return mongoConnection().getMongoDatabase().getCollection(name);
+        return mongoDatabase().getCollection(name);
     }
 
     /**
      * Drops the configured database.
      */
     public void dropDatabase() {
-        LOG.debug("Dropping database {}", mongoConnection().getMongoDatabase().getName());
-        mongoConnection().getMongoDatabase().drop();
+        LOG.debug("Dropping database {}", mongoDatabase().getName());
+        mongoDatabase().drop();
     }
 
     /**

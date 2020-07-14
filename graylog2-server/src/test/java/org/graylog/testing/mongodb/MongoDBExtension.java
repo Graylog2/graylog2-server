@@ -186,7 +186,7 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
                     invocationContext.getExecutable().getName());
             final MongoDBFixtureImporter fixtureImporter = new MongoDBFixtureImporter(fixtureFiles.value(), invocationContext.getTargetClass());
 
-            fixtureImporter.importResources(getInstance(context).mongoConnection().getMongoDatabase());
+            fixtureImporter.importResources(getInstance(context).mongoDatabase());
         }
     }
 }
