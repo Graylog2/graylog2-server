@@ -22,6 +22,7 @@ public class GRNTypes {
     public static final GRNType BUILTIN_TEAM = GRNType.create("builtin-team", "XXX-NOT-A-REAL-TYPE-XXX:");
     public static final GRNType COLLECTION = GRNType.create("collection", "collections:");
     public static final GRNType DASHBOARD = GRNType.create("dashboard", "dashboards:");
+    public static final GRNType EVENT_DEFINITION = GRNType.create("event_definition", "eventdefinitions:");
     public static final GRNType GRANT = GRNType.create("grant", "grants:");
     public static final GRNType ROLE = GRNType.create("role", "roles:");
     public static final GRNType STREAM = GRNType.create("stream", "streams:");
@@ -34,6 +35,7 @@ public class GRNTypes {
             .add(BUILTIN_TEAM)
             .add(COLLECTION)
             .add(DASHBOARD)
+            .add(EVENT_DEFINITION)
             .add(GRANT)
             .add(ROLE)
             .add(STREAM)
