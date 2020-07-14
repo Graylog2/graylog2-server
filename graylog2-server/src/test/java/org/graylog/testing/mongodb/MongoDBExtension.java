@@ -77,6 +77,10 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         return new MongoDBExtension(requireNonNull(version, "version cannot be null"));
     }
 
+    public MongoDBExtension() {
+        this(MongoDBTestService.DEFAULT_VERSION);
+    }
+
     public MongoDBExtension(String version) {
         this.version = version;
     }
