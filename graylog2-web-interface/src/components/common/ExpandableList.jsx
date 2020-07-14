@@ -36,3 +36,16 @@ class ExpandableList extends React.Component {
 }
 
 export default ExpandableList;
+
+const Container = styled.div(({ theme }) => css`
+  font-size: ${theme.fonts.size.body};
+      line-height: 20px;
+  label{
+    min-height: 20px;
+    margin-bottom:2px;
+    margin-right:   5px;
+    * {
+      cursor: pointer;
+    }
+  }
+`);
