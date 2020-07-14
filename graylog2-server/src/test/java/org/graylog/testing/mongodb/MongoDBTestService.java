@@ -16,6 +16,8 @@
  */
 package org.graylog.testing.mongodb;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
@@ -121,6 +123,16 @@ public class MongoDBTestService implements AutoCloseable {
      */
     public MongoConnection mongoConnection() {
         return requireNonNull(mongoConnection, "mongoConnection not initialized yet");
+    }
+
+    /**
+     * Returns the collection object for the given collection name.
+     *
+     * @param name the collection name
+     * @return the collection object
+     */
+    public MongoCollection<Document> mongoCollection(String name) {
+        return mongoConnection().getMongoDatabase().getCollection(name);
     }
 
     /**

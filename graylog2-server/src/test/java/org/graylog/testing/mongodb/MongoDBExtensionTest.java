@@ -55,7 +55,7 @@ class MongoDBExtensionTest {
 
         @BeforeEach
         void setUp(MongoDBTestService mongodb) {
-            collection = mongodb.mongoConnection().getMongoDatabase().getCollection("test_2");
+            collection = mongodb.mongoCollection("test_2");
         }
 
         @Test
@@ -97,16 +97,12 @@ class MongoDBExtensionTest {
         }
     }
 
-    private MongoCollection<Document> mongoCollection(MongoDBTestService mongodb, String name) {
-        return mongodb.mongoConnection().getMongoDatabase().getCollection(name);
-    }
-
     private void assertEmptyCollection(MongoDBTestService mongodb, String collectionName) {
-        assertThat(mongoCollection(mongodb, collectionName).countDocuments()).isEqualTo(0);
+        assertThat(mongodb.mongoCollection(collectionName).countDocuments()).isEqualTo(0);
     }
 
     private void assertCollection(MongoDBTestService mongodb, String collectionName, Bson query, String expectedId) {
-        assertCollection(mongoCollection(mongodb, collectionName), query, expectedId);
+        assertCollection(mongodb.mongoCollection(collectionName), query, expectedId);
     }
 
     private void assertCollection(MongoCollection<Document> collection, Bson query, String expectedId) {

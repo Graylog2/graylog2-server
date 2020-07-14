@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.mongodb;
 
-import com.mongodb.client.MongoDatabase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -82,7 +81,7 @@ class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     @Order(4)
     @MongoDBFixtures("MongoDBExtensionTest-1.json")
     void withFixtures(MongoDBTestService mongodb) {
-        assertThat(mongodb.mongoConnection().getMongoDatabase().getCollection("test_1").find(eq("hello", "world")).first())
+        assertThat(mongodb.mongoCollection("test_1").find(eq("hello", "world")).first())
                 .satisfies(document -> {
                     assertThat(document).isNotNull();
                     assertThat(document.get("_id").toString()).isEqualTo("54e3deadbeefdeadbeef0000");
@@ -92,8 +91,7 @@ class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     @Test
     @Order(5)
     void withoutFixtures(MongoDBTestService mongodb) {
-        final MongoDatabase database = mongodb.mongoConnection().getMongoDatabase();
-        assertThat(database.getCollection("test_1").countDocuments()).isEqualTo(0);
-        assertThat(database.getCollection("test_2").countDocuments()).isEqualTo(0);
+        assertThat(mongodb.mongoCollection("test_1").countDocuments()).isEqualTo(0);
+        assertThat(mongodb.mongoCollection("test_2").countDocuments()).isEqualTo(0);
     }
 }
