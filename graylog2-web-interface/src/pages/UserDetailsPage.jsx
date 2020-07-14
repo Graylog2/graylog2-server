@@ -20,7 +20,7 @@ type Props = {
   },
 };
 
-const PageTitle = ({ fullName }: {fullName: string}) => (
+const PageTitle = ({ fullName }: {fullName: ?string}) => (
   <>
     User Details {fullName && (
       <>
@@ -49,18 +49,16 @@ const UserDetailsPage = ({ params }: Props) => {
         </span>
 
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info" className="active">Users</Button>
+          <LinkContainer to={Routes.SYSTEM.USERS.edit(loadedUser?.username)}>
+            <Button bsStyle="success">Edit User</Button>
           </LinkContainer>
-
           <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info">Teams</Button>
+            <Button bsStyle="info">Users</Button>
           </LinkContainer>
-
         </ButtonToolbar>
       </PageHeader>
 
-      <UserDetails user={loadedUser} />
+      <UserDetails user={loadedUser?.username === params?.username ? loadedUser : undefined} />
     </div>
   );
 };

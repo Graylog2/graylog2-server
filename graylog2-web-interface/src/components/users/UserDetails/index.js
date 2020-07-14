@@ -1,3 +1,3 @@
-import UserDetails from './UserDetails.jsx';
+import UserDetails from './UserDetails';
 
 export default UserDetails;
