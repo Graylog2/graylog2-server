@@ -41,12 +41,7 @@ public class CatApi {
 
     public Set<String> indices(Collection<String> indices, Collection<String> status, String errorMessage) {
         final String joinedIndices = String.join(",", indices);
-        final Request request = request("GET", "indices/" + joinedIndices);
-        request.addParameter("h", "index,status");
-        request.addParameter("expand_wildcards", "all");
-        request.addParameter("s", "index,status");
-
-        final JsonNode jsonResponse = perform(request, new TypeReference<JsonNode>() {}, errorMessage);
+        final JsonNode jsonResponse = requestIndices(joinedIndices, errorMessage);
 
         //noinspection UnstableApiUsage
         return Streams.stream(jsonResponse.elements())
@@ -56,17 +51,21 @@ public class CatApi {
     }
 
     public Optional<String> indexState(String indexName, String errorMessage) {
-        final Request request = request("GET", "indices/" + indexName);
-        request.addParameter("h", "index,status");
-        request.addParameter("expand_wildcards", "all");
-        request.addParameter("s", "index,status");
-
-        final JsonNode jsonResponse = perform(request, new TypeReference<JsonNode>() {}, errorMessage);
+        final JsonNode jsonResponse = requestIndices(indexName, errorMessage);
 
         return Streams.stream(jsonResponse.elements())
                 .filter(index -> index.path("index").asText().equals(indexName))
                 .map(index -> index.path("status").asText())
                 .findFirst();
+    }
+
+    private JsonNode requestIndices(String indexName, String errorMessage) {
+        final Request request = request("GET", "indices/" + indexName);
+        request.addParameter("h", "index,status");
+        request.addParameter("expand_wildcards", "all");
+        request.addParameter("s", "index,status");
+
+        return perform(request, new TypeReference<JsonNode>() {}, errorMessage);
     }
 
     private <R> R perform(Request request, TypeReference<R> responseClass, String errorMessage) {
