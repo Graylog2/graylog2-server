@@ -73,7 +73,7 @@ public class StatsApi {
 
     private JsonNode stats(Collection<String> indices,
                            Collection<String> metrics,
-                           Consumer<Request> fn) {
+                           Consumer<Request> prepareRequest) {
         final StringBuilder endpoint = new StringBuilder();
         if (!indices.isEmpty()) {
             final String joinedIndices = String.join(",", indices);
@@ -88,7 +88,7 @@ public class StatsApi {
         }
 
         final Request request = new Request("GET", endpoint.toString());
-        fn.accept(request);
+        prepareRequest.accept(request);
         return client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
             final Response response = c.getLowLevelClient().performRequest(request);
