@@ -296,8 +296,12 @@ public class Indices {
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
     }
 
+    public boolean isOpen(final String indexName) {
+        return indicesAdapter.isOpen(indexName);
+    }
+
     public boolean isClosed(final String indexName) {
-        return getClosedIndices(Collections.singleton(indexName)).contains(indexName);
+        return indicesAdapter.isClosed(indexName);
     }
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {

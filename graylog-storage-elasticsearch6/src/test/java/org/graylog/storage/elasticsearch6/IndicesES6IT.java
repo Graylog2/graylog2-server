@@ -41,18 +41,10 @@ public class IndicesES6IT extends IndicesIT {
     }
 
     @Override
-    protected Map<String, Object> createTemplateFor(String indexWildcard) {
-        final Map<String, Object> beforeMapping = ImmutableMap.of(
-                "_source", ImmutableMap.of("enabled", false),
-                "properties", ImmutableMap.of("message",
-                        ImmutableMap.of(
-                                "type", "string",
-                                "index", "not_analyzed")));
-
-
+    protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
         return ImmutableMap.of(
                 "template", indexWildcard,
-                "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, beforeMapping)
+                "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, mapping)
         );
     }
 

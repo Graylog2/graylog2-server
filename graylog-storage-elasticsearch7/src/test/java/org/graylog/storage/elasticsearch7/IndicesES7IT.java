@@ -7,6 +7,7 @@ import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
+import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.IndicesIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -43,16 +44,15 @@ public class IndicesES7IT extends IndicesIT {
     }
 
     @Override
-    protected Map<String, Object> createTemplateFor(String indexWildcard) {
-        final Map<String, Object> beforeMapping = ImmutableMap.of(
-                "_source", ImmutableMap.of("enabled", false),
-                "properties", ImmutableMap.of("message",
-                        ImmutableMap.of("type", "text")));
+    protected NodeAdapter createNodeAdapter() {
+        return new NodeAdapterES7(elasticsearch.elasticsearchClient());
+    }
 
-
+    @Override
+    protected Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> mapping) {
         return ImmutableMap.of(
                 "template", indexWildcard,
-                "mappings", beforeMapping
+                "mappings", mapping
         );
     }
 }

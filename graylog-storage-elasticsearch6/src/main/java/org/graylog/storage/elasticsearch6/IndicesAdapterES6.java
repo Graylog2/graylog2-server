@@ -191,6 +191,9 @@ public class IndicesAdapterES6 implements IndicesAdapter {
                 .settings(settings)
                 .build();
 
+        // Make sure our index template exists before creating an index!
+        ensureIndexTemplate(templateName, template);
+
         final JestResult jestResult;
         try {
             jestResult = jestClient.execute(request);

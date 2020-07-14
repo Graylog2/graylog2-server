@@ -86,11 +86,9 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
-    private Indices indices;
+    protected Indices indices;
 
     protected abstract IndicesAdapter indicesAdapter();
-
-    private IndicesAdapter indicesAdapter;
 
     @Before
     public void setUp() {
@@ -121,12 +119,11 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     public void testClose() {
         final String index = client().createRandomIndex("indices_it_");
 
-        assertThat(indicesAdapter.isOpen(index)).isTrue();
+        assertThat(indices.isOpen(index)).isTrue();
 
         indices.close(index);
 
-        assertThat(indicesAdapter.isClosed(index)).isTrue();
-        //assertThat(getIndexState(index)).isEqualTo("close");
+        assertThat(indices.isClosed(index)).isTrue();
     }
 
     @Test
@@ -232,13 +229,18 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
         assertThat(client().fieldType("index_template_test", "message")).isEqualTo("text");
     }
 
-    protected abstract Map<String, Object> createTemplateFor(String indexWildcard);
+    protected abstract Map<String, Object> createTemplateFor(String indexWildcard, Map<String, Object> beforeMapping);
 
     @Test
     public void createOverwritesIndexTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
-        final Map<String, Object> templateSource = createTemplateFor(indexSet.getIndexWildcard());
+        final Map<String, Object> beforeMapping = ImmutableMap.of(
+                "_source", ImmutableMap.of("enabled", false),
+                "properties", ImmutableMap.of("message",
+                        ImmutableMap.of("type", "text")));
+
+        final Map<String, Object> templateSource = createTemplateFor(indexSet.getIndexWildcard(), beforeMapping);
 
         client().putTemplate(templateName, templateSource);
 
