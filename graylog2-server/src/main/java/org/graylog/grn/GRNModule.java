@@ -29,6 +29,7 @@ public class GRNModule extends PluginModule {
         addGRNType(GRNTypes.BUILTIN_TEAM, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.COLLECTION, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.DASHBOARD, FallbackGRNDescriptorProvider.class);
+        addGRNType(GRNTypes.EVENT_DEFINITION, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.GRANT, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.ROLE, FallbackGRNDescriptorProvider.class);
         addGRNType(GRNTypes.STREAM, FallbackGRNDescriptorProvider.class);
