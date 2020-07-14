@@ -77,6 +77,8 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         return new MongoDBExtension(requireNonNull(version, "version cannot be null"));
     }
 
+    // This is used by the JUnit 5 extension system
+    @SuppressWarnings("unused")
     public MongoDBExtension() {
         this(MongoDBTestService.DEFAULT_VERSION);
     }
