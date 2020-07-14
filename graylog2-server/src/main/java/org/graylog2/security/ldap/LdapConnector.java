@@ -87,6 +87,16 @@ public class LdapConnector {
         this.ldapSettingsService = ldapSettingsService;
     }
 
+    public LdapNetworkConnection connect(LdapSettings settings) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
+        final LdapConnectionConfig config = createConfig(settings);
+        return connect(config);
+    }
+
+    public LdapNetworkConnection connect(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
+        final LdapConnectionConfig config = createConfig(request);
+        return connect(config);
+    }
+
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
         connection.setTimeOut(connectionTimeout);
@@ -420,7 +430,7 @@ public class LdapConnector {
         return connection.isAuthenticated();
     }
 
-    public LdapConnectionConfig createConfig(LdapTestConfigRequest request) throws KeyStoreException, NoSuchAlgorithmException {
+    private LdapConnectionConfig createConfig(LdapTestConfigRequest request) throws KeyStoreException, NoSuchAlgorithmException {
         final LdapConnectionConfig config = new LdapConnectionConfig();
         final URI ldapUri = request.ldapUri();
         config.setLdapHost(ldapUri.getHost());
@@ -465,7 +475,7 @@ public class LdapConnector {
                 .orElseThrow(() -> new IllegalStateException("Unable to initialize default X509 trust manager."));
     }
 
-    public LdapConnectionConfig createConfig(LdapSettings ldapSettings) throws KeyStoreException, NoSuchAlgorithmException {
+    private LdapConnectionConfig createConfig(LdapSettings ldapSettings) throws KeyStoreException, NoSuchAlgorithmException {
         final LdapConnectionConfig config = new LdapConnectionConfig();
         config.setLdapHost(ldapSettings.getUri().getHost());
         config.setLdapPort(ldapSettings.getUri().getPort());

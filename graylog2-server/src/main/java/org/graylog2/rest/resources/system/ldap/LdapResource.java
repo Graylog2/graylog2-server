@@ -61,8 +61,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -127,14 +125,12 @@ public class LdapResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to test LDAP configuration")
     public LdapTestConfigResponse testLdapConfiguration(@ApiParam(name = "Configuration to test", required = true)
-                                                        @Valid @NotNull LdapTestConfigRequest request) throws KeyStoreException, NoSuchAlgorithmException {
-
-        final LdapConnectionConfig config = ldapConnector.createConfig(request);
+                                                        @Valid @NotNull LdapTestConfigRequest request) {
 
         LdapNetworkConnection connection = null;
         try {
             try {
-                connection = ldapConnector.connect(config);
+                connection = ldapConnector.connect(request);
             } catch (Exception e) {
                 Throwable rootCause = e;
                 while (rootCause.getCause() != null && rootCause.getCause().getMessage() != null) {
