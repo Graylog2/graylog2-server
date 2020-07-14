@@ -127,12 +127,12 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
     }
 
     @Override
-    public void afterAll(ExtensionContext context) throws Exception {
+    public void afterAll(ExtensionContext context) {
         closeInstance(context);
     }
 
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    public void afterEach(ExtensionContext context) {
         if (context.getStore(NAMESPACE).get(Lifecycle.class) == Lifecycle.SINGLE_TEST) {
             closeInstance(context);
         } else {
