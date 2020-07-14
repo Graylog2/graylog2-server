@@ -162,6 +162,11 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
 
     // Process MongoDBFixtures annotation on methods and classes
     private void processFixtures(ReflectiveInvocationContext<Method> invocationContext, ExtensionContext context) {
+        findFixtureAnnotation(context)
+                .ifPresent(annotation -> loadFixtures(invocationContext, context, annotation));
+    }
+
+    private Optional<MongoDBFixtures> findFixtureAnnotation(ExtensionContext context) {
         ExtensionContext currentContext = context;
         Optional<MongoDBFixtures> fixtureAnnotation;
 
@@ -175,16 +180,16 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
 
             currentContext = currentContext.getParent().get();
         } while (!fixtureAnnotation.isPresent() && currentContext != context.getRoot());
+        return fixtureAnnotation;
+    }
 
-        if (fixtureAnnotation.isPresent()) {
-            final MongoDBFixtures fixtureFiles = fixtureAnnotation.get();
-            LOG.debug("Loading fixtures {} for {}#{}()",
-                    fixtureFiles.value(),
-                    invocationContext.getTargetClass().getCanonicalName(),
-                    invocationContext.getExecutable().getName());
-            final MongoDBFixtureImporter fixtureImporter = new MongoDBFixtureImporter(fixtureFiles.value(), invocationContext.getTargetClass());
+    private void loadFixtures(ReflectiveInvocationContext<Method> invocationContext, ExtensionContext context, MongoDBFixtures fixtureAnnotation) {
+        LOG.debug("Loading fixtures {} for {}#{}()",
+                fixtureAnnotation.value(),
+                invocationContext.getTargetClass().getCanonicalName(),
+                invocationContext.getExecutable().getName());
+        final MongoDBFixtureImporter fixtureImporter = new MongoDBFixtureImporter(fixtureAnnotation.value(), invocationContext.getTargetClass());
 
-            fixtureImporter.importResources(getInstance(context).mongoConnection().getMongoDatabase());
-        }
+        fixtureImporter.importResources(getInstance(context).mongoConnection().getMongoDatabase());
     }
 }
