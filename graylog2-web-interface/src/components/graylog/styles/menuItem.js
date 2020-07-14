@@ -7,29 +7,30 @@ const menuItemStyles = css(({ theme }) => css`
 
       :hover,
       :focus {
-        color: ${theme.utils.contrastingColor(theme.colors.gray[90])};
-        background-color: ${theme.colors.gray[90]};
+        color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
+        background-color: ${theme.colors.variant.lighter.default};
       }
     }
 
     > .active > a {
-      color: ${theme.utils.contrastingColor(theme.colors.variant.light.info)};
-      background-color: ${theme.colors.variant.light.info};
+      color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
+      background-color: ${theme.colors.variant.lighter.default};
 
       :hover,
       :focus {
-        color: ${theme.utils.contrastingColor(theme.colors.variant.info)};
-        background-color: ${theme.colors.variant.info};
+        color: ${theme.utils.contrastingColor(theme.colors.variant.light.default)};
+        background-color: ${theme.colors.variant.light.default};
       }
     }
 
     > .disabled > a {
-      color: ${theme.utils.contrastingColor(theme.colors.gray[90], 'AA')};
-      background-color: ${theme.colors.gray[90]};
+      color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default, 'AA')};
+      background-color: ${theme.colors.variant.lighter.default};
 
       :hover,
       :focus {
-        color: ${theme.utils.contrastingColor(theme.colors.gray[90], 'AA')};
+        color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default, 'AA')};
+        background-color: ${theme.colors.variant.lighter.default};
       }
     }
   }
