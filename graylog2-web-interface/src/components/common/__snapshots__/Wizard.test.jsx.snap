@@ -281,24 +281,29 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   color: rgb(88,73,5);
 }
 
+.c3.nav > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
 .c3.nav > li > a:hover,
 .c3.nav > li > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
 }
 
 .c3.nav > li.disabled > a {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c3.nav > li.disabled > a:hover,
 .c3.nav > li.disabled > a:focus {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c3.nav .open > a,
 .c3.nav .open > a:hover,
 .c3.nav .open > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
   border-color: #702785;
 }
 
@@ -317,12 +322,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #cdcdcd #cdcdcd rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c3.nav .nav-tabs > li > a:hover {
-  background-color: #cdcdcd;
-  color: rgb(46,46,46);
+  background-color: #f3f3f3;
+  color: #1f1f1f;
 }
 
 .c3.nav .nav-tabs > li.active > a,
@@ -1143,24 +1148,29 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   color: rgb(88,73,5);
 }
 
+.c3.nav > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
 .c3.nav > li > a:hover,
 .c3.nav > li > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
 }
 
 .c3.nav > li.disabled > a {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c3.nav > li.disabled > a:hover,
 .c3.nav > li.disabled > a:focus {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c3.nav .open > a,
 .c3.nav .open > a:hover,
 .c3.nav .open > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
   border-color: #702785;
 }
 
@@ -1179,12 +1189,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #cdcdcd #cdcdcd rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c3.nav .nav-tabs > li > a:hover {
-  background-color: #cdcdcd;
-  color: rgb(46,46,46);
+  background-color: #f3f3f3;
+  color: #1f1f1f;
 }
 
 .c3.nav .nav-tabs > li.active > a,
@@ -2018,24 +2028,29 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   color: rgb(88,73,5);
 }
 
+.c1.nav > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
 .c1.nav > li > a:hover,
 .c1.nav > li > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
 }
 
 .c1.nav > li.disabled > a {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c1.nav > li.disabled > a:hover,
 .c1.nav > li.disabled > a:focus {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c1.nav .open > a,
 .c1.nav .open > a:hover,
 .c1.nav .open > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
   border-color: #702785;
 }
 
@@ -2054,12 +2069,12 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #cdcdcd #cdcdcd rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c1.nav .nav-tabs > li > a:hover {
-  background-color: #cdcdcd;
-  color: rgb(46,46,46);
+  background-color: #f3f3f3;
+  color: #1f1f1f;
 }
 
 .c1.nav .nav-tabs > li.active > a,
@@ -2835,24 +2850,29 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   color: rgb(88,73,5);
 }
 
+.c1.nav > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
 .c1.nav > li > a:hover,
 .c1.nav > li > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
 }
 
 .c1.nav > li.disabled > a {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c1.nav > li.disabled > a:hover,
 .c1.nav > li.disabled > a:focus {
-  color: #9b9b9b;
+  color: #a6a6a6;
 }
 
 .c1.nav .open > a,
 .c1.nav .open > a:hover,
 .c1.nav .open > a:focus {
-  background-color: #e6e6e6;
+  background-color: #f3f3f3;
   border-color: #702785;
 }
 
@@ -2871,12 +2891,12 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #cdcdcd #cdcdcd rgb(198,207,231);
+  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
 }
 
 .c1.nav .nav-tabs > li > a:hover {
-  background-color: #cdcdcd;
-  color: rgb(46,46,46);
+  background-color: #f3f3f3;
+  color: #1f1f1f;
 }
 
 .c1.nav .nav-tabs > li.active > a,

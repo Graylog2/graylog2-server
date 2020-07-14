@@ -38,7 +38,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": false,
-            "lastClassName": "hFTltL",
+            "lastClassName": "enyPVU",
             "rules": Array [
               [Function],
             ],
@@ -200,7 +200,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Nav-dzawzr-0",
                             "isStatic": false,
-                            "lastClassName": "hFTltL",
+                            "lastClassName": "enyPVU",
                             "rules": Array [
                               [Function],
                             ],
@@ -224,7 +224,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         activeKey="selection"
                         bsClass="nav"
                         bsStyle="pills"
-                        className="Nav-dzawzr-0 hFTltL"
+                        className="Nav-dzawzr-0 enyPVU"
                         justified={false}
                         onSelect={[Function]}
                         pullLeft={false}
@@ -232,7 +232,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         stacked={true}
                       >
                         <ul
-                          className="Nav-dzawzr-0 hFTltL nav nav-pills nav-stacked"
+                          className="Nav-dzawzr-0 enyPVU nav nav-pills nav-stacked"
                           role={null}
                         >
                           <NavItem
@@ -2300,7 +2300,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": false,
-            "lastClassName": "hFTltL",
+            "lastClassName": "enyPVU",
             "rules": Array [
               [Function],
             ],
@@ -2556,7 +2556,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Nav-dzawzr-0",
                             "isStatic": false,
-                            "lastClassName": "hFTltL",
+                            "lastClassName": "enyPVU",
                             "rules": Array [
                               [Function],
                             ],
@@ -2580,7 +2580,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         activeKey="selection"
                         bsClass="nav"
                         bsStyle="pills"
-                        className="Nav-dzawzr-0 hFTltL"
+                        className="Nav-dzawzr-0 enyPVU"
                         justified={false}
                         onSelect={[Function]}
                         pullLeft={false}
@@ -2588,7 +2588,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         stacked={true}
                       >
                         <ul
-                          className="Nav-dzawzr-0 hFTltL nav nav-pills nav-stacked"
+                          className="Nav-dzawzr-0 enyPVU nav nav-pills nav-stacked"
                           role={null}
                         >
                           <NavItem
