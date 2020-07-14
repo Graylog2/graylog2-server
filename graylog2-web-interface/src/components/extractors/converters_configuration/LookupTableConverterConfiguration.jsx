@@ -37,6 +37,7 @@ class LookupTableConverterConfiguration extends React.Component {
 
   _toggleConverter = (event) => {
     let converter;
+
     if (FormUtils.getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
@@ -46,6 +47,7 @@ class LookupTableConverterConfiguration extends React.Component {
 
   _updateConfigValue = (key, value) => {
     const newConfig = this.props.configuration;
+
     newConfig[key] = value;
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
   };

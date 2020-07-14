@@ -198,7 +198,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "jVYrA",
+              "lastClassName": "hpBclA",
               "rules": Array [
                 [Function],
               ],
@@ -222,12 +222,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 jVYrA"
+          className="Button__StyledButton-c9cbmb-0 hpBclA"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -251,7 +251,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           "componentStyle": ComponentStyle {
             "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "hJzPyZ",
+            "lastClassName": "iEmhYW",
             "rules": Array [
               [Function],
               "margin-top:10px;",
@@ -275,14 +275,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hJzPyZ"
+        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 iEmhYW"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 hJzPyZ table table-striped table-bordered"
+          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 iEmhYW table table-striped table-bordered"
         >
           <thead>
             <tr>
@@ -409,7 +409,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -435,7 +435,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       defaultValue="testam"
                                       inputRef={[Function]}
@@ -447,7 +447,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         defaultValue="testam"
                                         id="title-input0"
                                         label=""
@@ -561,7 +561,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -587,7 +587,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -599,7 +599,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input0"
                                         label=""
@@ -756,8 +756,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "inputBackground": "#fff",
                                             "link": "#702785",
                                             "linkHover": "#410057",
-                                            "tableBackground": "#ffffff",
-                                            "tableBackgroundAlt": "#cdcdcd",
                                             "textAlt": "#fff",
                                             "textDefault": "#1f1f1f",
                                           },
@@ -773,57 +771,78 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "80": "#cdcdcd",
                                             "90": "#e6e6e6",
                                           },
+                                          "table": Object {
+                                            "background": "#fafafa",
+                                            "backgroundAlt": "#f0f0f0",
+                                            "backgroundHover": "#f5f5f5",
+                                            "variant": Object {
+                                              "active": "#e6e6e6",
+                                              "danger": "#eddddd",
+                                              "info": "#dde2f0",
+                                              "primary": "#e4dee7",
+                                              "success": "#ddeddf",
+                                              "warning": "#fff5dd",
+                                            },
+                                            "variantHover": Object {
+                                              "active": "#d0d0d0",
+                                              "danger": "#debdbd",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
+                                            },
+                                          },
                                           "variant": Object {
                                             "danger": "#ad0707",
                                             "dark": Object {
-                                              "danger": "#9f0606",
-                                              "default": "#1d1d1d",
-                                              "info": "#005baf",
-                                              "primary": "#67247b",
-                                              "success": "#00a03d",
-                                              "warning": "#ebc200",
+                                              "danger": "#990606",
+                                              "default": "#737373",
+                                              "info": "#0057a8",
+                                              "primary": "#632275",
+                                              "success": "#009a3a",
+                                              "warning": "#e1b900",
                                             },
                                             "darker": Object {
-                                              "danger": "#7a0505",
-                                              "default": "#161616",
-                                              "info": "#004686",
-                                              "primary": "#4f1c5e",
-                                              "success": "#007b2f",
-                                              "warning": "#b49400",
+                                              "danger": "#740505",
+                                              "default": "#575757",
+                                              "info": "#00427f",
+                                              "primary": "#4b1a59",
+                                              "success": "#00752c",
+                                              "warning": "#ab8d00",
                                             },
                                             "darkest": Object {
-                                              "danger": "#430303",
-                                              "default": "#0c0c0c",
-                                              "info": "#00264a",
-                                              "primary": "#2b0f34",
-                                              "success": "#00431a",
-                                              "warning": "#635100",
+                                              "danger": "#3c0202",
+                                              "default": "#2d2d2d",
+                                              "info": "#002242",
+                                              "primary": "#270e2e",
+                                              "success": "#003c17",
+                                              "warning": "#584900",
                                             },
-                                            "default": "#1f1f1f",
+                                            "default": "#828282",
                                             "info": "#0063be",
                                             "light": Object {
-                                              "danger": "#bc6363",
-                                              "default": "#676767",
-                                              "info": "#6386c9",
-                                              "primary": "#8f699d",
-                                              "success": "#63bc74",
-                                              "warning": "#ffd963",
+                                              "danger": "#c27878",
+                                              "default": "#a6a6a6",
+                                              "info": "#7894ce",
+                                              "primary": "#9b7ca8",
+                                              "success": "#78c385",
+                                              "warning": "#ffdd78",
                                             },
                                             "lighter": Object {
-                                              "danger": "#dab4b4",
-                                              "default": "#b6b6b6",
-                                              "info": "#b4c1e1",
-                                              "primary": "#c5b6cb",
-                                              "success": "#b4daba",
-                                              "warning": "#ffeab4",
+                                              "danger": "#debdbd",
+                                              "default": "#d0d0d0",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
                                             },
                                             "lightest": Object {
-                                              "danger": "#f4ebeb",
-                                              "default": "#ebebeb",
-                                              "info": "#ebeef6",
-                                              "primary": "#efecf1",
-                                              "success": "#ebf5ec",
-                                              "warning": "#fff9eb",
+                                              "danger": "#f7efef",
+                                              "default": "#f3f3f3",
+                                              "info": "#eff2f8",
+                                              "primary": "#f2f0f4",
+                                              "success": "#eff7f0",
+                                              "warning": "#fffaef",
                                             },
                                             "primary": "#702785",
                                             "success": "#00ae42",
@@ -1160,10 +1179,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             Object {
                                               "borderRadius": 4,
                                               "colors": Object {
-                                                "danger": "#004686",
-                                                "dangerLight": "#b4c1e1",
+                                                "danger": "#00427f",
+                                                "dangerLight": "#bdc8e4",
                                                 "neutral0": "#ffffff",
-                                                "neutral10": "#ebeef6",
+                                                "neutral10": "#eff2f8",
                                                 "neutral20": "#cdcdcd",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
@@ -1173,10 +1192,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 "neutral70": "#515151",
                                                 "neutral80": "#383838",
                                                 "neutral90": "#1f1f1f",
-                                                "primary": "#6386c9",
-                                                "primary25": "#ebebeb",
-                                                "primary50": "#b6b6b6",
-                                                "primary75": "#676767",
+                                                "primary": "#7894ce",
+                                                "primary25": "#f3f3f3",
+                                                "primary50": "#d0d0d0",
+                                                "primary75": "#a6a6a6",
                                               },
                                               "spacing": Object {
                                                 "baseUnit": 4,
@@ -1312,10 +1331,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 Object {
                                                   "borderRadius": 4,
                                                   "colors": Object {
-                                                    "danger": "#004686",
-                                                    "dangerLight": "#b4c1e1",
+                                                    "danger": "#00427f",
+                                                    "dangerLight": "#bdc8e4",
                                                     "neutral0": "#ffffff",
-                                                    "neutral10": "#ebeef6",
+                                                    "neutral10": "#eff2f8",
                                                     "neutral20": "#cdcdcd",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
@@ -1325,10 +1344,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     "neutral70": "#515151",
                                                     "neutral80": "#383838",
                                                     "neutral90": "#1f1f1f",
-                                                    "primary": "#6386c9",
-                                                    "primary25": "#ebebeb",
-                                                    "primary50": "#b6b6b6",
-                                                    "primary75": "#676767",
+                                                    "primary": "#7894ce",
+                                                    "primary25": "#f3f3f3",
+                                                    "primary50": "#d0d0d0",
+                                                    "primary75": "#a6a6a6",
                                                   },
                                                   "spacing": Object {
                                                     "baseUnit": 4,
@@ -1339,7 +1358,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               }
                                             >
                                               <div
-                                                className="css-1nvce9p-control"
+                                                className="css-et9nfk-control"
                                                 onMouseDown={[Function]}
                                                 onTouchEnd={[Function]}
                                               >
@@ -1456,10 +1475,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     Object {
                                                       "borderRadius": 4,
                                                       "colors": Object {
-                                                        "danger": "#004686",
-                                                        "dangerLight": "#b4c1e1",
+                                                        "danger": "#00427f",
+                                                        "dangerLight": "#bdc8e4",
                                                         "neutral0": "#ffffff",
-                                                        "neutral10": "#ebeef6",
+                                                        "neutral10": "#eff2f8",
                                                         "neutral20": "#cdcdcd",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
@@ -1469,10 +1488,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "neutral70": "#515151",
                                                         "neutral80": "#383838",
                                                         "neutral90": "#1f1f1f",
-                                                        "primary": "#6386c9",
-                                                        "primary25": "#ebebeb",
-                                                        "primary50": "#b6b6b6",
-                                                        "primary75": "#676767",
+                                                        "primary": "#7894ce",
+                                                        "primary25": "#f3f3f3",
+                                                        "primary50": "#d0d0d0",
+                                                        "primary75": "#a6a6a6",
                                                       },
                                                       "spacing": Object {
                                                         "baseUnit": 4,
@@ -1604,10 +1623,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -1617,10 +1636,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -1742,10 +1761,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -1755,10 +1774,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -1973,10 +1992,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     Object {
                                                       "borderRadius": 4,
                                                       "colors": Object {
-                                                        "danger": "#004686",
-                                                        "dangerLight": "#b4c1e1",
+                                                        "danger": "#00427f",
+                                                        "dangerLight": "#bdc8e4",
                                                         "neutral0": "#ffffff",
-                                                        "neutral10": "#ebeef6",
+                                                        "neutral10": "#eff2f8",
                                                         "neutral20": "#cdcdcd",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
@@ -1986,10 +2005,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "neutral70": "#515151",
                                                         "neutral80": "#383838",
                                                         "neutral90": "#1f1f1f",
-                                                        "primary": "#6386c9",
-                                                        "primary25": "#ebebeb",
-                                                        "primary50": "#b6b6b6",
-                                                        "primary75": "#676767",
+                                                        "primary": "#7894ce",
+                                                        "primary25": "#f3f3f3",
+                                                        "primary50": "#d0d0d0",
+                                                        "primary75": "#a6a6a6",
                                                       },
                                                       "spacing": Object {
                                                         "baseUnit": 4,
@@ -2116,10 +2135,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -2129,10 +2148,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -2263,10 +2282,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -2276,10 +2295,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -2377,7 +2396,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "hpBclA",
                             "rules": Array [
                               [Function],
                             ],
@@ -2400,12 +2419,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -2539,7 +2558,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2565,7 +2584,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -2577,7 +2596,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         defaultValue="test"
                                         id="title-input1"
                                         label=""
@@ -2691,7 +2710,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -2717,7 +2736,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -2729,7 +2748,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input1"
                                         label=""
@@ -2886,8 +2905,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "inputBackground": "#fff",
                                             "link": "#702785",
                                             "linkHover": "#410057",
-                                            "tableBackground": "#ffffff",
-                                            "tableBackgroundAlt": "#cdcdcd",
                                             "textAlt": "#fff",
                                             "textDefault": "#1f1f1f",
                                           },
@@ -2903,57 +2920,78 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "80": "#cdcdcd",
                                             "90": "#e6e6e6",
                                           },
+                                          "table": Object {
+                                            "background": "#fafafa",
+                                            "backgroundAlt": "#f0f0f0",
+                                            "backgroundHover": "#f5f5f5",
+                                            "variant": Object {
+                                              "active": "#e6e6e6",
+                                              "danger": "#eddddd",
+                                              "info": "#dde2f0",
+                                              "primary": "#e4dee7",
+                                              "success": "#ddeddf",
+                                              "warning": "#fff5dd",
+                                            },
+                                            "variantHover": Object {
+                                              "active": "#d0d0d0",
+                                              "danger": "#debdbd",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
+                                            },
+                                          },
                                           "variant": Object {
                                             "danger": "#ad0707",
                                             "dark": Object {
-                                              "danger": "#9f0606",
-                                              "default": "#1d1d1d",
-                                              "info": "#005baf",
-                                              "primary": "#67247b",
-                                              "success": "#00a03d",
-                                              "warning": "#ebc200",
+                                              "danger": "#990606",
+                                              "default": "#737373",
+                                              "info": "#0057a8",
+                                              "primary": "#632275",
+                                              "success": "#009a3a",
+                                              "warning": "#e1b900",
                                             },
                                             "darker": Object {
-                                              "danger": "#7a0505",
-                                              "default": "#161616",
-                                              "info": "#004686",
-                                              "primary": "#4f1c5e",
-                                              "success": "#007b2f",
-                                              "warning": "#b49400",
+                                              "danger": "#740505",
+                                              "default": "#575757",
+                                              "info": "#00427f",
+                                              "primary": "#4b1a59",
+                                              "success": "#00752c",
+                                              "warning": "#ab8d00",
                                             },
                                             "darkest": Object {
-                                              "danger": "#430303",
-                                              "default": "#0c0c0c",
-                                              "info": "#00264a",
-                                              "primary": "#2b0f34",
-                                              "success": "#00431a",
-                                              "warning": "#635100",
+                                              "danger": "#3c0202",
+                                              "default": "#2d2d2d",
+                                              "info": "#002242",
+                                              "primary": "#270e2e",
+                                              "success": "#003c17",
+                                              "warning": "#584900",
                                             },
-                                            "default": "#1f1f1f",
+                                            "default": "#828282",
                                             "info": "#0063be",
                                             "light": Object {
-                                              "danger": "#bc6363",
-                                              "default": "#676767",
-                                              "info": "#6386c9",
-                                              "primary": "#8f699d",
-                                              "success": "#63bc74",
-                                              "warning": "#ffd963",
+                                              "danger": "#c27878",
+                                              "default": "#a6a6a6",
+                                              "info": "#7894ce",
+                                              "primary": "#9b7ca8",
+                                              "success": "#78c385",
+                                              "warning": "#ffdd78",
                                             },
                                             "lighter": Object {
-                                              "danger": "#dab4b4",
-                                              "default": "#b6b6b6",
-                                              "info": "#b4c1e1",
-                                              "primary": "#c5b6cb",
-                                              "success": "#b4daba",
-                                              "warning": "#ffeab4",
+                                              "danger": "#debdbd",
+                                              "default": "#d0d0d0",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
                                             },
                                             "lightest": Object {
-                                              "danger": "#f4ebeb",
-                                              "default": "#ebebeb",
-                                              "info": "#ebeef6",
-                                              "primary": "#efecf1",
-                                              "success": "#ebf5ec",
-                                              "warning": "#fff9eb",
+                                              "danger": "#f7efef",
+                                              "default": "#f3f3f3",
+                                              "info": "#eff2f8",
+                                              "primary": "#f2f0f4",
+                                              "success": "#eff7f0",
+                                              "warning": "#fffaef",
                                             },
                                             "primary": "#702785",
                                             "success": "#00ae42",
@@ -3290,10 +3328,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             Object {
                                               "borderRadius": 4,
                                               "colors": Object {
-                                                "danger": "#004686",
-                                                "dangerLight": "#b4c1e1",
+                                                "danger": "#00427f",
+                                                "dangerLight": "#bdc8e4",
                                                 "neutral0": "#ffffff",
-                                                "neutral10": "#ebeef6",
+                                                "neutral10": "#eff2f8",
                                                 "neutral20": "#cdcdcd",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
@@ -3303,10 +3341,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 "neutral70": "#515151",
                                                 "neutral80": "#383838",
                                                 "neutral90": "#1f1f1f",
-                                                "primary": "#6386c9",
-                                                "primary25": "#ebebeb",
-                                                "primary50": "#b6b6b6",
-                                                "primary75": "#676767",
+                                                "primary": "#7894ce",
+                                                "primary25": "#f3f3f3",
+                                                "primary50": "#d0d0d0",
+                                                "primary75": "#a6a6a6",
                                               },
                                               "spacing": Object {
                                                 "baseUnit": 4,
@@ -3442,10 +3480,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 Object {
                                                   "borderRadius": 4,
                                                   "colors": Object {
-                                                    "danger": "#004686",
-                                                    "dangerLight": "#b4c1e1",
+                                                    "danger": "#00427f",
+                                                    "dangerLight": "#bdc8e4",
                                                     "neutral0": "#ffffff",
-                                                    "neutral10": "#ebeef6",
+                                                    "neutral10": "#eff2f8",
                                                     "neutral20": "#cdcdcd",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
@@ -3455,10 +3493,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     "neutral70": "#515151",
                                                     "neutral80": "#383838",
                                                     "neutral90": "#1f1f1f",
-                                                    "primary": "#6386c9",
-                                                    "primary25": "#ebebeb",
-                                                    "primary50": "#b6b6b6",
-                                                    "primary75": "#676767",
+                                                    "primary": "#7894ce",
+                                                    "primary25": "#f3f3f3",
+                                                    "primary50": "#d0d0d0",
+                                                    "primary75": "#a6a6a6",
                                                   },
                                                   "spacing": Object {
                                                     "baseUnit": 4,
@@ -3469,7 +3507,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               }
                                             >
                                               <div
-                                                className="css-1nvce9p-control"
+                                                className="css-et9nfk-control"
                                                 onMouseDown={[Function]}
                                                 onTouchEnd={[Function]}
                                               >
@@ -3586,10 +3624,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     Object {
                                                       "borderRadius": 4,
                                                       "colors": Object {
-                                                        "danger": "#004686",
-                                                        "dangerLight": "#b4c1e1",
+                                                        "danger": "#00427f",
+                                                        "dangerLight": "#bdc8e4",
                                                         "neutral0": "#ffffff",
-                                                        "neutral10": "#ebeef6",
+                                                        "neutral10": "#eff2f8",
                                                         "neutral20": "#cdcdcd",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
@@ -3599,10 +3637,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "neutral70": "#515151",
                                                         "neutral80": "#383838",
                                                         "neutral90": "#1f1f1f",
-                                                        "primary": "#6386c9",
-                                                        "primary25": "#ebebeb",
-                                                        "primary50": "#b6b6b6",
-                                                        "primary75": "#676767",
+                                                        "primary": "#7894ce",
+                                                        "primary25": "#f3f3f3",
+                                                        "primary50": "#d0d0d0",
+                                                        "primary75": "#a6a6a6",
                                                       },
                                                       "spacing": Object {
                                                         "baseUnit": 4,
@@ -3734,10 +3772,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -3747,10 +3785,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -3872,10 +3910,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -3885,10 +3923,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -4103,10 +4141,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     Object {
                                                       "borderRadius": 4,
                                                       "colors": Object {
-                                                        "danger": "#004686",
-                                                        "dangerLight": "#b4c1e1",
+                                                        "danger": "#00427f",
+                                                        "dangerLight": "#bdc8e4",
                                                         "neutral0": "#ffffff",
-                                                        "neutral10": "#ebeef6",
+                                                        "neutral10": "#eff2f8",
                                                         "neutral20": "#cdcdcd",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
@@ -4116,10 +4154,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "neutral70": "#515151",
                                                         "neutral80": "#383838",
                                                         "neutral90": "#1f1f1f",
-                                                        "primary": "#6386c9",
-                                                        "primary25": "#ebebeb",
-                                                        "primary50": "#b6b6b6",
-                                                        "primary75": "#676767",
+                                                        "primary": "#7894ce",
+                                                        "primary25": "#f3f3f3",
+                                                        "primary50": "#d0d0d0",
+                                                        "primary75": "#a6a6a6",
                                                       },
                                                       "spacing": Object {
                                                         "baseUnit": 4,
@@ -4246,10 +4284,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -4259,10 +4297,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -4393,10 +4431,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -4406,10 +4444,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -4507,7 +4545,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "hpBclA",
                             "rules": Array [
                               [Function],
                             ],
@@ -4530,12 +4568,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -4669,7 +4707,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -4695,7 +4733,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       defaultValue="test"
                                       inputRef={[Function]}
@@ -4707,7 +4745,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         defaultValue="test"
                                         id="title-input2"
                                         label=""
@@ -4821,7 +4859,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "componentStyle": ComponentStyle {
                                           "componentId": "FormControl-sc-1amoaox-0",
                                           "isStatic": false,
-                                          "lastClassName": "fdBWEX",
+                                          "lastClassName": "eXfwDC",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -4847,7 +4885,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fdBWEX"
+                                      className="FormControl-sc-1amoaox-0 eXfwDC"
                                       componentClass="input"
                                       defaultValue="http://localhost:8080/system/"
                                       inputRef={[Function]}
@@ -4859,7 +4897,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       type="text"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                        className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                         defaultValue="http://localhost:8080/system/"
                                         id="value-input2"
                                         label=""
@@ -5016,8 +5054,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "inputBackground": "#fff",
                                             "link": "#702785",
                                             "linkHover": "#410057",
-                                            "tableBackground": "#ffffff",
-                                            "tableBackgroundAlt": "#cdcdcd",
                                             "textAlt": "#fff",
                                             "textDefault": "#1f1f1f",
                                           },
@@ -5033,57 +5069,78 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             "80": "#cdcdcd",
                                             "90": "#e6e6e6",
                                           },
+                                          "table": Object {
+                                            "background": "#fafafa",
+                                            "backgroundAlt": "#f0f0f0",
+                                            "backgroundHover": "#f5f5f5",
+                                            "variant": Object {
+                                              "active": "#e6e6e6",
+                                              "danger": "#eddddd",
+                                              "info": "#dde2f0",
+                                              "primary": "#e4dee7",
+                                              "success": "#ddeddf",
+                                              "warning": "#fff5dd",
+                                            },
+                                            "variantHover": Object {
+                                              "active": "#d0d0d0",
+                                              "danger": "#debdbd",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
+                                            },
+                                          },
                                           "variant": Object {
                                             "danger": "#ad0707",
                                             "dark": Object {
-                                              "danger": "#9f0606",
-                                              "default": "#1d1d1d",
-                                              "info": "#005baf",
-                                              "primary": "#67247b",
-                                              "success": "#00a03d",
-                                              "warning": "#ebc200",
+                                              "danger": "#990606",
+                                              "default": "#737373",
+                                              "info": "#0057a8",
+                                              "primary": "#632275",
+                                              "success": "#009a3a",
+                                              "warning": "#e1b900",
                                             },
                                             "darker": Object {
-                                              "danger": "#7a0505",
-                                              "default": "#161616",
-                                              "info": "#004686",
-                                              "primary": "#4f1c5e",
-                                              "success": "#007b2f",
-                                              "warning": "#b49400",
+                                              "danger": "#740505",
+                                              "default": "#575757",
+                                              "info": "#00427f",
+                                              "primary": "#4b1a59",
+                                              "success": "#00752c",
+                                              "warning": "#ab8d00",
                                             },
                                             "darkest": Object {
-                                              "danger": "#430303",
-                                              "default": "#0c0c0c",
-                                              "info": "#00264a",
-                                              "primary": "#2b0f34",
-                                              "success": "#00431a",
-                                              "warning": "#635100",
+                                              "danger": "#3c0202",
+                                              "default": "#2d2d2d",
+                                              "info": "#002242",
+                                              "primary": "#270e2e",
+                                              "success": "#003c17",
+                                              "warning": "#584900",
                                             },
-                                            "default": "#1f1f1f",
+                                            "default": "#828282",
                                             "info": "#0063be",
                                             "light": Object {
-                                              "danger": "#bc6363",
-                                              "default": "#676767",
-                                              "info": "#6386c9",
-                                              "primary": "#8f699d",
-                                              "success": "#63bc74",
-                                              "warning": "#ffd963",
+                                              "danger": "#c27878",
+                                              "default": "#a6a6a6",
+                                              "info": "#7894ce",
+                                              "primary": "#9b7ca8",
+                                              "success": "#78c385",
+                                              "warning": "#ffdd78",
                                             },
                                             "lighter": Object {
-                                              "danger": "#dab4b4",
-                                              "default": "#b6b6b6",
-                                              "info": "#b4c1e1",
-                                              "primary": "#c5b6cb",
-                                              "success": "#b4daba",
-                                              "warning": "#ffeab4",
+                                              "danger": "#debdbd",
+                                              "default": "#d0d0d0",
+                                              "info": "#bdc8e4",
+                                              "primary": "#cbbfd1",
+                                              "success": "#bddec2",
+                                              "warning": "#ffecbd",
                                             },
                                             "lightest": Object {
-                                              "danger": "#f4ebeb",
-                                              "default": "#ebebeb",
-                                              "info": "#ebeef6",
-                                              "primary": "#efecf1",
-                                              "success": "#ebf5ec",
-                                              "warning": "#fff9eb",
+                                              "danger": "#f7efef",
+                                              "default": "#f3f3f3",
+                                              "info": "#eff2f8",
+                                              "primary": "#f2f0f4",
+                                              "success": "#eff7f0",
+                                              "warning": "#fffaef",
                                             },
                                             "primary": "#702785",
                                             "success": "#00ae42",
@@ -5420,10 +5477,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                             Object {
                                               "borderRadius": 4,
                                               "colors": Object {
-                                                "danger": "#004686",
-                                                "dangerLight": "#b4c1e1",
+                                                "danger": "#00427f",
+                                                "dangerLight": "#bdc8e4",
                                                 "neutral0": "#ffffff",
-                                                "neutral10": "#ebeef6",
+                                                "neutral10": "#eff2f8",
                                                 "neutral20": "#cdcdcd",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
@@ -5433,10 +5490,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 "neutral70": "#515151",
                                                 "neutral80": "#383838",
                                                 "neutral90": "#1f1f1f",
-                                                "primary": "#6386c9",
-                                                "primary25": "#ebebeb",
-                                                "primary50": "#b6b6b6",
-                                                "primary75": "#676767",
+                                                "primary": "#7894ce",
+                                                "primary25": "#f3f3f3",
+                                                "primary50": "#d0d0d0",
+                                                "primary75": "#a6a6a6",
                                               },
                                               "spacing": Object {
                                                 "baseUnit": 4,
@@ -5572,10 +5629,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                 Object {
                                                   "borderRadius": 4,
                                                   "colors": Object {
-                                                    "danger": "#004686",
-                                                    "dangerLight": "#b4c1e1",
+                                                    "danger": "#00427f",
+                                                    "dangerLight": "#bdc8e4",
                                                     "neutral0": "#ffffff",
-                                                    "neutral10": "#ebeef6",
+                                                    "neutral10": "#eff2f8",
                                                     "neutral20": "#cdcdcd",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
@@ -5585,10 +5642,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     "neutral70": "#515151",
                                                     "neutral80": "#383838",
                                                     "neutral90": "#1f1f1f",
-                                                    "primary": "#6386c9",
-                                                    "primary25": "#ebebeb",
-                                                    "primary50": "#b6b6b6",
-                                                    "primary75": "#676767",
+                                                    "primary": "#7894ce",
+                                                    "primary25": "#f3f3f3",
+                                                    "primary50": "#d0d0d0",
+                                                    "primary75": "#a6a6a6",
                                                   },
                                                   "spacing": Object {
                                                     "baseUnit": 4,
@@ -5599,7 +5656,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               }
                                             >
                                               <div
-                                                className="css-1nvce9p-control"
+                                                className="css-et9nfk-control"
                                                 onMouseDown={[Function]}
                                                 onTouchEnd={[Function]}
                                               >
@@ -5716,10 +5773,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     Object {
                                                       "borderRadius": 4,
                                                       "colors": Object {
-                                                        "danger": "#004686",
-                                                        "dangerLight": "#b4c1e1",
+                                                        "danger": "#00427f",
+                                                        "dangerLight": "#bdc8e4",
                                                         "neutral0": "#ffffff",
-                                                        "neutral10": "#ebeef6",
+                                                        "neutral10": "#eff2f8",
                                                         "neutral20": "#cdcdcd",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
@@ -5729,10 +5786,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "neutral70": "#515151",
                                                         "neutral80": "#383838",
                                                         "neutral90": "#1f1f1f",
-                                                        "primary": "#6386c9",
-                                                        "primary25": "#ebebeb",
-                                                        "primary50": "#b6b6b6",
-                                                        "primary75": "#676767",
+                                                        "primary": "#7894ce",
+                                                        "primary25": "#f3f3f3",
+                                                        "primary50": "#d0d0d0",
+                                                        "primary75": "#a6a6a6",
                                                       },
                                                       "spacing": Object {
                                                         "baseUnit": 4,
@@ -5864,10 +5921,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -5877,10 +5934,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -6002,10 +6059,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -6015,10 +6072,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -6233,10 +6290,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                     Object {
                                                       "borderRadius": 4,
                                                       "colors": Object {
-                                                        "danger": "#004686",
-                                                        "dangerLight": "#b4c1e1",
+                                                        "danger": "#00427f",
+                                                        "dangerLight": "#bdc8e4",
                                                         "neutral0": "#ffffff",
-                                                        "neutral10": "#ebeef6",
+                                                        "neutral10": "#eff2f8",
                                                         "neutral20": "#cdcdcd",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
@@ -6246,10 +6303,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         "neutral70": "#515151",
                                                         "neutral80": "#383838",
                                                         "neutral90": "#1f1f1f",
-                                                        "primary": "#6386c9",
-                                                        "primary25": "#ebebeb",
-                                                        "primary50": "#b6b6b6",
-                                                        "primary75": "#676767",
+                                                        "primary": "#7894ce",
+                                                        "primary25": "#f3f3f3",
+                                                        "primary50": "#d0d0d0",
+                                                        "primary75": "#a6a6a6",
                                                       },
                                                       "spacing": Object {
                                                         "baseUnit": 4,
@@ -6376,10 +6433,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -6389,10 +6446,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -6523,10 +6580,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                         Object {
                                                           "borderRadius": 4,
                                                           "colors": Object {
-                                                            "danger": "#004686",
-                                                            "dangerLight": "#b4c1e1",
+                                                            "danger": "#00427f",
+                                                            "dangerLight": "#bdc8e4",
                                                             "neutral0": "#ffffff",
-                                                            "neutral10": "#ebeef6",
+                                                            "neutral10": "#eff2f8",
                                                             "neutral20": "#cdcdcd",
                                                             "neutral30": "#b4b4b4",
                                                             "neutral40": "#9b9b9b",
@@ -6536,10 +6593,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                             "neutral70": "#515151",
                                                             "neutral80": "#383838",
                                                             "neutral90": "#1f1f1f",
-                                                            "primary": "#6386c9",
-                                                            "primary25": "#ebebeb",
-                                                            "primary50": "#b6b6b6",
-                                                            "primary75": "#676767",
+                                                            "primary": "#7894ce",
+                                                            "primary25": "#f3f3f3",
+                                                            "primary50": "#d0d0d0",
+                                                            "primary75": "#a6a6a6",
                                                           },
                                                           "spacing": Object {
                                                             "baseUnit": 4,
@@ -6637,7 +6694,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "hpBclA",
                             "rules": Array [
                               [Function],
                             ],
@@ -6660,12 +6717,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6730,7 +6787,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "jVYrA",
+              "lastClassName": "hpBclA",
               "rules": Array [
                 [Function],
               ],
@@ -6754,12 +6811,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 jVYrA"
+          className="Button__StyledButton-c9cbmb-0 hpBclA"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"

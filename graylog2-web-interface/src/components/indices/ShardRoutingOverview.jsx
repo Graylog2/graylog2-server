@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import naturalSort from 'javascript-natural-sort';
 
 import { ShardRouting } from 'components/indices';
 
-const ShardRoutingWrap = styled.div(({ theme }) => `
+const ShardRoutingWrap = styled.div(({ theme }) => css`
   .shards {
     .shard {
       padding: 10px;

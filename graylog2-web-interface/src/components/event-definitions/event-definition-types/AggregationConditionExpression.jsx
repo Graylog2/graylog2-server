@@ -19,7 +19,6 @@ import GroupExpression from './AggregationConditionExpressions/GroupExpression';
 
 import styles from './AggregationConditionExpression.css';
 
-
 class AggregationConditionExpression extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
@@ -46,11 +45,13 @@ class AggregationConditionExpression extends React.Component {
 
   getEffectiveGlobalGroupOperator = () => {
     const { globalGroupOperator } = this.state;
+
     if (globalGroupOperator) {
       return globalGroupOperator;
     }
 
     const { expression } = this.props;
+
     return (expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&');
   };
 
@@ -58,7 +59,9 @@ class AggregationConditionExpression extends React.Component {
     if (!expression) {
       return defaultOperator;
     }
+
     const key = expression.expr === 'group' ? 'operator' : 'expr';
+
     return lodash.get(expression, key, defaultOperator) === '&&' ? '&&' : '||';
   };
 
@@ -67,6 +70,7 @@ class AggregationConditionExpression extends React.Component {
     const defaultOperator = this.getEffectiveGlobalGroupOperator();
     const prevOperator = this.getBooleanOperator(parent, defaultOperator);
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression });
+
     onChange({ conditions: nextExpression });
   };
 
@@ -77,11 +81,13 @@ class AggregationConditionExpression extends React.Component {
     const groupOperator = prevOperator === '&&' ? '||' : '&&';
     const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
+
     onChange({ conditions: nextExpression });
   };
 
   handleDeleteExpression = () => {
     const { onChange } = this.props;
+
     onChange({ conditions: null });
   };
 
@@ -91,11 +97,13 @@ class AggregationConditionExpression extends React.Component {
 
       if (!Object.keys(changes).includes('conditions')) {
         onChange(changes);
+
         return;
       }
 
       const update = changes.conditions;
       let nextUpdate;
+
       // A null update indicates that one of the branches got removed
       if (update === null) {
         if (branch === 'child') {
@@ -111,6 +119,7 @@ class AggregationConditionExpression extends React.Component {
       } else {
         // Propagate the update in the expression tree.
         const nextExpression = lodash.cloneDeep(expression);
+
         nextExpression[branch] = update;
         nextUpdate = nextExpression;
       }
@@ -121,8 +130,10 @@ class AggregationConditionExpression extends React.Component {
 
   handleOperatorChange = (nextOperator) => {
     const { expression, onChange } = this.props;
+
     this.setState({ globalGroupOperator: nextOperator });
     const nextExpression = replaceBooleanExpressionOperatorInGroup(nextOperator, expression);
+
     onChange({ conditions: nextExpression });
   };
 
@@ -147,6 +158,7 @@ class AggregationConditionExpression extends React.Component {
                              onChildChange={this.handleChildChange}
                              parent={parent} />
         );
+
         break;
       case '<':
       case '<=':

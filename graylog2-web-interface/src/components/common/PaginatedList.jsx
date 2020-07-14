@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import { Pagination } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
+
+import Pagination from './Pagination';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
 const INITIAL_PAGE = 1;
@@ -16,8 +17,10 @@ type PageSizeSelectProps = {
   onChange: (event: SyntheticInputEvent<HTMLLinkElement>) => void,
 };
 
+const pageFormStyle = { float: 'right' /* stylelint-disable-line declaration-colon-space-after */ };
+
 const PageSizeSelect = ({ pageSizes, pageSize, onChange }: PageSizeSelectProps) => (
-  <div className="form-inline page-size" style={{ float: 'right' }}>
+  <div className="form-inline page-size" style={pageFormStyle}>
     <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={onChange}>
       {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
     </Input>
@@ -57,6 +60,7 @@ const PaginatedList = ({
   useEffect(() => {
     setCurrentPage(activePage);
   }, [activePage]);
+
   useEffect(() => {
     setPageSize(propsPageSize);
   }, [propsPageSize]);
@@ -64,15 +68,15 @@ const PaginatedList = ({
   const _onChangePageSize = (event: SyntheticInputEvent<HTMLLinkElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
+
     setCurrentPage(INITIAL_PAGE);
     setPageSize(newPageSize);
     onChange(INITIAL_PAGE, newPageSize);
   };
 
-  const _onChangePage = (pageNo: number, event: MouseEvent) => {
-    event.preventDefault();
-    setCurrentPage(pageNo);
-    onChange(pageNo, pageSize);
+  const _onChangePage = (pageNum: number) => {
+    setCurrentPage(pageNum);
+    onChange(pageNum, pageSize);
   };
 
   return (
@@ -85,15 +89,9 @@ const PaginatedList = ({
 
       <IfInteractive>
         <div className="text-center pagination-wrapper">
-          <Pagination bsSize="small"
-                      items={numberPages}
-                      maxButtons={10}
-                      activePage={currentPage}
-                      onSelect={_onChangePage}
-                      prev
-                      next
-                      first
-                      last />
+          <Pagination totalPages={numberPages}
+                      currentPage={currentPage}
+                      onChange={_onChangePage} />
         </div>
       </IfInteractive>
     </>

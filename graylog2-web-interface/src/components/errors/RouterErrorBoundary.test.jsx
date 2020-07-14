@@ -35,6 +35,7 @@ describe('RouterErrorBoundary', () => {
           <ErroneusComponent />
         </RouterErrorBoundary>,
       );
+
       expect(getByText('Oh no, a banana peel fell on the party gorilla\'s head!')).not.toBeNull();
     });
   });

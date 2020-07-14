@@ -1,9 +1,10 @@
 // @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import connect from 'stores/connect';
 import Field from 'views/components/Field';
 import Value from 'views/components/Value';
@@ -15,7 +16,6 @@ import type { Message } from './Types';
 
 import CustomPropTypes from '../CustomPropTypes';
 import InteractiveContext from '../contexts/InteractiveContext';
-
 
 const SPECIAL_FIELDS = ['full_message', 'level'];
 
@@ -29,7 +29,7 @@ type Props = {
   },
 };
 
-const DecoratedField: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.small(({ theme }) => `
+const DecoratedField: StyledComponent<{}, ThemeInterface, HTMLElement> = styled.small(({ theme }) => css`
   color: ${theme.colors.gray[70]};
   font-weight: normal;
 `);

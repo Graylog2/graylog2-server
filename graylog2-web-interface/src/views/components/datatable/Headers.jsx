@@ -32,14 +32,18 @@ const columnPivotFieldsHeaders = (activeQuery, columnPivots, actualColumnPivotVa
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
       const lastKey = get(last(prev), 'key');
       const lastPath = get(last(prev), 'path');
+
       if (lastKey === cur.key && isEqual(lastPath, cur.path)) {
         const lastItem = last(prev);
         const remainder = prev.slice(0, -1);
         const newLastItem = { ...lastItem, count: lastItem.count + 1 };
+
         return [].concat(remainder, [newLastItem]);
       }
+
       return [].concat(prev, [cur]);
     }, []);
+
     return (
       <tr key={`header-table-row-${columnPivot}`}>
         {offset > 0 && _spacer(1, offset)}

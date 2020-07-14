@@ -24,8 +24,10 @@ class CreateUsersPage extends React.Component {
 
   _onSubmit = (r) => {
     const request = r;
+
     request.permissions = [];
     delete request['session-timeout-never'];
+
     UsersStore.create(request).then(() => {
       UserNotification.success(`User ${request.username} was created successfully.`, 'Success!');
       history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
@@ -44,6 +46,7 @@ class CreateUsersPage extends React.Component {
     if (!roles) {
       return <Spinner />;
     }
+
     return (
       <DocumentTitle title="Create new user">
         <span>

@@ -10,6 +10,7 @@ export default async (type: ViewType, streamId: ?string) => {
   const query = QueryGenerator(streamId);
   const search = Search.create().toBuilder().queries([query]).build();
   const viewState = await ViewStateGenerator(type, streamId);
+
   return View.create()
     .toBuilder()
     .type(type)

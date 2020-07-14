@@ -16,10 +16,13 @@ import Widget from '../widgets/Widget';
 
 const _removeWidgetTitle = (titlesMap: TitlesMap, widgetId: WidgetId): TitlesMap => {
   const widgetTitles = titlesMap.get('widget');
+
   if (!widgetTitles) {
     return titlesMap;
   }
+
   const newWidgetTitles = widgetTitles.remove(widgetId);
+
   return titlesMap.set('widget', newWidgetTitles);
 };
 
@@ -28,6 +31,7 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
   const widgetIndex = viewState.widgets.findIndex((widget) => widget.id === widgetId);
   const { widgetPositions, titles } = viewState;
   const newTitles = _removeWidgetTitle(titles, widgetId);
+
   delete widgetPositions[widgetId];
   const { widgetMapping } = viewState;
   const newWidgetMapping = widgetMapping.remove(widgetId);
@@ -37,6 +41,7 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
     .titles(newTitles)
     .widgetPositions(widgetPositions)
     .build();
+
   return dashboard.toBuilder()
     .state(dashboard.state.set(queryId, newViewState))
     .build();
@@ -46,8 +51,10 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: ?st
   if (!newTitle) {
     return titlesMap;
   }
+
   const widgetTitlesMap = titlesMap.get('widget', Immutable.Map());
   const newWidgetTitleMap = widgetTitlesMap.set(widgetID, newTitle);
+
   return titlesMap.set('widget', newWidgetTitleMap);
 };
 
@@ -64,6 +71,7 @@ const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View
     .titles(newTitleMap)
     .widgetPositions(newWidgetPositions)
     .build();
+
   return dashboard.toBuilder()
     .state(dashboard.state.set(targetQueryId, newViewState))
     .build();
@@ -92,8 +100,10 @@ const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: 
       .row(1)
       .build();
     const tempDashboard = copy ? dashboard : _removeWidgetFromTab(widgetId, queryId, dashboard);
+
     return UpdateSearchForWidgets(_addWidgetToTab(widget, targetQueryId, tempDashboard, newWidgetPosition, widgetTitle));
   }
+
   return undefined;
 };
 

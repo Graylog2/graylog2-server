@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +70,7 @@ public class MessagesTest {
     }
 
     @Test
-    public void bulkIndexingShouldAccountMessageSizes() {
+    public void bulkIndexingShouldAccountMessageSizes() throws IOException {
         when(messagesAdapter.bulkIndex(any())).thenReturn(Collections.emptyList());
         final IndexSet indexSet = mock(IndexSet.class);
         final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(
@@ -85,7 +86,7 @@ public class MessagesTest {
     }
 
     @Test
-    public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() {
+    public void bulkIndexingShouldAccountMessageSizesForSystemTrafficSeparately() throws IOException {
         when(messagesAdapter.bulkIndex(any())).thenReturn(Collections.emptyList());
         final IndexSet indexSet = mock(IndexSet.class);
         final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(

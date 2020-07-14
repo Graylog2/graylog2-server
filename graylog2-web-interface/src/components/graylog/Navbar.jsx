@@ -3,7 +3,6 @@ import { Navbar as BootstrapNavbar } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
-
 const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   &.navbar-default {
     background-color: ${theme.colors.gray[90]};
@@ -185,7 +184,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         &,
         &:hover,
         &:focus {
-          color: ${chroma(theme.colors.global.textDefault).brighten(0.50)};
+          color: ${chroma(theme.colors.global.textDefault).brighten(0.5)};
           background-color: transparent;
         }
       }
@@ -233,7 +232,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
             &,
             &:hover,
             &:focus {
-              color: ${chroma(theme.colors.global.textDefault).brighten(0.50)};
+              color: ${chroma(theme.colors.global.textDefault).brighten(0.5)};
               background-color: transparent;
             }
           }
@@ -279,7 +278,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${chroma(theme.colors.global.textDefault).brighten(0.50)};
+          color: ${chroma(theme.colors.global.textDefault).brighten(0.5)};
         }
       }
     }

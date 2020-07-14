@@ -43,6 +43,7 @@ const EditContentPackPage = createReactClass({
       const { contentPackRevisions } = result;
       const originContentPackRev = params.contentPackRev;
       const newContentPack = contentPackRevisions.createNewVersionFromRev(originContentPackRev);
+
       this.setState({ contentPack: newContentPack, contentPackEntities: cloneDeep(newContentPack.entities) });
 
       CatalogActions.showEntityIndex().then(() => {
@@ -55,16 +56,20 @@ const EditContentPackPage = createReactClass({
 
   _createEntityCatalog() {
     const { contentPack, contentPackEntities, entityIndex } = this.state;
+
     if (!contentPack || !entityIndex) {
       return;
     }
+
     const groupedContentPackEntities = groupBy(contentPackEntities, 'type.name');
     const entityCatalog = Object.keys(entityIndex)
       .reduce((result, entityType) => {
         /* eslint-disable-next-line no-param-reassign */
         result[entityType] = entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
+
         return result;
       }, {});
+
     this.setState({ entityCatalog });
   },
 
@@ -74,16 +79,21 @@ const EditContentPackPage = createReactClass({
     if (!contentPack || !entityIndex) {
       return;
     }
+
     const selectedEntities = contentPack.entities.reduce((result, entity) => {
       if (entityCatalog[entity.type.name]
         && entityCatalog[entity.type.name].findIndex((fetchedEntity) => { return fetchedEntity.id === entity.id; }) >= 0) {
         const newResult = result;
+
         newResult[entity.type.name] = result[entity.type.name] || [];
         newResult[entity.type.name].push(entity);
+
         return newResult;
       }
+
       return result;
     }, {});
+
     this.setState({ selectedEntities: selectedEntities });
   },
 
@@ -100,11 +110,14 @@ const EditContentPackPage = createReactClass({
         return { configKey: path, paramName: configPaths[path].getValue(), readOnly: true };
       });
       const newResult = result;
+
       if (paramMap.length > 0) {
         newResult[entity.id] = paramMap;
       }
+
       return newResult;
     }, {});
+
     this.setState({ appliedParameter: appliedParameter });
   },
 
@@ -132,9 +145,11 @@ const EditContentPackPage = createReactClass({
             + 'Graylog logs for more information.';
           const title = 'Could not import content pack';
           let smallMessage = '';
+
           if (response.additional && response.additional.body && response.additional.body.message) {
             smallMessage = `<br /><small>${response.additional.body.message}</small>`;
           }
+
           UserNotification.error(message + smallMessage, title);
         },
       );
@@ -153,6 +168,7 @@ const EditContentPackPage = createReactClass({
       const builtContentPack = contentPack.toBuilder()
         .entities(entities)
         .build();
+
       this.setState({ contentPack: builtContentPack, fetchedEntities: builtContentPack.entities });
     });
   },

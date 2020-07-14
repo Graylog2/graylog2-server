@@ -62,6 +62,7 @@ class TokenList extends React.Component {
 
   itemActionsFactory(token) {
     const deleteButton = this.props.deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete';
+
     return (
       <ButtonGroup>
         <ClipboardButton title="Copy to clipboard" text={token.token} bsSize="xsmall" />

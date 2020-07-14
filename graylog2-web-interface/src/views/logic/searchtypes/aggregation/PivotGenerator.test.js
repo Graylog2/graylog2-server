@@ -10,6 +10,7 @@ describe('PivotGenerator', () => {
 
     expect(result).toEqual(new Pivot('foo', 'time', { interval: { type: 'auto' } }));
   });
+
   it('generates values pivot for other fields', () => {
     const result = PivotGenerator('foo', new FieldType('keyword', [], []));
 

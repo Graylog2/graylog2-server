@@ -31,9 +31,11 @@ class IndicesMaintenanceDropdown extends React.Component {
 
   render() {
     let cycleButton;
+
     if (this.props.indexSet && this.props.indexSet.writable) {
       cycleButton = <MenuItem eventKey="2" onClick={this._onCycleDeflector}>Rotate active write index</MenuItem>;
     }
+
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>

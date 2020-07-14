@@ -93,12 +93,14 @@ const IndexSetsComponent = createReactClass({
     const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
     const isReadOnly = !indexSet.writable ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
     let { description } = indexSet;
+
     if (indexSet.default) {
       description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
     }
 
     let statsString;
     const stats = this.state.indexSetStats[indexSet.id];
+
     if (stats) {
       statsString = this._formatStatsString(stats);
     }
@@ -117,6 +119,7 @@ const IndexSetsComponent = createReactClass({
     if (!stats) {
       return 'N/A';
     }
+
     const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
     const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
     const size = NumberUtils.formatBytes(stats.size);

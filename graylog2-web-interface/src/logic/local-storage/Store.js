@@ -7,6 +7,7 @@ const Store = {
 
   get(key) {
     const value = localStorage.getItem(key);
+
     if (value === undefined || value === null) {
       return undefined;
     }

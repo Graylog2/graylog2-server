@@ -34,9 +34,9 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
 };
 
 const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
+  // $FlowFixMe: Needs to be typed properly, right now contains an arbitrary set of keys/values.
   const mergedObject = valuePath.reduce((elem, acc) => ({
     ...acc,
-    // $FlowFixMe: Needs to be typed properly, right now contains an arbitrary set of keys/values.
     ...elem,
   }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
@@ -55,6 +55,7 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
     .build();
 
   const title = `Messages for ${valuePathQuery}`;
+
   return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
 };
 

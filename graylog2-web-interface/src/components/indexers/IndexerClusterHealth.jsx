@@ -23,6 +23,7 @@ const IndexerClusterHealth = createReactClass({
     const { health } = this.state;
 
     let content;
+
     if (health) {
       content = <IndexerClusterHealthSummary health={health} />;
     } else {

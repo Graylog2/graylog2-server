@@ -24,6 +24,7 @@ export default function TimeRangeTypeSelector({ disabled }: Props) {
       name,
     },
   }), [onChange, value]);
+
   return (
     <ButtonToolbar className="pull-left">
       <TimeRangeDropdownButton disabled={disabled} onSelect={onSelect}>

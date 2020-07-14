@@ -24,24 +24,34 @@ describe('AddToQueryHandler', () => {
   const view = View.create().toBuilder().type(View.Type.Search).build();
   let queriesStoreListen;
   let queries;
+
   beforeEach(() => {
-    QueriesStore.listen = jest.fn((cb) => { queriesStoreListen = cb; return () => {}; });
+    QueriesStore.listen = jest.fn((cb) => {
+      queriesStoreListen = cb;
+
+      return () => {};
+    });
+
     QueriesStore.getInitialState = jest.fn(() => queries);
     QueriesActions.query = mockAction(jest.fn(() => Promise.resolve()));
     ViewStore.listen = jest.fn(() => () => {});
+
     ViewStore.getInitialState = jest.fn(() => ({
       view,
       activeQuery: 'queryId',
       dirty: false,
       isNew: false,
     }));
+
     GlobalOverrideStore.listen = jest.fn(() => () => {});
     GlobalOverrideStore.getInitialState = jest.fn(() => undefined);
   });
+
   it('formats date field for ES', () => {
     const query = Query.builder()
       .query({ type: 'elasticsearch', query_string: '' })
       .build();
+
     queries = Immutable.OrderedMap({ queryId: query });
 
     const addToQueryHandler = new AddToQueryHandler();
@@ -57,10 +67,12 @@ describe('AddToQueryHandler', () => {
         expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17 11:00:09.025"');
       });
   });
+
   it('updates query string before adding predicate', () => {
     const query = Query.builder()
       .query({ type: 'elasticsearch', query_string: '' })
       .build();
+
     queries = Immutable.OrderedMap({ queryId: query });
 
     const addToQueryHandler = new AddToQueryHandler();
@@ -76,6 +88,7 @@ describe('AddToQueryHandler', () => {
         expect(QueriesActions.query).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
       });
   });
+
   describe('for dashboards', () => {
     beforeEach(() => {
       asMock(ViewStore.getInitialState).mockReturnValue({
@@ -84,13 +97,16 @@ describe('AddToQueryHandler', () => {
         dirty: false,
         isNew: false,
       });
+
       asMock(GlobalOverrideStore.getInitialState).mockReturnValue(GlobalOverride.empty()
         .toBuilder()
         .query({ type: 'elasticsearch', query_string: 'something' })
         .build());
+
       GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined)));
       SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
     });
+
     it('retrieves query string from global override', () => {
       const addToQueryHandler = new AddToQueryHandler();
 

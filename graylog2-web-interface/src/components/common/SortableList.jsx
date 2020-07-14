@@ -84,6 +84,7 @@ class SortableList extends React.Component {
     const { onMoveItem } = this.props;
     const { items } = this.state;
     const tempItem = items[dragIndex];
+
     items[dragIndex] = items[hoverIndex];
     items[hoverIndex] = tempItem;
     this.setState({ items });
@@ -115,6 +116,5 @@ class SortableList extends React.Component {
     );
   }
 }
-
 
 export default DragDropContext(HTML5Backend)(SortableList);

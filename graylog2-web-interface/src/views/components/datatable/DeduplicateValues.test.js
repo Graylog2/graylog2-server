@@ -13,6 +13,7 @@ describe('DeduplicateValues', () => {
       { controller: 'FooController', action: 'delete' },
     ];
     const result = deduplicateValues(rows, ['controller', 'action']);
+
     expect(result).toEqual([
       { controller: 'FooController', action: 'index' },
       { action: 'create' },
@@ -20,6 +21,7 @@ describe('DeduplicateValues', () => {
       { action: 'delete' },
     ]);
   });
+
   it('should not deduplicate values for changing parent keys', () => {
     const rows = [
       { controller: 'FooController', action: 'index', method: 'GET' },
@@ -28,6 +30,7 @@ describe('DeduplicateValues', () => {
       { controller: 'BarController', action: 'index', method: 'POST' },
     ];
     const result = deduplicateValues(rows, ['controller', 'action', 'method']);
+
     expect(result).toEqual([
       { controller: 'FooController', action: 'index', method: 'GET' },
       { method: 'POST' },
@@ -35,12 +38,14 @@ describe('DeduplicateValues', () => {
       { method: 'POST' },
     ]);
   });
+
   it('should not deduplicate values for different parent keys', () => {
     const rows = [
       { controller: 'FooController', action: 'index', method: 'GET' },
       { controller: 'BarController', action: 'index', method: 'GET' },
     ];
     const result = deduplicateValues(rows, ['controller', 'action', 'method']);
+
     expect(result).toEqual([
       { controller: 'FooController', action: 'index', method: 'GET' },
       { controller: 'BarController', action: 'index', method: 'GET' },

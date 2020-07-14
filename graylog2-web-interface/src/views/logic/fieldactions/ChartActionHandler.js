@@ -20,6 +20,7 @@ const TIMESTAMP_FIELD = 'timestamp';
 
 const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
   const _fieldTypes = FieldTypesStore.getInitialState();
+
   if (!_fieldTypes) {
     return FieldType.Unknown;
   }
@@ -34,6 +35,7 @@ const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
 
   const mapping: FieldTypeMapping = (fieldTypes: FieldTypeMappingsList)
     .find((m: FieldTypeMapping) => m.name === fieldName, null, new FieldTypeMapping(fieldName, FieldType.Unknown));
+
   return mapping.type;
 };
 
@@ -50,6 +52,7 @@ const ChartActionHandler: FieldActionHandler = ({ queryId, field, contexts: { wi
     .config(config);
 
   const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
+
   return WidgetActions.create(widget);
 };
 

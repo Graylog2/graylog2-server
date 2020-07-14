@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { useContext } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { IconButton } from 'components/common';
 import SearchLink from 'components/search/SearchLink';
@@ -28,6 +29,7 @@ const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
 const ReplaySearchButton = () => {
   const { query, timerange, streams } = useContext(DrilldownContext);
   const searchLink = buildSearchLink(timerange, query.query_string, streams);
+
   return (
     <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
       <IconButton name="play" focusable={false} />

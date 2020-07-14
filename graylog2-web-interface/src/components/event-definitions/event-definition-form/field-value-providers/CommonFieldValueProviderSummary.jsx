@@ -20,6 +20,7 @@ class CommonFieldValueProviderSummary extends React.Component {
 
   toggleDisplayDetails = () => {
     const { displayDetails } = this.state;
+
     this.setState({ displayDetails: !displayDetails });
   };
 

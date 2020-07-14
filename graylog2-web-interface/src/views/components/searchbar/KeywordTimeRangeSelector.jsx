@@ -3,11 +3,12 @@ import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { trim } from 'lodash';
 import { connect, Field, useFormikContext } from 'formik';
 
-import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row, Tooltip } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 import type { ThemeInterface } from 'theme';
@@ -23,10 +24,14 @@ const KeywordPreview: StyledComponent<{}, void, *> = styled(Alert)`
   margin-top: 0 !important;  /* Would be overwritten by graylog.less */
 `;
 
-const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => `
+const KeywordInput: StyledComponent<{}, ThemeInterface, *> = styled(FormControl)(({ theme }) => css`
   min-height: 34px;
   font-size: ${theme.fonts.size.large};
 `);
+
+const StyledTooltip = styled(Tooltip)`
+  white-space: nowrap;
+`;
 
 const _parseKeywordPreview = (data) => {
   const from = DateTime.fromUTCDateTime(data.from).toString();
@@ -99,6 +104,11 @@ const KeywordTimeRangeSelector = ({ disabled }: Props) => {
                        style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
                        validationState={error ? 'error' : null}>
               <InputGroup>
+                {error && (
+                  <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+                    {error}
+                  </StyledTooltip>
+                )}
                 <KeywordInput type="text"
                               className="input-sm"
                               name={name}

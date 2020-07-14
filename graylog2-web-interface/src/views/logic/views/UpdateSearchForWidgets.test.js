@@ -16,6 +16,7 @@ const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
 })));
+
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
 jest.mock('../Widgets', () => ({
@@ -41,6 +42,7 @@ describe('UpdateSearchForWidgets', () => {
       .build();
 
     const newView = UpdateSearchForWidgets(searchView);
+
     expect(newView).toMatchSnapshot();
   });
 });

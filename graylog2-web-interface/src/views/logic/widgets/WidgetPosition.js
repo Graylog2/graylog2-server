@@ -84,26 +84,31 @@ class Builder {
 
   col(value: number) {
     this.value = this.value.set('col', value);
+
     return this;
   }
 
   row(value: number) {
     this.value = this.value.set('row', value);
+
     return this;
   }
 
   height(value: number) {
     this.value = this.value.set('height', value);
+
     return this;
   }
 
   width(value: number) {
     this.value = this.value.set('width', value);
+
     return this;
   }
 
   build(): WidgetPosition {
     const { col, row, height, width } = this.value.toObject();
+
     return new WidgetPosition(col, row, height, width);
   }
 }

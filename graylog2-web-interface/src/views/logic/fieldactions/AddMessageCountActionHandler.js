@@ -11,6 +11,7 @@ const AddMessageCountActionHandler: ActionHandler = () => {
     .toBuilder()
     .config(new SeriesConfig('Message Count'))
     .build();
+
   WidgetActions.create(AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()

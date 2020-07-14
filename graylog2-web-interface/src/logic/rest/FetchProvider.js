@@ -13,6 +13,7 @@ export class FetchError extends Error {
   constructor(message, additional) {
     super(message);
     this.message = message ?? additional?.message ?? 'Undefined error.';
+
     /* eslint-disable no-console */
     try {
       this.responseMessage = additional.body ? additional.body.message : undefined;
@@ -31,6 +32,7 @@ export class FetchError extends Error {
 
 const reportServerSuccess = () => {
   const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
+
   ServerAvailabilityActions.reportSuccess();
 };
 
@@ -39,8 +41,10 @@ const defaultOnUnauthorizedError = (error) => ErrorsActions.report(createFromFet
 const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
   const SessionStore = StoreProvider.getStore('Session');
   const fetchError = new FetchError(error.statusText, error);
+
   if (SessionStore.isLoggedIn() && error.status === 401) {
     const SessionActions = ActionsProvider.getActions('Session');
+
     SessionActions.logout(SessionStore.getSessionId());
   }
 
@@ -51,6 +55,7 @@ const onServerError = (error, onUnauthorized = defaultOnUnauthorizedError) => {
 
   if (error.originalError && !error.originalError.status) {
     const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
+
     ServerAvailabilityActions.reportError(fetchError);
   }
 
@@ -91,10 +96,13 @@ export class Builder {
       .then((resp) => {
         if (resp.ok) {
           reportServerSuccess();
+
           return resp.body;
         }
+
         throw new FetchError(resp.statusText, resp);
       }, (error) => onServerError(error));
+
     return this;
   }
 
@@ -106,15 +114,19 @@ export class Builder {
       .then((resp) => {
         if (resp.ok) {
           reportServerSuccess();
+
           return resp.text;
         }
+
         throw new FetchError(resp.statusText, resp);
       }, (error) => onServerError(error));
+
     return this;
   }
 
   plaintext(body) {
     const onUnauthorized = () => history.replace(Routes.STARTPAGE);
+
     this.request = this.request
       .send(body)
       .type('text/plain')
@@ -122,6 +134,7 @@ export class Builder {
       .then((resp) => {
         if (resp.ok) {
           reportServerSuccess();
+
           return resp.body;
         }
 
@@ -148,6 +161,7 @@ function queuePromiseIfNotLoggedin(promise) {
   if (!SessionStore.isLoggedIn()) {
     return () => new BluebirdPromise((resolve, reject) => {
       const SessionActions = ActionsProvider.getActions('Session');
+
       SessionActions.login.completed.listen(() => {
         promise().then(resolve, reject);
       });

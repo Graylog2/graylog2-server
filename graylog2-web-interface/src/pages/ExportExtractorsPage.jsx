@@ -22,6 +22,7 @@ const ExportExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get.triggerPromise(params.inputId);
   },
 
@@ -36,6 +37,7 @@ const ExportExtractorsPage = createReactClass({
     }
 
     const { input } = this.state;
+
     return (
       <DocumentTitle title={`Export extractors of ${input.title}`}>
         <div>

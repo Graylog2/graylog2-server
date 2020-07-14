@@ -49,16 +49,18 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
         const { interval } = newConfig;
         // $FlowFixMe: We know this is the right type
         const { unit, value } = (interval: { interval: TimeConfig });
+
         newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
+
       break;
     default:
   }
 
+  // $FlowFixMe: Not properly typed yet.
   return {
     type,
     field,
-    // $FlowFixMe: Not properly typed yet.
     ...newConfig,
   };
 };
@@ -94,6 +96,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
       ...(generateConfig(uuid(), 'trend', config)),
       timerange: { type: 'offset', source: 'search_type', id: chartConfig.id },
     };
+
     configBuilder.add(trendConfig);
   }
 
@@ -103,6 +106,7 @@ export default ({ config }: { config: AggregationWidgetConfig }) => {
       name: 'events',
       type: 'events',
     };
+
     configBuilder.add(eventAnnotationConfig);
   }
 
@@ -137,6 +141,7 @@ class ConfigBuilder {
 
   add(val: Config) {
     this.value = this.value.add(val);
+
     return this;
   }
 

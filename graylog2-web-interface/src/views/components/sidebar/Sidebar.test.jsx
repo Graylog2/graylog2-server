@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import PropTypes from 'prop-types';
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -7,13 +7,14 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 
-
-import SideBar from './SideBar';
+import Sidebar from './Sidebar';
 
 const mockCurrentUser = { timezone: 'UTC' };
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(['get', () => mockCurrentUser], ['getInitialState', () => ({ mockCurrentUser })]));
+
 jest.mock('stores/sessions/SessionStore', () => MockStore('isLoggedIn'));
+
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
@@ -66,35 +67,33 @@ describe('<Sidebar />', () => {
 
   it('should render and open when clicking on header', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    expect(wrapper.find('h4').text()).toBe(viewMetaData.title);
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('h1').text()).toBe(viewMetaData.title);
   });
 
-  it('should render with a description', () => {
-    const emptyViewMetaData = {
-      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-      id: '5b34f4c44880a54df9616380',
-    };
-
+  it('should render with a description about the query results', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={emptyViewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('SearchResultOverview').text()).toBe('Query executed in 64ms at 2018-08-28 09:39:26.');
   });
 
@@ -106,17 +105,19 @@ describe('<Sidebar />', () => {
 
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <SideBar viewMetadata={emptyViewMetaData}
+        <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>,
+        </Sidebar>,
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    expect(wrapper.find('h4').text()).toBe('Untitled Search');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('h1').text()).toBe('Untitled Search');
   });
 
   it('should render with a specific default title in the context of a new dashboard', () => {
@@ -127,152 +128,220 @@ describe('<Sidebar />', () => {
 
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <SideBar viewMetadata={emptyViewMetaData}
+        <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    expect(wrapper.find('h4').text()).toBe('Untitled Dashboard');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('h1').text()).toBe('Untitled Dashboard');
+  });
+
+  it('should render with a specific title for unsaved dashboards', () => {
+    const emptyViewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      id: '5b34f4c44880a54df9616380',
+    };
+
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </Sidebar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('h1').text()).toBe('Unsaved Dashboard');
+  });
+
+  it('should render with a specific title for unsaved searches', () => {
+    const emptyViewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      id: '5b34f4c44880a54df9616380',
+    };
+
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <Sidebar viewMetadata={emptyViewMetaData}
+                 viewIsNew
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </Sidebar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('h1').text()).toBe('Unsaved Search');
   });
 
   it('should render summary and description of a view', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <SideBar viewMetadata={viewMetaData}
+        <Sidebar viewMetadata={viewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
   it('should render placeholder if dashboard has no summary or description ', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <SideBar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+        <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('ViewDescription').text()).toContain('No dashboard description');
-    expect(wrapper.find('ViewDescription').text()).toContain('No dashboard summary');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no description');
+
+    expect(wrapper.find('ViewDescription').text()).toContain('This dashboard has no summary');
   });
 
   it('should render placeholder if saved search has no summary or description ', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <SideBar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+        <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('ViewDescription').text()).toContain('No search description');
-    expect(wrapper.find('ViewDescription').text()).toContain('No search summary');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
+    expect(wrapper.find('ViewDescription').text()).toContain('This search has no description');
+
+    expect(wrapper.find('ViewDescription').text()).toContain('This search has no summary');
   });
 
   it('should render a summary and description, for a saved search', () => {
     const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
-        <SideBar viewMetadata={viewMetaData}
+        <Sidebar viewMetadata={viewMetaData}
+                 viewIsNew={false}
                  toggleOpen={jest.fn}
                  queryId={query.id}
                  results={queryResult}>
           <TestComponent />
-        </SideBar>
+        </Sidebar>
       </ViewTypeContext.Provider>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
+
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
 
   it('should not render a summary and description, if the view is an ad hoc search', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={{ ...viewMetaData, id: undefined }}
+      <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
+
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
-    expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom description.');
+
+    expect(wrapper.find('ViewDescription').text()).toContain('Save the search or export it to a dashboard to add a custom summary and description.');
   });
 
   it('should render widget create options', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     wrapper.find('div[children="Create"]').simulate('click');
+
     expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
   });
 
   it('should render passed children', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     wrapper.find('div[children="Fields"]').simulate('click');
+
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
 
   it('should close a section when clicking on its title', () => {
     const wrapper = mount(
-      <SideBar viewMetadata={viewMetaData}
+      <Sidebar viewMetadata={viewMetaData}
+               viewIsNew={false}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
         <TestComponent />
-      </SideBar>,
+      </Sidebar>,
     );
 
-    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="Description"]').simulate('click');
+    wrapper.find('SidebarNavigation NavItem').first().simulate('click');
+
     expect(wrapper.find('SearchResultOverview')).toExist();
-    wrapper.find('div[children="Description"]').simulate('click');
+
+    wrapper.find('h1').simulate('click');
+
     expect(wrapper.find('SearchResultOverview')).not.toExist();
   });
 });

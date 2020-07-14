@@ -26,6 +26,7 @@ jest.mock('views/stores/SearchStore', () => ({
     executeWithCurrentState: jest.fn(),
   },
 }));
+
 jest.mock('stores/connect', () => (x) => x);
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/QueriesStore');
@@ -83,10 +84,12 @@ describe('XYPlot', () => {
     const timerange = { from: 'foo', to: 'bar' };
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} config={emptyConfig} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', { yaxis: { fixedrange: true, rangemode: 'tozero' }, xaxis: { fixedrange: true } });
     expect(genericPlot).toHaveProp('chartData', chartData);
 
     genericPlot.get(0).props.onZoom('from', 'to');
+
     expect(QueriesActions.timerange).not.toHaveBeenCalled();
   });
 
@@ -95,6 +98,7 @@ describe('XYPlot', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z' };
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
@@ -103,6 +107,7 @@ describe('XYPlot', () => {
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
 
     expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
+
     expect(QueriesActions.timerange).toHaveBeenCalledWith('dummyquery', {
       type: 'absolute',
       from: '2018-10-12T04:04:21.723Z',
@@ -116,6 +121,7 @@ describe('XYPlot', () => {
     const currentQueryForAllMessages = currentQuery.toBuilder().timerange(allMessages).build();
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} currentUser={{ ...viewsManager, timezone: 'UTC' }} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
@@ -125,6 +131,7 @@ describe('XYPlot', () => {
   it('sets correct plot legend position for small containers', () => {
     const wrapper = mount(<SimpleXYPlot height={140} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { fixedrange: true },
@@ -135,6 +142,7 @@ describe('XYPlot', () => {
   it('sets correct plot legend position for containers with medium height', () => {
     const wrapper = mount(<SimpleXYPlot height={350} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { fixedrange: true },
@@ -145,6 +153,7 @@ describe('XYPlot', () => {
   it('sets correct plot legend position for containers with huge height', () => {
     const wrapper = mount(<SimpleXYPlot height={700} />);
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { fixedrange: true },

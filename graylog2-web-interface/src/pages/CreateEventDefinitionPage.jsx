@@ -28,6 +28,7 @@ class CreateEventDefinitionPage extends React.Component {
 
   handleEventDefinitionChange = (eventDefinition) => {
     const { eventDefinitionTitle } = this.state;
+
     if (eventDefinition.title !== eventDefinitionTitle) {
       this.setState({ eventDefinitionTitle: eventDefinition.title });
     }

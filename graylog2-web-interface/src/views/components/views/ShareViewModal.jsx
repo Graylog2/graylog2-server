@@ -59,6 +59,7 @@ class ShareViewModal extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
     this.state = {
       viewSharing: null,
       loaded: false,
@@ -69,6 +70,7 @@ class ShareViewModal extends React.Component<Props, State> {
 
   componentDidMount() {
     const { view, currentUser } = this.props;
+
     Promise.all([
       ViewSharingActions.get(view.id),
       ViewSharingActions.users(view.id),
@@ -83,12 +85,15 @@ class ShareViewModal extends React.Component<Props, State> {
     const { viewSharing } = this.state;
     const viewTypeLabel = ViewTypeLabel({ type: view.type });
     let promise;
+
     if (viewSharing) {
       promise = ViewSharingActions.create(view.id, viewSharing);
     } else {
       promise = ViewSharingActions.remove(view.id);
     }
+
     const { onClose } = this.props;
+
     promise.then(() => {
       onClose(viewSharing);
       UserNotification.success(`Sharing ${viewTypeLabel} "${view.title}" was successful!`, 'Success!');
@@ -104,28 +109,35 @@ class ShareViewModal extends React.Component<Props, State> {
     const { view } = this.props;
     const type = e.target.name;
     const viewSharing = type === 'none' ? null : ViewSharing.fromJSON({ type, view_id: view.id });
+
     this.setState({ viewSharing });
   };
 
   _onRolesChange = (newRoles: Array<{value: string, label: string}>) => {
     const { viewSharing } = this.state;
+
     if (viewSharing === null || viewSharing.type !== SpecificRoles.Type) {
       return;
     }
+
     // $FlowFixMe: At this point we have a SpecificRoles instance.
     const specificRoles: SpecificRoles = viewSharing;
     const roles = newRoles.map(extractValue);
+
     this.setState({ viewSharing: specificRoles.toBuilder().roles(roles).build() });
   };
 
   _onUsersChange = (newUsers: Array<{value: string, label: string}>) => {
     const { viewSharing } = this.state;
+
     if (viewSharing === null || viewSharing.type !== SpecificUsers.Type) {
       return;
     }
+
     // $FlowFixMe: At this point we have a SpecificUsers instance.
     const specificUsers: SpecificUsers = viewSharing;
     const users = newUsers.map(extractValue);
+
     this.setState({ viewSharing: specificUsers.toBuilder().users(users).build() });
   };
 
@@ -187,6 +199,7 @@ class ShareViewModal extends React.Component<Props, State> {
         </Additional>
       </FormGroup>
     );
+
     return (
       <BootstrapModalConfirm onCancel={() => this._onClose()}
                              onConfirm={() => this._onSave()}

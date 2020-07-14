@@ -35,6 +35,7 @@ const ExtractorsPage = createReactClass({
 
   componentDidMount() {
     const { params } = this.props;
+
     InputsActions.get(params.inputId).then((input) => this.setState({ input }));
     NodesActions.list();
   },
@@ -44,6 +45,7 @@ const ExtractorsPage = createReactClass({
     const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_master);
 
     const { node } = this.state;
+
     if (!node || node.node_id !== newNode.node_id) {
       this.setState({ node: newNode });
     }
@@ -51,6 +53,7 @@ const ExtractorsPage = createReactClass({
 
   _isLoading() {
     const { node, input } = this.state;
+
     return !(input && node);
   },
 
@@ -60,6 +63,7 @@ const ExtractorsPage = createReactClass({
     }
 
     const { node, input } = this.state;
+
     return (
       <DocumentTitle title={`Extractors of ${input.title}`}>
         <div>

@@ -55,12 +55,14 @@ class FilterAggregationForm extends React.Component {
 
   propagateChange = (key, value) => {
     const { onChange } = this.props;
+
     onChange(key, value);
   };
 
   handleTypeChange = (event) => {
     const stateChange = {};
     const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
+
     stateChange[event.target.name] = nextConditionType;
 
     if (nextConditionType === conditionTypes.FILTER) {
@@ -68,19 +70,24 @@ class FilterAggregationForm extends React.Component {
 
       // Store existing data temporarily in state, to restore it in case the type change was accidental
       const existingAggregationConfig = {};
+
       Object.keys(initialAggregationConfig).forEach((key) => {
         existingAggregationConfig[key] = eventDefinition.config[key];
       });
+
       stateChange.existingAggregationConfig = existingAggregationConfig;
 
       const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
+
       this.propagateChange('config', nextConfig);
     } else {
       // Reset aggregation data from state if it exists
       const { existingAggregationConfig } = this.state;
+
       if (existingAggregationConfig) {
         const { eventDefinition } = this.props;
         const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
+
         this.propagateChange('config', nextConfig);
         stateChange.existingAggregationConfig = undefined;
       }
@@ -91,6 +98,7 @@ class FilterAggregationForm extends React.Component {
 
   handleChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 

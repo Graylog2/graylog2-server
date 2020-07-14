@@ -2,7 +2,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import { Icon } from 'components/common';
@@ -23,7 +24,7 @@ const InputWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   width: 200px;
 `;
 
-const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => `
+const Separator: StyledComponent<{}, ThemeInterface, HTMLParagraphElement> = styled.p(({ theme }) => css`
   margin: 0;
   line-height: 34px;
   font-size: ${theme.fonts.size.large};
@@ -38,7 +39,7 @@ const _isValidDateString = (dateString: string) => {
 
   return DateTime.isValidDateString(dateString)
     ? undefined
-    : `Invalid date: ${dateString}`;
+    : 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]';
 };
 
 const AbsoluteTimeRangeSelector = ({ disabled }: Props) => {

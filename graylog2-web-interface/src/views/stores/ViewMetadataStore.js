@@ -30,12 +30,15 @@ export const ViewMetadataStore: ViewMetadataStoreType = singletonStore(
     },
     onViewStoreUpdate({ view, activeQuery }) {
       let newState;
+
       if (view) {
         const { id, title, description, summary } = view;
+
         newState = { id, title, description, summary, activeQuery };
       } else {
         newState = {};
       }
+
       if (!isEqual(this.state, newState)) {
         this.state = newState;
         this._trigger();

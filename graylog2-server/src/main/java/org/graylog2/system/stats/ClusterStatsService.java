@@ -20,8 +20,7 @@ import org.graylog.plugins.views.search.views.DashboardService;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.inputs.InputService;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -36,8 +35,6 @@ import org.graylog2.users.RoleService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @Singleton
@@ -53,8 +50,7 @@ public class ClusterStatsService {
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final DashboardService dashboardService;
-    private final IndexSetRegistry indexSetRegistry;
-    private final ClusterAdapter clusterAdapter;
+    private final Cluster cluster;
 
     @Inject
     public ClusterStatsService(MongoProbe mongoProbe,
@@ -67,9 +63,8 @@ public class ClusterStatsService {
                                RoleService roleService,
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                               DashboardService dashboardService, IndexSetRegistry indexSetRegistry, ClusterAdapter clusterAdapter) {
-        this.indexSetRegistry = indexSetRegistry;
-        this.clusterAdapter = clusterAdapter;
+                               DashboardService dashboardService,
+                               Cluster cluster) {
         this.mongoProbe = mongoProbe;
         this.userService = userService;
         this.inputService = inputService;
@@ -81,6 +76,7 @@ public class ClusterStatsService {
         this.alertService = alertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.dashboardService = dashboardService;
+        this.cluster = cluster;
     }
 
     public ClusterStats clusterStats() {
@@ -109,8 +105,7 @@ public class ClusterStatsService {
     }
 
     public ElasticsearchStats elasticsearchStats() {
-        final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
-        return clusterAdapter.statsForIndices(indices);
+        return cluster.elasticsearchStats();
     }
 
     public MongoStats mongoStats() {

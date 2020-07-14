@@ -3,9 +3,9 @@ import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
@@ -15,7 +15,7 @@ import ClipboardButton from './ClipboardButton';
 import Icon from './Icon';
 import './webpack-resolver';
 
-const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => `
+const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => css`
   .ace_editor {
     border: 1px solid ${theme.colors.gray[80]};
     border-radius: 5px;
@@ -24,13 +24,14 @@ const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => `
   .react-resizable-handle {
     /* Ensure resize handle is over text editor */
     z-index: 100;
+
     /* Make resize handle visible on a dark background */
     filter: ${darkMode ? 'invert(100%) brightness(180%);' : 'none'};
     display: ${resizable ? 'block' : 'none'};
   }
 `);
 
-const Toolbar = styled.div(({ theme }) => `
+const Toolbar = styled.div(({ theme }) => css`
   background: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.gray[80]};
   border-bottom: 0;
@@ -109,6 +110,7 @@ class SourceCodeEditor extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       height: props.height,
       width: props.width,
@@ -120,7 +122,7 @@ class SourceCodeEditor extends React.Component {
     const { mode } = this.props;
 
     if (mode === 'pipeline') {
-      const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
+      const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
       fetch('GET', url).then((response) => {
         const functions = response.map((res) => res.name).join('|');
@@ -133,9 +135,9 @@ class SourceCodeEditor extends React.Component {
     }
   }
 
-
   componentDidUpdate(prevProps) {
     const { height, width } = this.props;
+
     if (height !== prevProps.height || width !== prevProps.width) {
       this.reloadEditor();
     }
@@ -143,11 +145,13 @@ class SourceCodeEditor extends React.Component {
 
   handleResize = (event, { size }) => {
     const { height, width } = size;
+
     this.setState({ height: height, width: width }, this.reloadEditor);
   };
 
   reloadEditor = () => {
     const { resizable } = this.props;
+
     if (resizable) {
       this.reactAce.editor.resize();
     }
@@ -177,11 +181,13 @@ class SourceCodeEditor extends React.Component {
 
   handleSelectionChange = (selection) => {
     const { toolbar, readOnly } = this.props;
+
     if (!this.reactAce || !toolbar || readOnly) {
       return;
     }
 
     const selectedText = this.reactAce.editor.getSession().getTextRange(selection.getRange());
+
     this.setState({ selectedText: selectedText });
   };
 
@@ -207,6 +213,7 @@ class SourceCodeEditor extends React.Component {
     } = this.props;
     const validCssWidth = lodash.isFinite(width) ? width : '100%';
     const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
+
     return (
       <div>
         {toolbar

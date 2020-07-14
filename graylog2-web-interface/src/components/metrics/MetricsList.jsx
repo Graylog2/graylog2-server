@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Metric } from 'components/metrics';
 
-const MetricListWrap = styled.ul(({ theme }) => `
+const MetricListWrap = styled.ul(({ theme }) => css`
   padding: 0;
 
   li {

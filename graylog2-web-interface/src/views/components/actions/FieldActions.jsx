@@ -1,13 +1,14 @@
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { MenuItem } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 
 import { createHandlerFor } from './ActionHandler';
 import type { ActionComponents, ActionDefinition, ActionHandlerCondition } from './ActionHandler';
@@ -37,7 +38,7 @@ type FieldElementProps = {
 
 const FieldElement: StyledComponent<FieldElementProps, ThemeInterface, HTMLSpanElement> = styled.span.attrs({
   className: 'field-element',
-})(({ active, disabled, theme }) => `
+})(({ active, disabled, theme }) => css`
   color: ${active ? theme.colors.variant.info : 'currentColor'};
   opacity: ${disabled ? '0.3' : '1'};
 `);
@@ -47,6 +48,7 @@ class FieldActions extends React.Component<Props, State> {
 
   constructor(props: Props, context: typeof ActionContext) {
     super(props, context);
+
     this.state = {
       open: false,
       overflowingComponents: {},
@@ -64,11 +66,13 @@ class FieldActions extends React.Component<Props, State> {
     const fieldActions: Array<ActionDefinition> = PluginStore.exports('fieldActions')
       .filter((action: ActionDefinition) => {
         const { isHidden = (() => false: ActionHandlerCondition) } = action;
+
         return !isHidden(handlerArgs);
       })
       .map((action: ActionDefinition) => {
         const setActionComponents = (fn) => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
         const handler = createHandlerFor(action, setActionComponents);
+
         const onSelect = () => {
           this._onMenuToggle();
           handler(handlerArgs);
@@ -76,6 +80,7 @@ class FieldActions extends React.Component<Props, State> {
 
         const { isEnabled = (() => true: ActionHandlerCondition) } = action;
         const actionDisabled = !isEnabled(handlerArgs);
+
         return (
           <MenuItem key={`${name}-action-${action.type}`}
                     disabled={actionDisabled}
@@ -84,6 +89,7 @@ class FieldActions extends React.Component<Props, State> {
           </MenuItem>
         );
       });
+
     return (
       <OverlayDropdown show={open}
                        toggle={wrappedElement}

@@ -33,6 +33,7 @@ const NumberVisualizationConfiguration = ({ config = NumberVisualizationConfig.e
       </p>
     </HoverForHelp>
   );
+
   return (
     <>
       <Input key="trend"

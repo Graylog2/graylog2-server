@@ -31,7 +31,6 @@ const ButtonLabel = styled.div`
   vertical-align: inherit;
 `;
 
-
 type RefreshConfig = {
   interval: number,
   enabled: boolean,
@@ -52,6 +51,7 @@ class RefreshControls extends React.Component<Props> {
 
   _toggleEnable = (): void => {
     const { refreshConfig } = this.props;
+
     if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
@@ -65,9 +65,11 @@ class RefreshControls extends React.Component<Props> {
 
   _buttonLabel = (refreshConfigEnabled, naturalInterval) => {
     let buttonText = 'Not updating';
+
     if (refreshConfigEnabled) {
       buttonText = <>Update every {naturalInterval}</>;
     }
+
     return <ButtonLabel>{buttonText}</ButtonLabel>;
   }
 
@@ -91,6 +93,7 @@ class RefreshControls extends React.Component<Props> {
       ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
       : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
     const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
+
     return (
       <ControlsContainer className="pull-right">
         <FlexibleButtonGroup>

@@ -11,7 +11,6 @@ import PipelineDetails from './PipelineDetails';
 import PipelineConnectionsForm from './PipelineConnectionsForm';
 import PipelineConnectionsList from './PipelineConnectionsList';
 
-
 const Pipeline = createReactClass({
   displayName: 'Pipeline',
 
@@ -48,6 +47,7 @@ const Pipeline = createReactClass({
 
   _saveStage(stage, callback) {
     const newStages = this.props.pipeline.stages.slice();
+
     newStages.push(stage);
     this.props.onStagesChange(newStages, callback);
   },
@@ -55,6 +55,7 @@ const Pipeline = createReactClass({
   _updateStage(prevStage) {
     return (stage, callback) => {
       const newStages = this.props.pipeline.stages.filter((s) => s.stage !== prevStage.stage);
+
       newStages.push(stage);
       this.props.onStagesChange(newStages, callback);
     };
@@ -64,6 +65,7 @@ const Pipeline = createReactClass({
     return () => {
       if (confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
         const newStages = this.props.pipeline.stages.filter((s) => s.stage !== stage.stage);
+
         this.props.onStagesChange(newStages);
       }
     };
@@ -72,6 +74,7 @@ const Pipeline = createReactClass({
   _formatConnectedStreams(streams) {
     const formattedStreams = streams.map((s) => `"${s.title}"`);
     const streamList = streams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
+
     return (
       <span>
         This pipeline is processing messages from the{' '}

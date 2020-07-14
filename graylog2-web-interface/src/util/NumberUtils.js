@@ -41,6 +41,7 @@ const NumberUtils = {
     numeral.zeroFormat('0B');
 
     let formattedNumber;
+
     try {
       formattedNumber = numeral(this.normalizeNumber(number)).format('0.0ib');
     } catch (e) {

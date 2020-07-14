@@ -15,6 +15,7 @@ describe('<ContentPackConstraints />', () => {
       version: '>=3.0.0-alpha.2',
     }];
     const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -28,6 +29,7 @@ describe('<ContentPackConstraints />', () => {
       version: '>=3.0.0-alpha.2',
     }];
     const wrapper = mount(<ContentPackConstraints constraints={constraints} isFulfilled />);
+
     expect(wrapper).toMatchSnapshot();
   });
 
@@ -48,6 +50,7 @@ describe('<ContentPackConstraints />', () => {
         fulfilled: false,
       }];
     const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
+
     expect(wrapper).toMatchSnapshot();
   });
 });

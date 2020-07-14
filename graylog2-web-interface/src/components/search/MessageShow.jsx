@@ -40,12 +40,14 @@ class MessageShow extends React.Component {
   renderForDisplay = (fieldName) => {
     // No highlighting for the message details view.
     const { message } = this.props;
+
     return StringUtils.stringify(message.fields[fieldName]);
   };
 
   render() {
     const { inputs, message } = this.props;
     const { streams, nodes } = this.state;
+
     return (
       <Row className="content">
         <Col md={12}>

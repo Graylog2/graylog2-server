@@ -11,13 +11,17 @@ const formatDecorator = (
   updateFn?: (Array<Decorator>) => mixed,
 ) => {
   const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
+
   const onUpdate = updateFn
     ? (id, updatedDecorator) => updateFn(decorators.map((curDecorator) => (curDecorator.id === id ? updatedDecorator : curDecorator)))
     : () => {};
+
   const onDelete = updateFn
     ? (deletedDecoratorId) => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
     : () => {};
+
   const { id, order } = decorator;
+
   return ({
     id,
     order,

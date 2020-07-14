@@ -28,6 +28,7 @@ export default class AllUsersOfInstance extends ViewSharing {
   static fromJSON(value: AllUsersOfInstanceJson) {
     // eslint-disable-next-line camelcase
     const { view_id } = value;
+
     return AllUsersOfInstance.create(view_id);
   }
 }

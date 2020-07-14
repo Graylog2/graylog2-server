@@ -15,12 +15,14 @@ class HttpNotificationForm extends React.Component {
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
     const nextConfig = lodash.cloneDeep(config);
+
     nextConfig[key] = value;
     onChange(nextConfig);
   };
 
   handleChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 

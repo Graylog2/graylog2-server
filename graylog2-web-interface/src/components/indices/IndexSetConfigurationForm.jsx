@@ -37,7 +37,9 @@ class IndexSetConfigurationForm extends React.Component {
     // at the time the change is applied, resulting in all different keys of the object being updated.
     this.setState((state) => {
       const config = lodash.cloneDeep(state.indexSet);
+
       config[fieldName] = value;
+
       return { indexSet: config };
     });
   };
@@ -48,11 +50,13 @@ class IndexSetConfigurationForm extends React.Component {
     if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
       if (this.state.validationErrors[event.target.name]) {
         const nextValidationErrors = { ...this.state.validationErrors };
+
         delete nextValidationErrors[event.target.name];
         this.setState({ validationErrors: nextValidationErrors });
       }
     } else {
       const nextValidationErrors = { ...this.state.validationErrors };
+
       if (value.length === 0) {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
       } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
@@ -62,6 +66,7 @@ class IndexSetConfigurationForm extends React.Component {
       } else {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
       }
+
       this.setState({ validationErrors: nextValidationErrors });
     }
 
@@ -80,8 +85,10 @@ class IndexSetConfigurationForm extends React.Component {
     event.preventDefault();
 
     const invalidFields = Object.keys(this.state.validationErrors);
+
     if (invalidFields.length !== 0) {
       document.getElementsByName(invalidFields[0])[0].focus();
+
       return;
     }
 
@@ -108,12 +115,14 @@ class IndexSetConfigurationForm extends React.Component {
     const { validationErrors } = this.state;
 
     let rotationConfig;
+
     if (this.props.rotationStrategies) {
       // The component expects a different structure - legacy
       const activeConfig = {
         config: this.props.indexSet.rotation_strategy,
         strategy: this.props.indexSet.rotation_strategy_class,
       };
+
       rotationConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
                                                  description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
@@ -128,12 +137,14 @@ class IndexSetConfigurationForm extends React.Component {
     }
 
     let retentionConfig;
+
     if (this.props.retentionStrategies) {
       // The component expects a different structure - legacy
       const activeConfig = {
         config: this.props.indexSet.retention_strategy,
         strategy: this.props.indexSet.retention_strategy_class,
       };
+
       retentionConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
                                                  description="Graylog uses a retention strategy to clean up old indices."
@@ -148,6 +159,7 @@ class IndexSetConfigurationForm extends React.Component {
     }
 
     let readOnlyconfig;
+
     if (this.props.create) {
       const indexPrefixHelp = (
         <span>
@@ -155,6 +167,7 @@ class IndexSetConfigurationForm extends React.Component {
           The prefix must start with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
         </span>
       );
+
       readOnlyconfig = (
         <span>
           <Input type="text"

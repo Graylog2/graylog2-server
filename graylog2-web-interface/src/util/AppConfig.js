@@ -5,6 +5,7 @@ const AppConfig = {
       // eslint-disable-next-line no-undef
       return GRAYLOG_HTTP_PUBLISH_URI;
     }
+
     return this.appConfig().gl2ServerUrl;
   },
 

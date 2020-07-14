@@ -20,14 +20,18 @@ import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 const _arrayToMap = ([name, x, y]) => ({ name, x, y });
 const _lastKey = (keys) => keys[keys.length - 1];
 const _mergeObject = (prev, last) => ({ ...prev, ...last });
+
 const _createSeriesWithoutMetric = (rows: Rows) => {
   const leafs = getLeafsFromRows(rows);
   const xLabels = getXLabelsFromLeafs(leafs);
+
   if (!isEmpty(xLabels)) {
     return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
   }
+
   return {};
 };
+
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   return (result) => result.map(({ name, x, y }) => {
     const keys = x.map((k) => k.slice(0, -1)
@@ -36,6 +40,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
     const newX = x.map(_lastKey);
     // eslint-disable-next-line no-unused-vars
     const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
+
     return { keys, name, values };
   });
 };
@@ -60,10 +65,12 @@ const WorldMapVisualization: VisualizationComponent = makeVisualization(({ confi
   const series = pipeline(rows);
 
   const viewport = get(config, 'visualizationConfig.viewport');
+
   const _onChange = (newViewport) => {
     const visualizationConfig = (config.visualizationConfig ? config.visualizationConfig.toBuilder() : WorldMapVisualizationConfig.builder())
       .viewport(Viewport.create(newViewport.center, newViewport.zoom))
       .build();
+
     if (editing) {
       onChange(visualizationConfig);
     }

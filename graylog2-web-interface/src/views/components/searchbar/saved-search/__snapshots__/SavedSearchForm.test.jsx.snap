@@ -57,8 +57,6 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "inputBackground": "#fff",
                         "link": "#702785",
                         "linkHover": "#410057",
-                        "tableBackground": "#ffffff",
-                        "tableBackgroundAlt": "#cdcdcd",
                         "textAlt": "#fff",
                         "textDefault": "#1f1f1f",
                       },
@@ -74,57 +72,78 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "80": "#cdcdcd",
                         "90": "#e6e6e6",
                       },
+                      "table": Object {
+                        "background": "#fafafa",
+                        "backgroundAlt": "#f0f0f0",
+                        "backgroundHover": "#f5f5f5",
+                        "variant": Object {
+                          "active": "#e6e6e6",
+                          "danger": "#eddddd",
+                          "info": "#dde2f0",
+                          "primary": "#e4dee7",
+                          "success": "#ddeddf",
+                          "warning": "#fff5dd",
+                        },
+                        "variantHover": Object {
+                          "active": "#d0d0d0",
+                          "danger": "#debdbd",
+                          "info": "#bdc8e4",
+                          "primary": "#cbbfd1",
+                          "success": "#bddec2",
+                          "warning": "#ffecbd",
+                        },
+                      },
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#9f0606",
-                          "default": "#1d1d1d",
-                          "info": "#005baf",
-                          "primary": "#67247b",
-                          "success": "#00a03d",
-                          "warning": "#ebc200",
+                          "danger": "#990606",
+                          "default": "#737373",
+                          "info": "#0057a8",
+                          "primary": "#632275",
+                          "success": "#009a3a",
+                          "warning": "#e1b900",
                         },
                         "darker": Object {
-                          "danger": "#7a0505",
-                          "default": "#161616",
-                          "info": "#004686",
-                          "primary": "#4f1c5e",
-                          "success": "#007b2f",
-                          "warning": "#b49400",
+                          "danger": "#740505",
+                          "default": "#575757",
+                          "info": "#00427f",
+                          "primary": "#4b1a59",
+                          "success": "#00752c",
+                          "warning": "#ab8d00",
                         },
                         "darkest": Object {
-                          "danger": "#430303",
-                          "default": "#0c0c0c",
-                          "info": "#00264a",
-                          "primary": "#2b0f34",
-                          "success": "#00431a",
-                          "warning": "#635100",
+                          "danger": "#3c0202",
+                          "default": "#2d2d2d",
+                          "info": "#002242",
+                          "primary": "#270e2e",
+                          "success": "#003c17",
+                          "warning": "#584900",
                         },
-                        "default": "#1f1f1f",
+                        "default": "#828282",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#bc6363",
-                          "default": "#676767",
-                          "info": "#6386c9",
-                          "primary": "#8f699d",
-                          "success": "#63bc74",
-                          "warning": "#ffd963",
+                          "danger": "#c27878",
+                          "default": "#a6a6a6",
+                          "info": "#7894ce",
+                          "primary": "#9b7ca8",
+                          "success": "#78c385",
+                          "warning": "#ffdd78",
                         },
                         "lighter": Object {
-                          "danger": "#dab4b4",
-                          "default": "#b6b6b6",
-                          "info": "#b4c1e1",
-                          "primary": "#c5b6cb",
-                          "success": "#b4daba",
-                          "warning": "#ffeab4",
+                          "danger": "#debdbd",
+                          "default": "#d0d0d0",
+                          "info": "#bdc8e4",
+                          "primary": "#cbbfd1",
+                          "success": "#bddec2",
+                          "warning": "#ffecbd",
                         },
                         "lightest": Object {
-                          "danger": "#f4ebeb",
-                          "default": "#ebebeb",
-                          "info": "#ebeef6",
-                          "primary": "#efecf1",
-                          "success": "#ebf5ec",
-                          "warning": "#fff9eb",
+                          "danger": "#f7efef",
+                          "default": "#f3f3f3",
+                          "info": "#eff2f8",
+                          "primary": "#f2f0f4",
+                          "success": "#eff7f0",
+                          "warning": "#fffaef",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -359,7 +378,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "fdBWEX",
+                                                "lastClassName": "eXfwDC",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -382,7 +401,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fdBWEX"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -390,7 +409,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -443,7 +462,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -467,13 +486,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -515,7 +534,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -538,12 +557,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -627,8 +646,6 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "inputBackground": "#fff",
                         "link": "#702785",
                         "linkHover": "#410057",
-                        "tableBackground": "#ffffff",
-                        "tableBackgroundAlt": "#cdcdcd",
                         "textAlt": "#fff",
                         "textDefault": "#1f1f1f",
                       },
@@ -644,57 +661,78 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "80": "#cdcdcd",
                         "90": "#e6e6e6",
                       },
+                      "table": Object {
+                        "background": "#fafafa",
+                        "backgroundAlt": "#f0f0f0",
+                        "backgroundHover": "#f5f5f5",
+                        "variant": Object {
+                          "active": "#e6e6e6",
+                          "danger": "#eddddd",
+                          "info": "#dde2f0",
+                          "primary": "#e4dee7",
+                          "success": "#ddeddf",
+                          "warning": "#fff5dd",
+                        },
+                        "variantHover": Object {
+                          "active": "#d0d0d0",
+                          "danger": "#debdbd",
+                          "info": "#bdc8e4",
+                          "primary": "#cbbfd1",
+                          "success": "#bddec2",
+                          "warning": "#ffecbd",
+                        },
+                      },
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#9f0606",
-                          "default": "#1d1d1d",
-                          "info": "#005baf",
-                          "primary": "#67247b",
-                          "success": "#00a03d",
-                          "warning": "#ebc200",
+                          "danger": "#990606",
+                          "default": "#737373",
+                          "info": "#0057a8",
+                          "primary": "#632275",
+                          "success": "#009a3a",
+                          "warning": "#e1b900",
                         },
                         "darker": Object {
-                          "danger": "#7a0505",
-                          "default": "#161616",
-                          "info": "#004686",
-                          "primary": "#4f1c5e",
-                          "success": "#007b2f",
-                          "warning": "#b49400",
+                          "danger": "#740505",
+                          "default": "#575757",
+                          "info": "#00427f",
+                          "primary": "#4b1a59",
+                          "success": "#00752c",
+                          "warning": "#ab8d00",
                         },
                         "darkest": Object {
-                          "danger": "#430303",
-                          "default": "#0c0c0c",
-                          "info": "#00264a",
-                          "primary": "#2b0f34",
-                          "success": "#00431a",
-                          "warning": "#635100",
+                          "danger": "#3c0202",
+                          "default": "#2d2d2d",
+                          "info": "#002242",
+                          "primary": "#270e2e",
+                          "success": "#003c17",
+                          "warning": "#584900",
                         },
-                        "default": "#1f1f1f",
+                        "default": "#828282",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#bc6363",
-                          "default": "#676767",
-                          "info": "#6386c9",
-                          "primary": "#8f699d",
-                          "success": "#63bc74",
-                          "warning": "#ffd963",
+                          "danger": "#c27878",
+                          "default": "#a6a6a6",
+                          "info": "#7894ce",
+                          "primary": "#9b7ca8",
+                          "success": "#78c385",
+                          "warning": "#ffdd78",
                         },
                         "lighter": Object {
-                          "danger": "#dab4b4",
-                          "default": "#b6b6b6",
-                          "info": "#b4c1e1",
-                          "primary": "#c5b6cb",
-                          "success": "#b4daba",
-                          "warning": "#ffeab4",
+                          "danger": "#debdbd",
+                          "default": "#d0d0d0",
+                          "info": "#bdc8e4",
+                          "primary": "#cbbfd1",
+                          "success": "#bddec2",
+                          "warning": "#ffecbd",
                         },
                         "lightest": Object {
-                          "danger": "#f4ebeb",
-                          "default": "#ebebeb",
-                          "info": "#ebeef6",
-                          "primary": "#efecf1",
-                          "success": "#ebf5ec",
-                          "warning": "#fff9eb",
+                          "danger": "#f7efef",
+                          "default": "#f3f3f3",
+                          "info": "#eff2f8",
+                          "primary": "#f2f0f4",
+                          "success": "#eff7f0",
+                          "warning": "#fffaef",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -929,7 +967,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "fdBWEX",
+                                                "lastClassName": "eXfwDC",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -952,7 +990,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fdBWEX"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -960,7 +998,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -1010,7 +1048,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1034,13 +1072,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1090,7 +1128,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1114,13 +1152,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={true}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-info"
                                       disabled={true}
                                       onClick={[Function]}
                                       type="submit"
@@ -1162,7 +1200,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1185,12 +1223,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -1274,8 +1312,6 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         "inputBackground": "#fff",
                         "link": "#702785",
                         "linkHover": "#410057",
-                        "tableBackground": "#ffffff",
-                        "tableBackgroundAlt": "#cdcdcd",
                         "textAlt": "#fff",
                         "textDefault": "#1f1f1f",
                       },
@@ -1291,57 +1327,78 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         "80": "#cdcdcd",
                         "90": "#e6e6e6",
                       },
+                      "table": Object {
+                        "background": "#fafafa",
+                        "backgroundAlt": "#f0f0f0",
+                        "backgroundHover": "#f5f5f5",
+                        "variant": Object {
+                          "active": "#e6e6e6",
+                          "danger": "#eddddd",
+                          "info": "#dde2f0",
+                          "primary": "#e4dee7",
+                          "success": "#ddeddf",
+                          "warning": "#fff5dd",
+                        },
+                        "variantHover": Object {
+                          "active": "#d0d0d0",
+                          "danger": "#debdbd",
+                          "info": "#bdc8e4",
+                          "primary": "#cbbfd1",
+                          "success": "#bddec2",
+                          "warning": "#ffecbd",
+                        },
+                      },
                       "variant": Object {
                         "danger": "#ad0707",
                         "dark": Object {
-                          "danger": "#9f0606",
-                          "default": "#1d1d1d",
-                          "info": "#005baf",
-                          "primary": "#67247b",
-                          "success": "#00a03d",
-                          "warning": "#ebc200",
+                          "danger": "#990606",
+                          "default": "#737373",
+                          "info": "#0057a8",
+                          "primary": "#632275",
+                          "success": "#009a3a",
+                          "warning": "#e1b900",
                         },
                         "darker": Object {
-                          "danger": "#7a0505",
-                          "default": "#161616",
-                          "info": "#004686",
-                          "primary": "#4f1c5e",
-                          "success": "#007b2f",
-                          "warning": "#b49400",
+                          "danger": "#740505",
+                          "default": "#575757",
+                          "info": "#00427f",
+                          "primary": "#4b1a59",
+                          "success": "#00752c",
+                          "warning": "#ab8d00",
                         },
                         "darkest": Object {
-                          "danger": "#430303",
-                          "default": "#0c0c0c",
-                          "info": "#00264a",
-                          "primary": "#2b0f34",
-                          "success": "#00431a",
-                          "warning": "#635100",
+                          "danger": "#3c0202",
+                          "default": "#2d2d2d",
+                          "info": "#002242",
+                          "primary": "#270e2e",
+                          "success": "#003c17",
+                          "warning": "#584900",
                         },
-                        "default": "#1f1f1f",
+                        "default": "#828282",
                         "info": "#0063be",
                         "light": Object {
-                          "danger": "#bc6363",
-                          "default": "#676767",
-                          "info": "#6386c9",
-                          "primary": "#8f699d",
-                          "success": "#63bc74",
-                          "warning": "#ffd963",
+                          "danger": "#c27878",
+                          "default": "#a6a6a6",
+                          "info": "#7894ce",
+                          "primary": "#9b7ca8",
+                          "success": "#78c385",
+                          "warning": "#ffdd78",
                         },
                         "lighter": Object {
-                          "danger": "#dab4b4",
-                          "default": "#b6b6b6",
-                          "info": "#b4c1e1",
-                          "primary": "#c5b6cb",
-                          "success": "#b4daba",
-                          "warning": "#ffeab4",
+                          "danger": "#debdbd",
+                          "default": "#d0d0d0",
+                          "info": "#bdc8e4",
+                          "primary": "#cbbfd1",
+                          "success": "#bddec2",
+                          "warning": "#ffecbd",
                         },
                         "lightest": Object {
-                          "danger": "#f4ebeb",
-                          "default": "#ebebeb",
-                          "info": "#ebeef6",
-                          "primary": "#efecf1",
-                          "success": "#ebf5ec",
-                          "warning": "#fff9eb",
+                          "danger": "#f7efef",
+                          "default": "#f3f3f3",
+                          "info": "#eff2f8",
+                          "primary": "#f2f0f4",
+                          "success": "#eff7f0",
+                          "warning": "#fffaef",
                         },
                         "primary": "#702785",
                         "success": "#00ae42",
@@ -1576,7 +1633,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "FormControl-sc-1amoaox-0",
                                                 "isStatic": false,
-                                                "lastClassName": "fdBWEX",
+                                                "lastClassName": "eXfwDC",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -1599,7 +1656,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 fdBWEX"
+                                            className="FormControl-sc-1amoaox-0 eXfwDC"
                                             componentClass="input"
                                             onChange={[Function]}
                                             placeholder="Enter title"
@@ -1607,7 +1664,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                             value="new Title"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 fdBWEX form-control"
+                                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
                                               onChange={[Function]}
                                               placeholder="Enter title"
                                               type="text"
@@ -1657,7 +1714,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1681,13 +1738,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1737,7 +1794,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1761,13 +1818,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="submit"
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="submit"
@@ -1809,7 +1866,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "jVYrA",
+                                        "lastClassName": "hpBclA",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1832,12 +1889,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                     block={false}
                                     bsClass="btn"
                                     bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 jVYrA button"
+                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 jVYrA button btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-default"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"

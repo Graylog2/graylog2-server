@@ -21,6 +21,7 @@ describe('Routes', () => {
 
     it('routes contain query parameters', () => {
       const uri = URI(Routes.search('', { rangetype: 'relative', relative: 300 }, 'hour'));
+
       expect(uri.path()).toMatch('/search');
       expect(uri.hasQuery('q', '')).toBeTruthy();
       expect(uri.hasQuery('rangetype', 'relative')).toBeTruthy();
@@ -32,9 +33,11 @@ describe('Routes', () => {
   describe('with prefix', () => {
     beforeAll(() => {
       jest.resetModules();
+
       window.appConfig = {
         gl2AppPathPrefix: prefix,
       };
+
       Routes = require.requireActual('./Routes');
     });
 
@@ -48,6 +51,7 @@ describe('Routes', () => {
 
     it('routes contain query parameters', () => {
       const uri = URI(Routes.search('', { rangetype: 'relative', relative: 300 }, 'hour'));
+
       expect(uri.path()).toMatch(`${prefix}/search`);
       expect(uri.hasQuery('q', '')).toBeTruthy();
       expect(uri.hasQuery('rangetype', 'relative')).toBeTruthy();

@@ -1,27 +1,28 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, keyframes, type StyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 // $FlowFixMe removing in future iteration
 import chroma from 'chroma-js';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 
-type ProgressBarProps = {
-  bars: Array<{
-    animated: boolean,
-    bsStyle: string,
-    label: string,
-    striped: boolean,
-    value: number,
-  }>,
-  className: string,
+type StyledBarProps = {
+  animated: boolean,
+  bsStyle: string,
+  striped: boolean,
+  value: number,
 };
 
 type BarProps = {
-  animated: boolean,
-  striped: boolean,
-  value: number,
+  ...StyledBarProps,
+  label: string,
+};
+
+type ProgressBarProps = {
+  bars: Array<BarProps>,
+  className: string,
 };
 
 const DEFAULT_BAR = {
@@ -68,7 +69,7 @@ const ProgressWrap: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled
   align-items: center;
 `);
 
-const Bar: StyledComponent<BarProps, ThemeInterface, HTMLDivElement> = styled.div(({ animated, striped, theme, value }) => {
+const Bar: StyledComponent<StyledBarProps, ThemeInterface, HTMLDivElement> = styled.div(({ animated, striped, theme, value }) => {
   const defaultStripColor = chroma(theme.colors.global.contentBackground).alpha(0.25).css();
 
   return css`
@@ -105,7 +106,7 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => {
   return (
     <ProgressWrap className={className}>
       {bars.map((bar, index) => {
-        const { label, animated, bsStyle, striped, value } = bar;
+        const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
 
         return (
           <Bar role="progressbar"

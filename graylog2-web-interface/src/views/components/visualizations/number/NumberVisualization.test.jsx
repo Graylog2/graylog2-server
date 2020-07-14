@@ -14,8 +14,10 @@ import AggregationWidgetConfig from '../../../logic/aggregationbuilder/Aggregati
 jest.mock('react-sizeme', () => ({
   SizeMe: ({ children: fn }) => fn({ size: { width: 320, height: 240 } }),
 }));
+
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
 jest.mock('stores/connect', () => (x) => x);
+
 jest.mock('views/components/messagelist/CustomHighlighting', () => {
   /* eslint-disable-next-line react/prop-types */
   return ({ children }) => {
@@ -68,11 +70,13 @@ describe('NumberVisualization', () => {
 
   it('should render a number visualization', () => {
     const wrapper = mount(<SimplifiedNumberVisualization />);
+
     expect(wrapper.find(NumberVisualization)).toMatchSnapshot();
   });
 
   it('calls render completion callback after first render', (done) => {
     const onRenderComplete = jest.fn(done);
+
     mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedNumberVisualization />
@@ -96,8 +100,10 @@ describe('NumberVisualization', () => {
       }],
     };
     const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
+
     expect(wrapper).toHaveText('0');
   });
+
   it('renders N/A if value is null', () => {
     const dataWithZeroValue = {
       chart: [{
@@ -114,6 +120,7 @@ describe('NumberVisualization', () => {
       }],
     };
     const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
+
     expect(wrapper).toHaveText('N/A');
   });
 });

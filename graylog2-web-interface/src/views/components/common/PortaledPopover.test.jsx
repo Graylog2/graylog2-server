@@ -8,11 +8,13 @@ const PopoverComponent = () => 'popover-component';
 describe('PortaledPopover', () => {
   let appRootContainer;
   let portalsContainer;
+
   beforeEach(() => {
     appRootContainer = document.createElement('div');
     portalsContainer = document.createElement('div');
     portalsContainer.id = 'portals';
   });
+
   it('does not render popover element when not clicked', () => {
     const wrapper = mount((
       <PortaledPopover popover={<PopoverComponent />}

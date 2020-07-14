@@ -41,6 +41,7 @@ export default class TimeHistogramPivot extends React.Component<Props, State> {
     super(props);
 
     const { interval } = props.value;
+
     this.state = { interval };
   }
 
@@ -49,6 +50,7 @@ export default class TimeHistogramPivot extends React.Component<Props, State> {
       if (state.interval.type === 'auto') {
         return { interval: { value: 1, unit: 'minutes', type: 'timeunit' } };
       }
+
       return { interval: { type: 'auto', scaling: 1.0 } };
     }, this._propagateState);
   };
@@ -61,6 +63,7 @@ export default class TimeHistogramPivot extends React.Component<Props, State> {
 
   render() {
     const { interval } = this.state;
+
     return (
       <FormGroup>
         <ControlLabel>Interval</ControlLabel>

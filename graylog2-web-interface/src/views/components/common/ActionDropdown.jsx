@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { Overlay } from 'react-overlays';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import { MenuItem } from 'components/graylog';
 
 import StopPropagation from './StopPropagation';
@@ -34,7 +35,7 @@ type ActionDropdownProps = {
   element: React.Node,
 };
 
-const StyledDropdownMenu: StyledComponent<ActionDropdownState, ThemeInterface, HTMLUListElement> = styled.ul(({ show, theme }) => `
+const StyledDropdownMenu: StyledComponent<ActionDropdownState, ThemeInterface, HTMLUListElement> = styled.ul(({ show, theme }) => css`
   display: ${show ? 'block' : 'none'};
   min-width: max-content;
   color: ${theme.colors.gray[40]};
@@ -87,6 +88,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
 
   constructor(props: ActionDropdownProps) {
     super(props);
+
     this.state = {
       show: false,
     };
@@ -114,6 +116,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
         } : {}),
       }),
     );
+
     return (
       <StopPropagation>
         <ActionToggle bsRole="toggle" onClick={this._onToggle}>
@@ -137,7 +140,6 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     );
   }
 }
-
 
 ActionDropdown.propTypes = {
   children: PropTypes.node.isRequired,

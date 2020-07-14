@@ -25,6 +25,7 @@ const iconClass = (type) => {
       return 'question-circle';
   }
 };
+
 const FieldTypeIcon = ({ type }) => {
   return <Icon name={iconClass(type.type)} className={styles.fieldTypeIcon} />;
 };

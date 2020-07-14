@@ -16,6 +16,8 @@ import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateSt
 import ShowViewPage from './ShowViewPage';
 
 jest.mock('stores/connect', () => (x) => x);
+jest.mock('views/logic/views/ViewDeserializer', () => jest.fn((x) => Promise.resolve(x)));
+
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.reject()),
@@ -26,19 +28,22 @@ jest.mock('views/stores/ViewManagementStore', () => ({
     },
   },
 }));
-jest.mock('views/logic/views/ViewDeserializer', () => jest.fn((x) => Promise.resolve(x)));
+
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: mockAction(jest.fn()),
   },
 }));
+
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateActions: {},
   SearchExecutionStateStore: { listen: jest.fn() },
 }));
+
 jest.mock('actions/errors/ErrorsActions', () => ({
   report: jest.fn(),
 }));
+
 jest.mock('util/History', () => ({}));
 jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
 
@@ -63,23 +68,31 @@ describe('ShowViewPage', () => {
                   route={{}}
                   {...props} />
   );
+
   beforeEach(() => {
     jest.resetAllMocks();
     jest.resetModules();
   });
+
   it('renders Spinner while loading', () => {
     const promise = () => new Promise<ViewJson>((resolve) => setTimeout(resolve, 30000, viewJson));
+
     ViewManagementActions.get = mockAction(jest.fn(promise));
     const wrapper = mount(<SimpleShowViewPage />);
+
     expect(wrapper.find('Spinner')).toExist();
   });
+
   it('loads view with id passed from props', () => {
     ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject()));
     mount(<SimpleShowViewPage />);
+
     expect(ViewManagementActions.get).toHaveBeenCalledWith('foo');
   });
+
   it('reports NotForundError error if loading view returns 404', (done) => {
     const error = new Error('Not found');
+
     // $FlowFixMe: Assigning to non-existing key on purpose
     error.status = 404;
     ViewManagementActions.get = mockAction(jest.fn(() => Promise.reject(error)));
@@ -88,35 +101,45 @@ describe('ShowViewPage', () => {
 
     setImmediate(() => {
       expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+
       expect(ErrorsActions.report).toHaveBeenCalledWith({
         error,
         type: NotFoundErrorType,
       });
+
       done();
     });
   });
+
   it('passes loaded view to ViewDeserializer', (done) => {
     ViewManagementActions.get = mockAction(jest.fn(() => Promise.resolve(viewJson)));
     SearchExecutionStateActions.setParameterValues = mockAction(jest.fn());
     const search = Search.create().toBuilder().parameters([]).build();
+
     // $FlowFixMe: Calling mockImplementation on jest.fn()
     ViewDeserializer.mockImplementation((response: ViewJson) => {
       const view = View.fromJSON(response).toBuilder().search(search).build();
+
       return Promise.resolve(view);
     });
+
     mount(<SimpleShowViewPage />);
 
     setImmediate(() => {
       expect(ViewDeserializer).toHaveBeenCalledWith(viewJson);
+
       done();
     });
   });
+
   it('calls ViewLoader upon mount', () => {
     const viewLoader = jest.fn(() => Promise.resolve());
+
     mount(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).toHaveBeenCalled();
   });
+
   it('calls ViewLoader again if view id prop changes', () => {
     const viewLoader = jest.fn(() => Promise.resolve());
     const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);
@@ -127,6 +150,7 @@ describe('ShowViewPage', () => {
 
     expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
   });
+
   it('does not call ViewLoader again if view id prop does not change', () => {
     const viewLoader = jest.fn(() => Promise.resolve());
     const wrapper = mount(<SimpleShowViewPage viewLoader={viewLoader} />);

@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import Select from 'components/common/Select';
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -24,6 +25,7 @@ const StreamSelect = ({ onChange, value, streams }: Props) => {
   const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
     .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
     .map(({ title, id }) => ({ label: title, value: id }))];
+
   return (
     <SelectContainer>
       <Select inputId="streams-filter"

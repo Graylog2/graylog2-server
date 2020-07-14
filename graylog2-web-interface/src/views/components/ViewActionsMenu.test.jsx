@@ -16,18 +16,21 @@ const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboar
   .build();
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
+
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: {
     getInitialState: () => ({ isNew: false, view: mockView }),
     listen: () => jest.fn(),
   },
 }));
+
 jest.mock('views/stores/SearchMetadataStore', () => ({
   SearchMetadataStore: {
     getInitialState: () => ({ undeclared: [] }),
     listen: () => jest.fn(),
   },
 }));
+
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
@@ -42,12 +45,14 @@ jest.mock('views/stores/SearchStore', () => ({
     }),
   },
 }));
+
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateStore: {
     getInitialState: jest.fn(),
     listen: () => jest.fn(),
   },
 }));
+
 jest.mock('views/stores/ViewSharingStore', () => ({
   ViewSharingActions: {
     create: jest.fn(() => Promise.resolve()),
@@ -73,6 +78,7 @@ describe('ViewActionsMenu', () => {
   it('should open modal to save new dashboard', () => {
     const { getByTestId, getByText } = render(<SimpleViewActionMenu />);
     const saveAsMenuItem = getByTestId('dashboard-save-as-button');
+
     fireEvent.click(saveAsMenuItem);
 
     expect(getByText('Save new dashboard')).not.toBeNull();
@@ -81,6 +87,7 @@ describe('ViewActionsMenu', () => {
   it('should open edit dashboard meta information modal', () => {
     const { getByText } = render(<SimpleViewActionMenu />);
     const editMenuItem = getByText(/Edit/i);
+
     fireEvent.click(editMenuItem);
 
     expect(getByText('Editing dashboard')).not.toBeNull();
@@ -89,6 +96,7 @@ describe('ViewActionsMenu', () => {
   it('should dashboard share modal', () => {
     const { getByText } = render(<SimpleViewActionMenu />);
     const editMenuItem = getByText(/Share/i);
+
     fireEvent.click(editMenuItem);
 
     expect(getByText(/Who is supposed to access the dashboard/i)).not.toBeNull();

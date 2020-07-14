@@ -42,6 +42,7 @@ const StreamEditPage = createReactClass({
                          messageId={this.props.location.query.message_id}
                          index={this.props.location.query.index} />
     );
+
     if (this.state.stream.is_default) {
       content = (
         <div className="row content">
@@ -53,6 +54,7 @@ const StreamEditPage = createReactClass({
         </div>
       );
     }
+
     return (
       <DocumentTitle title={`Rules of Stream ${this.state.stream.title}`}>
         <div>

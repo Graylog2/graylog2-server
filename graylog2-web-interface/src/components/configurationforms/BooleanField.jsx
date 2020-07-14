@@ -5,7 +5,6 @@ import FormsUtils from 'util/FormsUtils';
 
 import FieldHelpers from './FieldHelpers';
 
-
 class BooleanField extends React.Component {
   static propTypes = {
     autoFocus: PropTypes.bool,
@@ -20,6 +19,7 @@ class BooleanField extends React.Component {
     const { field } = this.props;
     const { typeName } = this.props;
     const { title } = this.props;
+
     return (
       <div className="form-group">
         <div className="checkbox">
@@ -42,6 +42,7 @@ class BooleanField extends React.Component {
 
   handleChange = (event) => {
     const newValue = FormsUtils.getValueFromInput(event.target);
+
     this.props.onChange(this.props.title, newValue);
   };
 }

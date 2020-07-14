@@ -63,6 +63,7 @@ export default class SearchMetadata {
       .map((metadata: QueryMetadataJson) => QueryMetadata.fromJSON(metadata));
     const declaredParameters = Immutable.Map(declared_parameters)
       .map((parameter: ParameterJson) => Parameter.fromJSON(parameter));
+
     return new SearchMetadata(queryMetadata, declaredParameters);
   }
 }

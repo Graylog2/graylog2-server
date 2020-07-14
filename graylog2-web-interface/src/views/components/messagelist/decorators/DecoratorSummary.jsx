@@ -25,6 +25,7 @@ class DecoratorSummary extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       editing: false,
     };
@@ -32,6 +33,7 @@ class DecoratorSummary extends React.Component {
 
   _handleDeleteClick = () => {
     const { onDelete, decorator } = this.props;
+
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to delete this decorator?')) {
       onDelete(decorator.id);
@@ -50,6 +52,7 @@ class DecoratorSummary extends React.Component {
     const { decorator } = this.props;
     const { stream, id, order } = decorator;
     const { onUpdate } = this.props;
+
     onUpdate(id, {
       id,
       type: data.type,
@@ -57,6 +60,7 @@ class DecoratorSummary extends React.Component {
       order: order,
       stream: stream,
     });
+
     this._closeEditForm();
   };
 
@@ -77,6 +81,7 @@ class DecoratorSummary extends React.Component {
     configKeys.forEach((key) => {
       const configValues = (typeConfig[key] ? typeConfig[key].additional_info.values : undefined);
       const originalValue = config[key];
+
       if (configValues) {
         if (configValues[originalValue]) {
           resolvedConfig[key] = configValues[originalValue];
@@ -89,6 +94,7 @@ class DecoratorSummary extends React.Component {
 
   _formatActionsMenu = () => {
     const { decorator } = this.props;
+
     return (
       <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
         <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>

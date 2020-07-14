@@ -15,9 +15,11 @@ import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixture
 import AreaVisualization from '../AreaVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
+
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().build()], 'listen'),
 }));
+
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
@@ -43,11 +45,13 @@ describe('AreaVisualization', () => {
                                               width={800} />));
 
     const genericPlot = wrapper.find('GenericPlot');
+
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
       xaxis: { range: ['2019-11-28T09:21:00-06:00', '2019-11-28T09:25:57-06:00'], type: 'date' },
       legend: { y: -0.14 },
     });
+
     expect(genericPlot).toHaveProp('chartData', [
       {
         type: 'scatter',

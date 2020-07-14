@@ -45,6 +45,7 @@ const EventDefinitionsStore = Reflux.createStore({
   eventDefinitionsUrl({ segments = [], query = {} }) {
     const uri = new URI(this.sourceUrl);
     const nextSegments = lodash.concat(uri.segment(), segments);
+
     uri.segmentCoded(nextSegments);
     uri.query(query);
 
@@ -55,6 +56,7 @@ const EventDefinitionsStore = Reflux.createStore({
     if (this.all) {
       this.listAll();
     }
+
     if (this.pagination.page) {
       this.listPaginated({
         query: this.query,
@@ -71,6 +73,7 @@ const EventDefinitionsStore = Reflux.createStore({
       this.all = response.event_definitions;
       this.context = response.context;
       this.propagateChanges();
+
       return response;
     });
 
@@ -90,6 +93,7 @@ const EventDefinitionsStore = Reflux.createStore({
       this.eventDefinitions = response.event_definitions;
       this.context = response.context;
       this.query = response.query;
+
       this.pagination = {
         count: response.count,
         page: response.page,
@@ -97,7 +101,9 @@ const EventDefinitionsStore = Reflux.createStore({
         total: response.total,
         grandTotal: response.grand_total,
       };
+
       this.propagateChanges();
+
       return response;
     });
 
@@ -106,17 +112,20 @@ const EventDefinitionsStore = Reflux.createStore({
 
   get(eventDefinitionId) {
     const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
+
     promise.catch((error) => {
       if (error.status === 404) {
         UserNotification.error(`Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
           'Could not retrieve Event Definition');
       }
     });
+
     EventDefinitionsActions.get.promise(promise);
   },
 
   setAlertFlag(eventDefinition) {
     const isAlert = eventDefinition.notifications.length > 0;
+
     return { ...eventDefinition, alert: isAlert };
   },
 
@@ -126,6 +135,7 @@ const EventDefinitionsStore = Reflux.createStore({
     const clonedEventDefinition = lodash.cloneDeep(eventDefinition);
     // eslint-disable-next-line camelcase
     const { _is_scheduled } = lodash.pick(clonedEventDefinition.config, ['_is_scheduled']);
+
     clonedEventDefinition.config = lodash.omit(clonedEventDefinition.config, ['_is_scheduled']);
 
     return { eventDefinition: clonedEventDefinition, isScheduled: lodash.defaultTo(_is_scheduled, true) };
@@ -134,11 +144,14 @@ const EventDefinitionsStore = Reflux.createStore({
   create(newEventDefinition) {
     const { eventDefinition, isScheduled } = this.extractSchedulerInfo(newEventDefinition);
     const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: isScheduled } }), this.setAlertFlag(eventDefinition));
+
     promise.then(
       (response) => {
         UserNotification.success('Event Definition created successfully',
           `Event Definition "${eventDefinition.title}" was created successfully.`);
+
         this.refresh();
+
         return response;
       },
       (error) => {
@@ -148,6 +161,7 @@ const EventDefinitionsStore = Reflux.createStore({
         }
       },
     );
+
     EventDefinitionsActions.create.promise(promise);
   },
 
@@ -155,11 +169,14 @@ const EventDefinitionsStore = Reflux.createStore({
     const { eventDefinition, isScheduled } = this.extractSchedulerInfo(updatedEventDefinition);
     const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }),
       this.setAlertFlag(eventDefinition));
+
     promise.then(
       (response) => {
         UserNotification.success('Event Definition updated successfully',
           `Event Definition "${eventDefinition.title}" was updated successfully.`);
+
         this.refresh();
+
         return response;
       },
       (error) => {
@@ -169,6 +186,7 @@ const EventDefinitionsStore = Reflux.createStore({
         }
       },
     );
+
     EventDefinitionsActions.update.promise(promise);
   },
 
@@ -179,6 +197,7 @@ const EventDefinitionsStore = Reflux.createStore({
       () => {
         UserNotification.success('Event Definition deleted successfully',
           `Event Definition "${eventDefinition.title}" was deleted successfully.`);
+
         this.refresh();
       },
       (error) => {
@@ -192,11 +211,14 @@ const EventDefinitionsStore = Reflux.createStore({
 
   enable(eventDefinition) {
     const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'schedule'] }));
+
     promise.then(
       (response) => {
         UserNotification.success('Event Definition successfully enabled',
           `Event Definition "${eventDefinition.title}" was successfully enabled.`);
+
         this.refresh();
+
         return response;
       },
       (error) => {
@@ -206,16 +228,20 @@ const EventDefinitionsStore = Reflux.createStore({
         }
       },
     );
+
     EventDefinitionsActions.enable.promise(promise);
   },
 
   disable(eventDefinition) {
     const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'unschedule'] }));
+
     promise.then(
       (response) => {
         UserNotification.success('Event Definition successfully disabled',
           `Event Definition "${eventDefinition.title}" was successfully disabled.`);
+
         this.refresh();
+
         return response;
       },
       (error) => {
@@ -225,6 +251,7 @@ const EventDefinitionsStore = Reflux.createStore({
         }
       },
     );
+
     EventDefinitionsActions.disable.promise(promise);
   },
 });

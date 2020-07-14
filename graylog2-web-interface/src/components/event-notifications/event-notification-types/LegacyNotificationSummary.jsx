@@ -21,6 +21,7 @@ class LegacyNotificationSummary extends React.Component {
     const typeData = legacyTypes[callbackType];
 
     let content;
+
     if (typeData) {
       const typeConfiguration = typeData.configuration;
 

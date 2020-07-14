@@ -16,6 +16,7 @@ class WidgetHorizontalStretch extends React.Component {
     const { onStretch, position, widgetId, widgetType } = this.props;
     const { col, row, height, width } = position;
     const { defaultWidth } = widgetDefinition(widgetType);
+
     onStretch({
       id: widgetId, col: col, row: row, height: height, width: width === Infinity ? defaultWidth : Infinity,
     });
@@ -27,6 +28,7 @@ class WidgetHorizontalStretch extends React.Component {
     const stretched = width === Infinity;
     const icon = stretched ? 'compress' : 'arrows-alt-h';
     const title = stretched ? 'Compress width' : 'Stretch width';
+
     return (
       <IconButton onClick={this._onClick} name={icon} title={title} />
     );

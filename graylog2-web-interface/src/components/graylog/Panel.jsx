@@ -72,7 +72,7 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
     }
   }
 
-  ${panelVariantStyles};
+  ${panelVariantStyles}
 `);
 
 const deprecatedVariantStyles = css(({ bsStyle, theme }) => {

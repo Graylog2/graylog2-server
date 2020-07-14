@@ -145,6 +145,7 @@ public class SyslogCodec extends AbstractCodec {
         final Message m = new Message(syslogMessage, parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
         m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
         m.addField("level", e.getLevel());
+        m.addField("facility_num", e.getFacility());
 
         // I can haz pattern matching?
         if (e instanceof CiscoSyslogServerEvent) {

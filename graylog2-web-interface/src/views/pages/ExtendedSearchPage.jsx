@@ -2,13 +2,14 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
 import Footer from 'components/layout/Footer';
 import AppContentGrid from 'components/layout/AppContentGrid';
-import SideBar from 'views/components/sidebar/SideBar';
+import Sidebar from 'views/components/sidebar/Sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
@@ -25,54 +26,51 @@ import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
-import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldsOverview } from 'views/components/sidebar';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
-import { AdditionalContext } from 'views/logic/ActionContext';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
-import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
-import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
+import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-
-import HighlightMessageInQuery from '../components/messagelist/HighlightMessageInQuery';
+import withPluginEntities from 'views/logic/withPluginEntities';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElement> = styled.div`
   ${({ interactive }) => (interactive ? css`
     height: calc(100vh - 50px);
-    display: -ms-grid;
-    display: grid;
-    grid-template-rows: 1fr;
-    -ms-grid-rows: 1fr;
-    grid-template-columns: 50px 1fr;
-    -ms-grid-columns: 50px 1fr;
+    display: flex;
+    > *:nth-child(2) {
+      flex-grow: 1;
+    }
   ` : '')}
 `;
 
 const SearchArea: StyledComponent<{}, void, *> = styled(AppContentGrid)`
-  height: calc(100vh - 50px);
-  grid-column: 2;
-  -ms-grid-column: 2;
-  grid-row: 1;
-  -ms-grid-row: 1;
+  height: 100%;
   z-index: 1;
   overflow-y: auto;
 `;
 
-const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
+const ConnectedSidebar = connect(
+  Sidebar,
+  { viewMetadata: ViewMetadataStore, searches: SearchStore, view: ViewStore },
   (props) => ({
-
     ...props,
+    viewIsNew: props.view.isNew,
     queryId: props.viewMetadata.activeQuery,
     results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
-  }));
+  }),
+);
 
 type Props = {
   route: any,
@@ -89,16 +87,20 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
     return true;
   }
+
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
 const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
   const { view } = ViewStore.getInitialState();
+
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.all();
+
       return SearchActions.execute(executionState);
     }
+
     return Promise.reject(searchMetadata);
   });
 };
@@ -125,14 +127,18 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
 
   useEffect(() => {
     SearchConfigActions.refresh();
+
     FieldTypesActions.all();
+
     StreamsActions.refresh();
 
     let storeListenersUnsubscribes = Immutable.List();
+
     refreshIfNotUndeclared().finally(() => {
       storeListenersUnsubscribes = storeListenersUnsubscribes
         .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
+
       return null;
     });
 
@@ -151,40 +157,42 @@ const ExtendedSearchPage = ({ route, location = { query: {} }, router, searchRef
       </IfInteractive>
       <InteractiveContext.Consumer>
         {(interactive) => (
-          <ViewAdditionalContextProvider>
+          <SearchPageLayoutProvider>
             <DefaultFieldTypesProvider>
-              <HighlightingRulesProvider>
-                <GridContainer id="main-row" interactive={interactive}>
-                  <IfInteractive>
-                    <ConnectedSideBar>
-                      <FieldsOverview />
-                    </ConnectedSideBar>
-                  </IfInteractive>
-                  <SearchArea>
+              <ViewAdditionalContextProvider>
+                <HighlightingRulesProvider>
+                  <GridContainer id="main-row" interactive={interactive}>
                     <IfInteractive>
-                      <HeaderElements />
-                      <IfDashboard>
-                        <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                      </IfDashboard>
-                      <IfSearch>
-                        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                      </IfSearch>
-
-                      <QueryBarElements />
-
-                      <IfDashboard>
-                        <QueryBar />
-                      </IfDashboard>
+                      <ConnectedSidebar>
+                        <FieldsOverview />
+                      </ConnectedSidebar>
                     </IfInteractive>
-                    <HighlightMessageInQuery query={location.query}>
-                      <SearchResult />
-                    </HighlightMessageInQuery>
-                    <Footer />
-                  </SearchArea>
-                </GridContainer>
-              </HighlightingRulesProvider>
+                    <SearchArea>
+                      <IfInteractive>
+                        <HeaderElements />
+                        <IfDashboard>
+                          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                        </IfDashboard>
+                        <IfSearch>
+                          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                        </IfSearch>
+
+                        <QueryBarElements />
+
+                        <IfDashboard>
+                          <QueryBar />
+                        </IfDashboard>
+                      </IfInteractive>
+                      <HighlightMessageInQuery query={location.query}>
+                        <SearchResult />
+                      </HighlightMessageInQuery>
+                      <Footer />
+                    </SearchArea>
+                  </GridContainer>
+                </HighlightingRulesProvider>
+              </ViewAdditionalContextProvider>
             </DefaultFieldTypesProvider>
-          </ViewAdditionalContextProvider>
+          </SearchPageLayoutProvider>
         )}
       </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>

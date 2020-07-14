@@ -75,12 +75,14 @@ export const CurrentViewStateStore = singletonStore(
     fields(newFields) {
       const newActiveState = this._activeState().toBuilder().fields(newFields).build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+
       CurrentViewStateActions.fields.promise(promise);
     },
 
     titles(newTitles) {
       const newActiveState = this._activeState().toBuilder().titles(newTitles).build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+
       CurrentViewStateActions.titles.promise(promise);
     },
 
@@ -95,18 +97,21 @@ export const CurrentViewStateStore = singletonStore(
         .widgetPositions(newPositionMap.toObject())
         .build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+
       CurrentViewStateActions.widgets.promise(promise);
     },
 
     widgetPositions(newPositions) {
       const newActiveState = this._activeState().toBuilder().widgetPositions(newPositions).build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+
       CurrentViewStateActions.widgetPositions.promise(promise);
     },
 
     formatting(formatting) {
       const newActiveState = this._activeState().toBuilder().formatting(formatting).build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
+
       CurrentViewStateActions.formatting.promise(promise);
     },
 

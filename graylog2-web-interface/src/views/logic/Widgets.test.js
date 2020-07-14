@@ -23,6 +23,7 @@ describe('Widgets', () => {
 
       expect(widgetDefinition('some-type')).toEqual({ type: 'some-type', value: 42 });
     });
+
     it('returns default definition if widget type is not present', () => {
       asMock(PluginStore.exports).mockReturnValue([{
         type: 'some-other-type',
@@ -34,6 +35,7 @@ describe('Widgets', () => {
 
       expect(widgetDefinition('some-type')).toEqual({ type: 'default', value: 42 });
     });
+
     it('throws error if widget type and default type are not present', () => {
       asMock(PluginStore.exports).mockReturnValue([{
         type: 'some-other-type',

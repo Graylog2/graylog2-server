@@ -30,6 +30,7 @@ const InputsStore = Reflux.createStore({
 
   list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+
     promise
       .then(
         (response) => {
@@ -77,6 +78,7 @@ const InputsStore = Reflux.createStore({
 
   create(input) {
     const promise = fetch('POST', URLUtils.qualifyUrl(this.sourceUrl), input);
+
     promise
       .then(
         () => {
@@ -97,6 +99,7 @@ const InputsStore = Reflux.createStore({
     const inputTitle = input.title;
 
     const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
+
     promise
       .then(
         () => {
@@ -114,6 +117,7 @@ const InputsStore = Reflux.createStore({
 
   update(id, input) {
     const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${id}`), input);
+
     promise
       .then(
         () => {
@@ -132,9 +136,11 @@ const InputsStore = Reflux.createStore({
 
 InputsStore.inputsAsMap = (inputsList) => {
   const inputsMap = {};
+
   inputsList.forEach((input) => {
     inputsMap[input.id] = input;
   });
+
   return inputsMap;
 };
 

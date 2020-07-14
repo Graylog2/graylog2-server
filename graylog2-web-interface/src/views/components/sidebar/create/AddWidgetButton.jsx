@@ -9,6 +9,9 @@ import { Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 
+import SectionInfo from '../SectionInfo';
+import SectionSubheadline from '../SectionSubheadline';
+
 const Group = styled.div`
   margin-bottom: 20px;
 
@@ -17,18 +20,14 @@ const Group = styled.div`
   }
 `;
 
-const GroupHeadline = styled.h4`
-  margin-bottom: 10px;
-`;
-
 const CreateButton = styled(Button)`
   display: block;
   margin: 5px 0;
+  width: 100%;
 `;
 
 type Props = {
   onClick: () => void,
-  toggleAutoClose: () => void,
 };
 
 type State = {
@@ -54,49 +53,60 @@ type CreatorComponentProps = {
 
 type ComponentCreator = {|
   component: React.ComponentType<CreatorComponentProps>,
+  condition?: () => boolean,
   title: string,
   type: CreatorType,
-  condition?: () => boolean,
 |};
 
 type Creator = ComponentCreator | FunctionalCreator;
 
 class AddWidgetButton extends React.Component<Props, State> {
-  state = {
-    overflowingComponents: {},
-  };
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      overflowingComponents: {},
+    };
+  }
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
-    const { onClick, toggleAutoClose } = this.props;
+    const { onClick } = this.props;
     const { view } = ViewStore.getInitialState();
+
     if (creator.func) {
       return () => {
         onClick();
-        toggleAutoClose();
+
         creator.func({ view });
       };
     }
+
     if (creator.component) {
       const CreatorComponent = creator.component;
+
       return () => {
         const id = uuid();
         const onClose = () => this.setState((state) => {
           const { overflowingComponents } = state;
+
           delete overflowingComponents[id];
+
           onClick();
-          toggleAutoClose();
+
           return { overflowingComponents };
         });
         const renderedComponent = <CreatorComponent key={creator.title} onClose={onClose} />;
+
         this.setState((state) => {
           const { overflowingComponents } = state;
+
           overflowingComponents[id] = renderedComponent;
+
           return { overflowingComponents };
-        }, () => {
-          toggleAutoClose();
         });
       };
     }
+
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
   };
 
@@ -111,6 +121,7 @@ class AddWidgetButton extends React.Component<Props, State> {
   _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
     const typeCreators = creators.filter((c) => (c.type === type));
     const sortedCreators = sortBy(typeCreators, 'title');
+
     return sortedCreators.map(this._createMenuItem);
   }
 
@@ -121,19 +132,21 @@ class AddWidgetButton extends React.Component<Props, State> {
     const generic = this._createGroup(creators, 'generic');
     // $FlowFixMe: Object.value signature is in the way
     const components: Array<React.Node> = Object.values(overflowingComponents);
+
     return (
       <>
+        <SectionInfo>Use the following options to add an aggregation or parameters (enterprise) to your search.</SectionInfo>
         <Group>
-          <GroupHeadline>Generic</GroupHeadline>
+          <SectionSubheadline>Generic</SectionSubheadline>
           {generic}
         </Group>
         <Group>
-          <GroupHeadline>Predefined Aggregation</GroupHeadline>
+          <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
           {presets}
         </Group>
         {!isEmpty(components) && (
           <Group>
-            <GroupHeadline>Other</GroupHeadline>
+            <SectionSubheadline>Other</SectionSubheadline>
             {components}
           </Group>
         )}

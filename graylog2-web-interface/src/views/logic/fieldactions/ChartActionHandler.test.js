@@ -16,11 +16,13 @@ import { createElasticsearchQueryString } from '../queries/Query';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 
 jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
+
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     create: jest.fn((widget) => Promise.resolve(widget)),
   },
 }));
+
 jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
 
 describe('ChartActionHandler', () => {
@@ -51,6 +53,7 @@ describe('ChartActionHandler', () => {
       // $FlowFixMe this is a mock
       pivotForField.mockReturnValue('PIVOT');
     });
+
     it('uses Unknown if FieldTypeStore returns nothing', () => {
       asMock(FieldTypesStore.getInitialState).mockReturnValue(undefined);
 
@@ -58,6 +61,7 @@ describe('ChartActionHandler', () => {
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
+
     it('uses Unknown if FieldTypeStore returns neither all nor query fields', () => {
       asMock(FieldTypesStore.getInitialState).mockReturnValue({
         all: Immutable.List([]),
@@ -68,8 +72,10 @@ describe('ChartActionHandler', () => {
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
+
     it('from query field types if present', () => {
       const timestampFieldType = new FieldType('date', [], []);
+
       asMock(FieldTypesStore.getInitialState).mockReturnValue({
         all: Immutable.List([]),
         queryFields: Immutable.fromJS({
@@ -85,8 +91,10 @@ describe('ChartActionHandler', () => {
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
+
     it('from all field types if present', () => {
       const timestampFieldType = new FieldType('date', [], []);
+
       asMock(FieldTypesStore.getInitialState).mockReturnValue({
         all: Immutable.List([
           new FieldTypeMapping('otherfield', new FieldType('sometype', [], [])),
@@ -100,6 +108,7 @@ describe('ChartActionHandler', () => {
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
+
     it('uses unknown if not in query field types', () => {
       asMock(FieldTypesStore.getInitialState).mockReturnValue({
         all: Immutable.List([]),
@@ -115,6 +124,7 @@ describe('ChartActionHandler', () => {
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
+
     it('uses Unknown if not in all field types', () => {
       asMock(FieldTypesStore.getInitialState).mockReturnValue({
         all: Immutable.List([
@@ -129,14 +139,17 @@ describe('ChartActionHandler', () => {
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
   });
+
   describe('Widget creation', () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
+
     it('should create widget with filter of original widget', () => {
       const filter = "author: 'Vanth'";
       const origWidget = Widget.builder().filter(filter).build();
       const timestampFieldType = new FieldType('date', [], []);
+
       asMock(FieldTypesStore.getInitialState).mockReturnValue({
         all: Immutable.List([]),
         queryFields: Immutable.fromJS({
@@ -155,6 +168,7 @@ describe('ChartActionHandler', () => {
       expect(widget.filter).toEqual(filter);
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
+
     it('duplicates query/timerange/streams/filter of original widget', () => {
       const origWidget = Widget.builder()
         .filter('author: "Vanth"')
@@ -171,7 +185,9 @@ describe('ChartActionHandler', () => {
       });
 
       expect(WidgetActions.create).toHaveBeenCalled();
+
       const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+
       expect(filter).toEqual('author: "Vanth"');
       expect(query).toEqual(createElasticsearchQueryString('foo:42'));
       expect(streams).toEqual(['stream1', 'stream23']);

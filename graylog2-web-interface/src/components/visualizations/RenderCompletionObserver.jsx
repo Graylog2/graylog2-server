@@ -18,13 +18,16 @@ class RenderCompletionObserver extends React.Component {
     if (this._renderComplete) {
       return;
     }
+
     this._renderComplete = true;
     const { onRenderComplete } = this.props;
+
     onRenderComplete();
   };
 
   render() {
     const { children } = this.props;
+
     return (
       <RenderCompletionCallback.Provider value={this._handleRenderComplete}>
         {children}

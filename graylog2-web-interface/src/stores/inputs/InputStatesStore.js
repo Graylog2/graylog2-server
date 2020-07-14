@@ -18,20 +18,25 @@ const InputStatesStore = Reflux.createStore({
 
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.list().url);
+
     return fetch('GET', url)
       .then((response) => {
         const result = {};
+
         Object.keys(response).forEach((node) => {
           if (!response[node]) {
             return;
           }
+
           response[node].forEach((input) => {
             if (!result[input.id]) {
               result[input.id] = {};
             }
+
             result[input.id][node] = input;
           });
         });
+
         this.inputStates = result;
         this.trigger({ inputStates: this.inputStates });
 
@@ -57,11 +62,13 @@ const InputStatesStore = Reflux.createStore({
 
   start(input) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.start(input.id).url);
+
     return fetch('PUT', url)
       .then(
         (response) => {
           this._checkInputStateChangeResponse(input, response, 'START');
           this.list();
+
           return response;
         },
         (error) => {
@@ -72,11 +79,13 @@ const InputStatesStore = Reflux.createStore({
 
   stop(input) {
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.stop(input.id).url);
+
     return fetch('DELETE', url)
       .then(
         (response) => {
           this._checkInputStateChangeResponse(input, response, 'STOP');
           this.list();
+
           return response;
         },
         (error) => {

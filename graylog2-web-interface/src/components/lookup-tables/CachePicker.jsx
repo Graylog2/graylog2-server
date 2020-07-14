@@ -22,6 +22,7 @@ class CachePicker extends React.Component {
 
   render() {
     const cachePlugins = {};
+
     PluginStore.exports('lookupTableCaches').forEach((p) => {
       cachePlugins[p.type] = p;
     });

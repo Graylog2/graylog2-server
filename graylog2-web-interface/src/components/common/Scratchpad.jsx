@@ -149,8 +149,10 @@ const Scratchpad = () => {
     }
 
     clipboard = new ClipboardJS('[data-clipboard-button]', {});
+
     clipboard.on('success', () => {
       setCopied(true);
+
       setTimeout(() => {
         setCopied(false);
       }, 1000);

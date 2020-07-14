@@ -30,6 +30,7 @@ function renderAppContainer(appContainer) {
 
 window.onload = () => {
   const appContainer = document.createElement('div');
+
   document.body.appendChild(appContainer);
 
   renderAppContainer(appContainer);

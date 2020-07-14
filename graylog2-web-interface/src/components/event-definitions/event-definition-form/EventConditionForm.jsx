@@ -25,6 +25,7 @@ class EventConditionForm extends React.Component {
     if (type === undefined) {
       return {};
     }
+
     return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
   };
 
@@ -36,6 +37,7 @@ class EventConditionForm extends React.Component {
 
       if (edt1Order !== undefined || edt2Order !== undefined) {
         const sort = lodash.defaultTo(edt1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(edt2Order, Number.MAX_SAFE_INTEGER);
+
         if (sort !== 0) {
           return sort;
         }
@@ -54,6 +56,7 @@ class EventConditionForm extends React.Component {
     const { onChange } = this.props;
     const conditionPlugin = this.getConditionPlugin(nextType);
     const defaultConfig = conditionPlugin.defaultConfig || {};
+
     onChange('config', { ...defaultConfig, type: nextType });
   };
 

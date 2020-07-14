@@ -18,6 +18,7 @@ class IndexerFailuresPage extends React.Component {
     IndexerFailuresStore.count(moment().subtract(10, 'years')).then((response) => {
       this.setState({ total: response.count });
     });
+
     this.loadData(1, this.defaultPageSize);
   }
 
@@ -37,6 +38,7 @@ class IndexerFailuresPage extends React.Component {
     if (this.state.total === undefined || !this.state.failures) {
       return <Spinner />;
     }
+
     return (
       <DocumentTitle title="Indexer failures">
         <span>

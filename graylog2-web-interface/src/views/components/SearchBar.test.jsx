@@ -12,16 +12,20 @@ import { default as MockQuery } from 'views/logic/queries/Query';
 import SearchBar from './SearchBar';
 
 const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
+
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
   ['get', () => mockCurrentUser],
   ['getInitialState', () => mockCurrentUser],
 ));
+
 jest.mock('stores/streams/StreamsStore', () => MockStore(
   'listen',
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
 ));
+
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
+
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
     .timerange({ type: 'relative', range: 300 })
@@ -56,6 +60,7 @@ describe('SearchBar', () => {
     const { getByTitle } = render(<SearchBar config={config} />);
 
     const searchButton = getByTitle('Perform search');
+
     fireEvent.click(searchButton);
 
     const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
@@ -77,6 +82,7 @@ describe('SearchBar', () => {
     const { parentNode, value } = asElement(option, HTMLOptionElement);
     const input = asElement(parentNode, HTMLSelectElement);
     const { name } = input;
+
     fireEvent.change(input, { target: { name, value: String(value) } });
   };
 

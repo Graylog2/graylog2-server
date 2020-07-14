@@ -25,7 +25,9 @@ describe('<MeasureDimensions />', () => {
         return (<div />);
       }
     }
+
     let childRef = null;
+
     mount(<MeasureDimensions><ChildComp ref={(node) => { childRef = node; }} /></MeasureDimensions>);
 
     // JSDOM does not have a height, therefore we can only check that containerHeight was set to 0.

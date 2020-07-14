@@ -57,16 +57,19 @@ const SidecarsStore = Reflux.createStore({
         this.sidecars = response.sidecars;
         this.query = response.query;
         this.onlyActive = response.only_active;
+
         this.pagination = {
           total: response.pagination.total,
           count: response.pagination.count,
           page: response.pagination.page,
           pageSize: response.pagination.per_page,
         };
+
         this.sort = {
           field: response.sort,
           order: response.order,
         };
+
         this.propagateChanges();
 
         return response;
@@ -82,22 +85,28 @@ const SidecarsStore = Reflux.createStore({
 
   getSidecar(sidecarId) {
     const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}`));
+
     promise.catch((error) => {
       let errorMessage = `Fetching Sidecar failed with status: ${error}`;
+
       if (error.status === 404) {
         errorMessage = `Unable to find a sidecar with ID <${sidecarId}>, maybe it was inactive for too long.`;
       }
+
       UserNotification.error(errorMessage, 'Could not retrieve Sidecar');
     });
+
     SidecarsActions.getSidecar.promise(promise);
   },
 
   restartCollector(sidecarId, collector) {
     const action = {};
+
     action.collector = collector;
     action.properties = {};
     action.properties.restart = true;
     const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`), [action]);
+
     promise
       .catch(
         (error) => {
@@ -105,11 +114,13 @@ const SidecarsStore = Reflux.createStore({
             'Could not restart Sidecar');
         },
       );
+
     SidecarsActions.restartCollector.promise(promise);
   },
 
   getSidecarActions(sidecarId) {
     const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`));
+
     promise
       .catch(
         (error) => {
@@ -117,6 +128,7 @@ const SidecarsStore = Reflux.createStore({
             'Could not retrieve Sidecar actions');
         },
       );
+
     SidecarsActions.getSidecarActions.promise(promise);
   },
 
@@ -142,10 +154,12 @@ const SidecarsStore = Reflux.createStore({
     });
 
     const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`), { nodes: nodes });
+
     promise
       .then(
         (response) => {
           UserNotification.success('', `Configuration change for ${sidecars.length} collectors requested`);
+
           return response;
         },
         (error) => {
@@ -153,6 +167,7 @@ const SidecarsStore = Reflux.createStore({
             'Could not retrieve Sidecar actions');
         },
       );
+
     SidecarsActions.assignConfigurations.promise(promise);
   },
 });

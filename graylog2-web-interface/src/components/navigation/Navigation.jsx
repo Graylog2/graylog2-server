@@ -1,18 +1,19 @@
+// @flow strict
+import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 import { withRouter } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
-import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
-import { isPermitted } from 'util/PermissionsMixin';
-import Routes from 'routing/Routes';
 import { appPrefixed } from 'util/URLUtils';
-import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import { IfPermitted } from 'components/common';
+import { isPermitted } from 'util/PermissionsMixin';
+import { Navbar, Nav, NavItem, NavDropdown } from 'components/graylog';
+import CurrentUserContext from 'contexts/CurrentUserContext';
+import GlobalThroughput from 'components/throughput/GlobalThroughput';
+import Routes from 'routing/Routes';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -24,8 +25,6 @@ import SystemMenu from './SystemMenu';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const _isActive = (requestPath, prefix) => {
   return requestPath.indexOf(appPrefixed(prefix)) === 0;
@@ -46,6 +45,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
     const activeChild = pluginRoute.children.filter(({ path }) => (path && _isActive(location.pathname, path)));
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(permissions, child.permissions));
+
     if (isEmpty) {
       return null;
     }
@@ -60,8 +60,12 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
   return formatSinglePluginRoute(pluginRoute, true);
 };
 
-const Navigation = ({ permissions, fullName, location, loginName }) => {
+const Navigation = ({ location }) => {
+  const currentUser = useContext(CurrentUserContext);
+  const { permissions, username, full_name: fullName } = currentUser || {};
+
   const pluginExports = PluginStore.exports('navigation');
+
   if (!pluginExports.find((value) => value.description.toLowerCase() === 'enterprise')) {
     // no enterprise plugin menu, so we will add one
     pluginExports.push({
@@ -69,6 +73,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
       description: 'Enterprise',
     });
   }
+
   const pluginNavigations = pluginExports
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map((pluginRoute) => formatPluginRoute(pluginRoute, permissions, location));
@@ -125,7 +130,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           </LinkContainer>
           <ScratchpadToggle />
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
-          <UserMenu fullName={fullName} loginName={loginName} />
+          <UserMenu fullName={fullName} loginName={username} />
         </Nav>
       </Navbar.Collapse>
     </StyledNavbar>
@@ -136,17 +141,6 @@ Navigation.propTypes = {
   location: PropTypes.shape({
     pathname: PropTypes.string.isRequired,
   }).isRequired,
-  loginName: PropTypes.string.isRequired,
-  fullName: PropTypes.string.isRequired,
-  permissions: PropTypes.arrayOf(PropTypes.string),
 };
 
-Navigation.defaultProps = {
-  permissions: undefined,
-};
-
-export default connect(
-  withRouter(Navigation),
-  { currentUser: CurrentUserStore },
-  ({ currentUser }) => ({ permissions: currentUser ? currentUser.currentUser.permissions : undefined }),
-);
+export default withRouter(Navigation);

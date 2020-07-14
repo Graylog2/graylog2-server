@@ -131,6 +131,7 @@ const IndexSetPage = createReactClass({
 
     let indicesInfo;
     let indicesOverview;
+
     if (this.state.indexerOverview && this.state.indexDetails.closedIndices) {
       const deflectorInfo = this.state.indexerOverview.deflector;
 
@@ -144,6 +145,7 @@ const IndexSetPage = createReactClass({
           <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
         </span>
       );
+
       indicesOverview = (
         <IndicesOverview indices={this.state.indexerOverview.indices}
                          indexDetails={this.state.indexDetails.indices}

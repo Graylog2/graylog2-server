@@ -5,7 +5,7 @@ import { withTheme } from 'styled-components';
 import { browserHistory } from 'react-router';
 
 import connect from 'stores/connect';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import { newDashboardsPath } from 'views/Constants';
@@ -80,26 +80,31 @@ class SavedSearchControls extends React.Component<Props, State> {
 
   toggleFormModal = () => {
     const { showForm } = this.state;
+
     this.setState({ showForm: !showForm });
   };
 
   toggleListModal = () => {
     const { showList } = this.state;
+
     this.setState({ showList: !showList });
   };
 
   toggleCSVExport = () => {
     const { showCSVExport } = this.state;
+
     this.setState({ showCSVExport: !showCSVExport });
   };
 
   toggleMetadataEdit = () => {
     const { showMetadataEdit } = this.state;
+
     this.setState({ showMetadataEdit: !showMetadataEdit });
   };
 
   toggleShareSearch = () => {
     const { showShareSearch } = this.state;
+
     this.setState({ showShareSearch: !showShareSearch });
   };
 
@@ -152,6 +157,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     ViewManagementActions.create(newView)
       .then((createdView) => {
         const loaderFunc = this.context;
+
         loaderFunc(createdView.id).then(() => {
           browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(createdView.id));
         });
@@ -168,6 +174,7 @@ class SavedSearchControls extends React.Component<Props, State> {
   deleteSavedSearch = (deletedView) => {
     const { viewStoreState } = this.props;
     const { view } = viewStoreState;
+
     return ViewManagementActions.delete(deletedView)
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => ViewActions.create(View.Type.Search))
@@ -197,12 +204,14 @@ class SavedSearchControls extends React.Component<Props, State> {
 
     const loaded = (view && view.id);
     let savedSearchColor: string = '';
+
     if (loaded) {
       savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
     }
 
     const disableReset = !(dirty || loaded);
     let title: string;
+
     if (dirty) {
       title = 'Unsaved changes';
     } else {
@@ -213,6 +222,7 @@ class SavedSearchControls extends React.Component<Props, State> {
       <CurrentUserContext.Consumer>
         {(currentUser) => {
           const isAllowedToEdit = (view && view.id) && _isAllowedToEdit(view, currentUser);
+
           return (
             <NewViewLoaderContext.Consumer>
               {(loadNewView) => (

@@ -17,6 +17,7 @@ type Props = {
 
 const _changeValue = (event: SyntheticInputEvent<HTMLInputElement>, interval: TimeUnitInterval, onChange: OnChange) => {
   const value = FormsUtils.getValueFromInput(event.target);
+
   onChange({ ...interval, value });
 };
 

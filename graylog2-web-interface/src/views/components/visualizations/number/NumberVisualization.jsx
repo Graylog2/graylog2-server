@@ -1,6 +1,7 @@
 // @flow strict
 import React, { useContext, useEffect, useRef } from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -62,13 +63,17 @@ const _extractValueAndField = (rows: Rows) => {
   if (!rows || !rows[0]) {
     return { value: undefined, field: undefined };
   }
+
   const results = rows[0];
+
   if (results.source === 'leaf') {
     const leaf = results.values.find((f) => f.source === 'row-leaf');
+
     if (leaf && leaf.source === 'row-leaf') {
       return { value: leaf.value, field: leaf.key[0] };
     }
   }
+
   return { value: undefined, field: undefined };
 };
 
@@ -82,12 +87,14 @@ type Props = {
 const NumberVisualization = ({ config: { visualizationConfig = NumberVisualizationConfig.create() } = {}, currentView, fields, data }: Props) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
+
   useEffect(onRenderComplete, [onRenderComplete]);
   const { activeQuery } = currentView;
   const chartRows = data.chart || Object.values(data)[0];
   const trendRows = data.trend;
   const { value, field } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);
+
   if (!field || (value !== 0 && !value)) {
     return 'N/A';
   }

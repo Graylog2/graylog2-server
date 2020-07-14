@@ -14,6 +14,7 @@ describe('SelectExtractorType', () => {
   const value = 'value of message';
   const field = 'value_field';
   const focus = jest.fn();
+
   window.open = jest.fn(() => { return { focus }; });
 
   const message = {
@@ -33,6 +34,7 @@ describe('SelectExtractorType', () => {
       </AdditionalContext.Provider>,
     );
     const bootstrapModalForm = wrapper.find('BootstrapModalForm');
+
     expect(bootstrapModalForm).toExist();
     expect(bootstrapModalForm).toHaveProp('show', true);
   });
@@ -47,11 +49,13 @@ describe('SelectExtractorType', () => {
     const { onChange } = select.at(0).props();
 
     const form = wrapper.find('form');
+
     expect(select).toExist();
     expect(select.at(0)).toHaveProp('placeholder', 'Select extractor type');
 
     onChange('grok');
     form.simulate('submit');
+
     expect(window.open).toHaveBeenCalled();
     expect(focus).toHaveBeenCalled();
   });

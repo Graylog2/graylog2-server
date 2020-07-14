@@ -21,7 +21,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             <button
               aria-expanded="false"
               aria-haspopup="true"
-              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 gPsjMO TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 goSdAM dropdown-toggle btn btn-info"
+              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 bLGhtq TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 goSdAM dropdown-toggle btn btn-info"
               id="timerange-type"
               role="button"
               type="button"
@@ -79,7 +79,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           </div>
         </div>
         <div
-          class="TimerangeSelector__TimerangeWrap-sc-1oa3haa-0 jJcaLS relative"
+          class="TimerangeSelector__TimerangeWrap-sc-1oa3haa-0 yKBJm relative"
           style="margin-left: 50px;"
         >
           <div
@@ -88,7 +88,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             
             <span>
               <select
-                class="FormControl-sc-1amoaox-0 fdBWEX relative form-control"
+                class="FormControl-sc-1amoaox-0 eXfwDC relative form-control"
                 id="relative-timerange-selector"
                 label=""
                 name="timerange.range"
@@ -124,7 +124,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             class="css-1pcexqc-container"
           >
             <div
-              class="css-1nvce9p-control"
+              class="css-et9nfk-control"
             >
               <div
                 class="css-1hio1c"
@@ -196,7 +196,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           </a>
         </div>
         <button
-          class="Button__StyledButton-c9cbmb-0 jVYrA SearchButton__StyledButton-mm3q5z-0 gkhrPg pull-left btn btn-success"
+          class="Button__StyledButton-c9cbmb-0 hpBclA SearchButton__StyledButton-mm3q5z-0 gkhrPg pull-left btn btn-success"
           title="Perform search"
           type="submit"
         >

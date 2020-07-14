@@ -1,17 +1,22 @@
+// @flow strict
+import * as React from 'react';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 
-import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
-import PermissionsMixin from 'util/PermissionsMixin';
-
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { isPermitted, isAnyPermitted } = PermissionsMixin;
+import CurrentUserContext from 'contexts/CurrentUserContext';
+import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 
 /**
  * Wrapper component that renders its children only if the current user fulfills certain permissions.
  * Current user's permissions are fetched from the server.
  */
+
+type Props = {
+  children: React.Node,
+  permissions: string | Array<string>,
+  anyPermissions?: boolean,
+};
+
 const _checkPermissions = (permissions, anyPermissions, currentUser) => {
   if (anyPermissions) {
     return isAnyPermitted(currentUser.permissions, permissions);
@@ -20,7 +25,9 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
   return isPermitted(currentUser.permissions, permissions);
 };
 
-const IfPermitted = ({ children, currentUser, permissions, anyPermissions, ...rest }) => {
+const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) => {
+  const currentUser = useContext(CurrentUserContext);
+
   if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
     return React.Children.map(children, (child) => {
       if (React.isValidElement(child)) {
@@ -29,8 +36,10 @@ const IfPermitted = ({ children, currentUser, permissions, anyPermissions, ...re
         const filteredRest = Object.entries(rest)
           .filter((entry) => !presentProps.includes(entry[0]))
           .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
+
         return React.cloneElement(child, filteredRest);
       }
+
       return child;
     });
   }
@@ -55,4 +64,4 @@ IfPermitted.defaultProps = {
 };
 
 /** @component */
-export default connect(IfPermitted, { currentUser: CurrentUserStore }, ({ currentUser }) => ({ currentUser: currentUser ? currentUser.currentUser : currentUser }));
+export default IfPermitted;

@@ -51,6 +51,7 @@ class TestLdapConnection extends React.Component {
     if (this.state.serverConnectionStatus.success) {
       return 'success';
     }
+
     if (this.state.serverConnectionStatus.error) {
       return 'danger';
     }
@@ -63,9 +64,11 @@ class TestLdapConnection extends React.Component {
     const isDisabled = this.props.disabled || this.props.ldapUri.hostname() === '' || serverConnectionStatus.loading;
 
     let serverConnectionResult;
+
     if (serverConnectionStatus.error) {
       serverConnectionResult = <Alert bsStyle="danger">{serverConnectionStatus.error}</Alert>;
     }
+
     if (serverConnectionStatus.success) {
       serverConnectionResult = <Alert bsStyle="success">Connection to server was successful</Alert>;
     }

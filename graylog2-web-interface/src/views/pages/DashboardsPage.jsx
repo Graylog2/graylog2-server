@@ -25,6 +25,7 @@ const handleViewDelete = (view) => {
   if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {
     return ViewManagementActions.delete(view);
   }
+
   return null;
 };
 
@@ -34,6 +35,7 @@ const refreshDashboards = () => {
 
 const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
   useEffect(refreshDashboards, []);
+
   return (
     <DocumentTitle title="Dashboards">
       <span>

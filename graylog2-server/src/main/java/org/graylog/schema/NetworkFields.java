@@ -22,12 +22,16 @@ public class NetworkFields {
     public static final String NETWORK_BYTES_RX = "network_bytes_rx";
     public static final String NETWORK_BYTES_TX = "network_bytes_tx";
     public static final String NETWORK_COMMUNITY_ID = "network_community_id";
+    public static final String NETWORK_DATA_BYTES = "network_data_bytes";
     public static final String NETWORK_DIRECTION = "network_direction";
     public static final String NETWORK_FORWARDED_IP = "network_forwarded_ip";
+    public static final String NETWORK_HEADER_BYTES = "network_header_bytes";
     public static final String NETWORK_IANA_NUMBER = "network_iana_number";
+    public static final String NETWORK_ICMP_BYTES = "network_icmp_bytes";
     public static final String NETWORK_INNER = "network_inner";
     public static final String NETWORK_INTERFACE_IN = "network_interface_in";
     public static final String NETWORK_INTERFACE_OUT = "network_interface_out";
+    public static final String NETWORK_IP_VERSION = "network_ip_version";
     public static final String NETWORK_NAME = "network_name";
     public static final String NETWORK_PACKETS = "network_packets";
     public static final String NETWORK_PROTOCOL = "network_protocol";

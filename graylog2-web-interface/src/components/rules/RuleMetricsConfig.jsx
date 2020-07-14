@@ -21,6 +21,7 @@ export default class RuleMetricsConfig extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       nextConfig: props.config,
     };
@@ -44,12 +45,14 @@ export default class RuleMetricsConfig extends React.Component {
   propagateChange = (key, value) => {
     const { config } = this.props;
     const nextConfig = lodash.cloneDeep(config);
+
     nextConfig[key] = value;
     this.setState({ nextConfig });
   };
 
   handleChange = (event) => {
     const { name } = event.target;
+
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 

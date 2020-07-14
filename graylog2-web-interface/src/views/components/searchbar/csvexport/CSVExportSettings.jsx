@@ -23,6 +23,7 @@ type CSVExportSettingsType = {
 
 const SelectedWidgetInfo = ({ selectedWidget, view }: {selectedWidget: Widget, view: View}) => {
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
+
   return (
     <Row>
       <i>

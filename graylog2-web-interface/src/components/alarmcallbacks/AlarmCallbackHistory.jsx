@@ -33,6 +33,7 @@ class AlarmCallbackHistory extends React.Component {
 
     let configurationWell;
     let configurationInfo;
+
     if (type) {
       configurationWell = <ConfigurationWell configuration={configuration.configuration} typeDefinition={type} />;
     } else {

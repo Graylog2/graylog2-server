@@ -61,14 +61,18 @@ class DataAdapterForm extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { type: currentType } = this.props;
+
     if (prevProps.type !== currentType) {
       this._input.getInputDOMNode().focus();
     }
+
     const { dataAdapter } = this.props;
+
     if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }
+
     this.updateState(dataAdapter);
   }
 
@@ -113,6 +117,7 @@ class DataAdapterForm extends React.Component {
 
     // first cancel outstanding validation timer, we have new data
     this._clearTimer();
+
     if (validate) {
       this.validationCheckTimer = setTimeout(() => validate(adapter), 500);
     }
@@ -121,16 +126,20 @@ class DataAdapterForm extends React.Component {
   _onChange = (event) => {
     const { dataAdapter: dataAdapterState } = this.state;
     const dataAdapter = ObjectUtils.clone(dataAdapterState);
+
     dataAdapter[event.target.name] = FormsUtils.getValueFromInput(event.target);
     let { generateAdapterName } = this.state;
+
     if (generateAdapterName && event.target.name === 'title') {
       // generate the name
       dataAdapter.name = this._sanitizeTitle(dataAdapter.title);
     }
+
     if (event.target.name === 'name') {
       // the adapter name has been changed manually, no longer automatically change it
       generateAdapterName = false;
     }
+
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter, generateAdapterName: generateAdapterName });
   };
@@ -138,6 +147,7 @@ class DataAdapterForm extends React.Component {
   _onConfigChange = (event) => {
     const { dataAdapter: dataAdapterState } = this.state;
     const dataAdapter = ObjectUtils.clone(dataAdapterState);
+
     dataAdapter.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
@@ -146,6 +156,7 @@ class DataAdapterForm extends React.Component {
   _updateConfig = (newConfig) => {
     const { dataAdapter: dataAdapterState } = this.state;
     const dataAdapter = ObjectUtils.clone(dataAdapterState);
+
     dataAdapter.config = newConfig;
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
@@ -166,6 +177,7 @@ class DataAdapterForm extends React.Component {
       dataAdapter[fieldPrefix] = null;
       dataAdapter[`${fieldPrefix}_enabled`] = false;
     }
+
     dataAdapter[`${fieldPrefix}_unit`] = enabled ? unit : null;
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
@@ -180,6 +192,7 @@ class DataAdapterForm extends React.Component {
     const { create, saved } = this.props;
 
     let promise;
+
     if (create) {
       promise = LookupTableDataAdaptersActions.create(dataAdapter);
     } else {
@@ -197,14 +210,17 @@ class DataAdapterForm extends React.Component {
 
   _validationState = (fieldName) => {
     const { validationErrors } = this.props;
+
     if (validationErrors[fieldName]) {
       return 'error';
     }
+
     return null;
   };
 
   _validationMessage = (fieldName, defaultText) => {
     const { validationErrors } = this.props;
+
     if (validationErrors[fieldName]) {
       return (
         <div>
@@ -214,11 +230,13 @@ class DataAdapterForm extends React.Component {
         </div>
       );
     }
+
     return <span>{defaultText}</span>;
   };
 
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
+
     return <TagName>{title} <small>({typeName})</small></TagName>;
   };
 
@@ -231,9 +249,12 @@ class DataAdapterForm extends React.Component {
     let configFieldSet = null;
     let documentationComponent = null;
     let pluginDisplayName = dataAdapter.config.type;
+
     if (plugin && plugin.length > 0) {
       const p = plugin[0];
+
       pluginDisplayName = p.displayName;
+
       configFieldSet = React.createElement(p.formComponent, {
         config: dataAdapter.config,
         handleFormEvent: this._onConfigChange,
@@ -241,23 +262,28 @@ class DataAdapterForm extends React.Component {
         validationMessage: this._validationMessage,
         validationState: this._validationState,
       });
+
       if (p.documentationComponent) {
         documentationComponent = React.createElement(p.documentationComponent, {
           dataAdapterId: dataAdapter.id,
         });
       }
     }
+
     let documentationColumn = null;
     let formRowWidth = 8; // If there is no documentation component, we don't use the complete page
+
     // width
     if (documentationComponent) {
       formRowWidth = 6;
+
       documentationColumn = (
         <Col lg={formRowWidth}>
           {documentationComponent}
         </Col>
       );
     }
+
     return (
       <>
         {this._renderTitle(title, pluginDisplayName, create)}

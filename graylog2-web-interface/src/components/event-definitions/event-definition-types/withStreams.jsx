@@ -7,6 +7,7 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 
 export default function withStreams(WrappedComponent, hiddenStreams = []) {
   const wrappedComponentName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
+
   class WithStreams extends React.Component {
     state = {
       streams: undefined,
@@ -15,9 +16,11 @@ export default function withStreams(WrappedComponent, hiddenStreams = []) {
     componentDidMount() {
       StreamsStore.load((streams) => {
         let filteredStreams = streams;
+
         if (hiddenStreams.length !== 0) {
           filteredStreams = streams.filter((s) => !hiddenStreams.includes(s.id));
         }
+
         this.setState({ streams: filteredStreams });
       });
     }

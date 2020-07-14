@@ -33,8 +33,8 @@ public class NodeInstance {
 
     private final GenericContainer<?> container;
 
-    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, int[] extraPorts) {
-        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, extraPorts);
+    public static NodeInstance createStarted(Network network, String mongoDbUri, String elasticsearchUri, String elasticsearchVersion, int[] extraPorts) {
+        NodeContainerConfig config = NodeContainerConfig.create(network, mongoDbUri, elasticsearchUri, elasticsearchVersion, extraPorts);
         GenericContainer<?> container = NodeContainerFactory.buildContainer(config);
         return new NodeInstance(container);
     }

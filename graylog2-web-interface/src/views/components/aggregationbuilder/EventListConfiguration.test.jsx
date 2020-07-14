@@ -8,6 +8,7 @@ describe('EventListConfiguration', () => {
 
   it('should render minimal', () => {
     const { container } = render(<EventListConfiguration />);
+
     expect(container).toMatchSnapshot();
   });
 
@@ -15,7 +16,9 @@ describe('EventListConfiguration', () => {
     const onChange = jest.fn();
     const { getByText } = render(<EventListConfiguration onChange={onChange} />);
     const checkbox = getByText('Enable Event Annotation');
+
     fireEvent.click(checkbox);
+
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 });

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import { Alert, Col, Row } from 'components/graylog';
@@ -28,6 +28,7 @@ const EnterpriseProductLink = ({ children }) => {
 EnterpriseProductLink.propTypes = {
   children: PropTypes.node,
 };
+
 EnterpriseProductLink.defaultProps = {
   children: null,
 };
@@ -37,7 +38,7 @@ const EnterpriseFeatureList = styled.ul`
   padding-left: 20px;
 `;
 
-const BiggerFontSize = styled.div(({ theme }) => `
+const BiggerFontSize = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 `);
 

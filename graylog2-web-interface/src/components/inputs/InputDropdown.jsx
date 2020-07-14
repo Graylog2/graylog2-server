@@ -30,7 +30,7 @@ class InputDropdown extends React.Component {
 
   _formatStaticInput = (input) => {
     return (
-      <Input id={`${input.type}-select`} type="select" style={{ float: 'left', width: 400, marginRight: 10 }} disabled>
+      <Input id={`${input.type}-select`} type="select" style={{ float: 'left', width: 400, marginRight: 10 /* stylelint-disable-line declaration-colon-space-after */ }} disabled>
         <option>{`${input.title} (${input.type})`}</option>
       </Input>
     );
@@ -46,6 +46,7 @@ class InputDropdown extends React.Component {
 
   render() {
     const { selectedInput } = this.state;
+
     // When an input is pre-selected, show a static dropdown
     if (this.props.inputs && this.props.preselectedInputId) {
       return (
@@ -63,11 +64,12 @@ class InputDropdown extends React.Component {
 
     if (this.props.inputs) {
       const inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
+
       return (
         <div>
           <Input id="placeholder-select"
                  type="select"
-                 style={{ float: 'left', width: 400, marginRight: 10 }}
+                 style={{ float: 'left', width: 400, marginRight: 10 /* stylelint-disable-line declaration-colon-space-after */ }}
                  value={selectedInput}
                  onChange={this.onSelectedInputChange}
                  placeholder={this.PLACEHOLDER}>

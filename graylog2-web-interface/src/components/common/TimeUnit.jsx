@@ -38,6 +38,7 @@ const TimeUnit = createReactClass({
     if (this.props.value === 0 && this.props.zeroIsNever) {
       return <span>Never</span>;
     }
+
     return (
       <span>
         {this.props.value}&nbsp;{this.UNITS[this.props.unit]}

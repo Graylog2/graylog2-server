@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 
 import { Col, Jumbotron, Row } from 'components/graylog';
 
-const H1 = styled.h1(({ theme }) => `
+const H1 = styled.h1(({ theme }) => css`
   font-size: ${theme.fonts.size.huge};
   margin-bottom: 15px;
 `);

@@ -97,12 +97,14 @@ class MessageList extends React.Component<Props, State> {
 
   componentDidMount() {
     const onRenderComplete = this.context;
+
     InputsActions.list().then(() => (onRenderComplete && onRenderComplete()));
     SearchActions.execute.completed.listen(this._resetPagination);
   }
 
   _resetPagination = () => {
     const { currentPage } = this.state;
+
     if (currentPage !== 1) {
       this.setState({ currentPage: 1, errors: [] });
     }
@@ -113,10 +115,13 @@ class MessageList extends React.Component<Props, State> {
     const { pageSize, searchTypes, data: { id: searchTypeId }, setLoadingState } = this.props;
     const { effectiveTimerange } = searchTypes[searchTypeId];
     const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
+
     RefreshActions.disable();
     setLoadingState(true);
+
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
+
       this.setState({
         errors: response.result.errors,
         currentPage: pageNo,
@@ -129,16 +134,20 @@ class MessageList extends React.Component<Props, State> {
     const { data: { messages } } = this.props;
     const { currentPage } = this.state;
     const defaultKey = `message-list-${currentPage}`;
+
     if (!isEmpty(messages)) {
       const firstMessageId = messages[0].message._id;
+
       return `${defaultKey}-${firstMessageId}`;
     }
+
     return defaultKey;
   };
 
   _onSortChange = (newSort: SortConfig[]) => {
     const { onConfigChange, config } = this.props;
     const newConfig = config.toBuilder().sort(newSort).build();
+
     return onConfigChange(newConfig);
   }
 
