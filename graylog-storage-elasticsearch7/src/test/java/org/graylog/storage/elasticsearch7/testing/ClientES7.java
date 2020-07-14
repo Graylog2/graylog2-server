@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ClientES7 implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientES7.class);
@@ -117,11 +118,18 @@ public class ClientES7 implements Client {
             return objectMapper.readTree(result.getEntity().getContent());
         });
 
-        return Streams.stream(response.path(index)
-                .path("mappings")
-                .path("properties")
-                .fields())
+        return extractFieldMappings(index, response)
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().path("type").asText()));
+    }
+
+    private Stream<Map.Entry<String, JsonNode>> extractFieldMappings(String index, JsonNode response) {
+        //noinspection UnstableApiUsage
+        return Streams.stream(
+                response.path(index)
+                        .path("mappings")
+                        .path("properties")
+                        .fields()
+        );
     }
 
     @Override
