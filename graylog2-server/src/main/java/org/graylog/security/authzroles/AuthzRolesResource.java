@@ -22,14 +22,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
@@ -46,9 +46,6 @@ import javax.ws.rs.core.MediaType;
 @Api(value = "AuthzRoles", description = "Read Roles")
 @Path("/authzRoles")
 public class AuthzRolesResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthzRolesResource.class);
-
-
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(AuthzRoleDTO.FIELD_NAME, SearchQueryField.create(AuthzRoleDTO.FIELD_NAME))
             .put(AuthzRoleDTO.FIELD_DESCRIPTION, SearchQueryField.create(AuthzRoleDTO.FIELD_DESCRIPTION))
@@ -68,6 +65,7 @@ public class AuthzRolesResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a paginated list of all roles")
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getList(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
         @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -94,6 +92,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation(value = "Get a paginated list roles for a user")
     @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
         @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
         @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
