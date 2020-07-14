@@ -254,6 +254,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
           }
         }
         tabSelectsValue={false}
+        theme={[Function]}
         value={Array []}
       >
         <Select
@@ -315,6 +316,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
           }
           tabIndex="0"
           tabSelectsValue={false}
+          theme={[Function]}
           value={Array []}
         >
           <SelectContainer
@@ -391,6 +393,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                 },
                 "tabIndex": "0",
                 "tabSelectsValue": false,
+                "theme": [Function],
                 "value": Array [],
               }
             }
@@ -399,23 +402,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
               Object {
                 "borderRadius": 4,
                 "colors": Object {
-                  "danger": "#DE350B",
-                  "dangerLight": "#FFBDAD",
-                  "neutral0": "hsl(0, 0%, 100%)",
-                  "neutral10": "hsl(0, 0%, 90%)",
-                  "neutral20": "hsl(0, 0%, 80%)",
-                  "neutral30": "hsl(0, 0%, 70%)",
-                  "neutral40": "hsl(0, 0%, 60%)",
-                  "neutral5": "hsl(0, 0%, 95%)",
-                  "neutral50": "hsl(0, 0%, 50%)",
-                  "neutral60": "hsl(0, 0%, 40%)",
-                  "neutral70": "hsl(0, 0%, 30%)",
-                  "neutral80": "hsl(0, 0%, 20%)",
-                  "neutral90": "hsl(0, 0%, 10%)",
-                  "primary": "#2684FF",
-                  "primary25": "#DEEBFF",
-                  "primary50": "#B2D4FF",
-                  "primary75": "#4C9AFF",
+                  "danger": "#00427f",
+                  "dangerLight": "#bdc8e4",
+                  "neutral0": "#ffffff",
+                  "neutral10": "#eff2f8",
+                  "neutral20": "#cdcdcd",
+                  "neutral30": "#b4b4b4",
+                  "neutral40": "#9b9b9b",
+                  "neutral5": "#e6e6e6",
+                  "neutral50": "#838383",
+                  "neutral60": "#6a6a6a",
+                  "neutral70": "#515151",
+                  "neutral80": "#383838",
+                  "neutral90": "#1f1f1f",
+                  "primary": "#7894ce",
+                  "primary25": "#f3f3f3",
+                  "primary50": "#d0d0d0",
+                  "primary75": "#a6a6a6",
                 },
                 "spacing": Object {
                   "baseUnit": 4,
@@ -505,6 +508,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                     },
                     "tabIndex": "0",
                     "tabSelectsValue": false,
+                    "theme": [Function],
                     "value": Array [],
                   }
                 }
@@ -513,23 +517,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                   Object {
                     "borderRadius": 4,
                     "colors": Object {
-                      "danger": "#DE350B",
-                      "dangerLight": "#FFBDAD",
-                      "neutral0": "hsl(0, 0%, 100%)",
-                      "neutral10": "hsl(0, 0%, 90%)",
-                      "neutral20": "hsl(0, 0%, 80%)",
-                      "neutral30": "hsl(0, 0%, 70%)",
-                      "neutral40": "hsl(0, 0%, 60%)",
-                      "neutral5": "hsl(0, 0%, 95%)",
-                      "neutral50": "hsl(0, 0%, 50%)",
-                      "neutral60": "hsl(0, 0%, 40%)",
-                      "neutral70": "hsl(0, 0%, 30%)",
-                      "neutral80": "hsl(0, 0%, 20%)",
-                      "neutral90": "hsl(0, 0%, 10%)",
-                      "primary": "#2684FF",
-                      "primary25": "#DEEBFF",
-                      "primary50": "#B2D4FF",
-                      "primary75": "#4C9AFF",
+                      "danger": "#00427f",
+                      "dangerLight": "#bdc8e4",
+                      "neutral0": "#ffffff",
+                      "neutral10": "#eff2f8",
+                      "neutral20": "#cdcdcd",
+                      "neutral30": "#b4b4b4",
+                      "neutral40": "#9b9b9b",
+                      "neutral5": "#e6e6e6",
+                      "neutral50": "#838383",
+                      "neutral60": "#6a6a6a",
+                      "neutral70": "#515151",
+                      "neutral80": "#383838",
+                      "neutral90": "#1f1f1f",
+                      "primary": "#7894ce",
+                      "primary25": "#f3f3f3",
+                      "primary50": "#d0d0d0",
+                      "primary75": "#a6a6a6",
                     },
                     "spacing": Object {
                       "baseUnit": 4,
@@ -540,7 +544,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                 }
               >
                 <div
-                  className="css-bg1rzq-control"
+                  className="css-1claph8-control"
                   onMouseDown={[Function]}
                   onTouchEnd={[Function]}
                 >
@@ -611,6 +615,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                         },
                         "tabIndex": "0",
                         "tabSelectsValue": false,
+                        "theme": [Function],
                         "value": Array [],
                       }
                     }
@@ -619,23 +624,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       Object {
                         "borderRadius": 4,
                         "colors": Object {
-                          "danger": "#DE350B",
-                          "dangerLight": "#FFBDAD",
-                          "neutral0": "hsl(0, 0%, 100%)",
-                          "neutral10": "hsl(0, 0%, 90%)",
-                          "neutral20": "hsl(0, 0%, 80%)",
-                          "neutral30": "hsl(0, 0%, 70%)",
-                          "neutral40": "hsl(0, 0%, 60%)",
-                          "neutral5": "hsl(0, 0%, 95%)",
-                          "neutral50": "hsl(0, 0%, 50%)",
-                          "neutral60": "hsl(0, 0%, 40%)",
-                          "neutral70": "hsl(0, 0%, 30%)",
-                          "neutral80": "hsl(0, 0%, 20%)",
-                          "neutral90": "hsl(0, 0%, 10%)",
-                          "primary": "#2684FF",
-                          "primary25": "#DEEBFF",
-                          "primary50": "#B2D4FF",
-                          "primary75": "#4C9AFF",
+                          "danger": "#00427f",
+                          "dangerLight": "#bdc8e4",
+                          "neutral0": "#ffffff",
+                          "neutral10": "#eff2f8",
+                          "neutral20": "#cdcdcd",
+                          "neutral30": "#b4b4b4",
+                          "neutral40": "#9b9b9b",
+                          "neutral5": "#e6e6e6",
+                          "neutral50": "#838383",
+                          "neutral60": "#6a6a6a",
+                          "neutral70": "#515151",
+                          "neutral80": "#383838",
+                          "neutral90": "#1f1f1f",
+                          "primary": "#7894ce",
+                          "primary25": "#f3f3f3",
+                          "primary50": "#d0d0d0",
+                          "primary75": "#a6a6a6",
                         },
                         "spacing": Object {
                           "baseUnit": 4,
@@ -717,6 +722,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                             },
                             "tabIndex": "0",
                             "tabSelectsValue": false,
+                            "theme": [Function],
                             "value": Array [],
                           }
                         }
@@ -725,23 +731,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           Object {
                             "borderRadius": 4,
                             "colors": Object {
-                              "danger": "#DE350B",
-                              "dangerLight": "#FFBDAD",
-                              "neutral0": "hsl(0, 0%, 100%)",
-                              "neutral10": "hsl(0, 0%, 90%)",
-                              "neutral20": "hsl(0, 0%, 80%)",
-                              "neutral30": "hsl(0, 0%, 70%)",
-                              "neutral40": "hsl(0, 0%, 60%)",
-                              "neutral5": "hsl(0, 0%, 95%)",
-                              "neutral50": "hsl(0, 0%, 50%)",
-                              "neutral60": "hsl(0, 0%, 40%)",
-                              "neutral70": "hsl(0, 0%, 30%)",
-                              "neutral80": "hsl(0, 0%, 20%)",
-                              "neutral90": "hsl(0, 0%, 10%)",
-                              "primary": "#2684FF",
-                              "primary25": "#DEEBFF",
-                              "primary50": "#B2D4FF",
-                              "primary75": "#4C9AFF",
+                              "danger": "#00427f",
+                              "dangerLight": "#bdc8e4",
+                              "neutral0": "#ffffff",
+                              "neutral10": "#eff2f8",
+                              "neutral20": "#cdcdcd",
+                              "neutral30": "#b4b4b4",
+                              "neutral40": "#9b9b9b",
+                              "neutral5": "#e6e6e6",
+                              "neutral50": "#838383",
+                              "neutral60": "#6a6a6a",
+                              "neutral70": "#515151",
+                              "neutral80": "#383838",
+                              "neutral90": "#1f1f1f",
+                              "primary": "#7894ce",
+                              "primary25": "#f3f3f3",
+                              "primary50": "#d0d0d0",
+                              "primary75": "#a6a6a6",
                             },
                             "spacing": Object {
                               "baseUnit": 4,
@@ -752,7 +758,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                         }
                       >
                         <div
-                          className="css-151xaom-placeholder"
+                          className="css-9j9oaf-placeholder"
                         >
                           None: click to add series
                         </div>
@@ -827,6 +833,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                             },
                             "tabIndex": "0",
                             "tabSelectsValue": false,
+                            "theme": [Function],
                             "value": Array [],
                           }
                         }
@@ -836,23 +843,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           Object {
                             "borderRadius": 4,
                             "colors": Object {
-                              "danger": "#DE350B",
-                              "dangerLight": "#FFBDAD",
-                              "neutral0": "hsl(0, 0%, 100%)",
-                              "neutral10": "hsl(0, 0%, 90%)",
-                              "neutral20": "hsl(0, 0%, 80%)",
-                              "neutral30": "hsl(0, 0%, 70%)",
-                              "neutral40": "hsl(0, 0%, 60%)",
-                              "neutral5": "hsl(0, 0%, 95%)",
-                              "neutral50": "hsl(0, 0%, 50%)",
-                              "neutral60": "hsl(0, 0%, 40%)",
-                              "neutral70": "hsl(0, 0%, 30%)",
-                              "neutral80": "hsl(0, 0%, 20%)",
-                              "neutral90": "hsl(0, 0%, 10%)",
-                              "primary": "#2684FF",
-                              "primary25": "#DEEBFF",
-                              "primary50": "#B2D4FF",
-                              "primary75": "#4C9AFF",
+                              "danger": "#00427f",
+                              "dangerLight": "#bdc8e4",
+                              "neutral0": "#ffffff",
+                              "neutral10": "#eff2f8",
+                              "neutral20": "#cdcdcd",
+                              "neutral30": "#b4b4b4",
+                              "neutral40": "#9b9b9b",
+                              "neutral5": "#e6e6e6",
+                              "neutral50": "#838383",
+                              "neutral60": "#6a6a6a",
+                              "neutral70": "#515151",
+                              "neutral80": "#383838",
+                              "neutral90": "#1f1f1f",
+                              "primary": "#7894ce",
+                              "primary25": "#f3f3f3",
+                              "primary50": "#d0d0d0",
+                              "primary75": "#a6a6a6",
                             },
                             "spacing": Object {
                               "baseUnit": 4,
@@ -865,7 +872,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                         value=""
                       >
                         <div
-                          className="css-1g6gooi"
+                          className="css-dg7tyz"
                         >
                           <AutosizeInput
                             aria-autocomplete="list"
@@ -1021,6 +1028,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                         },
                         "tabIndex": "0",
                         "tabSelectsValue": false,
+                        "theme": [Function],
                         "value": Array [],
                       }
                     }
@@ -1029,23 +1037,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       Object {
                         "borderRadius": 4,
                         "colors": Object {
-                          "danger": "#DE350B",
-                          "dangerLight": "#FFBDAD",
-                          "neutral0": "hsl(0, 0%, 100%)",
-                          "neutral10": "hsl(0, 0%, 90%)",
-                          "neutral20": "hsl(0, 0%, 80%)",
-                          "neutral30": "hsl(0, 0%, 70%)",
-                          "neutral40": "hsl(0, 0%, 60%)",
-                          "neutral5": "hsl(0, 0%, 95%)",
-                          "neutral50": "hsl(0, 0%, 50%)",
-                          "neutral60": "hsl(0, 0%, 40%)",
-                          "neutral70": "hsl(0, 0%, 30%)",
-                          "neutral80": "hsl(0, 0%, 20%)",
-                          "neutral90": "hsl(0, 0%, 10%)",
-                          "primary": "#2684FF",
-                          "primary25": "#DEEBFF",
-                          "primary50": "#B2D4FF",
-                          "primary75": "#4C9AFF",
+                          "danger": "#00427f",
+                          "dangerLight": "#bdc8e4",
+                          "neutral0": "#ffffff",
+                          "neutral10": "#eff2f8",
+                          "neutral20": "#cdcdcd",
+                          "neutral30": "#b4b4b4",
+                          "neutral40": "#9b9b9b",
+                          "neutral5": "#e6e6e6",
+                          "neutral50": "#838383",
+                          "neutral60": "#6a6a6a",
+                          "neutral70": "#515151",
+                          "neutral80": "#383838",
+                          "neutral90": "#1f1f1f",
+                          "primary": "#7894ce",
+                          "primary25": "#f3f3f3",
+                          "primary50": "#d0d0d0",
+                          "primary75": "#a6a6a6",
                         },
                         "spacing": Object {
                           "baseUnit": 4,
@@ -1126,6 +1134,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                             },
                             "tabIndex": "0",
                             "tabSelectsValue": false,
+                            "theme": [Function],
                             "value": Array [],
                           }
                         }
@@ -1134,23 +1143,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           Object {
                             "borderRadius": 4,
                             "colors": Object {
-                              "danger": "#DE350B",
-                              "dangerLight": "#FFBDAD",
-                              "neutral0": "hsl(0, 0%, 100%)",
-                              "neutral10": "hsl(0, 0%, 90%)",
-                              "neutral20": "hsl(0, 0%, 80%)",
-                              "neutral30": "hsl(0, 0%, 70%)",
-                              "neutral40": "hsl(0, 0%, 60%)",
-                              "neutral5": "hsl(0, 0%, 95%)",
-                              "neutral50": "hsl(0, 0%, 50%)",
-                              "neutral60": "hsl(0, 0%, 40%)",
-                              "neutral70": "hsl(0, 0%, 30%)",
-                              "neutral80": "hsl(0, 0%, 20%)",
-                              "neutral90": "hsl(0, 0%, 10%)",
-                              "primary": "#2684FF",
-                              "primary25": "#DEEBFF",
-                              "primary50": "#B2D4FF",
-                              "primary75": "#4C9AFF",
+                              "danger": "#00427f",
+                              "dangerLight": "#bdc8e4",
+                              "neutral0": "#ffffff",
+                              "neutral10": "#eff2f8",
+                              "neutral20": "#cdcdcd",
+                              "neutral30": "#b4b4b4",
+                              "neutral40": "#9b9b9b",
+                              "neutral5": "#e6e6e6",
+                              "neutral50": "#838383",
+                              "neutral60": "#6a6a6a",
+                              "neutral70": "#515151",
+                              "neutral80": "#383838",
+                              "neutral90": "#1f1f1f",
+                              "primary": "#7894ce",
+                              "primary25": "#f3f3f3",
+                              "primary50": "#d0d0d0",
+                              "primary75": "#a6a6a6",
                             },
                             "spacing": Object {
                               "baseUnit": 4,
@@ -1161,7 +1170,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                         }
                       >
                         <span
-                          className="css-bgvzuu-indicatorSeparator"
+                          className="css-1n6xxah-indicatorSeparator"
                         />
                       </IndicatorSeparator>
                       <DropdownIndicator
@@ -1239,6 +1248,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                             },
                             "tabIndex": "0",
                             "tabSelectsValue": false,
+                            "theme": [Function],
                             "value": Array [],
                           }
                         }
@@ -1247,23 +1257,23 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                           Object {
                             "borderRadius": 4,
                             "colors": Object {
-                              "danger": "#DE350B",
-                              "dangerLight": "#FFBDAD",
-                              "neutral0": "hsl(0, 0%, 100%)",
-                              "neutral10": "hsl(0, 0%, 90%)",
-                              "neutral20": "hsl(0, 0%, 80%)",
-                              "neutral30": "hsl(0, 0%, 70%)",
-                              "neutral40": "hsl(0, 0%, 60%)",
-                              "neutral5": "hsl(0, 0%, 95%)",
-                              "neutral50": "hsl(0, 0%, 50%)",
-                              "neutral60": "hsl(0, 0%, 40%)",
-                              "neutral70": "hsl(0, 0%, 30%)",
-                              "neutral80": "hsl(0, 0%, 20%)",
-                              "neutral90": "hsl(0, 0%, 10%)",
-                              "primary": "#2684FF",
-                              "primary25": "#DEEBFF",
-                              "primary50": "#B2D4FF",
-                              "primary75": "#4C9AFF",
+                              "danger": "#00427f",
+                              "dangerLight": "#bdc8e4",
+                              "neutral0": "#ffffff",
+                              "neutral10": "#eff2f8",
+                              "neutral20": "#cdcdcd",
+                              "neutral30": "#b4b4b4",
+                              "neutral40": "#9b9b9b",
+                              "neutral5": "#e6e6e6",
+                              "neutral50": "#838383",
+                              "neutral60": "#6a6a6a",
+                              "neutral70": "#515151",
+                              "neutral80": "#383838",
+                              "neutral90": "#1f1f1f",
+                              "primary": "#7894ce",
+                              "primary25": "#f3f3f3",
+                              "primary50": "#d0d0d0",
+                              "primary75": "#a6a6a6",
                             },
                             "spacing": Object {
                               "baseUnit": 4,
@@ -1275,7 +1285,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
                       >
                         <div
                           aria-hidden="true"
-                          className="css-16pqwjk-indicatorContainer"
+                          className="css-16e6rn3-indicatorContainer"
                           onMouseDown={[Function]}
                           onTouchEnd={[Function]}
                         >
