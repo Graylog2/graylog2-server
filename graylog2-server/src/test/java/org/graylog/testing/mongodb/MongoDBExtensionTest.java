@@ -37,7 +37,7 @@ class MongoDBExtensionTest {
 
         @Test
         @MongoDBFixtures("MongoDBExtensionTest-1.json")
-        void test(MongoDBTestService mongodb) {
+        void withFixtureImport(MongoDBTestService mongodb) {
             assertCollection(mongodb, "test_1", eq("hello", "world"), "54e3deadbeefdeadbeef0000");
         }
 
