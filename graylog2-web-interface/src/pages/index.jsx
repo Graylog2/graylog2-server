@@ -74,6 +74,7 @@ const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
 const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'));
 const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
+const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const UsersPage = loadAsync(() => import('./UsersPage'));
 
@@ -153,5 +154,6 @@ export {
   ThreadDumpPage,
   UsersOverviewPage,
   UserDetailsPage,
+  UserEditPage,
   UsersPage,
 };
