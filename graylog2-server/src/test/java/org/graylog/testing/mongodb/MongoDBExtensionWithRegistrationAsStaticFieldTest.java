@@ -16,17 +16,12 @@
  */
 package org.graylog.testing.mongodb;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,19 +35,9 @@ class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     @RegisterExtension
     static MongoDBExtension mongodbExtension = MongoDBExtension.createWithDefaultVersion();
 
-    // We use this static set to verify that registering the MongoDBExtension as a static field will reuse the
+    // We use this static string to verify that registering the MongoDBExtension as a static field will reuse the
     // same database instance for all tests.
-    static Set<String> instanceIds = new HashSet<>();
-
-    @BeforeAll
-    static void setUp() {
-        instanceIds.clear();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        instanceIds.clear();
-    }
+    static String instanceId = null;
 
     @Nested
     // Required to make the instance ID check work
@@ -60,24 +45,17 @@ class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     class UsingSameInstanceForAllTests {
         @Test
         @Order(1)
-        void registerInstanceId1(MongoDBTestService mongodb) {
-            // Just add the MongoDB instance ID so we can check them in checkInstanceIds()
-            instanceIds.add(mongodb.instanceId());
+        void recordInstanceId(MongoDBTestService mongodb) {
+            // Just set the MongoDB instance ID so we can check them in the next test
+            instanceId = mongodb.instanceId();
         }
 
         @Test
         @Order(2)
-        void registerInstanceId2(MongoDBTestService mongodb) {
-            // Just add the MongoDB instance ID so we can check them in checkInstanceIds()
-            instanceIds.add(mongodb.instanceId());
-        }
-
-        @Test
-        @Order(3)
-        void checkInstanceIds() {
-            assertThat(instanceIds)
+        void checkThatSameInstanceIdIsUsed(MongoDBTestService mongodb) {
+            assertThat(instanceId)
                     .withFailMessage("All test methods should use the same MongoDB instance, but we registered more than one")
-                    .hasSize(1);
+                    .isEqualTo(mongodb.instanceId());
         }
     }
 
