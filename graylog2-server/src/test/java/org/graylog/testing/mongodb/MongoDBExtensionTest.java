@@ -33,7 +33,7 @@ class MongoDBExtensionTest {
     class ProgrammaticInstanceRegistration {
         @SuppressWarnings("unused")
         @RegisterExtension
-        MongoDBExtension mongodbExtension = MongoDBExtension.create();
+        MongoDBExtension mongodbExtension = MongoDBExtension.createWithDefaultVersion();
 
         @Test
         @MongoDBFixtures("MongoDBExtensionTest-1.json")

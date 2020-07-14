@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     @SuppressWarnings("unused")
     @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create();
+    static MongoDBExtension mongodbExtension = MongoDBExtension.createWithDefaultVersion();
 
     // We use this static set to verify that registering the MongoDBExtension as a static field will reuse the
     // same database instance for all tests.

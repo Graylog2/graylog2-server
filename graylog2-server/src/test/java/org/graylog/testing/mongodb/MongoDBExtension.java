@@ -60,11 +60,11 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(MongoDBExtension.class);
 
     /**
-     * Create new extension instance using default settings.
+     * Create new extension instance using the {@link MongoDBTestService#DEFAULT_VERSION default version}.
      *
      * @return the new extension instance
      */
-    public static MongoDBExtension create() {
+    public static MongoDBExtension createWithDefaultVersion() {
         return new MongoDBExtension(MongoDBTestService.DEFAULT_VERSION);
     }
 
