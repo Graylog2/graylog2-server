@@ -104,11 +104,9 @@ public class MongoDBTestService implements AutoCloseable {
 
     /**
      * Close (shutdown) the service.
-     *
-     * @throws Exception when closing the service fails
      */
     @Override
-    public void close() throws Exception {
+    public void close() {
         container.close();
     }
 

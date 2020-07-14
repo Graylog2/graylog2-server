@@ -97,12 +97,12 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         });
     }
 
-    private void closeInstance(ExtensionContext context) throws Exception {
+    private void closeInstance(ExtensionContext context) {
         context.getStore(NAMESPACE).remove(Lifecycle.class);
         getInstance(context).close();
     }
 
-    private void clearInstance(ExtensionContext context) throws Exception {
+    private void clearInstance(ExtensionContext context) {
         getInstance(context).dropDatabase();
     }
 
