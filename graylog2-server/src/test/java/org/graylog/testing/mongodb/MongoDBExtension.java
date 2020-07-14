@@ -68,11 +68,6 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         return new MongoDBExtension(MongoDBTestService.DEFAULT_VERSION);
     }
 
-    /**
-     * Create new extension instance using the given MongoDB service version.
-     *
-     * @return the new extension instance
-     */
     public static MongoDBExtension create(String version) {
         return new MongoDBExtension(requireNonNull(version, "version cannot be null"));
     }
