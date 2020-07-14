@@ -1,6 +1,7 @@
 package org.graylog.storage.elasticsearch6;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
@@ -14,6 +15,7 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -28,6 +30,8 @@ public class MessagesES6IT extends MessagesIT {
     @Rule
     public final ElasticsearchInstance elasticsearch = ElasticsearchInstanceES6.create();
 
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
     @Override
     protected ElasticsearchInstance elasticsearch() {
         return this.elasticsearch;
@@ -37,7 +41,7 @@ public class MessagesES6IT extends MessagesIT {
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry, new ChunkedBulkIndexer());
+        return new MessagesAdapterES6(jestClient(elasticsearch), true, metricRegistry, new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexResponse;
@@ -12,6 +13,7 @@ import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.MessagesIT;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 
 import java.util.Map;
@@ -20,6 +22,8 @@ public class MessagesES7IT extends MessagesIT {
     @Rule
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
     @Override
     protected ElasticsearchInstance elasticsearch() {
         return this.elasticsearch;
@@ -27,7 +31,7 @@ public class MessagesES7IT extends MessagesIT {
 
     @Override
     protected MessagesAdapter createMessagesAdapter(MetricRegistry metricRegistry) {
-        return new MessagesAdapterES7(this.elasticsearch.elasticsearchClient(), metricRegistry, new ChunkedBulkIndexer());
+        return new MessagesAdapterES7(this.elasticsearch.elasticsearchClient(), metricRegistry, new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override

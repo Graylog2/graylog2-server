@@ -10,6 +10,7 @@ import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MessagesAdapterES6Test {
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private MessagesAdapterES6 messagesAdapter;
     private JestClient jestClient;
 
@@ -41,7 +43,7 @@ class MessagesAdapterES6Test {
     void setUp() {
         this.jestClient = mock(JestClient.class);
         final MetricRegistry metricRegistry = mock(MetricRegistry.class);
-        this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry, new ChunkedBulkIndexer());
+        this.messagesAdapter = new MessagesAdapterES6(jestClient, true, metricRegistry, new ChunkedBulkIndexer(), objectMapper);
     }
 
     public static class MockedBulkResult extends BulkResult {
