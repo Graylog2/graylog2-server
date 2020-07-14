@@ -56,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -317,13 +316,13 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public boolean exists(String index) throws IOException {
+    public boolean exists(String index) {
         final GetSettingsResponse result = settingsFor(index);
         return result.getIndexToSettings().size() == 1 && result.getIndexToSettings().containsKey(index);
     }
 
     @Override
-    public boolean aliasExists(String alias) throws IOException {
+    public boolean aliasExists(String alias) {
         final GetAliasesRequest request = new GetAliasesRequest(alias);
         return client.execute((c, requestOptions) -> c.indices().existsAlias(request, requestOptions));
     }
