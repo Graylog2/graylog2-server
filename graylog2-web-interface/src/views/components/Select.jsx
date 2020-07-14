@@ -137,12 +137,39 @@ const Select = ({
   };
   const filterOption = createFilter({ ignoreCase, ignoreAccents });
 
+  const selectTheme = (defaultTheme: {[string]: any}) => {
+    return {
+      ...defaultTheme,
+      colors: {
+        ...defaultTheme.colors,
+        primary: theme.colors.variant.light.info,
+        primary75: theme.colors.variant.light.default,
+        primary50: theme.colors.variant.lighter.default,
+        primary25: theme.colors.variant.lightest.default,
+        danger: theme.colors.variant.darker.info,
+        dangerLight: theme.colors.variant.lighter.info,
+        neutral0: theme.colors.gray[100],
+        neutral5: theme.colors.gray[90],
+        neutral10: theme.colors.variant.lightest.info,
+        neutral20: theme.colors.gray[80],
+        neutral30: theme.colors.gray[70],
+        neutral40: theme.colors.gray[60],
+        neutral50: theme.colors.gray[50],
+        neutral60: theme.colors.gray[40],
+        neutral70: theme.colors.gray[30],
+        neutral80: theme.colors.gray[20],
+        neutral90: theme.colors.gray[10],
+      },
+    };
+  };
+
   return (
     <Component {...rest}
                components={_components}
                filterOption={filterOption}
                styles={_styles}
                tabSelectsValue={false}
+               theme={selectTheme}
                ref={selectRef} />
   );
 };
