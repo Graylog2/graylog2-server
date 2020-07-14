@@ -12,7 +12,7 @@ type Props = {
 const ShowConfigValue = ({ label, value }: Props) => (
   <Row>
     <Col xs={3}>
-      <TextLabel>{label}</TextLabel><br />
+      <TextLabel>{label}</TextLabel>
     </Col>
     <Col xs={9}>
       {value ?? '-'}
