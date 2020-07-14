@@ -18,7 +18,8 @@ package org.graylog.testing.mongodb;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -34,8 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Testing programmatic extension registration with static fields has been moved to this separate file because
  * we cannot use static fields on nested classes in {@link MongoDBExtensionTest}.
  */
-// Required to make the instance ID check work
-@TestMethodOrder(OrderAnnotation.class)
 class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     @SuppressWarnings("unused")
     @RegisterExtension
@@ -55,30 +54,34 @@ class MongoDBExtensionWithRegistrationAsStaticFieldTest {
         instanceIds.clear();
     }
 
-    @Test
-    @Order(1)
-    void registerInstanceId1(MongoDBTestService mongodb) {
-        // Just add the MongoDB instance ID so we can check them in checkInstanceIds()
-        instanceIds.add(mongodb.instanceId());
+    @Nested
+    // Required to make the instance ID check work
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class UsingSameInstanceForAllTests {
+        @Test
+        @Order(1)
+        void registerInstanceId1(MongoDBTestService mongodb) {
+            // Just add the MongoDB instance ID so we can check them in checkInstanceIds()
+            instanceIds.add(mongodb.instanceId());
+        }
+
+        @Test
+        @Order(2)
+        void registerInstanceId2(MongoDBTestService mongodb) {
+            // Just add the MongoDB instance ID so we can check them in checkInstanceIds()
+            instanceIds.add(mongodb.instanceId());
+        }
+
+        @Test
+        @Order(3)
+        void checkInstanceIds() {
+            assertThat(instanceIds)
+                    .withFailMessage("All test methods should use the same MongoDB instance, but we registered more than one")
+                    .hasSize(1);
+        }
     }
 
     @Test
-    @Order(2)
-    void registerInstanceId2(MongoDBTestService mongodb) {
-        // Just add the MongoDB instance ID so we can check them in checkInstanceIds()
-        instanceIds.add(mongodb.instanceId());
-    }
-
-    @Test
-    @Order(3)
-    void checkInstanceIds() {
-        assertThat(instanceIds)
-                .withFailMessage("All test methods should use the same MongoDB instance, but we registered more than one")
-                .hasSize(1);
-    }
-
-    @Test
-    @Order(4)
     @MongoDBFixtures("MongoDBExtensionTest-1.json")
     void withFixtures(MongoDBTestService mongodb) {
         assertThat(mongodb.mongoCollection("test_1").find(eq("hello", "world")).first())
@@ -89,7 +92,6 @@ class MongoDBExtensionWithRegistrationAsStaticFieldTest {
     }
 
     @Test
-    @Order(5)
     void withoutFixtures(MongoDBTestService mongodb) {
         assertThat(mongodb.mongoCollection("test_1").countDocuments()).isEqualTo(0);
         assertThat(mongodb.mongoCollection("test_2").countDocuments()).isEqualTo(0);
