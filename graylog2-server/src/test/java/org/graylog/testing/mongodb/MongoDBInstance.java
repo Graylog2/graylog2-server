@@ -55,15 +55,6 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     private MongoDBFixtureImporter fixtureImporter;
 
     /**
-     * Creates a new MongoDB instance for every test method.
-     *
-     * @return the MongoDB instance
-     */
-    public static MongoDBInstance createForEachTest() {
-        return createWithDefaults(Network.newNetwork(), Lifecycle.METHOD);
-    }
-
-    /**
      * Creates a new MongoDB instance that is shared for all test methods in a test class.
      *
      * @return the MongoDB instance
