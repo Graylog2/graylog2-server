@@ -440,15 +440,17 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public boolean isOpen(String index) {
-        return indexState(index)
-                .map(state -> state.equals(State.Open))
-                .orElseThrow(() -> new IndexNotFoundException("Unable to determine state for absent index " + index));
+        return indexHasState(index, State.Open);
     }
 
     @Override
     public boolean isClosed(String index) {
+        return indexHasState(index, State.Closed);
+    }
+
+    private Boolean indexHasState(String index, State open) {
         return indexState(index)
-                .map(state -> state.equals(State.Closed))
+                .map(state -> state.equals(open))
                 .orElseThrow(() -> new IndexNotFoundException("Unable to determine state for absent index " + index));
     }
 
