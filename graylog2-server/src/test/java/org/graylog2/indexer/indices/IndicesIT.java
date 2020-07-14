@@ -130,7 +130,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testClosedIndices() {
+    public void findClosedIndices() {
         final String index1 = client().createRandomIndex("indices_it_");
         client().closeIndex(index1);
         final String index2 = client().createRandomIndex("otherindices_it_");
@@ -142,7 +142,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testAliasExists() {
+    public void aliasExistsReturnsIfGivenIndexNameIsIndexOrAlias() {
         final String index = client().createRandomIndex("indices_it_");
         final String alias = "graylog_alias_exists";
         assertThat(indices.aliasExists(alias)).isFalse();
@@ -154,27 +154,27 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testAliasExistsForIndex() {
+    public void aliasExistsReturnsIfGivenIndexHasAlias() {
         final String indexName = client().createRandomIndex("indices_it_");
 
         assertThat(indices.aliasExists(indexName)).isFalse();
     }
 
     @Test
-    public void testIndexIfIndexExists() {
+    public void existsIndicatesPresenceOfGivenIndex() {
         final String indexName = client().createRandomIndex("indices_it_");
 
         assertThat(indices.exists(indexName)).isTrue();
     }
 
     @Test
-    public void testExistsIfIndexDoesNotExist() {
+    public void existsReturnsFalseIfGivenIndexDoesNotExists() {
         final String indexNotAlias = "graylog_index_does_not_exist";
         assertThat(indices.exists(indexNotAlias)).isFalse();
     }
 
     @Test
-    public void testAliasTarget() {
+    public void aliasTargetReturnsListOfTargetsGivenAliasIsPointingTo() {
         final String index = client().createRandomIndex("indices_it_");
         final String alias = "graylog_alias_target";
         assertThat(indices.aliasTarget(alias)).isEmpty();
@@ -185,7 +185,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testTimestampStatsOfIndex() {
+    public void indexRangeStatsOfIndexReturnsMinMaxTimestampsForGivenIndex() {
         importFixture("org/graylog2/indexer/indices/IndicesIT.json");
 
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(INDEX_NAME);
@@ -195,7 +195,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void testTimestampStatsOfIndexWithEmptyIndex() {
+    public void indexRangeStatsWorksForEmptyIndex() {
         final String indexName = client().createRandomIndex("indices_it_");
 
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(indexName);
@@ -205,7 +205,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test(expected = IndexNotFoundException.class)
-    public void testTimestampStatsOfIndexWithClosedIndex() {
+    public void indexRangeStatsThrowsExceptionIfIndexIsClosed() {
         final String index = client().createRandomIndex("indices_it_");
 
         client().closeIndex(index);
@@ -214,12 +214,12 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test(expected = IndexNotFoundException.class)
-    public void testTimestampStatsOfIndexWithNonExistingIndex() {
+    public void indexRangeStatsThrowsExceptionIfIndexDoesNotExists() {
         indices.indexRangeStatsOfIndex("does-not-exist");
     }
 
     @Test
-    public void testCreateEnsuresIndexTemplateExists() {
+    public void createEnsuresIndexTemplateExists() {
         final String indexName = "index_template_test";
         final String templateName = indexSetConfig.indexTemplateName();
 
@@ -234,7 +234,7 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     protected abstract Map<String, Object> createTemplateFor(String indexWildcard);
 
     @Test
-    public void testCreateOverwritesIndexTemplate() {
+    public void createOverwritesIndexTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
         final Map<String, Object> templateSource = createTemplateFor(indexSet.getIndexWildcard());
