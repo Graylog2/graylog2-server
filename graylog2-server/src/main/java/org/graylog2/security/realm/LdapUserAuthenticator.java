@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -145,8 +144,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     }
 
     protected LdapNetworkConnection openLdapConnection(LdapSettings ldapSettings) throws LdapException, KeyStoreException, NoSuchAlgorithmException {
-        final LdapConnectionConfig config = ldapConnector.createConfig(ldapSettings);
-        return ldapConnector.connect(config);
+        return ldapConnector.connect(ldapSettings);
     }
 
     protected LdapEntry searchLdapUser(LdapNetworkConnection connection, String principal, LdapSettings ldapSettings) throws LdapException, CursorException {
