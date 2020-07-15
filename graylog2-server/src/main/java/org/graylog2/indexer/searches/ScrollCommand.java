@@ -31,6 +31,9 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class ScrollCommand {
+    public static final int NO_BATCHSIZE = -1;
+    public static final int NO_LIMIT = -1;
+
     public abstract String query();
     public abstract Set<String> indices();
     public abstract Optional<Set<String>> streams();

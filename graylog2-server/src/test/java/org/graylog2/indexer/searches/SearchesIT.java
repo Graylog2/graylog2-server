@@ -60,6 +60,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -237,19 +238,21 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
     public void testFieldStats() throws Exception {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
-        FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
+        FieldStatsResult fieldStats = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
 
-        assertThat(result.searchHits()).hasSize(10);
-        assertThat(result.count()).isEqualTo(8);
-        assertThat(result.min()).isEqualTo(1.0);
-        assertThat(result.max()).isEqualTo(4.0);
-        assertThat(result.mean()).isEqualTo(2.375);
-        assertThat(result.sum()).isEqualTo(19.0);
-        assertThat(result.sumOfSquares()).isEqualTo(53.0);
-        assertThat(result.variance()).isEqualTo(0.984375);
-        assertThat(result.stdDeviation()).isEqualTo(0.9921567416492215);
+        assertThat(fieldStats).satisfies(result -> {
+            assertThat(result.searchHits()).hasSize(10);
+            assertThat(result.count()).isEqualTo(8);
+            assertThat(result.min()).isEqualTo(1.0);
+            assertThat(result.max()).isEqualTo(4.0);
+            assertThat(result.mean()).isEqualTo(2.375);
+            assertThat(result.sum()).isEqualTo(19.0);
+            assertThat(result.sumOfSquares()).isEqualTo(53.0);
+            assertThat(result.variance()).isEqualTo(0.984375);
+            assertThat(result.stdDeviation()).isEqualTo(0.9921567416492215);
+        });
     }
 
     @Test
@@ -500,5 +503,54 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         assertThat(firstChunk.getMessages()).hasSize(5);
         assertThat(firstChunk.isFirstChunk()).isTrue();
         assertThat(firstChunk.getFields()).containsExactly("source");
+    }
+
+    @Test
+    public void scrollReturnsMultipleChunksRespectingBatchSize() throws Exception {
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
+
+        when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final ScrollResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, 2);
+
+        assertThat(scrollResult).isNotNull();
+        assertThat(scrollResult.totalHits()).isEqualTo(10L);
+
+        ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+        assertThat(scrollChunk.isFirstChunk()).isTrue();
+
+        final Set<ResultMessage> resultMessages = new HashSet<>(5);
+        while (scrollChunk != null && !scrollChunk.getMessages().isEmpty()) {
+            assertThat(scrollChunk.getMessages()).hasSize(2);
+            assertThat(scrollChunk.getFields()).containsExactly("source");
+
+            resultMessages.addAll(scrollChunk.getMessages());
+            scrollChunk = scrollResult.nextChunk();
+        }
+
+        assertThat(resultMessages).hasSize(10);
+    }
+
+    @Test
+    public void scrollReturnsMultipleChunksRespectingLimit() throws Exception {
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
+
+        when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final ScrollResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, 2);
+
+        assertThat(scrollResult).isNotNull();
+        assertThat(scrollResult.totalHits()).isEqualTo(10L);
+
+        ScrollResult.ScrollChunk scrollChunk = scrollResult.nextChunk();
+        assertThat(scrollChunk.isFirstChunk()).isTrue();
+
+        final Set<ResultMessage> resultMessages = new HashSet<>(5);
+        while (scrollChunk != null && !scrollChunk.getMessages().isEmpty()) {
+            resultMessages.addAll(scrollChunk.getMessages());
+            scrollChunk = scrollResult.nextChunk();
+        }
+
+        assertThat(resultMessages).hasSize(5);
     }
 }

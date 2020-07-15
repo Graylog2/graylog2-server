@@ -35,7 +35,9 @@ public interface ScrollResult {
 
         int getChunkNumber();
 
-        boolean isFirstChunk();
+        default boolean isFirstChunk() {
+            return getChunkNumber() == 0;
+        }
 
         List<ResultMessage> getMessages();
     }

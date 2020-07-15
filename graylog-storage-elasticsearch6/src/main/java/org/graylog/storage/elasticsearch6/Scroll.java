@@ -22,9 +22,13 @@ public class Scroll {
     }
 
     public ScrollResult scroll(Search search, Supplier<String> errorMessage,  String query, String scrollTime, List<String> fields) {
+        return scroll(search, errorMessage, query, scrollTime, fields, -1);
+    }
+
+    public ScrollResult scroll(Search search, Supplier<String> errorMessage,  String query, String scrollTime, List<String> fields, int limit) {
         final io.searchbox.core.SearchResult result = JestUtils.execute(jestClient, search, errorMessage);
         final Optional<ElasticsearchException> elasticsearchException = JestUtils.checkForFailedShards(result);
         elasticsearchException.ifPresent(e -> { throw e; });
-        return scrollResultFactory.create(result, query, scrollTime, fields);
+        return scrollResultFactory.create(result, query, scrollTime, fields, limit);
     }
 }
