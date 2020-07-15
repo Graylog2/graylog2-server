@@ -9,6 +9,7 @@ import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
 
@@ -38,6 +39,10 @@ const UserEdit = ({ user }: Props) => {
 
   if (!user) {
     return <Spinner />;
+  }
+
+  if (user.readOnly) {
+    return <ReadOnlyWarning fullName={user.fullName} />;
   }
 
   return (

@@ -48,9 +48,11 @@ const UserDetailsPage = ({ params }: Props) => {
         </span>
 
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.USERS.edit(loadedUser?.username)}>
-            <Button bsStyle="success">Edit User</Button>
-          </LinkContainer>
+          {loadedUser && !loadedUser.readOnly && (
+            <LinkContainer to={Routes.SYSTEM.USERS.edit(loadedUser?.username)}>
+              <Button bsStyle="success">Edit User</Button>
+            </LinkContainer>
+          )}
           <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
             <Button bsStyle="info">Users</Button>
           </LinkContainer>
