@@ -35,7 +35,7 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   z-index: 4;
 `);
 
-const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span`
   display: flex;
   width: 100%;
   height: 100%;
@@ -52,7 +52,7 @@ const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.sp
     height: 14px;
     transform: rotate(45deg);
   }
-`);
+`;
 
 const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover, sidebarIsPinned }) => css`
   position: relative;
@@ -69,7 +69,7 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
     background: ${isSelected ? theme.colors.variant.lighter.info : theme.colors.variant.lightest.info};
 
     ${Title} {
-      display: ${(!isSelected && showTitleOnHover) ? 'block' : 'none'};
+      display: ${(showTitleOnHover && !isSelected) ? 'block' : 'none'};
     }
 
     ${IconWrap}::after {
@@ -86,7 +86,7 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
 
     ::after {
       display: ${isSelected ? 'block' : 'none'};
-      box-shadow: ${(isSelected && !sidebarIsPinned) ? '3px -3px 2px 0px rgba(0,0,0,0.25)' : 'none'};
+      box-shadow: ${(isSelected && !sidebarIsPinned) ? '3px -3px 2px 0px rgba(0, 0, 0, 0.25)' : 'none'};
       background-color: ${theme.colors.variant.lighter.info};
     }
   }
