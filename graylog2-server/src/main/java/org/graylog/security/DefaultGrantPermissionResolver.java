@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -37,23 +36,19 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
     private final Logger logger;
     private final BuiltinCapabilities builtinCapabilities;
     private final DBGrantService grantService;
-    private final GRNRegistry grnRegistry;
 
     @Inject
     public DefaultGrantPermissionResolver(BuiltinCapabilities builtinCapabilities,
-                                          DBGrantService grantService,
-                                          GRNRegistry grnRegistry) {
-        this(LOG, builtinCapabilities, grantService, grnRegistry);
+                                          DBGrantService grantService) {
+        this(LOG, builtinCapabilities, grantService);
     }
 
     public DefaultGrantPermissionResolver(Logger logger,
                                           BuiltinCapabilities builtinCapabilities,
-                                          DBGrantService grantService,
-                                          GRNRegistry grnRegistry) {
+                                          DBGrantService grantService) {
         this.logger = logger;
         this.builtinCapabilities = builtinCapabilities;
         this.grantService = grantService;
-        this.grnRegistry = grnRegistry;
     }
 
     protected Set<GRN> resolveTargets(GRN target) {
@@ -67,13 +62,13 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
         }
     }
 
-    protected Set<GRN> resolveGrantees(String userName) {
-        return Collections.singleton(grnRegistry.newGRN("user", userName));
+    protected Set<GRN> resolveGrantees(GRN principal) {
+        return Collections.singleton(principal);
     }
 
     @Override
-    public Set<Permission> resolvePermissionsForUser(String userName) {
-        final Set<GrantDTO> grants = grantService.getForGranteesOrGlobal(resolveGrantees(userName));
+    public Set<Permission> resolvePermissionsForPrincipal(GRN principal) {
+        final Set<GrantDTO> grants = grantService.getForGranteesOrGlobal(resolveGrantees(principal));
 
         final ImmutableSet.Builder<Permission> permissionsBuilder = ImmutableSet.builder();
 

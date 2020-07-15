@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.BuiltinCapabilities;
-import org.graylog.security.UserAuthorizer;
+import org.graylog.security.GranteeAuthorizer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class EntityDependencyPermissionCheckerTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private UserAuthorizer.Factory userAuthorizerFactory;
+    private GranteeAuthorizer.Factory userAuthorizerFactory;
 
     private EntityDependencyPermissionChecker resolver;
     private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
@@ -82,8 +82,8 @@ public class EntityDependencyPermissionCheckerTest {
         final GRN granteeUser = grnRegistry.newGRN("user", "john");
         final GRN sharingUser = grnRegistry.newGRN("user", "jane");
         final GRN stream = grnRegistry.newGRN("stream", "54e3deadbeefdeadbeef0001");
-        final UserAuthorizer sharingUserAuthorizer = mock(UserAuthorizer.class);
-        final UserAuthorizer granteeUserAuthorizer = mock(UserAuthorizer.class);
+        final GranteeAuthorizer sharingUserAuthorizer = mock(GranteeAuthorizer.class);
+        final GranteeAuthorizer granteeUserAuthorizer = mock(GranteeAuthorizer.class);
         final ImmutableSet<GRN> selectedGrantees = ImmutableSet.of(granteeUser);
         final EntityDependency dependency = EntityDependency.create(stream, "Title", ImmutableSet.of());
         final ImmutableSet<EntityDependency> dependencies = ImmutableSet.of(dependency);

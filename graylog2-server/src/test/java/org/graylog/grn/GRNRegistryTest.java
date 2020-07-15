@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GRNRegistryTest {
+    private GRNType type;
     private GRNRegistry registry;
 
     @Nested
@@ -34,7 +35,8 @@ class GRNRegistryTest {
     class WithBuiltins {
         @BeforeEach
         void setup() {
-            registry = GRNRegistry.createWithTypes(Collections.singleton(GRNType.create("test", "tests:")));
+            type = GRNType.create("test", "tests:");
+            registry = GRNRegistry.createWithTypes(Collections.singleton(type));
         }
 
         @Test
@@ -60,6 +62,13 @@ class GRNRegistryTest {
         @Test
         void newGRN() {
             assertThat(registry.newGRN("test", "123").toString()).isEqualTo("grn::::test:123");
+            assertThat(registry.newGRN(type, "123").toString()).isEqualTo("grn::::test:123");
+        }
+
+        @Test
+        void newGRNBuilder() {
+            assertThat(registry.newGRNBuilder("test").entity("123").build().toString()).isEqualTo("grn::::test:123");
+            assertThat(registry.newGRNBuilder(type).entity("123").build().toString()).isEqualTo("grn::::test:123");
         }
     }
 

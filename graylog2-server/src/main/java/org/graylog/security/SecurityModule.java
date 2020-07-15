@@ -28,7 +28,7 @@ public class SecurityModule extends PluginModule {
 
         bind(BuiltinCapabilities.class).asEagerSingleton();
 
-        install(new FactoryModuleBuilder().implement(UserAuthorizer.class, UserAuthorizer.class).build(UserAuthorizer.Factory.class));
+        install(new FactoryModuleBuilder().implement(GranteeAuthorizer.class, GranteeAuthorizer.class).build(GranteeAuthorizer.Factory.class));
 
         OptionalBinder.newOptionalBinder(binder(), GrantPermissionResolver.class)
                 .setDefault().to(DefaultGrantPermissionResolver.class);

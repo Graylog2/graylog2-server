@@ -29,6 +29,9 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.GrantPermissionResolver;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -66,6 +69,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final UserImpl.Factory userFactory;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
     private final EventBus serverEventBus;
+    private final GRNRegistry grnRegistry;
     private final GrantPermissionResolver grantPermissionResolver;
 
     @Inject
@@ -76,6 +80,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final UserImpl.Factory userFactory,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                            final EventBus serverEventBus,
+                           final GRNRegistry grnRegistry,
                            final GrantPermissionResolver grantPermissionResolver) {
         super(mongoConnection);
         this.configuration = configuration;
@@ -84,6 +89,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         this.userFactory = userFactory;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
         this.serverEventBus = serverEventBus;
+        this.grnRegistry = grnRegistry;
         this.grantPermissionResolver = grantPermissionResolver;
 
         // ensure that the users' roles array is indexed
@@ -170,7 +176,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Deprecated
     public User getAdminUser() {
         return getRootUser().orElseThrow(() ->
-            new IllegalStateException("Local admin user requested but root user is disabled in config."));
+                new IllegalStateException("Local admin user requested but root user is disabled in config."));
     }
 
     @Override
@@ -229,10 +235,11 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public List<String> getPermissionsForUser(User user) {
+        final GRN principal = grnRegistry.newGRN(GRNTypes.USER.type(), user.getName());
         final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder()
                 .addAll(user.getPermissions())
                 // The frontend cannot handle (and currently does not need) GRNPermissions. Thus we filter them
-                .addAll(grantPermissionResolver.resolvePermissionsForUser(user.getName())
+                .addAll(grantPermissionResolver.resolvePermissionsForPrincipal(principal)
                         .stream().filter(p -> p instanceof WildcardPermission).map(Object::toString).collect(Collectors.toSet()))
                 .addAll(getUserPermissionsFromRoles(user));
 

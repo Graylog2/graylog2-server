@@ -27,17 +27,17 @@ import javax.inject.Inject;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class UserAuthorizer {
+public class GranteeAuthorizer {
     public interface Factory {
-        UserAuthorizer create(GRN grantee);
+        GranteeAuthorizer create(GRN grantee);
     }
 
     private final Subject subject;
 
     @Inject
-    public UserAuthorizer(DefaultSecurityManager securityManager, @Assisted GRN grantee) {
+    public GranteeAuthorizer(DefaultSecurityManager securityManager, @Assisted GRN grantee) {
         this.subject = new Subject.Builder(securityManager)
-                .principals(new SimplePrincipalCollection(grantee.entity(), "UserAuthorizer"))
+                .principals(new SimplePrincipalCollection(grantee, "GranteeAuthorizer"))
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();

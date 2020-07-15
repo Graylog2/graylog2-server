@@ -17,18 +17,19 @@
 package org.graylog.security;
 
 import org.apache.shiro.authz.Permission;
+import org.graylog.grn.GRN;
 
 import java.util.Set;
 
 /**
- * Resolves a user name to specific permissions based on grants.
+ * Resolves a principal to specific permissions based on grants.
  */
 public interface GrantPermissionResolver {
     /**
-     * Returns resolved permissions for the given user name.
+     * Returns resolved permissions for the given principal.
      *
-     * @param userName the user name
+     * @param principal the principal
      * @return the resolved permissions
      */
-    Set<Permission> resolvePermissionsForUser(String userName);
+    Set<Permission> resolvePermissionsForPrincipal(GRN principal);
 }

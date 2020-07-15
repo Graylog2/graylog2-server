@@ -98,6 +98,20 @@ public class GRNRegistry {
     }
 
     /**
+     * Returns the {@link GRN} for the given type and entity.
+     *
+     * @param type   the GRN type string
+     * @param entity the entity string
+     * @return the GRN
+     * @throws IllegalArgumentException when given type doesn't exist or any arguments are null or empty
+     */
+    public GRN newGRN(GRNType type, String entity) {
+        checkArgument(!isNullOrEmpty(entity), "entity cannot be null or empty");
+
+        return newGRNBuilder(type).entity(entity).build();
+    }
+
+    /**
      * Returns a new {@link GRN.Builder} for the given type string.
      *
      * @param type the GRN type string
@@ -106,6 +120,20 @@ public class GRNRegistry {
      */
     public GRN.Builder newGRNBuilder(String type) {
         final GRNType grnType = Optional.ofNullable(REGISTRY.get(toKey(type)))
+                .orElseThrow(() -> new IllegalArgumentException("type <" + type + "> does not exist"));
+
+        return grnType.newGRNBuilder();
+    }
+
+    /**
+     * Returns a new {@link GRN.Builder} for the given type string.
+     *
+     * @param type the GRN type string
+     * @return the GRN builder
+     * @throws IllegalArgumentException when given type doesn't exist
+     */
+    public GRN.Builder newGRNBuilder(GRNType type) {
+        final GRNType grnType = Optional.ofNullable(REGISTRY.get(type.type()))
                 .orElseThrow(() -> new IllegalArgumentException("type <" + type + "> does not exist"));
 
         return grnType.newGRNBuilder();
