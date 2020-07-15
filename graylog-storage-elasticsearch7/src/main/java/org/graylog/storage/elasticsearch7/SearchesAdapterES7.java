@@ -30,7 +30,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class SearchesAdapterES7 implements SearchesAdapter {
     private static final String AGG_CARDINALITY = "gl2_field_cardinality";
     private static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
-    private static final String AGG_FILTER = "gl2_filter";
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
     private final ElasticsearchClient client;
