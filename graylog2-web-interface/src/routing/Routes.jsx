@@ -91,6 +91,7 @@ const Routes = {
         edit: (username) => `/system/users/tokens/${username}`,
       },
       OVERVIEW: '/system/users',
+      show: (username) => `/system/users/${username}`,
     },
     LOOKUPTABLES: {
       OVERVIEW: '/system/lookuptables',

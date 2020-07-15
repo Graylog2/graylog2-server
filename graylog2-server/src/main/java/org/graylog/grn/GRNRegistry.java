@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.utilities;
-
-import com.google.common.collect.ImmutableSet;
+package org.graylog.grn;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
@@ -37,20 +35,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Singleton
 public class GRNRegistry {
     public static final String GLOBAL_USER_GRN = "grn::::builtin-team:everyone"; // TODO: Find a better name for the "everyone" grantee GRN type
-
-    // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
-    // TODO find a way to unify these
-    private static final ImmutableSet<GRNType> BUILTIN_TYPES = ImmutableSet.<GRNType>builder()
-            .add(GRNType.create("collection", "collections:"))
-            .add(GRNType.create("dashboard", "dashboards:"))
-            .add(GRNType.create(ModelTypes.EVENT_DEFINITION_V1.name(), "eventdefinitions:"))
-            .add(GRNType.create("grant", "grants:"))
-            .add(GRNType.create("role", "roles:"))
-            .add(GRNType.create("stream", "streams:"))
-            .add(GRNType.create("user", "users:"))
-            .add(GRNType.create("team", "teams:"))
-            .add(GRNType.create("builtin-team", "XXX-NOT-A-REAL-TYPE-XXX:"))
-            .build();
 
     private final ConcurrentMap<String, GRNType> REGISTRY = new ConcurrentHashMap<>();
 
@@ -73,7 +57,7 @@ public class GRNRegistry {
      * @return the registry
      */
     public static GRNRegistry createWithBuiltinTypes() {
-        return createWithTypes(BUILTIN_TYPES);
+        return createWithTypes(GRNTypes.builtinTypes());
     }
 
     /**
@@ -116,12 +100,26 @@ public class GRNRegistry {
         return newGRNBuilder(type).entity(entity).build();
     }
 
-    public GRN ofUser(User user) {
-        return newGRN("user", user.getName());
+    /**
+     * Returns the {@link GRN} for the given type and entity.
+     *
+     * @param type   the GRN type string
+     * @param entity the entity string
+     * @return the GRN
+     * @throws IllegalArgumentException when given type doesn't exist or any arguments are null or empty
+     */
+    public GRN newGRN(GRNType type, String entity) {
+        checkArgument(!isNullOrEmpty(entity), "entity cannot be null or empty");
+
+        return newGRNBuilder(type).entity(entity).build();
     }
 
     public GRN ofEventDefinition(EventDefinition eventDefinition) {
         return newGRN(ModelTypes.EVENT_DEFINITION_V1.name(), eventDefinition.id());
+    }
+
+    public GRN ofUser(User user) {
+        return newGRN(GRNTypes.USER, user.getName());
     }
 
     public boolean isUser(GRN grn) {
@@ -137,6 +135,20 @@ public class GRNRegistry {
      */
     public GRN.Builder newGRNBuilder(String type) {
         final GRNType grnType = Optional.ofNullable(REGISTRY.get(toKey(type)))
+                .orElseThrow(() -> new IllegalArgumentException("type <" + type + "> does not exist"));
+
+        return grnType.newGRNBuilder();
+    }
+
+    /**
+     * Returns a new {@link GRN.Builder} for the given type string.
+     *
+     * @param type the GRN type string
+     * @return the GRN builder
+     * @throws IllegalArgumentException when given type doesn't exist
+     */
+    public GRN.Builder newGRNBuilder(GRNType type) {
+        final GRNType grnType = Optional.ofNullable(REGISTRY.get(type.type()))
                 .orElseThrow(() -> new IllegalArgumentException("type <" + type + "> does not exist"));
 
         return grnType.newGRNBuilder();

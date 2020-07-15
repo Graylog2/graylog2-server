@@ -23,19 +23,21 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 import org.mongojack.DBQuery;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -127,5 +129,13 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 DBQuery.is(GrantDTO.FIELD_TARGET, target.toString()),
                 DBQuery.notEquals(GrantDTO.FIELD_GRANTEE, grantee.toString())
         )).toArray();
+    }
+
+    public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
+        return db.find(DBQuery.in(GrantDTO.FIELD_TARGET, targets)).toArray().stream()
+                .collect(Collectors.groupingBy(
+                        GrantDTO::target,
+                        Collectors.mapping(GrantDTO::grantee, Collectors.toSet())
+                ));
     }
 }

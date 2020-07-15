@@ -19,22 +19,23 @@ package org.graylog.security.shares;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
+import org.graylog.security.entities.EntityDependency;
+import org.graylog.security.entities.EntityDependencyPermissionChecker;
 import org.graylog.security.entities.EntityDependencyResolver;
 import org.graylog.security.shares.EntityShareResponse.ActiveShare;
 import org.graylog.security.shares.EntityShareResponse.AvailableCapability;
-import org.graylog.security.shares.EntityShareResponse.MissingDependency;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.users.UserService;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 
 import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,19 +48,19 @@ import static java.util.Objects.requireNonNull;
 public class EntitySharesService {
     private final DBGrantService grantService;
     private final EntityDependencyResolver entityDependencyResolver;
-    private final UserService userService;
+    private final EntityDependencyPermissionChecker entityDependencyPermissionChecker;
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
 
     @Inject
     public EntitySharesService(DBGrantService grantService,
                                EntityDependencyResolver entityDependencyResolver,
-                               UserService userService,
+                               EntityDependencyPermissionChecker entityDependencyPermissionChecker,
                                GRNRegistry grnRegistry,
                                GranteeService granteeService) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
-        this.userService = userService;
+        this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
     }
@@ -84,14 +85,15 @@ public class EntitySharesService {
         requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
+        final GRN sharingUserGRN = grnRegistry.newGRN("user", sharingUser.getName());
         return EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
-                .sharingUser(grnRegistry.newGRN("user", sharingUser.getName()))
+                .sharingUser(sharingUserGRN)
                 .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
-                .missingDependencies(getMissingDependencies(ownedEntity, sharingUser, request))
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
                 .build();
     }
 
@@ -112,7 +114,8 @@ public class EntitySharesService {
                 .orElse(ImmutableMap.of());
 
         final String userName = sharingUser.getName();
-        final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, grnRegistry.newGRN("user", sharingUser.getName()));
+        final GRN sharingUserGRN = grnRegistry.newGRN("user", sharingUser.getName());
+        final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
 
         // Update capabilities of existing grants (for a grantee)
         existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
@@ -150,12 +153,12 @@ public class EntitySharesService {
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
         return EntityShareResponse.builder()
                 .entity(ownedEntity.toString())
-                .sharingUser(grnRegistry.newGRN("user", sharingUser.getName()))
+                .sharingUser(sharingUserGRN)
                 .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
-                .missingDependencies(getMissingDependencies(ownedEntity, sharingUser, request))
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
                 .build();
     }
 
@@ -187,22 +190,10 @@ public class EntitySharesService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private ImmutableMap<GRN, MissingDependency> getMissingDependencies(GRN ownedEntity, User sharingUser, EntityShareRequest shareRequest) {
-        // TODO: We need to compute the missing dependencies by taking the selectedGranteeCapabilities into account.
-        //       (e.g. missing grants for selectedGranteeCapabilities on the streams required for a dashboard to work correctly)
-        // TODO: We only check for existing grants for the actual grantee. If the grantee is a team, we only check if
-        //       the team has a grant, not if any users in the team can access the dependency via other grants.
-        //       The same for the "everyone" grantee, we only check if  the "everyone" grantee has access to a dependency.
-        // TODO: We can only expose the missing dependencies that the sharing user has access to to avoid
-        //       leaking information to the user.
-        /*
-        final ImmutableSet<MissingDependency> dependencies = entityDependencyResolver.resolve(ownedEntity);
-        return dependencies.stream()
-                .filter(dependency -> true) // TODO: Only return dependencies the selectedGranteeCapabilities don't have access to
-                .collect(ImmutableSet.toImmutableSet());
-         */
-
-        return ImmutableMap.of();
+    private ImmutableMap<GRN, Collection<EntityDependency>> checkMissingPermissionsOnDependencies(GRN entity, GRN sharingUser, EntityShareRequest shareRequest) {
+        final ImmutableSet<EntityDependency> dependencies = entityDependencyResolver.resolve(entity);
+        final ImmutableSet<GRN> selectedGrantees = shareRequest.selectedGranteeCapabilities()
+                .orElse(ImmutableMap.of()).keySet();
+        return entityDependencyPermissionChecker.check(sharingUser, dependencies, selectedGrantees).asMap();
     }
-
 }

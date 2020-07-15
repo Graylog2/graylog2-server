@@ -16,6 +16,7 @@
  */
 package org.graylog2.security.realm;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -55,8 +56,14 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         LOG.debug("Retrieving authorization information for {}", principals);
-        final User user = userService.load(principals.getPrimaryPrincipal().toString());
 
+        // This realm can only handle string principals
+        final String principalString = Iterables.getFirst(principals.byType(String.class), null);
+        if (principalString == null) {
+            return new SimpleAuthorizationInfo();
+        }
+
+        final User user = userService.load(principalString);
         if (user == null) {
             return new SimpleAuthorizationInfo();
         } else {

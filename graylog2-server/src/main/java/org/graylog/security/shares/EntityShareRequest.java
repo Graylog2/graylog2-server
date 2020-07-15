@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRN;
 import org.graylog.security.Capability;
-import org.graylog2.utilities.GRN;
 
 import javax.annotation.Nullable;
 import java.util.Map;

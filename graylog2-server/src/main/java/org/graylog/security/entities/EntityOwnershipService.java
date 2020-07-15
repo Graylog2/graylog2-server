@@ -16,13 +16,13 @@
  */
 package org.graylog.security.entities;
 
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
