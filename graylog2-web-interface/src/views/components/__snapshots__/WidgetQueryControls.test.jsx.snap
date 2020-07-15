@@ -6,7 +6,7 @@ exports[`WidgetQueryControls should do something 1`] = `
     action="#"
   >
     <div
-      class="TopRow-sc-1ysyhyx-0 dDogjc row"
+      class="Row-sc-3iisrt-0 TopRow-sc-1ysyhyx-0 igHNcM row"
     >
       <div
         class="col-md-4"
@@ -177,7 +177,7 @@ exports[`WidgetQueryControls should do something 1`] = `
       </div>
     </div>
     <div
-      class="no-bm row"
+      class="Row-sc-3iisrt-0 bRJRJg no-bm row"
     >
       <div
         class="col-md-12"

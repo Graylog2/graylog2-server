@@ -20,6 +20,7 @@ import NavDropdown from './NavDropdown';
 import Panel from './Panel';
 import Popover from './Popover';
 import ProgressBar from './ProgressBar';
+import Row from './Row';
 import SplitButton from './SplitButton';
 import Table from './Table';
 import Tab from './Tab';
@@ -50,6 +51,7 @@ export {
   Panel,
   Popover,
   ProgressBar,
+  Row,
   SplitButton,
   Table,
   Tab,

@@ -10,8 +10,8 @@ type Props = {
   children: React.Node,
 };
 
-const Container: StyledComponent<Props, {}, HTMLDivElement> = styled.div`
-  padding: 15px 10px;
+const Container: StyledComponent<Props, void, HTMLDivElement> = styled.div`
+  padding: 15px 12px;
 `;
 
 const AppContentGrid = ({ children, ...rest }: Props) => (
