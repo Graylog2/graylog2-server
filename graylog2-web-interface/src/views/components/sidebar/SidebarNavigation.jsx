@@ -23,7 +23,7 @@ const Container: StyledComponent<{isOpen: boolean, sidebarIsPinned: boolean}, Th
   width: 50px;
   height: 100%;
   position:relative;
-  z-index: 1031;
+  z-index: 1031; /* higher than Navbar */
 
   ::before {
     content: '';
