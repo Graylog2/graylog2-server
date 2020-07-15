@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 
@@ -13,11 +13,13 @@ const ValueCol = styled(Col)`
   padding-top: 7px;
 `;
 
-const LabelCol = styled(ValueCol)`
-  text-align: right;
-`;
+const LabelCol = styled(ValueCol)(({ theme }) => css`
+  @media (min-width: ${theme.breakpoints.min.md}) {
+    text-align: right;
+  }
+`);
 
-const FormFieldRead = ({ label, value }: Props) => (
+const ReadOnlyFormField = ({ label, value }: Props) => (
   <Row>
     <LabelCol sm={3}>
       <b>{label}</b>
@@ -28,4 +30,4 @@ const FormFieldRead = ({ label, value }: Props) => (
   </Row>
 );
 
-export default FormFieldRead;
+export default ReadOnlyFormField;

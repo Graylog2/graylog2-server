@@ -7,7 +7,7 @@ import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
 import FormField from '../form/FormField';
-import FormFieldRead from '../form/FormFieldRead';
+import ReadOnlyFormField from '../form/ReadOnlyFormField';
 
 type Props = {
   user: User,
@@ -29,12 +29,12 @@ const ProfileSection = ({
 
   return (
     <SectionComponent title="Profile">
-      <Formik onSubmit={(data) => onSubmit({ email: data.email, full_name: data.fullName })}
-              initialValues={{ email, fullName }}>
+      <Formik onSubmit={onSubmit}
+              initialValues={{ email, full_name: fullName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <FormFieldRead label="Username" value={username} />
-            <FormField label="Full Name" name="fullName" required />
+            <ReadOnlyFormField label="Username" value={username} />
+            <FormField label="Full Name" name="full_name" required />
             <FormField label="E-Mail Address" name="email" type="email" required />
             <Row>
               <Col xs={12}>
