@@ -5,6 +5,7 @@ import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
 import ShowConfigValue from '../ShowConfigValue';
+import LoggedInIcon from '../LoggedInIcon';
 
 type Props = {
   user: User,
@@ -26,7 +27,7 @@ const ProfileSection = ({
     <ShowConfigValue label="E-Mail Address" value={email} />
     <ShowConfigValue label="Client Address" value={clientAddress} />
     <ShowConfigValue label="Last Activity" value={lastActivity} />
-    <ShowConfigValue label="Logged In" value={sessionActive ? 'yes' : 'no'} />
+    <ShowConfigValue label="Logged In" value={<LoggedInIcon active={sessionActive} />} />
   </SectionComponent>
 );
 
