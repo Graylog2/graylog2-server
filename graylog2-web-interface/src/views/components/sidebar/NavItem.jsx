@@ -13,6 +13,13 @@ type Props = {
   icon: string,
   onClick: () => void,
   showTitleOnHover: boolean,
+  sidebarIsPinned: boolean,
+};
+
+type ContainerProps = {
+  isSelected: boolean,
+  showTitleOnHover: boolean,
+  sidebarIsPinned: boolean,
 };
 
 const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
@@ -35,9 +42,19 @@ const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.sp
   align-items: center;
   justify-content: center;
   position: relative;
+
+  ::after {
+    content: ' ';
+    position: absolute;
+    right: -7px;
+    top: calc(50% - 7px);
+    width: 14px;
+    height: 14px;
+    transform: rotate(45deg);
+  }
 `);
 
-const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover }) => css`
+const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement> = styled.div(({ theme, isSelected, showTitleOnHover, sidebarIsPinned }) => css`
   position: relative;
   z-index: 4; /* to render over SidebarNav::before */
   width: 100%;
@@ -68,27 +85,21 @@ const Container: StyledComponent<{ isSelected: boolean, showTitleOnHover: boolea
     overflow: ${isSelected ? 'unset' : 'hidden'};
 
     ::after {
-      content: ' ';
       display: ${isSelected ? 'block' : 'none'};
-      position: absolute;
-      right: -8px;
-      top: calc(50% - 8px);
-      width: 16px;
-      height: 16px;
-      transform: rotate(45deg);
-      box-shadow: ${isSelected ? 'inset 3px -3px 2px 0px rgba(0,0,0,0.25)' : 'none'};
-      background-color: ${isSelected ? theme.colors.global.contentBackground : theme.colors.variant.light.info};
+      box-shadow: ${(isSelected && !sidebarIsPinned) ? '3px -3px 2px 0px rgba(0,0,0,0.25)' : 'none'};
+      background-color: ${theme.colors.variant.lighter.info};
     }
   }
 `);
 
-const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover }: Props) => {
+const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIsPinned }: Props) => {
   return (
     <Container aria-label={title}
                isSelected={isSelected}
                onClick={onClick}
                showTitleOnHover={showTitleOnHover}
-               title={showTitleOnHover ? '' : title}>
+               title={showTitleOnHover ? '' : title}
+               sidebarIsPinned={sidebarIsPinned}>
       <IconWrap><Icon name={icon} /></IconWrap>
       {(showTitleOnHover && !isSelected) && <Title>{title}</Title>}
     </Container>
@@ -99,6 +110,7 @@ NavItem.propTypes = {
   icon: PropTypes.node.isRequired,
   isSelected: PropTypes.bool,
   showTitleOnHover: PropTypes.bool,
+  sidebarIsPinned: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
 };
 

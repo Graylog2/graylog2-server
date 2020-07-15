@@ -12,13 +12,14 @@ type Props = {
   activeSection: ?SidebarSection,
   sections: Array<SidebarSection>,
   setActiveSectionKey: (sectionKey: string) => void,
+  sidebarIsPinned: boolean,
   toggleSidebar: () => void,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const Container: StyledComponent<{isOpen: boolean, sidebarIsPinned: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ isOpen, sidebarIsPinned, theme }) => css`
   background: ${theme.colors.global.contentBackground};
   color: ${theme.colors.gray[20]};
-  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : '3px 3px 3px rgba(0, 0, 0, 0.25)'};
   width: 50px;
   height: 100%;
   position:relative;
@@ -57,12 +58,12 @@ const HorizontalRuleWrapper = styled.div`
   }
 `;
 
-const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggleSidebar }: Props) => {
+const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, sidebarIsPinned, toggleSidebar }: Props) => {
   const toggleIcon = activeSection ? 'chevron-left' : 'chevron-right';
   const activeSectionKey = activeSection?.key;
 
   return (
-    <Container>
+    <Container sidebarIsPinned={sidebarIsPinned} isOpen={activeSection}>
       <NavItem icon={toggleIcon}
                onClick={toggleSidebar}
                showTitleOnHover={false}
@@ -74,7 +75,8 @@ const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, toggl
                    icon={icon}
                    onClick={() => setActiveSectionKey(key)}
                    key={key}
-                   title={title} />
+                   title={title}
+                   sidebarIsPinned={sidebarIsPinned} />
         ))}
       </SectionList>
     </Container>
