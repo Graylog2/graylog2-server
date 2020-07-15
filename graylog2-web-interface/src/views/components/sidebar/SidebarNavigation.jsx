@@ -63,7 +63,7 @@ const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, sideb
   const activeSectionKey = activeSection?.key;
 
   return (
-    <Container sidebarIsPinned={sidebarIsPinned} isOpen={activeSection}>
+    <Container sidebarIsPinned={sidebarIsPinned} isOpen={!!activeSection}>
       <NavItem icon={toggleIcon}
                onClick={toggleSidebar}
                showTitleOnHover={false}
