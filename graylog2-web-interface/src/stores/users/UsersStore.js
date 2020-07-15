@@ -272,4 +272,6 @@ const UsersStore: UsersStoreType = singletonStore(
   }),
 );
 
+export { UsersActions, UsersStore };
+
 export default UsersStore;

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import UserOverview from 'logic/users/UserOverview';
-import UsersActions from 'actions/users/UsersActions';
+import { UsersActions } from 'stores/users/UsersStore';
 import Routes from 'routing/Routes';
 import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';

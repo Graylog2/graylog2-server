@@ -2,8 +2,8 @@
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+import { UsersActions } from 'stores/users/UsersStore';
 import type { ThemeInterface } from 'theme';
-import UsersActions from 'actions/users/UsersActions';
 import { SearchForm } from 'components/common';
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
