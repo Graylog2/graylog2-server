@@ -86,7 +86,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                    onChange={_onClick}
                    checked={sessionTimeoutNever} />
           </Col>
-          <Col sm={2}>
+          <Col xs={3}>
             <input type="number"
                    id="timeout"
                    className="session-timeout-fields validatable form-control"
@@ -97,7 +97,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                    value={value}
                    onChange={_onChangeValue} />
           </Col>
-          <Col sm={3}>
+          <Col xs={4}>
             <TimeoutUnitSelect className="form-control session-timeout-fields"
                                disabled={sessionTimeoutNever}
                                value={unit}
