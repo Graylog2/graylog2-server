@@ -15,7 +15,7 @@ type AuthzRolesActionsType = RefluxActions<{
 const AuthzRolesActions: AuthzRolesActionsType = singletonActions(
   'AuthzRoles',
   () => Reflux.createActions({
-    loadForuser: { asyncResult: true },
+    loadForUser: { asyncResult: true },
   }),
 );
 

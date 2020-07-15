@@ -51,6 +51,7 @@ const AuthzRolesStore: AuthzRolesStoreType = singletonStore(
     loadForUser(username: string, page: number, perPage: number, query: string): Promise<PaginatedList> {
       const url = PaginationURL(ApiRoutes.AuthzRolesController.loadForUser(username).url, page, perPage, query);
 
+      console.log("store", username);
       const promise = fetch('GET', qualifyUrl(url))
         .then(_responseToPaginatedList,
           (error) => {
@@ -59,6 +60,8 @@ const AuthzRolesStore: AuthzRolesStoreType = singletonStore(
                 'Could not load roles for user');
             }
           });
+
+      AuthzRolesActions.loadForUser.promise(promise);
 
       return promise;
     },
