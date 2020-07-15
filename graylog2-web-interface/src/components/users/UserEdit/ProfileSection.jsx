@@ -32,7 +32,7 @@ const ProfileSection = ({
       <Formik onSubmit={(data) => onSubmit({ email: data.email, full_name: data.fullName })}
               initialValues={{ email, fullName }}>
         {({ isSubmitting, isValid }) => (
-          <Form>
+          <Form className="form form-horizontal">
             <FormFieldRead label="Username" value={username} />
             <FormField label="Full Name" name="fullName" required />
             <FormField label="E-Mail Address" name="email" type="email" required />

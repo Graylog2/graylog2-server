@@ -1,18 +1,31 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 
-import FormRow from './FormRow';
+import { Col, Row } from 'components/graylog';
 
 type Props = {
-  label: string,
-  value: string,
+  label: React.Node,
+  value: React.Node,
 };
 
-const FormFieldRead = ({ label, value }: Props) => (
-  <FormRow label={<b>{label}</b>}>
-    {value}
-  </FormRow>
+const ValueCol = styled(Col)`
+  padding-top: 7px;
+`;
 
+const LabelCol = styled(ValueCol)`
+  text-align: right;
+`;
+
+const FormFieldRead = ({ label, value }: Props) => (
+  <Row>
+    <LabelCol sm={3}>
+      <b>{label}</b>
+    </LabelCol>
+    <ValueCol sm={9}>
+      {value}
+    </ValueCol>
+  </Row>
 );
 
 export default FormFieldRead;
