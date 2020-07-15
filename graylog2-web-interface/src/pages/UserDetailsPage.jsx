@@ -5,8 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter } from 'react-router';
 
 import { useStore } from 'stores/connect';
-import UsersActions from 'actions/users/UsersActions';
-import UsersStore from 'stores/users/UsersStore';
+import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { ButtonToolbar, Button } from 'components/graylog';

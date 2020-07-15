@@ -2,7 +2,7 @@
 import asMock from 'helpers/mocking/AsMock';
 import { userList } from 'fixtures/users';
 
-import UsersActions from 'actions/users/UsersActions';
+import { UsersActions } from 'stores/users/UsersStore';
 import fetch from 'logic/rest/FetchProvider';
 
 describe('UsersStore', () => {

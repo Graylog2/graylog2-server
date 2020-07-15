@@ -3,10 +3,9 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import { type ThemeInterface } from 'theme';
 import { useStore } from 'stores/connect';
-import UsersStore from 'stores/users/UsersStore';
-import UsersActions from 'actions/users/UsersActions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList } from 'components/common';
 import { Col, Row } from 'components/graylog';

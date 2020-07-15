@@ -2,10 +2,10 @@
 import * as React from 'react';
 import { useContext } from 'react';
 
+import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner } from 'components/common';
 import UserNotification from 'util/UserNotification';
-import UsersActions from 'actions/users/UsersActions';
 import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
 
