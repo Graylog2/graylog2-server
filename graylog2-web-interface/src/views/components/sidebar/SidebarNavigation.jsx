@@ -67,7 +67,8 @@ const SidebarNavigation = ({ sections, activeSection, setActiveSectionKey, sideb
       <NavItem icon={toggleIcon}
                onClick={toggleSidebar}
                showTitleOnHover={false}
-               title={`${activeSection ? 'Close' : 'Open'} sidebar`} />
+               title={`${activeSection ? 'Close' : 'Open'} sidebar`}
+               sidebarIsPinned={sidebarIsPinned} />
       <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
       <SectionList>
         {sections.map(({ key, icon, title }) => (
