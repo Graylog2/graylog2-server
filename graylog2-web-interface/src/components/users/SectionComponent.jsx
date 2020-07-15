@@ -9,14 +9,14 @@ import { Row, Col } from 'components/graylog';
 type Props = {
   children: React.Node,
   title: string,
-  showLoading: boolean,
+  showLoading?: boolean,
 };
 
 export const Headline: StyledComponent<{}, ThemeInterface, HTMLHeadingElement> = styled.h2`
   margin-bottom: 15px;
 `;
 
-const SectionComponent = ({ children, title, showLoading }: Props) => (
+const SectionComponent = ({ children, title, showLoading = false }: Props) => (
   <Row className="content">
     <Col xs={12}>
       <Headline>{title}</Headline>{showLoading && <Spinner />}
@@ -24,5 +24,9 @@ const SectionComponent = ({ children, title, showLoading }: Props) => (
     </Col>
   </Row>
 );
+
+SectionComponent.defaultProps = {
+  showLoading: false,
+};
 
 export default SectionComponent;

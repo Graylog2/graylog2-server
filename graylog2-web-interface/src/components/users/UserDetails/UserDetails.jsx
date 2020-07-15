@@ -7,9 +7,9 @@ import User from 'logic/users/User';
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
 import MainDetailsGrid from './MainDetailsGrid';
+import RolesSection from './RolesSection';
 
 import SectionComponent from '../SectionComponent';
-import RolesSection from "./RolesSection";
 
 type Props = {
   user: ?User,
