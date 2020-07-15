@@ -1152,4 +1152,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("list_found")).isInstanceOf(List.class);
         assertThat(message.getField("int_found")).isInstanceOf(Long.class);
     }
+
+    @Test
+    public void notExpressionTypeCheck() {
+        try {
+            Rule rule = parser.parseRule(ruleForTest(), true);
+            Message in = new Message("test", "source", DateTime.now());
+            in.addField("facility", "mail");
+            evaluateRule(rule, in);
+            fail("missing type check for non-boolean type in unary NOT");
+        } catch (Exception e) {
+            assertThat(e).isInstanceOf(ParseException.class)
+                    .hasMessageContaining("Expected type Boolean but found String");
+        }
+    }
 }
