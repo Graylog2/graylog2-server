@@ -4,8 +4,8 @@ import * as React from 'react';
 import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
-import LoggedInIcon from '../LoggedInIcon';
 import ReadOnlyFormField from '../form/ReadOnlyFormField';
+import LoggedInIcon from '../LoggedInIcon';
 
 type Props = {
   user: User,
