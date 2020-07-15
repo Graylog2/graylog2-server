@@ -14,6 +14,8 @@ const ValueCol = styled(Col)`
 `;
 
 const LabelCol = styled(ValueCol)(({ theme }) => css`
+  font-weight: bold;
+
   @media (min-width: ${theme.breakpoints.min.md}) {
     text-align: right;
   }
@@ -22,10 +24,10 @@ const LabelCol = styled(ValueCol)(({ theme }) => css`
 const ReadOnlyFormField = ({ label, value }: Props) => (
   <Row>
     <LabelCol sm={3}>
-      <b>{label}</b>
+      {label}
     </LabelCol>
     <ValueCol sm={9}>
-      {value}
+      {value ?? '-'}
     </ValueCol>
   </Row>
 );

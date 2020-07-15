@@ -9,6 +9,6 @@ const StyledIcon: StyledComponent<{active?: boolean}, ThemeInterface, Icon> = st
   color: ${active ? theme.colors.variant.success : theme.colors.variant.danger};
 `);
 
-const LoggedInIcon = ({ active }: { active: boolean }) => <StyledIcon name="circle" active={active} />;
+const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => <StyledIcon {...rest} name="circle" active={active} />;
 
 export default LoggedInIcon;

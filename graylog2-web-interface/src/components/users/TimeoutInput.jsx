@@ -73,7 +73,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
       <Input id="timeout-controls"
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9"
-             label="Timeout">
+             label="Sessions Timeout">
         <Row className="no-bm">
           <Col xs={12}>
             <Input type="checkbox"

@@ -5,7 +5,9 @@ import styled, { type StyledComponent } from 'styled-components';
 import UserOverview from 'logic/users/UserOverview';
 import type { ThemeInterface } from 'theme';
 import { OverlayTrigger, Popover } from 'components/graylog';
-import { Timestamp, Icon } from 'components/common';
+import { Timestamp } from 'components/common';
+
+import LoggedInIcon from '../../LoggedInIcon';
 
 type Props = {
   lastActivity: $PropertyType<UserOverview, 'lastActivity'>,
@@ -18,25 +20,21 @@ const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
   text-align: right;
 `;
 
-const ActiveIcon = styled(Icon)(({ theme }) => `
-  color: ${theme.colors.variant.success};
-`);
-
 const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => (
   <Td>
-    {sessionActive && (
-      <OverlayTrigger trigger={['hover', 'focus']}
-                      placement="right"
-                      overlay={(
-                        <Popover id="session-badge-details" title="Logged in">
-                          <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
-                          <div>Client address: {clientAddress}</div>
-                        </Popover>
+
+    <OverlayTrigger trigger={['hover', 'focus']}
+                    placement="right"
+                    overlay={(
+                      <Popover id="session-badge-details" title="Logged in">
+                        <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
+                        <div>Client address: {clientAddress ?? '-'}</div>
+                      </Popover>
                       )}
-                      rootClose>
-        <ActiveIcon name="circle" />
-      </OverlayTrigger>
-    )}
+                    rootClose>
+      <LoggedInIcon active={sessionActive} />
+    </OverlayTrigger>
+
   </Td>
 );
 
