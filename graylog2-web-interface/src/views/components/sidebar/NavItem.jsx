@@ -35,11 +35,11 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   border-radius: 0 3px 3px 0;
 
   span {
-    color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.info, 'AA')};
+    background: ${theme.utils.contrastingColor(theme.colors.variant.lighter.info, 'AA')};
     font-size: ${theme.fonts.size.body};
     font-weight: bold;
     background-clip: text;
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
   }
 `);
