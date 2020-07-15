@@ -100,7 +100,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
     private SearchResponse nextSearchResult() throws IOException {
         final SearchScrollRequest scrollRequest = new SearchScrollRequest(this.scrollId);
         scrollRequest.scroll(TimeValue.parseTimeValue(this.scroll, DEFAULT_SCROLL, "scroll time"));
-        return client.executeUnsafe((c, requestOptions) -> c.scroll(scrollRequest, requestOptions),
+        return client.executeWithIOException((c, requestOptions) -> c.scroll(scrollRequest, requestOptions),
                 "Unable to retrieve next chunk from search: ");
     }
 
@@ -119,7 +119,7 @@ public class ScrollResultES7 extends IndexQueryResult implements ScrollResult {
         final ClearScrollRequest request = new ClearScrollRequest();
         request.addScrollId(scrollId);
 
-        client.executeUnsafe((c, requestOptions) -> c.clearScroll(request, requestOptions),
+        client.executeWithIOException((c, requestOptions) -> c.clearScroll(request, requestOptions),
                 "Unable to cancel scrolling search request");
     }
 

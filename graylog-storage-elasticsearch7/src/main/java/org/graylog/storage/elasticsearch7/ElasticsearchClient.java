@@ -90,7 +90,7 @@ public class ElasticsearchClient {
         }
     }
 
-    public <R> R executeUnsafe(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
+    public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
             return fn.apply(client, requestOptions());
         } catch (IOException e) {
