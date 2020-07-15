@@ -100,12 +100,6 @@ public class ClientES7 implements Client {
     }
 
     @Override
-    public boolean isSourceEnabled(String testIndexName) {
-        // TODO: implement
-        return true;
-    }
-
-    @Override
     public String fieldType(String testIndexName, String field) {
         return getMapping(testIndexName).get(field);
     }
