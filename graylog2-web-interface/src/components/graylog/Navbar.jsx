@@ -35,7 +35,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       }
     }
 
-    > .active > a {
+    > .active > a,
+    > .active > .btn-link {
       color: ${theme.colors.variant.dark.info};
 
       &,
@@ -46,7 +47,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       }
     }
 
-    > .disabled > a {
+    > .disabled > a,
+    > .disabled > .btn-link {
       &,
       &:hover,
       &:focus {
@@ -55,7 +57,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       }
     }
 
-    > .open > a {
+    > .open > a,
+    > .open > .btn-link {
       &,
       &:hover,
       &:focus {
@@ -64,7 +67,17 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       }
     }
 
-    @media (max-width: ${theme.breakpoints.max.sm}) {
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      padding-left: 50px;
+
+      > li > a,
+      > li > .btn-link {
+        &:hover,
+        &:focus {
+          background-color: ${theme.colors.variant.lightest.info};
+        }
+      }
+
       .open .dropdown-menu {
         > li > a,
         > li > .btn-link {
@@ -73,11 +86,12 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
           &:hover,
           &:focus {
             color: ${chroma(theme.colors.variant.info).darken(0.25)};
-            background-color: transparent;
+            background-color: ${theme.colors.variant.lightest.info};
           }
         }
 
-        > .active > a {
+        > .active > a,
+        > .active > .btn-link {
           &,
           &:hover,
           &:focus {
@@ -86,7 +100,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
           }
         }
 
-        > .disabled > a {
+        > .disabled > a,
+        > .disabled > .btn-link {
           &,
           &:hover,
           &:focus {
@@ -99,15 +114,15 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   }
 
   .navbar-toggle {
-    border-color: ${theme.colors.gray[80]};
+    border-color: ${theme.colors.variant.light.default};
 
     &:hover,
     &:focus {
-      background-color: ${theme.colors.gray[80]};
+      background-color: ${theme.colors.variant.lighter.default};
     }
 
     .icon-bar {
-      background-color: ${chroma(theme.colors.gray[80]).darken(0.25)};
+      background-color: ${theme.colors.variant.default};
     }
   }
 
