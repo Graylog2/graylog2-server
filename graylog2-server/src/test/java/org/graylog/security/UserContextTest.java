@@ -19,6 +19,9 @@ package org.graylog.security;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
+import org.apache.shiro.subject.Subject;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
@@ -50,8 +53,21 @@ class UserContextTest {
 
     @Test
     void runAs() {
+        // Simulate what we do in the DefaultSecurityManagerProvider
         DefaultSecurityManager sm = new DefaultSecurityManager();
         SecurityUtils.setSecurityManager(sm);
+        final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator() {
+            @Override
+            public boolean isSessionStorageEnabled(Subject subject) {
+                // save to session if we already have a session. do not create on just for saving the subject
+                return subject.getSession(false) != null;
+            }
+        };
+        sessionStorageEvaluator.setSessionStorageEnabled(false);
+        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
+        sm.setSubjectDAO(subjectDAO);
+
         final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class), ImmutableMap.of());
         when(userService.load(anyString())).thenReturn(user);
 
