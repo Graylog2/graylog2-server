@@ -17,15 +17,15 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
-public class Search {
+public class SearchRequestFactory {
     private final SortOrderMapper sortOrderMapper;
     private final boolean allowHighlighting;
     private final boolean allowLeadingWildcardSearches;
 
     @Inject
-    public Search(SortOrderMapper sortOrderMapper,
-                  @Named("allow_highlighting") boolean allowHighlighting,
-                  @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches) {
+    public SearchRequestFactory(SortOrderMapper sortOrderMapper,
+                                @Named("allow_highlighting") boolean allowHighlighting,
+                                @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches) {
         this.sortOrderMapper = sortOrderMapper;
         this.allowHighlighting = allowHighlighting;
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;

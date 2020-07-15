@@ -34,15 +34,15 @@ public class SearchesAdapterES7 implements SearchesAdapter {
 
     private final ElasticsearchClient client;
     private final Scroll scroll;
-    private final Search search;
+    private final SearchRequestFactory searchRequestFactory;
 
     @Inject
     public SearchesAdapterES7(ElasticsearchClient client,
                               Scroll scroll,
-                              Search search) {
+                              SearchRequestFactory searchRequestFactory) {
         this.client = client;
         this.scroll = scroll;
-        this.search = search;
+        this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SearchesAdapterES7 implements SearchesAdapter {
                 .limit(0)
                 .offset(0)
                 .build();
-        final SearchSourceBuilder searchSourceBuilder = search.create(config);
+        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
         final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
                 .source(searchSourceBuilder);
 
@@ -95,7 +95,7 @@ public class SearchesAdapterES7 implements SearchesAdapter {
 
     @Override
     public SearchResult search(Set<String> indices, Set<IndexRange> indexRanges, SearchesConfig config) {
-        final SearchSourceBuilder searchSourceBuilder = search.create(config);
+        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
 
         if (indexRanges.isEmpty()) {
             return SearchResult.empty(config.query(), searchSourceBuilder.toString());
@@ -128,7 +128,7 @@ public class SearchesAdapterES7 implements SearchesAdapter {
                 .offset(0)
                 .limit(-1)
                 .build();
-        final SearchSourceBuilder searchSourceBuilder = search.create(config);
+        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
 
         if (includeCount) {
             searchSourceBuilder.aggregation(AggregationBuilders.count(AGG_VALUE_COUNT).field(field));

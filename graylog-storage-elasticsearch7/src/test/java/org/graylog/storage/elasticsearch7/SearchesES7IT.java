@@ -30,7 +30,7 @@ public class SearchesES7IT extends SearchesIT {
                         sortOrderMapper,
                         allowLeadingWildcardSearches,
                         allowHighlighting),
-                new Search(sortOrderMapper,
+                new SearchRequestFactory(sortOrderMapper,
                         allowHighlighting,
                         allowLeadingWildcardSearches));
     }
