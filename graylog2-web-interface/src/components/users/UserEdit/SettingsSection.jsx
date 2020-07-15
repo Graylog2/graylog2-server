@@ -23,16 +23,17 @@ const SettingsSection = ({
   onSubmit,
 }: Props) => (
   <SectionComponent title="Settings">
-    <Formik onSubmit={(data) => onSubmit({ timezone: data.timezone, session_timeout_ms: data.timeout })}
-            initialValues={{ timezone, timeout: sessionTimeoutMs }}>
+    <Formik onSubmit={onSubmit}
+            initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs }}>
       {({ isSubmitting, isValid }) => (
         <Form className="form form-horizontal">
 
-          <Field name="timeout">
+          <Field name="session_timeout_ms">
             {({ field: { name, value, onChange } }) => (
               <TimeoutInput value={value}
                             labelSize={3}
                             controlSize={9}
+                            name={name}
                             onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
             )}
           </Field>
