@@ -53,6 +53,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
     private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);
+    public static final int NO_LIMIT = -1;
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
@@ -101,7 +102,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
                 searchQuery,
                 DEFAULT_SCROLLTIME,
                 scrollCommand.fields(),
-                scrollCommand.limit().orElse(-1)
+                scrollCommand.limit().orElse(NO_LIMIT)
         );
     }
 
