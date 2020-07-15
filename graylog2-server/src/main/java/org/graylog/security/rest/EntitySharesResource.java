@@ -21,6 +21,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.shares.EntityShareRequest;
@@ -29,8 +31,6 @@ import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.utilities.GRN;
-import org.graylog2.utilities.GRNRegistry;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

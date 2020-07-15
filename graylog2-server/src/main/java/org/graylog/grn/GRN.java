@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.utilities;
+package org.graylog.grn;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Locale;
@@ -50,12 +51,11 @@ public abstract class GRN {
 
     public abstract String entity();
 
-    public abstract String permissionPrefix();
+    public abstract GRNType grnType();
 
     public boolean isPermissionApplicable(String permission) {
         // ENTITY_OWN is applicable to any target
-        // TODO use constant from AdditionalRestPermissions
-        return permission.startsWith("entity:own") || permission.startsWith(permissionPrefix());
+        return permission.startsWith(RestPermissions.ENTITY_OWN) || permission.startsWith(grnType().permissionPrefix());
     }
 
     static GRN parse(String grn, GRNRegistry grnRegistry) {
@@ -72,7 +72,6 @@ public abstract class GRN {
                 .cluster(tokens.get(1))
                 .tenant(tokens.get(2))
                 .scope(tokens.get(3))
-                .type(type)
                 .entity(tokens.get(5));
 
         return builder.build();
@@ -128,7 +127,7 @@ public abstract class GRN {
 
         public abstract Builder entity(String entity);
 
-        public abstract Builder permissionPrefix(String permissionPrefix);
+        public abstract Builder grnType(GRNType grnType);
 
         public abstract GRN build();
     }

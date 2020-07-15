@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.utilities;
+package org.graylog.grn;
 
 import com.google.auto.value.AutoValue;
 
@@ -32,7 +32,7 @@ public abstract class GRNType {
     }
 
     public GRN.Builder newGRNBuilder() {
-        return GRN.builder().type(type()).permissionPrefix(permissionPrefix());
+        return GRN.builder().type(type()).grnType(this);
     }
 
     public static GRNType create(String type, String permissionPrefix) {

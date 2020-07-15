@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.utilities;
+package org.graylog.grn;
 
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class GRNTest {
 
     @Test
     public void builderWithEntitytTest() {
-        final GRN grn = GRN.builder().type("dashboard").entity("54e3deadbeefdeadbeef0000").permissionPrefix("dashboards:").build();
+        final GRN grn = GRNType.create("dashboard", "dashboards:").newGRNBuilder().entity("54e3deadbeefdeadbeef0000").build();
 
         assertEquals(grn.toString(), "grn::::dashboard:54e3deadbeefdeadbeef0000");
     }
@@ -59,7 +59,7 @@ public class GRNTest {
     public void compareGRNs() {
         final String testGRN = "grn::::stream:000000000000000002";
         final GRN grn1 = GRN.parse(testGRN, GRN_REGISTRY);
-        final GRN grn2 = GRN.builder().type("stream").entity("000000000000000002").permissionPrefix("streams:").build();
+        final GRN grn2 = GRNType.create("stream", "streams:").newGRNBuilder().entity("000000000000000002").build();
 
         assertEquals(grn1, grn2);
     }

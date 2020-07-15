@@ -14,22 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security;
-
-import org.apache.shiro.authz.Permission;
-import org.graylog.grn.GRN;
-
-import java.util.Set;
+package org.graylog.grn;
 
 /**
- * Resolves a principal to specific permissions based on grants.
+ * Provides a {@link GRNDescriptor} for the given {@link GRN}.
  */
-public interface GrantPermissionResolver {
+public interface GRNDescriptorProvider {
     /**
-     * Returns resolved permissions for the given principal.
-     *
-     * @param principal the principal
-     * @return the resolved permissions
+     * Returns the {@link GRNDescriptor} for the given {@link GRN}.
+     * @param grn the GRN
+     * @return the descriptor for the GRN
      */
-    Set<Permission> resolvePermissionsForPrincipal(GRN principal);
+    GRNDescriptor get(GRN grn);
 }

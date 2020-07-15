@@ -14,27 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.graylog.grn.providers;
 
-package org.graylog2.utilities;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNDescriptor;
+import org.graylog.grn.GRNDescriptorProvider;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
-
-import java.io.IOException;
-
-// TODO Not sure why this is needed
-public class GRNKeyDeserializer extends KeyDeserializer {
-    private final GRNRegistry grnRegistry;
-
-    public GRNKeyDeserializer(GRNRegistry grnRegistry) {
-        super();
-        this.grnRegistry = grnRegistry;
-    }
-
+/**
+ * Falback provider for GRN types that don't have a custom {@link GRNDescriptorProvider} yet.
+ */
+public class FallbackGRNDescriptorProvider implements GRNDescriptorProvider {
     @Override
-    public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
-        return grnRegistry.parse(key);
+    public GRNDescriptor get(GRN grn) {
+        return GRNDescriptor.empty(grn);
     }
-
 }
-

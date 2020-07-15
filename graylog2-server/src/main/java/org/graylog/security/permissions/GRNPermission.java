@@ -18,7 +18,7 @@ package org.graylog.security.permissions;
 
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.Permission;
-import org.graylog2.utilities.GRN;
+import org.graylog.grn.GRN;
 
 @AutoValue
 public abstract class GRNPermission implements Permission {

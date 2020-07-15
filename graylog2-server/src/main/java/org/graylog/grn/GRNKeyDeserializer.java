@@ -14,22 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security;
 
-import org.apache.shiro.authz.Permission;
-import org.graylog.grn.GRN;
+package org.graylog.grn;
 
-import java.util.Set;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 
-/**
- * Resolves a principal to specific permissions based on grants.
- */
-public interface GrantPermissionResolver {
-    /**
-     * Returns resolved permissions for the given principal.
-     *
-     * @param principal the principal
-     * @return the resolved permissions
-     */
-    Set<Permission> resolvePermissionsForPrincipal(GRN principal);
+import java.io.IOException;
+
+// TODO Not sure why this is needed
+public class GRNKeyDeserializer extends KeyDeserializer {
+    private final GRNRegistry grnRegistry;
+
+    public GRNKeyDeserializer(GRNRegistry grnRegistry) {
+        super();
+        this.grnRegistry = grnRegistry;
+    }
+
+    @Override
+    public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+        return grnRegistry.parse(key);
+    }
+
 }
+

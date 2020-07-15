@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.utilities.GRN;
+import org.graylog.grn.GRN;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
