@@ -20,12 +20,18 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.graylog.grn.GRN;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class UserContext {
     private final UserService userService;
@@ -105,20 +111,31 @@ public class UserContext {
         this.userService = userService;
     }
 
-    public boolean isPermitted(String permission, String id) {
-        return subject.isPermitted(permission + ":" + id);
-    }
-
-    public boolean isPermitted(String permission) {
-        return subject.isPermitted(permission);
-    }
-
     public String getUsername() {
         return username;
     }
 
     public User getUser() {
         return Optional.ofNullable(userService.load(username)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + username + "> from db"));
+    }
+
+    protected boolean isOwner(GRN entity) {
+        return subject.isPermitted(GRNPermission.create(RestPermissions.ENTITY_OWN, entity));
+    }
+
+    public boolean isPermitted(String permission, GRN target) {
+        return isPermitted(permission, target.entity());
+    }
+
+    public boolean isPermitted(String permission, String id) {
+        checkArgument(isNotBlank(permission), "permission cannot be null or empty");
+        checkArgument(isNotBlank(id), "id cannot be null or empty");
+        return subject.isPermitted(permission + ":" + id);
+    }
+
+    public boolean isPermitted(String permission) {
+        checkArgument(isNotBlank(permission), "permission cannot be null or empty");
+        return subject.isPermitted(permission);
     }
 }
 

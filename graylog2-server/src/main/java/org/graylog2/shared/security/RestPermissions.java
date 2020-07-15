@@ -279,8 +279,6 @@ public class RestPermissions implements PluginPermissions {
             DECORATORS_READ,
             FIELDNAMES_READ,
             INDEXERCLUSTER_READ,
-            DASHBOARDS_CREATE, // TODO remove
-            EVENT_DEFINITIONS_CREATE,
             INPUTS_READ,
             JOURNAL_READ,
             JVMSTATS_READ,

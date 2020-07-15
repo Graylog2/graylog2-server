@@ -16,7 +16,6 @@
  */
 package org.graylog.grn;
 import org.graylog.events.processor.EventDefinition;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Singleton;
@@ -115,7 +114,7 @@ public class GRNRegistry {
     }
 
     public GRN ofEventDefinition(EventDefinition eventDefinition) {
-        return newGRN(ModelTypes.EVENT_DEFINITION_V1.name(), eventDefinition.id());
+        return newGRN(GRNTypes.EVENT_DEFINITION, eventDefinition.id());
     }
 
     public GRN ofUser(User user) {
@@ -123,7 +122,7 @@ public class GRNRegistry {
     }
 
     public boolean isUser(GRN grn) {
-        return grn.type().equals("user");
+        return grn.type().equals(GRNTypes.USER.type());
     }
 
     /**
