@@ -6,8 +6,9 @@ import { Button, Col, Row } from 'components/graylog';
 import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
-import FormField from '../form/FormField';
 import ReadOnlyFormField from '../form/ReadOnlyFormField';
+import FormikFullName from '../UserCreate/FormikFullName';
+import FormikEmail from '../UserCreate/FormikEmail';
 
 type Props = {
   user: User,
@@ -34,15 +35,8 @@ const ProfileSection = ({
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <ReadOnlyFormField label="Username" value={username} />
-            <FormField label="Full Name"
-                       name="full_name"
-                       required
-                       help="Give a descriptive name for this account, e.g. the full name." />
-            <FormField label="E-Mail Address"
-                       name="email"
-                       type="email"
-                       required
-                       help="Give the contact email address." />
+            <FormikFullName />
+            <FormikEmail />
             <Row>
               <Col xs={12}>
                 <div className="pull-right">

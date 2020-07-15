@@ -73,6 +73,7 @@ const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const ThreadDumpPage = loadAsync(() => import('./ThreadDumpPage'));
 const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'));
+const UserCreatePage = loadAsync(() => import('./UserCreatePage'));
 const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
 const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
@@ -153,6 +154,7 @@ export {
   SystemOverviewPage,
   ThreadDumpPage,
   UsersOverviewPage,
+  UserCreatePage,
   UserDetailsPage,
   UserEditPage,
   UsersPage,
