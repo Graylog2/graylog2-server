@@ -25,14 +25,23 @@ type ContainerProps = {
 const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   display: none;
   position: absolute;
-  padding: 5px 10px;
+  padding: 0 10px;
   left: 100%;
-  top: 5px;
-  height: 30px;
-  font-size: ${theme.fonts.size.body};
-  color: white;
-  background-color: ${theme.utils.contrastingColor(theme.colors.gray[10], 'AA')};
+  top: calc(50% - 10px);
+  height: 21px;
+  background-color: ${theme.colors.variant.lighter.info};
+  box-shadow: 3px 3px 3px ${theme.colors.global.navigationBoxShadow};
   z-index: 4;
+  border-radius: 0 3px 3px 0;
+
+  span {
+    color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.info, 'AA')};
+    font-size: ${theme.fonts.size.body};
+    font-weight: bold;
+    background-clip: text;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+  }
 `);
 
 const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span`
@@ -62,14 +71,14 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
   text-align: center;
   cursor: pointer;
   font-size: ${theme.fonts.size.h3};
-  color: ${isSelected ? theme.colors.variant.dark.primary : theme.colors.variant.darker.info};
-  background: ${isSelected ? theme.colors.variant.lighter.info : 'transparent'};
+  color: ${isSelected ? theme.colors.variant.dark.default : theme.colors.variant.darker.default};
+  background: ${isSelected ? theme.colors.variant.lighter.default : 'transparent'};
 
   :hover {
-    background: ${isSelected ? theme.colors.variant.lighter.info : theme.colors.variant.lightest.info};
+    background: ${isSelected ? theme.colors.variant.lighter.default : theme.colors.variant.lightest.default};
 
     ${Title} {
-      display: ${(showTitleOnHover && !isSelected) ? 'block' : 'none'};
+      display: ${(showTitleOnHover && !isSelected) ? 'flex' : 'none'};
     }
 
     ${IconWrap}::after {
@@ -78,7 +87,7 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
   }
 
   :active {
-    background: ${theme.colors.variant.lighter.info};
+    background: ${theme.colors.variant.lighter.default};
   }
 
   ${IconWrap} {
@@ -86,8 +95,8 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
 
     ::after {
       display: ${isSelected ? 'block' : 'none'};
-      box-shadow: ${(isSelected && !sidebarIsPinned) ? '3px -3px 2px 0px rgba(0, 0, 0, 0.25)' : 'none'};
-      background-color: ${theme.colors.variant.lighter.info};
+      box-shadow: ${(isSelected && !sidebarIsPinned) ? `3px -3px 2px 0 ${theme.colors.global.navigationBoxShadow}` : 'none'};
+      background-color: ${isSelected ? theme.colors.variant.lighter.default : theme.colors.variant.lighter.info};
     }
   }
 `);
@@ -101,7 +110,7 @@ const NavItem = ({ isSelected, title, icon, onClick, showTitleOnHover, sidebarIs
                title={showTitleOnHover ? '' : title}
                sidebarIsPinned={sidebarIsPinned}>
       <IconWrap><Icon name={icon} /></IconWrap>
-      {(showTitleOnHover && !isSelected) && <Title>{title}</Title>}
+      {(showTitleOnHover && !isSelected) && <Title><span>{title}</span></Title>}
     </Container>
   );
 };

@@ -17,9 +17,9 @@ type Props = {
 };
 
 const Container: StyledComponent<{isOpen: boolean, sidebarIsPinned: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ isOpen, sidebarIsPinned, theme }) => css`
-  background: ${theme.colors.global.contentBackground};
-  color: ${theme.colors.gray[20]};
-  box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : '3px 3px 3px rgba(0, 0, 0, 0.25)'};
+  background: ${theme.colors.global.navigationBackground};
+  color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, 'AA')};
+  box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
   width: 50px;
   height: 100%;
   position:relative;
@@ -34,7 +34,7 @@ const Container: StyledComponent<{isOpen: boolean, sidebarIsPinned: boolean}, Th
     width: 6px;
     border-top-left-radius: 50%;
     background: transparent;
-    box-shadow: -6px -6px 0px 3px ${theme.colors.global.contentBackground};
+    box-shadow: -6px -6px 0px 3px ${theme.colors.global.navigationBackground};
     z-index: 4; /* to render over Sidebar ContentColumn */
   }
 `);
