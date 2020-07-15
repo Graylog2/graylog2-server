@@ -1,8 +1,9 @@
 package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.mapping.FieldMappingApi;
-import org.graylog.storage.elasticsearch7.state.StateApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
@@ -20,10 +21,12 @@ public class IndexFieldTypePollerES7IT extends IndexFieldTypePollerIT {
 
     @Override
     protected IndicesAdapter createIndicesAdapter() {
+        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
         return new IndicesAdapterES7(
-                elasticsearch.elasticsearchClient(),
-                new StateApi(objectMapper),
-                new StatsApi(objectMapper)
+                client,
+                new StatsApi(objectMapper, client),
+                new CatApi(objectMapper, client),
+                new ClusterStateApi(objectMapper, client)
         );
     }
 
