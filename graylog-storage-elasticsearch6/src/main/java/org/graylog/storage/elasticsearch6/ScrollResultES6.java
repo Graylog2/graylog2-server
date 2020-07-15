@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static org.graylog2.indexer.searches.ScrollCommand.NO_LIMIT;
+
 public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final String DEFAULT_SCROLL = "1m";
@@ -97,7 +99,7 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
 
     @Override
     public ScrollChunk nextChunk() throws IOException {
-        if (limit != -1 && resultCount >= limit) {
+        if (limit != NO_LIMIT && resultCount >= limit) {
             LOG.debug("[{}] Reached limit for query {}", queryHash, getOriginalQuery());
             return null;
         }
@@ -128,7 +130,7 @@ public class ScrollResultES6 extends IndexQueryResult implements ScrollResult {
 
         final int remainingResultsForLimit = limit - resultCount;
 
-        final List<ResultMessage> resultMessagesSlice = (limit != -1 && remainingResultsForLimit < resultMessages.size())
+        final List<ResultMessage> resultMessagesSlice = (limit != NO_LIMIT && remainingResultsForLimit < resultMessages.size())
                 ? resultMessages.subList(0, remainingResultsForLimit)
                 : resultMessages;
 

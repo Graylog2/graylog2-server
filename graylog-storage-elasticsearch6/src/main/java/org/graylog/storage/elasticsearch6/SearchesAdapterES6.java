@@ -44,6 +44,8 @@ import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.Qu
 import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.shaded.elasticsearch5.org.elasticsearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog2.indexer.searches.ScrollCommand.NO_BATCHSIZE;
+import static org.graylog2.indexer.searches.ScrollCommand.NO_LIMIT;
 
 public class SearchesAdapterES6 implements SearchesAdapter {
     private static final String DEFAULT_SCROLLTIME = "1m";
@@ -53,7 +55,6 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
     private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);
-    public static final int NO_LIMIT = -1;
     private final Configuration configuration;
     private final MultiSearch multiSearch;
     private final Scroll scroll;
@@ -94,7 +95,7 @@ public class SearchesAdapterES6 implements SearchesAdapter {
     @Override
     public ScrollResult scroll(ScrollCommand scrollCommand) {
         final String searchQuery = buildSearchRequest(scrollCommand).toString();
-        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices(), scrollCommand.batchSize().orElse(-1L));
+        final Search.Builder initialSearchBuilder = scrollBuilder(searchQuery, scrollCommand.indices(), scrollCommand.batchSize().orElse(NO_BATCHSIZE));
         scrollCommand.fields().forEach(initialSearchBuilder::addSourceIncludePattern);
         return scroll.scroll(
                 initialSearchBuilder.build(),
