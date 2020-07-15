@@ -34,8 +34,15 @@ const ProfileSection = ({
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <ReadOnlyFormField label="Username" value={username} />
-            <FormField label="Full Name" name="full_name" required />
-            <FormField label="E-Mail Address" name="email" type="email" required />
+            <FormField label="Full Name"
+                       name="full_name"
+                       required
+                       help="Give a descriptive name for this account, e.g. the full name." />
+            <FormField label="E-Mail Address"
+                       name="email"
+                       type="email"
+                       required
+                       help="Give the contact email address." />
             <Row>
               <Col xs={12}>
                 <div className="pull-right">
