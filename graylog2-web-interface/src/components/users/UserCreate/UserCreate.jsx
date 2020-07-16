@@ -20,7 +20,7 @@ import UsernameFormGroup from './UsernameFormGroup';
 import { Headline } from '../SectionComponent';
 
 const _onSubmit = (formData, setSubmitError) => {
-  const data = { ...formData };
+  const data = { ...formData, permissions: [] };
   delete data.password_repeat;
 
   setSubmitError(null);
