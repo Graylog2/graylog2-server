@@ -115,12 +115,6 @@ public class Indices {
         return indicesAdapter.getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    /**
-     * Check if a given name is an existing index.
-     *
-     * @param indexName Name of the index to check presence for.
-     * @return {@code true} if indexName is an existing index, {@code false} if it is non-existing or an alias.
-     */
     public boolean exists(String indexName) {
         try {
             return indicesAdapter.exists(indexName);
@@ -129,12 +123,6 @@ public class Indices {
         }
     }
 
-    /**
-     * Check if a given name is an existing alias.
-     *
-     * @param alias Name of the alias to check presence for.
-     * @return {@code true} if alias is an existing alias, {@code false} if it is non-existing or an index.
-     */
     public boolean aliasExists(String alias) {
         try {
             return indicesAdapter.aliasExists(alias);
@@ -281,15 +269,6 @@ public class Indices {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    /**
-     * Retrieves all indices in the given {@link IndexSet}.
-     * <p>
-     * If any status filter parameter are present, only indices with the given status are returned.
-     *
-     * @param indexSet the index set
-     * @param statusFilter only indices with the given status are returned. (available: "open", "close")
-     * @return the set of indices in the given index set
-     */
     public Set<String> getIndices(final IndexSet indexSet, final String... statusFilter) {
         final String indexWildcard = indexSet.getIndexWildcard();
         final List<String> status = Arrays.asList(statusFilter);
@@ -359,13 +338,6 @@ public class Indices {
         return indicesAdapter.indexCreationDate(index);
     }
 
-    /**
-     * Calculate min and max message timestamps in the given index.
-     *
-     * @param index Name of the index to query.
-     * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
-     * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
-     */
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
         return indicesAdapter.indexRangeStatsOfIndex(index);
     }
