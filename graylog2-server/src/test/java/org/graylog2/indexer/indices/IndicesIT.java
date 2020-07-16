@@ -397,4 +397,20 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
 
         assertThat(indicesStats).isNotEmpty();
     }
+
+    @Test
+    public void cyclingDeflectorMovesAliasFromOldToNewTarget() {
+        final String deflector = "indices_it_deflector";
+
+        final String index1 = client().createRandomIndex("indices_it_");
+        final String index2 = client().createRandomIndex("indices_it_");
+
+        client().addAliasMapping(index1, deflector);
+
+        assertThat(indices.aliasTarget(deflector)).hasValue(index1);
+
+        indices.cycleAlias(deflector, index2, index1);
+
+        assertThat(indices.aliasTarget(deflector)).hasValue(index2);
+    }
 }
