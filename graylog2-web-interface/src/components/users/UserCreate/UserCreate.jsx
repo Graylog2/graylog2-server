@@ -10,7 +10,7 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
-import TimeZoneSelectFormGroup from './TimeZoneFormGroup';
+import TimezoneFormGroup from './TimeZoneFormGroup';
 import TimoutInputFormGroup from './TimoutInputFormGroup';
 import FullNameFormGroup from './FullNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
@@ -64,7 +64,7 @@ const UserCreate = () => {
               <div>
                 <Headline>Settings</Headline>
                 <TimoutInputFormGroup />
-                <TimeZoneSelectFormGroup />
+                <TimezoneFormGroup />
               </div>
               <div>
                 <Headline>Password</Headline>
