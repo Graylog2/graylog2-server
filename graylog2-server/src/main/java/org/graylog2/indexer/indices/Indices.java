@@ -63,6 +63,7 @@ public class Indices {
     private final IndexMappingFactory indexMappingFactory;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
+    @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus;
     private final IndicesAdapter indicesAdapter;
 
@@ -70,7 +71,7 @@ public class Indices {
     public Indices(IndexMappingFactory indexMappingFactory,
                    NodeId nodeId,
                    AuditEventSender auditEventSender,
-                   EventBus eventBus,
+                   @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
                    IndicesAdapter indicesAdapter) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
@@ -96,6 +97,7 @@ public class Indices {
 
     public void delete(String indexName) {
         indicesAdapter.delete(indexName);
+        //noinspection UnstableApiUsage
         eventBus.post(IndicesDeletedEvent.create(indexName));
     }
 
@@ -104,6 +106,7 @@ public class Indices {
             indicesAdapter.removeAlias(indexName, indexName + REOPENED_ALIAS_SUFFIX);
         }
         indicesAdapter.close(indexName);
+        //noinspection UnstableApiUsage
         eventBus.post(IndicesClosedEvent.create(indexName));
     }
 
@@ -248,6 +251,7 @@ public class Indices {
 
     private void openIndex(String index) {
         indicesAdapter.openIndex(index);
+        //noinspection UnstableApiUsage
         eventBus.post(IndicesReopenedEvent.create(index));
     }
 
