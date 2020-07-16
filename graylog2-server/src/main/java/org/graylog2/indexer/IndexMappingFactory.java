@@ -36,7 +36,7 @@ public class IndexMappingFactory {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 
         if (IndexSetConfig.TemplateType.EVENTS.equals(templateType)) {
-            return new EventsIndexMapping(elasticsearchVersion);
+            return eventsIndexMappingFor(elasticsearchVersion);
         }
 
         return indexMappingFor(elasticsearchVersion);
@@ -49,6 +49,18 @@ public class IndexMappingFactory {
             return new IndexMapping6();
         } else if (elasticsearchVersion.satisfies("^7.0.0")) {
             return new IndexMapping7();
+        } else {
+            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
+        }
+    }
+
+    public static IndexMappingTemplate eventsIndexMappingFor(Version elasticsearchVersion) {
+        if (elasticsearchVersion.satisfies("^5.0.0")) {
+            return new EventsIndexMapping6();
+        } else if (elasticsearchVersion.satisfies("^6.0.0")) {
+            return new EventsIndexMapping6();
+        } else if (elasticsearchVersion.satisfies("^7.0.0")) {
+            return new EventsIndexMapping7();
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }

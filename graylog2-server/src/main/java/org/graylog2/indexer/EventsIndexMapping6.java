@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer;
 
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -25,28 +24,11 @@ import org.graylog2.plugin.Tools;
 
 import java.util.Map;
 
-public class EventsIndexMapping implements IndexMappingTemplate {
-    private final Version elasticsearchVersion;
-
-    EventsIndexMapping(Version elasticsearchVersion) {
-        this.elasticsearchVersion = elasticsearchVersion;
-    }
-
+public class EventsIndexMapping6 extends EventsIndexMappingBase implements IndexMappingTemplate {
     @Override
     public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
-        final String indexPatternsField;
-        final Object indexPatternsValue;
-
-        if (elasticsearchVersion.satisfies("^5.0.0")) {
-            indexPatternsField = "template";
-            indexPatternsValue = indexPattern;
-        } else if (elasticsearchVersion.satisfies("^6.0.0")) {
-            indexPatternsField = "index_patterns";
-            indexPatternsValue = ImmutableSet.of(indexPattern);
-        } else {
-            throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
-        }
-
+        final String indexPatternsField = "index_patterns";
+        final Object indexPatternsValue = indexPattern;
         final String indexRefreshInterval = "1s"; // TODO: Index refresh interval must be configurable
 
         return map()
@@ -217,17 +199,5 @@ public class EventsIndexMapping implements IndexMappingTemplate {
                                 .build())
                         .build())
                 .build();
-    }
-
-    private ImmutableMap.Builder<String, Object> map() {
-        return ImmutableMap.builder();
-    }
-
-    private ImmutableList.Builder<Object> list() {
-        return ImmutableList.builder();
-    }
-
-    private ImmutableSet.Builder<Object> set() {
-        return ImmutableSet.builder();
     }
 }

@@ -88,7 +88,7 @@ public class EventsIndexMappingTest {
 
     @Test
     public void templateWithES5() throws Exception {
-        final EventsIndexMapping mapping = new EventsIndexMapping(Version.valueOf("5.0.0"));
+        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("5.0.0"));
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
             at.jsonPathAsString("$.template").isEqualTo("test_*");
@@ -105,7 +105,7 @@ public class EventsIndexMappingTest {
 
     @Test
     public void templateWithES6() throws Exception {
-        final EventsIndexMapping mapping = new EventsIndexMapping(Version.valueOf("6.0.0"));
+        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("6.0.0"));
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
             at.jsonPathAsListOf("$.index_patterns", String.class).isEqualTo(Collections.singletonList("test_*"));
@@ -124,15 +124,15 @@ public class EventsIndexMappingTest {
     public void templateWithUnsupportedESVersions() {
         final String indexPattern = "test_*";
 
-        assertThatThrownBy(() -> new EventsIndexMapping(Version.valueOf("8.0.0")).toTemplate(indexSetConfig, indexPattern))
+        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("8.0.0")).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 8.0.0");
 
-        assertThatThrownBy(() -> new EventsIndexMapping(Version.valueOf("7.0.0")).toTemplate(indexSetConfig, indexPattern))
+        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("7.0.0")).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 7.0.0");
 
-        assertThatThrownBy(() -> new EventsIndexMapping(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
+        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 2.4.0");
     }
