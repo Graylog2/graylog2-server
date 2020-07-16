@@ -258,13 +258,13 @@ Object {
                 class="modal-footer"
               >
                 <button
-                  class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                   type="submit"
                 >
                   Save
@@ -595,13 +595,13 @@ Object {
                 class="modal-footer"
               >
                 <button
-                  class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
                   type="submit"
                 >
                   Save
