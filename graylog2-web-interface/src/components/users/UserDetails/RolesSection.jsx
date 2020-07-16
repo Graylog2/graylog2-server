@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
+import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
@@ -18,9 +19,18 @@ const RolesSection = ({ user: { username } }: Props) => {
   const _onLoad = ({ page, perPage, query }: PaginationInfo): Promise<PaginatedListType> => {
     setLoading(true);
 
-    // $FlowFixMe Role implements Descriptive Item!!!
+    // $FlowFixMe Role has DescriptiveItem implemented!!!
     return AuthzRolesActions.loadForUser(username, page, perPage, query)
-      .then(setLoading(false));
+      .then((response) => {
+        setLoading(false);
+
+        return response;
+      }).catch((error) => {
+        if (error.additional.status === 404) {
+          UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
+            'Could not load roles for user');
+        }
+      });
   };
 
   return (

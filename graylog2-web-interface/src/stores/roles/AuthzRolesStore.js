@@ -6,7 +6,6 @@ import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
@@ -51,13 +50,7 @@ const AuthzRolesStore: AuthzRolesStoreType = singletonStore(
       const url = PaginationURL(ApiRoutes.AuthzRolesController.loadForUser(username).url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedList,
-          (error) => {
-            if (error.additional.status !== 404) {
-              UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
-                'Could not load roles for user');
-            }
-          });
+        .then(_responseToPaginatedList);
 
       AuthzRolesActions.loadForUser.promise(promise);
 

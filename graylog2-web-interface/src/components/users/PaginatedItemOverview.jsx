@@ -1,16 +1,24 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 import * as Immutable from 'immutable';
 
-import { PaginatedList, SearchForm } from 'components/common';
+import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
+import { type ThemeInterface } from 'theme';
+import { SearchForm } from 'components/common';
+
 
 import PaginatedItem from './PaginatedItem';
 
 const Container = styled.div`
   margin-top: 10px;
 `;
+
+const NotFound: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  margin-left: 5px;
+  color: ${theme.colors.gray[50]};
+`);
 
 export type PaginationInfo = {
   total: number,
@@ -42,12 +50,17 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
   const [paginationInfo, setPaginationInfo] = useState({
     count: 0,
     total: 0,
-    page: 1,
+    page: INITIAL_PAGE,
     perPage: 5,
     query: '',
   });
 
-  const _setResponse = ({ list, pagination }: PaginatedListType) => {
+  const _setResponse = (response: PaginatedListType) => {
+    if (!response) {
+      return;
+    }
+
+    const { list, pagination } = response;
     setPaginationInfo(pagination);
     setItems(list);
   };
@@ -69,11 +82,15 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
   const _onSearch = (query) => {
     const pageInfo = {
       ...paginationInfo,
-      page: 1,
+      page: INITIAL_PAGE,
       query,
     };
     onLoad(pageInfo).then(_setResponse);
   };
+
+  const result = items && items.size > 0
+    ? items.toArray().map((item) => <PaginatedItem key={item.id} item={item} />)
+    : <NotFound>No items found to display</NotFound>;
 
   return (
     <PaginatedList onChange={_onPageChange(paginationInfo.query)}
@@ -83,7 +100,7 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
                    activePage={paginationInfo.page}>
       <SearchForm onSearch={_onSearch} />
       <Container>
-        {items && items.toArray().map((item) => <PaginatedItem key={item.id} item={item} />) }
+        {result}
       </Container>
     </PaginatedList>
   );

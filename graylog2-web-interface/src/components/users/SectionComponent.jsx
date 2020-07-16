@@ -16,10 +16,15 @@ export const Headline: StyledComponent<{}, ThemeInterface, HTMLHeadingElement> =
   margin-bottom: 15px;
 `;
 
+const LoadingSpinner = styled(Spinner)(({ theme }) => `
+  margin-left: 10px;
+  font-size: ${theme.fonts.size.h3};
+`);
+
 const SectionComponent = ({ children, title, showLoading = false }: Props) => (
   <Row className="content">
     <Col xs={12}>
-      <Headline>{title}</Headline>{showLoading && <Spinner />}
+      <Headline>{title}{showLoading && <LoadingSpinner text="" delay={0} />}</Headline>
       {children}
     </Col>
   </Row>

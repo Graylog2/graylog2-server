@@ -8,8 +8,8 @@ import type { DescriptiveItem } from './PaginatedItemOverview';
 
 type Props = { item: DescriptiveItem };
 
-const Container: StyledComponent<{ isAdmin: boolean }, ThemeInterface, HTMLSpanElement> = styled.span(({ isAdmin, theme }) => css`
-  display:block;
+const Container: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  display: block;
   padding: 10px;
   background-color: ${theme.colors.table.background};
 
@@ -26,7 +26,6 @@ const PaginatedItem = ({ item: { name, description } }: Props) => (
   <Container>
     <Header>{name}</Header>
     <span>{description}</span>
-    <hl />
   </Container>
 );
 
