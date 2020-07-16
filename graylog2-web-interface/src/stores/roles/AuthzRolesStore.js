@@ -56,6 +56,17 @@ const AuthzRolesStore: AuthzRolesStoreType = singletonStore(
 
       return promise;
     },
+
+    loadPaginated(page: number, perPage: number, query: string): Promise<PaginatedListType> {
+      const url = PaginationURL(ApiRoutes.AuthzRolesController.load().url, page, perPage, query);
+
+      const promise = fetch('GET', qualifyUrl(url))
+        .then(_responseToPaginatedList);
+
+      AuthzRolesActions.loadPaginated.promise(promise);
+
+      return promise;
+    },
   }),
 );
 

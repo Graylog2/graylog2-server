@@ -10,12 +10,16 @@ type AuthzRolesActionsType = RefluxActions<{
                 page: number,
                 perPage: number,
                 query: string) => Promise<PaginatedListType>,
+  loadPaginated: (page: number,
+                  perPage: number,
+                  query: string) => Promise<PaginatedListType>,
 }>;
 
 const AuthzRolesActions: AuthzRolesActionsType = singletonActions(
   'AuthzRoles',
   () => Reflux.createActions({
     loadForUser: { asyncResult: true },
+    loadPaginated: { asyncResult: true },
   }),
 );
 
