@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import UserCreate from 'components/users/UserCreate';
 
+import UserCreate from 'components/users/UserCreate';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { ButtonToolbar, Button } from 'components/graylog';

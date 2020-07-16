@@ -6,6 +6,7 @@ import FormField from '../form/FormField';
 const FormikEmail = () => (
   <FormField label="E-Mail Address"
              name="email"
+             maxLength={254}
              type="email"
              required
              help="Give the contact email address." />

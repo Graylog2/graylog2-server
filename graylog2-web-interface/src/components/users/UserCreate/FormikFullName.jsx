@@ -6,6 +6,7 @@ import FormField from '../form/FormField';
 const FormikFullName = () => (
   <FormField label="Full Name"
              name="full_name"
+             maxLength={200}
              required
              help="Give a descriptive name for this account, e.g. the full name." />
 );

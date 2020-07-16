@@ -84,6 +84,7 @@ type UsersStoreState = {
     list: ?Immutable.List<UserOverview>,
     pagination: PaginationType,
   },
+  list: ?Immutable.List<UserOverview>,
   loadedUser: ?User,
 };
 
@@ -98,6 +99,7 @@ const UsersStore: UsersStoreType = singletonStore(
       list: undefined,
       pagination: DEFAULT_PAGINATION,
     },
+    list: undefined,
     loadedUser: undefined,
 
     getInitialState(): UsersStoreState {
@@ -118,6 +120,8 @@ const UsersStore: UsersStoreType = singletonStore(
       const promise = fetch('GET', url).then(
         (response) => {
           const { users } = response;
+          this.list = Immutable.List(response.users.map((user) => UserOverview.fromJSON(user)));
+          this._trigger();
 
           return users;
         },
