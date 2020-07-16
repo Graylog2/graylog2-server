@@ -13,7 +13,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
@@ -21,7 +20,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -139,26 +137,6 @@ public class SearchRequestFactory {
             return "*";
         }
         return query.trim();
-    }
-
-    @Nullable
-    private QueryBuilder standardFilters(TimeRange range, String filter) {
-        BoolQueryBuilder bfb = null;
-
-        if (range != null) {
-            bfb = QueryBuilders.boolQuery()
-                    .must(TimeRangeQueryFactory.create(range));
-        }
-
-        // Not creating a filter for a "*" value because an empty filter used to be submitted that way.
-        if (!isNullOrEmpty(filter) && !"*".equals(filter)) {
-            if (bfb == null) {
-                bfb = QueryBuilders.boolQuery();
-            }
-            bfb.must(queryStringQuery(filter));
-        }
-
-        return bfb;
     }
 
     @AutoValue
