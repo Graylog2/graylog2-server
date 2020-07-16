@@ -41,20 +41,21 @@ export type PaginatedListType = {
 };
 
 type Props = {
-  onLoad: (PaginationInfo) => Promise<PaginatedListType>,
+  onLoad: (PaginationInfo) => Promise<?PaginatedListType>,
 };
 
 const PaginatedItemOverview = ({ onLoad }: Props) => {
+  const pageSizes = [5, 10, 30];
   const [items, setItems] = useState();
   const [paginationInfo, setPaginationInfo] = useState({
     count: 0,
     total: 0,
     page: INITIAL_PAGE,
-    perPage: 5,
+    perPage: pageSizes[0],
     query: '',
   });
 
-  const _setResponse = (response: PaginatedListType) => {
+  const _setResponse = (response: ?PaginatedListType) => {
     if (!response) {
       return;
     }
@@ -95,7 +96,7 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
     <PaginatedList onChange={_onPageChange(paginationInfo.query)}
                    pageSize={paginationInfo.perPage}
                    totalItems={paginationInfo.total}
-                   pageSizes={[5, 10, 30]}
+                   pageSizes={pageSizes}
                    activePage={paginationInfo.page}>
       <SearchForm onSearch={_onSearch} />
       <Container>
