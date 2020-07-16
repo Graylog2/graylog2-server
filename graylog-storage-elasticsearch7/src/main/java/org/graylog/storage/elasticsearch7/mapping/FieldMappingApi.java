@@ -5,25 +5,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FieldMappingApi {
     private final ObjectMapper objectMapper;
+    private final ElasticsearchClient client;
 
     @Inject
-    public FieldMappingApi(ObjectMapper objectMapper) {
+    public FieldMappingApi(ObjectMapper objectMapper,
+                           ElasticsearchClient client) {
         this.objectMapper = objectMapper;
+        this.client = client;
     }
 
-    public Map<String, String> fieldTypes(RestHighLevelClient client, String index) throws IOException {
-        final Response result = client.getLowLevelClient().performRequest(request(index));
-        final JsonNode response = objectMapper.readTree(result.getEntity().getContent());
-        final JsonNode fields = response.path(index).path("mappings").path("properties");
+    public Map<String, String> fieldTypes(String index) {
+        final JsonNode result = client.execute((c, requestOptions) -> {
+            final Response response = c.getLowLevelClient().performRequest(request(index));
+            return objectMapper.readTree(response.getEntity().getContent());
+        }, "Unable to retrieve field types of index " + index);
+        final JsonNode fields = result.path(index).path("mappings").path("properties");
+        //noinspection UnstableApiUsage
         return Streams.stream(fields.fields())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().path("type").asText()));
     }

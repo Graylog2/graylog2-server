@@ -31,7 +31,7 @@ public class IndexFieldTypePollerAdapterES7 implements IndexFieldTypePollerAdapt
     public Optional<Set<FieldTypeDTO>> pollIndex(String indexName, Timer pollTimer) {
         final Map<String, String> fieldTypes;
         try (final Timer.Context ignored = pollTimer.time()) {
-            fieldTypes = client.execute((c, requestOptions) -> fieldMappingApi.fieldTypes(c, indexName));
+            fieldTypes = fieldMappingApi.fieldTypes(indexName);
         } catch (IndexNotFoundException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("Couldn't get mapping for index <{}>", indexName, e);
