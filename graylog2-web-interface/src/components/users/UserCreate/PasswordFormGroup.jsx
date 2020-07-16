@@ -38,6 +38,7 @@ const PasswordFormGroup = () => {
                          id={name}
                          name={name}
                          onChange={onChange}
+                         maxLength={100}
                          type="password"
                          placeholder="Password"
                          required
@@ -58,6 +59,7 @@ const PasswordFormGroup = () => {
                          id={name}
                          name={name}
                          onChange={onChange}
+                         maxLength={100}
                          type="password"
                          placeholder="Repeat password"
                          required

@@ -11,6 +11,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
+import PasswordSection from './PasswordSection';
 import ProfileSection from './ProfileSection';
 
 import MainDetailsGrid from '../UserDetails/MainDetailsGrid';
@@ -53,6 +54,7 @@ const UserEdit = ({ user }: Props) => {
                           onSubmit={(data) => _updateUser(data, currentUser, user)} />
           <SettingsSection user={user}
                            onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          <PasswordSection user={user} />
         </div>
         <div>
           <SectionComponent title="Teams">Children</SectionComponent>
