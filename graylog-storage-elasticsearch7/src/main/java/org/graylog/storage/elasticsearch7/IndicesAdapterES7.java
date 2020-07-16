@@ -197,7 +197,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     }
 
     @Override
-    public String markIndexReopened(String index) {
+    public void markIndexReopened(String index) {
         final String aliasName = index + Indices.REOPENED_ALIAS_SUFFIX;
         final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest();
         final IndicesAliasesRequest.AliasActions aliasAction = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
@@ -207,8 +207,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
                 "Couldn't create reopened alias for index " + index);
-
-        return aliasName;
     }
 
     @Override

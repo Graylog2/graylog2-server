@@ -242,8 +242,8 @@ public class Indices {
         openIndex(index);
     }
 
-    public String markIndexReopened(String index) {
-        return indicesAdapter.markIndexReopened(index);
+    public void markIndexReopened(String index) {
+        indicesAdapter.markIndexReopened(index);
     }
 
     private void openIndex(String index) {

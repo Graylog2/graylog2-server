@@ -49,7 +49,7 @@ public interface IndicesAdapter {
 
     void flush(String index);
 
-    String markIndexReopened(String index);
+    void markIndexReopened(String index);
 
     void removeAlias(String indexName, String alias);
 
