@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { Map, List } from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
@@ -20,8 +20,6 @@ jest.mock('views/stores/FieldTypesStore', () => ({
 }));
 
 describe('DefaultFieldTypesProvider', () => {
-  afterEach(cleanup);
-
   const renderSUT = () => {
     const consume = jest.fn();
 

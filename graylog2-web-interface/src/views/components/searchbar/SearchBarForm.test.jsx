@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import SearchBarForm from './SearchBarForm';
@@ -32,7 +32,7 @@ describe('SearchBarForm', () => {
 
       await changeInput(fromDate, '2020-01-18 10:04:30.329');
 
-      await wait(() => expect(queryByText('Start date must be before end date')).not.toBeNull());
+      await waitFor(() => expect(queryByText('Start date must be before end date')).not.toBeNull());
     });
   });
 });

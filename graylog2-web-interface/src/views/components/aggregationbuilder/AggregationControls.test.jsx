@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
@@ -22,8 +22,6 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 class DummyVisualizationConfig extends VisualizationConfig {}
 
 describe('AggregationControls', () => {
-  afterEach(cleanup);
-
   // eslint-disable-next-line no-unused-vars, react/prop-types
   const DummyComponent = () => <div data-testid="dummy-component">The spice must flow.</div>;
   const children = <DummyComponent />;

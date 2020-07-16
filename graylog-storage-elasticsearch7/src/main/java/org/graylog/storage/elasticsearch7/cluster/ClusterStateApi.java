@@ -38,8 +38,6 @@ public class ClusterStateApi {
             return objectMapper.readTree(response.getEntity().getContent());
         }, "Unable to retrieve fields from indices: " + String.join(",", indices));
 
-
-
         //noinspection UnstableApiUsage
         return Streams.stream(jsonResponse.path("metadata").path("indices").fields())
                 .flatMap(index -> allFieldsFromIndex(index.getKey(), index.getValue()))
@@ -68,5 +66,4 @@ public class ClusterStateApi {
 
         return new Request("GET", apiEndpoint.toString());
     }
-
 }

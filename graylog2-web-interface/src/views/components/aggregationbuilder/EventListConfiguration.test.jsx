@@ -1,11 +1,9 @@
 import React from 'react';
-import { render, fireEvent, cleanup } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 
 import EventListConfiguration from './EventListConfiguration';
 
 describe('EventListConfiguration', () => {
-  afterEach(cleanup);
-
   it('should render minimal', () => {
     const { container } = render(<EventListConfiguration />);
 

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import type { SearchesConfig } from 'components/search/SearchConfig';
@@ -22,8 +22,6 @@ const searchConfig: SearchesConfig = {
 };
 
 describe('MessageActions', () => {
-  afterEach(cleanup);
-
   const renderActions = (props = {}) => render((
     <MessageActions index="some-index"
                     id="some-id"
