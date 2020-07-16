@@ -1,5 +1,4 @@
 // @flow strict
-
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 

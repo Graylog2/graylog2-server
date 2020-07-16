@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import type { DescriptiveItem } from 'components/users/PaginatedItemOverview';
+
 type InternalState = {
   id: string,
   name: string,
@@ -17,7 +19,7 @@ export type RoleJSON = {
   read_only: boolean,
 };
 
-export default class Role {
+export default class Role implements DescriptiveItem {
   _value: InternalState;
 
   // eslint-disable-next-line no-undef
