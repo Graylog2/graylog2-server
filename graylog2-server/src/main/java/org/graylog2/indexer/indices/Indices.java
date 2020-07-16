@@ -165,12 +165,6 @@ public class Indices {
         }
     }
 
-    /**
-     * Returns the generated Elasticsearch index template for the given index set.
-     *
-     * @param indexSet the index set
-     * @return the generated index template
-     */
     public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
         final String indexWildcard = indexSet.getIndexWildcard();
 
