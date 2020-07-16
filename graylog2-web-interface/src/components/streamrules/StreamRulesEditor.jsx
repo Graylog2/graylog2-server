@@ -46,8 +46,8 @@ class StreamRulesEditor extends React.Component {
     index: '',
   }
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       showStreamRuleForm: false,
