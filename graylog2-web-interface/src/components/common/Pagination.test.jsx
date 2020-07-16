@@ -1,11 +1,9 @@
 import React from 'react';
-import { fireEvent, render, cleanup } from 'wrappedTestingLibrary';
+import { fireEvent, render } from 'wrappedTestingLibrary';
 
 import Pagination from './Pagination';
 
 describe('<Pagination />', () => {
-  afterEach(cleanup);
-
   it('should display Pagination', () => {
     const currentPage = 1;
     const totalPages = 5;
