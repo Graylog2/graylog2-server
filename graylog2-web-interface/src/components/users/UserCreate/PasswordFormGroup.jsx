@@ -21,7 +21,7 @@ export const validatePasswords = (errors: { [name: string]: string }, password: 
   return newErrors;
 };
 
-const FormikPassword = () => {
+const PasswordFormGroup = () => {
   return (
     <Input id="password-field"
            label="Password"
@@ -74,9 +74,9 @@ const FormikPassword = () => {
   );
 };
 
-FormikPassword.defaultProps = {
+PasswordFormGroup.defaultProps = {
   passwordRef: undefined,
   passwordRepeatRef: undefined,
 };
 
-export default FormikPassword;
+export default PasswordFormGroup;

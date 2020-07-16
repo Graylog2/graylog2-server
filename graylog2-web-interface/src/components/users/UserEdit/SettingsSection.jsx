@@ -6,8 +6,8 @@ import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
-import FormikTimeZoneSelect from '../UserCreate/FormikTimeZoneSelect';
-import FormikTimoutInput from '../UserCreate/FormikTimoutInput';
+import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
+import TimoutInputFormGroup from '../UserCreate/TimoutInputFormGroup';
 
 type Props = {
   user: User,
@@ -26,8 +26,8 @@ const SettingsSection = ({
             initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs }}>
       {({ isSubmitting, isValid }) => (
         <Form className="form form-horizontal">
-          <FormikTimoutInput />
-          <FormikTimeZoneSelect />
+          <TimoutInputFormGroup />
+          <TimezoneFormGroup />
           <Row>
             <Col xs={12}>
               <div className="pull-right">

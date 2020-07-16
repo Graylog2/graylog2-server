@@ -4,7 +4,7 @@ import { Field } from 'formik';
 
 import TimeoutInput from 'components/users/TimeoutInput';
 
-const FomikTimeoutInput = () => (
+const TimeoutInputFormGroup = () => (
   <Field name="session_timeout_ms">
     {({ field: { name, value, onChange } }) => (
       <TimeoutInput value={value}
@@ -16,4 +16,4 @@ const FomikTimeoutInput = () => (
   </Field>
 );
 
-export default FomikTimeoutInput;
+export default TimeoutInputFormGroup;

@@ -10,12 +10,12 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
-import FormikTimeZoneSelect from './FormikTimeZoneSelect';
-import FormikTimoutInput from './FormikTimoutInput';
-import FormikFullName from './FormikFullName';
-import FormikEmail from './FormikEmail';
-import FormikPassword, { validatePasswords } from './FormikPassword';
-import FormikUsername from './FormikUsername';
+import TimeZoneSelectFormGroup from './TimeZoneFormGroup';
+import TimoutInputFormGroup from './TimoutInputFormGroup';
+import FullNameFormGroup from './FullNameFormGroup';
+import EmailFormGroup from './EmailFormGroup';
+import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
+import UsernameFormGroup from './UsernameFormGroup';
 
 import { Headline } from '../SectionComponent';
 
@@ -57,18 +57,18 @@ const UserCreate = () => {
             <Form className="form form-horizontal">
               <div>
                 <Headline>Profile</Headline>
-                <FormikUsername users={users} />
-                <FormikFullName />
-                <FormikEmail />
+                <UsernameFormGroup users={users} />
+                <FullNameFormGroup />
+                <EmailFormGroup />
               </div>
               <div>
                 <Headline>Settings</Headline>
-                <FormikTimoutInput />
-                <FormikTimeZoneSelect />
+                <TimoutInputFormGroup />
+                <TimeZoneSelectFormGroup />
               </div>
               <div>
                 <Headline>Password</Headline>
-                <FormikPassword />
+                <PasswordFormGroup />
               </div>
               <Row>
                 <Col xs={9} xsOffset={3}>

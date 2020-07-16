@@ -5,7 +5,7 @@ import { Field } from 'formik';
 import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
 
-const FormikTimezoneSelect = () => (
+const TimezoneFormGroup = () => (
   <Field name="timezone">
     {({ field: { name, value, onChange } }) => (
       <Input id="timezone-select"
@@ -22,4 +22,4 @@ const FormikTimezoneSelect = () => (
   </Field>
 );
 
-export default FormikTimezoneSelect;
+export default TimezoneFormGroup;
