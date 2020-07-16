@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import { Row, Col } from 'components/graylog';
+import { Row, Col, HelpBlock } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
@@ -69,19 +69,24 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   };
 
   return (
-    <span>
-      <Input type="checkbox"
-             id="session-timeout-never"
-             name="session_timeout_never"
-             label="Sessions do not time out"
-             help="When checked sessions never time out due to inactivity."
-             onChange={_onClick}
-             checked={sessionTimeoutNever} />
-
+    <>
       <Input id="timeout-controls"
-             help="Session automatically end after this amount of time, unless they are actively used.">
-        <Row>
-          <Col sm={2}>
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9"
+             label="Sessions Timeout">
+        <Row className="no-bm">
+          <Col xs={12}>
+            <Input type="checkbox"
+                   id="session-timeout-never"
+                   name="session_timeout_never"
+                   label="Sessions do not time out"
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9"
+                   help="When checked sessions never time out due to inactivity."
+                   onChange={_onClick}
+                   checked={sessionTimeoutNever} />
+          </Col>
+          <Col xs={3}>
             <input type="number"
                    id="timeout"
                    className="session-timeout-fields validatable form-control"
@@ -92,15 +97,20 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                    value={value}
                    onChange={_onChangeValue} />
           </Col>
-          <Col sm={3}>
+          <Col xs={4}>
             <TimeoutUnitSelect className="form-control session-timeout-fields"
                                disabled={sessionTimeoutNever}
                                value={unit}
                                onChange={_onChangeUnit} />
           </Col>
+          <Col xs={12}>
+            <HelpBlock>
+              Session automatically end after this amount of time, unless they are actively used.
+            </HelpBlock>
+          </Col>
         </Row>
       </Input>
-    </span>
+    </>
   );
 };
 
