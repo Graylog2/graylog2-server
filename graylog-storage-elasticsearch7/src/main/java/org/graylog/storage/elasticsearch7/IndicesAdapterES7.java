@@ -350,8 +350,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .index(targetIndex)
                 .alias(aliasName);
         final IndicesAliasesRequest.AliasActions removeAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE_INDEX)
-                .index(oldIndex)
-                .alias(aliasName);
+                .index(oldIndex);
         final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest()
                 .addAliasAction(removeAlias)
                 .addAliasAction(addAlias);
