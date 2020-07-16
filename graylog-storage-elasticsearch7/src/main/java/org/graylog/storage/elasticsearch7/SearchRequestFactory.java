@@ -44,11 +44,11 @@ public class SearchRequestFactory {
     }
 
     public SearchSourceBuilder create(SearchesConfig config) {
-        return create(Search.Command.from(config));
+        return create(SearchRequestFactory.Command.from(config));
     }
 
     public SearchSourceBuilder create(ScrollCommand scrollCommand) {
-        return create(Search.Command.from(scrollCommand));
+        return create(SearchRequestFactory.Command.from(scrollCommand));
     }
 
     public SearchSourceBuilder create(Command command) {
@@ -184,7 +184,7 @@ public class SearchRequestFactory {
                 OptionalInt offset,
                 OptionalLong batchSize,
                 boolean highlight) {
-            return new AutoValue_Search_Command(query, streams, sorting, filter, range, limit, offset, batchSize, highlight);
+            return new AutoValue_SearchRequestFactory_Command(query, streams, sorting, filter, range, limit, offset, batchSize, highlight);
         }
 
         static Command from(SearchesConfig searchesConfig) {

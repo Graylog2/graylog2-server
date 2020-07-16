@@ -13,19 +13,19 @@ public class Scroll {
     private static final String DEFAULT_SCROLLTIME = "1m";
     private final ElasticsearchClient client;
     private final ScrollResultES7.Factory scrollResultFactory;
-    private final Search search;
+    private final SearchRequestFactory searchRequestFactory;
 
     @Inject
     public Scroll(ElasticsearchClient client,
                   ScrollResultES7.Factory scrollResultFactory,
-                  Search search) {
+                  SearchRequestFactory searchRequestFactory) {
         this.client = client;
         this.scrollResultFactory = scrollResultFactory;
-        this.search = search;
+        this.searchRequestFactory = searchRequestFactory;
     }
 
     public ScrollResult scroll(ScrollCommand scrollCommand) {
-        final SearchSourceBuilder searchQuery = search.create(scrollCommand);
+        final SearchSourceBuilder searchQuery = searchRequestFactory.create(scrollCommand);
 
         searchQuery.fetchSource(scrollCommand.fields().toArray(new String[0]), new String[0]);
         scrollCommand.batchSize()
