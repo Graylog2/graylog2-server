@@ -237,7 +237,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .orElse(affectedIndices);
 
                     Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
-                    return new SearchRequest(searchTypeQueries.get(searchTypeId).toString())
+                    return new SearchRequest()
+                            .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
                             .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
                 })
