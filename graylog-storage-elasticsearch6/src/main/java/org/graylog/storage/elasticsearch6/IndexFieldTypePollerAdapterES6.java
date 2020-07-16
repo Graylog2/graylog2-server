@@ -52,7 +52,7 @@ public class IndexFieldTypePollerAdapterES6 implements IndexFieldTypePollerAdapt
         final JsonNode properties = result.getJsonObject()
                 .path(indexName)
                 .path("mappings")
-                .path(IndexMapping.TYPE_MESSAGE) // TODO: Hardcoded index type name
+                .path(IndexMapping.TYPE_MESSAGE)
                 .path("properties");
 
         if (properties.isMissingNode()) {
