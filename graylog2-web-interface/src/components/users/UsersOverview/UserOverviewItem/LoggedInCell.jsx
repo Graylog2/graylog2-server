@@ -22,19 +22,17 @@ const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
 
 const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => (
   <Td>
-
     <OverlayTrigger trigger={['hover', 'focus']}
                     placement="right"
                     overlay={(
-                      <Popover id="session-badge-details" title="Logged in">
+                      <Popover id="session-badge-details" title={sessionActive ? 'Logged in' : 'Logged out'}>
                         <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
                         <div>Client address: {clientAddress ?? '-'}</div>
                       </Popover>
-                      )}
+                    )}
                     rootClose>
       <LoggedInIcon active={sessionActive} />
     </OverlayTrigger>
-
   </Td>
 );
 
