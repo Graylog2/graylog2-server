@@ -4,12 +4,12 @@ import { useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter } from 'react-router';
 
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import { useStore } from 'stores/connect';
+import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import { ButtonToolbar, Button } from 'components/graylog';
-import { PageHeader } from 'components/common';
+import { PageHeader, DocumentTitle } from 'components/common';
 import UserDetails from 'components/users/UserDetails';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -37,7 +37,7 @@ const UserDetailsPage = ({ params }: Props) => {
   });
 
   return (
-    <div>
+    <DocumentTitle title={`User Detials ${loadedUser?.username ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
         <span />
 
@@ -54,13 +54,13 @@ const UserDetailsPage = ({ params }: Props) => {
             </LinkContainer>
           )}
           <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info">Users</Button>
+            <Button bsStyle="info">Users Overview</Button>
           </LinkContainer>
         </ButtonToolbar>
       </PageHeader>
 
       <UserDetails user={loadedUser?.username === params?.username ? loadedUser : undefined} />
-    </div>
+    </DocumentTitle>
   );
 };
 
