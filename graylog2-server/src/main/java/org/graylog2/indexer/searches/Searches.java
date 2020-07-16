@@ -104,7 +104,7 @@ public class Searches {
     }
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
-        return scroll(query, range, limit, offset, fields, filter, -1);
+        return scroll(query, range, limit, offset, fields, filter, ScrollCommand.NO_BATCHSIZE);
     }
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
@@ -124,8 +124,8 @@ public class Searches {
                 .sorting(sorting)
                 .indices(indexWildcards);
 
-        scrollCommandBuilder = limit != -1 ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
-        scrollCommandBuilder = batchSize != -1 ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
+        scrollCommandBuilder = limit != ScrollCommand.NO_LIMIT ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
+        scrollCommandBuilder = batchSize != ScrollCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
 
         final ScrollResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
 
