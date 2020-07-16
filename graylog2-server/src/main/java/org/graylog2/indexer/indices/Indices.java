@@ -154,9 +154,7 @@ public class Indices {
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE));
-
-        final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
+        final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
 
         final boolean result = indicesAdapter.ensureIndexTemplate(templateName, template);
 
@@ -192,9 +190,7 @@ public class Indices {
 
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE));
-
-        final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
+        final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
 
         try {
             // Make sure our index template exists before creating an index!
@@ -208,6 +204,13 @@ public class Indices {
 
         auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         return true;
+    }
+
+    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        final IndexSetConfig.TemplateType templateType = indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE);
+        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(templateType);
+
+        return indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
