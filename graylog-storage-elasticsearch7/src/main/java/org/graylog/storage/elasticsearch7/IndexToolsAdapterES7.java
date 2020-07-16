@@ -12,6 +12,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -53,7 +54,7 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
                 .subAggregation(AggregationBuilders.dateHistogram(AGG_DATE_HISTOGRAM)
                         .field("timestamp")
                         .subAggregation(AggregationBuilders.terms(AGG_MESSAGE_FIELD).field(fieldName))
-                        .interval(interval)
+                        .fixedInterval(new DateHistogramInterval(interval + "ms"))
                         // We use "min_doc_count" here to avoid empty buckets in the histogram result.
                         // This is needed to avoid out-of-memory errors when creating a histogram for a really large
                         // date range. See: https://github.com/Graylog2/graylog-plugin-archive/issues/59
