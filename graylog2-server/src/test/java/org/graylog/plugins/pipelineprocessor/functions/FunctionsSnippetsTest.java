@@ -1157,7 +1157,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     public void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);
-            Message in = new Message("test", "source", DateTime.now());
+            Message in = new Message("test", "source", Tools.nowUTC());
             in.addField("facility", "mail");
             evaluateRule(rule, in);
             fail("missing type check for non-boolean type in unary NOT");
