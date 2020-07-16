@@ -136,7 +136,7 @@ public class AbsoluteSearchResource extends SearchResource {
         final TimeRange timeRange = buildAbsoluteTimeRange(from, to);
 
         final ScrollResult scroll = searches
-                .scroll(query, timeRange, batchSize, offset, fieldList, filter);
+                .scroll(query, timeRange, limit, offset, fieldList, filter, batchSize);
         return buildChunkedOutput(scroll, limit);
     }
 
