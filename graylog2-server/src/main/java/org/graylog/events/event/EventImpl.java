@@ -16,20 +16,28 @@
  */
 package org.graylog.events.event;
 
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.util.Strings;
 import org.graylog.events.fields.FieldValue;
+import org.graylog2.jackson.TypeReferences;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
+import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
+import static org.joda.time.DateTimeZone.UTC;
 
 public class EventImpl implements Event {
     private final String eventId;
@@ -97,6 +105,16 @@ public class EventImpl implements Event {
     @Override
     public DateTime getEventTimestamp() {
         return eventTimestamp;
+    }
+
+    @Override
+    public DateTime getReceiveTime() {
+        return getEventTimestamp();
+    }
+
+    @Override
+    public DateTime getTimestamp() {
+        return getEventTimestamp();
     }
 
     @Override
@@ -273,6 +291,29 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter) {
+
+        final Map<String, Object> source = objectMapper.convertValue(this.toDto(), TypeReferences.MAP_STRING_OBJECT);
+
+        // "Fix" timestamps to be in the correct format. Our message index mapping is using this format so we have
+        // to use it for our events as well to make sure we can use the search without errors.
+        source.put(EventDto.FIELD_EVENT_TIMESTAMP, buildElasticSearchTimeFormat(requireNonNull(this.getEventTimestamp()).withZone(UTC)));
+        source.put(EventDto.FIELD_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(requireNonNull(this.getProcessingTimestamp()).withZone(UTC)));
+        if (this.getTimerangeStart() != null) {
+            source.put(EventDto.FIELD_TIMERANGE_START, buildElasticSearchTimeFormat(this.getTimerangeStart().withZone(UTC)));
+        }
+        if (this.getTimerangeEnd() != null) {
+            source.put(EventDto.FIELD_TIMERANGE_END, buildElasticSearchTimeFormat(this.getTimerangeEnd().withZone(UTC)));
+        }
+
+        // We cannot index events that don't have any stream set
+        if (this.getStreams().isEmpty()) {
+            throw new IllegalStateException("Event streams cannot be empty");
+        }
+        return source;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -320,5 +361,10 @@ public class EventImpl implements Event {
                 .add("alert", alert)
                 .add("fields", fields)
                 .toString();
+    }
+
+    @Override
+    public long getSize() {
+        return 0;
     }
 }

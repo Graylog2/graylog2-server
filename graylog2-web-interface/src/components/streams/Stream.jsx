@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, Tooltip } from 'components/graylog';
 import { OverlayElement, Icon } from 'components/common';
@@ -19,7 +19,7 @@ import StreamStateBadge from './StreamStateBadge';
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
-const StreamListItem = styled.li(({ theme }) => `
+const StreamListItem = styled.li(({ theme }) => css`
   display: block;
   padding: 15px 0;
 

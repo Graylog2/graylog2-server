@@ -2,7 +2,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
@@ -26,8 +26,8 @@ const StyledAlert = styled(Alert)`
   padding: 9px;
 `;
 
-const PipelineStage = styled.div(({ idle, theme }) => `
-  border: 1px solid ${theme.colors.gray[idle ? 50 : 70]};
+const PipelineStage = styled.div(({ idle, theme }) => css`
+  border: 1px solid ${theme.colors.gray[idle ? '50px' : '70px']};
   border-radius: 4px;
   display: inline-block;
   margin-right: 15px;

@@ -100,7 +100,7 @@ exports[`<ContentPackEntityConfig /> should render with a entity 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "gweZGk",
+                        "lastClassName": "gFYXlu",
                         "rules": Array [
                           [Function],
                         ],
@@ -118,7 +118,7 @@ exports[`<ContentPackEntityConfig /> should render with a entity 1`] = `
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gFYXlu table "
                   >
                     <thead>
                       <tr>

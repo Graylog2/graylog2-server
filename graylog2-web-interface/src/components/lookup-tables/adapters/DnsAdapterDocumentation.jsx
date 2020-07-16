@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-const StyledPre = styled.pre(({ theme }) => `
+const StyledPre = styled.pre(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 

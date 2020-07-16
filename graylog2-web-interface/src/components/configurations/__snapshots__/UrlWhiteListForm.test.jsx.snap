@@ -198,7 +198,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "jVYrA",
+              "lastClassName": "hpBclA",
               "rules": Array [
                 [Function],
               ],
@@ -222,12 +222,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 jVYrA"
+          className="Button__StyledButton-c9cbmb-0 hpBclA"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -251,7 +251,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           "componentStyle": ComponentStyle {
             "componentId": "UrlWhiteListForm__StyledTable-sc-1nddwv6-0",
             "isStatic": false,
-            "lastClassName": "cJCRcf",
+            "lastClassName": "fybJXt",
             "rules": Array [
               [Function],
               "margin-top:10px;",
@@ -275,14 +275,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       <Table
         bordered={true}
         bsClass="table"
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 cJCRcf"
+        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 fybJXt"
         condensed={false}
         hover={false}
         responsive={false}
         striped={true}
       >
         <table
-          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 cJCRcf table table-striped table-bordered"
+          className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 fybJXt table table-striped table-bordered"
         >
           <thead>
             <tr>
@@ -2396,7 +2396,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "hpBclA",
                             "rules": Array [
                               [Function],
                             ],
@@ -2419,12 +2419,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -4545,7 +4545,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "hpBclA",
                             "rules": Array [
                               [Function],
                             ],
@@ -4568,12 +4568,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6694,7 +6694,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVYrA",
+                            "lastClassName": "hpBclA",
                             "rules": Array [
                               [Function],
                             ],
@@ -6717,12 +6717,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA"
+                        className="Button__StyledButton-c9cbmb-0 hpBclA"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -6787,7 +6787,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
             "componentStyle": ComponentStyle {
               "componentId": "Button__StyledButton-c9cbmb-0",
               "isStatic": false,
-              "lastClassName": "jVYrA",
+              "lastClassName": "hpBclA",
               "rules": Array [
                 [Function],
               ],
@@ -6811,12 +6811,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
           bsClass="btn"
           bsSize="sm"
           bsStyle="default"
-          className="Button__StyledButton-c9cbmb-0 jVYrA"
+          className="Button__StyledButton-c9cbmb-0 hpBclA"
           disabled={false}
           onClick={[Function]}
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-default"
+            className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-sm btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"

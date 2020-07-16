@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/graylog';
@@ -17,7 +17,7 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
 
-const StyledJumbotron = styled(Jumbotron)(({ theme }) => `
+const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
     border: 1px solid ${theme.colors.gray[80]};
     border-top-left-radius: 0;

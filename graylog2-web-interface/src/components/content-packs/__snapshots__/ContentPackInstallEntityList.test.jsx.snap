@@ -218,7 +218,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "gweZGk",
+                        "lastClassName": "gFYXlu",
                         "rules": Array [
                           [Function],
                         ],
@@ -236,7 +236,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gFYXlu table "
                   >
                     <thead>
                       <tr>
@@ -505,7 +505,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "gweZGk",
+                        "lastClassName": "gFYXlu",
                         "rules": Array [
                           [Function],
                         ],
@@ -523,7 +523,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gFYXlu table "
                   >
                     <thead>
                       <tr>

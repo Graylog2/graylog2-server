@@ -2,6 +2,7 @@ package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkItemResponse;
@@ -15,11 +16,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.Analyz
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
+import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +46,14 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private final ElasticsearchClient client;
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public MessagesAdapterES7(ElasticsearchClient elasticsearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer) {
+    public MessagesAdapterES7(ElasticsearchClient elasticsearchClient, MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
         this.client = elasticsearchClient;
         this.invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         this.chunkedBulkIndexer = chunkedBulkIndexer;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -179,21 +182,21 @@ public class MessagesAdapterES7 implements MessagesAdapter {
             return Collections.emptyList();
         }
 
-        final Map<String, Message> messageMap = messageList.stream()
+        final Map<String, Indexable> messageMap = messageList.stream()
                 .map(IndexingRequest::message)
                 .distinct()
-                .collect(Collectors.toMap(Message::getId, Function.identity()));
+                .collect(Collectors.toMap(Indexable::getId, Function.identity()));
 
         return failedItems.stream()
                 .map(item -> {
-                    final Message message = messageMap.get(item.getId());
+                    final Indexable message = messageMap.get(item.getId());
 
                     return indexingErrorFromResponse(item, message);
                 })
                 .collect(Collectors.toList());
     }
 
-    private Messages.IndexingError indexingErrorFromResponse(BulkItemResponse item, Message message) {
+    private Messages.IndexingError indexingErrorFromResponse(BulkItemResponse item, Indexable message) {
         return Messages.IndexingError.create(message, item.getIndex(), errorTypeFromResponse(item), item.getFailureMessage());
     }
 
@@ -209,6 +212,6 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     private IndexRequest indexRequestFrom(IndexingRequest request) {
         return new IndexRequest(request.indexSet().getWriteIndexAlias())
                 .id(request.message().getId())
-                .source(request.message().toElasticSearchObject(this.invalidTimestampMeter));
+                .source(request.message().toElasticSearchObject(objectMapper, this.invalidTimestampMeter));
     }
 }

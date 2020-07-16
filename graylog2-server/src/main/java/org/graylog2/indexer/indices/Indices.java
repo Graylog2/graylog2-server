@@ -212,6 +212,8 @@ public class Indices {
         final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
 
         try {
+            // Make sure our index template exists before creating an index!
+            indicesAdapter.ensureIndexTemplate(templateName, template);
             indicesAdapter.create(indexName, indexSettings, templateName, template);
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage());
@@ -294,8 +296,12 @@ public class Indices {
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
     }
 
+    public boolean isOpen(final String indexName) {
+        return indicesAdapter.isOpen(indexName);
+    }
+
     public boolean isClosed(final String indexName) {
-        return getClosedIndices(Collections.singleton(indexName)).contains(indexName);
+        return indicesAdapter.isClosed(indexName);
     }
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {

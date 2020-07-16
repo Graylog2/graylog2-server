@@ -6,6 +6,7 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -16,41 +17,45 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.bulk.BulkRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.WriteRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexTemplatesResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.IndexTemplateMetaData;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.settings.Settings;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ClientES7 implements Client {
+    private static final Logger LOG = LoggerFactory.getLogger(ClientES7.class);
     private final ElasticsearchClient client;
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper;
 
     public ClientES7(ElasticsearchClient client) {
         this.client = client;
+        this.objectMapper = new ObjectMapperProvider().get();
     }
 
     @Override
     public void createIndex(String index, int shards, int replicas) {
+        LOG.debug("Creating index " + index);
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
         createIndexRequest.settings(
                 Settings.builder()
@@ -90,22 +95,51 @@ public class ClientES7 implements Client {
                 .alias(alias);
         indicesAliasesRequest.addAliasAction(aliasAction);
 
-        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions));
+        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
+                "failed to add alias " + alias + " for index " + indexName);
     }
 
     @Override
-    public JsonNode getMapping(String... indices) {
-        return null;
+    public String fieldType(String testIndexName, String field) {
+        return getMapping(testIndexName).get(field);
+    }
+
+    private Map<String, String> getMapping(String index) {
+        final Request request = new Request("GET", "/" + index + "/_mapping");
+        final JsonNode response = client.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+            final Response result = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(result.getEntity().getContent());
+        });
+
+        return extractFieldMappings(index, response)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().path("type").asText()));
+    }
+
+    private Stream<Map.Entry<String, JsonNode>> extractFieldMappings(String index, JsonNode response) {
+        //noinspection UnstableApiUsage
+        return Streams.stream(
+                response.path(index)
+                        .path("mappings")
+                        .path("properties")
+                        .fields()
+        );
     }
 
     @Override
-    public JsonNode getTemplate(String templateName) {
-        return null;
+    public boolean templateExists(String templateName) {
+        final GetIndexTemplatesRequest request = new GetIndexTemplatesRequest("*");
+        final GetIndexTemplatesResponse result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
+        return result.getIndexTemplates()
+                .stream()
+                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
     }
 
     @Override
-    public void putTemplate(String templateName, Object source) {
-
+    public void putTemplate(String templateName, Map<String, Object> source) {
+        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName).source(source);
+        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
+                "Unable to put template " + templateName);
     }
 
     @Override
@@ -151,8 +185,10 @@ public class ClientES7 implements Client {
 
     @Override
     public void cleanUp() {
+        LOG.debug("Removing indices: " + String.join(",", existingIndices()));
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
+        refreshNode();
     }
 
     private String[] existingTemplates() {
@@ -164,10 +200,20 @@ public class ClientES7 implements Client {
     }
 
     private String[] existingIndices() {
-        final GetIndexRequest getIndexRequest = new GetIndexRequest("*");
-        getIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
-        final GetIndexResponse result = client.execute((c, requestOptions) -> c.indices().get(getIndexRequest, requestOptions));
-        return result.getIndices();
+        final Request request = new Request("GET", "/_cat/indices");
+        request.addParameter("format", "json");
+        request.addParameter("h", "index");
+
+        final JsonNode jsonResponse = client.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+             final Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
+        });
+
+        return Streams.stream(jsonResponse.elements())
+                .map(index -> index.path("index").asText())
+                .distinct()
+                .toArray(String[]::new);
     }
 
     @Override
@@ -211,16 +257,11 @@ public class ClientES7 implements Client {
     }
 
     private boolean indexBlocksPresent(String index) {
-        final Response result = client.execute((c, requestOptions) -> c.getLowLevelClient()
-                .performRequest(new Request("GET", "/" + index)),
-                "Unable to retrieve index blocks for index " + index);
-
-        final JsonNode jsonResult;
-        try {
-            jsonResult = objectMapper.readTree(result.getEntity().getContent());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        final JsonNode jsonResult = client.execute((c, requestOptions) -> {
+            final Response result = c.getLowLevelClient()
+                    .performRequest(new Request("GET", "/" + index));
+            return objectMapper.readTree(result.getEntity().getContent());
+        }, "Unable to retrieve index blocks for index " + index);
 
         return jsonResult.path(index)
                 .path("settings")

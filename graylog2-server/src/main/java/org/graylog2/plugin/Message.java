@@ -18,6 +18,7 @@ package org.graylog2.plugin;
 
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -29,6 +30,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -66,7 +68,7 @@ import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
 @NotThreadSafe
-public class Message implements Messages {
+public class Message implements Messages, Indexable {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
     /**
@@ -349,7 +351,8 @@ public class Message implements Messages {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
 
-    public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter) {
+    @Override
+    public Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper, @Nonnull final Meter invalidTimestampMeter) {
         final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size());
 
         for (Map.Entry<String, Object> entry : fields.entrySet()) {

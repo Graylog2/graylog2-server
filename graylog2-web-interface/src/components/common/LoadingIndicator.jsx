@@ -17,7 +17,7 @@ const StyledAlert = styled(Alert)`
   transform: translateX(-50%);
   padding: 5px 20px;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 2000;
 `;
 

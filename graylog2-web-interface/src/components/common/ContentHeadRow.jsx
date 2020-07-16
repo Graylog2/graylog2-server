@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import classNames from 'classnames';
 
 import { Row } from 'components/graylog';
 
-const StyledRow = styled(Row)(({ theme }) => `
+const StyledRow = styled(Row)(({ theme }) => css`
   padding-bottom: 0;
 
   p {

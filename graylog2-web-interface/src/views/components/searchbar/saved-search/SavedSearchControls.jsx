@@ -5,7 +5,7 @@ import { withTheme } from 'styled-components';
 import { browserHistory } from 'react-router';
 
 import connect from 'stores/connect';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import { newDashboardsPath } from 'views/Constants';

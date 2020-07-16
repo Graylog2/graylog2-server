@@ -3,7 +3,7 @@
 exports[`ShowMessagePage renders for generic event 1`] = `
 <div>
   <div
-    class="content row"
+    class="Row-sc-3iisrt-0 bRJRJg content row"
   >
     <div
       class="col-md-12"
@@ -85,7 +85,7 @@ exports[`ShowMessagePage renders for generic event 1`] = `
 exports[`ShowMessagePage renders for generic message 1`] = `
 <div>
   <div
-    class="content row"
+    class="Row-sc-3iisrt-0 bRJRJg content row"
   >
     <div
       class="col-md-12"

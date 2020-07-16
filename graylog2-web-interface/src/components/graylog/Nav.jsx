@@ -8,18 +8,20 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
   &.nav {
     > li {
       > a {
+        transition: background-color 150ms ease-in-out;
+
         &:hover,
         &:focus {
-          background-color: ${theme.colors.gray[90]};
+          background-color: ${theme.colors.variant.lightest.default};
         }
       }
 
       &.disabled > a {
-        color: ${theme.colors.gray[60]};
+        color: ${theme.colors.variant.light.default};
 
         &:hover,
         &:focus {
-          color: ${theme.colors.gray[60]};
+          color: ${theme.colors.variant.light.default};
         }
       }
     }
@@ -28,7 +30,7 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       &,
       &:hover,
       &:focus {
-        background-color: ${theme.colors.gray[90]};
+        background-color: ${theme.colors.variant.lightest.default};
         border-color: ${theme.colors.variant.primary};
       }
     }
@@ -46,7 +48,7 @@ const Nav = styled(BootstrapNav)(({ theme }) => css`
       }
     }
 
-    ${navTabsStyles};
+    ${navTabsStyles}
   }
 `);
 

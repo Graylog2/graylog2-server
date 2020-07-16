@@ -116,7 +116,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "gweZGk",
+                        "lastClassName": "gFYXlu",
                         "rules": Array [
                           [Function],
                         ],
@@ -134,7 +134,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gFYXlu table "
                   >
                     <thead>
                       <tr>
@@ -557,7 +557,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "gweZGk",
+                        "lastClassName": "gFYXlu",
                         "rules": Array [
                           [Function],
                         ],
@@ -575,7 +575,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gFYXlu table "
                   >
                     <thead>
                       <tr>
@@ -998,7 +998,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                       "componentStyle": ComponentStyle {
                         "componentId": "DataTable__StyledTable-sc-1qrb405-0",
                         "isStatic": false,
-                        "lastClassName": "gweZGk",
+                        "lastClassName": "gFYXlu",
                         "rules": Array [
                           [Function],
                         ],
@@ -1016,7 +1016,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                   forwardedRef={null}
                 >
                   <table
-                    className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                    className="DataTable__StyledTable-sc-1qrb405-0 gFYXlu table "
                   >
                     <thead>
                       <tr>

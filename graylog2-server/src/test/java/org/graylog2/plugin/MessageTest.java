@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,6 +27,7 @@ import com.google.common.collect.Sets;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -68,6 +70,7 @@ public class MessageTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private Message message;
     private DateTime originalTimestamp;
     private MetricRegistry metricRegistry;
@@ -351,7 +354,7 @@ public class MessageTest {
         message.addField(Message.FIELD_TIMESTAMP,
                          dateTime.toDate());
 
-        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
@@ -390,7 +393,7 @@ public class MessageTest {
         message.addField("field2", "that");
         message.addField(Message.FIELD_STREAMS, Collections.singletonList("test-stream"));
 
-        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
@@ -407,7 +410,7 @@ public class MessageTest {
     public void testToElasticSearchObjectWithInvalidKey() throws Exception {
         message.addField("field.3", "dot");
 
-        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
         assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
@@ -427,7 +430,7 @@ public class MessageTest {
         message.addField("timestamp", "time!");
 
         final Meter errorMeter = metricRegistry.meter("test-meter");
-        final Map<String, Object> object = message.toElasticSearchObject(errorMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(objectMapper, errorMeter);
 
         assertNotEquals("time!", object.get("timestamp"));
         assertEquals(1, errorMeter.getCount());
@@ -441,7 +444,7 @@ public class MessageTest {
 
         message.addStream(stream);
 
-        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         @SuppressWarnings("unchecked")
         final Collection<String> streams = (Collection<String>) object.get("streams");
@@ -452,14 +455,12 @@ public class MessageTest {
     public void testToElasticsearchObjectAddsAccountedMessageSize() {
         final Message message = new Message("message", "source", Tools.nowUTC());
 
-        assertThat(message.toElasticSearchObject(invalidTimestampMeter).get("gl2_accounted_message_size"))
+        assertThat(message.toElasticSearchObject(objectMapper, invalidTimestampMeter).get("gl2_accounted_message_size"))
                 .isEqualTo(43L);
     }
 
     @Test
     public void messageSizes() {
-        final Meter invalidTimestampMeter = new Meter();
-
         final Message message = new Message("1234567890", "12345", Tools.nowUTC());
         assertThat(message.getSize()).isEqualTo(45);
 
