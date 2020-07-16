@@ -103,10 +103,6 @@ public class Searches {
         return result;
     }
 
-    public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
-        return scroll(query, range, limit, offset, fields, filter, ScrollCommand.NO_BATCHSIZE);
-    }
-
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
