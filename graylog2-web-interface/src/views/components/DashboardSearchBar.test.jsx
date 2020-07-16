@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
@@ -30,8 +30,6 @@ describe('DashboardSearchBar', () => {
     jest.clearAllMocks();
   });
 
-  afterEach(cleanup);
-
   const onExecute = jest.fn();
 
   it('defaults to no override being selected', () => {
@@ -56,7 +54,7 @@ describe('DashboardSearchBar', () => {
 
     expect(getByText('Search in last five minutes')).toBeVisible();
 
-    await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', range: 300 }, ''));
+    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', range: 300 }, ''));
 
     expect(onExecute).toHaveBeenCalled();
   });
@@ -76,7 +74,7 @@ describe('DashboardSearchBar', () => {
 
     fireEvent.click(searchButton);
 
-    await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(expect.objectContaining({
+    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(expect.objectContaining({
       type: 'absolute',
       from: expect.anything(),
       to: expect.anything(),
@@ -102,7 +100,7 @@ describe('DashboardSearchBar', () => {
 
     fireEvent.click(searchButton);
 
-    await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'keyword', keyword: 'Last five minutes' }, ''));
+    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'keyword', keyword: 'Last five minutes' }, ''));
 
     expect(onExecute).toHaveBeenCalled();
   });
@@ -121,7 +119,7 @@ describe('DashboardSearchBar', () => {
 
     fireEvent.click(searchButton);
 
-    await wait(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, ''));
+    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith(undefined, ''));
 
     expect(onExecute).toHaveBeenCalled();
   });

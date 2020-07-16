@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, cleanup, wait } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -11,8 +11,6 @@ import FieldSortIcon from './FieldSortIcon';
 describe('FieldSortIcon', () => {
   const currentSort = new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Descending);
   const config = new MessagesWidgetConfig(['timestamp', 'source'], true, [], [currentSort]);
-
-  afterEach(cleanup);
 
   it('should set descending sort on click, if field sort is not defined', () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
@@ -71,7 +69,7 @@ describe('FieldSortIcon', () => {
     expect(setLoadingStateStub).toHaveBeenCalledTimes(1);
     expect(setLoadingStateStub).toHaveBeenCalledWith(true);
 
-    await wait(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
+    await waitFor(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
 
     expect(setLoadingStateStub).toHaveBeenCalledTimes(2);
   });

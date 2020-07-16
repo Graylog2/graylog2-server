@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent, waitForElement } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -19,8 +19,6 @@ describe('FieldSortSelect', () => {
   const fields = List([fieldTypeMapping1, fieldTypeMapping2]);
   const sort = [new SortConfig('pivot', 'http_method', Direction.Ascending)];
 
-  afterEach(cleanup);
-
   it('should display current sort as selected option', () => {
     const { getByText } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
 
@@ -28,9 +26,8 @@ describe('FieldSortSelect', () => {
   });
 
   it('should open menu when focused', async () => {
-    const { getByText, container } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
-
+    const { findByText, container } = render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
     fireEvent.focus(container.getElementsByTagName('input')[0]);
-    await waitForElement(() => getByText(/2 results available./));
+    await findByText(/2 results available./);
   });
 });

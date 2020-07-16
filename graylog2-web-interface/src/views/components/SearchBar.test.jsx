@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
@@ -47,8 +47,6 @@ describe('SearchBar', () => {
     QueriesActions.update = mockAction(jest.fn());
   });
 
-  afterEach(cleanup);
-
   it('should render the SearchBar', () => {
     const { getByText } = render(<SearchBar config={config} onExecute={() => {}} />);
 
@@ -65,7 +63,7 @@ describe('SearchBar', () => {
 
     const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
 
-    await wait(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
+    await waitFor(() => expect(QueriesActions.update).toHaveBeenCalledWith(queryId, expect.objectContaining({ id: queryId })));
   });
 
   it('changing the time range type does not execute a new search', async () => {
@@ -75,7 +73,7 @@ describe('SearchBar', () => {
 
     fireEvent.click(absoluteTimeRange);
 
-    await wait(() => expect(onSubmit).not.toHaveBeenCalled());
+    await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
   });
 
   const selectOption = (option) => {

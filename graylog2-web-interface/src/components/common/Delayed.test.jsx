@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import Delayed from './Delayed';
@@ -9,8 +9,6 @@ describe('Delayed', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
-
-  afterEach(cleanup);
 
   const HelloWorld = () => <span>Hello World!</span>;
 
