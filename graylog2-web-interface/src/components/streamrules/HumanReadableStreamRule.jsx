@@ -20,7 +20,7 @@ class HumanReadableStreamRule extends React.Component {
     return undefined;
   };
 
-  _inputName = (inputId) => {
+  _findInput = (inputId) => {
     const { inputs } = this.props;
 
     return inputs.find((input) => input.id === inputId);
@@ -28,11 +28,13 @@ class HumanReadableStreamRule extends React.Component {
 
   _formatRuleValue = (streamRule) => {
     if (String(streamRule.type) === String(this.MATCH_INPUT)) {
-      const input = this._inputName(streamRule.value);
+      const input = this._findInput(streamRule.value);
 
       if (input) {
         return `${input.title} (${input.name}: ${input.id})`;
       }
+
+      return `<deleted input>: ${streamRule.value})`;
     }
 
     if (String(streamRule.type) !== String(this.FIELD_PRESENCE_RULE_TYPE)) {
