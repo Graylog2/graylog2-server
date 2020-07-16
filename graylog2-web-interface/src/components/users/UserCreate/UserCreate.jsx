@@ -10,7 +10,7 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
-import TimezoneFormGroup from './TimeZoneFormGroup';
+import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
 import FullNameFormGroup from './FullNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
