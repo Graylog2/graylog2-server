@@ -1,6 +1,5 @@
 package org.graylog.storage.elasticsearch7;
 
-import com.google.auto.value.AutoValue;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
@@ -10,14 +9,11 @@ import org.graylog2.indexer.searches.ScrollCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 import java.util.Set;
 
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -42,24 +38,24 @@ public class SearchRequestFactory {
     }
 
     public SearchSourceBuilder create(SearchesConfig config) {
-        return create(SearchRequestFactory.Command.from(config));
+        return create(SearchCommand.from(config));
     }
 
     public SearchSourceBuilder create(ScrollCommand scrollCommand) {
-        return create(SearchRequestFactory.Command.from(scrollCommand));
+        return create(SearchCommand.from(scrollCommand));
     }
 
-    public SearchSourceBuilder create(Command command) {
-        final String query = normalizeQuery(command.query());
+    public SearchSourceBuilder create(SearchCommand searchCommand) {
+        final String query = normalizeQuery(searchCommand.query());
 
         final QueryBuilder queryBuilder = isWildcardQuery(query)
                 ? matchAllQuery()
                 : queryStringQuery(query).allowLeadingWildcard(allowLeadingWildcardSearches);
 
-        final Optional<BoolQueryBuilder> rangeQueryBuilder = command.range()
+        final Optional<BoolQueryBuilder> rangeQueryBuilder = searchCommand.range()
                 .map(range -> boolQuery()
                         .must(TimeRangeQueryFactory.create(range)));
-        final Optional<BoolQueryBuilder> filterQueryBuilder = command.filter()
+        final Optional<BoolQueryBuilder> filterQueryBuilder = searchCommand.filter()
                 .filter(filter -> !isWildcardQuery(filter))
                 .map(QueryBuilders::queryStringQuery)
                 .map(filter -> rangeQueryBuilder.orElse(boolQuery())
@@ -69,14 +65,14 @@ public class SearchRequestFactory {
                 .must(queryBuilder);
         filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
 
-        applyStreamsFilter(filteredQueryBuilder, command);
+        applyStreamsFilter(filteredQueryBuilder, searchCommand);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filteredQueryBuilder);
 
-        applyPaginationIfPresent(searchSourceBuilder, command);
+        applyPaginationIfPresent(searchSourceBuilder, searchCommand);
 
-        applySortingIfPresent(searchSourceBuilder, command);
+        applySortingIfPresent(searchSourceBuilder, searchCommand);
 
         applyHighlighting(searchSourceBuilder);
 
@@ -94,13 +90,13 @@ public class SearchRequestFactory {
         }
     }
 
-    private void applyPaginationIfPresent(SearchSourceBuilder searchSourceBuilder, Command command) {
+    private void applyPaginationIfPresent(SearchSourceBuilder searchSourceBuilder, SearchCommand command) {
         command.offset().ifPresent(searchSourceBuilder::from);
         command.limit().ifPresent(searchSourceBuilder::size);
     }
 
 
-    private void applyStreamsFilter(BoolQueryBuilder filteredQueryBuilder, Command command) {
+    private void applyStreamsFilter(BoolQueryBuilder filteredQueryBuilder, SearchCommand command) {
         command.streams()
                 .map(this::buildStreamIdFilter)
                 .ifPresent(filteredQueryBuilder::filter);
@@ -122,7 +118,7 @@ public class SearchRequestFactory {
         return filterBuilder;
     }
 
-    private void applySortingIfPresent(SearchSourceBuilder searchSourceBuilder, Command command) {
+    private void applySortingIfPresent(SearchSourceBuilder searchSourceBuilder, SearchCommand command) {
         final Sorting sort = command.sorting().orElse(DEFAULT_SORTING);
         searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
     }
@@ -139,43 +135,4 @@ public class SearchRequestFactory {
         return query.trim();
     }
 
-    @AutoValue
-    static abstract class Command {
-        public abstract String query();
-        public abstract Optional<Set<String>> streams();
-        public abstract Optional<Sorting> sorting();
-        public abstract Optional<String> filter();
-        public abstract Optional<TimeRange> range();
-        public abstract OptionalInt limit();
-        public abstract OptionalInt offset();
-        public abstract OptionalLong batchSize();
-        public abstract boolean highlight();
-
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private static Command create(
-                String query,
-                Optional<Set<String>> streams,
-                Optional<Sorting> sorting,
-                Optional<String> filter,
-                Optional<TimeRange> range,
-                OptionalInt limit,
-                OptionalInt offset,
-                OptionalLong batchSize,
-                boolean highlight) {
-            return new AutoValue_SearchRequestFactory_Command(query, streams, sorting, filter, range, limit, offset, batchSize, highlight);
-        }
-
-        static Command from(SearchesConfig searchesConfig) {
-            return create(searchesConfig.query(), Optional.empty(), Optional.ofNullable(searchesConfig.sorting()),
-                    Optional.ofNullable(searchesConfig.filter()), Optional.of(searchesConfig.range()),
-                    OptionalInt.of(searchesConfig.limit()), OptionalInt.of(searchesConfig.offset()),
-                    OptionalLong.empty(), true);
-        }
-
-        static Command from(ScrollCommand scrollCommand) {
-            return create(scrollCommand.query(), scrollCommand.streams(), scrollCommand.sorting(),
-                    scrollCommand.filter(), scrollCommand.range(), scrollCommand.limit(), scrollCommand.offset(),
-                    scrollCommand.batchSize(), scrollCommand.highlight());
-        }
-    }
 }
