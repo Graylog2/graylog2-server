@@ -7,7 +7,7 @@ import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
-import TimoutInputFormGroup from '../UserCreate/TimoutInputFormGroup';
+import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 
 type Props = {
   user: User,
@@ -26,7 +26,7 @@ const SettingsSection = ({
             initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs }}>
       {({ isSubmitting, isValid }) => (
         <Form className="form form-horizontal">
-          <TimoutInputFormGroup />
+          <TimeoutFormGroup />
           <TimezoneFormGroup />
           <Row>
             <Col xs={12}>

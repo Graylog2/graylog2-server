@@ -11,7 +11,7 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import TimezoneFormGroup from './TimeZoneFormGroup';
-import TimoutInputFormGroup from './TimoutInputFormGroup';
+import TimeoutFormGroup from './TimeoutFormGroup';
 import FullNameFormGroup from './FullNameFormGroup';
 import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
@@ -63,7 +63,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Settings</Headline>
-                <TimoutInputFormGroup />
+                <TimeoutFormGroup />
                 <TimezoneFormGroup />
               </div>
               <div>
@@ -71,14 +71,14 @@ const UserCreate = () => {
                 <PasswordFormGroup />
               </div>
               {submitError && (
-              <Row>
-                <Col xs={9} xsOffset={3}>
-                  <Alert bsStyle="danger">
-                    <b>Failed to create user</b><br />
-                    {submitError?.additional?.res?.text}
-                  </Alert>
-                </Col>
-              </Row>
+                <Row>
+                  <Col xs={9} xsOffset={3}>
+                    <Alert bsStyle="danger">
+                      <b>Failed to create user</b><br />
+                      {submitError?.additional?.res?.text}
+                    </Alert>
+                  </Col>
+                </Row>
               )}
               <Row>
                 <Col xs={9} xsOffset={3}>
