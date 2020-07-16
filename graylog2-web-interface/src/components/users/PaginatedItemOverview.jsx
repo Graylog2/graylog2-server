@@ -8,7 +8,6 @@ import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import { type ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
 
-
 import PaginatedItem from './PaginatedItem';
 
 const Container = styled.div`
