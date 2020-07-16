@@ -20,7 +20,7 @@ import UsernameFormGroup from './UsernameFormGroup';
 import { Headline } from '../SectionComponent';
 
 const _onSubmit = (formData, setSubmitError) => {
-  const data = { ...formData, permissions: [] };
+  const data = { ...formData };
   delete data.password_repeat;
 
   setSubmitError(null);
@@ -70,14 +70,18 @@ const UserCreate = () => {
                 <Headline>Password</Headline>
                 <PasswordFormGroup />
               </div>
+              {submitError && (
               <Row>
                 <Col xs={9} xsOffset={3}>
-                  {submitError && (
                   <Alert bsStyle="danger">
                     <b>Failed to create user</b><br />
                     {submitError?.additional?.res?.text}
                   </Alert>
-                  )}
+                </Col>
+              </Row>
+              )}
+              <Row>
+                <Col xs={9} xsOffset={3}>
                   <Button bsStyle="success"
                           disabled={isSubmitting || !isValid}
                           title="Create User"
