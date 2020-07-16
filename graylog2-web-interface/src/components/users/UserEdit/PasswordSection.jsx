@@ -90,7 +90,7 @@ const PasswordSection = ({ user: { username } }: Props) => {
                 <div className="pull-right">
                   <Button bsStyle="success"
                           disabled={isSubmitting || !isValid}
-                          title="Update Profile"
+                          title="Change Password"
                           type="submit">
                     Change Password
                   </Button>
