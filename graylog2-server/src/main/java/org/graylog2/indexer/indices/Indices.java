@@ -298,10 +298,6 @@ public class Indices {
         return indicesAdapter.getIndexStats(index);
     }
 
-    private IndexStatistics buildIndexStatistics(String index, JsonNode indexStats) {
-        return IndexStatistics.create(index, indexStats);
-    }
-
     public Optional<Long> getStoreSizeInBytes(String index) {
         return indicesAdapter.storeSizeInBytes(index);
     }
