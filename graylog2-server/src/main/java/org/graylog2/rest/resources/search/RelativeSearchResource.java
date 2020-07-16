@@ -135,7 +135,7 @@ public class RelativeSearchResource extends SearchResource {
 
         final ScrollResult scroll = searches
                 .scroll(query, timeRange, limit, offset, fieldList, filter, batchSize);
-        return buildChunkedOutput(scroll, limit);
+        return buildChunkedOutput(scroll);
     }
 
     @GET
