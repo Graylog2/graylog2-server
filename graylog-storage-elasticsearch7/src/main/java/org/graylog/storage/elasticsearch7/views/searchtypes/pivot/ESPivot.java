@@ -32,6 +32,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
@@ -220,8 +221,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // first we iterate over all row groups (whose values generate a "key array", corresponding to the nesting level)
         // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
+        final HasAggregations initialResult = queryResult::getAggregations;
 
-        processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), aggregations);
+        processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), initialResult);
 
         return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
@@ -241,7 +243,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                              Pivot pivot,
                              List<BucketSpec> remainingRows,
                              ArrayDeque<String> rowKeys,
-                             Aggregations aggregation) {
+                             HasAggregations aggregation) {
         if (remainingRows.isEmpty()) {
             // this is the last row group, so we need to fork into the columns if they exist.
             // being here also means that `rowKeys` contains the maximum number of parts, one for each combination of row bucket keys
@@ -272,7 +274,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             bucketStream.forEach(bucket -> {
                 // push the bucket's key and use its aggregation as the new source for sub-aggregations
                 rowKeys.addLast(bucket.key());
-                processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, bucket.aggregation().getAggregations());
+                processRows(resultBuilder, searchResult, queryContext, pivot, tail(remainingRows), rowKeys, bucket.aggregation());
                 rowKeys.removeLast();
             });
             // also add the series for this row key if the client wants rollups
@@ -292,7 +294,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                 Pivot pivot,
                                 List<BucketSpec> remainingColumns,
                                 ArrayDeque<String> columnKeys,
-                                Aggregations aggregation) {
+                                HasAggregations aggregation) {
         if (remainingColumns.isEmpty()) {
             // this is the leaf cell of the pivot table, simply add all the series for the complete column key array
             // in the rollup: false case, this is the only set of series that is going to be added to the result
@@ -317,7 +319,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             bucketStream.forEach(bucket -> {
                 // push the bucket's key and use its aggregation as the new source for sub-aggregations
                 columnKeys.addLast(bucket.key());
-                processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, bucket.aggregation().getAggregations());
+                processColumns(rowBuilder, searchResult, queryContext, pivot, tail(remainingColumns), columnKeys, bucket.aggregation());
                 columnKeys.removeLast();
             });
             // also add the series for the base column key if the client wants rollups, the complete column key is processed in the leaf branch
@@ -335,7 +337,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                ESGeneratedQueryContext queryContext,
                                Pivot pivot,
                                ArrayDeque<String> columnKeys,
-                               Aggregations aggregation,
+                               HasAggregations aggregation,
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
@@ -368,9 +370,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             aggTypeMap.put(pivotSpec, Tuple.tuple(name, aggClass));
         }
 
-        public Aggregation getSubAggregation(PivotSpec pivotSpec, Aggregations currentAggregationOrBucket) {
+        public Aggregation getSubAggregation(PivotSpec pivotSpec, HasAggregations currentAggregationOrBucket) {
             final Tuple2<String, Class<? extends Aggregation>> tuple2 = getTypes(pivotSpec);
-            return currentAggregationOrBucket.get(tuple2.v1);
+            return currentAggregationOrBucket.getAggregations().get(tuple2.v1);
         }
 
         public Tuple2<String, Class<? extends Aggregation>> getTypes(PivotSpec pivotSpec) {

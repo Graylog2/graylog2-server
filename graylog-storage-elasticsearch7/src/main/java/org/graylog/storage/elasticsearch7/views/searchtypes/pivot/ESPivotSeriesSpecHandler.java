@@ -25,7 +25,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 
 import java.util.stream.Stream;
@@ -41,7 +41,7 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
         aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
     }
 
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
         return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
     }
 

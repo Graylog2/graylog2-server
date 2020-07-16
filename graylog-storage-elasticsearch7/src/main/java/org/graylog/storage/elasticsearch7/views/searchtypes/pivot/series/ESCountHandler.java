@@ -20,10 +20,13 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.ParsedMultiBucketAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
@@ -35,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -79,14 +84,58 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
     }
 
     @Override
-    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
-            return null;
+            if (aggregations instanceof ParsedMultiBucketAggregation.ParsedBucket) {
+                return createValueCount((ParsedMultiBucketAggregation.ParsedBucket) aggregations);
+            }
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
             // value_count aggregation. we'll handle that special case in doHandleResult above
-            return aggregations.get(objects.v1);
+            return aggregations.getAggregations().get(objects.v1);
         }
+
+        return null;
+    }
+
+    private Aggregation createValueCount(ParsedMultiBucketAggregation.ParsedBucket aggregations) {
+        final Long docCount = aggregations.getDocCount();
+        return new ValueCount() {
+            @Override
+            public long getValue() {
+                return docCount;
+            }
+
+            @Override
+            public double value() {
+                return docCount;
+            }
+
+            @Override
+            public String getValueAsString() {
+                return docCount.toString();
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public String getType() {
+                return null;
+            }
+
+            @Override
+            public Map<String, Object> getMetaData() {
+                return null;
+            }
+
+            @Override
+            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) throws IOException {
+                return null;
+            }
+        };
     }
 }
