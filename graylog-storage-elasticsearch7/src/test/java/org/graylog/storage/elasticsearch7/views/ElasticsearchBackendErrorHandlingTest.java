@@ -152,7 +152,8 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         assertThat(errors).isNotNull();
         assertThat(errors).hasSize(1);
         assertThat(errors.stream().map(SearchError::description).collect(Collectors.toList()))
-                .containsExactly("Unable to perform search query: \n\nFailed to parse query [[].");
+                .containsExactly("Unable to perform search query: " +
+                        "\n\nElasticsearch exception [type=query_shard_exception, reason=Failed to parse query [[]].");
     }
 
     @Test
@@ -169,6 +170,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         assertThat(errors).isNotNull();
         assertThat(errors).hasSize(1);
         assertThat(errors.stream().map(SearchError::description).collect(Collectors.toList()))
-                .containsExactly("Unable to perform search query: \n\nExpected numeric type on field [facility], but got [keyword].");
+                .containsExactly("Unable to perform search query: " +
+                        "\n\nElasticsearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [facility], but got [keyword]].");
     }
 }
