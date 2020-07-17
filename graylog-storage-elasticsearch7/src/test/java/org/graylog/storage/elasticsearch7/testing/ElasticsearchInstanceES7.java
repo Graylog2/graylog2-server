@@ -8,12 +8,15 @@ import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.elasticsearch.FixtureImporter;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.net.URI;
+
+import static org.mockito.Mockito.mock;
 
 public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
@@ -32,6 +35,7 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
 
     private ElasticsearchClient elasticsearchClientFrom(ElasticsearchContainer container) {
         final RestHighLevelClientProvider clientProvider = new RestHighLevelClientProvider(
+                mock(GracefulShutdownService.class),
                 ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
