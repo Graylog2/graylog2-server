@@ -85,14 +85,14 @@ const toggleSidebarPinning = (config, setConfig, currentUser, userPreferences, v
 };
 
 const SearchPageLayoutProvider = ({ children, currentUser, userPreferences, viewType }: Props) => {
-  const test = defaultLayoutConfig(currentUser, userPreferences);
-  const [config, setConfig] = useState(test);
+  const initialLayoutConfig = defaultLayoutConfig(currentUser, userPreferences);
+  const [config, setConfig] = useState(initialLayoutConfig);
   const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser, userPreferences, viewType) };
   const configHelpers = { sidebar: { isPinned: () => config.sidebar[sidebarPinningPreferenceKey(viewType)] } };
-  const conigWithHelpers = merge(config, configHelpers);
+  const configWithHelpers = merge(config, configHelpers);
 
   return (
-    <SearchPageLayoutContext.Provider value={{ config: conigWithHelpers, actions }}>
+    <SearchPageLayoutContext.Provider value={{ config: configWithHelpers, actions }}>
       {children}
     </SearchPageLayoutContext.Provider>
   );
