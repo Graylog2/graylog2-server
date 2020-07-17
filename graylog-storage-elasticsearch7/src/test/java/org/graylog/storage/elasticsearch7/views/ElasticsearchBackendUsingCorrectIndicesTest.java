@@ -30,9 +30,10 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -49,8 +50,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,12 +76,10 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
     private IndexLookup indexLookup;
 
     @Mock
-    private RestHighLevelClient restHighLevelClient;
-
     private ElasticsearchClient client;
 
     @Captor
-    private ArgumentCaptor<MultiSearchRequest> clientRequestCaptor;
+    private ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
 
     private SearchJob job;
     private Query query;
@@ -86,8 +88,10 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
     @Before
     public void setupSUT() throws Exception {
-        this.client = new ElasticsearchClient(restHighLevelClient);
-        when(restHighLevelClient.msearch(any(), any())).thenReturn(resultFor(resourceFile("successfulResponseWithSingleQuery.json")));
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(handlers,
@@ -125,9 +129,9 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final ESGeneratedQueryContext context = backend.generate(job, query, Collections.emptySet());
         backend.doRun(job, query, context, Collections.emptySet());
 
-        verify(restHighLevelClient, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 
-        final MultiSearchRequest clientRequest = clientRequestCaptor.getValue();
+        final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isEqualTo("");
     }
@@ -180,16 +184,15 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
         backend.doRun(job, query, context, Collections.emptySet());
 
-        verify(restHighLevelClient, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 
-        final MultiSearchRequest clientRequest = clientRequestCaptor.getValue();
+        final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isEqualTo("index1,index2");
     }
 
     @Test
     public void queryUsesOnlyIndicesBelongingToStream() throws Exception {
-
         final Query query = dummyQuery(RelativeRange.create(600)).toBuilder()
                 .filter(AndFilter.and(StreamFilter.ofId("stream1"), StreamFilter.ofId("stream2")))
                 .build();
@@ -202,9 +205,9 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
         backend.doRun(job, query, context, Collections.emptySet());
 
-        verify(restHighLevelClient, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 
-        final MultiSearchRequest clientRequest = clientRequestCaptor.getValue();
+        final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isEqualTo("index1,index2");
     }

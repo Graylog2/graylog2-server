@@ -25,14 +25,16 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,8 +50,10 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
 
     @Before
     public void setUp() throws Exception {
-        final MultiSearchResponse response = resultFor(resourceFile("successfulMultiSearchResponse.json"));
-        when(client.execute(any(), any())).thenReturn(response);
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
         when(indexLookup.indexNamesForStreamsInTimeRange(eq(ImmutableSet.of(stream1Id)), any()))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
         when(indexLookup.indexNamesForStreamsInTimeRange(eq(ImmutableSet.of(stream2Id)), any()))
@@ -65,7 +69,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
                                 .streams(Collections.emptySet())
                                 .build());
 
-        final MultiSearchRequest request = run(query);
+        final List<SearchRequest> request = run(query);
         assertThat(indicesOf(request).get(0)).isEqualTo("index1,index2");
     }
 
@@ -77,7 +81,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
                                 .rollup(true)
                                 .build());
 
-        final MultiSearchRequest request = run(query);
+        final List<SearchRequest> request = run(query);
         assertThat(indicesOf(request).get(0)).isEqualTo("index1,index2");
     }
 
@@ -90,7 +94,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
                                 .streams(Collections.singleton(stream2Id))
                                 .build());
 
-        final MultiSearchRequest request = run(query);
+        final List<SearchRequest> request = run(query);
         assertThat(indicesOf(request).get(0)).isEqualTo("index3");
     }
 
@@ -109,7 +113,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
                                 .streams(Collections.emptySet())
                                 .build());
 
-        final MultiSearchRequest request = run(query);
+        final List<SearchRequest> request = run(query);
         assertThat(indicesOf(request).get(0)).isEqualTo("index3");
         assertThat(indicesOf(request).get(1)).isEqualTo("index1,index2");
     }
@@ -124,13 +128,13 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
                 .build();
     }
 
-    private MultiSearchRequest run(Query query) throws IOException {
+    private List<SearchRequest> run(Query query) throws IOException {
         final SearchJob job = searchJobForQuery(query);
         final ESGeneratedQueryContext context = this.elasticsearchBackend.generate(job, query, Collections.emptySet());
 
         this.elasticsearchBackend.doRun(job, query, context, Collections.emptySet());
 
-        verify(restHighLevelClient, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 
         return clientRequestCaptor.getValue();
     }

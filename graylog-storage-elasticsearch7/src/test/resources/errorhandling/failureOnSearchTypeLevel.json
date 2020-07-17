@@ -15,11 +15,11 @@
         "hits": []
       },
       "aggregations": {
-        "timestamp-min": {
+        "min#timestamp-min": {
           "value": 1571733480000,
           "value_as_string": "2019-10-22 08:38:00.000"
         },
-        "timestamp-max": {
+        "max#timestamp-max": {
           "value": 1571733775000,
           "value_as_string": "2019-10-22 08:42:55.000"
         }
@@ -81,14 +81,15 @@
         "hits": []
       },
       "aggregations": {
-        "timestamp-min": {
+        "min#timestamp-min": {
           "value": null
         },
-        "timestamp-max": {
+        "max#timestamp-max": {
           "value": null
         }
       },
       "status": 200
     }
-  ]
+  ],
+  "took": 3
 }

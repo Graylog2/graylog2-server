@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,15 +30,9 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.LoggingDeprecationHandler;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.NamedXContentRegistry;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentFactory;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentParser;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -50,7 +44,9 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,8 +61,6 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
-    private RestHighLevelClient restHighLevelClient;
-
     private ElasticsearchClient client;
 
     @Mock
@@ -77,11 +71,11 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
     private Query query;
     private ESGeneratedQueryContext queryContext;
 
-    static abstract class DummyHandler implements ESSearchTypeHandler<SearchType> {}
+    static abstract class DummyHandler implements ESSearchTypeHandler<SearchType> {
+    }
 
     @Before
     public void setUp() throws Exception {
-        this.client = new ElasticsearchClient(restHighLevelClient);
         final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(
                 ImmutableMap.of(
@@ -131,8 +125,10 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
 
     @Test
     public void deduplicatesShardErrorsOnQueryLevel() throws IOException {
-        final MultiSearchResponse response = searchResultFromFixture("errorhandling/failureOnQueryLevel.json");
-        when(restHighLevelClient.msearch(any(), any())).thenReturn(response);
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("errorhandling/failureOnQueryLevel.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
         assertThatExceptionOfType(ElasticsearchException.class)
                 .isThrownBy(() -> this.backend.doRun(searchJob, query, queryContext, Collections.emptySet()))
@@ -144,8 +140,10 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
 
     @Test
     public void deduplicateShardErrorsOnSearchTypeLevel() throws IOException {
-        final MultiSearchResponse multiSearchResult = searchResultFromFixture("errorhandling/failureOnSearchTypeLevel.json");
-        when(restHighLevelClient.msearch(any(), any())).thenReturn(multiSearchResult);
+        final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/failureOnSearchTypeLevel.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(multiSearchResult.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
         final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
 
@@ -159,8 +157,10 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
 
     @Test
     public void deduplicateNumericShardErrorsOnSearchTypeLevel() throws IOException {
-        final MultiSearchResponse multiSearchResult = searchResultFromFixture("errorhandling/numericFailureOnSearchTypeLevel.json");
-        when(restHighLevelClient.msearch(any(), any())).thenReturn(multiSearchResult);
+        final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/numericFailureOnSearchTypeLevel.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(multiSearchResult.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
         final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
 
@@ -170,18 +170,5 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         assertThat(errors).hasSize(1);
         assertThat(errors.stream().map(SearchError::description).collect(Collectors.toList()))
                 .containsExactly("Unable to perform search query: \n\nExpected numeric type on field [facility], but got [keyword].");
-    }
-
-    private MultiSearchResponse searchResultFromFixture(String filename) throws IOException {
-        XContentBuilder b = XContentFactory.jsonBuilder().prettyPrint();
-        try (XContentParser p = XContentFactory.xContent(XContentType.JSON)
-                .createParser(
-                        NamedXContentRegistry.EMPTY,
-                        LoggingDeprecationHandler.INSTANCE,
-                        resourceFile(filename))) {
-            b.copyCurrentStructure(p);
-
-            return MultiSearchResponse.fromXContext(p);
-        }
     }
 }

@@ -17,6 +17,12 @@
 package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.collect.ImmutableSet;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.TypeRef;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -27,6 +33,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -37,9 +45,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,12 +97,49 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
         final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
-        final MultiSearchResponse response = resultFor(resourceFile("successfulMultiSearchResponse.json"));
-        when(client.execute(any(), any())).thenReturn(response);
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
-        final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
-        assertThat(generatedRequest).isEqualTo(resourceFile("overridesInSearchTypeAreIncorporatedIntoGeneratedQueries.request.ndjson"));
+        final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
+        final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
+
+        assertThat(queryString(pivot1)).isEqualTo("production:true");
+        assertThat(timerangeFrom(pivot1)).isEqualTo("2019-09-11 10:31:52.819");
+        assertThat(timerangeTo(pivot1)).isEqualTo("2019-09-11 10:36:52.823");
+        assertThat(streams(pivot1)).containsExactly("stream1");
+
+        assertThat(queryString(pivot2)).isEqualTo("production:true");
+        assertThat(timerangeFrom(pivot2)).isEqualTo("2018-08-23 08:02:00.247");
+        assertThat(timerangeTo(pivot2)).isEqualTo("2018-08-23 08:07:00.252");
+        assertThat(streams(pivot2)).containsExactly("stream1");
+    }
+
+    private DocumentContext parse(String json) {
+        return JsonPath
+                .using(Configuration.builder()
+                        .mappingProvider(new JacksonMappingProvider())
+                        .build())
+                .parse(json);
+    }
+
+    private String queryString(DocumentContext pivot) {
+        return pivot.read("$.query.bool.must[0].bool.filter[0].query_string.query", String.class);
+    }
+
+    private List<String> streams(DocumentContext pivot) {
+        return pivot.read("$.query.bool.must[2].terms.streams", new TypeRef<List<String>>() {});
+    }
+
+    private String timerangeFrom(DocumentContext pivot) {
+        return pivot.read("$.query.bool.must[1].range.timestamp.from", String.class);
+    }
+
+    private String timerangeTo(DocumentContext pivot) {
+        return pivot.read("$.query.bool.must[1].range.timestamp.to", String.class);
     }
 
     @Test
@@ -104,11 +152,22 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
         final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
-        final MultiSearchResponse response = resultFor(resourceFile("successfulMultiSearchResponse.json"));
-        when(client.execute(any(), any())).thenReturn(response);
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
-        final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
-        assertThat(generatedRequest).isEqualTo(resourceFile("timerangeOverridesAffectIndicesSelection.request.ndjson"));
+        assertThat(indicesOf(generatedRequest))
+                .hasSize(2)
+                .containsExactly(
+                        "searchTypeIndex",
+                        "queryIndex"
+                );
+    }
+
+    private JsonPathAssert jsonAssertThat(DocumentContext ctx) {
+        return JsonPathAssert.assertThat(ctx);
     }
 }

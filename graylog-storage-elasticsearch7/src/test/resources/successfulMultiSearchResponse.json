@@ -15,13 +15,13 @@
         "hits": []
       },
       "aggregations": {
-        "pivot1-series-avg(field1)": {
+        "avg#pivot1-series-avg(field1)": {
           "value": 27220.273504273504
         },
-        "timestamp-max": {
+        "max#timestamp-max": {
           "value": null
         },
-        "timestamp-min": {
+        "min#timestamp-min": {
           "value": null
         }
       },
@@ -42,17 +42,18 @@
         "hits": []
       },
       "aggregations": {
-        "pivot2-series-max(field2)": {
+        "max#pivot2-series-max(field2)": {
           "value": 42
         },
-        "timestamp-max": {
+        "max#timestamp-max": {
           "value": null
         },
-        "timestamp-min": {
+        "min#timestamp-min": {
           "value": null
         }
       },
       "status": 200
     }
-  ]
+  ],
+  "took": 40
 }

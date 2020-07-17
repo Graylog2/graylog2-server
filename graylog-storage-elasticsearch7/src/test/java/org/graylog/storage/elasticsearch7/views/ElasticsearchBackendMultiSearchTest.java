@@ -27,6 +27,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,9 +37,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -88,20 +94,25 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
 
     @Test
     public void everySearchTypeGeneratesOneESQuery() throws Exception {
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
+
         final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
-        when(client.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
-        final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
-
-        assertThat(generatedRequest).isEqualTo(resourceFile("everySearchTypeGeneratesOneESQuery.request.ndjson"));
+        assertThat(generatedRequest).hasSize(2);
     }
 
     @Test
     public void multiSearchResultsAreAssignedToSearchTypes() throws Exception {
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
+
         final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
-
-        when(client.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
-
         final QueryResult queryResult = this.elasticsearchBackend.doRun(searchJob, query, queryContext, Collections.emptySet());
 
         assertThat(queryResult.searchTypes()).containsOnlyKeys("pivot1", "pivot2");
@@ -125,7 +136,10 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
     public void oneFailingSearchTypeReturnsPartialResults() throws Exception {
         final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
 
-        when(client.execute(any(), any())).thenReturn(resultFor(resourceFile("partiallySuccessfulMultiSearchResponse.json")));
+        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
+        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
+                .collect(Collectors.toList());
+        when(client.msearch(any(), any())).thenReturn(items);
 
         final QueryResult queryResult = this.elasticsearchBackend.doRun(searchJob, query, queryContext, Collections.emptySet());
 
@@ -134,7 +148,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
         assertThat(searchTypeError.description()).isEqualTo(
                 "Unable to perform search query: \n" +
                         "\n" +
-                        "Expected numeric type on field [field1], but got [keyword]."
+                        "Elasticsearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [field1], but got [keyword]]."
         );
         assertThat(searchTypeError.searchTypeId()).isEqualTo("pivot1");
 

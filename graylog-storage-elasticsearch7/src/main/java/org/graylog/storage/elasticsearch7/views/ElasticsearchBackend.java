@@ -40,8 +40,10 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ShardOperationFailedException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
@@ -51,6 +53,7 @@ import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -262,6 +266,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             if (multiSearchResponse.isFailure()) {
                 ElasticsearchException e = new ElasticsearchException("Search type returned error: ", multiSearchResponse.getFailure());
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
+            } else if (checkForFailedShards(multiSearchResponse).isPresent()) {
+                ElasticsearchException e = checkForFailedShards(multiSearchResponse).get();
+                queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
                 if (searchTypeResult != null) {
@@ -276,6 +283,37 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
+    }
+
+    private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {
+        if (multiSearchResponse.isFailure()) {
+            return Optional.of(new ElasticsearchException(multiSearchResponse.getFailureMessage(), multiSearchResponse.getFailure()));
+        }
+
+        final SearchResponse searchResponse = multiSearchResponse.getResponse();
+        if (searchResponse != null && searchResponse.getFailedShards() > 0) {
+            final List<Throwable> shardFailures = Arrays.stream(searchResponse.getShardFailures())
+                    .map(ShardOperationFailedException::getCause)
+                    .collect(Collectors.toList());
+            final List<String> nonNumericFieldErrors = shardFailures
+                    .stream()
+                    .filter(shardFailure -> shardFailure.getMessage().contains("Expected numeric type on field"))
+                    .map(Throwable::getMessage)
+                    .distinct()
+                    .collect(Collectors.toList());
+            if (!nonNumericFieldErrors.isEmpty()) {
+                return Optional.of(new FieldTypeException("Unable to perform search query: ", nonNumericFieldErrors));
+            }
+
+            final List<String> errors = shardFailures
+                    .stream()
+                    .map(Throwable::getMessage)
+                    .distinct()
+                    .collect(Collectors.toList());
+            return Optional.of(new ElasticsearchException("Unable to perform search query: ", errors));
+        }
+
+        return Optional.empty();
     }
 
     @SuppressWarnings("UnstableApiUsage")

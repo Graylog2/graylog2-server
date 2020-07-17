@@ -31,8 +31,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
@@ -54,8 +53,15 @@ import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,8 +78,6 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
     ElasticsearchBackend elasticsearchBackend;
 
     @Mock
-    protected RestHighLevelClient restHighLevelClient;
-
     protected ElasticsearchClient client;
 
     @Mock
@@ -85,11 +89,10 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
     protected Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticSearchTypeHandlers;
 
     @Captor
-    protected ArgumentCaptor<MultiSearchRequest> clientRequestCaptor;
+    protected ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
 
     @Before
     public void setUpSUT() {
-        this.client = new ElasticsearchClient(restHighLevelClient);
         this.elasticSearchTypeHandlers = new HashMap<>();
         final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers = Collections.emptyMap();
         final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers = new HashMap<>();
@@ -122,12 +125,23 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         return null;
     }
 
-    String run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) throws IOException {
+    List<SearchRequest> run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) throws IOException {
         this.elasticsearchBackend.doRun(searchJob, query, queryContext, predecessorResults);
 
-        verify(restHighLevelClient, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 
-        final MultiSearchRequest generatedSearch = clientRequestCaptor.getValue();
-        return generatedSearch.toString();
+        final List<SearchRequest> generatedSearch = clientRequestCaptor.getValue();
+        return generatedSearch;
+    }
+
+    String resourceFile(String filename) {
+        try {
+            final URL resource = this.getClass().getResource(filename);
+            final Path path = Paths.get(resource.toURI());
+            final byte[] bytes = Files.readAllBytes(path);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
