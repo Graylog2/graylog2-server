@@ -42,18 +42,15 @@ export type PaginatedListType = {
 
 type Props = {
   onLoad: (PaginationInfo) => Promise<?PaginatedListType>,
+  overrideList: ?PaginatedListType,
 };
 
-const PaginatedItemOverview = ({ onLoad }: Props) => {
-  const pageSizes = [5, 10, 30];
+const pageSizes = [5, 10, 30];
+export const defaultPageInfo = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '', total: 0, count: 0 };
+
+const PaginatedItemOverview = ({ onLoad, overrideList }: Props) => {
   const [items, setItems] = useState();
-  const [paginationInfo, setPaginationInfo] = useState({
-    count: 0,
-    total: 0,
-    page: INITIAL_PAGE,
-    perPage: pageSizes[0],
-    query: '',
-  });
+  const [paginationInfo, setPaginationInfo] = useState(defaultPageInfo);
 
   const _setResponse = (response: ?PaginatedListType) => {
     if (!response) {
@@ -64,6 +61,8 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
     setPaginationInfo(pagination);
     setItems(list);
   };
+
+  useEffect(() => _setResponse(overrideList), [overrideList]);
 
   useEffect(() => {
     onLoad(paginationInfo).then(_setResponse);

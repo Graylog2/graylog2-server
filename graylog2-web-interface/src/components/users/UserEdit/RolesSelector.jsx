@@ -11,7 +11,7 @@ import { Select } from 'components/common';
 import User from 'logic/users/User';
 
 type Props = {
-  onSubmit: ({ roles: string[] }) => void,
+  onSubmit: ({ roles: string[] }) => Promise<void>,
   user: User,
 };
 
