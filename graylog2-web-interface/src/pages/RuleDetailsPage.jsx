@@ -24,7 +24,7 @@ function filterPipelines(pipelines = [], title = '') {
 
 const RuleDetailsPage = ({ params, rule, pipelines }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [filteredRule, setFilteredRule] = useState({});
+  const [filteredRule, setFilteredRule] = useState(undefined);
 
   const isNewRule = params.ruleId === 'new';
   const title = filteredRule?.title || '';
@@ -33,17 +33,16 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
   const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
   useEffect(() => {
-    console.log('useEffect', rule, params);
     setFilteredRule(filterRules(rule, params.ruleId));
-  }, [params]);
+  }, [params, rule]);
 
   useEffect(() => {
-    if (!isNewRule) {
-      PipelinesActions.list();
-      RulesActions.get(params?.ruleId);
-      setIsLoading(!(filteredRule && pipelines));
-    } else {
+    if (isNewRule) {
       setIsLoading(false);
+    } else {
+      PipelinesActions.list();
+      RulesActions.get(params.ruleId);
+      setIsLoading(!(filteredRule && pipelines));
     }
   }, [filteredRule]);
 
