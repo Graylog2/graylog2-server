@@ -8,6 +8,8 @@ import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
+import View from 'views/logic/views/View';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutProvider from './SearchPageLayoutProvider';
@@ -37,11 +39,13 @@ describe('CurrentUserPreferencesProvider', () => {
   const SimpleProvider = ({ children }: { children: any }) => (
     <CurrentUserProvider>
       <CurrentUserPreferencesProvider>
-        <SearchPageLayoutProvider>
-          <SearchPageLayoutContext.Consumer>
-            {children}
-          </SearchPageLayoutContext.Consumer>
-        </SearchPageLayoutProvider>
+        <CurrentViewTypeProvider type={View.Type.Search}>
+          <SearchPageLayoutProvider>
+            <SearchPageLayoutContext.Consumer>
+              {children}
+            </SearchPageLayoutContext.Consumer>
+          </SearchPageLayoutProvider>
+        </CurrentViewTypeProvider>
       </CurrentUserPreferencesProvider>
     </CurrentUserProvider>
   );
@@ -72,8 +76,7 @@ describe('CurrentUserPreferencesProvider', () => {
   it('provides default search page layout with empty preference store', () => {
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.dashboardSidebarIsPinned).toEqual(false);
-    expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(false);
+    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
   });
 
   it('provides default search page layout if user does not exists', () => {
@@ -81,8 +84,7 @@ describe('CurrentUserPreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.dashboardSidebarIsPinned).toEqual(false);
-    expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(false);
+    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
   });
 
   it('provides default search page layout if user has no preferences', () => {
@@ -90,8 +92,7 @@ describe('CurrentUserPreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.dashboardSidebarIsPinned).toEqual(false);
-    expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(false);
+    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(false);
   });
 
   it('provides search page layout based on user preferences', () => {
@@ -105,7 +106,7 @@ describe('CurrentUserPreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(true);
+    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(true);
   });
 
   it('provides search page layout based on local storage for system admin', () => {
@@ -125,7 +126,7 @@ describe('CurrentUserPreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume.mock.calls[0][0]?.config.sidebar.searchSidebarIsPinned).toEqual(true);
+    expect(consume.mock.calls[0][0]?.config.sidebar.isPinned).toEqual(true);
   });
 
   it('should update user preferences on layout change', () => {

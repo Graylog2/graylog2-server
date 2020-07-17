@@ -1,46 +1,49 @@
 // @flow strict
 import * as React from 'react';
-import { useContext, useState } from 'react';
-import { merge, isEmpty } from 'lodash';
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import type { User } from 'stores/users/UsersStore';
 import View, { type ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import UserPreferencesContext, { type UserPreferences } from 'contexts/UserPreferencesContext';
+import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import CombinedProvider from 'injection/CombinedProvider';
 import Store from 'logic/local-storage/Store';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
+import SearchPageLayoutState from './SearchPageLayoutState';
 
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
 type Props = {
   children: React.Node,
-  currentUser: ?User,
-  userPreferences: UserPreferences,
-  viewType: ?ViewType,
 };
 
-export const defaultLayoutConfig = (currentUser: ?User, userPreferences?: UserPreferences) => {
-  let dashboardSidebarIsPinned = false;
-  let searchSidebarIsPinned = false;
+const getPinningPreferenceKey = (viewType: ?ViewType): string => {
+  const preferenceKeyMapping = {
+    [View.Type.Dashboard]: 'dashboardSidebarIsPinned',
+    [View.Type.Search]: 'searchSidebarIsPinned',
+  };
 
-  if (currentUser?.id === 'local:admin') {
-    searchSidebarIsPinned = Store.get('searchSidebarIsPinned');
-    dashboardSidebarIsPinned = Store.get('dashboardSidebarIsPinned');
-  } else if (!isEmpty(userPreferences)) {
-    searchSidebarIsPinned = userPreferences.searchSidebarIsPinned;
-    dashboardSidebarIsPinned = userPreferences.dashboardSidebarIsPinned;
+  const preferenceKey = preferenceKeyMapping[viewType];
+
+  if (!preferenceKey) {
+    throw new Error(`User sidebar pinning preference key is missing for view type ${viewType}`);
   }
 
-  return {
-    sidebar: {
-      searchSidebarIsPinned,
-      dashboardSidebarIsPinned,
-    },
-  };
+  return preferenceKey;
+};
+
+const getDefaultIsPinned = (currentUser, userPreferences, viewType) => {
+  const fallbackDefault = false;
+  const sidebarPinningPrefKey = getPinningPreferenceKey(viewType);
+
+  // eslint-disable-next-line camelcase
+  if (currentUser?.read_only) {
+    return Store.get(sidebarPinningPrefKey) ?? fallbackDefault;
+  }
+
+  return userPreferences[sidebarPinningPrefKey] ?? fallbackDefault;
 };
 
 const createUserPreferencesArray = (userPreferences) => {
@@ -50,71 +53,50 @@ const createUserPreferencesArray = (userPreferences) => {
   }));
 };
 
-const sidebarPinningPreferenceKey = (viewType: ?ViewType): string => {
-  switch (viewType) {
-    case View.Type.Dashboard:
-      return 'dashboardSidebarIsPinned';
-    default:
-      return 'searchSidebarIsPinned';
-  }
-};
-
-const toggleSidebarPinning = (config, setConfig, currentUser, userPreferences, viewType) => {
-  const preferenceKey = sidebarPinningPreferenceKey(viewType);
-  const newState = !config.sidebar[preferenceKey];
-  const newLayoutConfig = {
-    ...config,
-    sidebar: {
-      ...config.sidebar,
-      [preferenceKey]: newState,
-    },
-  };
-
-  setConfig(newLayoutConfig);
+const _toggleSidebarPinning = (currentUser, userPreferences, viewType, setLayoutState, isPinned) => {
+  const sidebarPinningPrefKey = getPinningPreferenceKey(viewType);
+  const newPinningState = !isPinned;
+  setLayoutState('sidebarIsPinned', newPinningState);
 
   // eslint-disable-next-line camelcase
   if (currentUser?.read_only) {
-    Store.set(preferenceKey, newState);
+    Store.set(sidebarPinningPrefKey, !isPinned);
   } else {
     const newUserPreferences = {
       ...userPreferences,
-      [preferenceKey]: newState,
+      [sidebarPinningPrefKey]: newPinningState,
     };
     PreferencesActions.saveUserPreferences(currentUser?.username, createUserPreferencesArray(newUserPreferences), undefined, false);
   }
 };
 
-const SearchPageLayoutProvider = ({ children, currentUser, userPreferences, viewType }: Props) => {
-  const initialLayoutConfig = defaultLayoutConfig(currentUser, userPreferences);
-  const [config, setConfig] = useState(initialLayoutConfig);
-  const actions = { toggleSidebarPinning: () => toggleSidebarPinning(config, setConfig, currentUser, userPreferences, viewType) };
-  const configHelpers = { sidebar: { isPinned: () => config.sidebar[sidebarPinningPreferenceKey(viewType)] } };
-  const configWithHelpers = merge(config, configHelpers);
+const SearchPageLayoutProvider = ({ children }: Props) => {
+  const currentUser = useContext(CurrentUserContext);
+  const userPreferences = useContext(UserPreferencesContext);
+  const viewType = useContext(ViewTypeContext);
+  const defaultIsPinned = getDefaultIsPinned(currentUser, userPreferences, viewType);
 
   return (
-    <SearchPageLayoutContext.Provider value={{ config: configWithHelpers, actions }}>
-      {children}
-    </SearchPageLayoutContext.Provider>
+    <SearchPageLayoutState>
+      {({ getLayoutState, setLayoutState }) => {
+        const config = {
+          sidebar: { isPinned: getLayoutState('sidebarIsPinned', defaultIsPinned) },
+        };
+        const actions = { toggleSidebarPinning: () => _toggleSidebarPinning(currentUser, userPreferences, viewType, setLayoutState, config.sidebar.isPinned) };
+
+        return (
+          <SearchPageLayoutContext.Provider value={{ config, actions }}>
+            {children}
+          </SearchPageLayoutContext.Provider>
+        );
+      }}
+
+    </SearchPageLayoutState>
   );
 };
 
 SearchPageLayoutProvider.propTypes = {
   children: PropTypes.node.isRequired,
-  userPreferences: PropTypes.object,
 };
 
-SearchPageLayoutProvider.defaultProps = {
-  userPreferences: {},
-};
-
-const SearchPageLayoutProviderWithContext = ({ ...rest }: { children: React.Node }) => {
-  const currentUser = useContext(CurrentUserContext);
-  const userPreferences = useContext(UserPreferencesContext);
-  const viewType = useContext(ViewTypeContext);
-
-  return (
-    <SearchPageLayoutProvider {...rest} userPreferences={userPreferences} currentUser={currentUser} viewType={viewType} />
-  );
-};
-
-export default SearchPageLayoutProviderWithContext;
+export default SearchPageLayoutProvider;

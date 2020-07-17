@@ -54,7 +54,7 @@ const handleToggleSidebar = (initialSectionKey: string, activeSectionKey: ?strin
 };
 
 const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewMetadata, viewIsNew }: Props) => {
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned() ?? false;
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<?string>(sidebarIsPinned ? initialSectionKey : null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);

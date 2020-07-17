@@ -127,7 +127,7 @@ const sidebarTitle = (viewMetadata: ViewMetadata, viewType: ?ViewType, viewIsNew
 };
 
 const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata, viewIsNew }: Props) => {
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned();
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
 
   return (
     <ViewTypeContext.Consumer>
