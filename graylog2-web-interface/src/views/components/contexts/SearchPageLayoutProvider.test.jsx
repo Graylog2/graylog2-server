@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 
@@ -34,8 +34,6 @@ jest.mock('logic/local-storage/Store', () => ({
 }));
 
 describe('CurrentUserPreferencesProvider', () => {
-  afterEach(cleanup);
-
   const SimpleProvider = ({ children }: { children: any }) => (
     <CurrentUserProvider>
       <CurrentUserPreferencesProvider>

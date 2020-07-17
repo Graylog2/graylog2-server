@@ -16,7 +16,7 @@ const errorPageStyles = (backgroundImage) => css`
   }
 `;
 
-const ErrorMessage = styled.div(({ theme }) => `
+const ErrorMessage = styled.div(({ theme }) => css`
   margin-left: auto;
   margin-right: auto;
   text-align: left;

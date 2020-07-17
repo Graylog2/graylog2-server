@@ -14,13 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.events.indices;
+package org.graylog2.indexer.messages;
 
-import org.graylog.events.event.Event;
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
 
-import java.util.List;
+import javax.annotation.Nonnull;
 import java.util.Map;
 
-public interface EventIndexerAdapter {
-    void write(List<Map.Entry<String, Event>> requests);
+public interface Indexable {
+    String getId();
+    long getSize();
+    DateTime getReceiveTime();
+    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);
+    DateTime getTimestamp();
 }

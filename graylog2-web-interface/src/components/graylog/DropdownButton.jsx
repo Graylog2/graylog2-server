@@ -6,8 +6,7 @@ import styled, { css } from 'styled-components';
 import menuItemStyles from './styles/menuItem';
 
 const StyledDropdownButton = styled(BootstrapDropdownButton)(({ theme }) => css`
-  ${theme.components.button};
-
+  ${theme.components.button}
   & ~ {
     ${menuItemStyles}
   }

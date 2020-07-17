@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import { viewsManager } from 'fixtures/users';
 
 import type { User } from 'stores/users/UsersStore';
@@ -63,8 +63,6 @@ jest.mock('views/stores/ViewSharingStore', () => ({
 }));
 
 describe('ViewActionsMenu', () => {
-  afterEach(cleanup);
-
   const SimpleViewActionMenu = ({ currentUser, ...props }: {currentUser?: User}) => (
     <CurrentUserContext.Provider value={currentUser}>
       <ViewActionsMenu {...props} router={{}} />

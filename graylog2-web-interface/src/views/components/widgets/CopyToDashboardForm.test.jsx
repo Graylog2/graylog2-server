@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 
 import { DashboardsActions } from 'views/stores/DashboardsStore';
@@ -9,7 +9,9 @@ import View from 'views/logic/views/View';
 import CopyToDashboardForm from './CopyToDashboardForm';
 
 describe('CopyToDashboardForm', () => {
-  afterEach(cleanup);
+  beforeEach(() => {
+    DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
+  });
 
   const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
     .build();
@@ -85,7 +87,6 @@ describe('CopyToDashboardForm', () => {
   });
 
   it('should query for all dashboards & specific dashboards', () => {
-    DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
     const { getByPlaceholderText, getByText } = render(
       <CopyToDashboardForm dashboards={dashboardState}
                            widgetId="widget-id"

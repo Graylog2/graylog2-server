@@ -52,7 +52,9 @@ const ShowDashboardInBigDisplayMode = ({ location, params, route, view: { view, 
     RefreshActions.setInterval(configuration.refresh * 1000);
     RefreshActions.enable();
 
-    return () => RefreshActions.disable();
+    return () => {
+      RefreshActions.disable();
+    };
   }, [configuration.refresh]);
 
   return (

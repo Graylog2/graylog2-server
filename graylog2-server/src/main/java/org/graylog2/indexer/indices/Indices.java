@@ -63,6 +63,7 @@ public class Indices {
     private final IndexMappingFactory indexMappingFactory;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
+    @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus;
     private final IndicesAdapter indicesAdapter;
 
@@ -70,7 +71,7 @@ public class Indices {
     public Indices(IndexMappingFactory indexMappingFactory,
                    NodeId nodeId,
                    AuditEventSender auditEventSender,
-                   EventBus eventBus,
+                   @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
                    IndicesAdapter indicesAdapter) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
@@ -96,6 +97,7 @@ public class Indices {
 
     public void delete(String indexName) {
         indicesAdapter.delete(indexName);
+        //noinspection UnstableApiUsage
         eventBus.post(IndicesDeletedEvent.create(indexName));
     }
 
@@ -104,6 +106,7 @@ public class Indices {
             indicesAdapter.removeAlias(indexName, indexName + REOPENED_ALIAS_SUFFIX);
         }
         indicesAdapter.close(indexName);
+        //noinspection UnstableApiUsage
         eventBus.post(IndicesClosedEvent.create(indexName));
     }
 
@@ -115,12 +118,6 @@ public class Indices {
         return indicesAdapter.getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    /**
-     * Check if a given name is an existing index.
-     *
-     * @param indexName Name of the index to check presence for.
-     * @return {@code true} if indexName is an existing index, {@code false} if it is non-existing or an alias.
-     */
     public boolean exists(String indexName) {
         try {
             return indicesAdapter.exists(indexName);
@@ -129,12 +126,6 @@ public class Indices {
         }
     }
 
-    /**
-     * Check if a given name is an existing alias.
-     *
-     * @param alias Name of the alias to check presence for.
-     * @return {@code true} if alias is an existing alias, {@code false} if it is non-existing or an index.
-     */
     public boolean aliasExists(String alias) {
         try {
             return indicesAdapter.aliasExists(alias);
@@ -163,9 +154,7 @@ public class Indices {
     public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE));
-
-        final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
+        final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
 
         final boolean result = indicesAdapter.ensureIndexTemplate(templateName, template);
 
@@ -174,12 +163,6 @@ public class Indices {
         }
     }
 
-    /**
-     * Returns the generated Elasticsearch index template for the given index set.
-     *
-     * @param indexSet the index set
-     * @return the generated index template
-     */
     public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
         final String indexWildcard = indexSet.getIndexWildcard();
 
@@ -207,11 +190,11 @@ public class Indices {
 
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE));
-
-        final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
+        final Map<String, Object> template = buildTemplate(indexSet, indexSetConfig);
 
         try {
+            // Make sure our index template exists before creating an index!
+            indicesAdapter.ensureIndexTemplate(templateName, template);
             indicesAdapter.create(indexName, indexSettings, templateName, template);
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage());
@@ -221,6 +204,13 @@ public class Indices {
 
         auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         return true;
+    }
+
+    private Map<String, Object> buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) {
+        final IndexSetConfig.TemplateType templateType = indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE);
+        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(templateType);
+
+        return indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
@@ -252,12 +242,13 @@ public class Indices {
         openIndex(index);
     }
 
-    public String markIndexReopened(String index) {
-        return indicesAdapter.markIndexReopened(index);
+    public void markIndexReopened(String index) {
+        indicesAdapter.markIndexReopened(index);
     }
 
     private void openIndex(String index) {
         indicesAdapter.openIndex(index);
+        //noinspection UnstableApiUsage
         eventBus.post(IndicesReopenedEvent.create(index));
     }
 
@@ -279,23 +270,18 @@ public class Indices {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    /**
-     * Retrieves all indices in the given {@link IndexSet}.
-     * <p>
-     * If any status filter parameter are present, only indices with the given status are returned.
-     *
-     * @param indexSet the index set
-     * @param statusFilter only indices with the given status are returned. (available: "open", "close")
-     * @return the set of indices in the given index set
-     */
     public Set<String> getIndices(final IndexSet indexSet, final String... statusFilter) {
         final String indexWildcard = indexSet.getIndexWildcard();
         final List<String> status = Arrays.asList(statusFilter);
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
     }
 
+    public boolean isOpen(final String indexName) {
+        return indicesAdapter.isOpen(indexName);
+    }
+
     public boolean isClosed(final String indexName) {
-        return getClosedIndices(Collections.singleton(indexName)).contains(indexName);
+        return indicesAdapter.isClosed(indexName);
     }
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {
@@ -310,10 +296,6 @@ public class Indices {
 
     public Optional<IndexStatistics> getIndexStats(String index) {
         return indicesAdapter.getIndexStats(index);
-    }
-
-    private IndexStatistics buildIndexStatistics(String index, JsonNode indexStats) {
-        return IndexStatistics.create(index, indexStats);
     }
 
     public Optional<Long> getStoreSizeInBytes(String index) {
@@ -353,13 +335,6 @@ public class Indices {
         return indicesAdapter.indexCreationDate(index);
     }
 
-    /**
-     * Calculate min and max message timestamps in the given index.
-     *
-     * @param index Name of the index to query.
-     * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
-     * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
-     */
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
         return indicesAdapter.indexRangeStatsOfIndex(index);
     }

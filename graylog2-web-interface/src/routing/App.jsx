@@ -29,7 +29,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
 `);
 
-const App = ({ children, location }) => (
+const App = ({ children }) => (
   <CurrentUserContext.Consumer>
     {(currentUser) => {
       if (!currentUser) {
@@ -38,10 +38,7 @@ const App = ({ children, location }) => (
 
       return (
         <ScratchpadProvider loginName={currentUser.username}>
-          <Navigation requestPath={location.pathname}
-                      fullName={currentUser.full_name}
-                      loginName={currentUser.username}
-                      permissions={currentUser.permissions} />
+          <Navigation />
           <ScrollToHint id="scroll-to-hint">
             <Icon name="arrow-up" />
           </ScrollToHint>
@@ -62,7 +59,6 @@ App.propTypes = {
     PropTypes.arrayOf(PropTypes.element),
     PropTypes.element,
   ]).isRequired,
-  location: PropTypes.object.isRequired,
 };
 
 export default App;

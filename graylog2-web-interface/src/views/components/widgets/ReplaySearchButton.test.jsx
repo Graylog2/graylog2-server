@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, render } from 'wrappedTestingLibrary';
+import { asElement, render } from 'wrappedTestingLibrary';
 
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -16,8 +16,6 @@ type OptionalOverrides = {
 };
 
 describe('ReplaySearchButton', () => {
-  afterEach(cleanup);
-
   it('renders play button', () => {
     const { getByTitle } = render(<ReplaySearchButton />);
 

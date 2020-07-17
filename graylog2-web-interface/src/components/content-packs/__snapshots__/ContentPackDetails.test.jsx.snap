@@ -21,169 +21,200 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
   showConstraints={false}
   verbose={false}
 >
-  <Row
-    bsClass="row"
-    componentClass="div"
-  >
-    <div
-      className="row"
+  <Row>
+    <StyledComponent
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Row-sc-3iisrt-0",
+            "isStatic": false,
+            "lastClassName": "bRJRJg",
+            "rules": Array [
+              "&.content{",
+              [Function],
+              "}",
+            ],
+          },
+          "displayName": "Row",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Row-sc-3iisrt-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
     >
-      <Col
-        bsClass="col"
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 bRJRJg"
         componentClass="div"
-        sm={9}
-        smOffset={1}
       >
         <div
-          className="col-sm-9 col-sm-offset-1"
+          className="Row-sc-3iisrt-0 bRJRJg row"
         >
-          <div
-            id="content-pack-details"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={9}
+            smOffset={1}
           >
-            <h2>
-              Details
-            </h2>
-            <br />
-            <div>
-              <dl
-                className="deflist"
+            <div
+              className="col-sm-9 col-sm-offset-1"
+            >
+              <div
+                id="content-pack-details"
               >
-                <dt>
-                  Version:
-                </dt>
-                 
-                <dd>
-                  1
-                </dd>
-                <dt>
-                  Name:
-                </dt>
-                 
-                <dd>
-                  UFW Grok Patterns
-                   
-                </dd>
-                <dt>
-                  Summary:
-                </dt>
-                 
-                <dd>
-                  This is a summary
-                   
-                </dd>
-                <dt>
-                  Vendor:
-                </dt>
-                 
-                <dd>
-                  graylog.com
-                   
-                </dd>
-                <dt>
-                  URL:
-                </dt>
-                 
-                <dd>
-                  <a
-                    href="http://www.graylog.com"
+                <h2>
+                  Details
+                </h2>
+                <br />
+                <div>
+                  <dl
+                    className="deflist"
                   >
-                    http://www.graylog.com
-                  </a>
-                   
-                </dd>
-                <span>
-                  <dt>
-                    ID:
-                  </dt>
-                   
-                  <dd>
-                    <code>
+                    <dt>
+                      Version:
+                    </dt>
+                     
+                    <dd>
                       1
-                    </code>
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Parameters:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Entities:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-              </dl>
-            </div>
-            <div>
-              <h2>
-                Description
-              </h2>
-              <br />
-              <Well>
-                <StyledComponent
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "SIZES": Array [
-                        "large",
-                        "small",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "Well-sc-19gs1oc-0",
-                        "isStatic": false,
-                        "lastClassName": "eWEWxV",
-                        "rules": Array [
-                          [Function],
-                        ],
-                      },
-                      "displayName": "Well",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "Well-sc-19gs1oc-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
-                >
-                  <Well
-                    bsClass="well"
-                    className="Well-sc-19gs1oc-0 eWEWxV"
-                  >
-                    <div
-                      className="Well-sc-19gs1oc-0 eWEWxV well"
-                    >
-                      <div
-                        dangerouslySetInnerHTML={
-                          Object {
-                            "__html": "<p>Grok Patterns to extract informations from UFW logfiles</p>
-",
-                          }
+                    </dd>
+                    <dt>
+                      Name:
+                    </dt>
+                     
+                    <dd>
+                      UFW Grok Patterns
+                       
+                    </dd>
+                    <dt>
+                      Summary:
+                    </dt>
+                     
+                    <dd>
+                      This is a summary
+                       
+                    </dd>
+                    <dt>
+                      Vendor:
+                    </dt>
+                     
+                    <dd>
+                      graylog.com
+                       
+                    </dd>
+                    <dt>
+                      URL:
+                    </dt>
+                     
+                    <dd>
+                      <a
+                        href="http://www.graylog.com"
+                      >
+                        http://www.graylog.com
+                      </a>
+                       
+                    </dd>
+                    <span>
+                      <dt>
+                        ID:
+                      </dt>
+                       
+                      <dd>
+                        <code>
+                          1
+                        </code>
+                      </dd>
+                    </span>
+                    <span>
+                      <dt>
+                        Parameters:
+                      </dt>
+                       
+                      <dd>
+                        0
+                      </dd>
+                    </span>
+                    <span>
+                      <dt>
+                        Entities:
+                      </dt>
+                       
+                      <dd>
+                        0
+                      </dd>
+                    </span>
+                  </dl>
+                </div>
+                <div>
+                  <h2>
+                    Description
+                  </h2>
+                  <br />
+                  <Well>
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "SIZES": Array [
+                            "large",
+                            "small",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "Well-sc-19gs1oc-0",
+                            "isStatic": false,
+                            "lastClassName": "eWEWxV",
+                            "rules": Array [
+                              [Function],
+                            ],
+                          },
+                          "displayName": "Well",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "Well-sc-19gs1oc-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
                         }
-                      />
-                    </div>
+                      }
+                      forwardedRef={null}
+                    >
+                      <Well
+                        bsClass="well"
+                        className="Well-sc-19gs1oc-0 eWEWxV"
+                      >
+                        <div
+                          className="Well-sc-19gs1oc-0 eWEWxV well"
+                        >
+                          <div
+                            dangerouslySetInnerHTML={
+                              Object {
+                                "__html": "<p>Grok Patterns to extract informations from UFW logfiles</p>
+",
+                              }
+                            }
+                          />
+                        </div>
+                      </Well>
+                    </StyledComponent>
                   </Well>
-                </StyledComponent>
-              </Well>
+                </div>
+                <br />
+                <br />
+                <br />
+              </div>
             </div>
-            <br />
-            <br />
-            <br />
-          </div>
+          </Col>
         </div>
-      </Col>
-    </div>
+      </Row>
+    </StyledComponent>
   </Row>
 </ContentPackDetails>
 `;
@@ -211,111 +242,142 @@ exports[`<ContentPackDetails /> should render with content pack without a descri
   showConstraints={false}
   verbose={false}
 >
-  <Row
-    bsClass="row"
-    componentClass="div"
-  >
-    <div
-      className="row"
+  <Row>
+    <StyledComponent
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "Row-sc-3iisrt-0",
+            "isStatic": false,
+            "lastClassName": "bRJRJg",
+            "rules": Array [
+              "&.content{",
+              [Function],
+              "}",
+            ],
+          },
+          "displayName": "Row",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "Row-sc-3iisrt-0",
+          "target": [Function],
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
     >
-      <Col
-        bsClass="col"
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 bRJRJg"
         componentClass="div"
-        sm={9}
-        smOffset={1}
       >
         <div
-          className="col-sm-9 col-sm-offset-1"
+          className="Row-sc-3iisrt-0 bRJRJg row"
         >
-          <div
-            id="content-pack-details"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={9}
+            smOffset={1}
           >
-            <h2>
-              Details
-            </h2>
-            <br />
-            <div>
-              <dl
-                className="deflist"
+            <div
+              className="col-sm-9 col-sm-offset-1"
+            >
+              <div
+                id="content-pack-details"
               >
-                <dt>
-                  Version:
-                </dt>
-                 
-                <dd />
-                <dt>
-                  Name:
-                </dt>
-                 
-                <dd>
-                   
-                </dd>
-                <dt>
-                  Summary:
-                </dt>
-                 
-                <dd>
-                  This is a summary
-                   
-                </dd>
-                <dt>
-                  Vendor:
-                </dt>
-                 
-                <dd>
-                  graylog.com
-                   
-                </dd>
-                <dt>
-                  URL:
-                </dt>
-                 
-                <dd>
-                  <a
-                    href="http://www.graylog.com"
+                <h2>
+                  Details
+                </h2>
+                <br />
+                <div>
+                  <dl
+                    className="deflist"
                   >
-                    http://www.graylog.com
-                  </a>
-                   
-                </dd>
-                <span>
-                  <dt>
-                    ID:
-                  </dt>
-                   
-                  <dd>
-                    <code>
-                      1
-                    </code>
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Parameters:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    Entities:
-                  </dt>
-                   
-                  <dd>
-                    0
-                  </dd>
-                </span>
-              </dl>
+                    <dt>
+                      Version:
+                    </dt>
+                     
+                    <dd />
+                    <dt>
+                      Name:
+                    </dt>
+                     
+                    <dd>
+                       
+                    </dd>
+                    <dt>
+                      Summary:
+                    </dt>
+                     
+                    <dd>
+                      This is a summary
+                       
+                    </dd>
+                    <dt>
+                      Vendor:
+                    </dt>
+                     
+                    <dd>
+                      graylog.com
+                       
+                    </dd>
+                    <dt>
+                      URL:
+                    </dt>
+                     
+                    <dd>
+                      <a
+                        href="http://www.graylog.com"
+                      >
+                        http://www.graylog.com
+                      </a>
+                       
+                    </dd>
+                    <span>
+                      <dt>
+                        ID:
+                      </dt>
+                       
+                      <dd>
+                        <code>
+                          1
+                        </code>
+                      </dd>
+                    </span>
+                    <span>
+                      <dt>
+                        Parameters:
+                      </dt>
+                       
+                      <dd>
+                        0
+                      </dd>
+                    </span>
+                    <span>
+                      <dt>
+                        Entities:
+                      </dt>
+                       
+                      <dd>
+                        0
+                      </dd>
+                    </span>
+                  </dl>
+                </div>
+                <br />
+                <br />
+                <br />
+              </div>
             </div>
-            <br />
-            <br />
-            <br />
-          </div>
+          </Col>
         </div>
-      </Col>
-    </div>
+      </Row>
+    </StyledComponent>
   </Row>
 </ContentPackDetails>
 `;

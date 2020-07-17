@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-const TimerangeWrap = styled.div(({ theme }) => `
+const TimerangeWrap = styled.div(({ theme }) => css`
   .form-group {
     margin-bottom: 0;
   }

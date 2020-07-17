@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
 import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
@@ -17,7 +17,7 @@ import EventDetails from './EventDetails';
 
 const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
 
-const ExpandedTR = styled.tr(({ theme }) => `
+const ExpandedTR = styled.tr(({ theme }) => css`
   > td {
     border-top: 1px solid ${theme.colors.gray[80]} !important;
     padding: 10px 8px 8px 35px !important;
@@ -39,7 +39,7 @@ const ExpandedTR = styled.tr(({ theme }) => `
   }
 `);
 
-const EventsTbody = styled.tbody(({ expanded, theme }) => `
+const EventsTbody = styled.tbody(({ expanded, theme }) => css`
     border-left: ${expanded ? `3px solid ${theme.colors.variant.light.info}` : ''};
     border-collapse: ${expanded ? 'separate' : 'collapse'};
 `);
@@ -48,7 +48,7 @@ const CollapsibleTr = styled.tr`
   cursor: pointer;
 `;
 
-const EventsTable = styled(Table)(({ theme }) => `
+const EventsTable = styled(Table)(({ theme }) => css`
   tr {
     &:hover {
       background-color: ${theme.colors.gray[90]};
@@ -56,13 +56,13 @@ const EventsTable = styled(Table)(({ theme }) => `
 
     &${ExpandedTR} {
       &:hover {
-        background-corlor: ${theme.colors.global.contentBackground}
+        background-color: ${theme.colors.global.contentBackground};
       }
     }
   }
 `);
 
-const EventsIcon = styled(Icon)(({ theme }) => `
+const EventsIcon = styled(Icon)(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
   vertical-align: top;
 `);

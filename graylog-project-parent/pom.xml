@@ -583,6 +583,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.rest-assured</groupId>
                 <artifactId>rest-assured</artifactId>
                 <version>${restassured.version}</version>
@@ -705,6 +711,23 @@
                         <include>**/*Test.class</include>
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <forkCount>1</forkCount>
+                    <skip>false</skip>
+                    <argLine>-Djava.awt.headless=true</argLine>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>de.thetaphi</groupId>

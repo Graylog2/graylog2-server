@@ -3,7 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 // $FlowFixMe should be there
-import styled, { css, type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
@@ -12,7 +13,7 @@ import connect from 'stores/connect';
 import { Alert, Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
 import { Icon, PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {

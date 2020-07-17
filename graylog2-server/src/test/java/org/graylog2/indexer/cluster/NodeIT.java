@@ -14,20 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.storage.providers;
+package org.graylog2.indexer.cluster;
 
-import org.graylog.events.indices.EventIndexerAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.VersionAwareProvider;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.junit.Before;
+import org.junit.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class EventIndexerAdapterProvider extends VersionAwareProvider<EventIndexerAdapter> {
-    @Inject
-    public EventIndexerAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<EventIndexerAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+public abstract class NodeIT extends ElasticsearchBaseTest {
+    protected Node node;
+
+    protected abstract NodeAdapter nodeAdapter();
+
+    @Before
+    public void setUp() throws Exception {
+        this.node = new Node(nodeAdapter());
+    }
+
+    @Test
+    public void versionReturnsVersionOfCurrentElasticsearch() {
+        assertThat(node.getVersion())
+                .isNotEmpty()
+                .hasValue(elasticsearchVersion());
     }
 }

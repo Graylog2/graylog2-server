@@ -1,14 +1,12 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent } from 'wrappedTestingLibrary';
 
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import PaginatedList from './PaginatedList';
 
 describe('PaginatedList', () => {
-  afterEach(cleanup);
-
   it('should display Pagination', () => {
     const { getByText } = render(<PaginatedList totalItems={100} onChange={() => {}}>The list</PaginatedList>);
 

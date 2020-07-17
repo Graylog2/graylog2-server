@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { Grid } from 'components/graylog';
 
@@ -9,8 +10,8 @@ type Props = {
   children: React.Node,
 };
 
-const Container: StyledComponent<Props, {}, HTMLDivElement> = styled.div`
-  padding: 15px 10px;
+const Container: StyledComponent<Props, void, HTMLDivElement> = styled.div`
+  padding: 15px 12px;
 `;
 
 const AppContentGrid = ({ children, ...rest }: Props) => (

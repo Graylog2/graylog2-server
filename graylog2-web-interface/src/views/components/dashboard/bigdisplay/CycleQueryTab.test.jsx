@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -26,8 +26,6 @@ describe('CycleQueryTab', () => {
   const view = View.create().toBuilder().search(search).build();
 
   beforeEach(() => { jest.clearAllMocks(); });
-
-  afterEach(cleanup);
 
   it('does not return markup', () => {
     const { container } = render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);

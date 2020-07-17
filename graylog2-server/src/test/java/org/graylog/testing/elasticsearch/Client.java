@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 
 public interface Client {
     default void createIndex(String index) {
@@ -42,15 +42,9 @@ public interface Client {
 
     void addAliasMapping(String indexName, String alias);
 
-    JsonNode getMapping(String... indices);
+    boolean templateExists(String templateName);
 
-    JsonNode getTemplate(String templateName);
-
-    default JsonNode getTemplates() {
-        return getTemplate("");
-    }
-
-    void putTemplate(String templateName, Object source);
+    void putTemplate(String templateName, Map<String, Object> source);
 
     void deleteTemplates(String... templates);
 
@@ -61,6 +55,8 @@ public interface Client {
     void bulkIndex(BulkIndexRequest bulkIndexRequest);
 
     void cleanUp();
+
+    String fieldType(String testIndexName, String source);
 
     void putSetting(String setting, String value);
 

@@ -1,0 +1,16 @@
+{
+  "test_3": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "key": "value1"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "key": "value2"
+    }
+  ]
+}

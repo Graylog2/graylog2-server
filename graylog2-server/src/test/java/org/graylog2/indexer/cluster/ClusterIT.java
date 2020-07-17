@@ -25,6 +25,7 @@ import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
+import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +51,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     @Mock
     private IndexSetRegistry indexSetRegistry;
 
-    private Cluster cluster;
+    protected Cluster cluster;
 
     protected abstract ClusterAdapter clusterAdapter(Duration timeout);
 
@@ -81,18 +82,6 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     public void getDiskUsageStats() {
         final Set<NodeDiskUsageStats> diskUsageStats = cluster.getDiskUsageStats();
         assertThat(diskUsageStats).isNotEmpty();
-    }
-
-    @Test
-    public void getClusterAllocationDiskSettings() {
-        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
-
-        //Default Elasticsearch settings in Elasticsearch 5.6
-        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
-        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isNull();
     }
 
     @Test
@@ -209,5 +198,27 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.isUp()).thenReturn(true);
 
         cluster.waitForConnectedAndDeflectorHealthy();
+    }
+
+    @Test
+    public void retrievesClusterHealth() {
+        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{INDEX_NAME});
+        when(indexSetRegistry.getWriteIndexAliases()).thenReturn(new String[]{ALIAS_NAME});
+        when(indexSetRegistry.isUp()).thenReturn(true);
+
+        final Optional<ClusterHealth> clusterHealth = cluster.clusterHealthStats();
+
+        assertThat(clusterHealth).isNotEmpty();
+    }
+
+    @Test
+    public void getDefaultClusterAllocationDiskSettings() {
+        final ClusterAllocationDiskSettings clusterAllocationDiskSettings = cluster.getClusterAllocationDiskSettings();
+
+        assertThat(clusterAllocationDiskSettings.ThresholdEnabled()).isTrue();
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().type()).isEqualTo(WatermarkSettings.SettingsType.PERCENTAGE);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
+        assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isEqualTo(95D);
     }
 }

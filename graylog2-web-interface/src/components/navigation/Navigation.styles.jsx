@@ -1,8 +1,8 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Navbar } from 'components/graylog';
 
-const StyledNavbar = styled(Navbar)(({ theme }) => `
+const StyledNavbar = styled(Navbar)(({ theme }) => css`
   .dev-badge-wrap > a {
     padding: 0 !important;
     cursor: default;

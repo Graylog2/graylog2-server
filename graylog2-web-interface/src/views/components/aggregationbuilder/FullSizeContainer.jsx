@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 const Wrapper: StyledComponent<{}, {}, HTMLDivElement> = styled.div`
   height: 100%;
