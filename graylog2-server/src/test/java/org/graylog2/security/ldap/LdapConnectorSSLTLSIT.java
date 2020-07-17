@@ -18,6 +18,7 @@ package org.graylog2.security.ldap;
 
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.exception.LdapOperationException;
+import org.apache.directory.api.ldap.model.exception.LdapProtocolErrorException;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.mock;
 
 @Testcontainers
 public class LdapConnectorSSLTLSIT {
+    private static final int DEFAULT_TIMEOUT = 60 * 1000;
     private static final String NETWORK_ALIAS = "ldapserver";
     private static final Integer PORT = 389;
     private static final Integer SSL_PORT = 636;
@@ -62,7 +64,7 @@ public class LdapConnectorSSLTLSIT {
     @Test
     void shouldNotConnectViaTLSToSelfSignedCertIfValidationIsRequested() throws Exception {
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(60, ldapSettingsService);
+        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
 
         final LdapTestConfigRequest request = createTLSTestRequest(false);
 
@@ -75,7 +77,7 @@ public class LdapConnectorSSLTLSIT {
     @Test
     void shouldConnectViaTLSToSelfSignedCertIfValidationIsNotRequested() throws Exception {
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(60, ldapSettingsService);
+        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
 
         final LdapTestConfigRequest request = createTLSTestRequest(true);
 
@@ -109,21 +111,19 @@ public class LdapConnectorSSLTLSIT {
     @Test
     void shouldNotConnectViaSSLToSelfSignedCertIfValidationIsRequested() throws Exception {
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(60, ldapSettingsService);
+        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
 
         final LdapTestConfigRequest request = createSSLTestRequest(false);
 
         Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
-                .satisfies(e -> assertThat(e).isNotNull())
-                .isInstanceOf(LdapException.class)
-                .hasRootCauseInstanceOf(LdapOperationException.class)
-                .hasMessage("Failed to initialize the SSL context");
+                .isInstanceOf(LdapProtocolErrorException.class)
+                .hasMessage("PROTOCOL_ERROR: The server will disconnect!");
     }
 
     @Test
     void shouldConnectViaSSLToSelfSignedCertIfValidationIsNotRequested() throws Exception {
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(60, ldapSettingsService);
+        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
 
         final LdapTestConfigRequest request = createSSLTestRequest(true);
 
