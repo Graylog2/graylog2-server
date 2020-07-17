@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import SearchBarForm from './SearchBarForm';
@@ -13,8 +13,6 @@ const changeInput = async (input, value) => {
 };
 
 describe('SearchBarForm', () => {
-  afterEach(cleanup);
-
   describe('with AbsoluteTimeRangeSelector', () => {
     it('validates if timerange "from" date is after "to" date', async () => {
       const initialValues = {
