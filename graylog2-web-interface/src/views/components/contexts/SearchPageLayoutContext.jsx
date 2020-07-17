@@ -3,9 +3,7 @@ import * as React from 'react';
 
 type SearchPageLayoutConfig = {
   sidebar: {
-    dashboardSidebarIsPinned: boolean,
-    searchSidebarIsPinned: boolean,
-    isPinned: () => boolean,
+    isPinned: boolean,
   },
 };
 

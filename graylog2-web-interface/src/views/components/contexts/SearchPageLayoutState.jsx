@@ -1,4 +1,5 @@
 // @flow strict
+import * as React from 'react';
 import { useContext, useState } from 'react';
 
 import View, { type ViewType } from 'views/logic/views/View';
@@ -10,16 +11,23 @@ import Store from 'logic/local-storage/Store';
 
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
+type Props = {
+  children: ({
+    setLayoutState: (stateKey: string, value: boolean) => void,
+    getLayoutState: (stateKey: string) => boolean,
+  }) => React.Node,
+};
+
 const _getPinningPreferenceKey = (viewType: ?ViewType): string => {
   const preferenceKeyMapping = {
     [View.Type.Dashboard]: 'dashboardSidebarIsPinned',
     [View.Type.Search]: 'searchSidebarIsPinned',
   };
 
-  const preferenceKey = preferenceKeyMapping[viewType];
+  const preferenceKey = viewType && preferenceKeyMapping[viewType];
 
   if (!preferenceKey) {
-    throw new Error(`User sidebar pinning preference key is missing for view type ${viewType}`);
+    throw new Error(`User sidebar pinning preference key is missing for view type ${viewType ?? '(type not provided)'}`);
   }
 
   return preferenceKey;
@@ -59,7 +67,7 @@ const _updateUserSidebarPinning = (currentUser, userPreferences, viewType, newIs
   }
 };
 
-const SearchPageLayoutState = ({ children }) => {
+const SearchPageLayoutState = ({ children }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const userPreferences = useContext(UserPreferencesContext);
   const viewType = useContext(ViewTypeContext);
@@ -69,11 +77,11 @@ const SearchPageLayoutState = ({ children }) => {
 
   const _onSidebarPinningChange = (newIsPinned) => _updateUserSidebarPinning(currentUser, userPreferences, viewType, newIsPinned);
 
-  const getLayoutState = (stateKey) => {
+  const getLayoutState = (stateKey: string) => {
     return state[stateKey];
   };
 
-  const setLayoutState = (stateKey, value) => {
+  const setLayoutState = (stateKey: string, value: boolean) => {
     if (stateKey === 'sidebarIsPinned') {
       _onSidebarPinningChange(value);
     }
