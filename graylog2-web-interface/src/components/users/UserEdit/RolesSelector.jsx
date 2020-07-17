@@ -55,10 +55,13 @@ const _isRequired = (field) => (value) => (!value ? `The ${field} is required` :
 const RolesSelector = ({ user, onSubmit }: Props) => {
   const [roles, setRoles] = useState([]);
 
-  const onUpdate = ({ role }: { role: string }) => {
+  const onUpdate = ({ role }: { role: string }, { resetForm }) => {
     const userRoles = user.roles;
     const newRoles = userRoles.push(role).toJS();
-    onSubmit({ roles: newRoles });
+
+    onSubmit({ roles: newRoles }).then(() => {
+      resetForm();
+    });
   };
 
   useEffect(() => {
@@ -76,7 +79,7 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
 
   return (
     <div>
-      <Formik onSubmit={(data) => onUpdate(data)}
+      <Formik onSubmit={onUpdate}
               initialValues={{ role: undefined }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
