@@ -14,7 +14,7 @@ const { PreferencesActions } = CombinedProvider.get('Preferences');
 type Props = {
   children: ({
     setLayoutState: (stateKey: string, value: boolean) => void,
-    getLayoutState: (stateKey: string) => boolean,
+    getLayoutState: (stateKey: string, ddefaultValue: boolean) => boolean,
   }) => React.Node,
 };
 
@@ -33,16 +33,15 @@ const _getPinningPreferenceKey = (viewType: ?ViewType): string => {
   return preferenceKey;
 };
 
-const _defaultSidebarPinning = (currentUser, userPreferences, viewType) => {
-  const fallbackDefault = false;
+const _userSidebarPinningPref = (currentUser, userPreferences, viewType) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
   // eslint-disable-next-line camelcase
   if (currentUser?.read_only) {
-    return Store.get(sidebarPinningPrefKey) ?? fallbackDefault;
+    return Store.get(sidebarPinningPrefKey);
   }
 
-  return userPreferences[sidebarPinningPrefKey] ?? fallbackDefault;
+  return userPreferences[sidebarPinningPrefKey];
 };
 
 const _createUserPreferencesArray = (userPreferences) => {
@@ -52,7 +51,7 @@ const _createUserPreferencesArray = (userPreferences) => {
   }));
 };
 
-const _updateUserSidebarPinning = (currentUser, userPreferences, viewType, newIsPinned) => {
+const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
   const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
 
   // eslint-disable-next-line camelcase
@@ -72,13 +71,13 @@ const SearchPageLayoutState = ({ children }: Props) => {
   const userPreferences = useContext(UserPreferencesContext);
   const viewType = useContext(ViewTypeContext);
   const [state, setState] = useState({
-    sidebarIsPinned: _defaultSidebarPinning(currentUser, userPreferences, viewType),
+    sidebarIsPinned: _userSidebarPinningPref(currentUser, userPreferences, viewType),
   });
 
-  const _onSidebarPinningChange = (newIsPinned) => _updateUserSidebarPinning(currentUser, userPreferences, viewType, newIsPinned);
+  const _onSidebarPinningChange = (newIsPinned) => _updateUserSidebarPinningPref(currentUser, userPreferences, viewType, newIsPinned);
 
-  const getLayoutState = (stateKey: string) => {
-    return state[stateKey];
+  const getLayoutState = (stateKey: string, defaultValue: boolean) => {
+    return state[stateKey] ?? defaultValue;
   };
 
   const setLayoutState = (stateKey: string, value: boolean) => {

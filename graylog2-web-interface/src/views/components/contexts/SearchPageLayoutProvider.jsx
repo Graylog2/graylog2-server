@@ -14,7 +14,7 @@ const SearchPageLayoutProvider = ({ children }: Props) => {
     <SearchPageLayoutState>
       {({ getLayoutState, setLayoutState }) => {
         const config = {
-          sidebar: { isPinned: getLayoutState('sidebarIsPinned') },
+          sidebar: { isPinned: getLayoutState('sidebarIsPinned', false) },
         };
         const actions = { toggleSidebarPinning: () => setLayoutState('sidebarIsPinned', !config.sidebar.isPinned) };
 
