@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import CombinedProvider from 'injection/CombinedProvider';

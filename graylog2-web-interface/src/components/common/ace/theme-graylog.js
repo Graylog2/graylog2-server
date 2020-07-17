@@ -10,7 +10,7 @@ ace.define('ace/theme/graylog', ['require', 'exports', 'module', 'ace/lib/dom'],
   dom.importCssString(exports.cssText, exports.cssClass);
 });
 
-(function () {
+(function () { // eslint-disable-line func-names
   ace.require(['ace/theme/graylog'], (m) => {
     if (typeof module === 'object' && typeof exports === 'object' && module) {
       module.exports = m;
