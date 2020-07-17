@@ -121,7 +121,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   };
 
   adjustChildOnSelectProp = (child: React.Element<*>, updateDepth: number) => {
-    if (child.props.onSelect) {
+    if (child.props?.onSelect) {
       return {
         onSelect: (eventKey: ?string, event: SyntheticInputEvent<HTMLButtonElement>) => {
           child.props.onSelect();
@@ -130,7 +130,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
       };
     }
 
-    if (child.props.children) {
+    if (child.props?.children) {
       return {
         children: this.adjustChildProps(child.props.children, updateDepth + 1),
       };
