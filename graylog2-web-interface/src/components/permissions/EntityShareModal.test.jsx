@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, cleanup } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 import mockEntityShareState, { john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
