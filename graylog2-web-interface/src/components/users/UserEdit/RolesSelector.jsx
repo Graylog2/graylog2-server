@@ -1,16 +1,17 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
 
+import { AuthzRolesActions, type PaginatedListType } from 'stores/roles/AuthzRolesStore';
 import { type ThemeInterface } from 'theme';
 import { Button } from 'components/graylog';
 import { Select } from 'components/common';
-
 import User from 'logic/users/User';
 
 type Props = {
-  onUpdate: (User) => void,
+  onSubmit: ({ roles: string[] }) => void,
   user: User,
 };
 
@@ -41,14 +42,44 @@ const RoleSelectOption = styled.div`
   align-items: center;
 `;
 
-const _renderRoleOption = ({ name }: {name: string }) => (
-  <RoleSelectOption>{name}</RoleSelectOption>
+const StyledSelect = styled(Select)`
+  flex: 1;
+`;
+
+const _renderRoleOption = ({ label }: { label: string }) => (
+  <RoleSelectOption>{label}</RoleSelectOption>
 );
 
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
-const RolesSelector = ({ user, onUpdate }: Props) => {
-  const roles = [];
+const RolesSelector = ({ user, onSubmit }: Props) => {
+  const limit = 1000;
+  const [roles, setRoles] = useState([]);
+  const [total, setTotal] = useState(0);
+
+  const onUpdate = ({ role }: { role: string }) => {
+    const userRoles = user.roles;
+    const newRoles = userRoles.push(role).toJS();
+    onSubmit({ roles: newRoles });
+  };
+
+  useEffect(() => {
+    AuthzRolesActions.loadPaginated((1, limit, ''))
+      .then((response: PaginatedListType) => {
+        const { pagination: { total: resultTotal }, list } = response;
+        setTotal(resultTotal);
+
+        const resultRoles = list
+          .filter((r) => !user.roles.includes(r.name))
+          .toArray()
+          .map((r) => ({ label: r.name, value: r.name }));
+        setRoles(resultRoles);
+      });
+  }, []);
+
+  if (total > limit) {
+    return <span>You have more than {limit} roles. Are you serious?</span>;
+  }
 
   return (
     <div>
@@ -58,13 +89,15 @@ const RolesSelector = ({ user, onUpdate }: Props) => {
           <Form>
             <FormElements>
               <Field name="role" validate={_isRequired('role')}>
-                {({ field: { name, value, onChange }}) => (
-                  <Select inputProps={{ 'arial-label': 'Search for roles '}}
-                          onChange={(role) => onChange({ target: { value: role, name }})}
-                          optionRenderer={_renderRoleOption}
-                          options={roles}
-                          placeholder="Search for roles"
-                          value={value} />
+                {({ field: { name, value, onChange } }) => (
+                  <StyledSelect inputProps={{ 'arial-label': 'Search for roles ' }}
+                                onChange={(role) => {
+                                  onChange({ target: { value: role, name } });
+                                }}
+                                optionRenderer={_renderRoleOption}
+                                options={roles}
+                                placeholder="Search for roles"
+                                value={value} />
                 )}
               </Field>
               <SubmitButton bsStyle="success"

@@ -12,10 +12,10 @@ import RolesSelector from './RolesSelector';
 
 type Props = {
   user: User,
-  onUpdate: (User) => void,
+  onSubmit: (User) => void,
 };
 
-const RolesSection = ({ user, onUpdate }: Props) => {
+const RolesSection = ({ user, onSubmit }: Props) => {
   const { username } = user;
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +38,7 @@ const RolesSection = ({ user, onUpdate }: Props) => {
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <RolesSelector onUpdate={onUpdate} user={user} />
+      <RolesSelector onSubmit={onSubmit} user={user} />
       <PaginatedItemOverview onLoad={_onLoad} />
     </SectionComponent>
   );
