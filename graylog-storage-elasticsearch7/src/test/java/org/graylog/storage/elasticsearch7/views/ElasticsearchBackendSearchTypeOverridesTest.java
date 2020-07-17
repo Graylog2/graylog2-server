@@ -107,15 +107,15 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
         final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
 
-        assertThat(queryString(pivot1)).isEqualTo("production:true");
-        assertThat(timerangeFrom(pivot1)).isEqualTo("2019-09-11 10:31:52.819");
-        assertThat(timerangeTo(pivot1)).isEqualTo("2019-09-11 10:36:52.823");
-        assertThat(streams(pivot1)).containsExactly("stream1");
+        assertThat(queryStrings(pivot1)).containsExactly("production:true");
+        assertThat(timerangeFrom(pivot1)).containsExactly("2019-09-11 10:31:52.819");
+        assertThat(timerangeTo(pivot1)).containsExactly("2019-09-11 10:36:52.823");
+        assertThat(streams(pivot1)).containsExactly(Collections.singletonList("stream1"));
 
-        assertThat(queryString(pivot2)).isEqualTo("production:true");
-        assertThat(timerangeFrom(pivot2)).isEqualTo("2018-08-23 08:02:00.247");
-        assertThat(timerangeTo(pivot2)).isEqualTo("2018-08-23 08:07:00.252");
-        assertThat(streams(pivot2)).containsExactly("stream1");
+        assertThat(queryStrings(pivot2)).containsExactly("production:true", "source:babbage");
+        assertThat(timerangeFrom(pivot2)).containsExactly("2018-08-23 08:02:00.247");
+        assertThat(timerangeTo(pivot2)).containsExactly("2018-08-23 08:07:00.252");
+        assertThat(streams(pivot2)).containsExactly(Collections.singletonList("stream1"));
     }
 
     private DocumentContext parse(String json) {
@@ -126,20 +126,20 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                 .parse(json);
     }
 
-    private String queryString(DocumentContext pivot) {
-        return pivot.read("$.query.bool.must[0].bool.filter[0].query_string.query", String.class);
+    private List<String> queryStrings(DocumentContext pivot) {
+        return pivot.read("$..query_string.query", new TypeRef<List<String>>() {});
     }
 
-    private List<String> streams(DocumentContext pivot) {
-        return pivot.read("$.query.bool.must[2].terms.streams", new TypeRef<List<String>>() {});
+    private List<List<String>> streams(DocumentContext pivot) {
+        return pivot.read("$..terms.streams", new TypeRef<List<List<String>>>() {});
     }
 
-    private String timerangeFrom(DocumentContext pivot) {
-        return pivot.read("$.query.bool.must[1].range.timestamp.from", String.class);
+    private List<String> timerangeFrom(DocumentContext pivot) {
+        return pivot.read("$..timestamp.from", new TypeRef<List<String>>() {});
     }
 
-    private String timerangeTo(DocumentContext pivot) {
-        return pivot.read("$.query.bool.must[1].range.timestamp.to", String.class);
+    private List<String> timerangeTo(DocumentContext pivot) {
+        return pivot.read("$..timestamp.to", new TypeRef<List<String>>() {});
     }
 
     @Test
