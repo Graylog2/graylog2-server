@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import debounce from 'lodash/debounce';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -10,27 +9,21 @@ let VALIDATE_TIMEOUT;
 export const PipelineRulesContext = createContext();
 
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
-  const [errorAnnotations, setErrorAnnotations] = useState([]);
-  const [ruleSource, setRuleSource] = useState(rule?.source);
   const descriptionRef = useRef();
   const ruleSourceRef = useRef();
-
-  useEffect(() => {
-    descriptionRef.current.value = rule?.description;
-  }, []);
 
   const createAnnotations = (nextErrors) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
       return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
 
-    setErrorAnnotations(nextErrorAnnotations);
+    ruleSourceRef.current.editor.getSession().setAnnotations(nextErrorAnnotations);
   };
 
-  const validateNewRule = (nextSource, callback) => {
+  const validateNewRule = (callback) => {
     const nextRule = {
       ...rule,
-      source: nextSource,
+      source: ruleSourceRef.current.editor.getSession().getValue(),
       description: descriptionRef.current.value,
     };
 
@@ -40,29 +33,12 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const validateBeforeSave = (callback = () => {}) => {
     const savedRule = {
       ...rule,
-      source: ruleSource,
+      source: ruleSourceRef.current.editor.getSession().getValue(),
       description: descriptionRef.current.value,
     };
 
     RulesActions.parse(savedRule, () => callback(savedRule));
   };
-
-  const handleChangeRuleSource = debounce((newRuleSource) => {
-    setRuleSource(newRuleSource);
-
-    if (VALIDATE_TIMEOUT) {
-      clearTimeout(VALIDATE_TIMEOUT);
-      VALIDATE_TIMEOUT = null;
-    }
-
-    VALIDATE_TIMEOUT = setTimeout(() => {
-      validateNewRule(newRuleSource, (errors) => {
-        const nextErrors = errors || [];
-
-        createAnnotations(nextErrors);
-      });
-    }, 350);
-  }, 150);
 
   const handleDescription = (newDescription) => {
     descriptionRef.current.value = newDescription;
@@ -84,17 +60,43 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback));
   };
 
+  useEffect(() => {
+    if (ruleSourceRef.current) {
+      ruleSourceRef.current.editor.getSession().setValue(rule.source, -1);
+      ruleSourceRef.current.editor.session.setOption('useWorker', false);
+    }
+
+    if (descriptionRef.current) {
+      descriptionRef.current.value = rule.description;
+    }
+  }, [rule]);
+
+  useEffect(() => {
+    if (ruleSourceRef.current) {
+      ruleSourceRef.current.editor.on('change', () => {
+        if (VALIDATE_TIMEOUT) {
+          clearTimeout(VALIDATE_TIMEOUT);
+          VALIDATE_TIMEOUT = null;
+        }
+
+        VALIDATE_TIMEOUT = setTimeout(() => {
+          validateNewRule((errors) => {
+            const nextErrors = errors || [];
+
+            createAnnotations(nextErrors);
+          });
+        }, 500);
+      });
+    }
+  }, [ruleSourceRef.current]);
+
   return (
     <PipelineRulesContext.Provider value={{
       descriptionRef,
-      errorAnnotations,
-      handleChangeRuleSource,
       handleDescription,
       handleSavePipelineRule,
-      ruleSource,
-      usedInPipelines,
-      validateBeforeSave,
       ruleSourceRef,
+      usedInPipelines,
     }}>
       {children}
     </PipelineRulesContext.Provider>
@@ -115,7 +117,6 @@ PipelineRulesProvider.propTypes = {
 PipelineRulesProvider.defaultProps = {
   usedInPipelines: [],
   rule: {
-    id: undefined,
     description: '',
     source: '',
   },

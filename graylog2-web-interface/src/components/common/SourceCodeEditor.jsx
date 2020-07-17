@@ -87,6 +87,7 @@ class SourceCodeEditor extends React.Component {
     value: PropTypes.string,
     /** Editor width in pixels. Use `Infinity` to indicate the editor should use 100% of its container's width. */
     width: PropTypes.number,
+    innerRef: PropTypes.any,
   }
 
   static defaultProps = {
@@ -102,6 +103,7 @@ class SourceCodeEditor extends React.Component {
     toolbar: true,
     value: '',
     width: Infinity,
+    innerRef: undefined,
   };
 
   constructor(props) {
@@ -201,6 +203,7 @@ class SourceCodeEditor extends React.Component {
       fontSize,
       mode,
       id,
+      innerRef,
       onLoad,
       onChange,
       readOnly,
@@ -254,7 +257,10 @@ class SourceCodeEditor extends React.Component {
                    onResize={this.handleResize}>
           <SourceCodeContainer style={{ height: height, width: validCssWidth }}
                                resizable={resizable}>
-            <AceEditor ref={(c) => { this.reactAce = c; }}
+            <AceEditor ref={(c) => {
+              this.reactAce = c;
+              if (innerRef) { innerRef.current = c; }
+            }}
                        annotations={annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
                        // Convert Windows line breaks to Unix. See issue #7889

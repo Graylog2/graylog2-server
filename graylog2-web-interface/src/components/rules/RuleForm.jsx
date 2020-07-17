@@ -13,11 +13,9 @@ import PipelinesUsingRule from './PipelinesUsingRule';
 const RuleForm = ({ create }) => {
   const {
     descriptionRef,
-    errorAnnotations,
-    handleChangeRuleSource,
     handleDescription,
     handleSavePipelineRule,
-    ruleSource,
+    ruleSourceRef,
   } = useContext(PipelineRulesContext);
 
   const handleSubmit = (event) => {
@@ -58,10 +56,8 @@ const RuleForm = ({ create }) => {
 
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
-                            annotations={errorAnnotations}
-                            onChange={handleChangeRuleSource}
                             mode="pipeline"
-                            value={ruleSource} />
+                            innerRef={ruleSourceRef} />
         </Input>
       </fieldset>
 
