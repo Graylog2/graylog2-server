@@ -195,10 +195,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final Double to = max.getValue();
         final TimeRange pivotRange = query.effectiveTimeRange(pivot);
         return AbsoluteRange.create(
-                isAllMessagesTimeRange(pivotRange) && from != null
+                isAllMessagesTimeRange(pivotRange) && from != 0
                         ? new DateTime(from.longValue(), DateTimeZone.UTC)
                         : query.effectiveTimeRange(pivot).getFrom(),
-                isAllMessagesTimeRange(pivotRange) && to != null
+                isAllMessagesTimeRange(pivotRange) && to != 0
                         ? new DateTime(to.longValue(), DateTimeZone.UTC)
                         : query.effectiveTimeRange(pivot).getTo()
         );

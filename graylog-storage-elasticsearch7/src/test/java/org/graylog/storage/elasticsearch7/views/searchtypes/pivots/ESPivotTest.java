@@ -387,7 +387,7 @@ public class ESPivotTest {
         DateTimeUtils.setCurrentMillisFixed(1578584665408L);
         final long documentCount = 0;
         returnDocumentCount(queryResult, documentCount);
-        final Aggregations mockMetricAggregation = createTimestampRangeAggregations(null, null);
+        final Aggregations mockMetricAggregation = createTimestampRangeAggregations(0d, 0d);
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
 
