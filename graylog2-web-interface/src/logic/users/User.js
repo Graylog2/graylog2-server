@@ -392,7 +392,7 @@ class Builder {
 
   // eslint-disable-next-line no-undef
   sessionTimeoutMs(value: $PropertyType<InternalState, 'sessionTimeoutMs'>) {
-    return new Builder(this.value.set('sessionTimoutMs', value));
+    return new Builder(this.value.set('sessionTimeoutMs', value));
   }
 
   // eslint-disable-next-line no-undef
