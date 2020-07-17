@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { Row, Col } from 'components/graylog';
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
   title: string,
 };
 
-const Headline = styled.h2`
+export const Headline: StyledComponent<{}, ThemeInterface, HTMLHeadingElement> = styled.h2`
   margin-bottom: 15px;
 `;
 

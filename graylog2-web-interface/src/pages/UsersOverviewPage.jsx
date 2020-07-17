@@ -5,13 +5,13 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { ButtonToolbar, Button } from 'components/graylog';
-import { PageHeader } from 'components/common';
+import { PageHeader, DocumentTitle } from 'components/common';
 import UsersOverview from 'components/users/UsersOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 const UsersOverviewPage = () => {
   return (
-    <div>
+    <DocumentTitle title="Users Overview">
       <PageHeader title="Users Overview">
         <span>Overview of Graylog&apos;s registered users.</span>
 
@@ -32,7 +32,7 @@ const UsersOverviewPage = () => {
       </PageHeader>
 
       <UsersOverview />
-    </div>
+    </DocumentTitle>
   );
 };
 

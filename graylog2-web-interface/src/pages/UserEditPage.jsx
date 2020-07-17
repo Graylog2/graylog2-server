@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter } from 'react-router';
 
-import UserEdit from 'components/users/UserEdit';
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import { useStore } from 'stores/connect';
+import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import { ButtonToolbar, Button } from 'components/graylog';
-import { PageHeader } from 'components/common';
+import { PageHeader, DocumentTitle } from 'components/common';
+import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
@@ -37,7 +37,7 @@ const UserEditPage = ({ params }: Props) => {
   });
 
   return (
-    <div>
+    <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
         <span />
 
@@ -52,13 +52,13 @@ const UserEditPage = ({ params }: Props) => {
             <Button bsStyle="success">User Details</Button>
           </LinkContainer>
           <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info">Users</Button>
+            <Button bsStyle="info">Users Overview</Button>
           </LinkContainer>
         </ButtonToolbar>
       </PageHeader>
 
       <UserEdit user={loadedUser?.username === params?.username ? loadedUser : undefined} />
-    </div>
+    </DocumentTitle>
   );
 };
 

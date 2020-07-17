@@ -21,7 +21,7 @@ const LabelCol = styled(ValueCol)(({ theme }) => css`
   }
 `);
 
-const ReadOnlyFormField = ({ label, value }: Props) => (
+const ReadOnlyFormGroup = ({ label, value }: Props) => (
   <Row>
     <LabelCol sm={3}>
       {label}
@@ -32,4 +32,4 @@ const ReadOnlyFormField = ({ label, value }: Props) => (
   </Row>
 );
 
-export default ReadOnlyFormField;
+export default ReadOnlyFormGroup;

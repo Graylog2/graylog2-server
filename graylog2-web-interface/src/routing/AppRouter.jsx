@@ -82,6 +82,7 @@ import {
   SystemOverviewPage,
   ThreadDumpPage,
   UserDetailsPage,
+  UserCreatePage,
   UserEditPage,
   UsersOverviewPage,
   UsersPage,
@@ -216,6 +217,7 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
               <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
+              <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />
               <Route path={Routes.SYSTEM.USERS.show(':username')} component={UserDetailsPage} />
               <Route path={Routes.SYSTEM.USERS.edit(':username')} component={UserEditPage} />
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
