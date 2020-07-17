@@ -43,12 +43,12 @@ public class SearchAfter implements RequestStrategy {
     static final String DEFAULT_TIEBREAKER_FIELD = Message.FIELD_GL2_MESSAGE_ID;
     static final String EVENTS_TIEBREAKER_FIELD = Message.FIELD_ID;
 
-    private final ElasticsearchClient client;
+    private final ExportClient client;
 
     private Object[] searchAfterValues = null;
 
     @Inject
-    public SearchAfter(ElasticsearchClient client) {
+    public SearchAfter(ExportClient client) {
         this.client = client;
     }
 

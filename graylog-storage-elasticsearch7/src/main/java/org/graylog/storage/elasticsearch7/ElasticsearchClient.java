@@ -1,5 +1,6 @@
 package org.graylog.storage.elasticsearch7;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;

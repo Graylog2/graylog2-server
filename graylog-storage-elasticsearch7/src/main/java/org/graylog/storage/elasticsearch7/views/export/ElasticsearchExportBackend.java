@@ -103,7 +103,8 @@ public class ElasticsearchExportBackend implements ExportBackend {
         SearchSourceBuilder ssb = searchSourceBuilderFrom(command);
 
         Set<String> indices = indicesFor(command);
-        return new SearchRequest(ssb.toString())
+        return new SearchRequest()
+                .source(ssb)
                 .indices(indices.toArray(new String[0]))
                 .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
     }

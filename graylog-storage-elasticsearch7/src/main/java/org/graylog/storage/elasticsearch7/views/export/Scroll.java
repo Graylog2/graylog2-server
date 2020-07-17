@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.views.export;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.ClearScrollRequest;
@@ -25,7 +24,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +37,11 @@ public class Scroll implements RequestStrategy {
 
     private static final String SCROLL_TIME = "1m";
 
-    private final ObjectMapper objectMapper;
-    private final ElasticsearchClient client;
+    private final ExportClient client;
     private String currentScrollId;
 
     @Inject
-    public Scroll(ObjectMapper objectMapper, ElasticsearchClient client) {
-        this.objectMapper = objectMapper;
+    public Scroll(ExportClient client) {
         this.client = client;
     }
 
@@ -94,7 +90,8 @@ public class Scroll implements RequestStrategy {
     }
 
     private SearchResponse search(SearchRequest search) {
-        return client.search(search, "Failed to execute initial Scroll request");
+        search.scroll(SCROLL_TIME);
+        return client.singleSearch(search, "Failed to execute initial Scroll request");
     }
 
     private SearchResponse continueScroll(String scrollId) {
