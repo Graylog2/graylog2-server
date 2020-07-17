@@ -40,6 +40,7 @@ public class LdapConnectorSSLTLSIT {
     private static final Integer PORT = 389;
     private static final Integer SSL_PORT = 636;
 
+    @SuppressWarnings("rawtypes")
     @Container
     private final GenericContainer topLevelContainer = new GenericContainer("rroemhild/test-openldap:latest")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
@@ -113,9 +114,7 @@ public class LdapConnectorSSLTLSIT {
         final LdapTestConfigRequest request = createSSLTestRequest(false);
 
         Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
-                .satisfies(e -> {
-                    assertThat(e).isNotNull();
-                })
+                .satisfies(e -> assertThat(e).isNotNull())
                 .isInstanceOf(LdapException.class)
                 .hasRootCauseInstanceOf(LdapOperationException.class)
                 .hasMessage("Failed to initialize the SSL context");
