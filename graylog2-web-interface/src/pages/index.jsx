@@ -76,6 +76,7 @@ const ProcessBufferDumpPage = loadAsync(() => import('./ProcessBufferDumpPage'))
 const UserCreatePage = loadAsync(() => import('./UserCreatePage'));
 const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
 const UserEditPage = loadAsync(() => import('./UserEditPage'));
+const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
 const UsersPage = loadAsync(() => import('./UsersPage'));
 
@@ -157,5 +158,6 @@ export {
   UserCreatePage,
   UserDetailsPage,
   UserEditPage,
+  UserTokensEditPage,
   UsersPage,
 };
