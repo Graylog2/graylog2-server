@@ -75,7 +75,7 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
           .map((r) => ({ label: r.name, value: r.name }));
         setRoles(resultRoles);
       });
-  }, []);
+  }, [user]);
 
   return (
     <div>
