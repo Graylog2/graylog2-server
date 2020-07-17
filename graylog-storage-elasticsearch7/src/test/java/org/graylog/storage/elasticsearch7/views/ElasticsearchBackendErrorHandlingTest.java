@@ -34,7 +34,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +50,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -121,21 +119,6 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
         );
 
         searchTypes.forEach(queryContext::searchSourceBuilder);
-    }
-
-    @Test
-    public void deduplicatesShardErrorsOnQueryLevel() throws IOException {
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("errorhandling/failureOnQueryLevel.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
-
-        assertThatExceptionOfType(ElasticsearchException.class)
-                .isThrownBy(() -> this.backend.doRun(searchJob, query, queryContext, Collections.emptySet()))
-                .satisfies(ex -> {
-                    assertThat(ex.getErrorDetails()).hasSize(1);
-                    assertThat(ex.getErrorDetails()).containsExactly("Something went wrong");
-                });
     }
 
     @Test
