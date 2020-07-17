@@ -72,7 +72,8 @@ const toggleSidebarPinning = (config, setConfig, currentUser, userPreferences, v
 
   setConfig(newLayoutConfig);
 
-  if (currentUser?.id === 'local:admin') {
+  // eslint-disable-next-line camelcase
+  if (currentUser?.read_only) {
     Store.set(preferenceKey, newState);
   } else {
     const newUserPreferences = {

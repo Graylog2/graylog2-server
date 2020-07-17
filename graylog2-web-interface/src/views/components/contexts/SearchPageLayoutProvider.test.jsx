@@ -119,6 +119,7 @@ describe('CurrentUserPreferencesProvider', () => {
       currentUser: {
         id: 'local:admin',
         username: 'admin',
+        read_only: true,
       },
     });
 
@@ -158,6 +159,7 @@ describe('CurrentUserPreferencesProvider', () => {
       currentUser: {
         id: 'local:admin',
         username: 'admin',
+        read_only: true,
       },
     });
 
