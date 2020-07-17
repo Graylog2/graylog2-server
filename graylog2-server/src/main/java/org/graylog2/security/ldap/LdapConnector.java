@@ -108,16 +108,14 @@ public class LdapConnector {
 
         // this will perform an anonymous bind if there were no system credentials
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("ldap-connector-%d").build();
+        @SuppressWarnings("UnstableApiUsage")
         final SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor(threadFactory));
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "UnstableApiUsage"})
         final Callable<Boolean> timeLimitedConnection = timeLimiter.newProxy(
-                new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        return connection.connect();
-                    }
-                }, Callable.class,
-                connectionTimeout, TimeUnit.MILLISECONDS);
+                connection::connect,
+                Callable.class,
+                connectionTimeout,
+                TimeUnit.MILLISECONDS);
         try {
             final Boolean connected = timeLimitedConnection.call();
             if (!connected) {
