@@ -21,10 +21,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import one.util.streamex.StreamEx;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
+import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -47,16 +46,16 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 public class QueryEngine {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEngine.class);
 
-    private final Map<String, QueryBackend<? extends GeneratedQueryContext>> queryBackends;
     private final Set<QueryMetadataDecorator> queryMetadataDecorators;
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
+    private final QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend;
 
     @Inject
-    public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> queryBackends,
+    public QueryEngine(QueryBackend<? extends GeneratedQueryContext> elasticsearchBackend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators) {
-        this.queryBackends = queryBackends;
+        this.elasticsearchBackend = elasticsearchBackend;
         this.queryMetadataDecorators = queryMetadataDecorators;
     }
 
@@ -76,9 +75,7 @@ public class QueryEngine {
     }
 
     public QueryMetadata parse(Search search, Query query) {
-        final BackendQuery backendQuery = query.query();
-        final QueryBackend queryBackend = queryBackends.get(backendQuery.type());
-        final QueryMetadata parsedMetadata = queryBackend.parse(search.parameters(), query);
+        final QueryMetadata parsedMetadata = elasticsearchBackend.parse(search.parameters(), query);
 
         return this.queryMetadataDecorators.stream()
                 .reduce((decorator1, decorator2) -> (s, q, metadata) -> decorator1.decorate(s, q, decorator2.decorate(s, q, metadata)))
@@ -161,11 +158,6 @@ public class QueryEngine {
     }
 
     private QueryBackend<? extends GeneratedQueryContext> getQueryBackend(Query query) {
-        final BackendQuery backendQuery = query.query();
-        final QueryBackend<? extends GeneratedQueryContext> queryBackend = queryBackends.get(backendQuery.type());
-        if (queryBackend == null) {
-            throw new SearchException(new QueryError(query, "Unknown query backend " + backendQuery.type() + ". Cannot generate query."));
-        }
-        return queryBackend;
+        return elasticsearchBackend;
     }
 }

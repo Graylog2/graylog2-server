@@ -17,7 +17,6 @@
 package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -64,7 +63,7 @@ public class QueryPlanTest {
                 new QueryStringDecorators.Fake(),
                 (elasticsearchBackend, ssb, job, query, results) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, job, query, results, fieldTypesLookup),
                 false);
-        queryEngine = new QueryEngine(ImmutableMap.of("elasticsearch", backend), Collections.emptySet());
+        queryEngine = new QueryEngine(backend, Collections.emptySet());
     }
 
     private static String randomUUID() {
