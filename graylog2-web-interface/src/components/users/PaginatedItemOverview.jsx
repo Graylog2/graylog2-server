@@ -43,12 +43,13 @@ export type PaginatedListType = {
 type Props = {
   onLoad: (PaginationInfo) => Promise<?PaginatedListType>,
   overrideList: ?PaginatedListType,
+  onDeleteItem: ?(DescriptiveItem) => void,
 };
 
 const pageSizes = [5, 10, 30];
 export const defaultPageInfo = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '', total: 0, count: 0 };
 
-const PaginatedItemOverview = ({ onLoad, overrideList }: Props) => {
+const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) => {
   const [items, setItems] = useState();
   const [paginationInfo, setPaginationInfo] = useState(defaultPageInfo);
 
@@ -88,7 +89,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList }: Props) => {
   };
 
   const result = items && items.size > 0
-    ? items.toArray().map((item) => <PaginatedItem key={item.id} item={item} />)
+    ? items.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />)
     : <NotFound>No items found to display</NotFound>;
 
   return (

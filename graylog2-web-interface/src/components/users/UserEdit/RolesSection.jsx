@@ -43,7 +43,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   return (
     <SectionComponent title="Roles" showLoading={loading}>
       <RolesSelector onSubmit={onUpdate} user={user} />
-      <PaginatedItemOverview onLoad={_onLoad} overrideList={roles} />
+      <PaginatedItemOverview onLoad={_onLoad} overrideList={roles} onDeleteItem={(x) => console.log(x)}/>
     </SectionComponent>
   );
 };
