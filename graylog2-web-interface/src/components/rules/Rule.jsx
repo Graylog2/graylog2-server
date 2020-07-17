@@ -13,25 +13,28 @@ import RuleHelper from './RuleHelper';
 
 class Rule extends React.Component {
   static propTypes = {
-    rule: PropTypes.object,
-    usedInPipelines: PropTypes.array,
+    title: PropTypes.string,
     create: PropTypes.bool,
-    onSave: PropTypes.func.isRequired,
-    validateRule: PropTypes.func.isRequired,
-  };
+  }
+
+  static defaultProps = {
+    title: '',
+    create: false,
+  }
 
   render() {
-    let title;
+    const { create, title } = this.props;
+    let pageTitle;
 
-    if (this.props.create) {
-      title = 'Create pipeline rule';
+    if (create) {
+      pageTitle = 'Create pipeline rule';
     } else {
-      title = <span>Pipeline rule <em>{this.props.rule.title}</em></span>;
+      pageTitle = <span>Pipeline rule <em>{title}</em></span>;
     }
 
     return (
       <div>
-        <PageHeader title={title}>
+        <PageHeader title={pageTitle}>
           <span>
             Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list{' '}
             of actions.{' '}
@@ -60,11 +63,7 @@ class Rule extends React.Component {
 
         <Row className="content">
           <Col md={6}>
-            <RuleForm rule={this.props.rule}
-                      usedInPipelines={this.props.usedInPipelines}
-                      create={this.props.create}
-                      onSave={this.props.onSave}
-                      validateRule={this.props.validateRule} />
+            <RuleForm create={create} />
           </Col>
           <Col md={6}>
             <RuleHelper />

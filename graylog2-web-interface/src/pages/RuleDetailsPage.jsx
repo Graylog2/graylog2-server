@@ -1,76 +1,75 @@
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 
+import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import CombinedProvider from 'injection/CombinedProvider';
+import { PipelineRulesProvider } from 'components/rules/RuleContext';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
-function filterRules(state) {
-  return state.rules ? state.rules.filter((r) => r.id === this.props.params.ruleId)[0] : undefined;
+function filterRules({ rules }, { params }) {
+  return rules ? rules.filter((r) => r.id === params.ruleId)[0] : undefined;
 }
 
-const RuleDetailsPage = createReactClass({
-  displayName: 'RuleDetailsPage',
+const RuleDetailsPage = ({ params, rule, pipelines }) => {
+  const isNewRule = params.ruleId === 'new';
+  const title = rule?.title || '';
+  const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
+  const [isLoading, setIsLoading] = useState(false);
 
-  propTypes: {
-    params: PropTypes.object.isRequired,
-  },
+  const pipelinesUsingRule = isNewRule ? [] : pipelines.filter((pipeline) => {
+    return pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1);
+  });
 
-  mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules), Reflux.connect(PipelinesStore)],
-
-  componentDidMount() {
-    if (this.props.params.ruleId !== 'new') {
+  useEffect(() => {
+    if (!isNewRule) {
       PipelinesActions.list();
-      RulesActions.get(this.props.params.ruleId);
+      RulesActions.get(params.ruleId);
+      setIsLoading(!(rule && pipelines));
     }
-  },
+  }, []);
 
-  _save(rule, callback) {
-    let promise;
+  if (isLoading) {
+    return <Spinner />;
+  }
 
-    if (rule.id) {
-      promise = RulesActions.update.triggerPromise(rule);
-    } else {
-      promise = RulesActions.save.triggerPromise(rule);
-    }
+  return (
+    <DocumentTitle title={pageTitle}>
+      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={rule}>
+        <Rule create={isNewRule} title={title} />
+      </PipelineRulesProvider>
+    </DocumentTitle>
+  );
+};
 
-    promise.then(() => callback());
-  },
+RuleDetailsPage.propTypes = {
+  params: PropTypes.shape({
+    ruleId: PropTypes.string,
+  }).isRequired,
+  rule: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    source: PropTypes.string,
+    value: PropTypes.string,
+  }),
+  pipelines: PropTypes.any,
+};
 
-  _validateRule(rule, setErrorsCb) {
-    RulesActions.parse(rule, setErrorsCb);
-  },
+RuleDetailsPage.defaultProps = {
+  rule: undefined,
+  pipelines: undefined,
+};
 
-  _isLoading() {
-    return this.props.params.ruleId !== 'new' && !(this.state.rule && this.state.pipelines);
-  },
-
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
-
-    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter((pipeline) => {
-      return pipeline.stages.some((stage) => stage.rules.indexOf(this.state.rule.title) !== -1);
-    });
-
-    const pageTitle = (this.props.params.ruleId === 'new' ? 'New pipeline rule' : `Pipeline rule ${this.state.rule.title}`);
-
-    return (
-      <DocumentTitle title={pageTitle}>
-        <Rule rule={this.state.rule}
-              usedInPipelines={pipelinesUsingRule}
-              create={this.props.params.ruleId === 'new'}
-              onSave={this._save}
-              validateRule={this._validateRule} />
-      </DocumentTitle>
-    );
-  },
-});
-
-export default RuleDetailsPage;
+export default connect(RuleDetailsPage, {
+  rule: RulesStore,
+  pipelines: PipelinesStore,
+},
+({ rule, pipelines, ...otherProps }) => ({
+  rule: filterRules(rule, otherProps),
+  pipelines: pipelines.pipelines,
+  ...otherProps,
+}));
