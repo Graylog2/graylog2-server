@@ -10,35 +10,50 @@ import { PipelineRulesProvider } from 'components/rules/RuleContext';
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
-function filterRules({ rules }, { params }) {
-  return rules ? rules.filter((r) => r.id === params.ruleId)[0] : undefined;
+function filterRules(rule, ruleId) {
+  console.log('filterRules', rule, ruleId);
+
+  return rule?.rules?.filter((r) => r.id === ruleId)[0];
+}
+
+function filterPipelines(pipelines = [], title = '') {
+  return pipelines.filter((pipeline) => {
+    return pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1);
+  });
 }
 
 const RuleDetailsPage = ({ params, rule, pipelines }) => {
-  const isNewRule = params.ruleId === 'new';
-  const title = rule?.title || '';
-  const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filteredRule, setFilteredRule] = useState({});
 
-  const pipelinesUsingRule = isNewRule ? [] : pipelines.filter((pipeline) => {
-    return pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1);
-  });
+  const isNewRule = params.ruleId === 'new';
+  const title = filteredRule?.title || '';
+  const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
+
+  const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
+
+  useEffect(() => {
+    console.log('useEffect', rule, params);
+    setFilteredRule(filterRules(rule, params.ruleId));
+  }, [params]);
 
   useEffect(() => {
     if (!isNewRule) {
       PipelinesActions.list();
-      RulesActions.get(params.ruleId);
-      setIsLoading(!(rule && pipelines));
+      RulesActions.get(params?.ruleId);
+      setIsLoading(!(filteredRule && pipelines));
+    } else {
+      setIsLoading(false);
     }
-  }, []);
+  }, [filteredRule]);
 
   if (isLoading) {
-    return <Spinner />;
+    return <Spinner text="Loading Rule Details..." />;
   }
 
   return (
     <DocumentTitle title={pageTitle}>
-      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={rule}>
+      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={filteredRule}>
         <Rule create={isNewRule} title={title} />
       </PipelineRulesProvider>
     </DocumentTitle>
@@ -68,8 +83,7 @@ export default connect(RuleDetailsPage, {
   rule: RulesStore,
   pipelines: PipelinesStore,
 },
-({ rule, pipelines, ...otherProps }) => ({
-  rule: filterRules(rule, otherProps),
-  pipelines: pipelines.pipelines,
-  ...otherProps,
+({ pipelines, ...restProps }) => ({
+  pipelines: pipelines.pipelines || [],
+  ...restProps,
 }));

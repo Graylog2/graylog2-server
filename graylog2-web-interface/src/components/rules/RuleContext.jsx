@@ -1,33 +1,37 @@
-import React, { createContext, useRef, useState } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import debounce from 'lodash/debounce';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { RulesActions } = CombinedProvider.get('Rules');
+let VALIDATE_TIMEOUT;
 
 export const PipelineRulesContext = createContext();
 
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const [errorAnnotations, setErrorAnnotations] = useState([]);
-  const descriptionRef = useRef(rule?.description);
+  const [ruleSource, setRuleSource] = useState(rule?.source);
+  const descriptionRef = useRef();
   const ruleSourceRef = useRef();
 
-  console.log('descriptionRef', descriptionRef);
-  console.log('ruleSourceRef', ruleSourceRef);
+  useEffect(() => {
+    descriptionRef.current.value = rule?.description;
+  }, []);
 
-  const createAnnotations = (nextErrors) => {
+  const createAnnotations = (nextErrors, nextSource) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
       return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
 
+    setRuleSource(nextSource);
     setErrorAnnotations(nextErrorAnnotations);
   };
 
-  const validateNewRule = (nextValue, callback) => {
+  const validateNewRule = (nextSource, callback) => {
     const nextRule = {
       ...rule,
-      value: nextValue,
+      source: nextSource,
       description: descriptionRef.current.value,
     };
 
@@ -37,53 +41,60 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   const validateBeforeSave = (callback = () => {}) => {
     const savedRule = {
       ...rule,
-      value: ruleSourceRef.current.value,
+      source: ruleSource,
       description: descriptionRef.current.value,
     };
 
-    RulesActions.parse(savedRule, callback);
+    RulesActions.parse(savedRule, () => callback(savedRule));
   };
 
-  const handleChangeRuleValue = debounce((newRuleValue) => {
-    validateNewRule(newRuleValue, (errors) => {
-      const nextErrors = errors || [];
+  const handleChangeRuleSource = debounce((newRuleSource) => {
+    if (VALIDATE_TIMEOUT) {
+      setRuleSource(newRuleSource);
+      clearTimeout(VALIDATE_TIMEOUT);
+      VALIDATE_TIMEOUT = null;
+    }
 
-      createAnnotations(nextErrors);
-      ruleSourceRef.current.value = newRuleValue;
-    });
-  }, 500);
+    VALIDATE_TIMEOUT = setTimeout(() => {
+      validateNewRule(newRuleSource, (errors) => {
+        const nextErrors = errors || [];
+
+        createAnnotations(nextErrors, newRuleSource);
+      });
+    }, 350);
+  }, 150);
 
   const handleDescription = (newDescription) => {
     descriptionRef.current.value = newDescription;
-    console.log('descriptionRef', descriptionRef);
   };
 
-  const savePipelineRule = (callback = () => {}) => {
+  const savePipelineRule = (nextRule, callback = () => {}) => {
     let promise;
 
-    if (rule?.id) {
-      promise = RulesActions.update.triggerPromise(rule);
+    if (nextRule?.id) {
+      promise = RulesActions.update.triggerPromise(nextRule);
     } else {
-      promise = RulesActions.save.triggerPromise(rule);
+      promise = RulesActions.save.triggerPromise(nextRule);
     }
 
     promise.then(() => callback());
   };
 
   const handleSavePipelineRule = (callback = () => {}) => {
-    validateBeforeSave(() => savePipelineRule(callback));
+    validateBeforeSave((nextRule) => savePipelineRule(nextRule, callback));
   };
 
   return (
     <PipelineRulesContext.Provider value={{
       descriptionRef,
       errorAnnotations,
-      handleChangeRuleValue,
+      handleChangeRuleSource,
       handleDescription,
       handleSavePipelineRule,
-      ruleSourceRef,
+      ruleSource,
       usedInPipelines,
       validateBeforeSave,
+      ruleSourceRef,
     }}>
       {children}
     </PipelineRulesContext.Provider>
@@ -98,14 +109,14 @@ PipelineRulesProvider.propTypes = {
     title: PropTypes.string,
     description: PropTypes.string,
     source: PropTypes.string,
-    value: PropTypes.string,
   }),
 };
 
 PipelineRulesProvider.defaultProps = {
   usedInPipelines: [],
   rule: {
-    description: 'DO123',
-    value: 'DA321',
+    id: undefined,
+    description: '',
+    source: '',
   },
 };

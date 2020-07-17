@@ -14,14 +14,14 @@ const RuleForm = ({ create }) => {
   const {
     descriptionRef,
     errorAnnotations,
-    handleChangeRuleValue,
+    handleChangeRuleSource,
     handleDescription,
     handleSavePipelineRule,
-    ruleSourceRef,
+    ruleSource,
   } = useContext(PipelineRulesContext);
 
   const handleSubmit = (event) => {
-    event.preventDault();
+    event.preventDefault();
     handleSavePipelineRule(() => { history.push(Routes.SYSTEM.PIPELINES.RULES); });
   };
 
@@ -50,7 +50,7 @@ const RuleForm = ({ create }) => {
                label="Description"
                onChange={handleDescriptionChange}
                autoFocus
-               defaultValue={descriptionRef?.current}
+               defaultValue={descriptionRef?.current?.value}
                help="Rule description (optional)."
                ref={descriptionRef} />
 
@@ -59,9 +59,9 @@ const RuleForm = ({ create }) => {
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                             annotations={errorAnnotations}
-                            onChange={handleChangeRuleValue}
-                            ref={ruleSourceRef}
-                            mode="pipeline" />
+                            onChange={handleChangeRuleSource}
+                            mode="pipeline"
+                            value={ruleSource} />
         </Input>
       </fieldset>
 
