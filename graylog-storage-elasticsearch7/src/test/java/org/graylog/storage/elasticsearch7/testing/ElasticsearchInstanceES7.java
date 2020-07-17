@@ -4,6 +4,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -30,7 +31,7 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     }
 
     private ElasticsearchClient elasticsearchClientFrom(ElasticsearchContainer container) {
-        return new ElasticsearchClient(
+        final RestHighLevelClientProvider clientProvider = new RestHighLevelClientProvider(
                 ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -42,8 +43,9 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
                 null,
                 Duration.seconds(60),
                 "http",
-                false
-        );
+                false);
+
+        return new ElasticsearchClient(clientProvider.get());
     }
 
     public static ElasticsearchInstanceES7 create() {
