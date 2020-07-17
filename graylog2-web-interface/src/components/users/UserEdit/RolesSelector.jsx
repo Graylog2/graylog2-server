@@ -53,9 +53,7 @@ const _renderRoleOption = ({ label }: { label: string }) => (
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
 const RolesSelector = ({ user, onSubmit }: Props) => {
-  const limit = 1000;
   const [roles, setRoles] = useState([]);
-  const [total, setTotal] = useState(0);
 
   const onUpdate = ({ role }: { role: string }) => {
     const userRoles = user.roles;
@@ -64,10 +62,9 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
   };
 
   useEffect(() => {
-    AuthzRolesActions.loadPaginated((1, limit, ''))
+    AuthzRolesActions.loadPaginated(1, 0, '')
       .then((response: PaginatedListType) => {
-        const { pagination: { total: resultTotal }, list } = response;
-        setTotal(resultTotal);
+        const { list } = response;
 
         const resultRoles = list
           .filter((r) => !user.roles.includes(r.name))
@@ -76,10 +73,6 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
         setRoles(resultRoles);
       });
   }, []);
-
-  if (total > limit) {
-    return <span>You have more than {limit} roles. Are you serious?</span>;
-  }
 
   return (
     <div>
