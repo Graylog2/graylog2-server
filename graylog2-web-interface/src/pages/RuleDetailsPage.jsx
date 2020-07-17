@@ -11,8 +11,6 @@ const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
 function filterRules(rule, ruleId) {
-  console.log('filterRules', rule, ruleId);
-
   return rule?.rules?.filter((r) => r.id === ruleId)[0];
 }
 

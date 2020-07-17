@@ -6,8 +6,8 @@ import { SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import { PipelineRulesContext } from 'components/rules/RuleContext';
 
+import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
 
 const RuleForm = ({ create }) => {
@@ -54,7 +54,7 @@ const RuleForm = ({ create }) => {
                help="Rule description (optional)."
                ref={descriptionRef} />
 
-        <PipelinesUsingRule />
+        <PipelinesUsingRule create={create} />
 
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}

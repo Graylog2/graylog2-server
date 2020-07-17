@@ -19,12 +19,11 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
     descriptionRef.current.value = rule?.description;
   }, []);
 
-  const createAnnotations = (nextErrors, nextSource) => {
+  const createAnnotations = (nextErrors) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
       return { row: e.line - 1, column: e.position_in_line - 1, text: e.reason, type: 'error' };
     });
 
-    setRuleSource(nextSource);
     setErrorAnnotations(nextErrorAnnotations);
   };
 
@@ -49,8 +48,9 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
   };
 
   const handleChangeRuleSource = debounce((newRuleSource) => {
+    setRuleSource(newRuleSource);
+
     if (VALIDATE_TIMEOUT) {
-      setRuleSource(newRuleSource);
       clearTimeout(VALIDATE_TIMEOUT);
       VALIDATE_TIMEOUT = null;
     }
@@ -59,7 +59,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }) => {
       validateNewRule(newRuleSource, (errors) => {
         const nextErrors = errors || [];
 
-        createAnnotations(nextErrors, newRuleSource);
+        createAnnotations(nextErrors);
       });
     }, 350);
   }, 150);
