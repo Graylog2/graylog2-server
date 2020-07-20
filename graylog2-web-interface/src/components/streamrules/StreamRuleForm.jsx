@@ -1,94 +1,209 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Col, Well } from 'components/graylog';
-import { Input, BootstrapModalForm } from 'components/bootstrap';
-import { TypeAheadFieldInput, Icon } from 'components/common';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
+import { Icon, TypeAheadFieldInput } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
+import CombinedProvider from 'injection/CombinedProvider';
+import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import FormsUtils from 'util/FormsUtils';
 
-class StreamRuleForm extends React.Component {
+const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
+
+type StreamRule = {
+  type: number,
+  field: string,
+  value: string,
+  id?: string,
+  inverted: boolean,
+  description: string,
+};
+
+type StreamRuleType = {
+  id: number,
+  short_desc: string,
+  long_desc: string,
+};
+
+type Props = {
+  onSubmit: (?string, StreamRule) => void,
+  streamRule: StreamRule,
+  streamRuleTypes: [StreamRuleType],
+  title: string,
+  inputs: [],
+  onClose: () => void,
+};
+
+type State = {
+  streamRule: StreamRule,
+  error: string,
+};
+
+class StreamRuleForm extends React.Component<Props, State> {
+  static defaultProps = {
+    streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
+    inputs: [],
+    onClose: () => {},
+  };
+
   FIELD_PRESENCE_RULE_TYPE = 5;
 
   ALWAYS_MATCH_RULE_TYPE = 7;
 
+  MATCH_INPUT = 8;
+
+  PLACEHOLDER_INPUT = 0;
+
   constructor(props) {
     super(props);
 
-    this.state = props.streamRule;
-    this.modal = undefined;
+    this.state = {
+      streamRule: props.streamRule,
+      error: '',
+    };
   }
 
-  _resetValues = () => {
-    const { streamRule } = this.props;
+  componentDidMount() {
+    InputsActions.list();
+  }
 
-    this.setState(streamRule);
+  _validateMatchInput = () => {
+    const { streamRule: { value } } = this.state;
+
+    if (String(value) === String(this.PLACEHOLDER_INPUT)) {
+      this.setState({ error: 'Please choose an input' });
+
+      return false;
+    }
+
+    this.setState({ error: '' });
+
+    return true;
   };
 
   _onSubmit = () => {
-    const { type } = this.state;
+    const { streamRule: currentStreamRule } = this.state;
+    const { type } = currentStreamRule;
     const { streamRule, onSubmit } = this.props;
+    const { onClose } = this.props;
 
     if (type === this.ALWAYS_MATCH_RULE_TYPE) {
-      this.setState({ field: '' });
+      currentStreamRule.field = '';
+      this.setState({ streamRule: currentStreamRule });
     }
 
     if (type === this.FIELD_PRESENCE_RULE_TYPE || type === this.ALWAYS_MATCH_RULE_TYPE) {
-      this.setState({ value: '' });
+      currentStreamRule.value = '';
+      this.setState({ streamRule: currentStreamRule });
     }
 
-    onSubmit(streamRule.id, this.state);
-    this.modal.close();
+    if (String(type) === String(this.MATCH_INPUT)) {
+      if (!this._validateMatchInput()) {
+        return;
+      }
+    }
+
+    onSubmit(streamRule.id, currentStreamRule);
+    onClose();
   };
 
-  _formatStreamRuleType = (streamRuleType) => {
-    return (
-      <option key={`streamRuleType${streamRuleType.id}`}
-              value={streamRuleType.id}>
-        {streamRuleType.short_desc}
-      </option>
-    );
-  };
-
-  open = () => {
-    this._resetValues();
-    this.modal.open();
-  };
-
-  close = () => {
-    this.modal.close();
-  };
+  _formatStreamRuleType = (streamRuleType) => (
+    <option key={`streamRuleType${streamRuleType.id}`}
+            value={streamRuleType.id}>
+      {streamRuleType.short_desc}
+    </option>
+  );
 
   handleChange = (event) => {
-    const change = {};
+    const { streamRule } = this.state;
 
-    change[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    this.setState(change);
+    streamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
+
+    if (event.target.name === 'type' && String(streamRule.type) === String(this.MATCH_INPUT)) {
+      streamRule.value = String(this.PLACEHOLDER_INPUT);
+    }
+
+    this.setState({ streamRule });
+  };
+
+  _formatInputOptions = (input) => (
+    <option key={`input-${input.id}`} value={input.id}>
+      {input.title} ({input.name})
+    </option>
+  );
+
+  valueBox = () => {
+    const { streamRule: { value, type }, error } = this.state;
+    const { inputs } = this.props;
+
+    switch (String(type)) {
+      case String(this.FIELD_PRESENCE_RULE_TYPE):
+      case String(this.ALWAYS_MATCH_RULE_TYPE):
+        return '';
+
+      case String(this.MATCH_INPUT): {
+        const bsStyle = error && error.length > 0 ? 'error' : undefined;
+
+        return (
+          <Input bsStyle={bsStyle}
+                 help={error}
+                 id="Value"
+                 type="select"
+                 required
+                 label="Value"
+                 name="value"
+                 value={value}
+                 data-testid="input-selection"
+                 onChange={this.handleChange}>
+            <option value={this.PLACEHOLDER_INPUT}>Choose Input</option>
+            {inputs.map(this._formatInputOptions)}
+          </Input>
+        );
+      }
+
+      default:
+        return <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} />;
+    }
+  };
+
+  fieldBox = () => {
+    const { streamRule: { field, type } } = this.state;
+
+    switch (String(type)) {
+      case String(this.ALWAYS_MATCH_RULE_TYPE):
+      case String(this.MATCH_INPUT):
+        return '';
+      default:
+        return <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus />;
+    }
   };
 
   render() {
-    const { field, type, value, inverted, description } = this.state;
-    const { streamRuleTypes: ruleTypes, title } = this.props;
+    const { streamRule } = this.state;
+    const { type, inverted, description } = streamRule;
+    const { streamRuleTypes: ruleTypes, title, onClose, inputs } = this.props;
 
     const streamRuleTypes = ruleTypes.map(this._formatStreamRuleType);
-    const fieldBox = (String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
-      ? <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus /> : '');
-    const valueBox = (String(type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
-      ? <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} /> : '');
+    const fieldBox = this.fieldBox();
+    const valueBox = this.valueBox();
 
     return (
-      <BootstrapModalForm ref={(c) => { this.modal = c; }}
-                          title={title}
+      <BootstrapModalForm title={title}
+                          show
+                          onCancel={onClose}
+                          onModalClose={onClose}
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save"
                           formProps={{ id: 'StreamRuleForm' }}>
         <div>
           <Col md={8}>
             {fieldBox}
-            <Input id="Type" type="select" required label="Type" name="type" value={type} onChange={this.handleChange}>
+            <Input id="Type" data-testid="rule-type-selection" type="select" required label="Type" name="type" value={type} onChange={this.handleChange}>
               {streamRuleTypes}
             </Input>
             {valueBox}
@@ -99,7 +214,7 @@ class StreamRuleForm extends React.Component {
             <p>
               <strong>Result:</strong>
               {' '}
-              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={ruleTypes} />
+              <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={ruleTypes} inputs={inputs} />
             </p>
           </Col>
           <Col md={4}>
@@ -129,10 +244,10 @@ StreamRuleForm.propTypes = {
   streamRule: PropTypes.object,
   streamRuleTypes: PropTypes.array.isRequired,
   title: PropTypes.string.isRequired,
+  inputs: PropTypes.array,
+  onClose: PropTypes.func,
 };
 
-StreamRuleForm.defaultProps = {
-  streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
-};
-
-export default StreamRuleForm;
+export default connect(StreamRuleForm,
+  { inputs: InputsStore },
+  ({ inputs }) => ({ inputs: inputs.inputs }));
