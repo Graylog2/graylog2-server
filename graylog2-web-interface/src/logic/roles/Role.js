@@ -1,8 +1,6 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { DescriptiveItem } from 'components/users/PaginatedItemOverview';
-
 type InternalState = {
   id: string,
   name: string,
