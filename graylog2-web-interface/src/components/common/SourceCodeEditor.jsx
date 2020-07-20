@@ -71,6 +71,11 @@ class SourceCodeEditor extends React.Component {
     height: PropTypes.number,
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
+    /** Provides a ref associated to AceEditor component */
+    innerRef: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.shape({ current: PropTypes.any }),
+    ]),
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
     mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
     /** Function called on editor load. The first argument is the instance of the editor. */
@@ -87,7 +92,6 @@ class SourceCodeEditor extends React.Component {
     value: PropTypes.string,
     /** Editor width in pixels. Use `Infinity` to indicate the editor should use 100% of its container's width. */
     width: PropTypes.number,
-    innerRef: PropTypes.any,
   }
 
   static defaultProps = {
@@ -95,6 +99,7 @@ class SourceCodeEditor extends React.Component {
     focus: false,
     fontSize: 13,
     height: 200,
+    innerRef: undefined,
     mode: 'text',
     onChange: () => {},
     onLoad: () => {},
@@ -103,7 +108,6 @@ class SourceCodeEditor extends React.Component {
     toolbar: true,
     value: '',
     width: Infinity,
-    innerRef: undefined,
   };
 
   constructor(props) {
