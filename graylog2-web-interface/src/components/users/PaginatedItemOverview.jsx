@@ -42,8 +42,8 @@ export type PaginatedListType = {
 
 type Props = {
   onLoad: (PaginationInfo) => Promise<?PaginatedListType>,
-  overrideList: ?PaginatedListType,
-  onDeleteItem: ?(DescriptiveItem) => void,
+  overrideList?: PaginatedListType,
+  onDeleteItem?: (DescriptiveItem) => void,
 };
 
 const pageSizes = [5, 10, 30];
@@ -104,6 +104,11 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
       </Container>
     </PaginatedList>
   );
+};
+
+PaginatedItemOverview.defaultProps = {
+  onDeleteItem: undefined,
+  overrideList: undefined,
 };
 
 export default PaginatedItemOverview;

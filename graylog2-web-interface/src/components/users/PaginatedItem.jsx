@@ -9,12 +9,12 @@ import type { DescriptiveItem } from './PaginatedItemOverview';
 
 type Props = {
   item: DescriptiveItem,
-  onDeleteItem: ?(DescriptiveItem) => void,
+  onDeleteItem?: (DescriptiveItem) => void,
 };
 
 type DeleteProps = {
   item: DescriptiveItem,
-  onDeleteItem: ?(DescriptiveItem) => void,
+  onDeleteItem?: (DescriptiveItem) => void,
 };
 
 // eslint-disable-next-line react/prop-types
@@ -47,7 +47,7 @@ const Description = styled.span`
   flex: 1;
 `;
 
-const StyledDeleteButton = styled(DeleteButton)(({ theme }) => css`
+const StyledDeleteButton = styled(DeleteButton)(() => css`
   flex: 1;
 `);
 
@@ -58,5 +58,9 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
     <StyledDeleteButton onDeleteItem={onDeleteItem} item={item} />
   </Container>
 );
+
+PaginatedItem.defaultProps = {
+  onDeleteItem: undefined,
+};
 
 export default PaginatedItem;
