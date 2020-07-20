@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -57,6 +58,13 @@ public class QueryEngine {
                        Set<QueryMetadataDecorator> queryMetadataDecorators) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.queryMetadataDecorators = queryMetadataDecorators;
+    }
+
+    // TODO: Backwards-compatible constructor to avoid breakage. Remove at some point.
+    @Deprecated
+    public QueryEngine(Map<String, QueryBackend<? extends GeneratedQueryContext>> backends,
+                       Set<QueryMetadataDecorator> queryMetadataDecorators) {
+        this(backends.get("elasticsearch"), queryMetadataDecorators);
     }
 
     private static Set<QueryResult> allOfResults(Set<CompletableFuture<QueryResult>> futures) {
