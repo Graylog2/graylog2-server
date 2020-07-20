@@ -89,6 +89,11 @@ const input = {
   placeholder: gray[60],
 };
 
+/* eslint-disable prefer-destructuring */
+global.navigationBackground = global.contentBackground;
+global.navigationBoxShadow = chroma(gray[10]).alpha(0.1).css();
+/* eslint-enable prefer-destructuring */
+
 const teinte = {
   brand,
   global,
