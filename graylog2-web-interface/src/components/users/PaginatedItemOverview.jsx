@@ -27,11 +27,11 @@ export type PaginationInfo = {
   query: string,
 };
 
-export interface DescriptiveItem {
-  get id(): string,
-  get name(): string,
-  get description(): string,
-}
+export type DescriptiveItem = {
+  +id: string,
+  +name: string,
+  +description: string,
+};
 
 type ListOfDescriptiveItems = Immutable.List<DescriptiveItem>;
 

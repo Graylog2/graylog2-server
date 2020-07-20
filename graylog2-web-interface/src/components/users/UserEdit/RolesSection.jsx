@@ -7,12 +7,12 @@ import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { UsersActions } from 'stores/users/UsersStore';
-import Role from 'logic/roles/Role';
 
 import RolesSelector from './RolesSelector';
 
 import PaginatedItemOverview, { defaultPageInfo, type PaginationInfo, type PaginatedListType } from '../PaginatedItemOverview';
 import SectionComponent from '../SectionComponent';
+import type { DescriptiveItem } from '../PaginatedItemOverview';
 
 type Props = {
   user: User,
@@ -32,12 +32,17 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       .then((response) => {
         setLoading(false);
 
-        return response;
-      }).catch((error) => {
+        return {
+          pagination: response.pagination,
+          list: response.list.map((item) => (item: DescriptiveItem)),
+        };
+      }, (error) => {
         if (error.additional.status === 404) {
           UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
             'Could not load roles for user');
         }
+
+        return error;
       });
   };
 
@@ -46,7 +51,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     UsersActions.load(username);
   });
 
-  const onDeleteRole = (role: Role) => {
+  const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();
     onUpdate({ roles: newUserRoles });
   };

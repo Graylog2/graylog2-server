@@ -19,7 +19,7 @@ export type RoleJSON = {
   read_only: boolean,
 };
 
-export default class Role implements DescriptiveItem {
+export default class Role {
   _value: InternalState;
 
   // eslint-disable-next-line no-undef
