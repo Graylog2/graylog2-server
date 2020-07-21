@@ -20,7 +20,8 @@ class TextField extends React.Component {
     value: this.props.value,
   };
 
-  componentWillReceiveProps(props) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(props) {
     this.setState(props);
   }
 

@@ -17,7 +17,8 @@ class TestLdapConnection extends React.Component {
     serverConnectionStatus: {},
   };
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // Reset connection status if ldapSettings changed
     if (JSON.stringify(this.props.ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
       this.setState({ serverConnectionStatus: {} });

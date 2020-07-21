@@ -46,7 +46,8 @@ class LookupTableForm extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (_.isEqual(this.props.table, nextProps.table)) {
       // props haven't change, don't update our state from them
       return;

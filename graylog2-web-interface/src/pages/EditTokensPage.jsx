@@ -32,7 +32,8 @@ const EditTokensPage = createReactClass({
     this._loadTokens(this.props.params.username);
   },
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.params.username !== nextProps.params.username) {
       this._loadTokens(nextProps.params.username);
     }

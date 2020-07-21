@@ -15,7 +15,8 @@ class MessageFieldExtractorActions extends React.Component {
     this._refreshExtractorRoutes(this.props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this._refreshExtractorRoutes(nextProps);
   }
 

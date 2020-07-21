@@ -48,7 +48,8 @@ const UserForm = createReactClass({
     DashboardsActions.search('', 1, 32768);
   },
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.user.username !== nextProps.user.username) {
       this.setState({
         user: this._getUserStateFromProps(nextProps),
