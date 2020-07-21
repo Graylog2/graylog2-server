@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import * as Immutable from 'immutable';
-
 import styled from 'styled-components';
+
 import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
