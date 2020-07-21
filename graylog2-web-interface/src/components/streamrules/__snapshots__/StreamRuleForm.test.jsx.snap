@@ -18,7 +18,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 eNmkew in modal"
+        class="fade Modal-nuree8-0 hMPgsT in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -70,17 +70,17 @@ Object {
                     >
                       <div />
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                           for="Type"
                         >
                           Type
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -134,17 +134,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                           for="Value"
                         >
                           Value
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -157,7 +157,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <span>
                           <div
@@ -180,17 +180,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                           for="Description"
                         >
                           Description (optional)
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -225,7 +225,7 @@ Object {
                       class="col-md-4"
                     >
                       <div
-                        class="Well-sc-19gs1oc-0 eWEWxV matcher-github well well-sm"
+                        class="Well-sc-19gs1oc-0 YXCuT matcher-github well well-sm"
                       >
                         The server will try to convert to strings or numbers based on the matcher type as well as it can.
                         <br />
@@ -258,13 +258,13 @@ Object {
                 class="modal-footer"
               >
                 <button
-                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                  class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
+                  class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                   type="submit"
                 >
                   Save
@@ -351,7 +351,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 eNmkew in modal"
+        class="fade Modal-nuree8-0 hMPgsT in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -405,17 +405,17 @@ Object {
                         field_1
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                           for="Type"
                         >
                           Type
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -469,17 +469,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                           for="Value"
                         >
                           Value
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -492,7 +492,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <span>
                           <div
@@ -515,17 +515,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 hCskeX control-label"
+                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                           for="Description"
                         >
                           Description (optional)
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 eXfwDC form-control"
+                            class="FormControl-sc-1amoaox-0 kmJcge form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -562,7 +562,7 @@ Object {
                       class="col-md-4"
                     >
                       <div
-                        class="Well-sc-19gs1oc-0 eWEWxV matcher-github well well-sm"
+                        class="Well-sc-19gs1oc-0 YXCuT matcher-github well well-sm"
                       >
                         The server will try to convert to strings or numbers based on the matcher type as well as it can.
                         <br />
@@ -595,13 +595,13 @@ Object {
                 class="modal-footer"
               >
                 <button
-                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-default"
+                  class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button__StyledButton-c9cbmb-0 hpBclA btn btn-primary"
+                  class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                   type="submit"
                 >
                   Save
