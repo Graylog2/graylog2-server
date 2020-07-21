@@ -17,8 +17,8 @@
     <description>Graylog Storage Module for Elasticsearch 7</description>
 
     <properties>
-        <it.es.version>7.6.2</it.es.version>
-        <elasticsearch.version>7.6.2</elasticsearch.version>
+        <it.es.version>7.8.0</it.es.version>
+        <elasticsearch.version>7.8.0</elasticsearch.version>
     </properties>
 
     <dependencies>
