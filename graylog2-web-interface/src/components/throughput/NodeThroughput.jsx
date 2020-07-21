@@ -29,7 +29,8 @@ const NodeThroughput = createReactClass({
     };
   },
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.metricNames = {
       totalIn: 'org.graylog2.throughput.input.1-sec-rate',
       totalOut: 'org.graylog2.throughput.output.1-sec-rate',
@@ -52,7 +53,7 @@ const NodeThroughput = createReactClass({
         <span>
           Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and <strong>
             {numeral(metrics.totalOut).format('0,0')}
-          </strong> outgoing msg/s.
+                                                                                            </strong> outgoing msg/s.
         </span>
       );
     }

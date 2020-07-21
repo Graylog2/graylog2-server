@@ -45,7 +45,8 @@ export default class EditWidgetFrame extends React.Component<Props> {
     children: PropTypes.node.isRequired,
   };
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     globalStyles.use();
   }
 
