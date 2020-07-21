@@ -19,7 +19,7 @@ const ThemeModeToggleWrap: StyledComponent<{}, void, HTMLDivElement> = styled.di
   align-items: center;
 `;
 
-const ModeIcon: StyledComponent<{currentMode: boolean}, ThemeInterface, HTMLOrSVGElement> = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
+const ModeIcon: StyledComponent<{currentMode: boolean}, ThemeInterface, SVGElement> = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
   opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
   color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.default)};
 `;

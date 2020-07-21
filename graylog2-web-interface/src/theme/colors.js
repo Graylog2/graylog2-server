@@ -1,8 +1,10 @@
 // @flow strict
+import PropTypes from 'prop-types';
+
 import teinte from './variants/teinte';
 import noire from './variants/noire';
 
-type Colors = {
+export type Colors = {
   brand: {
     primary: string,
     secondary: string,
@@ -118,12 +120,129 @@ type Colors = {
   },
 };
 
-export type Modes = {
+export const colorsPropTypes = {
+  brand: PropTypes.shape({
+    primary: PropTypes.string.isRequired,
+    secondary: PropTypes.string.isRequired,
+    tertiary: PropTypes.string.isRequired,
+  }).isRequired,
+  global: PropTypes.shape({
+    background: PropTypes.string.isRequired,
+    contentBackground: PropTypes.string.isRequired,
+    inputBackground: PropTypes.string.isRequired,
+    link: PropTypes.string.isRequired,
+    linkHover: PropTypes.string.isRequired,
+    navigationBackground: PropTypes.string.isRequired,
+    navigationBoxShadow: PropTypes.string.isRequired,
+    textAlt: PropTypes.string.isRequired,
+    textDefault: PropTypes.string.isRequired,
+  }).isRequired,
+  gray: PropTypes.shape({
+    10: PropTypes.string.isRequired,
+    20: PropTypes.string.isRequired,
+    30: PropTypes.string.isRequired,
+    40: PropTypes.string.isRequired,
+    50: PropTypes.string.isRequired,
+    60: PropTypes.string.isRequired,
+    70: PropTypes.string.isRequired,
+    80: PropTypes.string.isRequired,
+    90: PropTypes.string.isRequired,
+    100: PropTypes.string.isRequired,
+  }).isRequired,
+  input: PropTypes.shape({
+    background: PropTypes.string.isRequired,
+    backgroundDisabled: PropTypes.string.isRequired,
+    border: PropTypes.string.isRequired,
+    borderFocus: PropTypes.string.isRequired,
+    boxShadow: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    colorDisabled: PropTypes.string.isRequired,
+  }).isRequired,
+  table: PropTypes.shape({
+    background: PropTypes.string.isRequired,
+    backgroundAlt: PropTypes.string.isRequired,
+    backgroundHover: PropTypes.string.isRequired,
+    variant: PropTypes.shape({
+      active: PropTypes.string.isRequired,
+      danger: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    variantHover: PropTypes.shape({
+      active: PropTypes.string.isRequired,
+      danger: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  variant: PropTypes.shape({
+    danger: PropTypes.string.isRequired,
+    dark: PropTypes.shape({
+      danger: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    darker: PropTypes.shape({
+      danger: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    darkest: PropTypes.shape({
+      danger: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    default: PropTypes.string.isRequired,
+    info: PropTypes.string.isRequired,
+    light: PropTypes.shape({
+      danger: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    lighter: PropTypes.shape({
+      danger: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    lightest: PropTypes.shape({
+      danger: PropTypes.string.isRequired,
+      default: PropTypes.string.isRequired,
+      info: PropTypes.string.isRequired,
+      primary: PropTypes.string.isRequired,
+      success: PropTypes.string.isRequired,
+      warning: PropTypes.string.isRequired,
+    }).isRequired,
+    primary: PropTypes.string.isRequired,
+    success: PropTypes.string.isRequired,
+    warning: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
+type Modes = {
   teinte: Colors,
   noire: Colors,
 };
 
-const colors = {
+const colors: Modes = {
   teinte,
   noire,
 };

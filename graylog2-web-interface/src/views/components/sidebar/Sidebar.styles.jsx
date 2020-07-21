@@ -52,7 +52,7 @@ export const Headline: StyledComponent<{}, void, HTMLHeadingElement> = styled.h4
   white-space: nowrap;
 `;
 
-export const ToggleIcon: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ open, theme }) => `
+export const ToggleIcon: StyledComponent<{open: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ open, theme }) => `
   width: 25px;
   text-align: center;
   font-size: ${theme.fonts.size.large};

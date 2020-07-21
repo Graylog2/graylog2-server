@@ -1,4 +1,5 @@
 // @flow strict
+import PropTypes from 'prop-types';
 
 import 'opensans-npm-webfont/open_sans.css';
 import 'opensans-npm-webfont/open_sans_italic.css';
@@ -24,6 +25,27 @@ export type Fonts = {
     h5: string,
     h6: string,
   },
+};
+
+export const fontsPropTypes = {
+  family: PropTypes.shape({
+    body: PropTypes.string.isRequired,
+    monospace: PropTypes.string.isRequired,
+  }).isRequired,
+  size: PropTypes.shape({
+    root: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+    huge: PropTypes.string.isRequired,
+    large: PropTypes.string.isRequired,
+    small: PropTypes.string.isRequired,
+    tiny: PropTypes.string.isRequired,
+    h1: PropTypes.string.isRequired,
+    h2: PropTypes.string.isRequired,
+    h3: PropTypes.string.isRequired,
+    h4: PropTypes.string.isRequired,
+    h5: PropTypes.string.isRequired,
+    h6: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 const family = {
