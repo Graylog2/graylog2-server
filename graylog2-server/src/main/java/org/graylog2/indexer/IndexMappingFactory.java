@@ -55,9 +55,7 @@ public class IndexMappingFactory {
     }
 
     public static IndexMappingTemplate eventsIndexMappingFor(Version elasticsearchVersion) {
-        if (elasticsearchVersion.satisfies("^5.0.0")) {
-            return new EventsIndexMapping6();
-        } else if (elasticsearchVersion.satisfies("^6.0.0")) {
+        if (elasticsearchVersion.satisfies("^5.0.0 | ^6.0.0")) {
             return new EventsIndexMapping6();
         } else if (elasticsearchVersion.satisfies("^7.0.0")) {
             return new EventsIndexMapping7();
