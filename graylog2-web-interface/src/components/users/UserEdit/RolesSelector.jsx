@@ -2,7 +2,8 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
-import styled, { type StyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 
 import { AuthzRolesActions, type PaginatedListType } from 'stores/roles/AuthzRolesStore';
 import { type ThemeInterface } from 'theme';
@@ -23,7 +24,7 @@ const FormElements = styled.div`
   display: flex;
 `;
 
-const Errors: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const Errors: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   width: 100%;
   margin-top: 3px;
   color: ${theme.colors.variant.danger};
@@ -98,7 +99,7 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
               </Field>
               <SubmitButton bsStyle="success"
                             disabled={isSubmitting || !isValid}
-                            title="Add Collaborator"
+                            title="Add Role"
                             type="submit">
                 Add Role
               </SubmitButton>

@@ -12,22 +12,6 @@ type Props = {
   onDeleteItem?: (DescriptiveItem) => void,
 };
 
-type DeleteProps = {
-  item: DescriptiveItem,
-  onDeleteItem?: (DescriptiveItem) => void,
-};
-
-// eslint-disable-next-line react/prop-types
-const DeleteButton = ({ onDeleteItem, item }: DeleteProps) => {
-  if (typeof onDeleteItem === 'function') {
-    return (
-      <IconButton onClick={() => onDeleteItem(item)} name="remove" />
-    );
-  }
-
-  return null;
-};
-
 const Container: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   display: flex;
   padding: 10px;
@@ -47,17 +31,23 @@ const Description = styled.span`
   flex: 1;
 `;
 
-const StyledDeleteButton = styled(DeleteButton)(() => css`
+const StyledDeleteButton = styled(IconButton)(() => css`
   flex: 1;
 `);
 
-const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => (
-  <Container>
-    <Header>{name}</Header>
-    <Description>{description}</Description>
-    <StyledDeleteButton onDeleteItem={onDeleteItem} item={item} />
-  </Container>
-);
+const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
+  const deleteButton = typeof onDeleteItem === 'function'
+    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="remove" />
+    : null;
+
+  return (
+    <Container>
+      <Header>{name}</Header>
+      <Description>{description}</Description>
+      { deleteButton }
+    </Container>
+  );
+};
 
 PaginatedItem.defaultProps = {
   onDeleteItem: undefined,
