@@ -26,7 +26,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.ParsedMultiBucketAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
@@ -87,8 +86,8 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
     protected Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
         final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
         if (objects == null) {
-            if (aggregations instanceof ParsedMultiBucketAggregation.ParsedBucket) {
-                return createValueCount((ParsedMultiBucketAggregation.ParsedBucket) aggregations);
+            if (aggregations instanceof MultiBucketsAggregation.Bucket) {
+                return createValueCount((MultiBucketsAggregation.Bucket) aggregations);
             }
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
@@ -99,7 +98,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
         return null;
     }
 
-    private Aggregation createValueCount(ParsedMultiBucketAggregation.ParsedBucket aggregations) {
+    private Aggregation createValueCount(MultiBucketsAggregation.Bucket aggregations) {
         final Long docCount = aggregations.getDocCount();
         return new ValueCount() {
             @Override

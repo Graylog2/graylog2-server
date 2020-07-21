@@ -221,17 +221,20 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // first we iterate over all row groups (whose values generate a "key array", corresponding to the nesting level)
         // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
-        final HasAggregations initialResult = queryResult::getAggregations;
+        final HasAggregations initialResult = createInitialResult(queryResult);
 
         processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), initialResult);
 
         return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
 
+    private HasAggregations createInitialResult(SearchResponse queryResult) {
+        return InitialBucket.create(queryResult);
+    }
+
     private long extractDocumentCount(SearchResponse queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {
         return queryResult.getHits().getTotalHits().value;
     }
-
 
     /*
         results from elasticsearch are nested so we need to recurse into the aggregation tree, but our result is a table, thus we need
