@@ -22,7 +22,7 @@ type ContainerProps = {
   sidebarIsPinned: boolean,
 };
 
-const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+export const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   display: none;
   position: absolute;
   padding: 0 10px;

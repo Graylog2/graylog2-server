@@ -55,24 +55,24 @@ Object.keys(variant).forEach((name) => {
 });
 
 const table = {
-  background: lighten(variant.default, 0.95),
-  backgroundAlt: lighten(variant.default, 0.85),
-  backgroundHover: lighten(variant.default, 0.9),
+  background: darken(variant.default, 0.95),
+  backgroundAlt: darken(variant.default, 0.85),
+  backgroundHover: darken(variant.default, 0.9),
   variant: {
-    danger: lighten(variant.danger, 0.75),
-    active: lighten(variant.default, 0.75),
-    info: lighten(variant.info, 0.75),
-    primary: lighten(variant.primary, 0.75),
-    success: lighten(variant.success, 0.75),
-    warning: lighten(variant.warning, 0.75),
+    danger: darken(variant.danger, 0.75),
+    active: darken(variant.default, 0.75),
+    info: darken(variant.info, 0.75),
+    primary: darken(variant.primary, 0.75),
+    success: darken(variant.success, 0.75),
+    warning: darken(variant.warning, 0.75),
   },
   variantHover: {
-    danger: variant.lighter.danger,
-    active: variant.lighter.default,
-    info: variant.lighter.info,
-    primary: variant.lighter.primary,
-    success: variant.lighter.success,
-    warning: variant.lighter.warning,
+    danger: variant.darker.danger,
+    active: variant.darker.default,
+    info: variant.darker.info,
+    primary: variant.darker.primary,
+    success: variant.darker.success,
+    warning: variant.darker.warning,
   },
 };
 

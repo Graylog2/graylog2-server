@@ -4,7 +4,7 @@ import chroma from 'chroma-js';
 
 import { type ThemeInterface } from 'theme';
 
-import { Title as NavItemTitle } from './NavItem.styles';
+import { Title as NavItemTitle } from './NavItem';
 
 const sidebarWidth = {
   open: '250px',
