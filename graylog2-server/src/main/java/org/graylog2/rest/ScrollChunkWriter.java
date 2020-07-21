@@ -44,7 +44,7 @@ public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollC
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return ScrollResult.ScrollChunk.class.equals(type) && MoreMediaTypes.TEXT_CSV_TYPE.isCompatible(mediaType);
+        return ScrollResult.ScrollChunk.class.isAssignableFrom(type) && MoreMediaTypes.TEXT_CSV_TYPE.isCompatible(mediaType);
 
     }
 
