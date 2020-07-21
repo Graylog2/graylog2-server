@@ -128,10 +128,6 @@ public class EventsIndexMappingTest {
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 8.0.0");
 
-        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("7.0.0")).toTemplate(indexSetConfig, indexPattern))
-                .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: 7.0.0");
-
         assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 2.4.0");
