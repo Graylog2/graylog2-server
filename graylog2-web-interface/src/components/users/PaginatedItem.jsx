@@ -28,16 +28,16 @@ const Header = styled.h4`
 `;
 
 const Description = styled.span`
-  flex: 1;
+  flex: 2;
 `;
 
 const StyledDeleteButton = styled(IconButton)(() => css`
-  flex: 1;
+  flex: 0;
 `);
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
   const deleteButton = typeof onDeleteItem === 'function'
-    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="remove" />
+    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="times" />
     : null;
 
   return (
