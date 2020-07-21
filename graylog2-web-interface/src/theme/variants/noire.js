@@ -47,24 +47,57 @@ Object.keys(variant).forEach((name) => {
     variant.light[name] = darken(variant[name], 0.15);
     variant.lighter[name] = darken(variant[name], 0.5);
     variant.lightest[name] = darken(variant[name], 0.85);
+
     variant.dark[name] = lighten(variant[name], 0.15);
     variant.darker[name] = lighten(variant[name], 0.5);
     variant.darkest[name] = lighten(variant[name], 0.85);
   }
 });
 
+const table = {
+  background: lighten(variant.default, 0.95),
+  backgroundAlt: lighten(variant.default, 0.85),
+  backgroundHover: lighten(variant.default, 0.9),
+  variant: {
+    danger: lighten(variant.danger, 0.75),
+    active: lighten(variant.default, 0.75),
+    info: lighten(variant.info, 0.75),
+    primary: lighten(variant.primary, 0.75),
+    success: lighten(variant.success, 0.75),
+    warning: lighten(variant.warning, 0.75),
+  },
+  variantHover: {
+    danger: variant.lighter.danger,
+    active: variant.lighter.default,
+    info: variant.lighter.info,
+    primary: variant.lighter.primary,
+    success: variant.lighter.success,
+    warning: variant.lighter.warning,
+  },
+};
+
+const input = {
+  background: global.contentBackground,
+  backgroundDisabled: darken(global.contentBackground, 0.25),
+  border: variant.light.default,
+  borderFocus: variant.light.info,
+  boxShadow: `inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px ${chroma(variant.dark.info).alpha(0.4).css()}`,
+  color: global.textDefault,
+  colorDisabled: gray[60],
+  placeholder: gray[60],
+};
+
 /* eslint-disable prefer-destructuring */
-// global.tableBackground = gray[100];
-global.tableBackground = variant.light.default;
-// global.tableBackgroundAlt = gray[80];
-global.tableBackgroundAlt = variant.lighter.default;
-global.inputBackground = global.contentBackground;
+global.navigationBackground = global.contentBackground;
+global.navigationBoxShadow = chroma(gray[100]).alpha(0.1).css();
 /* eslint-enable prefer-destructuring */
 
 const teinte = {
   brand,
   global,
   gray,
+  input,
+  table,
   variant,
 };
 
