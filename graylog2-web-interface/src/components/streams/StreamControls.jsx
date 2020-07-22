@@ -20,6 +20,7 @@ const StreamControls = createReactClass({
     indexSets: PropTypes.array.isRequired,
     onDelete: PropTypes.func.isRequired,
     onClone: PropTypes.func.isRequired,
+    onShare: PropTypes.func.isRequired,
     onQuickAdd: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
     isDefaultStream: PropTypes.bool,
@@ -77,6 +78,9 @@ const StreamControls = createReactClass({
           </IfPermitted>
           <MenuItem key={`setAsStartpage-${stream.id}`} onSelect={this._setStartpage} disabled={this.props.user.read_only}>
             Set as startpage
+          </MenuItem>
+          <MenuItem key={`share-${stream.id}`} onSelect={this.props.onShare}>
+            Share
           </MenuItem>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`divider-${stream.id}`} divider />
