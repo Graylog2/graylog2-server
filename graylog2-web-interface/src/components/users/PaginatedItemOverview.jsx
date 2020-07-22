@@ -98,7 +98,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
                    totalItems={paginationInfo.total}
                    pageSizes={pageSizes}
                    activePage={paginationInfo.page}>
-      <SearchForm onSearch={_onSearch} />
+      <SearchForm onSearch={_onSearch} label="Filter" placeholder="Enter query to filter" searchButtonLabel="Filter" />
       <Container>
         {result}
       </Container>

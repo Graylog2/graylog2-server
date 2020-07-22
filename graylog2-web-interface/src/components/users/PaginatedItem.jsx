@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { type ThemeInterface } from 'theme';
 import { IconButton } from 'components/common';
@@ -31,9 +32,9 @@ const Description = styled.span`
   flex: 2;
 `;
 
-const StyledDeleteButton = styled(IconButton)(() => css`
+const StyledDeleteButton = styled(IconButton)`
   flex: 0;
-`);
+`;
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
   const deleteButton = typeof onDeleteItem === 'function'
@@ -51,6 +52,10 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
 
 PaginatedItem.defaultProps = {
   onDeleteItem: undefined,
+};
+
+PaginatedItem.propTypes = {
+  onDeleteItem: PropTypes.func,
 };
 
 export default PaginatedItem;
