@@ -41,7 +41,8 @@ public class BuiltinCapabilities {
                         "Viewer",
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
-                                RestPermissions.DASHBOARDS_READ
+                                RestPermissions.DASHBOARDS_READ,
+                                RestPermissions.EVENT_DEFINITIONS_READ
                                 // TODO: Add missing collection permissions
                         )
                 ))

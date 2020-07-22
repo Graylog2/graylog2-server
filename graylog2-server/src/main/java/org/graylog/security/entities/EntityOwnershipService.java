@@ -18,10 +18,10 @@ package org.graylog.security.entities;
 
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
-import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +45,12 @@ public class EntityOwnershipService {
     }
 
     public void registerNewEventDefinition(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(ModelTypes.EVENT_DEFINITION_V1.name(), id);
+        final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, id);
         registerNewEntity(grn, user);
     }
 
     public void registerNewView(String id, User user) {
-        final GRN grn = grnRegistry.newGRN(ModelTypes.DASHBOARD_V2.name(), id);
+        final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
         registerNewEntity(grn, user);
     }
 
