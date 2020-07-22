@@ -21,7 +21,7 @@ type Props = {
 };
 
 export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => css`
-  position: ${sidebarIsPinned ? 'static' : 'fixed'}
+  position: ${sidebarIsPinned ? 'static' : 'fixed'};
   display: grid;
   display: -ms-grid;
   grid-template-columns: 1fr;

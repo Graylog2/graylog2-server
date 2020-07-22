@@ -3,6 +3,7 @@ package org.graylog.storage.elasticsearch7;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -30,6 +31,8 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
+
+        bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

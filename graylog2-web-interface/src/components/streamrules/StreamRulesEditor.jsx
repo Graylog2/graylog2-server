@@ -46,7 +46,13 @@ class StreamRulesEditor extends React.Component {
     index: '',
   }
 
-  state = {};
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showStreamRuleForm: false,
+    };
+  }
 
   componentDidMount() {
     this.loadData();
@@ -98,7 +104,7 @@ class StreamRulesEditor extends React.Component {
 
   _onAddStreamRule = (event) => {
     event.preventDefault();
-    this.newStreamRuleForm.open();
+    this.setState({ showStreamRuleForm: true });
   };
 
   _getListClassName = (matchData) => {
@@ -132,7 +138,7 @@ class StreamRulesEditor extends React.Component {
   };
 
   render() {
-    const { matchData, stream, streamRuleTypes } = this.state;
+    const { matchData, stream, streamRuleTypes, showStreamRuleForm } = this.state;
     const { currentUser, messageId, index } = this.props;
     const styles = (matchData ? this._getListClassName(matchData) : 'info');
 
@@ -156,10 +162,12 @@ class StreamRulesEditor extends React.Component {
                       onClick={this._onAddStreamRule}>
                 Add stream rule
               </Button>
-              <StreamRuleForm ref={(newStreamRuleForm) => { this.newStreamRuleForm = newStreamRuleForm; }}
-                              title="New Stream Rule"
-                              streamRuleTypes={streamRuleTypes}
-                              onSubmit={this._onStreamRuleFormSubmit} />
+              { showStreamRuleForm && (
+                <StreamRuleForm title="New Stream Rule"
+                                onClose={() => this.setState({ showStreamRuleForm: false })}
+                                streamRuleTypes={streamRuleTypes}
+                                onSubmit={this._onStreamRuleFormSubmit} />
+              ) }
             </div>
 
             <h2>2. Manage stream rules</h2>

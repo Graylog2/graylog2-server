@@ -1,29 +1,37 @@
-import React, { useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
+import { useStore } from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/graylog';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import StoreProvider from 'injection/StoreProvider';
 import UserNotification from 'util/UserNotification';
 
+const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
+
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
-const { isPermitted } = PermissionsMixin;
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;
 `;
 
 const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleTypes, onSubmit, onDelete }) => {
-  const streamRuleFormRef = useRef();
+  const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
+  const { inputs } = useStore(InputsStore);
+
+  useEffect(() => {
+    InputsActions.list();
+  }, []);
 
   const _onEdit = (event) => {
     event.preventDefault();
-    streamRuleFormRef.current.open();
+    setShowStreamRuleForm(true);
   };
 
   const _onDelete = (event) => {
@@ -77,12 +85,14 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
   return (
     <ListGroupItem bsStyle={listGroupStyle}>
       {actionItems}
-      <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
-      <StreamRuleForm ref={streamRuleFormRef}
-                      streamRule={streamRule}
-                      streamRuleTypes={streamRuleTypes}
-                      title="Edit Stream Rule"
-                      onSubmit={_onSubmit} />
+      <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} inputs={inputs} />
+      { showStreamRuleForm && (
+        <StreamRuleForm streamRule={streamRule}
+                        onClose={() => setShowStreamRuleForm(false)}
+                        streamRuleTypes={streamRuleTypes}
+                        title="Edit Stream Rule"
+                        onSubmit={_onSubmit} />
+      ) }
       {description}
     </ListGroupItem>
   );
