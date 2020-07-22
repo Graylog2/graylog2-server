@@ -2,7 +2,7 @@
 
 exports[`<Pagination /> should display Pagination 1`] = `
 <ul
-  class="Pagination__StyledBootstrapPagination-aj0t2h-0 flIvuU pagination"
+  class="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm pagination"
   data-testid="graylog-pagination"
 >
   <li

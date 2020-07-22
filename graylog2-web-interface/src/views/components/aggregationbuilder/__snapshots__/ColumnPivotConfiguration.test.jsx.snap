@@ -29,125 +29,67 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
           controlId="rollup"
           validationState={null}
         >
-          <StyledComponent
+          <FormGroup
+            bsClass="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
             controlId="rollup"
-            forwardedComponent={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "SIZES": Array [
-                  "large",
-                  "small",
-                ],
-                "attrs": Array [],
-                "componentStyle": ComponentStyle {
-                  "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                  "isStatic": false,
-                  "lastClassName": "gcTkZc",
-                  "rules": Array [
-                    [Function],
-                  ],
-                },
-                "displayName": "FormGroup__StyledFormGroup",
-                "foldedComponentIds": Array [],
-                "render": [Function],
-                "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                "target": [Function],
-                "toString": [Function],
-                "warnTooManyClasses": [Function],
-                "withComponent": [Function],
-              }
-            }
-            forwardedRef={null}
             validationState={null}
           >
-            <FormGroup
-              bsClass="form-group"
-              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
-              controlId="rollup"
-              validationState={null}
+            <div
+              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
             >
-              <div
-                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
-              >
-                <InputWrapper>
-                  <span>
-                    <Checkbox
-                      autoFocus={true}
-                      bsClass="checkbox"
-                      checked={true}
-                      disabled={false}
-                      inline={false}
-                      inputRef={[Function]}
-                      label="Rollup"
-                      name="rollup"
-                      onChange={[Function]}
-                      placeholder=""
-                      title=""
-                      type="checkbox"
+              <InputWrapper>
+                <span>
+                  <Checkbox
+                    autoFocus={true}
+                    bsClass="checkbox"
+                    checked={true}
+                    disabled={false}
+                    inline={false}
+                    inputRef={[Function]}
+                    label="Rollup"
+                    name="rollup"
+                    onChange={[Function]}
+                    placeholder=""
+                    title=""
+                    type="checkbox"
+                  >
+                    <div
+                      className="checkbox"
                     >
-                      <div
-                        className="checkbox"
+                      <label
+                        title=""
                       >
-                        <label
-                          title=""
-                        >
-                          <input
-                            autoFocus={true}
-                            checked={true}
-                            disabled={false}
-                            label="Rollup"
-                            name="rollup"
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                          />
-                          Rollup
-                        </label>
-                      </div>
-                    </Checkbox>
-                    <HelpBlock>
-                      <StyledComponent
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "HelpBlock-i8is92-0",
-                              "isStatic": false,
-                              "lastClassName": "kxWRDS",
-                              "rules": Array [
-                                [Function],
-                              ],
-                            },
-                            "displayName": "HelpBlock",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "HelpBlock-i8is92-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
+                        <input
+                          autoFocus={true}
+                          checked={true}
+                          disabled={false}
+                          label="Rollup"
+                          name="rollup"
+                          onChange={[Function]}
+                          placeholder=""
+                          type="checkbox"
+                        />
+                        Rollup
+                      </label>
+                    </div>
+                  </Checkbox>
+                  <HelpBlock>
+                    <HelpBlock
+                      bsClass="help-block"
+                      className="HelpBlock-i8is92-0 fSaklp"
+                    >
+                      <span
+                        className="HelpBlock-i8is92-0 fSaklp help-block"
                       >
-                        <HelpBlock
-                          bsClass="help-block"
-                          className="HelpBlock-i8is92-0 kxWRDS"
-                        >
-                          <span
-                            className="HelpBlock-i8is92-0 kxWRDS help-block"
-                          >
-                            When rollup is enabled, an additional trace totalling individual subtraces will be included.
-                          </span>
-                        </HelpBlock>
-                      </StyledComponent>
+                        When rollup is enabled, an additional trace totalling individual subtraces will be included.
+                      </span>
                     </HelpBlock>
-                  </span>
-                </InputWrapper>
-              </div>
-            </FormGroup>
-          </StyledComponent>
+                  </HelpBlock>
+                </span>
+              </InputWrapper>
+            </div>
+          </FormGroup>
         </FormGroup__StyledFormGroup>
       </Component>
     </Input>
@@ -167,66 +109,24 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
           bsStyle="success"
           onClick={[Function]}
         >
-          <StyledComponent
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
             bsStyle="success"
-            forwardedComponent={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "SIZES": Array [
-                  "large",
-                  "small",
-                  "xsmall",
-                ],
-                "STYLES": Array [
-                  "success",
-                  "warning",
-                  "danger",
-                  "info",
-                  "default",
-                  "primary",
-                  "link",
-                ],
-                "attrs": Array [],
-                "componentStyle": ComponentStyle {
-                  "componentId": "Button__StyledButton-c9cbmb-0",
-                  "isStatic": false,
-                  "lastClassName": "hpBclA",
-                  "rules": Array [
-                    [Function],
-                  ],
-                },
-                "displayName": "Button__StyledButton",
-                "foldedComponentIds": Array [],
-                "render": [Function],
-                "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                "target": [Function],
-                "toString": [Function],
-                "warnTooManyClasses": [Function],
-                "withComponent": [Function],
-              }
-            }
-            forwardedRef={null}
+            className="Button__StyledButton-c9cbmb-0 laZUlH"
+            disabled={false}
             onClick={[Function]}
           >
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="success"
-              className="Button__StyledButton-c9cbmb-0 hpBclA"
+            <button
+              className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
               disabled={false}
               onClick={[Function]}
+              type="button"
             >
-              <button
-                className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-success"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Done
-              </button>
-            </Button>
-          </StyledComponent>
+              Done
+            </button>
+          </Button>
         </Button__StyledButton>
       </ForwardRef>
     </div>

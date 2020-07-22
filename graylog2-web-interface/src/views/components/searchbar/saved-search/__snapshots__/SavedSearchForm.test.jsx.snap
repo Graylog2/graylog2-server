@@ -209,375 +209,167 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                   id="saved-search-popover"
                   title="Name of search"
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Popover__StyledPopover-wd1j0g-0",
-                          "isStatic": false,
-                          "lastClassName": "cdMcFy",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Popover__StyledPopover",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Popover__StyledPopover-wd1j0g-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <Popover
+                    bsClass="popover"
+                    className="Popover__StyledPopover-wd1j0g-0 imQAUx"
                     id="saved-search-popover"
+                    placement="right"
                     title="Name of search"
                   >
-                    <Popover
-                      bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
+                    <div
+                      className="Popover__StyledPopover-wd1j0g-0 imQAUx popover right"
                       id="saved-search-popover"
-                      placement="right"
-                      title="Name of search"
+                      role="tooltip"
+                      style={
+                        Object {
+                          "display": "block",
+                          "left": undefined,
+                          "top": undefined,
+                        }
+                      }
                     >
                       <div
-                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
-                        id="saved-search-popover"
-                        role="tooltip"
+                        className="arrow"
                         style={
                           Object {
-                            "display": "block",
                             "left": undefined,
                             "top": undefined,
                           }
                         }
+                      />
+                      <h3
+                        className="popover-title"
                       >
-                        <div
-                          className="arrow"
-                          style={
-                            Object {
-                              "left": undefined,
-                              "top": undefined,
-                            }
-                          }
-                        />
-                        <h3
-                          className="popover-title"
+                        Name of search
+                      </h3>
+                      <div
+                        className="popover-content"
+                      >
+                        <form
+                          onSubmit={[Function]}
                         >
-                          Name of search
-                        </h3>
-                        <div
-                          className="popover-content"
-                        >
-                          <form
-                            onSubmit={[Function]}
+                          <Component
+                            validationState={null}
                           >
-                            <Component
+                            <FormGroup__StyledFormGroup
                               validationState={null}
                             >
-                              <FormGroup__StyledFormGroup
+                              <FormGroup
+                                bsClass="form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                                 validationState={null}
                               >
-                                <StyledComponent
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                        "isStatic": false,
-                                        "lastClassName": "gcTkZc",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormGroup__StyledFormGroup",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  validationState={null}
+                                <div
+                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                                 >
-                                  <FormGroup
-                                    bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
-                                    validationState={null}
-                                  >
-                                    <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                                  <ControlLabel>
+                                    <ControlLabel
+                                      bsClass="control-label"
+                                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                      srOnly={false}
                                     >
-                                      <ControlLabel>
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                                "isStatic": false,
-                                                "lastClassName": "hCskeX",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "ControlLabel",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                        >
-                                          <ControlLabel
-                                            bsClass="control-label"
-                                            className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                            srOnly={false}
-                                          >
-                                            <label
-                                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                            >
-                                              Title
-                                            </label>
-                                          </ControlLabel>
-                                        </StyledComponent>
-                                      </ControlLabel>
-                                      <FormControl
+                                      <label
+                                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                      >
+                                        Title
+                                      </label>
+                                    </ControlLabel>
+                                  </ControlLabel>
+                                  <FormControl
+                                    onChange={[Function]}
+                                    placeholder="Enter title"
+                                    type="text"
+                                    value="new Title"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 kmJcge"
+                                      componentClass="input"
+                                      onChange={[Function]}
+                                      placeholder="Enter title"
+                                      type="text"
+                                      value="new Title"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
                                         value="new Title"
-                                      >
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "Feedback": [Function],
-                                              "SIZES": Array [
-                                                "small",
-                                                "large",
-                                              ],
-                                              "Static": [Function],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "FormControl-sc-1amoaox-0",
-                                                "isStatic": false,
-                                                "lastClassName": "eXfwDC",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "FormControl",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "FormControl-sc-1amoaox-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                          onChange={[Function]}
-                                          placeholder="Enter title"
-                                          type="text"
-                                          value="new Title"
-                                        >
-                                          <FormControl
-                                            bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 eXfwDC"
-                                            componentClass="input"
-                                            onChange={[Function]}
-                                            placeholder="Enter title"
-                                            type="text"
-                                            value="new Title"
-                                          >
-                                            <input
-                                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                              onChange={[Function]}
-                                              placeholder="Enter title"
-                                              type="text"
-                                              value="new Title"
-                                            />
-                                          </FormControl>
-                                        </StyledComponent>
-                                      </FormControl>
-                                    </div>
-                                  </FormGroup>
-                                </StyledComponent>
-                              </FormGroup__StyledFormGroup>
-                            </Component>
-                            <ForwardRef
+                                      />
+                                    </FormControl>
+                                  </FormControl>
+                                </div>
+                              </FormGroup>
+                            </FormGroup__StyledFormGroup>
+                          </Component>
+                          <ForwardRef
+                            bsStyle="info"
+                            className="button"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="submit"
+                          >
+                            <Button__StyledButton
                               bsStyle="info"
                               className="button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsStyle="info"
-                                className="button"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <StyledComponent
-                                  bsStyle="info"
-                                  className="button"
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
                                   disabled={false}
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   onClick={[Function]}
                                   type="submit"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-info"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Create new
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                  Create new
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
+                            className="button"
+                            onClick={[Function]}
+                          >
+                            <Button__StyledButton
                               className="button"
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
-                                className="button"
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                                disabled={false}
                                 onClick={[Function]}
                               >
-                                <StyledComponent
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
+                                  disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-default"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                          </form>
-                        </div>
+                                  Cancel
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </form>
                       </div>
-                    </Popover>
-                  </StyledComponent>
+                    </div>
+                  </Popover>
                 </Popover__StyledPopover>
               </ThemeProvider>
             </GraylogThemeProvider>
@@ -798,452 +590,200 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                   id="saved-search-popover"
                   title="Name of search"
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Popover__StyledPopover-wd1j0g-0",
-                          "isStatic": false,
-                          "lastClassName": "cdMcFy",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Popover__StyledPopover",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Popover__StyledPopover-wd1j0g-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <Popover
+                    bsClass="popover"
+                    className="Popover__StyledPopover-wd1j0g-0 imQAUx"
                     id="saved-search-popover"
+                    placement="right"
                     title="Name of search"
                   >
-                    <Popover
-                      bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
+                    <div
+                      className="Popover__StyledPopover-wd1j0g-0 imQAUx popover right"
                       id="saved-search-popover"
-                      placement="right"
-                      title="Name of search"
+                      role="tooltip"
+                      style={
+                        Object {
+                          "display": "block",
+                          "left": undefined,
+                          "top": undefined,
+                        }
+                      }
                     >
                       <div
-                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
-                        id="saved-search-popover"
-                        role="tooltip"
+                        className="arrow"
                         style={
                           Object {
-                            "display": "block",
                             "left": undefined,
                             "top": undefined,
                           }
                         }
+                      />
+                      <h3
+                        className="popover-title"
                       >
-                        <div
-                          className="arrow"
-                          style={
-                            Object {
-                              "left": undefined,
-                              "top": undefined,
-                            }
-                          }
-                        />
-                        <h3
-                          className="popover-title"
+                        Name of search
+                      </h3>
+                      <div
+                        className="popover-content"
+                      >
+                        <form
+                          onSubmit={[Function]}
                         >
-                          Name of search
-                        </h3>
-                        <div
-                          className="popover-content"
-                        >
-                          <form
-                            onSubmit={[Function]}
+                          <Component
+                            validationState={null}
                           >
-                            <Component
+                            <FormGroup__StyledFormGroup
                               validationState={null}
                             >
-                              <FormGroup__StyledFormGroup
+                              <FormGroup
+                                bsClass="form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                                 validationState={null}
                               >
-                                <StyledComponent
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                        "isStatic": false,
-                                        "lastClassName": "gcTkZc",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormGroup__StyledFormGroup",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  validationState={null}
+                                <div
+                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                                 >
-                                  <FormGroup
-                                    bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
-                                    validationState={null}
-                                  >
-                                    <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                                  <ControlLabel>
+                                    <ControlLabel
+                                      bsClass="control-label"
+                                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                      srOnly={false}
                                     >
-                                      <ControlLabel>
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                                "isStatic": false,
-                                                "lastClassName": "hCskeX",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "ControlLabel",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                        >
-                                          <ControlLabel
-                                            bsClass="control-label"
-                                            className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                            srOnly={false}
-                                          >
-                                            <label
-                                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                            >
-                                              Title
-                                            </label>
-                                          </ControlLabel>
-                                        </StyledComponent>
-                                      </ControlLabel>
-                                      <FormControl
+                                      <label
+                                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                      >
+                                        Title
+                                      </label>
+                                    </ControlLabel>
+                                  </ControlLabel>
+                                  <FormControl
+                                    onChange={[Function]}
+                                    placeholder="Enter title"
+                                    type="text"
+                                    value="new Title"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 kmJcge"
+                                      componentClass="input"
+                                      onChange={[Function]}
+                                      placeholder="Enter title"
+                                      type="text"
+                                      value="new Title"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
                                         value="new Title"
-                                      >
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "Feedback": [Function],
-                                              "SIZES": Array [
-                                                "small",
-                                                "large",
-                                              ],
-                                              "Static": [Function],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "FormControl-sc-1amoaox-0",
-                                                "isStatic": false,
-                                                "lastClassName": "eXfwDC",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "FormControl",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "FormControl-sc-1amoaox-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                          onChange={[Function]}
-                                          placeholder="Enter title"
-                                          type="text"
-                                          value="new Title"
-                                        >
-                                          <FormControl
-                                            bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 eXfwDC"
-                                            componentClass="input"
-                                            onChange={[Function]}
-                                            placeholder="Enter title"
-                                            type="text"
-                                            value="new Title"
-                                          >
-                                            <input
-                                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                              onChange={[Function]}
-                                              placeholder="Enter title"
-                                              type="text"
-                                              value="new Title"
-                                            />
-                                          </FormControl>
-                                        </StyledComponent>
-                                      </FormControl>
-                                    </div>
-                                  </FormGroup>
-                                </StyledComponent>
-                              </FormGroup__StyledFormGroup>
-                            </Component>
-                            <ForwardRef
+                                      />
+                                    </FormControl>
+                                  </FormControl>
+                                </div>
+                              </FormGroup>
+                            </FormGroup__StyledFormGroup>
+                          </Component>
+                          <ForwardRef
+                            bsStyle="primary"
+                            className="button"
+                            onClick={[Function]}
+                            type="submit"
+                          >
+                            <Button__StyledButton
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsStyle="primary"
-                                className="button"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                                disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <StyledComponent
-                                  bsStyle="primary"
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-primary"
+                                  disabled={false}
                                   onClick={[Function]}
                                   type="submit"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-primary"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Save
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                  Save
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
+                            bsStyle="info"
+                            className="button"
+                            disabled={true}
+                            onClick={[Function]}
+                            type="submit"
+                          >
+                            <Button__StyledButton
                               bsStyle="info"
                               className="button"
                               disabled={true}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsStyle="info"
-                                className="button"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <StyledComponent
-                                  bsStyle="info"
-                                  className="button"
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
                                   disabled={true}
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   onClick={[Function]}
                                   type="submit"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={true}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-info"
-                                      disabled={true}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Save as
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                  Save as
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
+                            className="button"
+                            onClick={[Function]}
+                          >
+                            <Button__StyledButton
                               className="button"
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
-                                className="button"
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                                disabled={false}
                                 onClick={[Function]}
                               >
-                                <StyledComponent
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
+                                  disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-default"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                          </form>
-                        </div>
+                                  Cancel
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </form>
                       </div>
-                    </Popover>
-                  </StyledComponent>
+                    </div>
+                  </Popover>
                 </Popover__StyledPopover>
               </ThemeProvider>
             </GraylogThemeProvider>
@@ -1464,452 +1004,200 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                   id="saved-search-popover"
                   title="Name of search"
                 >
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Popover__StyledPopover-wd1j0g-0",
-                          "isStatic": false,
-                          "lastClassName": "cdMcFy",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Popover__StyledPopover",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Popover__StyledPopover-wd1j0g-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
+                  <Popover
+                    bsClass="popover"
+                    className="Popover__StyledPopover-wd1j0g-0 imQAUx"
                     id="saved-search-popover"
+                    placement="right"
                     title="Name of search"
                   >
-                    <Popover
-                      bsClass="popover"
-                      className="Popover__StyledPopover-wd1j0g-0 cdMcFy"
+                    <div
+                      className="Popover__StyledPopover-wd1j0g-0 imQAUx popover right"
                       id="saved-search-popover"
-                      placement="right"
-                      title="Name of search"
+                      role="tooltip"
+                      style={
+                        Object {
+                          "display": "block",
+                          "left": undefined,
+                          "top": undefined,
+                        }
+                      }
                     >
                       <div
-                        className="Popover__StyledPopover-wd1j0g-0 cdMcFy popover right"
-                        id="saved-search-popover"
-                        role="tooltip"
+                        className="arrow"
                         style={
                           Object {
-                            "display": "block",
                             "left": undefined,
                             "top": undefined,
                           }
                         }
+                      />
+                      <h3
+                        className="popover-title"
                       >
-                        <div
-                          className="arrow"
-                          style={
-                            Object {
-                              "left": undefined,
-                              "top": undefined,
-                            }
-                          }
-                        />
-                        <h3
-                          className="popover-title"
+                        Name of search
+                      </h3>
+                      <div
+                        className="popover-content"
+                      >
+                        <form
+                          onSubmit={[Function]}
                         >
-                          Name of search
-                        </h3>
-                        <div
-                          className="popover-content"
-                        >
-                          <form
-                            onSubmit={[Function]}
+                          <Component
+                            validationState={null}
                           >
-                            <Component
+                            <FormGroup__StyledFormGroup
                               validationState={null}
                             >
-                              <FormGroup__StyledFormGroup
+                              <FormGroup
+                                bsClass="form-group"
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                                 validationState={null}
                               >
-                                <StyledComponent
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                        "isStatic": false,
-                                        "lastClassName": "gcTkZc",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormGroup__StyledFormGroup",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
-                                  validationState={null}
+                                <div
+                                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                                 >
-                                  <FormGroup
-                                    bsClass="form-group"
-                                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
-                                    validationState={null}
-                                  >
-                                    <div
-                                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                                  <ControlLabel>
+                                    <ControlLabel
+                                      bsClass="control-label"
+                                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                      srOnly={false}
                                     >
-                                      <ControlLabel>
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                                "isStatic": false,
-                                                "lastClassName": "hCskeX",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "ControlLabel",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                        >
-                                          <ControlLabel
-                                            bsClass="control-label"
-                                            className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                            srOnly={false}
-                                          >
-                                            <label
-                                              className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                            >
-                                              Title
-                                            </label>
-                                          </ControlLabel>
-                                        </StyledComponent>
-                                      </ControlLabel>
-                                      <FormControl
+                                      <label
+                                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                      >
+                                        Title
+                                      </label>
+                                    </ControlLabel>
+                                  </ControlLabel>
+                                  <FormControl
+                                    onChange={[Function]}
+                                    placeholder="Enter title"
+                                    type="text"
+                                    value="new Title"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 kmJcge"
+                                      componentClass="input"
+                                      onChange={[Function]}
+                                      placeholder="Enter title"
+                                      type="text"
+                                      value="new Title"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 kmJcge form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
                                         value="new Title"
-                                      >
-                                        <StyledComponent
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "Feedback": [Function],
-                                              "SIZES": Array [
-                                                "small",
-                                                "large",
-                                              ],
-                                              "Static": [Function],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "FormControl-sc-1amoaox-0",
-                                                "isStatic": false,
-                                                "lastClassName": "eXfwDC",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "FormControl",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "FormControl-sc-1amoaox-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
-                                          onChange={[Function]}
-                                          placeholder="Enter title"
-                                          type="text"
-                                          value="new Title"
-                                        >
-                                          <FormControl
-                                            bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 eXfwDC"
-                                            componentClass="input"
-                                            onChange={[Function]}
-                                            placeholder="Enter title"
-                                            type="text"
-                                            value="new Title"
-                                          >
-                                            <input
-                                              className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                              onChange={[Function]}
-                                              placeholder="Enter title"
-                                              type="text"
-                                              value="new Title"
-                                            />
-                                          </FormControl>
-                                        </StyledComponent>
-                                      </FormControl>
-                                    </div>
-                                  </FormGroup>
-                                </StyledComponent>
-                              </FormGroup__StyledFormGroup>
-                            </Component>
-                            <ForwardRef
+                                      />
+                                    </FormControl>
+                                  </FormControl>
+                                </div>
+                              </FormGroup>
+                            </FormGroup__StyledFormGroup>
+                          </Component>
+                          <ForwardRef
+                            bsStyle="primary"
+                            className="button"
+                            onClick={[Function]}
+                            type="submit"
+                          >
+                            <Button__StyledButton
                               bsStyle="primary"
                               className="button"
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsStyle="primary"
-                                className="button"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                                disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <StyledComponent
-                                  bsStyle="primary"
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-primary"
+                                  disabled={false}
                                   onClick={[Function]}
                                   type="submit"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-primary"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Save
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                  Save
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
+                            bsStyle="info"
+                            className="button"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="submit"
+                          >
+                            <Button__StyledButton
                               bsStyle="info"
                               className="button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsStyle="info"
-                                className="button"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <StyledComponent
-                                  bsStyle="info"
-                                  className="button"
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
                                   disabled={false}
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   onClick={[Function]}
                                   type="submit"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="submit"
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-info"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="submit"
-                                    >
-                                      Save as
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                  Save as
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                          <ForwardRef
+                            className="button"
+                            onClick={[Function]}
+                          >
+                            <Button__StyledButton
                               className="button"
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
-                                className="button"
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
+                                bsStyle="default"
+                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                                disabled={false}
                                 onClick={[Function]}
                               >
-                                <StyledComponent
-                                  className="button"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "SIZES": Array [
-                                        "large",
-                                        "small",
-                                        "xsmall",
-                                      ],
-                                      "STYLES": Array [
-                                        "success",
-                                        "warning",
-                                        "danger",
-                                        "info",
-                                        "default",
-                                        "primary",
-                                        "link",
-                                      ],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "Button__StyledButton-c9cbmb-0",
-                                        "isStatic": false,
-                                        "lastClassName": "hpBclA",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "Button__StyledButton",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
+                                <button
+                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
+                                  disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsStyle="default"
-                                    className="Button__StyledButton-c9cbmb-0 hpBclA button"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                  >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 hpBclA button btn btn-default"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </Button>
-                                </StyledComponent>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                          </form>
-                        </div>
+                                  Cancel
+                                </button>
+                              </Button>
+                            </Button__StyledButton>
+                          </ForwardRef>
+                        </form>
                       </div>
-                    </Popover>
-                  </StyledComponent>
+                    </div>
+                  </Popover>
                 </Popover__StyledPopover>
               </ThemeProvider>
             </GraylogThemeProvider>

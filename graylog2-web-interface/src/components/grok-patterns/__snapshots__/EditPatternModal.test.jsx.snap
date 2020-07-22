@@ -21,66 +21,24 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
         bsStyle="success"
         onClick={[Function]}
       >
-        <StyledComponent
+        <Button
+          active={false}
+          block={false}
+          bsClass="btn"
           bsStyle="success"
-          forwardedComponent={
-            Object {
-              "$$typeof": Symbol(react.forward_ref),
-              "SIZES": Array [
-                "large",
-                "small",
-                "xsmall",
-              ],
-              "STYLES": Array [
-                "success",
-                "warning",
-                "danger",
-                "info",
-                "default",
-                "primary",
-                "link",
-              ],
-              "attrs": Array [],
-              "componentStyle": ComponentStyle {
-                "componentId": "Button__StyledButton-c9cbmb-0",
-                "isStatic": false,
-                "lastClassName": "hpBclA",
-                "rules": Array [
-                  [Function],
-                ],
-              },
-              "displayName": "Button__StyledButton",
-              "foldedComponentIds": Array [],
-              "render": [Function],
-              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-              "target": [Function],
-              "toString": [Function],
-              "warnTooManyClasses": [Function],
-              "withComponent": [Function],
-            }
-          }
-          forwardedRef={null}
+          className="Button__StyledButton-c9cbmb-0 laZUlH"
+          disabled={false}
           onClick={[Function]}
         >
-          <Button
-            active={false}
-            block={false}
-            bsClass="btn"
-            bsStyle="success"
-            className="Button__StyledButton-c9cbmb-0 hpBclA"
+          <button
+            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
             disabled={false}
             onClick={[Function]}
+            type="button"
           >
-            <button
-              className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-success"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              Create pattern
-            </button>
-          </Button>
-        </StyledComponent>
+            Create pattern
+          </button>
+        </Button>
       </Button__StyledButton>
     </ForwardRef>
     <BootstrapModalForm
@@ -110,54 +68,39 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
           onHide={[Function]}
           show={false}
         >
-          <StyledComponent
+          <Modal
+            animation={true}
+            autoFocus={true}
             backdrop="static"
+            bsClass="modal"
             bsSize="large"
-            forwardedComponent={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "BACKDROP_TRANSITION_DURATION": 150,
-                "Body": [Function],
-                "Dialog": [Function],
-                "Footer": [Function],
-                "Header": [Function],
-                "SIZES": Array [
-                  "large",
-                  "small",
-                ],
-                "TRANSITION_DURATION": 300,
-                "Title": [Function],
-                "attrs": Array [],
-                "componentStyle": ComponentStyle {
-                  "componentId": "Modal-nuree8-0",
-                  "isStatic": false,
-                  "lastClassName": "eNmkew",
-                  "rules": Array [
-                    [Function],
-                  ],
-                },
-                "displayName": "Modal",
-                "foldedComponentIds": Array [],
-                "render": [Function],
-                "styledComponentId": "Modal-nuree8-0",
-                "target": [Function],
-                "toString": [Function],
-                "warnTooManyClasses": [Function],
-                "withComponent": [Function],
+            className="Modal-nuree8-0 hMPgsT"
+            dialogComponentClass={[Function]}
+            enforceFocus={true}
+            keyboard={true}
+            manager={
+              ModalManager {
+                "add": [Function],
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "isTopModal": [Function],
+                "modals": Array [],
+                "remove": [Function],
               }
             }
-            forwardedRef={null}
             onHide={[Function]}
+            renderBackdrop={[Function]}
+            restoreFocus={true}
             show={false}
           >
             <Modal
-              animation={true}
               autoFocus={true}
               backdrop="static"
-              bsClass="modal"
-              bsSize="large"
-              className="Modal-nuree8-0 eNmkew"
-              dialogComponentClass={[Function]}
+              backdropClassName="modal-backdrop"
+              backdropTransition={[Function]}
+              containerClassName="modal-open"
               enforceFocus={true}
               keyboard={true}
               manager={
@@ -172,42 +115,16 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
                   "remove": [Function],
                 }
               }
+              onEntering={[Function]}
+              onExited={[Function]}
               onHide={[Function]}
+              onMouseUp={[Function]}
               renderBackdrop={[Function]}
               restoreFocus={true}
               show={false}
-            >
-              <Modal
-                autoFocus={true}
-                backdrop="static"
-                backdropClassName="modal-backdrop"
-                backdropTransition={[Function]}
-                containerClassName="modal-open"
-                enforceFocus={true}
-                keyboard={true}
-                manager={
-                  ModalManager {
-                    "add": [Function],
-                    "containers": Array [],
-                    "data": Array [],
-                    "handleContainerOverflow": true,
-                    "hideSiblingNodes": true,
-                    "isTopModal": [Function],
-                    "modals": Array [],
-                    "remove": [Function],
-                  }
-                }
-                onEntering={[Function]}
-                onExited={[Function]}
-                onHide={[Function]}
-                onMouseUp={[Function]}
-                renderBackdrop={[Function]}
-                restoreFocus={true}
-                show={false}
-                transition={[Function]}
-              />
-            </Modal>
-          </StyledComponent>
+              transition={[Function]}
+            />
+          </Modal>
         </Modal>
       </BootstrapModalWrapper>
     </BootstrapModalForm>
@@ -238,70 +155,27 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
         bsStyle="info"
         onClick={[Function]}
       >
-        <StyledComponent
+        <Button
+          active={false}
+          block={false}
+          bsClass="btn"
           bsSize="xs"
           bsStyle="info"
-          forwardedComponent={
-            Object {
-              "$$typeof": Symbol(react.forward_ref),
-              "SIZES": Array [
-                "large",
-                "small",
-                "xsmall",
-              ],
-              "STYLES": Array [
-                "success",
-                "warning",
-                "danger",
-                "info",
-                "default",
-                "primary",
-                "link",
-              ],
-              "attrs": Array [],
-              "componentStyle": ComponentStyle {
-                "componentId": "Button__StyledButton-c9cbmb-0",
-                "isStatic": false,
-                "lastClassName": "hpBclA",
-                "rules": Array [
-                  [Function],
-                ],
-              },
-              "displayName": "Button__StyledButton",
-              "foldedComponentIds": Array [],
-              "render": [Function],
-              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-              "target": [Function],
-              "toString": [Function],
-              "warnTooManyClasses": [Function],
-              "withComponent": [Function],
-            }
-          }
-          forwardedRef={null}
+          className="Button__StyledButton-c9cbmb-0 laZUlH"
+          disabled={false}
           onClick={[Function]}
         >
-          <Button
-            active={false}
-            block={false}
-            bsClass="btn"
-            bsSize="xs"
-            bsStyle="info"
-            className="Button__StyledButton-c9cbmb-0 hpBclA"
+          <button
+            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
             disabled={false}
             onClick={[Function]}
+            type="button"
           >
-            <button
-              className="Button__StyledButton-c9cbmb-0 hpBclA btn btn-xs btn-info"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              <span>
-                Edit
-              </span>
-            </button>
-          </Button>
-        </StyledComponent>
+            <span>
+              Edit
+            </span>
+          </button>
+        </Button>
       </Button__StyledButton>
     </ForwardRef>
     <BootstrapModalForm
@@ -331,54 +205,39 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
           onHide={[Function]}
           show={false}
         >
-          <StyledComponent
+          <Modal
+            animation={true}
+            autoFocus={true}
             backdrop="static"
+            bsClass="modal"
             bsSize="large"
-            forwardedComponent={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "BACKDROP_TRANSITION_DURATION": 150,
-                "Body": [Function],
-                "Dialog": [Function],
-                "Footer": [Function],
-                "Header": [Function],
-                "SIZES": Array [
-                  "large",
-                  "small",
-                ],
-                "TRANSITION_DURATION": 300,
-                "Title": [Function],
-                "attrs": Array [],
-                "componentStyle": ComponentStyle {
-                  "componentId": "Modal-nuree8-0",
-                  "isStatic": false,
-                  "lastClassName": "eNmkew",
-                  "rules": Array [
-                    [Function],
-                  ],
-                },
-                "displayName": "Modal",
-                "foldedComponentIds": Array [],
-                "render": [Function],
-                "styledComponentId": "Modal-nuree8-0",
-                "target": [Function],
-                "toString": [Function],
-                "warnTooManyClasses": [Function],
-                "withComponent": [Function],
+            className="Modal-nuree8-0 hMPgsT"
+            dialogComponentClass={[Function]}
+            enforceFocus={true}
+            keyboard={true}
+            manager={
+              ModalManager {
+                "add": [Function],
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "isTopModal": [Function],
+                "modals": Array [],
+                "remove": [Function],
               }
             }
-            forwardedRef={null}
             onHide={[Function]}
+            renderBackdrop={[Function]}
+            restoreFocus={true}
             show={false}
           >
             <Modal
-              animation={true}
               autoFocus={true}
               backdrop="static"
-              bsClass="modal"
-              bsSize="large"
-              className="Modal-nuree8-0 eNmkew"
-              dialogComponentClass={[Function]}
+              backdropClassName="modal-backdrop"
+              backdropTransition={[Function]}
+              containerClassName="modal-open"
               enforceFocus={true}
               keyboard={true}
               manager={
@@ -393,42 +252,16 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
                   "remove": [Function],
                 }
               }
+              onEntering={[Function]}
+              onExited={[Function]}
               onHide={[Function]}
+              onMouseUp={[Function]}
               renderBackdrop={[Function]}
               restoreFocus={true}
               show={false}
-            >
-              <Modal
-                autoFocus={true}
-                backdrop="static"
-                backdropClassName="modal-backdrop"
-                backdropTransition={[Function]}
-                containerClassName="modal-open"
-                enforceFocus={true}
-                keyboard={true}
-                manager={
-                  ModalManager {
-                    "add": [Function],
-                    "containers": Array [],
-                    "data": Array [],
-                    "handleContainerOverflow": true,
-                    "hideSiblingNodes": true,
-                    "isTopModal": [Function],
-                    "modals": Array [],
-                    "remove": [Function],
-                  }
-                }
-                onEntering={[Function]}
-                onExited={[Function]}
-                onHide={[Function]}
-                onMouseUp={[Function]}
-                renderBackdrop={[Function]}
-                restoreFocus={true}
-                show={false}
-                transition={[Function]}
-              />
-            </Modal>
-          </StyledComponent>
+              transition={[Function]}
+            />
+          </Modal>
         </Modal>
       </BootstrapModalWrapper>
     </BootstrapModalForm>
