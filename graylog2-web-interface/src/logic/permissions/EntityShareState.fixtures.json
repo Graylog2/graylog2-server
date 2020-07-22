@@ -48,7 +48,7 @@
     "grn::::user:jane": "grn::::capability:54e3deadbeefdeadbeef0001",
     "grn::::team:security": "grn::::capability:54e3deadbeefdeadbeef0000"
   },
-  "missing_dependencies": {
+  "missing_permissions_on_dependencies": {
     "grn::::user:jane": [
       {
         "id": "grn::::stream:57bc9188e62a2373778d9e03",

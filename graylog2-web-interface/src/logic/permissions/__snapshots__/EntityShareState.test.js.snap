@@ -46,7 +46,7 @@ Object {
     },
   ],
   "entity": "grn::::dashboard:57bc9188e62a2373778d9e06",
-  "missing_dependencies": Immutable.List [
+  "missing_permissions_on_dependencies": Immutable.List [
     Immutable.Map {
       "grn::::user:jane": Immutable.List [
         Object {
