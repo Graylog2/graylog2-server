@@ -13,11 +13,7 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   border-top-color: ${theme.colors.gray[80]};
 `);
 
-const panelVariantStyles = css(({ bsStyle, theme }) => {
-  if (!bsStyle) {
-    return undefined;
-  }
-
+const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
   const backgroundColor = theme.colors.variant.lighter[bsStyle];
   const borderColor = theme.colors.variant.dark[bsStyle];
 
@@ -75,17 +71,14 @@ const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
   ${panelVariantStyles}
 `);
 
-const deprecatedVariantStyles = css(({ bsStyle, theme }) => {
-  if (!bsStyle) {
-    return undefined;
-  }
-
-  const backgroundColor = theme.colors.variant.lighter[bsStyle];
-  const borderColor = theme.colors.variant.dark[bsStyle];
+const deprecatedVariantStyles = css(({ bsStyle = 'default', theme }) => {
+  const backgroundColor = theme.colors.variant.lightest[bsStyle];
+  const borderColor = theme.colors.variant.light[bsStyle];
 
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
     border-color: ${borderColor};
+    background: ${theme.colors.table.background};
 
     & > .panel-heading {
       color: ${theme.utils.contrastingColor(backgroundColor)};
