@@ -7,6 +7,7 @@ import User from 'logic/users/User';
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
 import MainDetailsGrid from './MainDetailsGrid';
+import RolesSection from './RolesSection';
 
 import SectionComponent from '../SectionComponent';
 
@@ -28,7 +29,7 @@ const UserDetails = ({ user }: Props) => {
         </div>
         <div>
           <SectionComponent title="Teams">Children</SectionComponent>
-          <SectionComponent title="Roles">Children</SectionComponent>
+          <RolesSection user={user} />
         </div>
       </MainDetailsGrid>
       <SectionComponent title="Entity Shares">Children</SectionComponent>

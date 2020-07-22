@@ -1,16 +1,14 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect } from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter } from 'react-router';
 
-import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
 import { UsersActions, UsersStore } from 'stores/users/UsersStore';
-import { ButtonToolbar, Button } from 'components/graylog';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserDetails from 'components/users/UserDetails';
+import UserManagementLinks from 'components/users/UserManagementLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
@@ -31,15 +29,18 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const UserDetailsPage = ({ params }: Props) => {
   const { loadedUser } = useStore(UsersStore);
+  const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(params?.username);
+    UsersActions.load(username);
   });
 
   return (
-    <DocumentTitle title={`User Detials ${loadedUser?.username ?? ''}`}>
+    <DocumentTitle title={`User Detials ${username ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
-        <span />
+        <span>
+          Overview of details like profile information, settings, teams and roles.
+        </span>
 
         <span>
           Learn more in the{' '}
@@ -47,19 +48,11 @@ const UserDetailsPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <ButtonToolbar>
-          {loadedUser && !loadedUser.readOnly && (
-            <LinkContainer to={Routes.SYSTEM.USERS.edit(loadedUser?.username)}>
-              <Button bsStyle="success">Edit User</Button>
-            </LinkContainer>
-          )}
-          <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info">Users Overview</Button>
-          </LinkContainer>
-        </ButtonToolbar>
+        <UserManagementLinks username={username}
+                             userIsReadOnly={loadedUser?.readOnly} />
       </PageHeader>
 
-      <UserDetails user={loadedUser?.username === params?.username ? loadedUser : undefined} />
+      <UserDetails user={username === params?.username ? loadedUser : undefined} />
     </DocumentTitle>
   );
 };

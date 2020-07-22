@@ -303,9 +303,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
-        final JsonNode result = statsApi.indexStatsWithDocsAndStore(indices);
-
-        return result.path("indices");
+        return statsApi.indexStatsWithDocsAndStore(indices);
     }
 
     @Override

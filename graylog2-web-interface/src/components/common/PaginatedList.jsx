@@ -9,7 +9,7 @@ import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
-const INITIAL_PAGE = 1;
+export const INITIAL_PAGE = 1;
 
 type Props = {
   children: React.Node,

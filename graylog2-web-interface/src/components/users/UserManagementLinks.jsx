@@ -1,0 +1,43 @@
+// @flow strict
+import * as React from 'react';
+import { LinkContainer } from 'react-router-bootstrap';
+
+import User from 'logic/users/User';
+import Routes from 'routing/Routes';
+import { ButtonToolbar, Button } from 'components/graylog';
+
+type Props = {
+  username: $PropertyType<User, 'username'>,
+  userIsReadOnly: boolean,
+};
+
+const UserManagementLinks = ({ username, userIsReadOnly }: Props) => {
+  return (
+    <ButtonToolbar>
+      <LinkContainer to={Routes.SYSTEM.USERS.show(username)}>
+        <Button bsStyle="success">
+          View Details
+        </Button>
+      </LinkContainer>
+      {!userIsReadOnly && (
+        <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
+          <Button bsStyle="success">
+            Edit
+          </Button>
+        </LinkContainer>
+      )}
+      <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
+        <Button bsStyle="success">
+          Edit Tokens
+        </Button>
+      </LinkContainer>
+      <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
+        <Button bsStyle="info">
+          Users Overview
+        </Button>
+      </LinkContainer>
+    </ButtonToolbar>
+  );
+};
+
+export default UserManagementLinks;

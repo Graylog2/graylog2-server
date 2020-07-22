@@ -33,7 +33,7 @@ const SettingsSection = ({
               <div className="pull-right">
                 <Button bsStyle="success"
                         disabled={isSubmitting || !isValid}
-                        title="Update Profile"
+                        title="Update Settings"
                         type="submit">
                   Update Settings
                 </Button>
