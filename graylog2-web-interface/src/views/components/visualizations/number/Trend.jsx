@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { type StyledComponent, css } from 'styled-components';
 import numeral from 'numeral';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 

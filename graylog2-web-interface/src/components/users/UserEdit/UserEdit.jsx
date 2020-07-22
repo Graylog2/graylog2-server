@@ -2,14 +2,16 @@
 import * as React from 'react';
 import { useContext } from 'react';
 
+import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner } from 'components/common';
 import UserNotification from 'util/UserNotification';
-import UsersActions from 'actions/users/UsersActions';
 import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
+import PasswordSection from './PasswordSection';
 import ProfileSection from './ProfileSection';
 
 import MainDetailsGrid from '../UserDetails/MainDetailsGrid';
@@ -40,6 +42,10 @@ const UserEdit = ({ user }: Props) => {
     return <Spinner />;
   }
 
+  if (user.readOnly) {
+    return <ReadOnlyWarning fullName={user.fullName} />;
+  }
+
   return (
     <>
       <MainDetailsGrid>
@@ -48,6 +54,7 @@ const UserEdit = ({ user }: Props) => {
                           onSubmit={(data) => _updateUser(data, currentUser, user)} />
           <SettingsSection user={user}
                            onSubmit={(data) => _updateUser(data, currentUser, user)} />
+          <PasswordSection user={user} />
         </div>
         <div>
           <SectionComponent title="Teams">Children</SectionComponent>

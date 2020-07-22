@@ -8,10 +8,7 @@ class HumanReadableStreamRule extends React.Component {
 
   ALWAYS_MATCH_RULE_TYPE = 7;
 
-  static propTypes = {
-    streamRule: PropTypes.object.isRequired,
-    streamRuleTypes: PropTypes.array.isRequired,
-  };
+  MATCH_INPUT = 8;
 
   _getTypeForInteger = (type, streamRuleTypes) => {
     if (streamRuleTypes) {
@@ -23,7 +20,23 @@ class HumanReadableStreamRule extends React.Component {
     return undefined;
   };
 
+  _findInput = (inputId) => {
+    const { inputs } = this.props;
+
+    return inputs.find((input) => input.id === inputId);
+  }
+
   _formatRuleValue = (streamRule) => {
+    if (String(streamRule.type) === String(this.MATCH_INPUT)) {
+      const input = this._findInput(streamRule.value);
+
+      if (input) {
+        return `${input.title} (${input.name}: ${input.id})`;
+      }
+
+      return `<deleted input>: ${streamRule.value})`;
+    }
+
     if (String(streamRule.type) !== String(this.FIELD_PRESENCE_RULE_TYPE)) {
       if (streamRule.value) {
         return streamRule.value;
@@ -38,6 +51,10 @@ class HumanReadableStreamRule extends React.Component {
   _formatRuleField = (streamRule) => {
     if (streamRule.field) {
       return streamRule.field;
+    }
+
+    if (String(streamRule.type) === String(this.MATCH_INPUT)) {
+      return 'gl_source_input';
     }
 
     return this.EMPTY_TAG;
@@ -62,5 +79,15 @@ class HumanReadableStreamRule extends React.Component {
     );
   }
 }
+
+HumanReadableStreamRule.propTypes = {
+  streamRule: PropTypes.object.isRequired,
+  streamRuleTypes: PropTypes.array.isRequired,
+  inputs: PropTypes.array,
+};
+
+HumanReadableStreamRule.defaultProps = {
+  inputs: [],
+};
 
 export default HumanReadableStreamRule;

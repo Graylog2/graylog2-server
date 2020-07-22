@@ -24,6 +24,10 @@ const ApiRoutes = {
     available: () => { return { url: '/alerts/conditions/types' }; },
     list: () => { return { url: '/alerts/conditions' }; },
   },
+  AuthzRolesController: {
+    load: () => { return { url: '/authzRoles' }; },
+    loadForUser: (username) => { return { url: `/authzRoles/${username}` }; },
+  },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
     queryEntities: () => { return { url: '/system/catalog' }; },

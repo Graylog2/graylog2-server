@@ -14,6 +14,7 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetContext from 'views/components/contexts/WidgetContext';
+import { RowContentStyles } from 'components/graylog/Row';
 
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
@@ -25,11 +26,10 @@ const DashboardWrap = styled.div(({ theme }) => css`
   width: 100%;
 `);
 
-const WidgetContainer = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.gray[80]};
+const WidgetContainer = styled.div`
   z-index: auto;
-`);
+  ${RowContentStyles}
+`;
 
 const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 

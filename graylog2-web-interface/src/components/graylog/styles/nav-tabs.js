@@ -11,11 +11,11 @@ const navTabsStyles = css(({ theme }) => {
         > a {
           transition: background-color 150ms ease-in-out;
           color: ${theme.colors.global.textDefault};
-          border-color: ${theme.colors.gray[80]} ${theme.colors.gray[80]} ${borderColor};
+          border-color: ${theme.colors.variant.lightest.default} ${theme.colors.variant.lightest.default} ${borderColor};
 
           &:hover {
-            background-color: ${theme.colors.gray[80]};
-            color: ${theme.utils.contrastingColor(theme.colors.gray[80])};
+            background-color: ${theme.colors.variant.lightest.default};
+            color: ${theme.colors.global.textDefault};
           }
         }
 

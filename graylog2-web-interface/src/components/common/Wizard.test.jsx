@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { enzymeFind } from 'styled-components/test-utils';
 
 import { Nav } from 'components/graylog';
+import Wizard from 'components/common/Wizard';
+
 import 'helpers/mocking/react-dom_mock';
 import 'jest-styled-components';
-
-import Wizard from 'components/common/Wizard';
 
 describe('<Wizard />', () => {
   const steps = [

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, ButtonToolbar, Col, Nav, Row } from 'components/graylog';
@@ -13,14 +13,14 @@ import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
-const StyledNav = styled(Nav)(({ theme }) => `
+const StyledNav = styled(Nav)(({ theme }) => css`
   &.nav {
     > li {
-      border: 1px solid ${theme.colors.gray[80]};
+      border: 1px solid ${theme.colors.variant.lighter.default};
       border-left: 0;
 
       &:first-child {
-        border-left: 1px solid ${theme.colors.gray[80]};
+        border-left: 1px solid ${theme.colors.variant.lighter.default};
         border-radius: 4px 0 0 4px;
 
         > a {
@@ -36,28 +36,36 @@ const StyledNav = styled(Nav)(({ theme }) => `
         }
       }
 
-      &:not(:last-child)::after {
-        background-color: ${theme.colors.gray[100]};
-        border-color: ${theme.colors.gray[80]};
-        border-style: solid;
-        border-width: 0 1px 1px 0;
-        content: '';
-        display: block;
-        height: 15px;
-        position: absolute;
-        right: -1px;
-        top: 50%;
-        transform: translateY(-50%) translateX(50%) rotate(-45deg);
-        width: 15px;
-        z-index: 2;
+      &:not(:last-child) > a {
+        ::after {
+          transition: background-color 150ms ease-in-out;
+          background-color: ${theme.colors.global.contentBackground};
+          border-color: ${theme.colors.variant.lighter.default};
+          border-style: solid;
+          border-width: 0 1px 1px 0;
+          content: '';
+          display: block;
+          height: 15px;
+          position: absolute;
+          right: -1px;
+          top: 50%;
+          transform: translateY(-50%) translateX(50%) rotate(-45deg);
+          width: 15px;
+          z-index: 2;
+        }
+
+        :hover::after {
+          background-color: ${theme.colors.variant.lightest.default};
+        }
       }
 
-      &:hover::after {
-        background-color: ${theme.colors.gray[90]};
-      }
-
-      &.active::after {
-        background-color: ${theme.colors.global.link};
+      &.active a {
+        &,
+        &:hover,
+        &::after,
+        &:hover::after {
+          background-color: ${theme.colors.global.link};
+        }
       }
 
       > a {

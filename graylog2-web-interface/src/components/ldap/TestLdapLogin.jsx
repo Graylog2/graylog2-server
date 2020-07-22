@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Row, Col, Panel, Button } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -26,7 +26,7 @@ const LoginResultPanel = styled(Panel)`
   }
 `;
 
-const StatusIcon = styled(Icon)(({ status, theme }) => `
+const StatusIcon = styled(Icon)(({ status, theme }) => css`
   color: ${theme.colors.variant[status]};
 `);
 

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { MockCombinedProvider, MockStore } from 'helpers/mocking';
 
@@ -15,8 +15,6 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 jest.mock('injection/CombinedProvider', () => new MockCombinedProvider({ CurrentUser: { CurrentUserStore: MockStore() } }));
 
 describe('CurrentUserPreferencesProvider', () => {
-  afterEach(cleanup);
-
   const SimpleCurrentUserPreferencesProvider = ({ children }: {children: JestMockFn<*, *>}) => (
     <CurrentUserPreferencesProvider>
       <UserPreferencesContext.Consumer>

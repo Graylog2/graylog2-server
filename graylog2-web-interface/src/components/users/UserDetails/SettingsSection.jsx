@@ -4,7 +4,7 @@ import * as React from 'react';
 import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
-import ShowConfigValue from '../ShowConfigValue';
+import ReadOnlyFormGroup from '../form/ReadOnlyFormGroup';
 
 type Props = {
   user: User,
@@ -25,8 +25,8 @@ const SettingsSection = ({
   },
 }: Props) => (
   <SectionComponent title="Settings">
-    <ShowConfigValue label="Sessions Timeout" value={_sessionTimeout(sessionTimeout)} />
-    <ShowConfigValue label="Timezone" value={timezone} />
+    <ReadOnlyFormGroup label="Sessions Timeout" value={_sessionTimeout(sessionTimeout)} />
+    <ReadOnlyFormGroup label="Timezone" value={timezone} />
   </SectionComponent>
 );
 

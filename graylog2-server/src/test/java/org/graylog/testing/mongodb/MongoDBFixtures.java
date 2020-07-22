@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * database by using {@link MongoDBFixtureImporter}.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface MongoDBFixtures {
     String[] value();
 }

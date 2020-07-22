@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, cleanup, fireEvent, render, wait } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 
@@ -34,8 +34,6 @@ const changeInput = async (input, value) => {
 };
 
 describe('AbsoluteTimeRangeSelector', () => {
-  afterEach(cleanup);
-
   it('does not try to parse an empty date in from field', async () => {
     const { getByDisplayValue } = renderWithForm((
       <AbsoluteTimeRangeSelector />
@@ -44,7 +42,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, '');
 
-    await wait(() => expect(getValidationStateOfInput(fromDate)).toEqual('error'));
+    await waitFor(() => expect(getValidationStateOfInput(fromDate)).toEqual('error'));
   });
 
   it('does not try to parse an empty date in to field', async () => {
@@ -55,7 +53,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(toDate, '');
 
-    await wait(() => expect(getValidationStateOfInput(toDate)).toEqual('error'));
+    await waitFor(() => expect(getValidationStateOfInput(toDate)).toEqual('error'));
   });
 
   it('shows error message for from date if parsing fails after changing input', async () => {
@@ -67,7 +65,7 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, 'invalid');
 
-    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
+    await waitFor(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
   });
 
   it('shows error message for to date if parsing fails after changing input', async () => {
@@ -79,6 +77,6 @@ describe('AbsoluteTimeRangeSelector', () => {
 
     await changeInput(fromDate, 'invalid');
 
-    await wait(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
+    await waitFor(() => expect(queryByText('Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]]')).not.toBeNull());
   });
 });

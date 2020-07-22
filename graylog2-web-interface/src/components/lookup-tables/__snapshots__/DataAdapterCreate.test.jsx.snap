@@ -15,35 +15,29 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
 >
   <div>
     <Row
-      bsClass="row"
       className="content"
-      componentClass="div"
     >
-      <div
-        className="content row"
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl content"
+        componentClass="div"
       >
-        <Col
-          bsClass="col"
-          componentClass="div"
-          lg={8}
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl content row"
         >
-          <div
-            className="col-lg-8"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            lg={8}
           >
-            <form
-              className="form form-horizontal"
-              onSubmit={[Function]}
+            <div
+              className="col-lg-8"
             >
-              <InputMock
-                autoFocus={true}
-                help="The type of data adapter to configure."
-                id="data-adapter-type-select"
-                label="Data Adapter Type"
-                labelClassName="col-sm-3"
-                required={true}
-                wrapperClassName="col-sm-9"
+              <form
+                className="form form-horizontal"
+                onSubmit={[Function]}
               >
-                <input-mock
+                <InputMock
                   autoFocus={true}
                   help="The type of data adapter to configure."
                   id="data-adapter-type-select"
@@ -52,22 +46,16 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
                   required={true}
                   wrapperClassName="col-sm-9"
                 >
-                  <SelectMock
-                    clearable={false}
-                    matchProp="label"
-                    onChange={[Function]}
-                    options={
-                      Array [
-                        Object {
-                          "label": "Some Mocked Data Adapter Type",
-                          "value": "someType",
-                        },
-                      ]
-                    }
-                    placeholder="Select Data Adapter Type"
-                    value={null}
+                  <input-mock
+                    autoFocus={true}
+                    help="The type of data adapter to configure."
+                    id="data-adapter-type-select"
+                    label="Data Adapter Type"
+                    labelClassName="col-sm-3"
+                    required={true}
+                    wrapperClassName="col-sm-9"
                   >
-                    <select-mock
+                    <SelectMock
                       clearable={false}
                       matchProp="label"
                       onChange={[Function]}
@@ -81,14 +69,30 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
                       }
                       placeholder="Select Data Adapter Type"
                       value={null}
-                    />
-                  </SelectMock>
-                </input-mock>
-              </InputMock>
-            </form>
-          </div>
-        </Col>
-      </div>
+                    >
+                      <select-mock
+                        clearable={false}
+                        matchProp="label"
+                        onChange={[Function]}
+                        options={
+                          Array [
+                            Object {
+                              "label": "Some Mocked Data Adapter Type",
+                              "value": "someType",
+                            },
+                          ]
+                        }
+                        placeholder="Select Data Adapter Type"
+                        value={null}
+                      />
+                    </SelectMock>
+                  </input-mock>
+                </InputMock>
+              </form>
+            </div>
+          </Col>
+        </div>
+      </Row>
     </Row>
   </div>
 </DataAdapterCreate>
@@ -103,35 +107,29 @@ exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
 >
   <div>
     <Row
-      bsClass="row"
       className="content"
-      componentClass="div"
     >
-      <div
-        className="content row"
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl content"
+        componentClass="div"
       >
-        <Col
-          bsClass="col"
-          componentClass="div"
-          lg={8}
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl content row"
         >
-          <div
-            className="col-lg-8"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            lg={8}
           >
-            <form
-              className="form form-horizontal"
-              onSubmit={[Function]}
+            <div
+              className="col-lg-8"
             >
-              <InputMock
-                autoFocus={true}
-                help="The type of data adapter to configure."
-                id="data-adapter-type-select"
-                label="Data Adapter Type"
-                labelClassName="col-sm-3"
-                required={true}
-                wrapperClassName="col-sm-9"
+              <form
+                className="form form-horizontal"
+                onSubmit={[Function]}
               >
-                <input-mock
+                <InputMock
                   autoFocus={true}
                   help="The type of data adapter to configure."
                   id="data-adapter-type-select"
@@ -140,29 +138,39 @@ exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
                   required={true}
                   wrapperClassName="col-sm-9"
                 >
-                  <SelectMock
-                    clearable={false}
-                    matchProp="label"
-                    onChange={[Function]}
-                    options={Array []}
-                    placeholder="Select Data Adapter Type"
-                    value={null}
+                  <input-mock
+                    autoFocus={true}
+                    help="The type of data adapter to configure."
+                    id="data-adapter-type-select"
+                    label="Data Adapter Type"
+                    labelClassName="col-sm-3"
+                    required={true}
+                    wrapperClassName="col-sm-9"
                   >
-                    <select-mock
+                    <SelectMock
                       clearable={false}
                       matchProp="label"
                       onChange={[Function]}
                       options={Array []}
                       placeholder="Select Data Adapter Type"
                       value={null}
-                    />
-                  </SelectMock>
-                </input-mock>
-              </InputMock>
-            </form>
-          </div>
-        </Col>
-      </div>
+                    >
+                      <select-mock
+                        clearable={false}
+                        matchProp="label"
+                        onChange={[Function]}
+                        options={Array []}
+                        placeholder="Select Data Adapter Type"
+                        value={null}
+                      />
+                    </SelectMock>
+                  </input-mock>
+                </InputMock>
+              </form>
+            </div>
+          </Col>
+        </div>
+      </Row>
     </Row>
   </div>
 </DataAdapterCreate>
@@ -183,35 +191,29 @@ exports[`<DataAdapterCreate /> with mocked console.error should render for types
 >
   <div>
     <Row
-      bsClass="row"
       className="content"
-      componentClass="div"
     >
-      <div
-        className="content row"
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl content"
+        componentClass="div"
       >
-        <Col
-          bsClass="col"
-          componentClass="div"
-          lg={8}
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl content row"
         >
-          <div
-            className="col-lg-8"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            lg={8}
           >
-            <form
-              className="form form-horizontal"
-              onSubmit={[Function]}
+            <div
+              className="col-lg-8"
             >
-              <InputMock
-                autoFocus={true}
-                help="The type of data adapter to configure."
-                id="data-adapter-type-select"
-                label="Data Adapter Type"
-                labelClassName="col-sm-3"
-                required={true}
-                wrapperClassName="col-sm-9"
+              <form
+                className="form form-horizontal"
+                onSubmit={[Function]}
               >
-                <input-mock
+                <InputMock
                   autoFocus={true}
                   help="The type of data adapter to configure."
                   id="data-adapter-type-select"
@@ -220,23 +222,16 @@ exports[`<DataAdapterCreate /> with mocked console.error should render for types
                   required={true}
                   wrapperClassName="col-sm-9"
                 >
-                  <SelectMock
-                    clearable={false}
-                    matchProp="label"
-                    onChange={[Function]}
-                    options={
-                      Array [
-                        Object {
-                          "disabled": true,
-                          "label": "unknownType - missing or invalid plugin",
-                          "value": "unknownType",
-                        },
-                      ]
-                    }
-                    placeholder="Select Data Adapter Type"
-                    value={null}
+                  <input-mock
+                    autoFocus={true}
+                    help="The type of data adapter to configure."
+                    id="data-adapter-type-select"
+                    label="Data Adapter Type"
+                    labelClassName="col-sm-3"
+                    required={true}
+                    wrapperClassName="col-sm-9"
                   >
-                    <select-mock
+                    <SelectMock
                       clearable={false}
                       matchProp="label"
                       onChange={[Function]}
@@ -251,14 +246,31 @@ exports[`<DataAdapterCreate /> with mocked console.error should render for types
                       }
                       placeholder="Select Data Adapter Type"
                       value={null}
-                    />
-                  </SelectMock>
-                </input-mock>
-              </InputMock>
-            </form>
-          </div>
-        </Col>
-      </div>
+                    >
+                      <select-mock
+                        clearable={false}
+                        matchProp="label"
+                        onChange={[Function]}
+                        options={
+                          Array [
+                            Object {
+                              "disabled": true,
+                              "label": "unknownType - missing or invalid plugin",
+                              "value": "unknownType",
+                            },
+                          ]
+                        }
+                        placeholder="Select Data Adapter Type"
+                        value={null}
+                      />
+                    </SelectMock>
+                  </input-mock>
+                </InputMock>
+              </form>
+            </div>
+          </Col>
+        </div>
+      </Row>
     </Row>
   </div>
 </DataAdapterCreate>

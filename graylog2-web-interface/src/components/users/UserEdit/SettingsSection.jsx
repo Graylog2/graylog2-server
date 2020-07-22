@@ -1,14 +1,13 @@
 // @flow strict
 import * as React from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 
 import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
-import TimeoutInput from 'components/users/TimeoutInput';
-import { TimezoneSelect } from 'components/common';
 
 import SectionComponent from '../SectionComponent';
-import FormRow from '../form/FormRow';
+import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
+import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 
 type Props = {
   user: User,
@@ -23,36 +22,18 @@ const SettingsSection = ({
   onSubmit,
 }: Props) => (
   <SectionComponent title="Settings">
-    <Formik onSubmit={(data) => onSubmit({ timezone: data.timezone, session_timeout_ms: data.timeout })}
-            initialValues={{ timezone, timeout: sessionTimeoutMs }}>
+    <Formik onSubmit={onSubmit}
+            initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs }}>
       {({ isSubmitting, isValid }) => (
-        <Form>
-          <FormRow label={<label htmlFor="timeout">Sessions Timeout</label>}>
-            <Field name="timeout">
-              {({ field: { name, value, onChange } }) => (
-                <TimeoutInput value={value}
-                              labelSize={3}
-                              controlSize={9}
-                              onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
-              )}
-            </Field>
-          </FormRow>
-          <FormRow label={<label htmlFor="timezone">Time Zone</label>}>
-            <Field name="timezone">
-              {({ field: { name, value, onChange } }) => (
-                <TimezoneSelect className="timezone-select"
-                                value={value}
-                                name="timezone"
-                                onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
-              )}
-            </Field>
-          </FormRow>
+        <Form className="form form-horizontal">
+          <TimeoutFormGroup />
+          <TimezoneFormGroup />
           <Row>
             <Col xs={12}>
               <div className="pull-right">
                 <Button bsStyle="success"
                         disabled={isSubmitting || !isValid}
-                        title="Update Profile"
+                        title="Update Settings"
                         type="submit">
                   Update Settings
                 </Button>

@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.storage.providers;
+package org.graylog2.indexer.messages;
 
-import org.graylog.events.indices.EventIndexerAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.VersionAwareProvider;
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.DateTime;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class EventIndexerAdapterProvider extends VersionAwareProvider<EventIndexerAdapter> {
-    @Inject
-    public EventIndexerAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<EventIndexerAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
-    }
+public interface Indexable {
+    String getId();
+    long getSize();
+    DateTime getReceiveTime();
+    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,@Nonnull final Meter invalidTimestampMeter);
+    DateTime getTimestamp();
 }

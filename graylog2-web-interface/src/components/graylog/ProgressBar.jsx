@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css, keyframes, type StyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 // $FlowFixMe removing in future iteration
 import chroma from 'chroma-js';
 
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 
 type StyledBarProps = {
   animated: boolean,

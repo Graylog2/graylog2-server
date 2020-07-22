@@ -31,130 +31,90 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
     }
   >
     <Row
-      bsClass="row"
       className="content"
-      componentClass="div"
     >
-      <div
-        className="content row"
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl content"
+        componentClass="div"
       >
-        <Col
-          bsClass="col"
-          className="bootstrapHeading"
-          componentClass="div"
-          md={6}
-          mdOffset={3}
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl content row"
         >
-          <div
-            className="bootstrapHeading col-md-6 col-md-offset-3"
+          <Col
+            bsClass="col"
+            className="bootstrapHeading"
+            componentClass="div"
+            md={6}
+            mdOffset={3}
           >
-            <h1>
-              View: 
-              <em />
-            </h1>
-            <p>
-              Unfortunately executing this view is not possible. It uses the following capabilities which are not available:
-            </p>
-            <ul>
-              <li
-                key="timetravel"
-              >
-                <strong>
-                  timetravel
-                </strong>
-                 - included in 
-                <a
-                  href="https://www.graylog.org"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Pandora's Box
-                </a>
-              </li>
-              <li
-                key="hyperspeed"
-              >
-                <strong>
-                  hyperspeed
-                </strong>
-                 - included in 
-                <a
-                  href="https://www.graylog.org"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Pandora's Box
-                </a>
-              </li>
-            </ul>
-          </div>
-        </Col>
-        <Col
-          bsClass="col"
-          componentClass="div"
-          md={1}
-          mdOffset={8}
-        >
-          <div
-            className="col-md-1 col-md-offset-8"
-          >
-            <LinkContainer
-              action="push"
-              onlyActiveOnIndex={false}
-              to="/path/to/views"
+            <div
+              className="bootstrapHeading col-md-6 col-md-offset-3"
             >
-              <ForwardRef
+              <h1>
+                View: 
+                <em />
+              </h1>
+              <p>
+                Unfortunately executing this view is not possible. It uses the following capabilities which are not available:
+              </p>
+              <ul>
+                <li
+                  key="timetravel"
+                >
+                  <strong>
+                    timetravel
+                  </strong>
+                   - included in 
+                  <a
+                    href="https://www.graylog.org"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Pandora's Box
+                  </a>
+                </li>
+                <li
+                  key="hyperspeed"
+                >
+                  <strong>
+                    hyperspeed
+                  </strong>
+                   - included in 
+                  <a
+                    href="https://www.graylog.org"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Pandora's Box
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </Col>
+          <Col
+            bsClass="col"
+            componentClass="div"
+            md={1}
+            mdOffset={8}
+          >
+            <div
+              className="col-md-1 col-md-offset-8"
+            >
+              <LinkContainer
                 action="push"
-                bsStyle="success"
-                onClick={[Function]}
-                type="submit"
+                onlyActiveOnIndex={false}
+                to="/path/to/views"
               >
-                <Button__StyledButton
+                <ForwardRef
                   action="push"
                   bsStyle="success"
                   onClick={[Function]}
                   type="submit"
                 >
-                  <StyledComponent
+                  <Button__StyledButton
                     action="push"
                     bsStyle="success"
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                          "xsmall",
-                        ],
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                          "default",
-                          "primary",
-                          "link",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Button__StyledButton-c9cbmb-0",
-                          "isStatic": false,
-                          "lastClassName": "jVYrA",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Button__StyledButton",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
                     onClick={[Function]}
                     type="submit"
                   >
@@ -164,14 +124,14 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                       block={false}
                       bsClass="btn"
                       bsStyle="success"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                       disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
                       <button
                         action="push"
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-success"
+                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
                         disabled={false}
                         onClick={[Function]}
                         type="submit"
@@ -179,13 +139,13 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                         Back
                       </button>
                     </Button>
-                  </StyledComponent>
-                </Button__StyledButton>
-              </ForwardRef>
-            </LinkContainer>
-          </div>
-        </Col>
-      </div>
+                  </Button__StyledButton>
+                </ForwardRef>
+              </LinkContainer>
+            </div>
+          </Col>
+        </div>
+      </Row>
     </Row>
   </MissingRequirements>
 </Component>

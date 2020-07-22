@@ -1,42 +1,39 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, cleanup } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { alice, bob, adminUser } from 'fixtures/users';
 
-import UsersActions from 'actions/users/UsersActions';
+import { UsersActions } from 'stores/users/UsersStore';
 
 import UsersOverview from './UsersOverview';
 
 const mockUsers = Immutable.List([alice, bob, adminUser]);
 
 jest.mock('stores/users/UsersStore', () => ({
-  listen: jest.fn(),
-  getInitialState: jest.fn(() => ({
-    paginatedList: {
-      list: mockUsers,
-      pagination: {
-        page: 1,
-        perPage: 10,
-        total: mockUsers.size,
+  UsersStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(() => ({
+      paginatedList: {
+        list: mockUsers,
+        pagination: {
+          page: 1,
+          perPage: 10,
+          total: mockUsers.size,
+        },
+        adminUser: undefined,
       },
-      adminUser: undefined,
-    },
-  })),
-}));
-
-jest.mock('actions/users/UsersActions', () => ({
-  searchPaginated: jest.fn(),
-  deleteUser: jest.fn(),
+    })),
+  },
+  UsersActions: {
+    searchPaginated: jest.fn(),
+    deleteUser: jest.fn(),
+  },
 }));
 
 describe('UsersOverview', () => {
   beforeEach(() => {
     UsersActions.deleteUser.completed = { listen: jest.fn(() => jest.fn()) };
-  });
-
-  afterEach(() => {
-    cleanup();
   });
 
   describe('should display table header', () => {

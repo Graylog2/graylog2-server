@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Well } from 'components/graylog';
 
 import MessageLoader from './MessageLoader';
 
-const NewExampleWell = styled(Well)(({ theme }) => `
+const NewExampleWell = styled(Well)(({ theme }) => css`
   margin-bottom: 5px;
   font-family: ${theme.fonts.family.monospace};
   font-size: ${theme.fonts.size.body};

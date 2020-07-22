@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { cleanup, render, wait } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import ShowMessagePage from './ShowMessagePage';
@@ -27,13 +27,11 @@ jest.mock('injection/CombinedProvider', () => ({
 }));
 
 describe('ShowMessagePage', () => {
-  afterEach(cleanup);
-
   it('triggers a node list refresh on mount', async () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
     render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
-    await wait(() => expect(mockListNodes).toHaveBeenCalled());
+    await waitFor(() => expect(mockListNodes).toHaveBeenCalled());
   });
 
   it('renders for generic message', async () => {
@@ -41,7 +39,7 @@ describe('ShowMessagePage', () => {
     mockGetInput.mockImplementation(() => Promise.resolve(input));
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'graylog_5', messageId: '20f683d2-a874-11e9-8a11-0242ac130004' }} />);
 
-    await wait(() => expect(queryByTestId('spinner')).toBeNull());
+    await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
 
     expect(container).toMatchSnapshot();
   });
@@ -51,7 +49,7 @@ describe('ShowMessagePage', () => {
     mockGetInput.mockImplementation(() => Promise.resolve());
     const { container, queryByTestId } = render(<ShowMessagePage params={{ index: 'gl-events_0', messageId: '01DFZQ64CMGV30NT7DW2P7HQX2' }} />);
 
-    await wait(() => expect(queryByTestId('spinner')).toBeNull());
+    await waitFor(() => expect(queryByTestId('spinner')).toBeNull());
 
     expect(container).toMatchSnapshot();
   });

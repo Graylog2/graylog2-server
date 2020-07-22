@@ -58,123 +58,69 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
       onSubmit={[Function]}
     >
       <Row
-        bsClass="row"
         className="applyParameter"
-        componentClass="div"
       >
-        <div
-          className="applyParameter row"
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 gPzTHl applyParameter"
+          componentClass="div"
         >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={5}
-            smOffset={1}
+          <div
+            className="Row-sc-3iisrt-0 gPzTHl applyParameter row"
           >
-            <div
-              className="col-sm-5 col-sm-offset-1"
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={5}
+              smOffset={1}
             >
-              <Input
-                addonAfter={null}
-                bsStyle={null}
-                buttonAfter={null}
-                help=""
-                id="config_key"
-                label="Config Key"
-                name="config_key"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value=""
+              <div
+                className="col-sm-5 col-sm-offset-1"
               >
-                <Component
-                  controlId="config_key"
-                  validationState={null}
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="config_key"
+                  label="Config Key"
+                  name="config_key"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="select"
+                  value=""
                 >
-                  <FormGroup__StyledFormGroup
+                  <Component
                     controlId="config_key"
                     validationState={null}
                   >
-                    <StyledComponent
+                    <FormGroup__StyledFormGroup
                       controlId="config_key"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                            "isStatic": false,
-                            "lastClassName": "gcTkZc",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "FormGroup__StyledFormGroup",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       validationState={null}
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                         controlId="config_key"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                         >
                           <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "hCskeX",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                              srOnly={false}
                             >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                srOnly={false}
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                htmlFor="config_key"
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                  htmlFor="config_key"
-                                >
-                                  Config Key
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
+                                Config Key
+                              </label>
+                            </ControlLabel>
                           </ControlLabel>
                           <InputWrapper>
                             <span>
@@ -189,37 +135,10 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 type="select"
                                 value=""
                               >
-                                <StyledComponent
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 kmJcge"
                                   componentClass="select"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "eXfwDC",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   inputRef={[Function]}
                                   label="Config Key"
                                   name="config_key"
@@ -229,11 +148,9 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   type="select"
                                   value=""
                                 >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 eXfwDC"
-                                    componentClass="select"
-                                    inputRef={[Function]}
+                                  <select
+                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    id="config_key"
                                     label="Config Key"
                                     name="config_key"
                                     onChange={[Function]}
@@ -242,164 +159,94 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     type="select"
                                     value=""
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                      id="config_key"
-                                      label="Config Key"
-                                      name="config_key"
-                                      onChange={[Function]}
-                                      placeholder=""
-                                      required={true}
-                                      type="select"
+                                    <option
+                                      key="EMPTY"
                                       value=""
                                     >
-                                      <option
-                                        key="EMPTY"
-                                        value=""
-                                      >
-                                        Choose Config Key
-                                      </option>
-                                      <option
-                                        key="configuration.listen_address"
-                                        value="configuration.listen_address"
-                                      >
-                                        configuration.listen_address
-                                      </option>
-                                      <option
-                                        key="name"
-                                        value="name"
-                                      >
-                                        name
-                                      </option>
-                                      <option
-                                        key="title"
-                                        value="title"
-                                      >
-                                        title
-                                      </option>
-                                    </select>
-                                  </FormControl>
-                                </StyledComponent>
+                                      Choose Config Key
+                                    </option>
+                                    <option
+                                      key="configuration.listen_address"
+                                      value="configuration.listen_address"
+                                    >
+                                      configuration.listen_address
+                                    </option>
+                                    <option
+                                      key="name"
+                                      value="name"
+                                    >
+                                      name
+                                    </option>
+                                    <option
+                                      key="title"
+                                      value="title"
+                                    >
+                                      title
+                                    </option>
+                                  </select>
+                                </FormControl>
                               </FormControl>
                             </span>
                           </InputWrapper>
                         </div>
                       </FormGroup>
-                    </StyledComponent>
-                  </FormGroup__StyledFormGroup>
-                </Component>
-              </Input>
-            </div>
-          </Col>
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={5}
-          >
-            <div
-              className="col-sm-5"
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={5}
             >
-              <Input
-                addonAfter={null}
-                bsStyle={null}
-                buttonAfter={null}
-                help=""
-                id="parameter"
-                label="Parameter"
-                name="parameter"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value=""
+              <div
+                className="col-sm-5"
               >
-                <Component
-                  controlId="parameter"
-                  validationState={null}
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="parameter"
+                  label="Parameter"
+                  name="parameter"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="select"
+                  value=""
                 >
-                  <FormGroup__StyledFormGroup
+                  <Component
                     controlId="parameter"
                     validationState={null}
                   >
-                    <StyledComponent
+                    <FormGroup__StyledFormGroup
                       controlId="parameter"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                            "isStatic": false,
-                            "lastClassName": "gcTkZc",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "FormGroup__StyledFormGroup",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       validationState={null}
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                         controlId="parameter"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                         >
                           <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "hCskeX",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                              srOnly={false}
                             >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                srOnly={false}
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                htmlFor="parameter"
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                  htmlFor="parameter"
-                                >
-                                  Parameter
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
+                                Parameter
+                              </label>
+                            </ControlLabel>
                           </ControlLabel>
                           <InputWrapper>
                             <span>
@@ -414,37 +261,10 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                 type="select"
                                 value=""
                               >
-                                <StyledComponent
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 kmJcge"
                                   componentClass="select"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "eXfwDC",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   inputRef={[Function]}
                                   label="Parameter"
                                   name="parameter"
@@ -454,11 +274,9 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   type="select"
                                   value=""
                                 >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 eXfwDC"
-                                    componentClass="select"
-                                    inputRef={[Function]}
+                                  <select
+                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    id="parameter"
                                     label="Parameter"
                                     name="parameter"
                                     onChange={[Function]}
@@ -467,123 +285,71 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     type="select"
                                     value=""
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                      id="parameter"
-                                      label="Parameter"
-                                      name="parameter"
-                                      onChange={[Function]}
-                                      placeholder=""
-                                      required={true}
-                                      type="select"
+                                    <option
+                                      key="EMPTY"
                                       value=""
                                     >
-                                      <option
-                                        key="EMPTY"
-                                        value=""
-                                      >
-                                        Choose...
-                                      </option>
-                                      <option
-                                        key="PORT"
-                                        value="PORT"
-                                      >
-                                        Port
-                                         (
-                                        PORT
-                                        )
-                                      </option>
-                                    </select>
-                                  </FormControl>
-                                </StyledComponent>
+                                      Choose...
+                                    </option>
+                                    <option
+                                      key="PORT"
+                                      value="PORT"
+                                    >
+                                      Port
+                                       (
+                                      PORT
+                                      )
+                                    </option>
+                                  </select>
+                                </FormControl>
                               </FormControl>
                             </span>
                           </InputWrapper>
                         </div>
                       </FormGroup>
-                    </StyledComponent>
-                  </FormGroup__StyledFormGroup>
-                </Component>
-              </Input>
-            </div>
-          </Col>
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={1}
-          >
-            <div
-              className="col-sm-1"
-            />
-          </Col>
-        </div>
-      </Row>
-      <Row
-        bsClass="row"
-        componentClass="div"
-      >
-        <div
-          className="row"
-        >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={2}
-            smOffset={10}
-          >
-            <div
-              className="col-sm-2 col-sm-offset-10"
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={1}
             >
-              <ForwardRef
-                bsStyle="primary"
-                disabled={true}
-                type="submit"
+              <div
+                className="col-sm-1"
+              />
+            </Col>
+          </div>
+        </Row>
+      </Row>
+      <Row>
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 gPzTHl"
+          componentClass="div"
+        >
+          <div
+            className="Row-sc-3iisrt-0 gPzTHl row"
+          >
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={2}
+              smOffset={10}
+            >
+              <div
+                className="col-sm-2 col-sm-offset-10"
               >
-                <Button__StyledButton
+                <ForwardRef
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <StyledComponent
+                  <Button__StyledButton
                     bsStyle="primary"
                     disabled={true}
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                          "xsmall",
-                        ],
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                          "default",
-                          "primary",
-                          "link",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Button__StyledButton-c9cbmb-0",
-                          "isStatic": false,
-                          "lastClassName": "jVYrA",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Button__StyledButton",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
                     type="submit"
                   >
                     <Button
@@ -591,130 +357,106 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
                         Apply
                       </button>
                     </Button>
-                  </StyledComponent>
-                </Button__StyledButton>
-              </ForwardRef>
-            </div>
-          </Col>
-        </div>
+                  </Button__StyledButton>
+                </ForwardRef>
+              </div>
+            </Col>
+          </div>
+        </Row>
       </Row>
     </form>
-    <Row
-      bsClass="row"
-      componentClass="div"
-    >
-      <div
-        className="row"
+    <Row>
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl"
+        componentClass="div"
       >
-        <Col
-          bsClass="col"
-          componentClass="div"
-          sm={10}
-          smOffset={1}
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl row"
         >
-          <div
-            className="col-sm-10 col-sm-offset-1"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={10}
+            smOffset={1}
           >
-            <DataTable
-              className=""
-              dataRowFormatter={[Function]}
-              displayKey="value"
-              filterBy=""
-              filterKeys={Array []}
-              filterLabel="Filter"
-              filterSuggestions={Array []}
-              headerCellFormatter={[Function]}
-              headers={
-                Array [
-                  "Config Key",
-                  "Parameter",
-                  "Action",
-                ]
-              }
-              id="config-key-list"
-              noDataText="No data available."
-              rowClassName=""
-              rows={
-                Array [
-                  Object {
-                    "configKey": "configuration.port",
-                    "paramName": "PORT",
-                  },
-                ]
-              }
-              useResponsiveTable={true}
+            <div
+              className="col-sm-10 col-sm-offset-1"
             >
-              <div>
-                <Filter
-                  displayKey="value"
-                  filterBy=""
-                  filterKeys={Array []}
-                  filterSuggestions={Array []}
-                  id="config-key-list"
-                  label="Filter"
-                  onDataFiltered={[Function]}
-                  rows={
-                    Array [
-                      Object {
-                        "configKey": "configuration.port",
-                        "paramName": "PORT",
-                      },
-                    ]
-                  }
-                />
-                <div
-                  className="row "
-                >
+              <DataTable
+                className=""
+                dataRowFormatter={[Function]}
+                displayKey="value"
+                filterBy=""
+                filterKeys={Array []}
+                filterLabel="Filter"
+                filterSuggestions={Array []}
+                headerCellFormatter={[Function]}
+                headers={
+                  Array [
+                    "Config Key",
+                    "Parameter",
+                    "Action",
+                  ]
+                }
+                id="config-key-list"
+                noDataText="No data available."
+                rowClassName=""
+                rows={
+                  Array [
+                    Object {
+                      "configKey": "configuration.port",
+                      "paramName": "PORT",
+                    },
+                  ]
+                }
+                useResponsiveTable={true}
+              >
+                <div>
+                  <Filter
+                    displayKey="value"
+                    filterBy=""
+                    filterKeys={Array []}
+                    filterSuggestions={Array []}
+                    id="config-key-list"
+                    label="Filter"
+                    onDataFiltered={[Function]}
+                    rows={
+                      Array [
+                        Object {
+                          "configKey": "configuration.port",
+                          "paramName": "PORT",
+                        },
+                      ]
+                    }
+                  />
                   <div
-                    className="col-md-12"
+                    className="row "
                   >
                     <div
-                      className="data-table table-responsive"
-                      id="config-key-list"
+                      className="col-md-12"
                     >
-                      <DataTable__StyledTable
-                        className="table "
+                      <div
+                        className="data-table table-responsive"
+                        id="config-key-list"
                       >
-                        <StyledComponent
+                        <DataTable__StyledTable
                           className="table "
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "DataTable__StyledTable-sc-1qrb405-0",
-                                "isStatic": false,
-                                "lastClassName": "gweZGk",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "DataTable__StyledTable",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
-                              "target": "table",
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
                         >
                           <table
-                            className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                            className="DataTable__StyledTable-sc-1qrb405-0 dPQrOa table "
                           >
                             <thead>
                               <tr>
@@ -782,68 +524,25 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                         bsStyle="info"
                                         onClick={[Function]}
                                       >
-                                        <StyledComponent
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
                                           bsSize="small"
                                           bsStyle="info"
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "SIZES": Array [
-                                                "large",
-                                                "small",
-                                                "xsmall",
-                                              ],
-                                              "STYLES": Array [
-                                                "success",
-                                                "warning",
-                                                "danger",
-                                                "info",
-                                                "default",
-                                                "primary",
-                                                "link",
-                                              ],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                                "isStatic": false,
-                                                "lastClassName": "jVYrA",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "Button__StyledButton",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
+                                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                          disabled={false}
                                           onClick={[Function]}
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsSize="small"
-                                            bsStyle="info"
-                                            className="Button__StyledButton-c9cbmb-0 jVYrA"
+                                          <button
+                                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
                                             disabled={false}
                                             onClick={[Function]}
+                                            type="button"
                                           >
-                                            <button
-                                              className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-sm btn-info"
-                                              disabled={false}
-                                              onClick={[Function]}
-                                              type="button"
-                                            >
-                                              Clear
-                                            </button>
-                                          </Button>
-                                        </StyledComponent>
+                                            Clear
+                                          </button>
+                                        </Button>
                                       </Button__StyledButton>
                                     </ForwardRef>
                                   </td>
@@ -851,16 +550,16 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               </DataTableElement>
                             </tbody>
                           </table>
-                        </StyledComponent>
-                      </DataTable__StyledTable>
+                        </DataTable__StyledTable>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </DataTable>
-          </div>
-        </Col>
-      </div>
+              </DataTable>
+            </div>
+          </Col>
+        </div>
+      </Row>
     </Row>
   </div>
 </ContentPackApplyParameter>
@@ -908,123 +607,69 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
       onSubmit={[Function]}
     >
       <Row
-        bsClass="row"
         className="applyParameter"
-        componentClass="div"
       >
-        <div
-          className="applyParameter row"
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 gPzTHl applyParameter"
+          componentClass="div"
         >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={5}
-            smOffset={1}
+          <div
+            className="Row-sc-3iisrt-0 gPzTHl applyParameter row"
           >
-            <div
-              className="col-sm-5 col-sm-offset-1"
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={5}
+              smOffset={1}
             >
-              <Input
-                addonAfter={null}
-                bsStyle={null}
-                buttonAfter={null}
-                help=""
-                id="config_key"
-                label="Config Key"
-                name="config_key"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value=""
+              <div
+                className="col-sm-5 col-sm-offset-1"
               >
-                <Component
-                  controlId="config_key"
-                  validationState={null}
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="config_key"
+                  label="Config Key"
+                  name="config_key"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="select"
+                  value=""
                 >
-                  <FormGroup__StyledFormGroup
+                  <Component
                     controlId="config_key"
                     validationState={null}
                   >
-                    <StyledComponent
+                    <FormGroup__StyledFormGroup
                       controlId="config_key"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                            "isStatic": false,
-                            "lastClassName": "gcTkZc",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "FormGroup__StyledFormGroup",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       validationState={null}
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                         controlId="config_key"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                         >
                           <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "hCskeX",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                              srOnly={false}
                             >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                srOnly={false}
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                htmlFor="config_key"
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                  htmlFor="config_key"
-                                >
-                                  Config Key
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
+                                Config Key
+                              </label>
+                            </ControlLabel>
                           </ControlLabel>
                           <InputWrapper>
                             <span>
@@ -1039,37 +684,10 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 type="select"
                                 value=""
                               >
-                                <StyledComponent
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 kmJcge"
                                   componentClass="select"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "eXfwDC",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   inputRef={[Function]}
                                   label="Config Key"
                                   name="config_key"
@@ -1079,11 +697,9 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   type="select"
                                   value=""
                                 >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 eXfwDC"
-                                    componentClass="select"
-                                    inputRef={[Function]}
+                                  <select
+                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    id="config_key"
                                     label="Config Key"
                                     name="config_key"
                                     onChange={[Function]}
@@ -1092,170 +708,100 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                     type="select"
                                     value=""
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                      id="config_key"
-                                      label="Config Key"
-                                      name="config_key"
-                                      onChange={[Function]}
-                                      placeholder=""
-                                      required={true}
-                                      type="select"
+                                    <option
+                                      key="EMPTY"
                                       value=""
                                     >
-                                      <option
-                                        key="EMPTY"
-                                        value=""
-                                      >
-                                        Choose Config Key
-                                      </option>
-                                      <option
-                                        key="configuration.listen_address"
-                                        value="configuration.listen_address"
-                                      >
-                                        configuration.listen_address
-                                      </option>
-                                      <option
-                                        key="configuration.port"
-                                        value="configuration.port"
-                                      >
-                                        configuration.port
-                                      </option>
-                                      <option
-                                        key="name"
-                                        value="name"
-                                      >
-                                        name
-                                      </option>
-                                      <option
-                                        key="title"
-                                        value="title"
-                                      >
-                                        title
-                                      </option>
-                                    </select>
-                                  </FormControl>
-                                </StyledComponent>
+                                      Choose Config Key
+                                    </option>
+                                    <option
+                                      key="configuration.listen_address"
+                                      value="configuration.listen_address"
+                                    >
+                                      configuration.listen_address
+                                    </option>
+                                    <option
+                                      key="configuration.port"
+                                      value="configuration.port"
+                                    >
+                                      configuration.port
+                                    </option>
+                                    <option
+                                      key="name"
+                                      value="name"
+                                    >
+                                      name
+                                    </option>
+                                    <option
+                                      key="title"
+                                      value="title"
+                                    >
+                                      title
+                                    </option>
+                                  </select>
+                                </FormControl>
                               </FormControl>
                             </span>
                           </InputWrapper>
                         </div>
                       </FormGroup>
-                    </StyledComponent>
-                  </FormGroup__StyledFormGroup>
-                </Component>
-              </Input>
-            </div>
-          </Col>
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={5}
-          >
-            <div
-              className="col-sm-5"
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={5}
             >
-              <Input
-                addonAfter={null}
-                bsStyle={null}
-                buttonAfter={null}
-                help=""
-                id="parameter"
-                label="Parameter"
-                name="parameter"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value=""
+              <div
+                className="col-sm-5"
               >
-                <Component
-                  controlId="parameter"
-                  validationState={null}
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="parameter"
+                  label="Parameter"
+                  name="parameter"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="select"
+                  value=""
                 >
-                  <FormGroup__StyledFormGroup
+                  <Component
                     controlId="parameter"
                     validationState={null}
                   >
-                    <StyledComponent
+                    <FormGroup__StyledFormGroup
                       controlId="parameter"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                            "isStatic": false,
-                            "lastClassName": "gcTkZc",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "FormGroup__StyledFormGroup",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       validationState={null}
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                         controlId="parameter"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                         >
                           <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "hCskeX",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                              srOnly={false}
                             >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                srOnly={false}
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                htmlFor="parameter"
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                  htmlFor="parameter"
-                                >
-                                  Parameter
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
+                                Parameter
+                              </label>
+                            </ControlLabel>
                           </ControlLabel>
                           <InputWrapper>
                             <span>
@@ -1270,37 +816,10 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                 type="select"
                                 value=""
                               >
-                                <StyledComponent
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 kmJcge"
                                   componentClass="select"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "eXfwDC",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   inputRef={[Function]}
                                   label="Parameter"
                                   name="parameter"
@@ -1310,11 +829,9 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   type="select"
                                   value=""
                                 >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 eXfwDC"
-                                    componentClass="select"
-                                    inputRef={[Function]}
+                                  <select
+                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    id="parameter"
                                     label="Parameter"
                                     name="parameter"
                                     onChange={[Function]}
@@ -1323,114 +840,62 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                     type="select"
                                     value=""
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                      id="parameter"
-                                      label="Parameter"
-                                      name="parameter"
-                                      onChange={[Function]}
-                                      placeholder=""
-                                      required={true}
-                                      type="select"
+                                    <option
+                                      key="EMPTY"
                                       value=""
                                     >
-                                      <option
-                                        key="EMPTY"
-                                        value=""
-                                      >
-                                        Create a parameter first
-                                      </option>
-                                    </select>
-                                  </FormControl>
-                                </StyledComponent>
+                                      Create a parameter first
+                                    </option>
+                                  </select>
+                                </FormControl>
                               </FormControl>
                             </span>
                           </InputWrapper>
                         </div>
                       </FormGroup>
-                    </StyledComponent>
-                  </FormGroup__StyledFormGroup>
-                </Component>
-              </Input>
-            </div>
-          </Col>
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={1}
-          >
-            <div
-              className="col-sm-1"
-            />
-          </Col>
-        </div>
-      </Row>
-      <Row
-        bsClass="row"
-        componentClass="div"
-      >
-        <div
-          className="row"
-        >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={2}
-            smOffset={10}
-          >
-            <div
-              className="col-sm-2 col-sm-offset-10"
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={1}
             >
-              <ForwardRef
-                bsStyle="primary"
-                disabled={true}
-                type="submit"
+              <div
+                className="col-sm-1"
+              />
+            </Col>
+          </div>
+        </Row>
+      </Row>
+      <Row>
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 gPzTHl"
+          componentClass="div"
+        >
+          <div
+            className="Row-sc-3iisrt-0 gPzTHl row"
+          >
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={2}
+              smOffset={10}
+            >
+              <div
+                className="col-sm-2 col-sm-offset-10"
               >
-                <Button__StyledButton
+                <ForwardRef
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <StyledComponent
+                  <Button__StyledButton
                     bsStyle="primary"
                     disabled={true}
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                          "xsmall",
-                        ],
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                          "default",
-                          "primary",
-                          "link",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Button__StyledButton-c9cbmb-0",
-                          "isStatic": false,
-                          "lastClassName": "jVYrA",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Button__StyledButton",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
                     type="submit"
                   >
                     <Button
@@ -1438,96 +903,99 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
                         Apply
                       </button>
                     </Button>
-                  </StyledComponent>
-                </Button__StyledButton>
-              </ForwardRef>
+                  </Button__StyledButton>
+                </ForwardRef>
+              </div>
+            </Col>
+          </div>
+        </Row>
+      </Row>
+    </form>
+    <Row>
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl"
+        componentClass="div"
+      >
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl row"
+        >
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={10}
+            smOffset={1}
+          >
+            <div
+              className="col-sm-10 col-sm-offset-1"
+            >
+              <DataTable
+                className=""
+                dataRowFormatter={[Function]}
+                displayKey="value"
+                filterBy=""
+                filterKeys={Array []}
+                filterLabel="Filter"
+                filterSuggestions={Array []}
+                headerCellFormatter={[Function]}
+                headers={
+                  Array [
+                    "Config Key",
+                    "Parameter",
+                    "Action",
+                  ]
+                }
+                id="config-key-list"
+                noDataText="No data available."
+                rowClassName=""
+                rows={Array []}
+                useResponsiveTable={true}
+              >
+                <div>
+                  <Filter
+                    displayKey="value"
+                    filterBy=""
+                    filterKeys={Array []}
+                    filterSuggestions={Array []}
+                    id="config-key-list"
+                    label="Filter"
+                    onDataFiltered={[Function]}
+                    rows={Array []}
+                  />
+                  <div
+                    className="row "
+                  >
+                    <div
+                      className="col-md-12"
+                    >
+                      <div
+                        className="data-table table-responsive"
+                        id="config-key-list"
+                      >
+                        <p>
+                          No data available.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </DataTable>
             </div>
           </Col>
         </div>
       </Row>
-    </form>
-    <Row
-      bsClass="row"
-      componentClass="div"
-    >
-      <div
-        className="row"
-      >
-        <Col
-          bsClass="col"
-          componentClass="div"
-          sm={10}
-          smOffset={1}
-        >
-          <div
-            className="col-sm-10 col-sm-offset-1"
-          >
-            <DataTable
-              className=""
-              dataRowFormatter={[Function]}
-              displayKey="value"
-              filterBy=""
-              filterKeys={Array []}
-              filterLabel="Filter"
-              filterSuggestions={Array []}
-              headerCellFormatter={[Function]}
-              headers={
-                Array [
-                  "Config Key",
-                  "Parameter",
-                  "Action",
-                ]
-              }
-              id="config-key-list"
-              noDataText="No data available."
-              rowClassName=""
-              rows={Array []}
-              useResponsiveTable={true}
-            >
-              <div>
-                <Filter
-                  displayKey="value"
-                  filterBy=""
-                  filterKeys={Array []}
-                  filterSuggestions={Array []}
-                  id="config-key-list"
-                  label="Filter"
-                  onDataFiltered={[Function]}
-                  rows={Array []}
-                />
-                <div
-                  className="row "
-                >
-                  <div
-                    className="col-md-12"
-                  >
-                    <div
-                      className="data-table table-responsive"
-                      id="config-key-list"
-                    >
-                      <p>
-                        No data available.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </DataTable>
-          </div>
-        </Col>
-      </div>
     </Row>
   </div>
 </ContentPackApplyParameter>
@@ -1592,123 +1060,69 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
       onSubmit={[Function]}
     >
       <Row
-        bsClass="row"
         className="applyParameter"
-        componentClass="div"
       >
-        <div
-          className="applyParameter row"
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 gPzTHl applyParameter"
+          componentClass="div"
         >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={5}
-            smOffset={1}
+          <div
+            className="Row-sc-3iisrt-0 gPzTHl applyParameter row"
           >
-            <div
-              className="col-sm-5 col-sm-offset-1"
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={5}
+              smOffset={1}
             >
-              <Input
-                addonAfter={null}
-                bsStyle={null}
-                buttonAfter={null}
-                help=""
-                id="config_key"
-                label="Config Key"
-                name="config_key"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value=""
+              <div
+                className="col-sm-5 col-sm-offset-1"
               >
-                <Component
-                  controlId="config_key"
-                  validationState={null}
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="config_key"
+                  label="Config Key"
+                  name="config_key"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="select"
+                  value=""
                 >
-                  <FormGroup__StyledFormGroup
+                  <Component
                     controlId="config_key"
                     validationState={null}
                   >
-                    <StyledComponent
+                    <FormGroup__StyledFormGroup
                       controlId="config_key"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                            "isStatic": false,
-                            "lastClassName": "gcTkZc",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "FormGroup__StyledFormGroup",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       validationState={null}
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                         controlId="config_key"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                         >
                           <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "hCskeX",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                              srOnly={false}
                             >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                srOnly={false}
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                htmlFor="config_key"
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                  htmlFor="config_key"
-                                >
-                                  Config Key
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
+                                Config Key
+                              </label>
+                            </ControlLabel>
                           </ControlLabel>
                           <InputWrapper>
                             <span>
@@ -1723,37 +1137,10 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 type="select"
                                 value=""
                               >
-                                <StyledComponent
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 kmJcge"
                                   componentClass="select"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "eXfwDC",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   inputRef={[Function]}
                                   label="Config Key"
                                   name="config_key"
@@ -1763,11 +1150,9 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   type="select"
                                   value=""
                                 >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 eXfwDC"
-                                    componentClass="select"
-                                    inputRef={[Function]}
+                                  <select
+                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    id="config_key"
                                     label="Config Key"
                                     name="config_key"
                                     onChange={[Function]}
@@ -1776,164 +1161,94 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                     type="select"
                                     value=""
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                      id="config_key"
-                                      label="Config Key"
-                                      name="config_key"
-                                      onChange={[Function]}
-                                      placeholder=""
-                                      required={true}
-                                      type="select"
+                                    <option
+                                      key="EMPTY"
                                       value=""
                                     >
-                                      <option
-                                        key="EMPTY"
-                                        value=""
-                                      >
-                                        Choose Config Key
-                                      </option>
-                                      <option
-                                        key="configuration.listen_address"
-                                        value="configuration.listen_address"
-                                      >
-                                        configuration.listen_address
-                                      </option>
-                                      <option
-                                        key="name"
-                                        value="name"
-                                      >
-                                        name
-                                      </option>
-                                      <option
-                                        key="title"
-                                        value="title"
-                                      >
-                                        title
-                                      </option>
-                                    </select>
-                                  </FormControl>
-                                </StyledComponent>
+                                      Choose Config Key
+                                    </option>
+                                    <option
+                                      key="configuration.listen_address"
+                                      value="configuration.listen_address"
+                                    >
+                                      configuration.listen_address
+                                    </option>
+                                    <option
+                                      key="name"
+                                      value="name"
+                                    >
+                                      name
+                                    </option>
+                                    <option
+                                      key="title"
+                                      value="title"
+                                    >
+                                      title
+                                    </option>
+                                  </select>
+                                </FormControl>
                               </FormControl>
                             </span>
                           </InputWrapper>
                         </div>
                       </FormGroup>
-                    </StyledComponent>
-                  </FormGroup__StyledFormGroup>
-                </Component>
-              </Input>
-            </div>
-          </Col>
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={5}
-          >
-            <div
-              className="col-sm-5"
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={5}
             >
-              <Input
-                addonAfter={null}
-                bsStyle={null}
-                buttonAfter={null}
-                help=""
-                id="parameter"
-                label="Parameter"
-                name="parameter"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="select"
-                value=""
+              <div
+                className="col-sm-5"
               >
-                <Component
-                  controlId="parameter"
-                  validationState={null}
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help=""
+                  id="parameter"
+                  label="Parameter"
+                  name="parameter"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="select"
+                  value=""
                 >
-                  <FormGroup__StyledFormGroup
+                  <Component
                     controlId="parameter"
                     validationState={null}
                   >
-                    <StyledComponent
+                    <FormGroup__StyledFormGroup
                       controlId="parameter"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "SIZES": Array [
-                            "large",
-                            "small",
-                          ],
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                            "isStatic": false,
-                            "lastClassName": "gcTkZc",
-                            "rules": Array [
-                              [Function],
-                            ],
-                          },
-                          "displayName": "FormGroup__StyledFormGroup",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
-                      }
-                      forwardedRef={null}
                       validationState={null}
                     >
                       <FormGroup
                         bsClass="form-group"
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc"
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                         controlId="parameter"
                         validationState={null}
                       >
                         <div
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 gcTkZc form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                         >
                           <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "hCskeX",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                              srOnly={false}
                             >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 hCskeX"
-                                srOnly={false}
+                              <label
+                                className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                htmlFor="parameter"
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 hCskeX control-label"
-                                  htmlFor="parameter"
-                                >
-                                  Parameter
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
+                                Parameter
+                              </label>
+                            </ControlLabel>
                           </ControlLabel>
                           <InputWrapper>
                             <span>
@@ -1948,37 +1263,10 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                 type="select"
                                 value=""
                               >
-                                <StyledComponent
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 kmJcge"
                                   componentClass="select"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "eXfwDC",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
-                                    }
-                                  }
-                                  forwardedRef={null}
                                   inputRef={[Function]}
                                   label="Parameter"
                                   name="parameter"
@@ -1988,11 +1276,9 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   type="select"
                                   value=""
                                 >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 eXfwDC"
-                                    componentClass="select"
-                                    inputRef={[Function]}
+                                  <select
+                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    id="parameter"
                                     label="Parameter"
                                     name="parameter"
                                     onChange={[Function]}
@@ -2001,123 +1287,71 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                     type="select"
                                     value=""
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 eXfwDC form-control"
-                                      id="parameter"
-                                      label="Parameter"
-                                      name="parameter"
-                                      onChange={[Function]}
-                                      placeholder=""
-                                      required={true}
-                                      type="select"
+                                    <option
+                                      key="EMPTY"
                                       value=""
                                     >
-                                      <option
-                                        key="EMPTY"
-                                        value=""
-                                      >
-                                        Choose...
-                                      </option>
-                                      <option
-                                        key="PORT"
-                                        value="PORT"
-                                      >
-                                        Port
-                                         (
-                                        PORT
-                                        )
-                                      </option>
-                                    </select>
-                                  </FormControl>
-                                </StyledComponent>
+                                      Choose...
+                                    </option>
+                                    <option
+                                      key="PORT"
+                                      value="PORT"
+                                    >
+                                      Port
+                                       (
+                                      PORT
+                                      )
+                                    </option>
+                                  </select>
+                                </FormControl>
                               </FormControl>
                             </span>
                           </InputWrapper>
                         </div>
                       </FormGroup>
-                    </StyledComponent>
-                  </FormGroup__StyledFormGroup>
-                </Component>
-              </Input>
-            </div>
-          </Col>
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={1}
-          >
-            <div
-              className="col-sm-1"
-            />
-          </Col>
-        </div>
-      </Row>
-      <Row
-        bsClass="row"
-        componentClass="div"
-      >
-        <div
-          className="row"
-        >
-          <Col
-            bsClass="col"
-            componentClass="div"
-            sm={2}
-            smOffset={10}
-          >
-            <div
-              className="col-sm-2 col-sm-offset-10"
+                    </FormGroup__StyledFormGroup>
+                  </Component>
+                </Input>
+              </div>
+            </Col>
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={1}
             >
-              <ForwardRef
-                bsStyle="primary"
-                disabled={true}
-                type="submit"
+              <div
+                className="col-sm-1"
+              />
+            </Col>
+          </div>
+        </Row>
+      </Row>
+      <Row>
+        <Row
+          bsClass="row"
+          className="Row-sc-3iisrt-0 gPzTHl"
+          componentClass="div"
+        >
+          <div
+            className="Row-sc-3iisrt-0 gPzTHl row"
+          >
+            <Col
+              bsClass="col"
+              componentClass="div"
+              sm={2}
+              smOffset={10}
+            >
+              <div
+                className="col-sm-2 col-sm-offset-10"
               >
-                <Button__StyledButton
+                <ForwardRef
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <StyledComponent
+                  <Button__StyledButton
                     bsStyle="primary"
                     disabled={true}
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "SIZES": Array [
-                          "large",
-                          "small",
-                          "xsmall",
-                        ],
-                        "STYLES": Array [
-                          "success",
-                          "warning",
-                          "danger",
-                          "info",
-                          "default",
-                          "primary",
-                          "link",
-                        ],
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "Button__StyledButton-c9cbmb-0",
-                          "isStatic": false,
-                          "lastClassName": "jVYrA",
-                          "rules": Array [
-                            [Function],
-                          ],
-                        },
-                        "displayName": "Button__StyledButton",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
-                    }
-                    forwardedRef={null}
                     type="submit"
                   >
                     <Button
@@ -2125,132 +1359,108 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       block={false}
                       bsClass="btn"
                       bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 jVYrA"
+                      className="Button__StyledButton-c9cbmb-0 laZUlH"
                       disabled={true}
                       type="submit"
                     >
                       <button
-                        className="Button__StyledButton-c9cbmb-0 jVYrA btn btn-primary"
+                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
                         disabled={true}
                         type="submit"
                       >
                         Apply
                       </button>
                     </Button>
-                  </StyledComponent>
-                </Button__StyledButton>
-              </ForwardRef>
-            </div>
-          </Col>
-        </div>
+                  </Button__StyledButton>
+                </ForwardRef>
+              </div>
+            </Col>
+          </div>
+        </Row>
       </Row>
     </form>
-    <Row
-      bsClass="row"
-      componentClass="div"
-    >
-      <div
-        className="row"
+    <Row>
+      <Row
+        bsClass="row"
+        className="Row-sc-3iisrt-0 gPzTHl"
+        componentClass="div"
       >
-        <Col
-          bsClass="col"
-          componentClass="div"
-          sm={10}
-          smOffset={1}
+        <div
+          className="Row-sc-3iisrt-0 gPzTHl row"
         >
-          <div
-            className="col-sm-10 col-sm-offset-1"
+          <Col
+            bsClass="col"
+            componentClass="div"
+            sm={10}
+            smOffset={1}
           >
-            <DataTable
-              className=""
-              dataRowFormatter={[Function]}
-              displayKey="value"
-              filterBy=""
-              filterKeys={Array []}
-              filterLabel="Filter"
-              filterSuggestions={Array []}
-              headerCellFormatter={[Function]}
-              headers={
-                Array [
-                  "Config Key",
-                  "Parameter",
-                  "Action",
-                ]
-              }
-              id="config-key-list"
-              noDataText="No data available."
-              rowClassName=""
-              rows={
-                Array [
-                  Object {
-                    "configKey": "configuration.port",
-                    "paramName": "PORT",
-                    "readOnly": true,
-                  },
-                ]
-              }
-              useResponsiveTable={true}
+            <div
+              className="col-sm-10 col-sm-offset-1"
             >
-              <div>
-                <Filter
-                  displayKey="value"
-                  filterBy=""
-                  filterKeys={Array []}
-                  filterSuggestions={Array []}
-                  id="config-key-list"
-                  label="Filter"
-                  onDataFiltered={[Function]}
-                  rows={
-                    Array [
-                      Object {
-                        "configKey": "configuration.port",
-                        "paramName": "PORT",
-                        "readOnly": true,
-                      },
-                    ]
-                  }
-                />
-                <div
-                  className="row "
-                >
+              <DataTable
+                className=""
+                dataRowFormatter={[Function]}
+                displayKey="value"
+                filterBy=""
+                filterKeys={Array []}
+                filterLabel="Filter"
+                filterSuggestions={Array []}
+                headerCellFormatter={[Function]}
+                headers={
+                  Array [
+                    "Config Key",
+                    "Parameter",
+                    "Action",
+                  ]
+                }
+                id="config-key-list"
+                noDataText="No data available."
+                rowClassName=""
+                rows={
+                  Array [
+                    Object {
+                      "configKey": "configuration.port",
+                      "paramName": "PORT",
+                      "readOnly": true,
+                    },
+                  ]
+                }
+                useResponsiveTable={true}
+              >
+                <div>
+                  <Filter
+                    displayKey="value"
+                    filterBy=""
+                    filterKeys={Array []}
+                    filterSuggestions={Array []}
+                    id="config-key-list"
+                    label="Filter"
+                    onDataFiltered={[Function]}
+                    rows={
+                      Array [
+                        Object {
+                          "configKey": "configuration.port",
+                          "paramName": "PORT",
+                          "readOnly": true,
+                        },
+                      ]
+                    }
+                  />
                   <div
-                    className="col-md-12"
+                    className="row "
                   >
                     <div
-                      className="data-table table-responsive"
-                      id="config-key-list"
+                      className="col-md-12"
                     >
-                      <DataTable__StyledTable
-                        className="table "
+                      <div
+                        className="data-table table-responsive"
+                        id="config-key-list"
                       >
-                        <StyledComponent
+                        <DataTable__StyledTable
                           className="table "
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "DataTable__StyledTable-sc-1qrb405-0",
-                                "isStatic": false,
-                                "lastClassName": "gweZGk",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "DataTable__StyledTable",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "DataTable__StyledTable-sc-1qrb405-0",
-                              "target": "table",
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
                         >
                           <table
-                            className="DataTable__StyledTable-sc-1qrb405-0 gweZGk table "
+                            className="DataTable__StyledTable-sc-1qrb405-0 dPQrOa table "
                           >
                             <thead>
                               <tr>
@@ -2313,16 +1523,16 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               </DataTableElement>
                             </tbody>
                           </table>
-                        </StyledComponent>
-                      </DataTable__StyledTable>
+                        </DataTable__StyledTable>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </DataTable>
-          </div>
-        </Col>
-      </div>
+              </DataTable>
+            </div>
+          </Col>
+        </div>
+      </Row>
     </Row>
   </div>
 </ContentPackApplyParameter>

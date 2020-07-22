@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, Col, Panel, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -14,7 +14,7 @@ const { LdapGroupsActions } = CombinedProvider.get('LdapGroups');
 const { LdapStore } = CombinedProvider.get('Ldap');
 const { RolesStore } = CombinedProvider.get('Roles');
 
-const StyledLegend = styled.legend(({ theme }) => `
+const StyledLegend = styled.legend(({ theme }) => css`
   font-size: ${theme.fonts.size.large};
 `);
 

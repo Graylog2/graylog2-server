@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Col, FormControl, FormGroup } from 'components/graylog';
 import { Select } from 'components/common';
 
-const OperatorSelector = styled.div(({ theme }) => `
+const OperatorSelector = styled.div(({ theme }) => css`
   margin-bottom: 15px;
   font-size: ${theme.fonts.size.body};
 `);

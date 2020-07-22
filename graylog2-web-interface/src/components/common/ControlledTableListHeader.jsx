@@ -2,11 +2,11 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ListGroupItem } from 'components/graylog';
 
-const StyledListGroupItem = styled(ListGroupItem)(({ theme }) => `
+const StyledListGroupItem = styled(ListGroupItem)(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
   font-size: ${theme.fonts.size.body};
   padding: 0 15px;

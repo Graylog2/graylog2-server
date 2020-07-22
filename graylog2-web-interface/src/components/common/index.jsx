@@ -50,7 +50,6 @@ export { default as Spinner } from './Spinner';
 export { default as TableList } from './TableList';
 export { default as Timestamp } from './Timestamp';
 export { default as TimezoneSelect } from './TimezoneSelect';
-export { default as TextLabel } from './TextLabel';
 export { default as TypeAheadDataFilter } from './TypeAheadDataFilter';
 export { default as TypeAheadFieldInput } from './TypeAheadFieldInput';
 export { default as TypeAheadInput } from './TypeAheadInput';

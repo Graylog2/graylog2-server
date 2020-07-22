@@ -13,6 +13,8 @@ import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
 import User from 'logic/users/User';
 
+import type { PaginatedResponseType, PaginationType } from '../PaginationTypes';
+
 const DEFAULT_PAGINATION = {
   count: undefined,
   total: undefined,
@@ -58,20 +60,7 @@ export type ChangePasswordRequest = {
   password: string,
 };
 
-type PaginationType = {
-  count: number,
-  total: number,
-  page: number,
-  perPage: number,
-  query: string,
-};
-
-type PaginatedResponse = {
-  count: number,
-  total: number,
-  page: number,
-  per_page: number,
-  query: string,
+type PaginatedResponse = PaginatedResponseType & {
   users: Array<UserJSON>,
   context: {
     admin_user: UserJSON,
@@ -84,6 +73,7 @@ type UsersStoreState = {
     list: ?Immutable.List<UserOverview>,
     pagination: PaginationType,
   },
+  list: ?Immutable.List<UserOverview>,
   loadedUser: ?User,
 };
 
@@ -98,6 +88,7 @@ const UsersStore: UsersStoreType = singletonStore(
       list: undefined,
       pagination: DEFAULT_PAGINATION,
     },
+    list: undefined,
     loadedUser: undefined,
 
     getInitialState(): UsersStoreState {
@@ -118,6 +109,8 @@ const UsersStore: UsersStoreType = singletonStore(
       const promise = fetch('GET', url).then(
         (response) => {
           const { users } = response;
+          this.list = Immutable.List(response.users.map((user) => UserOverview.fromJSON(user)));
+          this._trigger();
 
           return users;
         },
@@ -271,5 +264,7 @@ const UsersStore: UsersStoreType = singletonStore(
     },
   }),
 );
+
+export { UsersActions, UsersStore };
 
 export default UsersStore;

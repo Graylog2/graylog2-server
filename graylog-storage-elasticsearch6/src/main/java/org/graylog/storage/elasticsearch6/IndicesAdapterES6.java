@@ -255,13 +255,11 @@ public class IndicesAdapterES6 implements IndicesAdapter {
     }
 
     @Override
-    public String markIndexReopened(String index) {
+    public void markIndexReopened(String index) {
         final String aliasName = index + Indices.REOPENED_ALIAS_SUFFIX;
         final ModifyAliases request = new ModifyAliases.Builder(new AddAliasMapping.Builder(index, aliasName).build()).build();
 
         JestUtils.execute(jestClient, request, () -> "Couldn't create reopened alias for index " + index);
-
-        return aliasName;
     }
 
     @Override

@@ -72,107 +72,55 @@ exports[`NumberVisualization should render a number visualization 1`] = `
   width={200}
 >
   <NumberVisualization__SingleItemGrid>
-    <StyledComponent
-      forwardedComponent={
-        Object {
-          "$$typeof": Symbol(react.forward_ref),
-          "attrs": Array [],
-          "componentStyle": ComponentStyle {
-            "componentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
-            "isStatic": false,
-            "lastClassName": "bAvNbr",
-            "rules": Array [
-              "display:grid;grid-template-columns:1fr;grid-template-rows:1fr;grid-column-gap:0;grid-row-gap:0;height:100%;width:100%;",
-            ],
-          },
-          "displayName": "NumberVisualization__SingleItemGrid",
-          "foldedComponentIds": Array [],
-          "render": [Function],
-          "styledComponentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
-          "target": "div",
-          "toString": [Function],
-          "warnTooManyClasses": [Function],
-          "withComponent": [Function],
-        }
-      }
-      forwardedRef={null}
+    <div
+      className="NumberVisualization__SingleItemGrid-lb6dwm-1 fdCxSw"
     >
-      <div
-        className="NumberVisualization__SingleItemGrid-lb6dwm-1 bAvNbr"
-      >
-        <NumberVisualization__NumberBox>
-          <StyledComponent
-            forwardedComponent={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "attrs": Array [],
-                "componentStyle": ComponentStyle {
-                  "componentId": "NumberVisualization__NumberBox-lb6dwm-2",
-                  "isStatic": false,
-                  "lastClassName": "hHukuE",
-                  "rules": Array [
-                    "display:flex;justify-content:center;align-items:center;height:100%;width:100%;text-align:center;padding-bottom:10px;",
-                  ],
-                },
-                "displayName": "NumberVisualization__NumberBox",
-                "foldedComponentIds": Array [],
-                "render": [Function],
-                "styledComponentId": "NumberVisualization__NumberBox-lb6dwm-2",
-                "target": "div",
-                "toString": [Function],
-                "warnTooManyClasses": [Function],
-                "withComponent": [Function],
-              }
-            }
-            forwardedRef={null}
+      <NumberVisualization__NumberBox>
+        <div
+          className="NumberVisualization__NumberBox-lb6dwm-2 fqPkzh"
+        >
+          <SizeMe
+            monitorHeight={true}
+            monitorWidth={true}
           >
-            <div
-              className="NumberVisualization__NumberBox-lb6dwm-2 hHukuE"
+            <Component
+              height={240}
+              width={320}
             >
-              <SizeMe
-                monitorHeight={true}
-                monitorWidth={true}
+              <Component
+                field="sum(lines_add)"
+                value={2134342}
               >
-                <Component
-                  height={240}
-                  width={320}
-                >
+                <div>
                   <Component
                     field="sum(lines_add)"
+                    queryId="dead-beef"
+                    render={[Function]}
+                    type={
+                      FieldType {
+                        "value": Immutable.Map {
+                          "type": "float",
+                          "properties": Immutable.Set [
+                            "numeric",
+                            "enumerable",
+                          ],
+                          "indexNames": Immutable.Set [],
+                        },
+                      }
+                    }
                     value={2134342}
                   >
                     <div>
-                      <Component
-                        field="sum(lines_add)"
-                        queryId="dead-beef"
-                        render={[Function]}
-                        type={
-                          FieldType {
-                            "value": Immutable.Map {
-                              "type": "float",
-                              "properties": Immutable.Set [
-                                "numeric",
-                                "enumerable",
-                              ],
-                              "indexNames": Immutable.Set [],
-                            },
-                          }
-                        }
-                        value={2134342}
-                      >
-                        <div>
-                          2134342
-                        </div>
-                      </Component>
+                      2134342
                     </div>
                   </Component>
-                </Component>
-              </SizeMe>
-            </div>
-          </StyledComponent>
-        </NumberVisualization__NumberBox>
-      </div>
-    </StyledComponent>
+                </div>
+              </Component>
+            </Component>
+          </SizeMe>
+        </div>
+      </NumberVisualization__NumberBox>
+    </div>
   </NumberVisualization__SingleItemGrid>
 </NumberVisualization>
 `;

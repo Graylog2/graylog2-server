@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { cleanup, render, fireEvent, wait } from 'wrappedTestingLibrary';
+import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 import mockEntityShareState, { john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
@@ -32,8 +32,6 @@ describe('EntityShareModal', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-
-    cleanup();
   });
 
   const SimpleEntityShareModal = ({ ...props }) => {
@@ -62,7 +60,7 @@ describe('EntityShareModal', () => {
 
     fireEvent.click(submitButton);
 
-    await wait(() => {
+    await waitFor(() => {
       expect(EntityShareActions.update).toBeCalledTimes(1);
 
       expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, {
@@ -79,7 +77,7 @@ describe('EntityShareModal', () => {
 
     fireEvent.click(cancelButton);
 
-    await wait(() => {
+    await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
   });
@@ -143,12 +141,10 @@ describe('EntityShareModal', () => {
 
         fireEvent.click(submitButton);
 
-        await wait(() => {
-          expect(EntityShareActions.prepare).toBeCalledTimes(2);
+        await waitFor(() => expect(EntityShareActions.prepare).toHaveBeenCalledTimes(1));
 
-          expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
-            selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
-          });
+        expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
+          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
         });
       };
 
@@ -167,7 +163,7 @@ describe('EntityShareModal', () => {
 
       fireEvent.click(submitButton);
 
-      await wait(() => expect(getByText('The grantee is required.')).not.toBeNull());
+      await waitFor(() => expect(getByText('The grantee is required.')).not.toBeNull());
     });
   });
 
@@ -189,7 +185,7 @@ describe('EntityShareModal', () => {
 
       await act(async () => { await selectEvent.select(capabilitySelect, viewer.title); });
 
-      await wait(() => {
+      await waitFor(() => {
         expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
         expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
@@ -241,7 +237,7 @@ describe('EntityShareModal', () => {
 
         fireEvent.click(deleteButton);
 
-        await wait(() => {
+        await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {

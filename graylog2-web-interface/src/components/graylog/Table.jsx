@@ -112,7 +112,7 @@ const tableCss = css(({ theme }) => css`
     background-color: ${theme.colors.table.backgroundHover};
   }
 
-  ${variantRowStyles};
+  ${variantRowStyles}
 `);
 
 const Table = styled(BootstrapTable)`

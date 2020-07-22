@@ -1,18 +1,15 @@
 // @flow strict
 import * as React from 'react';
 import { useEffect } from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
 import { withRouter } from 'react-router';
 
-import UserEdit from 'components/users/UserEdit';
-import { useStore } from 'stores/connect';
-import UsersActions from 'actions/users/UsersActions';
-import UsersStore from 'stores/users/UsersStore';
-import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { ButtonToolbar, Button } from 'components/graylog';
-import { PageHeader } from 'components/common';
+import { useStore } from 'stores/connect';
+import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { PageHeader, DocumentTitle } from 'components/common';
+import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
+import UserManagementLinks from 'components/users/UserManagementLinks';
 
 type Props = {
   params: {
@@ -32,15 +29,18 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const UserEditPage = ({ params }: Props) => {
   const { loadedUser } = useStore(UsersStore);
+  const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(params?.username);
+    UsersActions.load(username);
   });
 
   return (
-    <div>
+    <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
-        <span />
+        <span>
+          You can change the user details and password here and assign roles and teams.
+        </span>
 
         <span>
           Learn more in the{' '}
@@ -48,18 +48,12 @@ const UserEditPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.USERS.show(loadedUser?.username)}>
-            <Button bsStyle="success">User Details</Button>
-          </LinkContainer>
-          <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-            <Button bsStyle="info">Users</Button>
-          </LinkContainer>
-        </ButtonToolbar>
+        <UserManagementLinks username={username}
+                             userIsReadOnly={loadedUser?.readOnly} />
       </PageHeader>
 
-      <UserEdit user={loadedUser?.username === params?.username ? loadedUser : undefined} />
-    </div>
+      <UserEdit user={username === params?.username ? loadedUser : undefined} />
+    </DocumentTitle>
   );
 };
 

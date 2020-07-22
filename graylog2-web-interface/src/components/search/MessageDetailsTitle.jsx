@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-const Title = styled.h3(({ theme }) => `
+const Title = styled.h3(({ theme }) => css`
   height: 30px;
 
   a {

@@ -113,7 +113,7 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
     }
   }
 
-  ${variantStyles};
+  ${variantStyles}
 `);
 
 const ListGroupItem = forwardRef((props, ref) => {

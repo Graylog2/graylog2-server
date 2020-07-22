@@ -4,7 +4,8 @@ import * as React from 'react';
 import User from 'logic/users/User';
 
 import SectionComponent from '../SectionComponent';
-import ShowConfigValue from '../ShowConfigValue';
+import ReadOnlyFormGroup from '../form/ReadOnlyFormGroup';
+import LoggedInIcon from '../LoggedInIcon';
 
 type Props = {
   user: User,
@@ -21,12 +22,12 @@ const ProfileSection = ({
   },
 }: Props) => (
   <SectionComponent title="Profile">
-    <ShowConfigValue label="Username" value={username} />
-    <ShowConfigValue label="Full name" value={fullName} />
-    <ShowConfigValue label="E-Mail Address" value={email} />
-    <ShowConfigValue label="Client Address" value={clientAddress} />
-    <ShowConfigValue label="Last Activity" value={lastActivity} />
-    <ShowConfigValue label="Logged In" value={sessionActive ? 'yes' : 'no'} />
+    <ReadOnlyFormGroup label="Username" value={username} />
+    <ReadOnlyFormGroup label="Full name" value={fullName} />
+    <ReadOnlyFormGroup label="E-Mail Address" value={email} />
+    <ReadOnlyFormGroup label="Client Address" value={clientAddress} />
+    <ReadOnlyFormGroup label="Last Activity" value={lastActivity} />
+    <ReadOnlyFormGroup label="Logged In" value={<LoggedInIcon active={sessionActive} />} />
   </SectionComponent>
 );
 

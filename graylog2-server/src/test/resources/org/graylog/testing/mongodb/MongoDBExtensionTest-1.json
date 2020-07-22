@@ -1,0 +1,36 @@
+{
+  "test_1": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "hello": "world"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "another": "test"
+    }
+  ],
+  "test_2": {
+    "data": [
+      {
+        "_id": {
+          "$oid": "54e3deadbeefdeadbeef0001"
+        },
+        "field_a": "content1",
+        "created_at": {"$date": "2019-01-01T00:00:00.000Z"}
+      }
+    ],
+    "indexes": [
+      {
+        "index": {"field_a": 1},
+        "options": {"unique": true}
+      },
+      {
+        "index": {"created_at": -1}
+      }
+    ]
+  }
+}

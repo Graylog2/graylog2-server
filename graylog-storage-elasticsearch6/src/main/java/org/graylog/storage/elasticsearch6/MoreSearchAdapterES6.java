@@ -144,7 +144,11 @@ public class MoreSearchAdapterES6 implements MoreSearchAdapter {
             LOG.debug("Execute search: {}", searchBuilder.build().toString());
         }
 
-        final ScrollResult scrollResult = scroll.scroll(searchBuilder.build(), () -> "Unable to scroll indices.", searchSourceBuilder.toString(), scrollTime, Collections.emptyList());
+        final ScrollResult scrollResult = scroll.scroll(searchBuilder.build(),
+                () -> "Unable to scroll indices.",
+                searchSourceBuilder.toString(),
+                scrollTime,
+                Collections.emptyList());
         final AtomicBoolean continueScrolling = new AtomicBoolean(true);
 
         final Stopwatch stopwatch = Stopwatch.createStarted();

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, waitForElement, wait } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import { act } from 'react-dom/test-utils';
 
@@ -33,25 +33,24 @@ describe('NewDashboardPage', () => {
   });
 
   afterEach(() => {
-    cleanup();
     jest.clearAllMocks();
   });
 
   it('shows loading spinner before rendering page', async () => {
-    const { getByText } = render(<SimpleNewDashboardPage />);
+    const { findByText, getByText } = render(<SimpleNewDashboardPage />);
 
     act(() => jest.advanceTimersByTime(200));
 
     expect(getByText('Loading...')).not.toBeNull();
 
-    await waitForElement(() => getByText('Extended search page'));
+    await findByText('Extended search page');
   });
 
   it('should create new view with type dashboard on mount', async () => {
     render(<SimpleNewDashboardPage />);
 
-    await wait(() => expect(ViewActions.create).toBeCalledTimes(1));
-    await wait(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
+    await waitFor(() => expect(ViewActions.create).toBeCalledTimes(1));
+    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
   });
 
   it('should render transform search view to dashboard view, if view is defined in location state', async () => {
@@ -60,11 +59,11 @@ describe('NewDashboardPage', () => {
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
 
-    const { getByText } = render((
+    const { findByText } = render((
       <SimpleNewDashboardPage location={{ state: { view } }} />
     ));
 
-    await waitForElement(() => getByText('Extended search page'));
+    await findByText('Extended search page');
 
     expect(loedViewMock).toHaveBeenCalledTimes(1);
     expect(loedViewMock.mock.calls[0][0].type).toStrictEqual(View.Type.Dashboard);
@@ -76,7 +75,7 @@ describe('NewDashboardPage', () => {
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
 
-    const { getByText } = render((
+    const { findByText } = render((
       <SimpleNewDashboardPage location={{
         state: { view },
         query: {
@@ -87,7 +86,7 @@ describe('NewDashboardPage', () => {
       }} />
     ));
 
-    await waitForElement(() => getByText('Extended search page'));
+    await findByText('Extended search page');
 
     expect(processHooksAction).toBeCalledTimes(1);
     expect(processHooksAction.mock.calls[0][3]).toStrictEqual({ q: '', rangetype: 'relative', relative: '300' });
@@ -99,11 +98,11 @@ describe('NewDashboardPage', () => {
       .build()
       .toJSON();
 
-    const { getByText } = render((
+    const { findByText } = render((
       <SimpleNewDashboardPage location={{ state: { view } }} />
     ));
 
-    await waitForElement(() => getByText('Extended search page'));
+    await findByText('Extended search page');
 
     expect(ViewActions.load).toHaveBeenCalledTimes(0);
   });

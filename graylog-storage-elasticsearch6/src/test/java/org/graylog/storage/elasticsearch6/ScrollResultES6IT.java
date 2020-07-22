@@ -70,7 +70,8 @@ public class ScrollResultES6IT extends ElasticsearchBaseTest {
         final SearchResult searchResult = JestUtils.execute(jestClient(elasticsearch), request, () -> "Exception");
 
         assertThat(jestClient(elasticsearch)).isNotNull();
-        final ScrollResult scrollResult = new ScrollResultES6(jestClient(elasticsearch), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        final ScrollResult scrollResult = new ScrollResultES6(jestClient(elasticsearch), objectMapper, searchResult,
+                "*", Collections.singletonList("message"), -1);
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );

@@ -129,7 +129,7 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
         validators.put(FIELD_STREAM_ID, new ObjectIdValidator());
         validators.put(FIELD_CONTENT_PACK, new OptionalStringValidator());
 
-        if (!EnumSet.of(StreamRuleType.ALWAYS_MATCH).contains(this.getType())) {
+        if (!EnumSet.of(StreamRuleType.ALWAYS_MATCH, StreamRuleType.MATCH_INPUT).contains(this.getType())) {
             validators.put(FIELD_FIELD, new FilledStringValidator());
         }
 

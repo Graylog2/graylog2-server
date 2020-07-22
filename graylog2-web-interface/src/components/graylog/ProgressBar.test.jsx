@@ -1,13 +1,9 @@
 import React from 'react';
-import { render, cleanup } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import ProgressBar from './ProgressBar';
 
 describe('<ProgressBar />', () => {
-  afterEach(() => {
-    cleanup();
-  });
-
   it('properly renders with no props', () => {
     const { container } = render(<ProgressBar />);
 

@@ -2,14 +2,15 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 import { List as ImmutableList } from 'immutable';
 
 import connect from 'stores/connect';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import { type ThemeInterface } from 'theme';
+import type { ThemeInterface } from 'theme';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/graylog';
 

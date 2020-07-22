@@ -3,7 +3,7 @@
 This will allow developers to access all `theme` props in each component. In most cases, on a new component, you can access the `theme` prop via Styled-Components like the following:
 
 ```jsx static
-const StyledElement = styled.div(({ theme }) => `
+const StyledElement = styled.div(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
 `);
 ```
@@ -11,10 +11,11 @@ const StyledElement = styled.div(({ theme }) => `
 Or, if you are using Flow, you can type the component with
 
 ```jsx static
-import styled, { type StyledComponent } from 'styled-components';
-import { type ThemeInterface } from 'theme';
+import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
+import type { ThemeInterface } from 'theme';
 
-const StyledElement: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => `
+const StyledElement: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
 `);
 ```
@@ -22,12 +23,12 @@ const StyledElement: StyledComponent<{}, ThemeInterface, HTMLDivElement> = style
 If you need to base some styles off of props, you can access them as well.
 
 ```jsx static
-const StyledElement = styled.div(({ wide, theme }) => `
+const StyledElement = styled.div(({ wide, theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   width: ${wide ? '100%' : '50%'};
 `);
 // or
-const StyledElement: StyledComponent<{wide: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ wide, theme }) => `
+const StyledElement: StyledComponent<{wide: boolean}, ThemeInterface, HTMLDivElement> = styled.div(({ wide, theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   width: ${wide ? '100%' : '50%'};
 `);

@@ -15,5 +15,4 @@ module.exports = [
   'reflux-core',
   'reflux',
   'styled-components',
-  'styled-theming',
 ];

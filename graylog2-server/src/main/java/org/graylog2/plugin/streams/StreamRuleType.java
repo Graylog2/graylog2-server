@@ -25,7 +25,8 @@ public enum StreamRuleType {
     SMALLER(4, "smaller than", "be smaller than"),
     PRESENCE(5, "field presence", "be present"),
     CONTAINS(6, "contain", "contain"),
-    ALWAYS_MATCH(7, "always match", "always match");
+    ALWAYS_MATCH(7, "always match", "always match"),
+    MATCH_INPUT(8, "match input", "match input");
 
     private final int value;
     private final String shortDesc;

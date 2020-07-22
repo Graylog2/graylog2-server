@@ -14,13 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.events.indices;
+package org.graylog2.streams.matchers;
 
-import org.graylog.events.event.Event;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.StreamRule;
 
-import java.util.List;
-import java.util.Map;
+public class InputMatcher implements StreamRuleMatcher {
 
-public interface EventIndexerAdapter {
-    void write(List<Map.Entry<String, Event>> requests);
+    @Override
+    public boolean match(Message msg, StreamRule rule) {
+       if(msg.getField(Message.FIELD_GL2_SOURCE_INPUT) == null) {
+           return rule.getInverted();
+       }
+        final String value = msg.getField(Message.FIELD_GL2_SOURCE_INPUT).toString();
+        return rule.getInverted() ^ value.trim().equalsIgnoreCase(rule.getValue());
+    }
 }

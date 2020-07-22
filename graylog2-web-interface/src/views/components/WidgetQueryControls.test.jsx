@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { asElement, render, waitForElement, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
+import { asElement, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import WrappingContainer from 'WrappingContainer';
 
@@ -41,8 +41,6 @@ jest.mock('views/components/searchbar/QueryInput', () => () => <span>Query Input
 describe('WidgetQueryControls', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
-  afterEach(cleanup);
-
   const config = {
     relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
     query_time_range_limit: 'PT0S',
@@ -77,10 +75,10 @@ describe('WidgetQueryControls', () => {
     const indicatorText = 'These controls are disabled, because a filter is applied to all widgets.';
 
     it('shows an indicator if global override is set', async () => {
-      const { getByText, getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const { findByText, findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
 
-      await waitForElement(() => getByText(indicatorText));
-      await waitForElement(() => getByTestId('reset-filter'));
+      await findByText(indicatorText);
+      await findByTestId('reset-filter');
     });
 
     it('does not show an indicator if global override is not set', async () => {
@@ -90,26 +88,24 @@ describe('WidgetQueryControls', () => {
     });
 
     it('triggers resetting the global override store when reset filter button is clicked', async () => {
-      const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
-
+      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetFilterButton = await findByTestId('reset-filter');
       fireEvent.click(resetFilterButton);
 
       expect(GlobalOverrideActions.reset).toHaveBeenCalled();
     });
 
     it('executes search when reset filter button is clicked', async () => {
-      const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
-
+      const { findByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetFilterButton = await findByTestId('reset-filter');
       fireEvent.click(resetFilterButton);
-      await wait(() => expect(SearchActions.refresh).toHaveBeenCalled());
+      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notification', async () => {
-      const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const { findByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
 
-      await waitForElement(() => getByText(indicatorText));
+      await findByText(indicatorText);
 
       rerender(
         <WrappingContainer>
@@ -142,7 +138,7 @@ describe('WidgetQueryControls', () => {
 
     fireEvent.click(searchButton);
 
-    await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+    await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
       timerange: { type: 'relative', range: 0 },
     })));
   });
@@ -159,7 +155,7 @@ describe('WidgetQueryControls', () => {
 
     fireEvent.click(searchButton);
 
-    await wait(() => expect(WidgetActions.update)
+    await waitFor(() => expect(WidgetActions.update)
       .toHaveBeenLastCalledWith('deadbeef', expect.objectContaining({
         timerange: {
           type: 'absolute',
@@ -189,7 +185,7 @@ describe('WidgetQueryControls', () => {
 
     fireEvent.click(searchButton);
 
-    await wait(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+    await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
       streams: ['5c2e27d6ba33a9681ad62775'],
     })));
   });

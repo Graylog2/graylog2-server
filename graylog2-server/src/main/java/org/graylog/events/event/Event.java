@@ -19,12 +19,13 @@ package org.graylog.events.event;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.fields.FieldValue;
+import org.graylog2.indexer.messages.Indexable;
 import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
 
-public interface Event {
+public interface Event extends Indexable {
     String getId();
 
     String getEventDefinitionType();
