@@ -322,7 +322,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c4.nav .nav-tabs > li > a:hover {
@@ -1028,7 +1028,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c4.nav .nav-tabs > li > a:hover {
@@ -1747,7 +1747,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c2.nav .nav-tabs > li > a:hover {
@@ -2436,7 +2436,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c2.nav .nav-tabs > li > a:hover {
