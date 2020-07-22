@@ -79,7 +79,7 @@ export type EntityShareStateJson = {|
   selected_grantee_capabilities: {|
     [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
   |} | {||},
-  missing_dependencies: {[GRN]: Array<MissingDependencyType>},
+  missing_permissions_on_dependencies: {[GRN]: Array<MissingDependencyType>},
 |};
 
 export default class EntityShareState {
@@ -181,7 +181,7 @@ export default class EntityShareState {
       available_capabilities: availableCapabilities,
       active_shares: activeShares,
       selected_grantee_capabilities: selectedGranteeCapabilities,
-      missing_dependencies: missingDependencies,
+      missing_permissions_on_dependencies: missingDependencies,
     };
   }
 
@@ -193,7 +193,7 @@ export default class EntityShareState {
       available_capabilities,
       active_shares,
       selected_grantee_capabilities,
-      missing_dependencies,
+      missing_permissions_on_dependencies,
     } = value;
 
     const availableGrantees = Immutable.fromJS(available_grantees.map((ag) => Grantee.fromJSON(ag)));
@@ -201,7 +201,7 @@ export default class EntityShareState {
     const activeShares = Immutable.fromJS(active_shares.map((as) => ActiveShare.fromJSON(as)));
     const selectedGranteeCapabilities = Immutable.fromJS(selected_grantee_capabilities);
     const missingDependencies = Immutable.fromJS(
-      Object.entries(missing_dependencies).map(
+      Object.entries(missing_permissions_on_dependencies).map(
         ([granteeGRN, dependencyList]) => ({
           // $FlowFixMe: Object entries returns mixed value
           [granteeGRN]: dependencyList.map((dependency) => MissingDependency.fromJSON(dependency)),
