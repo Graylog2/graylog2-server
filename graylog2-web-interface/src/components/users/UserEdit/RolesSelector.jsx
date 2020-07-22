@@ -66,7 +66,9 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
   };
 
   useEffect(() => {
-    AuthzRolesActions.loadPaginated(1, 0, '')
+    const getUnlimited = [1, 0, ''];
+
+    AuthzRolesActions.loadPaginated(...getUnlimited)
       .then((response: PaginatedListType) => {
         const { list } = response;
 
