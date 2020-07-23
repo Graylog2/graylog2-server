@@ -17,6 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
@@ -288,6 +289,18 @@ public class RestPermissions implements PluginPermissions {
             .filter(permission -> READER_BASE_PERMISSION_SELECTION.contains(permission.permission()))
             .collect(Collectors.toSet());
 
+    protected static final ImmutableSet<BuiltinRole> BUILTIN_ROLES = ImmutableSet.<BuiltinRole>builder().add(
+            BuiltinRole.create("Dashboard Creator", "Allows creation of Dashboards (built-in)", ImmutableSet.of(
+                    RestPermissions.DASHBOARDS_CREATE
+            )),
+            BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
+                    RestPermissions.EVENT_DEFINITIONS_CREATE
+            )),
+            BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
+                    RestPermissions.EVENT_NOTIFICATIONS_CREATE
+            ))
+    ).build();
+
     @Override
     public Set<Permission> readerBasePermissions() {
         return READER_BASE_PERMISSIONS;
@@ -296,5 +309,10 @@ public class RestPermissions implements PluginPermissions {
     @Override
     public Set<Permission> permissions() {
         return PERMISSIONS;
+    }
+
+    @Override
+    public Set<BuiltinRole> builtinRoles() {
+        return BUILTIN_ROLES;
     }
 }

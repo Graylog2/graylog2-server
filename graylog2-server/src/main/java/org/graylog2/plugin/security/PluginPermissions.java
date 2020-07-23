@@ -16,10 +16,21 @@
  */
 package org.graylog2.plugin.security;
 
+import com.google.common.collect.ImmutableSet;
+import org.graylog.security.authzroles.BuiltinRole;
+
 import java.util.Set;
 
 public interface PluginPermissions {
     Set<Permission> permissions();
 
     Set<Permission> readerBasePermissions();
+
+    /**
+     * A set of built-in roles that should be added to every graylog setup.
+     * @return The roles that this plugin provides
+     */
+    default Set<BuiltinRole> builtinRoles() {
+        return ImmutableSet.of();
+    }
 }
