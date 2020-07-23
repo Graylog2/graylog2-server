@@ -115,9 +115,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String ROLES_DELETE = "roles:delete";
     public static final String ROLES_EDIT = "roles:edit";
     public static final String ROLES_READ = "roles:read";
-    public static final String SAVEDSEARCHES_CREATE = "savedsearches:create";
-    public static final String SAVEDSEARCHES_EDIT = "savedsearches:edit";
-    public static final String SAVEDSEARCHES_READ = "savedsearches:read";
     public static final String SEARCHES_ABSOLUTE = "searches:absolute";
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
@@ -237,9 +234,6 @@ public class RestPermissions implements PluginPermissions {
             .add(create(ROLES_DELETE, ""))
             .add(create(ROLES_EDIT, ""))
             .add(create(ROLES_READ, ""))
-            .add(create(SAVEDSEARCHES_CREATE, ""))
-            .add(create(SAVEDSEARCHES_EDIT, ""))
-            .add(create(SAVEDSEARCHES_READ, ""))
             .add(create(SEARCHES_ABSOLUTE, ""))
             .add(create(SEARCHES_KEYWORD, ""))
             .add(create(SEARCHES_RELATIVE, ""))
@@ -286,9 +280,6 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_ANALYZE,
             MESSAGES_READ,
             METRICS_READ,
-            SAVEDSEARCHES_CREATE,
-            SAVEDSEARCHES_EDIT,
-            SAVEDSEARCHES_READ,
             SYSTEM_READ,
             THROUGHPUT_READ
     ).build();
