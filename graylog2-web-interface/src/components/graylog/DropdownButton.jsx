@@ -6,14 +6,12 @@ import styled, { css } from 'styled-components';
 import { buttonStyles } from './Button';
 import menuItemStyles from './styles/menuItem';
 
-const StyledDropdownButton = styled(BootstrapDropdownButton)(({ bsStyle }) => css`
+const DropdownButton = React.memo(styled(BootstrapDropdownButton)(({ bsStyle }) => css`
   ${buttonStyles(bsStyle)}
   & ~ {
     ${menuItemStyles}
   }
-`);
-
-const DropdownButton = React.memo((props) => <StyledDropdownButton {...props} />);
+`));
 
 /** @component */
 export default DropdownButton;

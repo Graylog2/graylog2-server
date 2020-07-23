@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { buttonStyles } from './Button';
 import menuItemStyles from './styles/menuItem';
 
-const StyledSplitButton = styled(BootstrapSplitButton)(({ bsStyle }) => css`
+const SplitButton = React.memo(styled(BootstrapSplitButton)(({ bsStyle }) => css`
   ${buttonStyles(bsStyle)}
   ~ .btn.dropdown-toggle {
     ${buttonStyles(bsStyle)}
@@ -14,9 +14,7 @@ const StyledSplitButton = styled(BootstrapSplitButton)(({ bsStyle }) => css`
       ${menuItemStyles}
     }
   }
-`);
-
-const SplitButton = React.memo((props) => <StyledSplitButton {...props} />);
+`));
 
 /** @component */
 export default SplitButton;

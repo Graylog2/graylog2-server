@@ -70,11 +70,9 @@ const buttonStyles = (bsStyle = 'default') => css(({ theme }) => {
   `;
 });
 
-const StyledButton = styled(BootstrapButton)(({ bsStyle }) => css`
+const Button = React.memo(styled(BootstrapButton)(({ bsStyle }) => css`
   ${buttonStyles(bsStyle)}
-`);
-
-const Button = React.memo((props) => <StyledButton {...props} />);
+`));
 
 export default Button;
 export { buttonStyles };
