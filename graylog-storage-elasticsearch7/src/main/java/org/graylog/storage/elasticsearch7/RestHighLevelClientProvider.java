@@ -76,6 +76,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                         .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
                         .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
                         .setExpectContinueEnabled(useExpectContinue)
+                        .setAuthenticationEnabled(true)
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> httpClientConfig
                         .setMaxConnTotal(maxTotalConnections)
