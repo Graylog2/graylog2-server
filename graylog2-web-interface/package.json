@@ -166,7 +166,7 @@
     "glob": "^7.0.0",
     "html-webpack-plugin": "^4.2.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^25.1.0",
+    "jest": "^26.1.0",
     "jest-environment-enzyme": "^7.1.2",
     "jest-enzyme": "^7.1.2",
     "jest-localstorage-mock": "^2.4.0",
