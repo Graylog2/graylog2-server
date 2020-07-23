@@ -42,6 +42,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
             @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
+            @Named("elasticsearch_use_expect_continue") boolean useExpectContinue,
             CredentialsProvider credentialsProvider) {
         client = buildClient(
                 hosts,
@@ -49,6 +50,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 socketTimeout,
                 maxTotalConnections,
                 maxTotalConnectionsPerRoute,
+                useExpectContinue,
                 credentialsProvider);
 
         registerShutdownHook(shutdownService);
@@ -65,6 +67,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             Duration socketTimeout,
             int maxTotalConnections,
             int maxTotalConnectionsPerRoute,
+            boolean useExpectContinue,
             CredentialsProvider credentialsProvider) {
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
 
@@ -72,6 +75,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 .setRequestConfigCallback(requestConfig -> requestConfig
                         .setConnectTimeout(Math.toIntExact(connectTimeout.toMilliseconds()))
                         .setSocketTimeout(Math.toIntExact(socketTimeout.toMilliseconds()))
+                        .setExpectContinueEnabled(useExpectContinue)
                 )
                 .setHttpClientConfigCallback(httpClientConfig -> httpClientConfig
                         .setMaxConnTotal(maxTotalConnections)
