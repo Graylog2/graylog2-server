@@ -65,7 +65,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 kmJcge"
+                      className="FormControl-sc-1amoaox-0 fKSsjP"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -74,7 +74,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                        className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -264,7 +264,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 kmJcge"
+                                            className="FormControl-sc-1amoaox-0 fKSsjP"
                                             componentClass="input"
                                             inputRef={[Function]}
                                             label="Filter"
@@ -273,7 +273,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                             type="text"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                              className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                               id="filter-data-filter"
                                               label="Filter"
                                               name="filter-data-filter"
@@ -567,7 +567,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 kmJcge"
+                      className="FormControl-sc-1amoaox-0 fKSsjP"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -576,7 +576,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                        className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -792,7 +792,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                         >
                                           <FormControl
                                             bsClass="form-control"
-                                            className="FormControl-sc-1amoaox-0 kmJcge"
+                                            className="FormControl-sc-1amoaox-0 fKSsjP"
                                             componentClass="input"
                                             inputRef={[Function]}
                                             label="Filter"
@@ -801,7 +801,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             type="text"
                                           >
                                             <input
-                                              className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                              className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                               id="filter-data-filter"
                                               label="Filter"
                                               name="filter-data-filter"

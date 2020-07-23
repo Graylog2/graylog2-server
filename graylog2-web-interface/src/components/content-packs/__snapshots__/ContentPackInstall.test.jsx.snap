@@ -137,7 +137,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 inputRef={[Function]}
                                 label="Comment"
@@ -149,7 +149,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 value=""
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   id="comment"
                                   label="Comment"
                                   maxLength={512}
@@ -267,7 +267,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 inputRef={[Function]}
                                 label="A parameter"
@@ -280,7 +280,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 value="parameter"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   id="PARAM"
                                   label="A parameter"
                                   maxLength={250}
