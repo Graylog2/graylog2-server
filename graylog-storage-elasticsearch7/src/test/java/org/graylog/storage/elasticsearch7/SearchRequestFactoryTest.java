@@ -2,11 +2,8 @@ package org.graylog.storage.elasticsearch7;
 
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.searches.ScrollCommand;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,18 +19,14 @@ class SearchRequestFactoryTest {
         this.searchRequestFactory = new SearchRequestFactory(new SortOrderMapper(), true, true);
     }
 
-    @AfterEach
-    public void tearDown() {
-        DateTimeUtils.setCurrentMillisSystem();
-    }
-
     @Test
-    void searchIncludesTimerange() throws InvalidRangeParametersException {
-        DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2020-07-23T11:08:32.243Z").getMillis());
-
+    void searchIncludesTimerange() {
         final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
-                .range(RelativeRange.create(300))
+                .range(AbsoluteRange.create(
+                        DateTime.parse("2020-07-23T11:03:32.243Z"),
+                        DateTime.parse("2020-07-23T11:08:32.243Z")
+                ))
                 .build());
 
         assertJsonPath(search, request -> {
