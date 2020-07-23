@@ -53,17 +53,17 @@ public class SearchRequestFactory {
                 : queryStringQuery(query).allowLeadingWildcard(allowLeadingWildcardSearches);
 
         final Optional<BoolQueryBuilder> rangeQueryBuilder = searchCommand.range()
-                .map(range -> boolQuery()
-                        .must(TimeRangeQueryFactory.create(range)));
+                .map(TimeRangeQueryFactory::create)
+                .map(rangeQuery -> boolQuery().must(rangeQuery));
         final Optional<BoolQueryBuilder> filterQueryBuilder = searchCommand.filter()
                 .filter(filter -> !isWildcardQuery(filter))
                 .map(QueryBuilders::queryStringQuery)
-                .map(filter -> rangeQueryBuilder.orElse(boolQuery())
-                        .must(filter));
+                .map(queryStringQuery -> boolQuery().must(queryStringQuery));
 
         final BoolQueryBuilder filteredQueryBuilder = boolQuery()
                 .must(queryBuilder);
         filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
+        rangeQueryBuilder.ifPresent(filteredQueryBuilder::filter);
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 
