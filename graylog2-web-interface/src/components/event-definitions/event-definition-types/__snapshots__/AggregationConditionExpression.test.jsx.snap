@@ -362,29 +362,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     "#737373",
                                     ";}}",
                                   ],
-                                  "button": Array [
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                  ],
                                 },
                                 "fonts": Object {
                                   "family": Object {
@@ -2480,29 +2457,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                         "#737373",
                                                         ";}}",
                                                       ],
-                                                      "button": Array [
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                      ],
                                                     },
                                                     "fonts": Object {
                                                       "family": Object {
@@ -4021,29 +3975,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                         ";}.ace_comment{color:",
                                                         "#737373",
                                                         ";}}",
-                                                      ],
-                                                      "button": Array [
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
                                                       ],
                                                     },
                                                     "fonts": Object {
@@ -5948,29 +5879,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "#737373",
                                           ";}}",
                                         ],
-                                        "button": Array [
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                        ],
                                       },
                                       "fonts": Object {
                                         "family": Object {
@@ -7861,129 +7769,114 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                         className="btn-toolbar"
                         role="toolbar"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
+                              <Icon
+                                fixedWidth={true}
+                                name="minus"
+                                type="solid"
                               >
-                                <Icon
+                                <FontAwesomeIcon
                                   fixedWidth={true}
-                                  name="minus"
-                                  type="solid"
-                                >
-                                  <FontAwesomeIcon
-                                    fixedWidth={true}
-                                    icon={
-                                      Object {
-                                        "iconName": "minus",
-                                        "prefix": "fas",
-                                      }
+                                  icon={
+                                    Object {
+                                      "iconName": "minus",
+                                      "prefix": "fas",
                                     }
-                                  >
-                                    <svg
-                                      className="svg-inline--fa fa-minus"
-                                    />
-                                  </FontAwesomeIcon>
-                                </Icon>
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-minus"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
+                              <Icon
+                                fixedWidth={true}
+                                name="plus"
+                                type="solid"
                               >
-                                <Icon
+                                <FontAwesomeIcon
                                   fixedWidth={true}
-                                  name="plus"
-                                  type="solid"
-                                >
-                                  <FontAwesomeIcon
-                                    fixedWidth={true}
-                                    icon={
-                                      Object {
-                                        "iconName": "plus",
-                                        "prefix": "fas",
-                                      }
+                                  icon={
+                                    Object {
+                                      "iconName": "plus",
+                                      "prefix": "fas",
                                     }
-                                  >
-                                    <svg
-                                      className="svg-inline--fa fa-plus"
-                                    />
-                                  </FontAwesomeIcon>
-                                </Icon>
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-plus"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Add Group
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Add Group
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </ButtonToolbar>
                   </div>
@@ -8487,29 +8380,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                         ";}.ace_comment{color:",
                                                         "#737373",
                                                         ";}}",
-                                                      ],
-                                                      "button": Array [
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
                                                       ],
                                                     },
                                                     "fonts": Object {
@@ -10029,29 +9899,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                         ";}.ace_comment{color:",
                                                         "#737373",
                                                         ";}}",
-                                                      ],
-                                                      "button": Array [
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
                                                       ],
                                                     },
                                                     "fonts": Object {
@@ -11942,29 +11789,6 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "#737373",
                                           ";}}",
                                         ],
-                                        "button": Array [
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                        ],
                                       },
                                       "fonts": Object {
                                         "family": Object {
@@ -13839,129 +13663,114 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                         className="btn-toolbar"
                         role="toolbar"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
+                              <Icon
+                                fixedWidth={true}
+                                name="minus"
+                                type="solid"
                               >
-                                <Icon
+                                <FontAwesomeIcon
                                   fixedWidth={true}
-                                  name="minus"
-                                  type="solid"
-                                >
-                                  <FontAwesomeIcon
-                                    fixedWidth={true}
-                                    icon={
-                                      Object {
-                                        "iconName": "minus",
-                                        "prefix": "fas",
-                                      }
+                                  icon={
+                                    Object {
+                                      "iconName": "minus",
+                                      "prefix": "fas",
                                     }
-                                  >
-                                    <svg
-                                      className="svg-inline--fa fa-minus"
-                                    />
-                                  </FontAwesomeIcon>
-                                </Icon>
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-minus"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
+                              <Icon
+                                fixedWidth={true}
+                                name="plus"
+                                type="solid"
                               >
-                                <Icon
+                                <FontAwesomeIcon
                                   fixedWidth={true}
-                                  name="plus"
-                                  type="solid"
-                                >
-                                  <FontAwesomeIcon
-                                    fixedWidth={true}
-                                    icon={
-                                      Object {
-                                        "iconName": "plus",
-                                        "prefix": "fas",
-                                      }
+                                  icon={
+                                    Object {
+                                      "iconName": "plus",
+                                      "prefix": "fas",
                                     }
-                                  >
-                                    <svg
-                                      className="svg-inline--fa fa-plus"
-                                    />
-                                  </FontAwesomeIcon>
-                                </Icon>
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-plus"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Add Group
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Add Group
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </ButtonToolbar>
                   </div>
@@ -14341,29 +14150,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     ";}.ace_comment{color:",
                                     "#737373",
                                     ";}}",
-                                  ],
-                                  "button": Array [
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
                                   ],
                                 },
                                 "fonts": Object {
@@ -16472,29 +16258,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "#737373",
                                                         ";}}",
                                                       ],
-                                                      "button": Array [
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                      ],
                                                     },
                                                     "fonts": Object {
                                                       "family": Object {
@@ -18013,29 +17776,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         ";}.ace_comment{color:",
                                                         "#737373",
                                                         ";}}",
-                                                      ],
-                                                      "button": Array [
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
-                                                        Array [
-                                                          [Function],
-                                                        ],
                                                       ],
                                                     },
                                                     "fonts": Object {
@@ -19940,29 +19680,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "#737373",
                                           ";}}",
                                         ],
-                                        "button": Array [
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                        ],
                                       },
                                       "fonts": Object {
                                         "family": Object {
@@ -21853,129 +21570,114 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                         className="btn-toolbar"
                         role="toolbar"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
+                              <Icon
+                                fixedWidth={true}
+                                name="minus"
+                                type="solid"
                               >
-                                <Icon
+                                <FontAwesomeIcon
                                   fixedWidth={true}
-                                  name="minus"
-                                  type="solid"
-                                >
-                                  <FontAwesomeIcon
-                                    fixedWidth={true}
-                                    icon={
-                                      Object {
-                                        "iconName": "minus",
-                                        "prefix": "fas",
-                                      }
+                                  icon={
+                                    Object {
+                                      "iconName": "minus",
+                                      "prefix": "fas",
                                     }
-                                  >
-                                    <svg
-                                      className="svg-inline--fa fa-minus"
-                                    />
-                                  </FontAwesomeIcon>
-                                </Icon>
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-minus"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
+                              <Icon
+                                fixedWidth={true}
+                                name="plus"
+                                type="solid"
                               >
-                                <Icon
+                                <FontAwesomeIcon
                                   fixedWidth={true}
-                                  name="plus"
-                                  type="solid"
-                                >
-                                  <FontAwesomeIcon
-                                    fixedWidth={true}
-                                    icon={
-                                      Object {
-                                        "iconName": "plus",
-                                        "prefix": "fas",
-                                      }
+                                  icon={
+                                    Object {
+                                      "iconName": "plus",
+                                      "prefix": "fas",
                                     }
-                                  >
-                                    <svg
-                                      className="svg-inline--fa fa-plus"
-                                    />
-                                  </FontAwesomeIcon>
-                                </Icon>
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                                  }
+                                >
+                                  <svg
+                                    className="svg-inline--fa fa-plus"
+                                  />
+                                </FontAwesomeIcon>
+                              </Icon>
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           bsSize="sm"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="sm"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="sm"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Add Group
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Add Group
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </ButtonToolbar>
                   </div>
@@ -22413,29 +22115,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           ";}.ace_comment{color:",
                                           "#737373",
                                           ";}}",
-                                        ],
-                                        "button": Array [
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
-                                          Array [
-                                            [Function],
-                                          ],
                                         ],
                                       },
                                       "fonts": Object {
@@ -24449,29 +24128,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "#737373",
                                                                 ";}}",
                                                               ],
-                                                              "button": Array [
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                              ],
                                                             },
                                                             "fonts": Object {
                                                               "family": Object {
@@ -25990,29 +25646,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 ";}.ace_comment{color:",
                                                                 "#737373",
                                                                 ";}}",
-                                                              ],
-                                                              "button": Array [
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
-                                                                Array [
-                                                                  [Function],
-                                                                ],
                                                               ],
                                                             },
                                                             "fonts": Object {
@@ -27903,29 +27536,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "#737373",
                                                   ";}}",
                                                 ],
-                                                "button": Array [
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                  Array [
-                                                    [Function],
-                                                  ],
-                                                ],
                                               },
                                               "fonts": Object {
                                                 "family": Object {
@@ -29800,129 +29410,114 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 className="btn-toolbar"
                                 role="toolbar"
                               >
-                                <ForwardRef
+                                <Button
                                   bsSize="sm"
                                   onClick={[Function]}
                                 >
-                                  <Button__StyledButton
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
                                     bsSize="sm"
+                                    bsStyle="default"
+                                    className="Button-c9cbmb-0 gPpVTH"
+                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
-                                      bsSize="sm"
-                                      bsStyle="default"
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                    <button
+                                      className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                                       disabled={false}
                                       onClick={[Function]}
+                                      type="button"
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                        disabled={false}
-                                        onClick={[Function]}
-                                        type="button"
+                                      <Icon
+                                        fixedWidth={true}
+                                        name="minus"
+                                        type="solid"
                                       >
-                                        <Icon
+                                        <FontAwesomeIcon
                                           fixedWidth={true}
-                                          name="minus"
-                                          type="solid"
-                                        >
-                                          <FontAwesomeIcon
-                                            fixedWidth={true}
-                                            icon={
-                                              Object {
-                                                "iconName": "minus",
-                                                "prefix": "fas",
-                                              }
+                                          icon={
+                                            Object {
+                                              "iconName": "minus",
+                                              "prefix": "fas",
                                             }
-                                          >
-                                            <svg
-                                              className="svg-inline--fa fa-minus"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </button>
-                                    </Button>
-                                  </Button__StyledButton>
-                                </ForwardRef>
-                                <ForwardRef
+                                          }
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-minus"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
+                                    </button>
+                                  </Button>
+                                </Button>
+                                <Button
                                   bsSize="sm"
                                   onClick={[Function]}
                                 >
-                                  <Button__StyledButton
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
                                     bsSize="sm"
+                                    bsStyle="default"
+                                    className="Button-c9cbmb-0 gPpVTH"
+                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
-                                      bsSize="sm"
-                                      bsStyle="default"
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                    <button
+                                      className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                                       disabled={false}
                                       onClick={[Function]}
+                                      type="button"
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                        disabled={false}
-                                        onClick={[Function]}
-                                        type="button"
+                                      <Icon
+                                        fixedWidth={true}
+                                        name="plus"
+                                        type="solid"
                                       >
-                                        <Icon
+                                        <FontAwesomeIcon
                                           fixedWidth={true}
-                                          name="plus"
-                                          type="solid"
-                                        >
-                                          <FontAwesomeIcon
-                                            fixedWidth={true}
-                                            icon={
-                                              Object {
-                                                "iconName": "plus",
-                                                "prefix": "fas",
-                                              }
+                                          icon={
+                                            Object {
+                                              "iconName": "plus",
+                                              "prefix": "fas",
                                             }
-                                          >
-                                            <svg
-                                              className="svg-inline--fa fa-plus"
-                                            />
-                                          </FontAwesomeIcon>
-                                        </Icon>
-                                      </button>
-                                    </Button>
-                                  </Button__StyledButton>
-                                </ForwardRef>
-                                <ForwardRef
+                                          }
+                                        >
+                                          <svg
+                                            className="svg-inline--fa fa-plus"
+                                          />
+                                        </FontAwesomeIcon>
+                                      </Icon>
+                                    </button>
+                                  </Button>
+                                </Button>
+                                <Button
                                   bsSize="sm"
                                   onClick={[Function]}
                                 >
-                                  <Button__StyledButton
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
                                     bsSize="sm"
+                                    bsStyle="default"
+                                    className="Button-c9cbmb-0 gPpVTH"
+                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
-                                      bsSize="sm"
-                                      bsStyle="default"
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                    <button
+                                      className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                                       disabled={false}
                                       onClick={[Function]}
+                                      type="button"
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                        disabled={false}
-                                        onClick={[Function]}
-                                        type="button"
-                                      >
-                                        Add Group
-                                      </button>
-                                    </Button>
-                                  </Button__StyledButton>
-                                </ForwardRef>
+                                      Add Group
+                                    </button>
+                                  </Button>
+                                </Button>
                               </div>
                             </ButtonToolbar>
                           </div>
@@ -30306,29 +29901,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       ";}.ace_comment{color:",
                                       "#737373",
                                       ";}}",
-                                    ],
-                                    "button": Array [
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
                                     ],
                                   },
                                   "fonts": Object {
@@ -32356,29 +31928,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "#737373",
                                                             ";}}",
                                                           ],
-                                                          "button": Array [
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                          ],
                                                         },
                                                         "fonts": Object {
                                                           "family": Object {
@@ -33897,29 +33446,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             ";}.ace_comment{color:",
                                                             "#737373",
                                                             ";}}",
-                                                          ],
-                                                          "button": Array [
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
-                                                            Array [
-                                                              [Function],
-                                                            ],
                                                           ],
                                                         },
                                                         "fonts": Object {
@@ -35824,29 +35350,6 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               "#737373",
                                               ";}}",
                                             ],
-                                            "button": Array [
-                                              Array [
-                                                [Function],
-                                              ],
-                                              Array [
-                                                [Function],
-                                              ],
-                                              Array [
-                                                [Function],
-                                              ],
-                                              Array [
-                                                [Function],
-                                              ],
-                                              Array [
-                                                [Function],
-                                              ],
-                                              Array [
-                                                [Function],
-                                              ],
-                                              Array [
-                                                [Function],
-                                              ],
-                                            ],
                                           },
                                           "fonts": Object {
                                             "family": Object {
@@ -37737,129 +37240,114 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                             className="btn-toolbar"
                             role="toolbar"
                           >
-                            <ForwardRef
+                            <Button
                               bsSize="sm"
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="sm"
+                                bsStyle="default"
+                                className="Button-c9cbmb-0 gPpVTH"
+                                disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="sm"
-                                  bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                                   disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="button"
+                                  <Icon
+                                    fixedWidth={true}
+                                    name="minus"
+                                    type="solid"
                                   >
-                                    <Icon
+                                    <FontAwesomeIcon
                                       fixedWidth={true}
-                                      name="minus"
-                                      type="solid"
-                                    >
-                                      <FontAwesomeIcon
-                                        fixedWidth={true}
-                                        icon={
-                                          Object {
-                                            "iconName": "minus",
-                                            "prefix": "fas",
-                                          }
+                                      icon={
+                                        Object {
+                                          "iconName": "minus",
+                                          "prefix": "fas",
                                         }
-                                      >
-                                        <svg
-                                          className="svg-inline--fa fa-minus"
-                                        />
-                                      </FontAwesomeIcon>
-                                    </Icon>
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-minus"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </button>
+                              </Button>
+                            </Button>
+                            <Button
                               bsSize="sm"
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="sm"
+                                bsStyle="default"
+                                className="Button-c9cbmb-0 gPpVTH"
+                                disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="sm"
-                                  bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                                   disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="button"
+                                  <Icon
+                                    fixedWidth={true}
+                                    name="plus"
+                                    type="solid"
                                   >
-                                    <Icon
+                                    <FontAwesomeIcon
                                       fixedWidth={true}
-                                      name="plus"
-                                      type="solid"
-                                    >
-                                      <FontAwesomeIcon
-                                        fixedWidth={true}
-                                        icon={
-                                          Object {
-                                            "iconName": "plus",
-                                            "prefix": "fas",
-                                          }
+                                      icon={
+                                        Object {
+                                          "iconName": "plus",
+                                          "prefix": "fas",
                                         }
-                                      >
-                                        <svg
-                                          className="svg-inline--fa fa-plus"
-                                        />
-                                      </FontAwesomeIcon>
-                                    </Icon>
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
-                            <ForwardRef
+                                      }
+                                    >
+                                      <svg
+                                        className="svg-inline--fa fa-plus"
+                                      />
+                                    </FontAwesomeIcon>
+                                  </Icon>
+                                </button>
+                              </Button>
+                            </Button>
+                            <Button
                               bsSize="sm"
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="sm"
+                                bsStyle="default"
+                                className="Button-c9cbmb-0 gPpVTH"
+                                disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="sm"
-                                  bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                                   disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="button"
-                                  >
-                                    Add Group
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
+                                  Add Group
+                                </button>
+                              </Button>
+                            </Button>
                           </div>
                         </ButtonToolbar>
                       </div>
@@ -38217,29 +37705,6 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                     ";}.ace_comment{color:",
                                     "#737373",
                                     ";}}",
-                                  ],
-                                  "button": Array [
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
                                   ],
                                 },
                                 "fonts": Object {
@@ -40179,29 +39644,6 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                     "#737373",
                                                     ";}}",
                                                   ],
-                                                  "button": Array [
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                  ],
                                                 },
                                                 "fonts": Object {
                                                   "family": Object {
@@ -41718,29 +41160,6 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                     ";}.ace_comment{color:",
                                                     "#737373",
                                                     ";}}",
-                                                  ],
-                                                  "button": Array [
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
                                                   ],
                                                 },
                                                 "fonts": Object {
@@ -43448,29 +42867,6 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       ";}.ace_comment{color:",
                                       "#737373",
                                       ";}}",
-                                    ],
-                                    "button": Array [
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
                                     ],
                                   },
                                   "fonts": Object {
@@ -45350,129 +44746,114 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                     className="btn-toolbar"
                     role="toolbar"
                   >
-                    <ForwardRef
+                    <Button
                       bsSize="sm"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="sm"
+                        bsStyle="default"
+                        className="Button-c9cbmb-0 gPpVTH"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="sm"
-                          bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
+                          <Icon
+                            fixedWidth={true}
+                            name="minus"
+                            type="solid"
                           >
-                            <Icon
+                            <FontAwesomeIcon
                               fixedWidth={true}
-                              name="minus"
-                              type="solid"
-                            >
-                              <FontAwesomeIcon
-                                fixedWidth={true}
-                                icon={
-                                  Object {
-                                    "iconName": "minus",
-                                    "prefix": "fas",
-                                  }
+                              icon={
+                                Object {
+                                  "iconName": "minus",
+                                  "prefix": "fas",
                                 }
-                              >
-                                <svg
-                                  className="svg-inline--fa fa-minus"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
-                    <ForwardRef
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-minus"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
+                        </button>
+                      </Button>
+                    </Button>
+                    <Button
                       bsSize="sm"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="sm"
+                        bsStyle="default"
+                        className="Button-c9cbmb-0 gPpVTH"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="sm"
-                          bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
+                          <Icon
+                            fixedWidth={true}
+                            name="plus"
+                            type="solid"
                           >
-                            <Icon
+                            <FontAwesomeIcon
                               fixedWidth={true}
-                              name="plus"
-                              type="solid"
-                            >
-                              <FontAwesomeIcon
-                                fixedWidth={true}
-                                icon={
-                                  Object {
-                                    "iconName": "plus",
-                                    "prefix": "fas",
-                                  }
+                              icon={
+                                Object {
+                                  "iconName": "plus",
+                                  "prefix": "fas",
                                 }
-                              >
-                                <svg
-                                  className="svg-inline--fa fa-plus"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
-                    <ForwardRef
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-plus"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
+                        </button>
+                      </Button>
+                    </Button>
+                    <Button
                       bsSize="sm"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="sm"
+                        bsStyle="default"
+                        className="Button-c9cbmb-0 gPpVTH"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="sm"
-                          bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            Add Group
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
+                          Add Group
+                        </button>
+                      </Button>
+                    </Button>
                   </div>
                 </ButtonToolbar>
               </div>
@@ -45832,29 +45213,6 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                     ";}.ace_comment{color:",
                                     "#737373",
                                     ";}}",
-                                  ],
-                                  "button": Array [
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
-                                    Array [
-                                      [Function],
-                                    ],
                                   ],
                                 },
                                 "fonts": Object {
@@ -47813,29 +47171,6 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                     "#737373",
                                                     ";}}",
                                                   ],
-                                                  "button": Array [
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                  ],
                                                 },
                                                 "fonts": Object {
                                                   "family": Object {
@@ -49354,29 +48689,6 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                     ";}.ace_comment{color:",
                                                     "#737373",
                                                     ";}}",
-                                                  ],
-                                                  "button": Array [
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
-                                                    Array [
-                                                      [Function],
-                                                    ],
                                                   ],
                                                 },
                                                 "fonts": Object {
@@ -51281,29 +50593,6 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       ";}.ace_comment{color:",
                                       "#737373",
                                       ";}}",
-                                    ],
-                                    "button": Array [
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
-                                      Array [
-                                        [Function],
-                                      ],
                                     ],
                                   },
                                   "fonts": Object {
@@ -53230,129 +52519,114 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                     className="btn-toolbar"
                     role="toolbar"
                   >
-                    <ForwardRef
+                    <Button
                       bsSize="sm"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="sm"
+                        bsStyle="default"
+                        className="Button-c9cbmb-0 gPpVTH"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="sm"
-                          bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
+                          <Icon
+                            fixedWidth={true}
+                            name="minus"
+                            type="solid"
                           >
-                            <Icon
+                            <FontAwesomeIcon
                               fixedWidth={true}
-                              name="minus"
-                              type="solid"
-                            >
-                              <FontAwesomeIcon
-                                fixedWidth={true}
-                                icon={
-                                  Object {
-                                    "iconName": "minus",
-                                    "prefix": "fas",
-                                  }
+                              icon={
+                                Object {
+                                  "iconName": "minus",
+                                  "prefix": "fas",
                                 }
-                              >
-                                <svg
-                                  className="svg-inline--fa fa-minus"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
-                    <ForwardRef
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-minus"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
+                        </button>
+                      </Button>
+                    </Button>
+                    <Button
                       bsSize="sm"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="sm"
+                        bsStyle="default"
+                        className="Button-c9cbmb-0 gPpVTH"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="sm"
-                          bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
+                          <Icon
+                            fixedWidth={true}
+                            name="plus"
+                            type="solid"
                           >
-                            <Icon
+                            <FontAwesomeIcon
                               fixedWidth={true}
-                              name="plus"
-                              type="solid"
-                            >
-                              <FontAwesomeIcon
-                                fixedWidth={true}
-                                icon={
-                                  Object {
-                                    "iconName": "plus",
-                                    "prefix": "fas",
-                                  }
+                              icon={
+                                Object {
+                                  "iconName": "plus",
+                                  "prefix": "fas",
                                 }
-                              >
-                                <svg
-                                  className="svg-inline--fa fa-plus"
-                                />
-                              </FontAwesomeIcon>
-                            </Icon>
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
-                    <ForwardRef
+                              }
+                            >
+                              <svg
+                                className="svg-inline--fa fa-plus"
+                              />
+                            </FontAwesomeIcon>
+                          </Icon>
+                        </button>
+                      </Button>
+                    </Button>
+                    <Button
                       bsSize="sm"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="sm"
+                        bsStyle="default"
+                        className="Button-c9cbmb-0 gPpVTH"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="sm"
-                          bsStyle="default"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            Add Group
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
+                          Add Group
+                        </button>
+                      </Button>
+                    </Button>
                   </div>
                 </ButtonToolbar>
               </div>

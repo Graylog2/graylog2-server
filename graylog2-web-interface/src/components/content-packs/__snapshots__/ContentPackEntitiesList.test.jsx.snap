@@ -76,37 +76,30 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
               }
             }
           >
-            <ForwardRef
+            <Button
               bsStyle="default"
               className="submit-button"
               disabled={false}
               type="submit"
             >
-              <Button__StyledButton
+              <Button
+                active={false}
+                block={false}
+                bsClass="btn"
                 bsStyle="default"
-                className="submit-button"
+                className="Button-c9cbmb-0 gPpVTH submit-button"
                 disabled={false}
                 type="submit"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
-                  bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                <button
+                  className="Button-c9cbmb-0 gPpVTH submit-button btn btn-default"
                   disabled={false}
                   type="submit"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                    disabled={false}
-                    type="submit"
-                  >
-                    Filter
-                  </button>
-                </Button>
-              </Button__StyledButton>
-            </ForwardRef>
+                  Filter
+                </button>
+              </Button>
+            </Button>
           </div>
           <div
             className="form-group"
@@ -116,37 +109,31 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
               }
             }
           >
-            <ForwardRef
+            <Button
               className="reset-button"
               onClick={[Function]}
               type="reset"
             >
-              <Button__StyledButton
-                className="reset-button"
+              <Button
+                active={false}
+                block={false}
+                bsClass="btn"
+                bsStyle="default"
+                className="Button-c9cbmb-0 gPpVTH reset-button"
+                disabled={false}
                 onClick={[Function]}
                 type="reset"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
-                  bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                <button
+                  className="Button-c9cbmb-0 gPpVTH reset-button btn btn-default"
                   disabled={false}
                   onClick={[Function]}
                   type="reset"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                    disabled={false}
-                    onClick={[Function]}
-                    type="reset"
-                  >
-                    Reset
-                  </button>
-                </Button>
-              </Button__StyledButton>
-            </ForwardRef>
+                  Reset
+                </button>
+              </Button>
+            </Button>
           </div>
         </form>
       </div>
@@ -355,37 +342,30 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
               }
             }
           >
-            <ForwardRef
+            <Button
               bsStyle="default"
               className="submit-button"
               disabled={false}
               type="submit"
             >
-              <Button__StyledButton
+              <Button
+                active={false}
+                block={false}
+                bsClass="btn"
                 bsStyle="default"
-                className="submit-button"
+                className="Button-c9cbmb-0 gPpVTH submit-button"
                 disabled={false}
                 type="submit"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
-                  bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                <button
+                  className="Button-c9cbmb-0 gPpVTH submit-button btn btn-default"
                   disabled={false}
                   type="submit"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                    disabled={false}
-                    type="submit"
-                  >
-                    Filter
-                  </button>
-                </Button>
-              </Button__StyledButton>
-            </ForwardRef>
+                  Filter
+                </button>
+              </Button>
+            </Button>
           </div>
           <div
             className="form-group"
@@ -395,37 +375,31 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
               }
             }
           >
-            <ForwardRef
+            <Button
               className="reset-button"
               onClick={[Function]}
               type="reset"
             >
-              <Button__StyledButton
-                className="reset-button"
+              <Button
+                active={false}
+                block={false}
+                bsClass="btn"
+                bsStyle="default"
+                className="Button-c9cbmb-0 gPpVTH reset-button"
+                disabled={false}
                 onClick={[Function]}
                 type="reset"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
-                  bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                <button
+                  className="Button-c9cbmb-0 gPpVTH reset-button btn btn-default"
                   disabled={false}
                   onClick={[Function]}
                   type="reset"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                    disabled={false}
-                    onClick={[Function]}
-                    type="reset"
-                  >
-                    Reset
-                  </button>
-                </Button>
-              </Button__StyledButton>
-            </ForwardRef>
+                  Reset
+                </button>
+              </Button>
+            </Button>
           </div>
         </form>
       </div>
@@ -677,70 +651,57 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               className="btn-toolbar"
                               role="toolbar"
                             >
-                              <ForwardRef
+                              <Button
                                 bsSize="xs"
                                 bsStyle="primary"
                                 disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button__StyledButton
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
                                   bsSize="xs"
                                   bsStyle="primary"
+                                  className="Button-c9cbmb-0 fWkxiM"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsSize="xs"
-                                    bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                  <button
+                                    className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                     disabled={false}
                                     onClick={[Function]}
+                                    type="button"
                                   >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Edit
-                                    </button>
-                                  </Button>
-                                </Button__StyledButton>
-                              </ForwardRef>
-                              <ForwardRef
+                                    Edit
+                                  </button>
+                                </Button>
+                              </Button>
+                              <Button
                                 bsSize="xs"
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button__StyledButton
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
                                   bsSize="xs"
                                   bsStyle="info"
+                                  className="Button-c9cbmb-0 hgjeXH"
+                                  disabled={false}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsSize="xs"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                  <button
+                                    className="Button-c9cbmb-0 hgjeXH btn btn-xs btn-info"
                                     disabled={false}
                                     onClick={[Function]}
+                                    type="button"
                                   >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Show
-                                    </button>
-                                  </Button>
-                                </Button__StyledButton>
-                              </ForwardRef>
+                                    Show
+                                  </button>
+                                </Button>
+                              </Button>
                             </div>
                           </ButtonToolbar>
                         </td>
@@ -976,70 +937,57 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               className="btn-toolbar"
                               role="toolbar"
                             >
-                              <ForwardRef
+                              <Button
                                 bsSize="xs"
                                 bsStyle="primary"
                                 disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button__StyledButton
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
                                   bsSize="xs"
                                   bsStyle="primary"
+                                  className="Button-c9cbmb-0 fWkxiM"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsSize="xs"
-                                    bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                  <button
+                                    className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                     disabled={false}
                                     onClick={[Function]}
+                                    type="button"
                                   >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Edit
-                                    </button>
-                                  </Button>
-                                </Button__StyledButton>
-                              </ForwardRef>
-                              <ForwardRef
+                                    Edit
+                                  </button>
+                                </Button>
+                              </Button>
+                              <Button
                                 bsSize="xs"
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button__StyledButton
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
                                   bsSize="xs"
                                   bsStyle="info"
+                                  className="Button-c9cbmb-0 hgjeXH"
+                                  disabled={false}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsSize="xs"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                  <button
+                                    className="Button-c9cbmb-0 hgjeXH btn btn-xs btn-info"
                                     disabled={false}
                                     onClick={[Function]}
+                                    type="button"
                                   >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Show
-                                    </button>
-                                  </Button>
-                                </Button__StyledButton>
-                              </ForwardRef>
+                                    Show
+                                  </button>
+                                </Button>
+                              </Button>
                             </div>
                           </ButtonToolbar>
                         </td>

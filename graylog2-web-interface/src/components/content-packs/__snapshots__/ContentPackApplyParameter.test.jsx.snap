@@ -342,35 +342,29 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               <div
                 className="col-sm-2 col-sm-offset-10"
               >
-                <ForwardRef
+                <Button
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="primary"
+                    className="Button-c9cbmb-0 fWkxiM"
                     disabled={true}
                     type="submit"
                   >
-                    <Button
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    <button
+                      className="Button-c9cbmb-0 fWkxiM btn btn-primary"
                       disabled={true}
                       type="submit"
                     >
-                      <button
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                        disabled={true}
-                        type="submit"
-                      >
-                        Apply
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Apply
+                    </button>
+                  </Button>
+                </Button>
               </div>
             </Col>
           </div>
@@ -497,37 +491,31 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     PORT
                                   </td>
                                   <td>
-                                    <ForwardRef
+                                    <Button
                                       bsSize="small"
                                       bsStyle="info"
                                       onClick={[Function]}
                                     >
-                                      <Button__StyledButton
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
                                         bsSize="small"
                                         bsStyle="info"
+                                        className="Button-c9cbmb-0 hgjeXH"
+                                        disabled={false}
                                         onClick={[Function]}
                                       >
-                                        <Button
-                                          active={false}
-                                          block={false}
-                                          bsClass="btn"
-                                          bsSize="small"
-                                          bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                        <button
+                                          className="Button-c9cbmb-0 hgjeXH btn btn-sm btn-info"
                                           disabled={false}
                                           onClick={[Function]}
+                                          type="button"
                                         >
-                                          <button
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                            disabled={false}
-                                            onClick={[Function]}
-                                            type="button"
-                                          >
-                                            Clear
-                                          </button>
-                                        </Button>
-                                      </Button__StyledButton>
-                                    </ForwardRef>
+                                          Clear
+                                        </button>
+                                      </Button>
+                                    </Button>
                                   </td>
                                 </tr>
                               </DataTableElement>
@@ -871,35 +859,29 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
               <div
                 className="col-sm-2 col-sm-offset-10"
               >
-                <ForwardRef
+                <Button
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="primary"
+                    className="Button-c9cbmb-0 fWkxiM"
                     disabled={true}
                     type="submit"
                   >
-                    <Button
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    <button
+                      className="Button-c9cbmb-0 fWkxiM btn btn-primary"
                       disabled={true}
                       type="submit"
                     >
-                      <button
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                        disabled={true}
-                        type="submit"
-                      >
-                        Apply
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Apply
+                    </button>
+                  </Button>
+                </Button>
               </div>
             </Col>
           </div>
@@ -1317,35 +1299,29 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
               <div
                 className="col-sm-2 col-sm-offset-10"
               >
-                <ForwardRef
+                <Button
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="primary"
+                    className="Button-c9cbmb-0 fWkxiM"
                     disabled={true}
                     type="submit"
                   >
-                    <Button
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    <button
+                      className="Button-c9cbmb-0 fWkxiM btn btn-primary"
                       disabled={true}
                       type="submit"
                     >
-                      <button
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                        disabled={true}
-                        type="submit"
-                      >
-                        Apply
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Apply
+                    </button>
+                  </Button>
+                </Button>
               </div>
             </Col>
           </div>

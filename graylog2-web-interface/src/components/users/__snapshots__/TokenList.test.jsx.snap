@@ -93,39 +93,32 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                 <div
                   className="col-sm-2"
                 >
-                  <ForwardRef
+                  <Button
                     bsStyle="primary"
                     disabled={true}
                     id="create-token"
                     type="submit"
                   >
-                    <Button__StyledButton
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
                       bsStyle="primary"
+                      className="Button-c9cbmb-0 fWkxiM"
                       disabled={true}
                       id="create-token"
                       type="submit"
                     >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                      <button
+                        className="Button-c9cbmb-0 fWkxiM btn btn-primary"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
-                        <button
-                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                          disabled={true}
-                          id="create-token"
-                          type="submit"
-                        >
-                          Create Token
-                        </button>
-                      </Button>
-                    </Button__StyledButton>
-                  </ForwardRef>
+                        Create Token
+                      </button>
+                    </Button>
+                  </Button>
                 </div>
               </Col>
             </div>
@@ -290,7 +283,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             </Component>
                           </Input>
                         </TypeAheadInput>
-                        <ForwardRef
+                        <Button
                           style={
                             Object {
                               "marginLeft": 5,
@@ -298,7 +291,13 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           }
                           type="submit"
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             style={
                               Object {
                                 "marginLeft": 5,
@@ -306,12 +305,8 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             }
                             type="submit"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-default"
                               disabled={false}
                               style={
                                 Object {
@@ -320,22 +315,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               }
                               type="submit"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                disabled={false}
-                                style={
-                                  Object {
-                                    "marginLeft": 5,
-                                  }
-                                }
-                                type="submit"
-                              >
-                                Filter
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                              Filter
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -345,7 +329,12 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           }
                           type="button"
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -355,12 +344,8 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             }
                             type="button"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-default"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -370,22 +355,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               }
                               type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                disabled={true}
-                                onClick={[Function]}
-                                style={
-                                  Object {
-                                    "marginLeft": 5,
-                                  }
-                                }
-                                type="button"
-                              >
-                                Reset
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Reset
+                            </button>
+                          </Button>
+                        </Button>
                       </form>
                       <ul
                         className="pill-list"
@@ -595,39 +568,32 @@ exports[`<TokenList /> should render with tokens 1`] = `
                 <div
                   className="col-sm-2"
                 >
-                  <ForwardRef
+                  <Button
                     bsStyle="primary"
                     disabled={true}
                     id="create-token"
                     type="submit"
                   >
-                    <Button__StyledButton
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
                       bsStyle="primary"
+                      className="Button-c9cbmb-0 fWkxiM"
                       disabled={true}
                       id="create-token"
                       type="submit"
                     >
-                      <Button
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                      <button
+                        className="Button-c9cbmb-0 fWkxiM btn btn-primary"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
-                        <button
-                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                          disabled={true}
-                          id="create-token"
-                          type="submit"
-                        >
-                          Create Token
-                        </button>
-                      </Button>
-                    </Button__StyledButton>
-                  </ForwardRef>
+                        Create Token
+                      </button>
+                    </Button>
+                  </Button>
                 </div>
               </Col>
             </div>
@@ -818,7 +784,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             </Component>
                           </Input>
                         </TypeAheadInput>
-                        <ForwardRef
+                        <Button
                           style={
                             Object {
                               "marginLeft": 5,
@@ -826,7 +792,13 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           }
                           type="submit"
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
+                            disabled={false}
                             style={
                               Object {
                                 "marginLeft": 5,
@@ -834,12 +806,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             }
                             type="submit"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-default"
                               disabled={false}
                               style={
                                 Object {
@@ -848,22 +816,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               }
                               type="submit"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                disabled={false}
-                                style={
-                                  Object {
-                                    "marginLeft": 5,
-                                  }
-                                }
-                                type="submit"
-                              >
-                                Filter
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
-                        <ForwardRef
+                              Filter
+                            </button>
+                          </Button>
+                        </Button>
+                        <Button
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -873,7 +830,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           }
                           type="button"
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="Button-c9cbmb-0 gPpVTH"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -883,12 +845,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             }
                             type="button"
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 laZUlH"
+                            <button
+                              className="Button-c9cbmb-0 gPpVTH btn btn-default"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -898,22 +856,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               }
                               type="button"
                             >
-                              <button
-                                className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                disabled={true}
-                                onClick={[Function]}
-                                style={
-                                  Object {
-                                    "marginLeft": 5,
-                                  }
-                                }
-                                type="button"
-                              >
-                                Reset
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Reset
+                            </button>
+                          </Button>
+                        </Button>
                       </form>
                       <ul
                         className="pill-list"
@@ -996,39 +942,32 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                       text="beef2001"
                                       title="Copy to clipboard"
                                     />
-                                    <ForwardRef
+                                    <Button
                                       bsSize="xsmall"
                                       bsStyle="primary"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
-                                      <Button__StyledButton
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
                                         bsSize="xsmall"
                                         bsStyle="primary"
+                                        className="Button-c9cbmb-0 fWkxiM"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
-                                        <Button
-                                          active={false}
-                                          block={false}
-                                          bsClass="btn"
-                                          bsSize="xsmall"
-                                          bsStyle="primary"
-                                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                        <button
+                                          className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                           disabled={false}
                                           onClick={[Function]}
+                                          type="button"
                                         >
-                                          <button
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                            disabled={false}
-                                            onClick={[Function]}
-                                            type="button"
-                                          >
-                                            Delete
-                                          </button>
-                                        </Button>
-                                      </Button__StyledButton>
-                                    </ForwardRef>
+                                          Delete
+                                        </button>
+                                      </Button>
+                                    </Button>
                                   </div>
                                 </ButtonGroup>
                               </div>
@@ -1077,39 +1016,32 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                       text="beef2002"
                                       title="Copy to clipboard"
                                     />
-                                    <ForwardRef
+                                    <Button
                                       bsSize="xsmall"
                                       bsStyle="primary"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
-                                      <Button__StyledButton
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
                                         bsSize="xsmall"
                                         bsStyle="primary"
+                                        className="Button-c9cbmb-0 fWkxiM"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
-                                        <Button
-                                          active={false}
-                                          block={false}
-                                          bsClass="btn"
-                                          bsSize="xsmall"
-                                          bsStyle="primary"
-                                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                        <button
+                                          className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                           disabled={false}
                                           onClick={[Function]}
+                                          type="button"
                                         >
-                                          <button
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                            disabled={false}
-                                            onClick={[Function]}
-                                            type="button"
-                                          >
-                                            Delete
-                                          </button>
-                                        </Button>
-                                      </Button__StyledButton>
-                                    </ForwardRef>
+                                          Delete
+                                        </button>
+                                      </Button>
+                                    </Button>
                                   </div>
                                 </ButtonGroup>
                               </div>

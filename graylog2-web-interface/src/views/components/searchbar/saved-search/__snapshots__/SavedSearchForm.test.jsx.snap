@@ -221,29 +221,6 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                         "#737373",
                         ";}}",
                       ],
-                      "button": Array [
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                      ],
                     },
                     "fonts": Object {
                       "family": Object {
@@ -373,69 +350,56 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                               </FormGroup>
                             </FormGroup__StyledFormGroup>
                           </Component>
-                          <ForwardRef
+                          <Button
                             bsStyle="info"
                             className="button"
                             disabled={false}
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="info"
-                              className="button"
+                              className="Button-c9cbmb-0 hgjeXH button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="info"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 hgjeXH button btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Create new
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Create new
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             className="button"
                             onClick={[Function]}
                           >
-                            <Button__StyledButton
-                              className="button"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 gPpVTH button"
+                              disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 gPpVTH button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
+                                type="button"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Cancel
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                Cancel
+                              </button>
+                            </Button>
+                          </Button>
                         </form>
                       </div>
                     </div>
@@ -672,29 +636,6 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                         "#737373",
                         ";}}",
                       ],
-                      "button": Array [
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                      ],
                     },
                     "fonts": Object {
                       "family": Object {
@@ -824,102 +765,82 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                               </FormGroup>
                             </FormGroup__StyledFormGroup>
                           </Component>
-                          <ForwardRef
+                          <Button
                             bsStyle="primary"
                             className="button"
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="primary"
-                              className="button"
+                              className="Button-c9cbmb-0 fWkxiM button"
+                              disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="primary"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 fWkxiM button btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-primary"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             bsStyle="info"
                             className="button"
                             disabled={true}
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="info"
-                              className="button"
+                              className="Button-c9cbmb-0 hgjeXH button"
                               disabled={true}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="info"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 hgjeXH button btn btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
-                                  disabled={true}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save as
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save as
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             className="button"
                             onClick={[Function]}
                           >
-                            <Button__StyledButton
-                              className="button"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 gPpVTH button"
+                              disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 gPpVTH button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
+                                type="button"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Cancel
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                Cancel
+                              </button>
+                            </Button>
+                          </Button>
                         </form>
                       </div>
                     </div>
@@ -1156,29 +1077,6 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                         "#737373",
                         ";}}",
                       ],
-                      "button": Array [
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                        Array [
-                          [Function],
-                        ],
-                      ],
                     },
                     "fonts": Object {
                       "family": Object {
@@ -1308,102 +1206,82 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                               </FormGroup>
                             </FormGroup__StyledFormGroup>
                           </Component>
-                          <ForwardRef
+                          <Button
                             bsStyle="primary"
                             className="button"
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="primary"
-                              className="button"
+                              className="Button-c9cbmb-0 fWkxiM button"
+                              disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="primary"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 fWkxiM button btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-primary"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             bsStyle="info"
                             className="button"
                             disabled={false}
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="info"
-                              className="button"
+                              className="Button-c9cbmb-0 hgjeXH button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="info"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 hgjeXH button btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save as
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save as
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             className="button"
                             onClick={[Function]}
                           >
-                            <Button__StyledButton
-                              className="button"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 gPpVTH button"
+                              disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 gPpVTH button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
+                                type="button"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Cancel
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                Cancel
+                              </button>
+                            </Button>
+                          </Button>
                         </form>
                       </div>
                     </div>

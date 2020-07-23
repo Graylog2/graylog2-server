@@ -106,41 +106,34 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                 onlyActiveOnIndex={false}
                 to="/path/to/views"
               >
-                <ForwardRef
+                <Button
                   action="push"
                   bsStyle="success"
                   onClick={[Function]}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
                     action="push"
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="success"
+                    className="Button-c9cbmb-0 eqVrkX"
+                    disabled={false}
                     onClick={[Function]}
                     type="submit"
                   >
-                    <Button
+                    <button
                       action="push"
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="success"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                      className="Button-c9cbmb-0 eqVrkX btn btn-success"
                       disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
-                      <button
-                        action="push"
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="submit"
-                      >
-                        Back
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Back
+                    </button>
+                  </Button>
+                </Button>
               </LinkContainer>
             </div>
           </Col>

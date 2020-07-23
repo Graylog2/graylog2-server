@@ -322,37 +322,31 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <span
                                 className="addButton"
                               >
-                                <ForwardRef
+                                <Button
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <Button__StyledButton
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
                                     bsSize="xsmall"
                                     bsStyle="primary"
+                                    className="Button-c9cbmb-0 fWkxiM"
+                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
-                                      bsSize="xsmall"
-                                      bsStyle="primary"
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                    <button
+                                      className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
+                                      type="button"
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                        disabled={false}
-                                        onClick={[Function]}
-                                        type="button"
-                                      >
-                                        Add
-                                      </button>
-                                    </Button>
-                                  </Button__StyledButton>
-                                </ForwardRef>
+                                      Add
+                                    </button>
+                                  </Button>
+                                </Button>
                               </span>
                             </p>
                           </span>
@@ -399,37 +393,31 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <span
                                 className="addButton"
                               >
-                                <ForwardRef
+                                <Button
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <Button__StyledButton
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
                                     bsSize="xsmall"
                                     bsStyle="primary"
+                                    className="Button-c9cbmb-0 fWkxiM"
+                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
-                                      bsSize="xsmall"
-                                      bsStyle="primary"
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                    <button
+                                      className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
+                                      type="button"
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                        disabled={false}
-                                        onClick={[Function]}
-                                        type="button"
-                                      >
-                                        Add
-                                      </button>
-                                    </Button>
-                                  </Button__StyledButton>
-                                </ForwardRef>
+                                      Add
+                                    </button>
+                                  </Button>
+                                </Button>
                               </span>
                             </p>
                           </span>
@@ -476,37 +464,31 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <span
                                 className="addButton"
                               >
-                                <ForwardRef
+                                <Button
                                   bsSize="xsmall"
                                   bsStyle="primary"
                                   onClick={[Function]}
                                 >
-                                  <Button__StyledButton
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
                                     bsSize="xsmall"
                                     bsStyle="primary"
+                                    className="Button-c9cbmb-0 fWkxiM"
+                                    disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
-                                      active={false}
-                                      block={false}
-                                      bsClass="btn"
-                                      bsSize="xsmall"
-                                      bsStyle="primary"
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                    <button
+                                      className="Button-c9cbmb-0 fWkxiM btn btn-xs btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
+                                      type="button"
                                     >
-                                      <button
-                                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                                        disabled={false}
-                                        onClick={[Function]}
-                                        type="button"
-                                      >
-                                        Add
-                                      </button>
-                                    </Button>
-                                  </Button__StyledButton>
-                                </ForwardRef>
+                                      Add
+                                    </button>
+                                  </Button>
+                                </Button>
                               </span>
                             </p>
                           </span>

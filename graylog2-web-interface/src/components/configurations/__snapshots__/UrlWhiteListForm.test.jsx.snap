@@ -109,35 +109,30 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       </FormGroup__StyledFormGroup>
     </Component>
   </Input>
-  <ForwardRef
+  <Button
     bsSize="sm"
     onClick={[Function]}
   >
-    <Button__StyledButton
+    <Button
+      active={false}
+      block={false}
+      bsClass="btn"
       bsSize="sm"
+      bsStyle="default"
+      className="Button-c9cbmb-0 gPpVTH"
+      disabled={false}
       onClick={[Function]}
     >
-      <Button
-        active={false}
-        block={false}
-        bsClass="btn"
-        bsSize="sm"
-        bsStyle="default"
-        className="Button__StyledButton-c9cbmb-0 laZUlH"
+      <button
+        className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
         disabled={false}
         onClick={[Function]}
+        type="button"
       >
-        <button
-          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Add Url
-        </button>
-      </Button>
-    </Button__StyledButton>
-  </ForwardRef>
+        Add Url
+      </button>
+    </Button>
+  </Button>
   <UrlWhiteListForm__StyledTable
     bordered={true}
     striped={true}
@@ -612,29 +607,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         ";}.ace_comment{color:",
                                         "#737373",
                                         ";}}",
-                                      ],
-                                      "button": Array [
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
                                       ],
                                     },
                                     "fonts": Object {
@@ -2130,48 +2102,44 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </Input>
             </td>
             <td>
-              <ForwardRef
+              <Button
                 onClick={[Function]}
               >
-                <Button__StyledButton
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button-c9cbmb-0 gPpVTH"
+                  disabled={false}
                   onClick={[Function]}
                 >
-                  <Button
-                    active={false}
-                    block={false}
-                    bsClass="btn"
-                    bsStyle="default"
-                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                  <button
+                    className="Button-c9cbmb-0 gPpVTH btn btn-default"
                     disabled={false}
                     onClick={[Function]}
+                    type="button"
                   >
-                    <button
-                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <Icon
+                      name="trash-alt"
+                      type="solid"
                     >
-                      <Icon
-                        name="trash-alt"
-                        type="solid"
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            Object {
-                              "iconName": "trash-alt",
-                              "prefix": "fas",
-                            }
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "trash-alt",
+                            "prefix": "fas",
                           }
-                        >
-                          <svg
-                            className="svg-inline--fa fa-trash-alt"
-                          />
-                        </FontAwesomeIcon>
-                      </Icon>
-                    </button>
-                  </Button>
-                </Button__StyledButton>
-              </ForwardRef>
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-trash-alt"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
+                  </button>
+                </Button>
+              </Button>
             </td>
           </tr>
           <tr
@@ -2612,29 +2580,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         ";}.ace_comment{color:",
                                         "#737373",
                                         ";}}",
-                                      ],
-                                      "button": Array [
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
                                       ],
                                     },
                                     "fonts": Object {
@@ -4130,48 +4075,44 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </Input>
             </td>
             <td>
-              <ForwardRef
+              <Button
                 onClick={[Function]}
               >
-                <Button__StyledButton
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button-c9cbmb-0 gPpVTH"
+                  disabled={false}
                   onClick={[Function]}
                 >
-                  <Button
-                    active={false}
-                    block={false}
-                    bsClass="btn"
-                    bsStyle="default"
-                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                  <button
+                    className="Button-c9cbmb-0 gPpVTH btn btn-default"
                     disabled={false}
                     onClick={[Function]}
+                    type="button"
                   >
-                    <button
-                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <Icon
+                      name="trash-alt"
+                      type="solid"
                     >
-                      <Icon
-                        name="trash-alt"
-                        type="solid"
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            Object {
-                              "iconName": "trash-alt",
-                              "prefix": "fas",
-                            }
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "trash-alt",
+                            "prefix": "fas",
                           }
-                        >
-                          <svg
-                            className="svg-inline--fa fa-trash-alt"
-                          />
-                        </FontAwesomeIcon>
-                      </Icon>
-                    </button>
-                  </Button>
-                </Button__StyledButton>
-              </ForwardRef>
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-trash-alt"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
+                  </button>
+                </Button>
+              </Button>
             </td>
           </tr>
           <tr
@@ -4612,29 +4553,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         ";}.ace_comment{color:",
                                         "#737373",
                                         ";}}",
-                                      ],
-                                      "button": Array [
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
-                                        Array [
-                                          [Function],
-                                        ],
                                       ],
                                     },
                                     "fonts": Object {
@@ -6130,82 +6048,73 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </Input>
             </td>
             <td>
-              <ForwardRef
+              <Button
                 onClick={[Function]}
               >
-                <Button__StyledButton
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button-c9cbmb-0 gPpVTH"
+                  disabled={false}
                   onClick={[Function]}
                 >
-                  <Button
-                    active={false}
-                    block={false}
-                    bsClass="btn"
-                    bsStyle="default"
-                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                  <button
+                    className="Button-c9cbmb-0 gPpVTH btn btn-default"
                     disabled={false}
                     onClick={[Function]}
+                    type="button"
                   >
-                    <button
-                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <Icon
+                      name="trash-alt"
+                      type="solid"
                     >
-                      <Icon
-                        name="trash-alt"
-                        type="solid"
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            Object {
-                              "iconName": "trash-alt",
-                              "prefix": "fas",
-                            }
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "trash-alt",
+                            "prefix": "fas",
                           }
-                        >
-                          <svg
-                            className="svg-inline--fa fa-trash-alt"
-                          />
-                        </FontAwesomeIcon>
-                      </Icon>
-                    </button>
-                  </Button>
-                </Button__StyledButton>
-              </ForwardRef>
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-trash-alt"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
+                  </button>
+                </Button>
+              </Button>
             </td>
           </tr>
         </tbody>
       </table>
     </Table>
   </UrlWhiteListForm__StyledTable>
-  <ForwardRef
+  <Button
     bsSize="sm"
     onClick={[Function]}
   >
-    <Button__StyledButton
+    <Button
+      active={false}
+      block={false}
+      bsClass="btn"
       bsSize="sm"
+      bsStyle="default"
+      className="Button-c9cbmb-0 gPpVTH"
+      disabled={false}
       onClick={[Function]}
     >
-      <Button
-        active={false}
-        block={false}
-        bsClass="btn"
-        bsSize="sm"
-        bsStyle="default"
-        className="Button__StyledButton-c9cbmb-0 laZUlH"
+      <button
+        className="Button-c9cbmb-0 gPpVTH btn btn-sm btn-default"
         disabled={false}
         onClick={[Function]}
+        type="button"
       >
-        <button
-          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Add Url
-        </button>
-      </Button>
-    </Button__StyledButton>
-  </ForwardRef>
+        Add Url
+      </button>
+    </Button>
+  </Button>
 </UrlWhiteListForm>
 `;

@@ -57,7 +57,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                    class="Button-c9cbmb-0 gPpVTH submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+                    class="Button-c9cbmb-0 gPpVTH reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -92,7 +92,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
+              class="Button-c9cbmb-0 gPpVTH btn btn-default"
               type="button"
             >
               Cancel
@@ -162,7 +162,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
+                    class="Button-c9cbmb-0 gPpVTH submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -173,7 +173,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
+                    class="Button-c9cbmb-0 gPpVTH reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -251,7 +251,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
+              class="Button-c9cbmb-0 gPpVTH btn btn-default"
               type="button"
             >
               Cancel

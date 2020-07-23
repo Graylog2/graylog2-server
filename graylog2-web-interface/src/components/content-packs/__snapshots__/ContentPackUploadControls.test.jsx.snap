@@ -3,42 +3,34 @@
 exports[`<ContentPackUploadControls /> should render 1`] = `
 <ContentPackUploadControls>
   <span>
-    <ForwardRef
+    <Button
       active={false}
       bsStyle="success"
       className="button"
       id="upload-content-pack-button"
       onClick={[Function]}
     >
-      <Button__StyledButton
+      <Button
         active={false}
+        block={false}
+        bsClass="btn"
         bsStyle="success"
-        className="button"
+        className="Button-c9cbmb-0 eqVrkX button"
+        disabled={false}
         id="upload-content-pack-button"
         onClick={[Function]}
       >
-        <Button
-          active={false}
-          block={false}
-          bsClass="btn"
-          bsStyle="success"
-          className="Button__StyledButton-c9cbmb-0 laZUlH button"
+        <button
+          className="Button-c9cbmb-0 eqVrkX button btn btn-success"
           disabled={false}
           id="upload-content-pack-button"
           onClick={[Function]}
+          type="button"
         >
-          <button
-            className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-success"
-            disabled={false}
-            id="upload-content-pack-button"
-            onClick={[Function]}
-            type="button"
-          >
-            Upload
-          </button>
-        </Button>
-      </Button__StyledButton>
-    </ForwardRef>
+          Upload
+        </button>
+      </Button>
+    </Button>
     <BootstrapModalForm
       cancelButtonText="Cancel"
       formProps={Object {}}
