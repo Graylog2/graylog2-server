@@ -40,7 +40,6 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
                 .size(10000);
     }
 
-    @SuppressWarnings("unchecked")
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
         return StreamSupport.stream(result.getHits().spliterator(), false)
                 .map(SearchHit::getSourceAsMap)

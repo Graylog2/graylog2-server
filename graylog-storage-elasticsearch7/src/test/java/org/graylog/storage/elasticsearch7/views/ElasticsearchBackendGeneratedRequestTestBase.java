@@ -52,13 +52,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -125,23 +118,11 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchB
         return null;
     }
 
-    List<SearchRequest> run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) throws IOException {
+    List<SearchRequest> run(SearchJob searchJob, Query query, ESGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
         this.elasticsearchBackend.doRun(searchJob, query, queryContext, predecessorResults);
 
         verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
 
-        final List<SearchRequest> generatedSearch = clientRequestCaptor.getValue();
-        return generatedSearch;
-    }
-
-    String resourceFile(String filename) {
-        try {
-            final URL resource = this.getClass().getResource(filename);
-            final Path path = Paths.get(resource.toURI());
-            final byte[] bytes = Files.readAllBytes(path);
-            return new String(bytes, StandardCharsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return clientRequestCaptor.getValue();
     }
 }

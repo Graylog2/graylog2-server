@@ -99,7 +99,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // add global rollup series if those were requested
         if (pivot.rollup()) {
             seriesStream(pivot, queryContext, "global rollup")
-                    .forEach(previousAggregation != null ? previousAggregation::subAggregation : searchSourceBuilder::aggregation);
+                    .forEach(searchSourceBuilder::aggregation);
         }
 
         final Iterator<BucketSpec> rowBuckets = pivot.rowGroups().iterator();

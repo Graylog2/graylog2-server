@@ -24,7 +24,6 @@ import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -112,10 +111,6 @@ public class ViewsESBackendModule extends ViewsModule {
         return bindExportBackend(SUPPORTED_ES_VERSION);
     }
 
-    private void registerQueryBackend() {
-        registerQueryBackend(SUPPORTED_ES_VERSION, ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
-    }
-
     private MapBinder<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> pivotBucketHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
@@ -123,11 +118,11 @@ public class ViewsESBackendModule extends ViewsModule {
 
     }
 
-    private ScopedBindingBuilder registerPivotBucketHandler(
+    private void registerPivotBucketHandler(
             String name,
             Class<? extends ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> implementation
     ) {
-        return pivotBucketHandlerBinder().addBinding(name).to(implementation);
+        pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
 
     protected MapBinder<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
@@ -137,11 +132,11 @@ public class ViewsESBackendModule extends ViewsModule {
 
     }
 
-    private ScopedBindingBuilder registerPivotSeriesHandler(
+    private void registerPivotSeriesHandler(
             String name,
             Class<? extends ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
     ) {
-        return pivotSeriesHandlerBinder().addBinding(name).to(implementation);
+        pivotSeriesHandlerBinder().addBinding(name).to(implementation);
     }
 
     private MapBinder<String, ESSearchTypeHandler<? extends SearchType>> esSearchTypeHandlerBinder() {

@@ -22,7 +22,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -165,9 +164,5 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                         "searchTypeIndex",
                         "queryIndex"
                 );
-    }
-
-    private JsonPathAssert jsonAssertThat(DocumentContext ctx) {
-        return JsonPathAssert.assertThat(ctx);
     }
 }

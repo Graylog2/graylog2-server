@@ -64,20 +64,19 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Count count,
                                         SearchResponse searchResult,
-                                        ValueCount metricAggregation,
+                                        ValueCount valueCount,
                                         ESPivot searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
-        Object value = null;
-        if (metricAggregation instanceof MultiBucketsAggregation.Bucket) {
-            value = ((MultiBucketsAggregation.Bucket) metricAggregation).getDocCount();
-        } else if (metricAggregation instanceof Aggregations) {
-            value = searchResult.getHits().getTotalHits().value;
-        } else if (metricAggregation != null) {
-            value = metricAggregation.getValue();
-        }
-        if (value == null) {
-            LOG.error("Unexpected aggregation type {}, returning 0 for the count. This is a bug.", metricAggregation);
+        final Object value;
+        if (valueCount == null) {
+            LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
             value = 0;
+        } else if (valueCount instanceof MultiBucketsAggregation.Bucket) {
+            value = ((MultiBucketsAggregation.Bucket) valueCount).getDocCount();
+        } else if (valueCount instanceof Aggregations) {
+            value = searchResult.getHits().getTotalHits().value;
+        } else {
+            value = valueCount.getValue();
         }
         return Stream.of(Value.create(count.id(), Count.NAME, value));
     }
