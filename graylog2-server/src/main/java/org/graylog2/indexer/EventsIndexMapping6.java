@@ -18,13 +18,12 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Tools;
 
 import java.util.Map;
 
-public class EventsIndexMapping6 extends EventsIndexMappingBase implements IndexMappingTemplate {
+public class EventsIndexMapping6 implements IndexMappingTemplate {
     @Override
     public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
         final String indexPatternsField = "index_patterns";
@@ -199,5 +198,12 @@ public class EventsIndexMapping6 extends EventsIndexMappingBase implements Index
                                 .build())
                         .build())
                 .build();
+    }
+
+    ImmutableMap.Builder<String, Object> map() {
+        return ImmutableMap.builder();
+    }
+    ImmutableList.Builder<Object> list() {
+        return ImmutableList.builder();
     }
 }
