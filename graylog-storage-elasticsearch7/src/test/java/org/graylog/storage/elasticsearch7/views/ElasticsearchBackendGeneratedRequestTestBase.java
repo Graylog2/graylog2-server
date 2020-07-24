@@ -62,7 +62,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchBackendTestBase {
+public class ElasticsearchBackendGeneratedRequestTestBase {
     protected static final QueryStringParser queryStringParser = new QueryStringParser();
 
     @Rule

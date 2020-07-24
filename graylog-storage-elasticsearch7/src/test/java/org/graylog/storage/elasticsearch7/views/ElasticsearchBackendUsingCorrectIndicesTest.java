@@ -57,13 +57,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBackendTestBase {
+public class ElasticsearchBackendUsingCorrectIndicesTest {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new ESMessageList(new QueryStringDecorators.Fake())
     );

@@ -17,16 +17,12 @@
 package org.graylog.storage.elasticsearch7.views;
 
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-abstract class ElasticsearchBackendTestBase {
-    static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-
-    List<String> indicesOf(List<SearchRequest> clientRequest) throws IOException {
+class ViewsUtils {
+    static List<String> indicesOf(List<SearchRequest> clientRequest) {
         return clientRequest.stream()
                 .map(request -> String.join(",", request.indices()))
                 .collect(Collectors.toList());

@@ -61,7 +61,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TestMultisearchResponse {
-    static List<NamedXContentRegistry.Entry> getDefaultNamedXContents() {
+    public static MultiSearchResponse fromFixture(String filename) throws IOException {
+        return resultFor(resourceFile(filename));
+    }
+
+    private static List<NamedXContentRegistry.Entry> getDefaultNamedXContents() {
         Map<String, ContextParser<Object, ? extends Aggregation>> map = new HashMap<>();
         map.put("cardinality", (p, c) -> ParsedCardinality.fromXContent(p, (String)c));
         map.put("percentiles_bucket", (p, c) -> ParsedPercentilesBucket.fromXContent(p, (String)c));
@@ -103,13 +107,14 @@ public class TestMultisearchResponse {
         entries.add(new NamedXContentRegistry.Entry(Suggest.Suggestion.class, new ParseField("completion"), (parser, context) -> CompletionSuggestion.fromXContent(parser, (String)context)));
         return entries;
     }
-    static MultiSearchResponse resultFor(InputStream result) throws IOException {
+
+    private static MultiSearchResponse resultFor(InputStream result) throws IOException {
         final NamedXContentRegistry registry = new NamedXContentRegistry(getDefaultNamedXContents());
         final XContentParser parser = JsonXContent.jsonXContent.createParser(registry, LoggingDeprecationHandler.INSTANCE, result);
         return MultiSearchResponse.fromXContext(parser);
     }
 
-    static InputStream resourceFile(String filename) {
+    private static InputStream resourceFile(String filename) {
         try {
             @SuppressWarnings("UnstableApiUsage")
             final URL resource = Resources.getResource(filename);
@@ -120,9 +125,5 @@ public class TestMultisearchResponse {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static MultiSearchResponse fromFixture(String filename) throws IOException {
-        return resultFor(resourceFile(filename));
     }
 }
