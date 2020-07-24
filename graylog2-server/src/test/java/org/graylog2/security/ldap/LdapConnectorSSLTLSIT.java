@@ -16,6 +16,7 @@
  */
 package org.graylog2.security.ldap;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.exception.LdapOperationException;
 import org.apache.directory.api.ldap.model.exception.LdapProtocolErrorException;
@@ -23,6 +24,7 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -31,6 +33,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.net.URI;
 import java.util.Locale;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -38,6 +41,7 @@ import static org.mockito.Mockito.mock;
 @Testcontainers
 public class LdapConnectorSSLTLSIT {
     private static final int DEFAULT_TIMEOUT = 60 * 1000;
+    private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2");
     private static final String NETWORK_ALIAS = "ldapserver";
     private static final Integer PORT = 389;
     private static final Integer SSL_PORT = 636;
@@ -61,11 +65,16 @@ public class LdapConnectorSSLTLSIT {
                 topLevelContainer.getMappedPort(SSL_PORT)));
     }
 
+    private LdapConnector ldapConnector;
+
+    @BeforeEach
+    void setUp() {
+        final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
+        this.ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, ldapSettingsService);
+    }
+
     @Test
     void shouldNotConnectViaTLSToSelfSignedCertIfValidationIsRequested() throws Exception {
-        final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
-
         final LdapTestConfigRequest request = createTLSTestRequest(false);
 
         Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
@@ -76,13 +85,9 @@ public class LdapConnectorSSLTLSIT {
 
     @Test
     void shouldConnectViaTLSToSelfSignedCertIfValidationIsNotRequested() throws Exception {
-        final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
-
         final LdapTestConfigRequest request = createTLSTestRequest(true);
 
         final LdapNetworkConnection connection = ldapConnector.connect(request);
-
         assertThat(connection.isAuthenticated()).isTrue();
         assertThat(connection.isConnected()).isTrue();
         assertThat(connection.isSecured()).isTrue();
@@ -110,9 +115,6 @@ public class LdapConnectorSSLTLSIT {
 
     @Test
     void shouldNotConnectViaSSLToSelfSignedCertIfValidationIsRequested() throws Exception {
-        final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
-
         final LdapTestConfigRequest request = createSSLTestRequest(false);
 
         Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
@@ -122,9 +124,6 @@ public class LdapConnectorSSLTLSIT {
 
     @Test
     void shouldConnectViaSSLToSelfSignedCertIfValidationIsNotRequested() throws Exception {
-        final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ldapSettingsService);
-
         final LdapTestConfigRequest request = createSSLTestRequest(true);
 
         final LdapNetworkConnection connection = ldapConnector.connect(request);
