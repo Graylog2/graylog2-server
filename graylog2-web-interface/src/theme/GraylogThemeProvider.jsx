@@ -17,7 +17,7 @@ const GraylogThemeProvider = ({ children }) => {
       colors,
       fonts,
       components: {
-        button: buttonStyles({ colors }),
+        button: buttonStyles({ colors, utils }),
         aceEditor: aceEditorStyles({ colors }),
       },
       utils,
