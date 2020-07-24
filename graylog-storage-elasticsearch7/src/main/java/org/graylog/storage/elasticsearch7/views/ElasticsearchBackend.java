@@ -130,7 +130,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
                 .from(0)
-                .size(0);
+                .size(0)y
+                .trackTotalHits(true);
 
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
