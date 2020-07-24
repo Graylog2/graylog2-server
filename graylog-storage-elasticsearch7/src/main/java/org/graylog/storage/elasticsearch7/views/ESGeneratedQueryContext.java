@@ -87,7 +87,9 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
             final QueryBuilder queryBuilder = generateFilterClause(searchType.filter())
                     .map(filterClause -> (QueryBuilder)new BoolQueryBuilder().must(ssb.query()).must(filterClause))
                     .orElse(ssb.query());
-            return ssb.copyWithNewSlice(ssb.slice()).query(queryBuilder);
+            return ssb.shallowCopy()
+                    .slice(ssb.slice())
+                    .query(queryBuilder);
         });
     }
 

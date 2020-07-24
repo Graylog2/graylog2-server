@@ -126,7 +126,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
             }
 
             @Override
-            public Map<String, Object> getMetaData() {
+            public Map<String, Object> getMetadata() {
                 return null;
             }
 
