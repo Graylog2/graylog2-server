@@ -27,6 +27,7 @@ import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
+import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
@@ -234,14 +235,12 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
-    public List<String> getPermissionsForUser(User user) {
+    public List<Permission> getPermissionsForUser(User user) {
         final GRN principal = grnRegistry.newGRN(GRNTypes.USER.type(), user.getName());
-        final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder()
-                .addAll(user.getPermissions())
-                // The frontend cannot handle (and currently does not need) GRNPermissions. Thus we filter them
-                .addAll(grantPermissionResolver.resolvePermissionsForPrincipal(principal)
-                        .stream().filter(p -> p instanceof WildcardPermission).map(Object::toString).collect(Collectors.toSet()))
-                .addAll(getUserPermissionsFromRoles(user));
+        final ImmutableSet.Builder<Permission> permSet = ImmutableSet.<Permission>builder()
+                .addAll(user.getPermissions().stream().map(WildcardPermission::new).collect(Collectors.toSet()))
+                .addAll(grantPermissionResolver.resolvePermissionsForPrincipal(principal))
+                .addAll(getUserPermissionsFromRoles(user).stream().map(WildcardPermission::new).collect(Collectors.toSet()));
 
         return permSet.build().asList();
     }

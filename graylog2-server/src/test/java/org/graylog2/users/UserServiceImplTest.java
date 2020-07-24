@@ -27,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.GrantPermissionResolver;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
@@ -52,6 +53,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -228,9 +230,13 @@ public class UserServiceImplTest {
 
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
         when(grantPermissionResolver.resolvePermissionsForPrincipal(grnRegistry.newGRN(GRNTypes.USER, "user")))
-                .thenReturn(ImmutableSet.of(new WildcardPermission("perm:from:grant")));
+                .thenReturn(ImmutableSet.of(
+                        new WildcardPermission("perm:from:grant"),
+                        GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"))));
 
-        assertThat(userService.getPermissionsForUser(user)).containsOnly("users:passwordchange:user", "users:edit:user",
-                "foo:bar", "hello:world", "perm:from:grant", "users:tokenlist:user", "users:tokencreate:user", "users:tokenremove:user");
+        assertThat(userService.getPermissionsForUser(user).stream().map(Objects::toString)).containsExactlyInAnyOrder(
+                "users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user", "users:tokencreate:user", "users:tokenremove:user",
+                "perm:from:grant",
+                "entity:own|grn::::dashboard:1234");
     }
 }

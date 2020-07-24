@@ -40,4 +40,11 @@ public abstract class GRNPermission implements Permission {
 
         return (other.type().equals(type()) && other.target().equals(target()));
     }
+
+    @Override
+    // This string representation is used in the UserSummary and exported to the frontend
+    // Don't change this!
+    public String toString() {
+        return type() + "|" + target().toString();
+    }
 }

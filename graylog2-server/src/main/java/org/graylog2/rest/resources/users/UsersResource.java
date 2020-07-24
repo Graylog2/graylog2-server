@@ -29,6 +29,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -609,13 +611,25 @@ public class UsersResource extends RestResource {
             lastActivity = session.getLastAccessTime();
             clientAddress = session.getHost();
         }
+        List<WildcardPermission> wildcardPermissions;
+        List<GRNPermission> grnPermissions;
+        if (includePermissions) {
+            wildcardPermissions = userService.getPermissionsForUser(user).stream()
+                    .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).collect(Collectors.toList());
+            grnPermissions = userService.getPermissionsForUser(user).stream()
+                    .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).collect(Collectors.toList());
+        } else {
+            wildcardPermissions = ImmutableList.of();
+            grnPermissions = ImmutableList.of();
+        }
 
         return UserSummary.create(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getFullName(),
-                includePermissions ? userService.getPermissionsForUser(user) : Collections.emptyList(),
+                wildcardPermissions,
+                grnPermissions,
                 user.getPreferences(),
                 user.getTimeZone() == null ? null : user.getTimeZone().getID(),
                 user.getSessionTimeoutMs(),
