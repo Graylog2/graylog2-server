@@ -190,68 +190,56 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                               className="btn-toolbar"
                               role="toolbar"
                             >
-                              <ForwardRef
+                              <Button
                                 bsSize="small"
                                 bsStyle="primary"
                                 onClick={[Function]}
                               >
-                                <Button__StyledButton
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
                                   bsSize="small"
                                   bsStyle="primary"
+                                  className="Button-c9cbmb-0 bNulii"
+                                  disabled={false}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsSize="small"
-                                    bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                  <button
+                                    className="Button-c9cbmb-0 bNulii btn btn-sm btn-primary"
                                     disabled={false}
                                     onClick={[Function]}
+                                    type="button"
                                   >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-primary"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      Uninstall
-                                    </button>
-                                  </Button>
-                                </Button__StyledButton>
-                              </ForwardRef>
-                              <ForwardRef
+                                    Uninstall
+                                  </button>
+                                </Button>
+                              </Button>
+                              <Button
                                 bsSize="small"
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button__StyledButton
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
                                   bsSize="small"
                                   bsStyle="info"
+                                  className="Button-c9cbmb-0 bNulii"
+                                  disabled={false}
                                   onClick={[Function]}
                                 >
-                                  <Button
-                                    active={false}
-                                    block={false}
-                                    bsClass="btn"
-                                    bsSize="small"
-                                    bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                  <button
+                                    className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
                                     disabled={false}
                                     onClick={[Function]}
+                                    type="button"
                                   >
-                                    <button
-                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                      disabled={false}
-                                      onClick={[Function]}
-                                      type="button"
-                                    >
-                                      View
-                                    </button>
-                                  </Button>
-                                </Button__StyledButton>
-                              </ForwardRef>
+                                    View
+                                  </button>
+                                </Button>
+                              </Button>
                               <BootstrapModalWrapper
                                 backdrop="static"
                                 bsSize="large"

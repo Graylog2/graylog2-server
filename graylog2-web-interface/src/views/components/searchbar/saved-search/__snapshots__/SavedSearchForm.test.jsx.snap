@@ -223,25 +223,291 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                       ],
                       "button": Array [
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "danger",
+                          "{background-color:",
+                          "#ad0707",
+                          ";border-color:",
+                          "#b23939",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#a00e0e",
+                          ";border-color:",
+                          "#a53636",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}&.active{background-color:",
+                          "#b75151",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";:hover{background-color:",
+                          "#a94c4c",
+                          ";border-color:",
+                          "#ad5c5c",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";:hover{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "default",
+                          "{background-color:",
+                          "#e6e6e6",
+                          ";border-color:",
+                          "#e0e0e0",
+                          ";color:",
+                          "rgb(73,73,73)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#d4d4d4",
+                          ";border-color:",
+                          "#cfcfcf",
+                          ";color:",
+                          "#444444",
+                          ";}&.active{background-color:",
+                          "#dadada",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(49,49,49)",
+                          ";:hover{background-color:",
+                          "#cacaca",
+                          ";border-color:",
+                          "#c4c4c4",
+                          ";color:",
+                          "#2f2f2f",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";:hover{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "info",
+                          "{background-color:",
+                          "#0063be",
+                          ";border-color:",
+                          "#3970c2",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0c5cb0",
+                          ";border-color:",
+                          "#3668b3",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}&.active{background-color:",
+                          "#517cc5",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";:hover{background-color:",
+                          "#4b73b6",
+                          ";border-color:",
+                          "#5c7dba",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";:hover{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "link",
+                          "{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebebeb26",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#68267b",
+                          ";}&.active{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#410057",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#3d0c51",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "primary",
+                          "{background-color:",
+                          "#702785",
+                          ";border-color:",
+                          "#7b458e",
+                          ";color:",
+                          "rgb(234,229,236)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#68267b",
+                          ";border-color:",
+                          "#724083",
+                          ";color:",
+                          "#d8d3da",
+                          ";}&.active{background-color:",
+                          "#855996",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(250,249,251)",
+                          ";:hover{background-color:",
+                          "#7c538b",
+                          ";border-color:",
+                          "#846292",
+                          ";color:",
+                          "#e7e6e8",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";:hover{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "success",
+                          "{background-color:",
+                          "#00ae42",
+                          ";border-color:",
+                          "#39b356",
+                          ";color:",
+                          "rgb(249,252,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0ca13e",
+                          ";border-color:",
+                          "#36a550",
+                          ";color:",
+                          "#e6e9e6",
+                          ";}&.active{background-color:",
+                          "#51b866",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(249,252,250)",
+                          ";:hover{background-color:",
+                          "#4baa5f",
+                          ";border-color:",
+                          "#5cae6c",
+                          ";color:",
+                          "#e6e9e7",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";:hover{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "warning",
+                          "{background-color:",
+                          "#ffd200",
+                          ";border-color:",
+                          "#f9cd07",
+                          ";color:",
+                          "rgb(57,47,0)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebc20c",
+                          ";border-color:",
+                          "#e6bd0e",
+                          ";color:",
+                          "#362d0c",
+                          ";}&.active{background-color:",
+                          "#f2c70a",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(54,45,2)",
+                          ";:hover{background-color:",
+                          "#e0b80f",
+                          ";border-color:",
+                          "#d9b310",
+                          ";color:",
+                          "#332b0c",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";:hover{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";}}}",
                         ],
                       ],
                     },
@@ -373,69 +639,56 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                               </FormGroup>
                             </FormGroup__StyledFormGroup>
                           </Component>
-                          <ForwardRef
+                          <Button
                             bsStyle="info"
                             className="button"
                             disabled={false}
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="info"
-                              className="button"
+                              className="Button-c9cbmb-0 bNulii button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="info"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Create new
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Create new
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             className="button"
                             onClick={[Function]}
                           >
-                            <Button__StyledButton
-                              className="button"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 bNulii button"
+                              disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
+                                type="button"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Cancel
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                Cancel
+                              </button>
+                            </Button>
+                          </Button>
                         </form>
                       </div>
                     </div>
@@ -674,25 +927,291 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                       ],
                       "button": Array [
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "danger",
+                          "{background-color:",
+                          "#ad0707",
+                          ";border-color:",
+                          "#b23939",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#a00e0e",
+                          ";border-color:",
+                          "#a53636",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}&.active{background-color:",
+                          "#b75151",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";:hover{background-color:",
+                          "#a94c4c",
+                          ";border-color:",
+                          "#ad5c5c",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";:hover{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "default",
+                          "{background-color:",
+                          "#e6e6e6",
+                          ";border-color:",
+                          "#e0e0e0",
+                          ";color:",
+                          "rgb(73,73,73)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#d4d4d4",
+                          ";border-color:",
+                          "#cfcfcf",
+                          ";color:",
+                          "#444444",
+                          ";}&.active{background-color:",
+                          "#dadada",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(49,49,49)",
+                          ";:hover{background-color:",
+                          "#cacaca",
+                          ";border-color:",
+                          "#c4c4c4",
+                          ";color:",
+                          "#2f2f2f",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";:hover{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "info",
+                          "{background-color:",
+                          "#0063be",
+                          ";border-color:",
+                          "#3970c2",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0c5cb0",
+                          ";border-color:",
+                          "#3668b3",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}&.active{background-color:",
+                          "#517cc5",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";:hover{background-color:",
+                          "#4b73b6",
+                          ";border-color:",
+                          "#5c7dba",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";:hover{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "link",
+                          "{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebebeb26",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#68267b",
+                          ";}&.active{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#410057",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#3d0c51",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "primary",
+                          "{background-color:",
+                          "#702785",
+                          ";border-color:",
+                          "#7b458e",
+                          ";color:",
+                          "rgb(234,229,236)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#68267b",
+                          ";border-color:",
+                          "#724083",
+                          ";color:",
+                          "#d8d3da",
+                          ";}&.active{background-color:",
+                          "#855996",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(250,249,251)",
+                          ";:hover{background-color:",
+                          "#7c538b",
+                          ";border-color:",
+                          "#846292",
+                          ";color:",
+                          "#e7e6e8",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";:hover{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "success",
+                          "{background-color:",
+                          "#00ae42",
+                          ";border-color:",
+                          "#39b356",
+                          ";color:",
+                          "rgb(249,252,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0ca13e",
+                          ";border-color:",
+                          "#36a550",
+                          ";color:",
+                          "#e6e9e6",
+                          ";}&.active{background-color:",
+                          "#51b866",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(249,252,250)",
+                          ";:hover{background-color:",
+                          "#4baa5f",
+                          ";border-color:",
+                          "#5cae6c",
+                          ";color:",
+                          "#e6e9e7",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";:hover{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "warning",
+                          "{background-color:",
+                          "#ffd200",
+                          ";border-color:",
+                          "#f9cd07",
+                          ";color:",
+                          "rgb(57,47,0)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebc20c",
+                          ";border-color:",
+                          "#e6bd0e",
+                          ";color:",
+                          "#362d0c",
+                          ";}&.active{background-color:",
+                          "#f2c70a",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(54,45,2)",
+                          ";:hover{background-color:",
+                          "#e0b80f",
+                          ";border-color:",
+                          "#d9b310",
+                          ";color:",
+                          "#332b0c",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";:hover{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";}}}",
                         ],
                       ],
                     },
@@ -824,102 +1343,82 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                               </FormGroup>
                             </FormGroup__StyledFormGroup>
                           </Component>
-                          <ForwardRef
+                          <Button
                             bsStyle="primary"
                             className="button"
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="primary"
-                              className="button"
+                              className="Button-c9cbmb-0 bNulii button"
+                              disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="primary"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-primary"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             bsStyle="info"
                             className="button"
                             disabled={true}
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="info"
-                              className="button"
+                              className="Button-c9cbmb-0 bNulii button"
                               disabled={true}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="info"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
-                                  disabled={true}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save as
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save as
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             className="button"
                             onClick={[Function]}
                           >
-                            <Button__StyledButton
-                              className="button"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 bNulii button"
+                              disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
+                                type="button"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Cancel
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                Cancel
+                              </button>
+                            </Button>
+                          </Button>
                         </form>
                       </div>
                     </div>
@@ -1158,25 +1657,291 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                       ],
                       "button": Array [
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "danger",
+                          "{background-color:",
+                          "#ad0707",
+                          ";border-color:",
+                          "#b23939",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#a00e0e",
+                          ";border-color:",
+                          "#a53636",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}&.active{background-color:",
+                          "#b75151",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,249,249)",
+                          ";:hover{background-color:",
+                          "#a94c4c",
+                          ";border-color:",
+                          "#ad5c5c",
+                          ";color:",
+                          "#e9e6e6",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";:hover{background-color:",
+                          "#c07272",
+                          ";border-color:",
+                          "#bc6363",
+                          ";color:",
+                          "rgb(252,250,250)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "default",
+                          "{background-color:",
+                          "#e6e6e6",
+                          ";border-color:",
+                          "#e0e0e0",
+                          ";color:",
+                          "rgb(73,73,73)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#d4d4d4",
+                          ";border-color:",
+                          "#cfcfcf",
+                          ";color:",
+                          "#444444",
+                          ";}&.active{background-color:",
+                          "#dadada",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(49,49,49)",
+                          ";:hover{background-color:",
+                          "#cacaca",
+                          ";border-color:",
+                          "#c4c4c4",
+                          ";color:",
+                          "#2f2f2f",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";:hover{background-color:",
+                          "#cecece",
+                          ";border-color:",
+                          "#d4d4d4",
+                          ";color:",
+                          "rgb(80,80,80)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "info",
+                          "{background-color:",
+                          "#0063be",
+                          ";border-color:",
+                          "#3970c2",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0c5cb0",
+                          ";border-color:",
+                          "#3668b3",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}&.active{background-color:",
+                          "#517cc5",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(249,250,252)",
+                          ";:hover{background-color:",
+                          "#4b73b6",
+                          ";border-color:",
+                          "#5c7dba",
+                          ";color:",
+                          "#e6e7e9",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";:hover{background-color:",
+                          "#7290cd",
+                          ";border-color:",
+                          "#6386c9",
+                          ";color:",
+                          "rgb(250,251,253)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "link",
+                          "{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebebeb26",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#68267b",
+                          ";}&.active{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#410057",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "#ebebeb26",
+                          ";color:",
+                          "#3d0c51",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";:hover{background-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";border-color:",
+                          "rgba(255, 255, 255, 0)",
+                          ";color:",
+                          "#702785",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "primary",
+                          "{background-color:",
+                          "#702785",
+                          ";border-color:",
+                          "#7b458e",
+                          ";color:",
+                          "rgb(234,229,236)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#68267b",
+                          ";border-color:",
+                          "#724083",
+                          ";color:",
+                          "#d8d3da",
+                          ";}&.active{background-color:",
+                          "#855996",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(250,249,251)",
+                          ";:hover{background-color:",
+                          "#7c538b",
+                          ";border-color:",
+                          "#846292",
+                          ";color:",
+                          "#e7e6e8",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";:hover{background-color:",
+                          "#9877a5",
+                          ";border-color:",
+                          "#8f699d",
+                          ";color:",
+                          "rgb(251,250,251)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "success",
+                          "{background-color:",
+                          "#00ae42",
+                          ";border-color:",
+                          "#39b356",
+                          ";color:",
+                          "rgb(249,252,249)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#0ca13e",
+                          ";border-color:",
+                          "#36a550",
+                          ";color:",
+                          "#e6e9e6",
+                          ";}&.active{background-color:",
+                          "#51b866",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(249,252,250)",
+                          ";:hover{background-color:",
+                          "#4baa5f",
+                          ";border-color:",
+                          "#5cae6c",
+                          ";color:",
+                          "#e6e9e7",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";:hover{background-color:",
+                          "#72c180",
+                          ";border-color:",
+                          "#63bc74",
+                          ";color:",
+                          "rgb(250,252,250)",
+                          ";}}}",
                         ],
                         Array [
-                          [Function],
+                          "&.btn-",
+                          "warning",
+                          "{background-color:",
+                          "#ffd200",
+                          ";border-color:",
+                          "#f9cd07",
+                          ";color:",
+                          "rgb(57,47,0)",
+                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                          "#ebc20c",
+                          ";border-color:",
+                          "#e6bd0e",
+                          ";color:",
+                          "#362d0c",
+                          ";}&.active{background-color:",
+                          "#f2c70a",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(54,45,2)",
+                          ";:hover{background-color:",
+                          "#e0b80f",
+                          ";border-color:",
+                          "#d9b310",
+                          ";color:",
+                          "#332b0c",
+                          ";}}&[disabled],&.disabled{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";:hover{background-color:",
+                          "#e4bc0e",
+                          ";border-color:",
+                          "#ebc20c",
+                          ";color:",
+                          "rgb(88,73,5)",
+                          ";}}}",
                         ],
                       ],
                     },
@@ -1308,102 +2073,82 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                               </FormGroup>
                             </FormGroup__StyledFormGroup>
                           </Component>
-                          <ForwardRef
+                          <Button
                             bsStyle="primary"
                             className="button"
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="primary"
-                              className="button"
+                              className="Button-c9cbmb-0 bNulii button"
+                              disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="primary"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-primary"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             bsStyle="info"
                             className="button"
                             disabled={false}
                             onClick={[Function]}
                             type="submit"
                           >
-                            <Button__StyledButton
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
                               bsStyle="info"
-                              className="button"
+                              className="Button-c9cbmb-0 bNulii button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="info"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-info"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="submit"
-                                >
-                                  Save as
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
-                          <ForwardRef
+                                Save as
+                              </button>
+                            </Button>
+                          </Button>
+                          <Button
                             className="button"
                             onClick={[Function]}
                           >
-                            <Button__StyledButton
-                              className="button"
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 bNulii button"
+                              disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH button"
+                              <button
+                                className="Button-c9cbmb-0 bNulii button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
+                                type="button"
                               >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH button btn btn-default"
-                                  disabled={false}
-                                  onClick={[Function]}
-                                  type="button"
-                                >
-                                  Cancel
-                                </button>
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                Cancel
+                              </button>
+                            </Button>
+                          </Button>
                         </form>
                       </div>
                     </div>

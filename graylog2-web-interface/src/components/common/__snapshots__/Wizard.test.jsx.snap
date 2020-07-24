@@ -476,102 +476,89 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                       className="c2 btn-toolbar"
                       role="toolbar"
                     >
-                      <ForwardRef
+                      <Button
                         bsSize="xsmall"
                         bsStyle="info"
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsSize="xsmall"
                           bsStyle="info"
+                          className="c3"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsSize="xsmall"
-                            bsStyle="info"
-                            className="c3"
+                          <button
+                            className="c3 btn btn-xs btn-info"
                             disabled={true}
                             onClick={[Function]}
+                            type="button"
                           >
-                            <button
-                              className="c3 btn btn-xs btn-info"
-                              disabled={true}
-                              onClick={[Function]}
-                              type="button"
+                            <Icon
+                              name="caret-left"
+                              type="solid"
                             >
-                              <Icon
-                                name="caret-left"
-                                type="solid"
-                              >
-                                <FontAwesomeIcon
-                                  icon={
-                                    Object {
-                                      "iconName": "caret-left",
-                                      "prefix": "fas",
-                                    }
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "caret-left",
+                                    "prefix": "fas",
                                   }
-                                >
-                                  <svg
-                                    className="svg-inline--fa fa-caret-left"
-                                  />
-                                </FontAwesomeIcon>
-                              </Icon>
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                      <ForwardRef
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-caret-left"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
+                          </button>
+                        </Button>
+                      </Button>
+                      <Button
                         bsSize="xsmall"
                         bsStyle="info"
                         onClick={[Function]}
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsSize="xsmall"
                           bsStyle="info"
+                          className="c3"
+                          disabled={false}
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsSize="xsmall"
-                            bsStyle="info"
-                            className="c3"
+                          <button
+                            className="c3 btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
+                            type="button"
                           >
-                            <button
-                              className="c3 btn btn-xs btn-info"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="button"
+                            <Icon
+                              name="caret-right"
+                              type="solid"
                             >
-                              <Icon
-                                name="caret-right"
-                                type="solid"
-                              >
-                                <FontAwesomeIcon
-                                  icon={
-                                    Object {
-                                      "iconName": "caret-right",
-                                      "prefix": "fas",
-                                    }
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "caret-right",
+                                    "prefix": "fas",
                                   }
-                                >
-                                  <svg
-                                    className="svg-inline--fa fa-caret-right"
-                                  />
-                                </FontAwesomeIcon>
-                              </Icon>
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-caret-right"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                   </ButtonToolbar>
                 </Wizard__HorizontalButtonToolbar>
@@ -1182,102 +1169,89 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                       className="c2 btn-toolbar"
                       role="toolbar"
                     >
-                      <ForwardRef
+                      <Button
                         bsSize="xsmall"
                         bsStyle="info"
                         disabled={true}
                         onClick={[Function]}
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsSize="xsmall"
                           bsStyle="info"
+                          className="c3"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsSize="xsmall"
-                            bsStyle="info"
-                            className="c3"
+                          <button
+                            className="c3 btn btn-xs btn-info"
                             disabled={true}
                             onClick={[Function]}
+                            type="button"
                           >
-                            <button
-                              className="c3 btn btn-xs btn-info"
-                              disabled={true}
-                              onClick={[Function]}
-                              type="button"
+                            <Icon
+                              name="caret-left"
+                              type="solid"
                             >
-                              <Icon
-                                name="caret-left"
-                                type="solid"
-                              >
-                                <FontAwesomeIcon
-                                  icon={
-                                    Object {
-                                      "iconName": "caret-left",
-                                      "prefix": "fas",
-                                    }
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "caret-left",
+                                    "prefix": "fas",
                                   }
-                                >
-                                  <svg
-                                    className="svg-inline--fa fa-caret-left"
-                                  />
-                                </FontAwesomeIcon>
-                              </Icon>
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
-                      <ForwardRef
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-caret-left"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
+                          </button>
+                        </Button>
+                      </Button>
+                      <Button
                         bsSize="xsmall"
                         bsStyle="info"
                         onClick={[Function]}
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsSize="xsmall"
                           bsStyle="info"
+                          className="c3"
+                          disabled={false}
                           onClick={[Function]}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsSize="xsmall"
-                            bsStyle="info"
-                            className="c3"
+                          <button
+                            className="c3 btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
+                            type="button"
                           >
-                            <button
-                              className="c3 btn btn-xs btn-info"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="button"
+                            <Icon
+                              name="caret-right"
+                              type="solid"
                             >
-                              <Icon
-                                name="caret-right"
-                                type="solid"
-                              >
-                                <FontAwesomeIcon
-                                  icon={
-                                    Object {
-                                      "iconName": "caret-right",
-                                      "prefix": "fas",
-                                    }
+                              <FontAwesomeIcon
+                                icon={
+                                  Object {
+                                    "iconName": "caret-right",
+                                    "prefix": "fas",
                                   }
-                                >
-                                  <svg
-                                    className="svg-inline--fa fa-caret-right"
-                                  />
-                                </FontAwesomeIcon>
-                              </Icon>
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                                }
+                              >
+                                <svg
+                                  className="svg-inline--fa fa-caret-right"
+                                />
+                              </FontAwesomeIcon>
+                            </Icon>
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                   </ButtonToolbar>
                 </Wizard__HorizontalButtonToolbar>
@@ -2012,39 +1986,32 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                       <div
                         className="col-xs-6"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="small"
                             bsStyle="info"
+                            className="c3"
                             disabled={true}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="small"
-                              bsStyle="info"
-                              className="c3"
+                            <button
+                              className="c3 btn btn-sm btn-info"
                               disabled={true}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="c3 btn btn-sm btn-info"
-                                disabled={true}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Previous
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Previous
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </Col>
                     <Col
@@ -2056,37 +2023,31 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                       <div
                         className="text-right col-xs-6"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="small"
                           bsStyle="info"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="small"
                             bsStyle="info"
+                            className="c3"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="small"
-                              bsStyle="info"
-                              className="c3"
+                            <button
+                              className="c3 btn btn-sm btn-info"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="c3 btn btn-sm btn-info"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Next
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Next
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </Col>
                   </div>
@@ -2701,39 +2662,32 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                       <div
                         className="col-xs-6"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="small"
                           bsStyle="info"
                           disabled={true}
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="small"
                             bsStyle="info"
+                            className="c3"
                             disabled={true}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="small"
-                              bsStyle="info"
-                              className="c3"
+                            <button
+                              className="c3 btn btn-sm btn-info"
                               disabled={true}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="c3 btn btn-sm btn-info"
-                                disabled={true}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Previous
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Previous
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </Col>
                     <Col
@@ -2745,37 +2699,31 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                       <div
                         className="text-right col-xs-6"
                       >
-                        <ForwardRef
+                        <Button
                           bsSize="small"
                           bsStyle="info"
                           onClick={[Function]}
                         >
-                          <Button__StyledButton
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
                             bsSize="small"
                             bsStyle="info"
+                            className="c3"
+                            disabled={false}
                             onClick={[Function]}
                           >
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsSize="small"
-                              bsStyle="info"
-                              className="c3"
+                            <button
+                              className="c3 btn btn-sm btn-info"
                               disabled={false}
                               onClick={[Function]}
+                              type="button"
                             >
-                              <button
-                                className="c3 btn btn-sm btn-info"
-                                disabled={false}
-                                onClick={[Function]}
-                                type="button"
-                              >
-                                Next
-                              </button>
-                            </Button>
-                          </Button__StyledButton>
-                        </ForwardRef>
+                              Next
+                            </button>
+                          </Button>
+                        </Button>
                       </div>
                     </Col>
                   </div>

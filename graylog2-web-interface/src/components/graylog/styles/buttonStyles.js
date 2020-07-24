@@ -34,11 +34,11 @@ const buttonStyles = ({ colors, utils }) => {
 
     const hoverBackground = mixColor(defaultBackground);
     const hoverBorderColor = mixColor(defaultBorder);
-    const hoverColor = mixColor(defaultBorder);
+    const hoverColor = mixColor(defaultColor);
 
     const activeHoverBackground = mixColor(activeBackground);
     const activeHoverBorderColor = mixColor(activeBorder);
-    const activeHoverColor = mixColor(activeBorder);
+    const activeHoverColor = mixColor(activeColor);
 
     return css`
       &.btn-${variant} {
