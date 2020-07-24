@@ -1,4 +1,3 @@
-import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { DropdownButton as BootstrapDropdownButton } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
