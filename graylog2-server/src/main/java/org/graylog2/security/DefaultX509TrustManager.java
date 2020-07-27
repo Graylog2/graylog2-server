@@ -43,7 +43,7 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     }
 
     @VisibleForTesting
-    DefaultX509TrustManager(String host, KeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException {
+    public DefaultX509TrustManager(String host, KeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException {
         super();
         this.authorizer = new JsseDefaultHostnameAuthorizer(Collections.emptySet());
 
