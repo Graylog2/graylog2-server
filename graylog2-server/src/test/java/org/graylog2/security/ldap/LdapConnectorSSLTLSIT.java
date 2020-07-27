@@ -34,8 +34,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import sun.security.provider.certpath.SunCertPathBuilderException;
 
 import javax.net.ssl.TrustManager;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -221,7 +225,13 @@ public class LdapConnectorSSLTLSIT {
     }
 
     private String resource(String path) {
-        return this.getClass().getResource(path).getPath();
+        final URL resourceUrl = this.getClass().getResource(path);
+        try {
+            final File file = Paths.get(resourceUrl.toURI()).toFile();
+            return file.getAbsolutePath();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private URI internalUri() {
