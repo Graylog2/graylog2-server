@@ -186,8 +186,18 @@ const Scratchpad = () => {
                   spellCheck={false} />
 
         <Footer>
-          <OverlayTrigger placement="right" trigger={['click', 'focus']} overlay={<Tooltip id="scratchpad-help">You can use this space to store personal notes and other information while interacting with Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.</Tooltip>}>
-            <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
+          <OverlayTrigger placement="right"
+                          trigger={['hover', 'focus']}
+                          overlay={(
+                            <Tooltip id="scratchpad-help">
+                              You can use this space to store personal notes and other information while interacting with
+                              Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP
+                              addresses you need in various investigations.
+                            </Tooltip>
+                          )}>
+            <Button bsStyle="link">
+              <Icon name="question-circle" />
+            </Button>
           </OverlayTrigger>
 
           <SavingMessage visible={recentlySaved}><Icon name="hdd" type="regular" /> Saved!</SavingMessage>
