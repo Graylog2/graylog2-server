@@ -23,15 +23,16 @@ import org.apache.directory.api.ldap.model.exception.LdapProtocolErrorException;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
+import org.graylog2.security.DefaultX509TrustManager;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Set;
 
@@ -46,31 +47,48 @@ public class LdapConnectorSSLTLSIT {
     private static final Integer PORT = 389;
     private static final Integer SSL_PORT = 636;
 
-    @SuppressWarnings("rawtypes")
-    @Container
-    private final GenericContainer topLevelContainer = new GenericContainer("rroemhild/test-openldap:latest")
+    private final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
+            .withEnv("LDAP_TLS_VERIFY_CLIENT", "allow")
+            .withEnv("LDAP_TLS_CRT_FILENAME", "server-cert.pem")
+            .withEnv("LDAP_TLS_KEY_FILENAME", "server-key.pem")
+            .withEnv("LDAP_TLS_CA_CRT_FILENAME", "CA-cert.pem")
+            .withFileSystemBind(resourceDir("certs"), "/container/service/slapd/assets/certs")
             .withNetworkAliases(NETWORK_ALIAS)
-            .withExposedPorts(PORT, SSL_PORT);
+            .withExposedPorts(PORT, SSL_PORT)
+            .withStartupTimeout(Duration.ofMinutes(1));
+
+    private String resourceDir(String certs) {
+        return this.getClass().getResource(certs).getPath();
+    }
 
     private URI internalUri() {
         return URI.create(String.format(Locale.US, "ldap://%s:%d",
-                topLevelContainer.getContainerIpAddress(),
-                topLevelContainer.getMappedPort(PORT)));
+                container.getContainerIpAddress(),
+                container.getMappedPort(PORT)));
     }
 
     private URI internalSSLUri() {
         return URI.create(String.format(Locale.US, "ldaps://%s:%d",
-                topLevelContainer.getContainerIpAddress(),
-                topLevelContainer.getMappedPort(SSL_PORT)));
+                container.getContainerIpAddress(),
+                container.getMappedPort(SSL_PORT)));
     }
 
     private LdapConnector ldapConnector;
 
     @BeforeEach
     void setUp() {
+        container.start();
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        this.ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, ldapSettingsService);
+        final LdapConnector.TrustManagerProvider trustManagerProvider = (host) -> {
+            try {
+                return new DefaultX509TrustManager(host);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        this.ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, ldapSettingsService, trustManagerProvider);
     }
 
     @Test
@@ -96,8 +114,8 @@ public class LdapConnectorSSLTLSIT {
     @NotNull
     private LdapTestConfigRequest createTLSTestRequest(boolean trustAllCertificates) {
         return LdapTestConfigRequest.create(
-                "cn=admin,dc=planetexpress,dc=com",
-                "GoodNewsEveryone",
+                "cn=admin,dc=example,dc=org",
+                "admin",
                 internalUri(),
                 true,
                 trustAllCertificates,
@@ -136,8 +154,8 @@ public class LdapConnectorSSLTLSIT {
     @NotNull
     private LdapTestConfigRequest createSSLTestRequest(boolean trustAllCertificates) {
         return LdapTestConfigRequest.create(
-                "cn=admin,dc=planetexpress,dc=com",
-                "GoodNewsEveryone",
+                "cn=admin,dc=example,dc=org",
+                "admin",
                 internalSSLUri(),
                 false,
                 trustAllCertificates,

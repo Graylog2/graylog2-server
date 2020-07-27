@@ -37,7 +37,6 @@ import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.graylog2.plugin.DocsHelper;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
-import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -78,14 +77,21 @@ public class LdapConnector {
     private final int connectionTimeout;
     private final Set<String> enabledTlsProtocols;
     private final LdapSettingsService ldapSettingsService;
+    private final TrustManagerProvider trustManagerProvider;
+
+    public interface TrustManagerProvider {
+        TrustManager create(String host);
+    }
 
     @Inject
     public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout,
                          @Named("enabled_tls_protocols") Set<String> enabledTlsProtocols,
-                         LdapSettingsService ldapSettingsService) {
+                         LdapSettingsService ldapSettingsService,
+                         TrustManagerProvider trustManagerProvider) {
         this.connectionTimeout = connectionTimeout;
         this.enabledTlsProtocols = enabledTlsProtocols;
         this.ldapSettingsService = ldapSettingsService;
+        this.trustManagerProvider = trustManagerProvider;
     }
 
     public LdapNetworkConnection connect(LdapSettings settings) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
@@ -448,7 +454,7 @@ public class LdapConnector {
         if (request.trustAllCertificates()) {
             config.setTrustManagers(new TrustAllX509TrustManager());
         } else {
-            config.setTrustManagers(createDefaultTrustManager(ldapUri.getHost()));
+            config.setTrustManagers(trustManagerProvider.create(ldapUri.getHost()));
         }
 
         if (!isNullOrEmpty(request.systemUsername())) {
@@ -471,10 +477,6 @@ public class LdapConnector {
         return config;
     }
 
-    private TrustManager createDefaultTrustManager(String host) throws KeyStoreException, NoSuchAlgorithmException {
-        return new DefaultX509TrustManager(host);
-    }
-
     private LdapConnectionConfig createConfig(LdapSettings ldapSettings) throws KeyStoreException, NoSuchAlgorithmException {
         final LdapConnectionConfig config = new LdapConnectionConfig();
         final String hostname = ldapSettings.getUri().getHost();
@@ -485,7 +487,7 @@ public class LdapConnector {
         if (ldapSettings.isTrustAllCertificates()) {
             config.setTrustManagers(new TrustAllX509TrustManager());
         } else {
-            config.setTrustManagers(createDefaultTrustManager(hostname));
+            config.setTrustManagers(trustManagerProvider.create(hostname));
         }
         config.setName(ldapSettings.getSystemUserName());
         config.setCredentials(ldapSettings.getSystemPassword());
