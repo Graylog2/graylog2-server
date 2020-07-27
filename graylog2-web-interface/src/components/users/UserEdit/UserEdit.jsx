@@ -13,6 +13,7 @@ import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
 import PasswordSection from './PasswordSection';
 import ProfileSection from './ProfileSection';
+import RolesSection from './RolesSection';
 
 import MainDetailsGrid from '../UserDetails/MainDetailsGrid';
 import SectionComponent from '../SectionComponent';
@@ -58,7 +59,8 @@ const UserEdit = ({ user }: Props) => {
         </div>
         <div>
           <SectionComponent title="Teams">Children</SectionComponent>
-          <SectionComponent title="Roles">Children</SectionComponent>
+          <RolesSection user={user}
+                        onSubmit={(data) => _updateUser(data, currentUser, user)} />
         </div>
       </MainDetailsGrid>
     </>

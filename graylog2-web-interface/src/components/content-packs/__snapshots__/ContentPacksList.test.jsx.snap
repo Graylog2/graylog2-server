@@ -866,7 +866,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   <FormControl
                                     bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show:"
@@ -877,7 +877,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     value={10}
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
                                       label="Show:"
                                       name="page-size"
@@ -7232,7 +7232,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   <FormControl
                                     bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show:"
@@ -7243,7 +7243,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     value={10}
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
                                       label="Show:"
                                       name="page-size"
@@ -7660,7 +7660,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   <FormControl
                                     bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show:"
@@ -7671,7 +7671,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     value={10}
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
                                       label="Show:"
                                       name="page-size"
@@ -7854,7 +7854,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   <FormControl
                                     bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show:"
@@ -7865,7 +7865,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     value={10}
                                   >
                                     <select
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
                                       label="Show:"
                                       name="page-size"
