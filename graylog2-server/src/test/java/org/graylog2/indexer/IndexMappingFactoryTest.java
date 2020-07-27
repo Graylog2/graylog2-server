@@ -70,6 +70,7 @@ public class IndexMappingFactoryTest {
             "5.4.0, IndexMapping5",
             "6.3.1, IndexMapping6",
             "6.8.1, IndexMapping6",
+            "7.8.0, IndexMapping7"
     })
     void createsMessageIndexMappings(String version, String expectedMappingClass) throws ClassNotFoundException {
         testForIndexMappingType(version, expectedMappingClass, IndexSetConfig.TemplateType.MESSAGES);
@@ -84,6 +85,7 @@ public class IndexMappingFactoryTest {
             "5.4.0, EventsIndexMapping6",
             "6.3.1, EventsIndexMapping6",
             "6.8.1, EventsIndexMapping6",
+            "7.8.0, EventsIndexMapping7"
     })
     void createsEventIndexMappings(String version, String expectedMappingClass) throws ClassNotFoundException {
         testForIndexMappingType(version, expectedMappingClass, IndexSetConfig.TemplateType.EVENTS);
