@@ -100,7 +100,7 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
         config.setName(ADMIN_DN);
         config.setCredentials(ADMIN_PASSWORD);
 
-        connector = new LdapConnector(10000, ENABLED_TLS_PROTOCOLS, mock(LdapSettingsService.class));
+        connector = new LdapConnector(10000, ENABLED_TLS_PROTOCOLS, mock(LdapSettingsService.class), (host) -> null);
         connection = connector.connect(config);
     }
 
