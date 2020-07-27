@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.joda.time.DateTime;
 
-import java.util.Map;
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
         @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
@@ -40,9 +38,4 @@ public abstract class TimeRange {
 
     @JsonIgnore
     public abstract DateTime getTo();
-
-    @JsonIgnore
-    // TODO: remove this when pre 3.2 dashboarding is removed.
-    public abstract Map<String, Object> getPersistedConfig();
-
 }

@@ -95,13 +95,13 @@ public class IndexMappingFactoryTest {
                     {"6.3.1", IndexSetConfig.TemplateType.MESSAGES, IndexMapping6.class},
                     {"6.8.1", IndexSetConfig.TemplateType.MESSAGES, IndexMapping6.class},
 
-                    {"5.0.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
-                    {"5.1.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
-                    {"5.2.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
-                    {"5.3.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
-                    {"5.4.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
-                    {"6.3.1", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
-                    {"6.8.1", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping.class},
+                    {"5.0.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
+                    {"5.1.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
+                    {"5.2.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
+                    {"5.3.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
+                    {"5.4.0", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
+                    {"6.3.1", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
+                    {"6.8.1", IndexSetConfig.TemplateType.EVENTS, EventsIndexMapping6.class},
             });
         }
 

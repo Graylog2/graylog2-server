@@ -12,21 +12,21 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
   &.ace-queryinput {
     height: 34px !important;
     width: 100% !important;
-    background-color: ${scTheme.colors.global.inputBackground};
-    color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
+    background-color: ${scTheme.colors.input.background};
+    color: ${scTheme.utils.contrastingColor(scTheme.colors.input.background, 'AAA')};
 
     &.ace_multiselect .ace_selection.ace_start {
-      box-shadow: 0 0 3px 0 ${scTheme.colors.global.inputBackground};
+      box-shadow: 0 0 3px 0 ${scTheme.colors.input.background};
     }
 
     .ace_gutter {
-      background: ${scTheme.colors.global.inputBackground};
-      color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
+      background: ${scTheme.colors.input.background};
+      color: ${scTheme.utils.contrastingColor(scTheme.colors.input.background, 'AAA')};
     }
 
     .ace_print-margin {
       width: 1px;
-      background: ${scTheme.colors.global.inputBackground};
+      background: ${scTheme.colors.input.background};
     }
 
     .ace_cursor {
@@ -47,11 +47,11 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     }
 
     .ace_marker-layer .ace_active-line {
-      background: ${scTheme.colors.global.inputBackground};
+      background: ${scTheme.colors.input.background};
     }
 
     .ace_gutter-active-line {
-      background-color: ${scTheme.colors.global.inputBackground};
+      background-color: ${scTheme.colors.input.background};
     }
 
     .ace_marker-layer .ace_selected-word {
@@ -59,7 +59,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
     }
 
     .ace_invisible {
-      color: ${scTheme.colors.global.inputBackground};
+      color: ${scTheme.colors.input.background};
     }
 
     .ace_keyword,
@@ -99,7 +99,7 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme }) => ({
 
     .ace_fold {
       background-color: ${scTheme.colors.variant.info};
-      border-color: ${scTheme.utils.contrastingColor(scTheme.colors.global.inputBackground, 'AAA')};
+      border-color: ${scTheme.utils.contrastingColor(scTheme.colors.input.background, 'AAA')};
     }
 
     .ace_entity.ace_name.ace_function,

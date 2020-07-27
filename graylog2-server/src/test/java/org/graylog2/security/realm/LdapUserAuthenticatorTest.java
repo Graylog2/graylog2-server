@@ -121,8 +121,8 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
         configuration = mock(Configuration.class);
         when(configuration.getPasswordSecret()).thenReturn(PASSWORD_SECRET);
 
-        ldapConnector = new LdapConnector(10000);
         ldapSettingsService = mock(LdapSettingsService.class);
+        ldapConnector = new LdapConnector(10000, ldapSettingsService);
         userService = mock(UserService.class);
 
         ldapSettings = new LdapSettingsImpl(configuration, mock(RoleService.class));

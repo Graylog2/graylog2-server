@@ -26,7 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseI
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutIndexTemplateRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetaData;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.reindex.ReindexRequest;
@@ -250,7 +250,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().stream().map(AliasMetaData::alias).collect(Collectors.toSet())
+                        entry -> entry.getValue().stream().map(AliasMetadata::alias).collect(Collectors.toSet())
                 ));
     }
 

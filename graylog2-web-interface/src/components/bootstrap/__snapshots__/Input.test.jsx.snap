@@ -49,7 +49,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 kmJcge"
+                        className="FormControl-sc-1amoaox-0 fKSsjP"
                         componentClass="input"
                         inputRef={[Function]}
                         label=""
@@ -58,7 +58,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                         type="text"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                          className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                           id="inputWithAddon"
                           label=""
                           name="inputWithAddon"
@@ -74,13 +74,13 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                         className="input-group-addon"
                       >
                         <StyledBootstrapInputAddon
-                          className="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                          className="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                         >
                           <InputGroupAddon
-                            bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                            bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                           >
                             <span
-                              className="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                              className="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                             >
                               .00
                             </span>
@@ -149,7 +149,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 kmJcge"
+                        className="FormControl-sc-1amoaox-0 fKSsjP"
                         componentClass="input"
                         inputRef={[Function]}
                         label=""
@@ -158,7 +158,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         type="text"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                          className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                           id="inputWithButton"
                           label=""
                           name="inputWithButton"
@@ -264,7 +264,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 kmJcge"
+                        className="FormControl-sc-1amoaox-0 fKSsjP"
                         componentClass="input"
                         inputRef={[Function]}
                         label=""
@@ -273,7 +273,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                         type="text"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                          className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                           id="inputWithCheckboxAddon"
                           label=""
                           name="inputWithCheckboxAddon"
@@ -289,13 +289,13 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                         className="input-group-addon"
                       >
                         <StyledBootstrapInputAddon
-                          className="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                          className="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                         >
                           <InputGroupAddon
-                            bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                            bsClass="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                           >
                             <span
-                              className="InputGroup__StyledAddon-sc-1a8jz8l-0 hIsRCw input-group-addon"
+                              className="InputGroup__StyledAddon-sc-1a8jz8l-0 jyXQlz input-group-addon"
                             >
                               <input
                                 aria-label="..."
@@ -360,7 +360,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
               >
                 <FormControl
                   bsClass="form-control"
-                  className="FormControl-sc-1amoaox-0 kmJcge"
+                  className="FormControl-sc-1amoaox-0 fKSsjP"
                   componentClass="input"
                   inputRef={[Function]}
                   label=""
@@ -369,7 +369,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
                   type="text"
                 >
                   <input
-                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                     id="inputWithoutNameProp"
                     label=""
                     name="inputWithNameProp"
@@ -427,7 +427,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
               >
                 <FormControl
                   bsClass="form-control"
-                  className="FormControl-sc-1amoaox-0 kmJcge"
+                  className="FormControl-sc-1amoaox-0 fKSsjP"
                   componentClass="input"
                   inputRef={[Function]}
                   label=""
@@ -436,7 +436,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
                   type="text"
                 >
                   <input
-                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                     id="inputWithoutNameProp"
                     label=""
                     name="inputWithoutNameProp"

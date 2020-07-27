@@ -1,76 +1,86 @@
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 
+import connect from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
 import CombinedProvider from 'injection/CombinedProvider';
+import { PipelineRulesProvider } from 'components/rules/RuleContext';
 
 const { RulesStore, RulesActions } = CombinedProvider.get('Rules');
 const { PipelinesStore, PipelinesActions } = CombinedProvider.get('Pipelines');
 
-function filterRules(state) {
-  return state.rules ? state.rules.filter((r) => r.id === this.props.params.ruleId)[0] : undefined;
+function filterRules(rule, ruleId) {
+  return rule?.rules?.filter((r) => r.id === ruleId)[0];
 }
 
-const RuleDetailsPage = createReactClass({
-  displayName: 'RuleDetailsPage',
+function filterPipelines(pipelines = [], title = '') {
+  return pipelines.filter((pipeline) => {
+    return pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1);
+  });
+}
 
-  propTypes: {
-    params: PropTypes.object.isRequired,
-  },
+const RuleDetailsPage = ({ params, rule, pipelines }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [filteredRule, setFilteredRule] = useState(undefined);
 
-  mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules), Reflux.connect(PipelinesStore)],
+  const isNewRule = params.ruleId === 'new';
+  const title = filteredRule?.title || '';
+  const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
 
-  componentDidMount() {
-    if (this.props.params.ruleId !== 'new') {
-      PipelinesActions.list();
-      RulesActions.get(this.props.params.ruleId);
-    }
-  },
+  const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
-  _save(rule, callback) {
-    let promise;
+  useEffect(() => {
+    setFilteredRule(filterRules(rule, params.ruleId));
+  }, [params, rule]);
 
-    if (rule.id) {
-      promise = RulesActions.update.triggerPromise(rule);
+  useEffect(() => {
+    if (isNewRule) {
+      setIsLoading(false);
     } else {
-      promise = RulesActions.save.triggerPromise(rule);
+      PipelinesActions.list();
+      RulesActions.get(params.ruleId);
+      setIsLoading(!(filteredRule && pipelines));
     }
+  }, [filteredRule]);
 
-    promise.then(() => callback());
-  },
+  if (isLoading) {
+    return <Spinner text="Loading Rule Details..." />;
+  }
 
-  _validateRule(rule, setErrorsCb) {
-    RulesActions.parse(rule, setErrorsCb);
-  },
+  return (
+    <DocumentTitle title={pageTitle}>
+      <PipelineRulesProvider usedInPipelines={pipelinesUsingRule} rule={filteredRule}>
+        <Rule create={isNewRule} title={title} />
+      </PipelineRulesProvider>
+    </DocumentTitle>
+  );
+};
 
-  _isLoading() {
-    return this.props.params.ruleId !== 'new' && !(this.state.rule && this.state.pipelines);
-  },
+RuleDetailsPage.propTypes = {
+  params: PropTypes.shape({
+    ruleId: PropTypes.string,
+  }).isRequired,
+  rule: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    source: PropTypes.string,
+    value: PropTypes.string,
+  }),
+  pipelines: PropTypes.any,
+};
 
-  render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
+RuleDetailsPage.defaultProps = {
+  rule: undefined,
+  pipelines: undefined,
+};
 
-    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter((pipeline) => {
-      return pipeline.stages.some((stage) => stage.rules.indexOf(this.state.rule.title) !== -1);
-    });
-
-    const pageTitle = (this.props.params.ruleId === 'new' ? 'New pipeline rule' : `Pipeline rule ${this.state.rule.title}`);
-
-    return (
-      <DocumentTitle title={pageTitle}>
-        <Rule rule={this.state.rule}
-              usedInPipelines={pipelinesUsingRule}
-              create={this.props.params.ruleId === 'new'}
-              onSave={this._save}
-              validateRule={this._validateRule} />
-      </DocumentTitle>
-    );
-  },
-});
-
-export default RuleDetailsPage;
+export default connect(RuleDetailsPage, {
+  rule: RulesStore,
+  pipelines: PipelinesStore,
+},
+({ pipelines, ...restProps }) => ({
+  pipelines: pipelines.pipelines || [],
+  ...restProps,
+}));

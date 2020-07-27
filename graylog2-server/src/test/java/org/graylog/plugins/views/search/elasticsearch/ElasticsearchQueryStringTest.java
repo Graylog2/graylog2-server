@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.storage.elasticsearch6.views;
+package org.graylog.plugins.views.search.elasticsearch;
 
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
