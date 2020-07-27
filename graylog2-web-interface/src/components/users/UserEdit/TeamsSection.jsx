@@ -18,7 +18,7 @@ const Header = styled.h4`
 const NoEnterpriseComponent = () => (
   <SectionComponent title="Teams">
     <Header>No enterprise plugin found</Header>
-    <p>To use the <b>Teams</b> functionality you install the Graylog <b>Enterprise</b> plugin.</p>
+    <p>To use the <b>Teams</b> functionality you need to install the Graylog <b>Enterprise</b> plugin.</p>
   </SectionComponent>
 );
 
