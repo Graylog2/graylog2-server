@@ -37,7 +37,7 @@ const ProfileSection = ({
             <ReadOnlyFormGroup label="Username" value={username} />
             <FullNameFormGroup />
             <EmailFormGroup />
-            <Row>
+            <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
                   <Button bsStyle="success"

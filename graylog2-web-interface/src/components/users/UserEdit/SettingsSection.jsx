@@ -28,7 +28,7 @@ const SettingsSection = ({
         <Form className="form form-horizontal">
           <TimeoutFormGroup />
           <TimezoneFormGroup />
-          <Row>
+          <Row className="no-bm">
             <Col xs={12}>
               <div className="pull-right">
                 <Button bsStyle="success"
