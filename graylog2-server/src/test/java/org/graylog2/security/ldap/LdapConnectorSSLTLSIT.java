@@ -18,9 +18,9 @@ package org.graylog2.security.ldap;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.exception.LdapOperationException;
 import org.apache.directory.api.ldap.model.exception.LdapProtocolErrorException;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import org.apache.directory.ldap.client.api.exception.InvalidConnectionException;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.security.DefaultX509TrustManager;
@@ -30,14 +30,23 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import sun.security.provider.certpath.SunCertPathBuilderException;
 
+import javax.net.ssl.TrustManager;
+import java.io.IOException;
 import java.net.URI;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 public class LdapConnectorSSLTLSIT {
@@ -46,6 +55,8 @@ public class LdapConnectorSSLTLSIT {
     private static final String NETWORK_ALIAS = "ldapserver";
     private static final Integer PORT = 389;
     private static final Integer SSL_PORT = 636;
+    public static final String ADMIN_NAME = "cn=admin,dc=example,dc=org";
+    public static final String ADMIN_PASSWORD = "admin";
 
     private final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
@@ -58,35 +69,17 @@ public class LdapConnectorSSLTLSIT {
             .withExposedPorts(PORT, SSL_PORT)
             .withStartupTimeout(Duration.ofMinutes(1));
 
-    private String resourceDir(String certs) {
-        return this.getClass().getResource(certs).getPath();
-    }
-
-    private URI internalUri() {
-        return URI.create(String.format(Locale.US, "ldap://%s:%d",
-                container.getContainerIpAddress(),
-                container.getMappedPort(PORT)));
-    }
-
-    private URI internalSSLUri() {
-        return URI.create(String.format(Locale.US, "ldaps://%s:%d",
-                container.getContainerIpAddress(),
-                container.getMappedPort(SSL_PORT)));
-    }
+    private LdapConnector.TrustManagerProvider trustManagerProvider;
 
     private LdapConnector ldapConnector;
-
+    
     @BeforeEach
     void setUp() {
         container.start();
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
-        final LdapConnector.TrustManagerProvider trustManagerProvider = (host) -> {
-            try {
-                return new DefaultX509TrustManager(host);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
+        this.trustManagerProvider = mock(LdapConnector.TrustManagerProvider.class);
+
+        mockTrustManagerWithSystemKeystore();
 
         this.ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, ldapSettingsService, trustManagerProvider);
     }
@@ -97,38 +90,35 @@ public class LdapConnectorSSLTLSIT {
 
         Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
                 .isInstanceOf(LdapException.class)
-                .hasRootCauseInstanceOf(LdapOperationException.class)
-                .hasMessage("Failed to initialize the SSL context");
+                .hasRootCauseInstanceOf(SunCertPathBuilderException.class)
+                .hasMessage("SSL handshake failed.");
+    }
+
+    @Test
+    void shouldNotConnectViaTLSToCertWithMismatchingCommonNameIfValidationIsRequested() throws Exception {
+        mockTrustManagerWithKeystore(singleCA());
+
+        final LdapTestConfigRequest request = createRequest(internalUriWithIpAddress(), true, false);
+
+        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
+                .isInstanceOf(LdapException.class)
+                .hasMessage("PROTOCOL_ERROR: The server will disconnect!");
+    }
+
+    @Test
+    void shouldConnectViaTLSToTrustedCertWithMatchingCommonNameIfValidationIsRequested() throws Exception {
+        mockTrustManagerWithKeystore(singleCA());
+
+        final LdapTestConfigRequest request = createRequest(internalUri(), true, false);
+
+        assertConnectionSuccess(request);
     }
 
     @Test
     void shouldConnectViaTLSToSelfSignedCertIfValidationIsNotRequested() throws Exception {
         final LdapTestConfigRequest request = createTLSTestRequest(true);
 
-        final LdapNetworkConnection connection = ldapConnector.connect(request);
-        assertThat(connection.isAuthenticated()).isTrue();
-        assertThat(connection.isConnected()).isTrue();
-        assertThat(connection.isSecured()).isTrue();
-    }
-
-    @NotNull
-    private LdapTestConfigRequest createTLSTestRequest(boolean trustAllCertificates) {
-        return LdapTestConfigRequest.create(
-                "cn=admin,dc=example,dc=org",
-                "admin",
-                internalUri(),
-                true,
-                trustAllCertificates,
-                false,
-                null,
-                null,
-                null,
-                null,
-                true,
-                null,
-                null,
-                null
-        );
+        assertConnectionSuccess(request);
     }
 
     @Test
@@ -141,23 +131,48 @@ public class LdapConnectorSSLTLSIT {
     }
 
     @Test
+    void shouldNotConnectViaSSLToTrustedCertWithMismatchingHostnameIfValidationIsRequested() throws Exception {
+        mockTrustManagerWithKeystore(singleCA());
+
+        final LdapTestConfigRequest request = createRequest(internalSSLUriWithIpAddress(), false, false);
+
+        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
+                .isInstanceOf(InvalidConnectionException.class)
+                .hasMessage("SSL handshake failed.");
+    }
+
+    @Test
+    void shouldConnectViaSSLToTrustedCertWithMatchingHostnameIfValidationIsRequested() throws Exception {
+        mockTrustManagerWithKeystore(singleCA());
+
+        final LdapTestConfigRequest request = createSSLTestRequest(false);
+
+        assertConnectionSuccess(request);
+    }
+
+    @Test
     void shouldConnectViaSSLToSelfSignedCertIfValidationIsNotRequested() throws Exception {
         final LdapTestConfigRequest request = createSSLTestRequest(true);
 
-        final LdapNetworkConnection connection = ldapConnector.connect(request);
+        assertConnectionSuccess(request);
+    }
 
-        assertThat(connection.isAuthenticated()).isTrue();
-        assertThat(connection.isConnected()).isTrue();
-        assertThat(connection.isSecured()).isTrue();
+    @NotNull
+    private LdapTestConfigRequest createTLSTestRequest(boolean trustAllCertificates) {
+        return createRequest(internalSSLUri(), true, trustAllCertificates);
     }
 
     @NotNull
     private LdapTestConfigRequest createSSLTestRequest(boolean trustAllCertificates) {
+        return createRequest(internalSSLUri(), false, trustAllCertificates);
+    }
+
+    private LdapTestConfigRequest createRequest(URI uri, boolean startTls, boolean trustAllCertificates) {
         return LdapTestConfigRequest.create(
-                "cn=admin,dc=example,dc=org",
-                "admin",
-                internalSSLUri(),
-                false,
+                ADMIN_NAME,
+                ADMIN_PASSWORD,
+                uri,
+                startTls,
                 trustAllCertificates,
                 false,
                 null,
@@ -169,5 +184,62 @@ public class LdapConnectorSSLTLSIT {
                 null,
                 null
         );
+    }
+
+    private void assertConnectionSuccess(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
+        final LdapNetworkConnection connection = ldapConnector.connect(request);
+        assertThat(connection.isAuthenticated()).isTrue();
+        assertThat(connection.isConnected()).isTrue();
+        assertThat(connection.isSecured()).isTrue();
+    }
+
+    private void mockTrustManagerWithSystemKeystore() {
+        mockTrustManagerWithKeystore(null);
+    }
+
+    private void mockTrustManagerWithKeystore(KeyStore keyStore) {
+        when(this.trustManagerProvider.create(anyString()))
+                .then((invocation) -> provideTrustManager(invocation.getArgument(0), keyStore));
+    }
+
+    private KeyStore singleCA() throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException {
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(this.getClass().getResource("single-ca.jks").openStream(), "changeit".toCharArray());
+
+        return keystore;
+    }
+
+    private TrustManager provideTrustManager(String host, KeyStore keyStore) {
+        try {
+            return new DefaultX509TrustManager(host, keyStore);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String resourceDir(String certs) {
+        return this.getClass().getResource(certs).getPath();
+    }
+
+    private URI internalUri() {
+        return URI.create(String.format(Locale.US, "ldap://%s:%d",
+                container.getHost(),
+                container.getMappedPort(PORT)));
+    }
+
+    private URI internalSSLUri() {
+        return URI.create(String.format(Locale.US, "ldaps://%s:%d",
+                container.getHost(),
+                container.getMappedPort(SSL_PORT)));
+    }
+
+    private URI internalSSLUriWithIpAddress() {
+        return URI.create(String.format(Locale.US, "ldaps://127.0.0.1:%d",
+                container.getMappedPort(SSL_PORT)));
+    }
+
+    private URI internalUriWithIpAddress() {
+        return URI.create(String.format(Locale.US, "ldap://127.0.0.1:%d",
+                container.getMappedPort(SSL_PORT)));
     }
 }
