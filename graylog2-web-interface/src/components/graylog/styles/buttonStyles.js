@@ -1,7 +1,7 @@
 import chroma from 'chroma-js';
 import { css } from 'styled-components';
 
-const buttonStyles = ({ colors }) => {
+const buttonStyles = ({ colors, utils }) => {
   const variants = {
     danger: colors.variant.danger,
     default: colors.gray[90],
@@ -14,7 +14,7 @@ const buttonStyles = ({ colors }) => {
 
   const mixColor = (originalColor) => chroma.mix(originalColor, colors.global.textDefault, 0.15);
 
-  return Object.keys(variants).map((variant) => css(({ theme }) => {
+  return Object.keys(variants).map((variant) => {
     const variantColor = variants[variant];
     const isLink = variant === 'link';
 
@@ -22,15 +22,23 @@ const buttonStyles = ({ colors }) => {
 
     const defaultBackground = variantColor;
     const defaultBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.05);
-    const defaultColor = isLink ? colors.global.link : theme.utils.contrastingColor(defaultBackground);
+    const defaultColor = isLink ? colors.global.link : utils.contrastingColor(defaultBackground);
 
     const activeBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.10);
     const activeBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
-    const activeColor = isLink ? colors.global.linkHover : theme.utils.contrastingColor(activeBackground);
+    const activeColor = isLink ? colors.global.linkHover : utils.contrastingColor(activeBackground);
 
     const disabledBackground = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.20);
     const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
-    const disabledColor = isLink ? colors.global.link : theme.utils.contrastingColor(disabledBackground, 'AA');
+    const disabledColor = isLink ? colors.global.link : utils.contrastingColor(disabledBackground, 'AA');
+
+    const hoverBackground = mixColor(defaultBackground);
+    const hoverBorderColor = mixColor(defaultBorder);
+    const hoverColor = mixColor(defaultColor);
+
+    const activeHoverBackground = mixColor(activeBackground);
+    const activeHoverBorderColor = mixColor(activeBorder);
+    const activeHoverColor = mixColor(activeColor);
 
     return css`
       &.btn-${variant} {
@@ -42,9 +50,9 @@ const buttonStyles = ({ colors }) => {
           color 150ms ease-in-out;
 
         :hover {
-          background-color: ${mixColor(defaultBackground)};
-          border-color: ${mixColor(defaultBorder)};
-          color: ${mixColor(defaultColor)};
+          background-color: ${hoverBackground};
+          border-color: ${hoverBorderColor};
+          color: ${hoverColor};
         }
 
         &.active {
@@ -53,9 +61,9 @@ const buttonStyles = ({ colors }) => {
           color: ${activeColor};
 
           :hover {
-            background-color: ${isLink ? variants.link : mixColor(activeBackground)};
-            border-color: ${mixColor(activeBorder)};
-            color: ${mixColor(activeColor)};
+            background-color: ${isLink ? variants.link : activeHoverBackground};
+            border-color: ${activeHoverBorderColor};
+            color: ${activeHoverColor};
           }
         }
 
@@ -73,7 +81,7 @@ const buttonStyles = ({ colors }) => {
         }
       }
     `;
-  }));
+  });
 };
 
 export default buttonStyles;

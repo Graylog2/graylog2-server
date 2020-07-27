@@ -86,36 +86,30 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
         }
       }
     >
-      <ForwardRef
+      <Button
         bsStyle="success"
         disabled={false}
         onClick={[Function]}
       >
-        <Button__StyledButton
+        <Button
+          active={false}
+          block={false}
+          bsClass="btn"
           bsStyle="success"
+          className="Button-c9cbmb-0 bNulii"
           disabled={false}
           onClick={[Function]}
         >
-          <Button
-            active={false}
-            block={false}
-            bsClass="btn"
-            bsStyle="success"
-            className="Button__StyledButton-c9cbmb-0 laZUlH"
+          <button
+            className="Button-c9cbmb-0 bNulii btn btn-success"
             disabled={false}
             onClick={[Function]}
+            type="button"
           >
-            <button
-              className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              Done
-            </button>
-          </Button>
-        </Button__StyledButton>
-      </ForwardRef>
+            Done
+          </button>
+        </Button>
+      </Button>
     </div>
   </span>
 </SeriesConfiguration>

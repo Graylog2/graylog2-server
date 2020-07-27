@@ -380,7 +380,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       </Component>
                                                     </Input>
                                                   </TypeAheadInput>
-                                                  <ForwardRef
+                                                  <Button
                                                     style={
                                                       Object {
                                                         "marginLeft": 5,
@@ -388,7 +388,13 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     }
                                                     type="submit"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
+                                                      disabled={false}
                                                       style={
                                                         Object {
                                                           "marginLeft": 5,
@@ -396,12 +402,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       }
                                                       type="submit"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -410,22 +412,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         }
                                                         type="submit"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={false}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="submit"
-                                                        >
-                                                          Filter
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
-                                                  <ForwardRef
+                                                        Filter
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
+                                                  <Button
                                                     disabled={true}
                                                     onClick={[Function]}
                                                     style={
@@ -435,7 +426,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     }
                                                     type="button"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -445,12 +441,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       }
                                                       type="button"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -460,22 +452,10 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         }
                                                         type="button"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={true}
-                                                          onClick={[Function]}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="button"
-                                                        >
-                                                          Reset
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
+                                                        Reset
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
                                                 </form>
                                                 <ul
                                                   className="pill-list"
@@ -625,66 +605,54 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -802,66 +770,54 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -1165,7 +1121,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       </Component>
                                                     </Input>
                                                   </TypeAheadInput>
-                                                  <ForwardRef
+                                                  <Button
                                                     style={
                                                       Object {
                                                         "marginLeft": 5,
@@ -1173,7 +1129,13 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     }
                                                     type="submit"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
+                                                      disabled={false}
                                                       style={
                                                         Object {
                                                           "marginLeft": 5,
@@ -1181,12 +1143,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       }
                                                       type="submit"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -1195,22 +1153,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         }
                                                         type="submit"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={false}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="submit"
-                                                        >
-                                                          Filter
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
-                                                  <ForwardRef
+                                                        Filter
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
+                                                  <Button
                                                     disabled={true}
                                                     onClick={[Function]}
                                                     style={
@@ -1220,7 +1167,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     }
                                                     type="button"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -1230,12 +1182,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       }
                                                       type="button"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -1245,22 +1193,10 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         }
                                                         type="button"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={true}
-                                                          onClick={[Function]}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="button"
-                                                        >
-                                                          Reset
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
+                                                        Reset
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
                                                 </form>
                                                 <ul
                                                   className="pill-list"
@@ -1410,66 +1346,54 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -1587,66 +1511,54 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -2145,7 +2057,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       </Component>
                                                     </Input>
                                                   </TypeAheadInput>
-                                                  <ForwardRef
+                                                  <Button
                                                     style={
                                                       Object {
                                                         "marginLeft": 5,
@@ -2153,7 +2065,13 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     }
                                                     type="submit"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
+                                                      disabled={false}
                                                       style={
                                                         Object {
                                                           "marginLeft": 5,
@@ -2161,12 +2079,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       }
                                                       type="submit"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -2175,22 +2089,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         }
                                                         type="submit"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={false}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="submit"
-                                                        >
-                                                          Filter
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
-                                                  <ForwardRef
+                                                        Filter
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
+                                                  <Button
                                                     disabled={true}
                                                     onClick={[Function]}
                                                     style={
@@ -2200,7 +2103,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     }
                                                     type="button"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -2210,12 +2118,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       }
                                                       type="button"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -2225,22 +2129,10 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         }
                                                         type="button"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={true}
-                                                          onClick={[Function]}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="button"
-                                                        >
-                                                          Reset
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
+                                                        Reset
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
                                                 </form>
                                                 <ul
                                                   className="pill-list"
@@ -2390,66 +2282,54 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={true}
                                                                 bsStyle="info"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={true}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="info"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={true}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="info"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-info active"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info active"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -2567,66 +2447,54 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={true}
                                                                 bsStyle="info"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={true}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="info"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={true}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="info"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-info active"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info active"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -2930,7 +2798,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       </Component>
                                                     </Input>
                                                   </TypeAheadInput>
-                                                  <ForwardRef
+                                                  <Button
                                                     style={
                                                       Object {
                                                         "marginLeft": 5,
@@ -2938,7 +2806,13 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     }
                                                     type="submit"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
+                                                      disabled={false}
                                                       style={
                                                         Object {
                                                           "marginLeft": 5,
@@ -2946,12 +2820,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       }
                                                       type="submit"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -2960,22 +2830,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         }
                                                         type="submit"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={false}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="submit"
-                                                        >
-                                                          Filter
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
-                                                  <ForwardRef
+                                                        Filter
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
+                                                  <Button
                                                     disabled={true}
                                                     onClick={[Function]}
                                                     style={
@@ -2985,7 +2844,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     }
                                                     type="button"
                                                   >
-                                                    <Button__StyledButton
+                                                    <Button
+                                                      active={false}
+                                                      block={false}
+                                                      bsClass="btn"
+                                                      bsStyle="default"
+                                                      className="Button-c9cbmb-0 bNulii"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -2995,12 +2859,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       }
                                                       type="button"
                                                     >
-                                                      <Button
-                                                        active={false}
-                                                        block={false}
-                                                        bsClass="btn"
-                                                        bsStyle="default"
-                                                        className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                      <button
+                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -3010,22 +2870,10 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         }
                                                         type="button"
                                                       >
-                                                        <button
-                                                          className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                          disabled={true}
-                                                          onClick={[Function]}
-                                                          style={
-                                                            Object {
-                                                              "marginLeft": 5,
-                                                            }
-                                                          }
-                                                          type="button"
-                                                        >
-                                                          Reset
-                                                        </button>
-                                                      </Button>
-                                                    </Button__StyledButton>
-                                                  </ForwardRef>
+                                                        Reset
+                                                      </button>
+                                                    </Button>
+                                                  </Button>
                                                 </form>
                                                 <ul
                                                   className="pill-list"
@@ -3175,66 +3023,54 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
@@ -3352,66 +3188,54 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             <div
                                                               className="btn-group btn-group-sm"
                                                             >
-                                                              <ForwardRef
+                                                              <Button
                                                                 active={true}
                                                                 bsStyle="info"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={true}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="info"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={true}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="info"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-info active"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-info active"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow reading
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
-                                                              <ForwardRef
+                                                                    Allow reading
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
+                                                              <Button
                                                                 active={false}
                                                                 bsStyle="default"
                                                                 onClick={[Function]}
                                                               >
-                                                                <Button__StyledButton
+                                                                <Button
                                                                   active={false}
+                                                                  block={false}
+                                                                  bsClass="btn"
                                                                   bsStyle="default"
+                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  disabled={false}
                                                                   onClick={[Function]}
                                                                 >
-                                                                  <Button
-                                                                    active={false}
-                                                                    block={false}
-                                                                    bsClass="btn"
-                                                                    bsStyle="default"
-                                                                    className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                                                  <button
+                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
+                                                                    type="button"
                                                                   >
-                                                                    <button
-                                                                      className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                                                      disabled={false}
-                                                                      onClick={[Function]}
-                                                                      type="button"
-                                                                    >
-                                                                      Allow editing
-                                                                    </button>
-                                                                  </Button>
-                                                                </Button__StyledButton>
-                                                              </ForwardRef>
+                                                                    Allow editing
+                                                                  </button>
+                                                                </Button>
+                                                              </Button>
                                                             </div>
                                                           </ButtonGroup>
                                                         </div>
