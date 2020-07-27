@@ -111,8 +111,6 @@ export default class User {
   }
 
   get sessionTimeout() {
-    console.log('this.sessionTimeoutMs', this.sessionTimeoutMs);
-
     if (!this.sessionTimeoutMs) {
       return undefined;
     }
