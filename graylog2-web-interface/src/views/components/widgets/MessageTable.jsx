@@ -248,7 +248,9 @@ class MessageTable extends React.Component<Props, State> {
                       style={this._columnStyle(selectedFieldName)}>
                     <Field type={this._fieldTypeFor(selectedFieldName, fields)}
                            name={selectedFieldName}
-                           queryId={activeQueryId} />
+                           queryId={activeQueryId}>
+                      {selectedFieldName}
+                    </Field>
                     {editing && (
                       <FieldSortIcon fieldName={selectedFieldName}
                                      onSortChange={onSortChange}
