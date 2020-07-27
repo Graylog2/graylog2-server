@@ -40,7 +40,7 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
     font-size: ${theme.fonts.size.body};
     font-weight: bold;
     background-clip: text;
-    -webkit-background-clip: text;
+    -webkit-background-clip: text; /* stylelint-disable-line property-no-vendor-prefix */
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
   }
