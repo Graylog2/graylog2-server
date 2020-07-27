@@ -13,6 +13,7 @@ export const INITIAL_PAGE = 1;
 
 type Props = {
   children: React.Node,
+  className?: string,
   onChange: (currentPage: number, pageSize: number) => void,
   activePage: number,
   pageSize: number,
@@ -30,6 +31,7 @@ type Props = {
 const PaginatedList = ({
   activePage,
   children,
+  className,
   onChange,
   pageSize: propsPageSize,
   pageSizes,
@@ -72,7 +74,7 @@ const PaginatedList = ({
       {children}
 
       <IfInteractive>
-        <div className="text-center pagination-wrapper">
+        <div className={`text-center pagination-wrapper ${className ?? ''}`}>
           <Pagination totalPages={numberPages}
                       currentPage={currentPage}
                       onChange={_onChangePage} />
