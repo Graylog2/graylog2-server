@@ -26,7 +26,7 @@ const RolesSection = ({ user: { username } }: Props) => {
         // $FlowFixMe Role has DescriptiveItem implemented!!!
         return response;
       }).catch((error) => {
-        if (error.additional.status === 404) {
+        if (error?.additional?.status === 404) {
           UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
             'Could not load roles for user');
         }
