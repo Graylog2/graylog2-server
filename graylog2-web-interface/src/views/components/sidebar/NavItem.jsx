@@ -27,18 +27,20 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   position: absolute;
   padding: 0 10px;
   left: 100%;
-  top: calc(50% - 10px);
-  height: 21px;
+  top: calc(50% - 13px);
+  height: 26px;
   background-color: ${theme.colors.variant.lighter.info};
   box-shadow: 3px 3px 3px ${theme.colors.global.navigationBoxShadow};
   z-index: 4;
   border-radius: 0 3px 3px 0;
+  align-items: center;
 
   span {
     background: ${theme.utils.contrastingColor(theme.colors.variant.lighter.info, 'AA')};
     font-size: ${theme.fonts.size.body};
     font-weight: bold;
     background-clip: text;
+    -webkit-background-clip: text;
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
   }
@@ -55,10 +57,10 @@ const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.sp
   ::after {
     content: ' ';
     position: absolute;
-    right: -7px;
-    top: calc(50% - 7px);
-    width: 14px;
-    height: 14px;
+    right: -9px;
+    top: calc(50% - 9px);
+    width: 18px;
+    height: 18px;
     transform: rotate(45deg);
   }
 `;
