@@ -27,6 +27,7 @@ import org.graylog2.security.DefaultX509TrustManager;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -57,6 +58,7 @@ public class LdapConnectorSSLTLSIT {
     private static final Integer SSL_PORT = 636;
     public static final String ADMIN_NAME = "cn=admin,dc=example,dc=org";
     public static final String ADMIN_PASSWORD = "admin";
+    public static final String CERTS_PATH = "/container/service/slapd/assets/certs";
 
     private final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
@@ -64,7 +66,8 @@ public class LdapConnectorSSLTLSIT {
             .withEnv("LDAP_TLS_CRT_FILENAME", "server-cert.pem")
             .withEnv("LDAP_TLS_KEY_FILENAME", "server-key.pem")
             .withEnv("LDAP_TLS_CA_CRT_FILENAME", "CA-cert.pem")
-            .withFileSystemBind(resourceDir("certs"), "/container/service/slapd/assets/certs")
+            .withFileSystemBind(resource("certs"), CERTS_PATH, BindMode.READ_ONLY)
+            .withCommand("--copy-service")
             .withNetworkAliases(NETWORK_ALIAS)
             .withExposedPorts(PORT, SSL_PORT)
             .withStartupTimeout(Duration.ofMinutes(1));
@@ -72,7 +75,7 @@ public class LdapConnectorSSLTLSIT {
     private LdapConnector.TrustManagerProvider trustManagerProvider;
 
     private LdapConnector ldapConnector;
-    
+
     @BeforeEach
     void setUp() {
         container.start();
@@ -217,8 +220,8 @@ public class LdapConnectorSSLTLSIT {
         }
     }
 
-    private String resourceDir(String certs) {
-        return this.getClass().getResource(certs).getPath();
+    private String resource(String path) {
+        return this.getClass().getResource(path).getPath();
     }
 
     private URI internalUri() {
