@@ -89,6 +89,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
           <Col xs={3}>
             <input type="number"
                    id="timeout"
+                   placeholder="Timeout amount"
                    className="session-timeout-fields validatable form-control"
                    name="timeout"
                    min={1}
