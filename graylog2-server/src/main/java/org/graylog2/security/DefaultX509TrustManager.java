@@ -66,6 +66,7 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
 
     @Override
     public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+        this.defaultTrustManager.checkServerTrusted(x509Certificates, s);
         validateHostnames(x509Certificates, s);
     }
 
