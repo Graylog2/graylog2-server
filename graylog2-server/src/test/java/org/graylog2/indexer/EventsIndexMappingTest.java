@@ -22,7 +22,8 @@ import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.utilities.AssertJsonPath;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -36,9 +37,13 @@ public class EventsIndexMappingTest {
 
     private static final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-    @Test
-    public void templateWithES5() throws Exception {
-        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("5.0.0"));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "5.0.0",
+            "6.0.0"
+    })
+    void createsValidMappingTemplates(String version) throws Exception {
+        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf(version));
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
             at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
@@ -53,34 +58,17 @@ public class EventsIndexMappingTest {
         });
     }
 
-    @Test
-    public void templateWithES6() throws Exception {
-        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("6.0.0"));
-
-        assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
-            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
-            at.jsonPathAsInteger("$.order").isEqualTo(-1);
-            assertStandardMappingValues(at);
-        });
-
-        assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*", 42), at -> {
-            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
-            at.jsonPathAsInteger("$.order").isEqualTo(42);
-            assertStandardMappingValues(at);
-        });
-    }
-
-    @Test
-    public void templateWithUnsupportedESVersions() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2.4.0",
+            "8.0.0"
+    })
+    void templateWithUnsupportedESVersions(String version) {
         final String indexPattern = "test_*";
 
-        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("8.0.0")).toTemplate(indexSetConfig, indexPattern))
+        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf(version)).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: 8.0.0");
-
-        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
-                .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: 2.4.0");
+                .hasMessageContaining("Unsupported Elasticsearch version: " + version);
     }
 
     private void assertJsonPath(Map<String, Object> map, Consumer<JsonPathAssert> consumer) throws Exception {
