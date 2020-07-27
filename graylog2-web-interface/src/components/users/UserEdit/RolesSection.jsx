@@ -63,7 +63,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <h4>Add Roles</h4>
+      <h4>Assign Roles</h4>
       <Container>
         <RolesSelector onSubmit={onUpdate} user={user} />
       </Container>

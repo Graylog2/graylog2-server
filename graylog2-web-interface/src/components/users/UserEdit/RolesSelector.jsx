@@ -101,9 +101,9 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
               </Field>
               <SubmitButton bsStyle="success"
                             disabled={isSubmitting || !isValid}
-                            title="Add Role"
+                            title="Assign Role"
                             type="submit">
-                Add Role
+                Assign Role
               </SubmitButton>
             </FormElements>
             {errors && (
