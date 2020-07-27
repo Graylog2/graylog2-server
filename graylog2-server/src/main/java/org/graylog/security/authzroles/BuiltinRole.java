@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.security;
+package org.graylog.security.authzroles;
 
-import com.google.common.collect.ImmutableSet;
-import org.graylog.security.authzroles.BuiltinRole;
+import com.google.auto.value.AutoValue;
 
 import java.util.Set;
 
-public interface PluginPermissions {
-    Set<Permission> permissions();
+@AutoValue
+public abstract class BuiltinRole {
 
-    Set<Permission> readerBasePermissions();
-
-    /**
-     * A set of built-in roles that should be added to every graylog setup.
-     * @return The roles that this plugin provides
-     */
-    default Set<BuiltinRole> builtinRoles() {
-        return ImmutableSet.of();
+    public static BuiltinRole create(String name, String description, Set<String> permissions) {
+        return new AutoValue_BuiltinRole(name, description, permissions);
     }
+
+    public abstract String name();
+    public abstract String description();
+    public abstract Set<String> permissions();
 }
