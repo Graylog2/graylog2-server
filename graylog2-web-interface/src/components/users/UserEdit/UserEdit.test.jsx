@@ -28,13 +28,12 @@ jest.mock('stores/users/UsersStore', () => ({
   },
 }));
 
-const mockRolesList = Immutable.List();
-const mockPromise = Promise.resolve({ list: mockRolesList, pagination: { total: 0 } });
+const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), pagination: { total: 0 } });
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
-    loadForUser: jest.fn(() => mockPromise),
-    loadPaginated: jest.fn(() => mockPromise),
+    loadForUser: jest.fn(() => mockAuthzRolesPromise),
+    loadPaginated: jest.fn(() => mockAuthzRolesPromise),
   },
 }));
 
@@ -49,7 +48,7 @@ describe('<UserEdit />', () => {
 
       expect(getByText(user.username)).not.toBeNull();
 
-      await act(() => mockPromise);
+      await act(() => mockAuthzRolesPromise);
     });
 
     it('should use user details as initial values', async () => {
