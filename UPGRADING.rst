@@ -4,6 +4,13 @@ Upgrading to Graylog 3.3.x
 
 .. _upgrade-from-32-to-33:
 
+[BREAKING] Fixing certificate validation for LDAP servers used for authentication
+=================================================================================
+
+Prior to v3.3.3, the certificates of LDAP servers which are connected to using a secure connection (SSL or TLS) were not validated, even if the "Allow self-signed certificates" option was unchecked. Starting with v3.3.3, certificates are validated against the local default keystore. This might introduce a breaking change, depending on your local LDAP settings and the validity of the certificates used (if any). Please ensure that all certificates used are valid, their common name matches the host part of your configured LDAP server and your local keystore contains all CA/intermediate certs required for validation.
+
+A `CVE <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-15813>`_ is tracked for this issue.
+
 Deprecating legacy Aggregation API endpoints
 ============================================
 

@@ -17,6 +17,7 @@
 
 package org.graylog2.security.ldap;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
@@ -44,6 +45,7 @@ import org.junit.runner.RunWith;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(transports = {
@@ -78,6 +80,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 )
 @ApplyLdifFiles("org/graylog2/security/ldap/base.ldif")
 public class LdapConnectorTest extends AbstractLdapTestUnit {
+    private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2", "TLSv1.3");
     private static final String ADMIN_DN = "uid=admin,ou=system";
     private static final String ADMIN_PASSWORD = "secret";
 
@@ -97,7 +100,7 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
         config.setName(ADMIN_DN);
         config.setCredentials(ADMIN_PASSWORD);
 
-        connector = new LdapConnector(10000);
+        connector = new LdapConnector(10000, ENABLED_TLS_PROTOCOLS, mock(LdapSettingsService.class), (host) -> null);
         connection = connector.connect(config);
     }
 
