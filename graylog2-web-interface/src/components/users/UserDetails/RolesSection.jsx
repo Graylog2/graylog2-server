@@ -16,12 +16,14 @@ type Props = {
 const RolesSection = ({ user: { username } }: Props) => {
   const [loading, setLoading] = useState(false);
 
-  const _onLoad = ({ page, perPage, query }: PaginationInfo): Promise<?PaginatedListType> => {
+  const _onLoad = ({ page, perPage, query }: PaginationInfo, isSubscribed: boolean): Promise<?PaginatedListType> => {
     setLoading(true);
 
     return AuthzRolesActions.loadForUser(username, page, perPage, query)
       .then((response) => {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
 
         // $FlowFixMe Role has DescriptiveItem implemented!!!
         return response;
