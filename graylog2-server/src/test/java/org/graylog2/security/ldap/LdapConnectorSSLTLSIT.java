@@ -70,6 +70,7 @@ public class LdapConnectorSSLTLSIT {
             .withEnv("LDAP_TLS_CRT_FILENAME", "server-cert.pem")
             .withEnv("LDAP_TLS_KEY_FILENAME", "server-key.pem")
             .withEnv("LDAP_TLS_CA_CRT_FILENAME", "CA-cert.pem")
+            .withEnv("LDAP_TLS_DH_PARAM_FILENAME", "dhparam.pem")
             .withFileSystemBind(resource("certs"), CERTS_PATH, BindMode.READ_ONLY)
             .withCommand("--copy-service")
             .withNetworkAliases(NETWORK_ALIAS)
