@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
@@ -68,7 +69,7 @@ class IndexMappingTest {
     }
 
     private String fixtureFor(Version version) {
-        final String fixtureFileName = String.format("expected_template%s.json", version.getMajorVersion());
+        final String fixtureFileName = String.format(Locale.ENGLISH, "expected_template%s.json", version.getMajorVersion());
         return resourceFile(fixtureFileName);
     }
 
