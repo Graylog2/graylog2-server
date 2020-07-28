@@ -28,7 +28,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 public class EventsIndexMappingTest {
@@ -58,19 +57,6 @@ public class EventsIndexMappingTest {
             at.jsonPathAsInteger("$.order").isEqualTo(23);
             assertStandardMappingValues(at, version);
         });
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "2.4.0",
-            "8.0.0"
-    })
-    void templateWithUnsupportedESVersions(String version) {
-        final String indexPattern = "test_*";
-
-        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf(version)).toTemplate(indexSetConfig, indexPattern))
-                .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: " + version);
     }
 
     private void assertJsonPath(Map<String, Object> map, Consumer<JsonPathAssert> consumer) throws Exception {

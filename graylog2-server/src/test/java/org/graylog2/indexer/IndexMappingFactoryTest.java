@@ -52,10 +52,27 @@ public class IndexMappingFactoryTest {
             "8.0.0",
             "9.0.0"
     })
-    void failsForUnsupportedElasticsearchVersion(String version) {
+    void messageMappingFailsForUnsupportedElasticsearchVersion(String version) {
+        testForUnsupportedVersion(version, IndexSetConfig.TemplateType.MESSAGES);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "1.7.3",
+            "2.0.0",
+            "3.0.0",
+            "4.0.0",
+            "8.0.0",
+            "9.0.0"
+    })
+    void eventsMappingFailsForUnsupportedElasticsearchVersion(String version) {
+        testForUnsupportedVersion(version, IndexSetConfig.TemplateType.EVENTS);
+    }
+
+    private void testForUnsupportedVersion(String version, IndexSetConfig.TemplateType templateType) {
         mockNodeVersion(version);
 
-        assertThatThrownBy(() -> sut.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES))
+        assertThatThrownBy(() -> sut.createIndexMapping(templateType))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Elasticsearch version: " + version)
                 .hasNoCause();
