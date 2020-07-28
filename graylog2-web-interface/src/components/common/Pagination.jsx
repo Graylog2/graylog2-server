@@ -33,13 +33,13 @@ const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled
       > span {
         color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
         background-color: ${theme.colors.global.contentBackground};
-        border-color: ${theme.colors.variant.lighter.default};
+        border-color: ${theme.colors.variant.light.default};
 
         &:hover,
         &:focus {
-          color: ${theme.utils.contrastingColor(theme.colors.variant.light.default)};
-          background-color: ${theme.colors.variant.light.default};
-          border-color: ${theme.colors.variant.lighter.default};
+          color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
+          background-color: ${theme.colors.variant.lighter.default};
+          border-color: ${theme.colors.variant.light.default};
         }
       }
 
