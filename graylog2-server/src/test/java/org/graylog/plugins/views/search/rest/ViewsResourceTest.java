@@ -16,16 +16,22 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
+import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -120,14 +126,19 @@ public class ViewsResourceTest {
         when(builder.owner(any())).thenReturn(builder);
         when(builder.build()).thenReturn(view);
 
-        when(currentUser.getName()).thenReturn("basti");
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(testUser);
+        when(userContext.getUsername()).thenReturn("testuser");
+        when(currentUser.getName()).thenReturn("testuser");
         when(currentUser.isLocalAdmin()).thenReturn(true);
 
-        this.viewsResource.create(view);
+        this.viewsResource.create(view, userContext);
 
         final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
         verify(builder, times(1)).owner(ownerCaptor.capture());
-        assertThat(ownerCaptor.getValue()).isEqualTo("basti");
+        assertThat(ownerCaptor.getValue()).isEqualTo("testuser");
     }
 
     @Test
@@ -136,7 +147,7 @@ public class ViewsResourceTest {
 
         when(subject.isPermitted("dashboards:create")).thenReturn(false);
 
-        assertThatThrownBy(() -> this.viewsResource.create(view))
+        assertThatThrownBy(() -> this.viewsResource.create(view, null))
                 .isInstanceOf(ForbiddenException.class);
     }
 

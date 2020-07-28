@@ -41,7 +41,8 @@ import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,14 +62,17 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
     private final ObjectMapper objectMapper;
     private final ViewService viewService;
     private final SearchDbService searchDbService;
+    protected final UserService userService;
 
     @Inject
     public ViewFacade(ObjectMapper objectMapper,
                       SearchDbService searchDbService,
-                      ViewService viewService) {
+                      ViewService viewService,
+                      UserService userService) {
         this.objectMapper = objectMapper;
         this.searchDbService = searchDbService;
         this.viewService = viewService;
+        this.userService = userService;
     }
 
     @Override
@@ -114,12 +118,13 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
                                                     Map<EntityDescriptor, Object> nativeEntities,
                                                     String username) {
         ensureV1(entity);
-        return decode((EntityV1) entity, parameters, nativeEntities);
+        final User user = Optional.ofNullable(userService.load(username)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + username + "> from db"));
+        return decode((EntityV1) entity, parameters, nativeEntities, user);
     }
 
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                          Map<String, ValueReference> parameters,
-                                         Map<EntityDescriptor, Object> nativeEntities) {
+                                         Map<EntityDescriptor, Object> nativeEntities, User user) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         final Map<String, ViewStateDTO> viewStateMap = new HashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
@@ -131,7 +136,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         final Search search = viewEntity.search().toNativeEntity(parameters, nativeEntities);
         final Search persistedSearch = searchDbService.save(search);
 
-        final ViewDTO persistedView = viewService.save(viewBuilder.searchId(persistedSearch.id()).build());
+        final ViewDTO persistedView = viewService.saveWithOwner(viewBuilder.searchId(persistedSearch.id()).build(), user);
 
         return NativeEntity.create(entityV1.id(), persistedView.id(), getModelType(), persistedView.title(), persistedView);
     }

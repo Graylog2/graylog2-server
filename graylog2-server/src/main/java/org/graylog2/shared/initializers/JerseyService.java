@@ -35,6 +35,7 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog.security.UserContextBinder;
 import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
@@ -265,6 +266,7 @@ public class JerseyService extends AbstractIdleService {
                         return objectMapper;
                     }
                 })
+                .register(new UserContextBinder())
                 .packages(true, controllerPackages)
                 .packages(true, RESOURCE_PACKAGE_WEB)
                 .registerResources(additionalResources);

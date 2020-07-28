@@ -40,6 +40,7 @@ import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationFunction;
 import org.graylog.events.processor.aggregation.AggregationSeries;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,7 @@ public class LegacyAlertConditionMigrator {
     private final EventDefinitionHandler eventDefinitionHandler;
     private final NotificationResourceHandler notificationResourceHandler;
     private final DBNotificationService dbNotificationService;
+    private final UserService userService;
     private final long executeEveryMs;
 
     @Inject
@@ -78,12 +80,14 @@ public class LegacyAlertConditionMigrator {
                                         EventDefinitionHandler eventDefinitionHandler,
                                         NotificationResourceHandler notificationResourceHandler,
                                         DBNotificationService dbNotificationService,
+                                        UserService userService,
                                         @Named("alert_check_interval") int alertCheckInterval) {
         this.streamsCollection = mongoConnection.getMongoDatabase().getCollection("streams");
         this.alarmCallbacksCollection = mongoConnection.getMongoDatabase().getCollection("alarmcallbackconfigurations");
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.notificationResourceHandler = notificationResourceHandler;
         this.dbNotificationService = dbNotificationService;
+        this.userService = userService;
 
         // The old alert conditions have been executed every "alert_check_interval" in seconds
         this.executeEveryMs = alertCheckInterval * 1000L;
@@ -232,7 +236,7 @@ public class LegacyAlertConditionMigrator {
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
         LOG.info("Migrate legacy message count alert condition <{}>", definitionDto.title());
-        eventDefinitionHandler.create(definitionDto);
+        eventDefinitionHandler.create(definitionDto, userService.getRootUser());
     }
 
     /**
@@ -295,7 +299,7 @@ public class LegacyAlertConditionMigrator {
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
         LOG.info("Migrate legacy field value alert condition <{}>", definitionDto.title());
-        eventDefinitionHandler.create(definitionDto);
+        eventDefinitionHandler.create(definitionDto, userService.getRootUser());
     }
 
     /**
@@ -355,7 +359,7 @@ public class LegacyAlertConditionMigrator {
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
         LOG.info("Migrate legacy field content value alert condition <{}>", definitionDto.title());
-        eventDefinitionHandler.create(definitionDto);
+        eventDefinitionHandler.create(definitionDto, userService.getRootUser());
     }
 
     private static class Helper {
