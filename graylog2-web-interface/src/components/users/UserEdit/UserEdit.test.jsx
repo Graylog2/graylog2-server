@@ -1,8 +1,8 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import * as Immutable from 'immutable';
+import { render, fireEvent, waitFor, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import { act } from 'react-dom/test-utils';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
@@ -28,16 +28,28 @@ jest.mock('stores/users/UsersStore', () => ({
   },
 }));
 
+const mockRolesList = Immutable.List();
+const mockPromise = Promise.resolve({ list: mockRolesList, pagination: { total: 0 } });
+
+jest.mock('stores/roles/AuthzRolesStore', () => ({
+  AuthzRolesActions: {
+    loadForUser: jest.fn(() => mockPromise),
+    loadPaginated: jest.fn(() => mockPromise),
+  },
+}));
+
 describe('<UserEdit />', () => {
-  beforeEach(() => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   describe('profile section', () => {
-    it('should display username', () => {
+    it('should display username', async () => {
       const { getByText } = render(<UserEdit user={user} />);
 
       expect(getByText(user.username)).not.toBeNull();
+
+      await act(() => mockPromise);
     });
 
     it('should use user details as initial values', async () => {
@@ -95,9 +107,9 @@ describe('<UserEdit />', () => {
       const submitButton = getByText('Update Settings');
 
       fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
-      await selectEvent.openMenu(timeoutUnitSelect);
+      await act(async () => { await selectEvent.openMenu(timeoutUnitSelect); });
       await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Hours'); });
-      await selectEvent.openMenu(timezoneSelect);
+      await act(async () => { await selectEvent.openMenu(timezoneSelect); });
       await act(async () => { await selectEvent.select(timezoneSelect, 'Vancouver'); });
       fireEvent.click(submitButton);
 
