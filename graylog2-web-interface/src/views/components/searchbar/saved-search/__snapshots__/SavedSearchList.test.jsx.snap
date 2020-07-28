@@ -244,7 +244,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               </button>
             </div>
             <div
-              class="text-center pagination-wrapper"
+              class="text-center pagination-wrapper "
             />
           </div>
           <div
