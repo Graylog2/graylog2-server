@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import type {
   Grantee as GranteeType,
   Capability as CapabilityType,
-  MissingDependency as MissingDependencyType,
+  ShareEntity as ShareEntityType,
   ActiveShare as ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
@@ -13,14 +13,14 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import Capability from './Capability';
 import Grantee from './Grantee';
 import ActiveShare from './ActiveShare';
-import MissingDependency from './MissingDependency';
+import ShareEntity from './ShareEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
 
 export type AvailableGrantees = Immutable.List<Grantee>;
 export type AvailableCapabilities = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare>;
-export type MissingDependencies = Immutable.Map<GRN, Immutable.List<MissingDependency>>;
+export type MissingDependencies = Immutable.Map<GRN, Immutable.List<ShareEntity>>;
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
@@ -39,7 +39,7 @@ const mockMissingDependencies = () => {
     .type('team')
     .build();
 
-  const missingDependecy = MissingDependency
+  const missingDependecy = ShareEntity
     .builder()
     .id('grn::::stream:57bc9188e62a2373778d9e03')
     .type('stream')
@@ -79,7 +79,7 @@ export type EntityShareStateJson = {|
   selected_grantee_capabilities: {|
     [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
   |} | {||},
-  missing_permissions_on_dependencies: {[GRN]: Array<MissingDependencyType>},
+  missing_permissions_on_dependencies: {[GRN]: Array<ShareEntityType>},
 |};
 
 export default class EntityShareState {
@@ -204,7 +204,7 @@ export default class EntityShareState {
       Object.entries(missing_permissions_on_dependencies).map(
         ([granteeGRN, dependencyList]) => ({
           // $FlowFixMe: Object entries returns mixed value
-          [granteeGRN]: dependencyList.map((dependency) => MissingDependency.fromJSON(dependency)),
+          [granteeGRN]: dependencyList.map((dependency) => ShareEntity.fromJSON(dependency)),
         }),
       ),
     );

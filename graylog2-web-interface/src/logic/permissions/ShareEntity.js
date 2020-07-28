@@ -1,18 +1,18 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { MissingDependency as MissingDependencyType } from 'logic/permissions/types';
+import type { ShareEntity as ShareEntityType } from 'logic/permissions/types';
 
 import Grantee from './Grantee';
 
 type InternalState = {
-  id: $PropertyType<MissingDependencyType, 'id'>,
+  id: $PropertyType<ShareEntityType, 'id'>,
   owners: Immutable.List<Grantee>,
-  title: $PropertyType<MissingDependencyType, 'title'>,
-  type: $PropertyType<MissingDependencyType, 'type'>,
+  title: $PropertyType<ShareEntityType, 'title'>,
+  type: $PropertyType<ShareEntityType, 'type'>,
 };
 
-export default class MissingDependency {
+export default class ShareEntity {
   _value: InternalState;
 
   constructor(
@@ -54,11 +54,11 @@ export default class MissingDependency {
     return { id, owners, title, type };
   }
 
-  static fromJSON(value: MissingDependencyType): MissingDependency {
+  static fromJSON(value: ShareEntityType): ShareEntity {
     const { id, owners, title, type } = value;
     const formattedOwners = Immutable.fromJS(owners.map((o) => Grantee.fromJSON(o)));
 
-    return MissingDependency
+    return ShareEntity
       .builder()
       .id(id)
       .owners(formattedOwners)
@@ -99,9 +99,9 @@ class Builder {
     return new Builder(this.value.set('type', value));
   }
 
-  build(): MissingDependency {
+  build(): ShareEntity {
     const { id, owners, title, type } = this.value.toObject();
 
-    return new MissingDependency(id, owners, title, type);
+    return new ShareEntity(id, owners, title, type);
   }
 }

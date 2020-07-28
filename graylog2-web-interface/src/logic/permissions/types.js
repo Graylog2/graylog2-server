@@ -19,7 +19,7 @@ export type ActiveShare = {|
   capability: GRN,
 |};
 
-export type MissingDependency = {|
+export type ShareEntity = {|
   id: GRN,
   owners: Array<Grantee>,
   title: string,
