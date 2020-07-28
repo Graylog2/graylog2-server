@@ -16,7 +16,7 @@ const global = {
   textDefault: '#fff',
 };
 
-global.linkHover = chroma(global.link).darken(1).hex();
+global.linkHover = chroma(global.link).brighten(1).hex();
 
 const grayScale = chroma.scale([global.textDefault, global.textAlt]).colors(10);
 const gray = {};
@@ -44,13 +44,13 @@ const variant = {
 
 Object.keys(variant).forEach((name) => {
   if (typeof variant[name] === 'string') {
-    variant.light[name] = darken(variant[name], 0.15);
-    variant.lighter[name] = darken(variant[name], 0.5);
-    variant.lightest[name] = darken(variant[name], 0.85);
+    variant.light[name] = darken(variant[name], 0.22);
+    variant.lighter[name] = darken(variant[name], 0.55);
+    variant.lightest[name] = darken(variant[name], 0.88);
 
-    variant.dark[name] = lighten(variant[name], 0.15);
-    variant.darker[name] = lighten(variant[name], 0.5);
-    variant.darkest[name] = lighten(variant[name], 0.85);
+    variant.dark[name] = lighten(variant[name], 0.22);
+    variant.darker[name] = lighten(variant[name], 0.55);
+    variant.darkest[name] = lighten(variant[name], 0.88);
   }
 });
 
@@ -92,7 +92,7 @@ global.navigationBackground = global.contentBackground;
 global.navigationBoxShadow = chroma(gray[100]).alpha(0.1).css();
 /* eslint-enable prefer-destructuring */
 
-const teinte = {
+const noire = {
   brand,
   global,
   gray,
@@ -101,4 +101,4 @@ const teinte = {
   variant,
 };
 
-export default teinte;
+export default noire;
