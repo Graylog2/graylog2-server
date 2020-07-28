@@ -106,6 +106,7 @@ PaginatedList.propTypes = {
 
 PaginatedList.defaultProps = {
   activePage: 0,
+  className: undefined,
   pageSizes: DEFAULT_PAGE_SIZES,
   pageSize: DEFAULT_PAGE_SIZES[0],
   showPageSizeSelect: true,
