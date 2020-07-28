@@ -504,11 +504,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   >
                     <Pagination
                       bsClass="pagination"
-                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 ejkJpt"
                       data-testid="graylog-pagination"
                     >
                       <ul
-                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm pagination"
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 ejkJpt pagination"
                         data-testid="graylog-pagination"
                       >
                         <Component
@@ -6624,11 +6624,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   >
                     <Pagination
                       bsClass="pagination"
-                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 ejkJpt"
                       data-testid="graylog-pagination"
                     >
                       <ul
-                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm pagination"
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 ejkJpt pagination"
                         data-testid="graylog-pagination"
                       >
                         <Component
