@@ -81,7 +81,7 @@ public class LdapConnectorSSLTLSIT {
     private LdapConnector ldapConnector;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws KeyStoreException, NoSuchAlgorithmException {
         container.start();
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
         this.trustManagerProvider = mock(LdapConnector.TrustManagerProvider.class);
@@ -200,11 +200,11 @@ public class LdapConnectorSSLTLSIT {
         assertThat(connection.isSecured()).isTrue();
     }
 
-    private void mockTrustManagerWithSystemKeystore() {
+    private void mockTrustManagerWithSystemKeystore() throws KeyStoreException, NoSuchAlgorithmException {
         mockTrustManagerWithKeystore(null);
     }
 
-    private void mockTrustManagerWithKeystore(KeyStore keyStore) {
+    private void mockTrustManagerWithKeystore(KeyStore keyStore) throws KeyStoreException, NoSuchAlgorithmException {
         when(this.trustManagerProvider.create(anyString()))
                 .then((invocation) -> provideTrustManager(invocation.getArgument(0), keyStore));
     }

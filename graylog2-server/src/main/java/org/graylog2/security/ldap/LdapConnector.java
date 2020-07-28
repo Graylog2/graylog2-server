@@ -80,7 +80,7 @@ public class LdapConnector {
     private final TrustManagerProvider trustManagerProvider;
 
     public interface TrustManagerProvider {
-        TrustManager create(String host);
+        TrustManager create(String host) throws KeyStoreException, NoSuchAlgorithmException;
     }
 
     @Inject
