@@ -1,21 +1,19 @@
-import React, { forwardRef } from 'react';
-import PropTypes from 'prop-types';
+// @flow strict
 import styled, { css } from 'styled-components';
+import type { StyledComponent } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-const StyledAlert = styled(BootstrapAlert)(({ bsStyle, theme }) => {
-  if (!bsStyle) {
-    return undefined;
-  }
+import type { ThemeInterface } from 'theme/types';
 
-  const borderColor = theme.colors.variant.light[bsStyle];
+const Alert: StyledComponent<{bsStyle: string}, ThemeInterface, typeof BootstrapAlert> = styled(BootstrapAlert)(({ bsStyle = 'default', theme }) => {
+  const borderColor = theme.colors.variant.lighter[bsStyle];
   const backgroundColor = theme.colors.variant.lightest[bsStyle];
 
   return css`
     background-color: ${backgroundColor};
     border-color: ${borderColor};
-    color: ${theme.utils.readableColor(backgroundColor)};
+    color: ${theme.utils.contrastingColor(backgroundColor)};
 
     a:not(.btn) {
       color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
@@ -25,7 +23,7 @@ const StyledAlert = styled(BootstrapAlert)(({ bsStyle, theme }) => {
       &:hover,
       &:focus,
       &:active {
-        color: ${theme.utils.contrastingColor(backgroundColor, 'AAA')};
+        color: ${theme.utils.contrastingColor(backgroundColor)};
       }
 
       &:hover,
@@ -35,20 +33,5 @@ const StyledAlert = styled(BootstrapAlert)(({ bsStyle, theme }) => {
     }
   `;
 });
-
-const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
-  return (
-    <StyledAlert {...props} bsStyle={bsStyle} ref={ref} />
-  );
-});
-
-Alert.propTypes = {
-  /** Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(['danger', 'info', 'success', 'warning']),
-};
-
-Alert.defaultProps = {
-  bsStyle: 'info',
-};
 
 export default Alert;
