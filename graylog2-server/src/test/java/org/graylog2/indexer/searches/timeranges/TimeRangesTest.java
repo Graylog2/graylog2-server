@@ -24,8 +24,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -47,11 +45,6 @@ public class TimeRangesTest {
             public DateTime getTo() {
                 return null;
             }
-
-            @Override
-            public Map<String, Object> getPersistedConfig() {
-                return null;
-            }
         })).isEqualTo(0);
         assertThat(TimeRanges.toSeconds(new TimeRange() {
             @Override
@@ -67,11 +60,6 @@ public class TimeRangesTest {
             @Override
             public DateTime getTo() {
                 return DateTime.now(DateTimeZone.UTC);
-            }
-
-            @Override
-            public Map<String, Object> getPersistedConfig() {
-                return null;
             }
         })).isEqualTo(0);
     }

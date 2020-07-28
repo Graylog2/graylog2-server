@@ -6,7 +6,7 @@ import { type ThemeInterface } from 'theme';
 const MainDetailsGrid: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-column-gap: 45px;
+  grid-column-gap: 40px;
 
   @media (max-width: ${theme.breakpoints.max.md}) {
     grid-template-columns: 1fr;

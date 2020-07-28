@@ -27,11 +27,11 @@ export type PaginationInfo = {
   query: string,
 };
 
-export interface DescriptiveItem {
-  get id(): string,
-  get name(): string,
-  get description(): string,
-}
+export type DescriptiveItem = {
+  +id: string,
+  +name: string,
+  +description: string,
+};
 
 type ListOfDescriptiveItems = Immutable.List<DescriptiveItem>;
 
@@ -42,18 +42,16 @@ export type PaginatedListType = {
 
 type Props = {
   onLoad: (PaginationInfo) => Promise<?PaginatedListType>,
+  overrideList?: PaginatedListType,
+  onDeleteItem?: (DescriptiveItem) => void,
 };
 
-const PaginatedItemOverview = ({ onLoad }: Props) => {
-  const pageSizes = [5, 10, 30];
+const pageSizes = [5, 10, 30];
+export const defaultPageInfo = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '', total: 0, count: 0 };
+
+const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) => {
   const [items, setItems] = useState();
-  const [paginationInfo, setPaginationInfo] = useState({
-    count: 0,
-    total: 0,
-    page: INITIAL_PAGE,
-    perPage: pageSizes[0],
-    query: '',
-  });
+  const [paginationInfo, setPaginationInfo] = useState(defaultPageInfo);
 
   const _setResponse = (response: ?PaginatedListType) => {
     if (!response) {
@@ -64,6 +62,8 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
     setPaginationInfo(pagination);
     setItems(list);
   };
+
+  useEffect(() => _setResponse(overrideList), [overrideList]);
 
   useEffect(() => {
     onLoad(paginationInfo).then(_setResponse);
@@ -89,7 +89,7 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
   };
 
   const result = items && items.size > 0
-    ? items.toArray().map((item) => <PaginatedItem key={item.id} item={item} />)
+    ? items.toArray().map((item) => <PaginatedItem key={item.id} onDeleteItem={onDeleteItem} item={item} />)
     : <NotFound>No items found to display</NotFound>;
 
   return (
@@ -98,12 +98,17 @@ const PaginatedItemOverview = ({ onLoad }: Props) => {
                    totalItems={paginationInfo.total}
                    pageSizes={pageSizes}
                    activePage={paginationInfo.page}>
-      <SearchForm onSearch={_onSearch} />
+      <SearchForm onSearch={_onSearch} label="Filter" placeholder="Enter query to filter" searchButtonLabel="Filter" />
       <Container>
         {result}
       </Container>
     </PaginatedList>
   );
+};
+
+PaginatedItemOverview.defaultProps = {
+  onDeleteItem: undefined,
+  overrideList: undefined,
 };
 
 export default PaginatedItemOverview;

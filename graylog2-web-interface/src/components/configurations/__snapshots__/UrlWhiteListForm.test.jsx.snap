@@ -234,7 +234,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 defaultValue="testam"
                                 inputRef={[Function]}
@@ -246,7 +246,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   defaultValue="testam"
                                   id="title-input0"
                                   label=""
@@ -313,7 +313,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 defaultValue="http://localhost:8080/system/"
                                 inputRef={[Function]}
@@ -325,7 +325,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   defaultValue="http://localhost:8080/system/"
                                   id="value-input0"
                                   label=""
@@ -446,7 +446,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       "global": Object {
                                         "background": "#e8e8e8",
                                         "contentBackground": "#fff",
-                                        "inputBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
                                         "textAlt": "#fff",
@@ -463,6 +462,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "70": "#b4b4b4",
                                         "80": "#cdcdcd",
                                         "90": "#e6e6e6",
+                                      },
+                                      "input": Object {
+                                        "background": "#fff",
+                                        "backgroundDisabled": "#dddddd",
+                                        "border": "#a6a6a6",
+                                        "borderFocus": "#7894ce",
+                                        "boxShadow": "inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)",
+                                        "color": "#1f1f1f",
+                                        "colorDisabled": "#9b9b9b",
+                                        "placeholder": "#9b9b9b",
                                       },
                                       "table": Object {
                                         "background": "#fafafa",
@@ -543,6 +552,67 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     },
                                     "components": Object {
+                                      "aceEditor": Array [
+                                        ".ace_editor{border:1px solid ",
+                                        "#cdcdcd",
+                                        ";border-radius:5px;}.ace-graylog{background-color:",
+                                        "#fff",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";&.ace_multiselect .ace_selection.ace_start{box-shadow:0 0 3px 0 ",
+                                        "#fff",
+                                        ";}.ace_gutter{background:",
+                                        "#f3f3f3",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";}.ace_print-margin{width:1px;background:",
+                                        "#f3f3f3",
+                                        ";}.ace_cursor{color:",
+                                        "#a6a6a6",
+                                        ";}.ace_marker-layer{.ace_selection{background:",
+                                        "#b4b4b4",
+                                        ";}.ace_step{background:rgb(255,255,0);}.ace_bracket{margin:-1px 0 0 -1px;border:1px solid ",
+                                        "#b4b4b4",
+                                        ";}.ace_selected-word{border:1px solid ",
+                                        "#9b9b9b",
+                                        ";}.ace_active-line{background:",
+                                        "#e6e6e6",
+                                        ";}}.ace_gutter-active-line{background-color:",
+                                        "#cdcdcd",
+                                        ";}.ace_invisible{color:",
+                                        "#b4b4b4",
+                                        ";}.ace_keyword,.ace_meta,.ace_storage,.ace_storage.ace_type,.ace_support.ace_type{color:",
+                                        "#702785",
+                                        ";}.ace_keyword.ace_operator{color:",
+                                        "#00427f",
+                                        ";}.ace_constant.ace_character,.ace_constant.ace_language,.ace_constant.ace_numeric,.ace_keyword.ace_other.ace_unit,.ace_support.ace_constant,.ace_variable.ace_parameter{color:",
+                                        "#4b1a59",
+                                        ";}.ace_constant.ace_other{color:",
+                                        "#575757",
+                                        ";}.ace_invalid{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#c27878",
+                                        ";}.ace_invalid.ace_deprecated{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#702785",
+                                        ";}.ace_fold{background-color:",
+                                        "#0063be",
+                                        ";border-color:",
+                                        "#2d2d2d",
+                                        ";}.ace_entity.ace_name.ace_function,.ace_support.ace_function,.ace_variable{color:",
+                                        "#0063be",
+                                        ";}.ace_support.ace_class,.ace_support.ace_type{color:",
+                                        "#ab8d00",
+                                        ";}.ace_heading,.ace_markup.ace_heading,.ace_string{color:",
+                                        "#00752c",
+                                        ";}.ace_entity.ace_name.ace_tag,.ace_entity.ace_other.ace_attribute-name,.ace_meta.ace_tag,.ace_string.ace_regexp,.ace_variable{color:",
+                                        "#c27878",
+                                        ";}.ace_comment{color:",
+                                        "#737373",
+                                        ";}}",
+                                      ],
                                       "button": Array [
                                         Array [
                                           [Function],
@@ -874,12 +944,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "colors": Object {
                                             "danger": "#00427f",
                                             "dangerLight": "#bdc8e4",
-                                            "neutral0": "#ffffff",
+                                            "neutral0": "#fff",
                                             "neutral10": "#eff2f8",
-                                            "neutral20": "#cdcdcd",
+                                            "neutral20": "#a6a6a6",
                                             "neutral30": "#b4b4b4",
                                             "neutral40": "#9b9b9b",
-                                            "neutral5": "#e6e6e6",
+                                            "neutral5": "#dddddd",
                                             "neutral50": "#838383",
                                             "neutral60": "#6a6a6a",
                                             "neutral70": "#515151",
@@ -1026,12 +1096,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               "colors": Object {
                                                 "danger": "#00427f",
                                                 "dangerLight": "#bdc8e4",
-                                                "neutral0": "#ffffff",
+                                                "neutral0": "#fff",
                                                 "neutral10": "#eff2f8",
-                                                "neutral20": "#cdcdcd",
+                                                "neutral20": "#a6a6a6",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
-                                                "neutral5": "#e6e6e6",
+                                                "neutral5": "#dddddd",
                                                 "neutral50": "#838383",
                                                 "neutral60": "#6a6a6a",
                                                 "neutral70": "#515151",
@@ -1051,7 +1121,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           }
                                         >
                                           <div
-                                            className="css-et9nfk-control"
+                                            className="css-ghr2vn-control"
                                             onMouseDown={[Function]}
                                             onTouchEnd={[Function]}
                                           >
@@ -1170,12 +1240,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -1318,12 +1388,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -1456,12 +1526,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -1687,12 +1757,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -1830,12 +1900,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -1977,12 +2047,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -2011,7 +2081,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           "color": "#9b9b9b",
                                                         },
                                                         "boxSizing": "border-box",
-                                                        "color": "#cdcdcd",
+                                                        "color": "#a6a6a6",
                                                         "display": "flex",
                                                         "fontSize": "150%",
                                                         "label": "indicatorContainer",
@@ -2164,7 +2234,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 defaultValue="test"
                                 inputRef={[Function]}
@@ -2176,7 +2246,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   defaultValue="test"
                                   id="title-input1"
                                   label=""
@@ -2243,7 +2313,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 defaultValue="http://localhost:8080/system/"
                                 inputRef={[Function]}
@@ -2255,7 +2325,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   defaultValue="http://localhost:8080/system/"
                                   id="value-input1"
                                   label=""
@@ -2376,7 +2446,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       "global": Object {
                                         "background": "#e8e8e8",
                                         "contentBackground": "#fff",
-                                        "inputBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
                                         "textAlt": "#fff",
@@ -2393,6 +2462,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "70": "#b4b4b4",
                                         "80": "#cdcdcd",
                                         "90": "#e6e6e6",
+                                      },
+                                      "input": Object {
+                                        "background": "#fff",
+                                        "backgroundDisabled": "#dddddd",
+                                        "border": "#a6a6a6",
+                                        "borderFocus": "#7894ce",
+                                        "boxShadow": "inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)",
+                                        "color": "#1f1f1f",
+                                        "colorDisabled": "#9b9b9b",
+                                        "placeholder": "#9b9b9b",
                                       },
                                       "table": Object {
                                         "background": "#fafafa",
@@ -2473,6 +2552,67 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     },
                                     "components": Object {
+                                      "aceEditor": Array [
+                                        ".ace_editor{border:1px solid ",
+                                        "#cdcdcd",
+                                        ";border-radius:5px;}.ace-graylog{background-color:",
+                                        "#fff",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";&.ace_multiselect .ace_selection.ace_start{box-shadow:0 0 3px 0 ",
+                                        "#fff",
+                                        ";}.ace_gutter{background:",
+                                        "#f3f3f3",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";}.ace_print-margin{width:1px;background:",
+                                        "#f3f3f3",
+                                        ";}.ace_cursor{color:",
+                                        "#a6a6a6",
+                                        ";}.ace_marker-layer{.ace_selection{background:",
+                                        "#b4b4b4",
+                                        ";}.ace_step{background:rgb(255,255,0);}.ace_bracket{margin:-1px 0 0 -1px;border:1px solid ",
+                                        "#b4b4b4",
+                                        ";}.ace_selected-word{border:1px solid ",
+                                        "#9b9b9b",
+                                        ";}.ace_active-line{background:",
+                                        "#e6e6e6",
+                                        ";}}.ace_gutter-active-line{background-color:",
+                                        "#cdcdcd",
+                                        ";}.ace_invisible{color:",
+                                        "#b4b4b4",
+                                        ";}.ace_keyword,.ace_meta,.ace_storage,.ace_storage.ace_type,.ace_support.ace_type{color:",
+                                        "#702785",
+                                        ";}.ace_keyword.ace_operator{color:",
+                                        "#00427f",
+                                        ";}.ace_constant.ace_character,.ace_constant.ace_language,.ace_constant.ace_numeric,.ace_keyword.ace_other.ace_unit,.ace_support.ace_constant,.ace_variable.ace_parameter{color:",
+                                        "#4b1a59",
+                                        ";}.ace_constant.ace_other{color:",
+                                        "#575757",
+                                        ";}.ace_invalid{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#c27878",
+                                        ";}.ace_invalid.ace_deprecated{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#702785",
+                                        ";}.ace_fold{background-color:",
+                                        "#0063be",
+                                        ";border-color:",
+                                        "#2d2d2d",
+                                        ";}.ace_entity.ace_name.ace_function,.ace_support.ace_function,.ace_variable{color:",
+                                        "#0063be",
+                                        ";}.ace_support.ace_class,.ace_support.ace_type{color:",
+                                        "#ab8d00",
+                                        ";}.ace_heading,.ace_markup.ace_heading,.ace_string{color:",
+                                        "#00752c",
+                                        ";}.ace_entity.ace_name.ace_tag,.ace_entity.ace_other.ace_attribute-name,.ace_meta.ace_tag,.ace_string.ace_regexp,.ace_variable{color:",
+                                        "#c27878",
+                                        ";}.ace_comment{color:",
+                                        "#737373",
+                                        ";}}",
+                                      ],
                                       "button": Array [
                                         Array [
                                           [Function],
@@ -2804,12 +2944,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "colors": Object {
                                             "danger": "#00427f",
                                             "dangerLight": "#bdc8e4",
-                                            "neutral0": "#ffffff",
+                                            "neutral0": "#fff",
                                             "neutral10": "#eff2f8",
-                                            "neutral20": "#cdcdcd",
+                                            "neutral20": "#a6a6a6",
                                             "neutral30": "#b4b4b4",
                                             "neutral40": "#9b9b9b",
-                                            "neutral5": "#e6e6e6",
+                                            "neutral5": "#dddddd",
                                             "neutral50": "#838383",
                                             "neutral60": "#6a6a6a",
                                             "neutral70": "#515151",
@@ -2956,12 +3096,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               "colors": Object {
                                                 "danger": "#00427f",
                                                 "dangerLight": "#bdc8e4",
-                                                "neutral0": "#ffffff",
+                                                "neutral0": "#fff",
                                                 "neutral10": "#eff2f8",
-                                                "neutral20": "#cdcdcd",
+                                                "neutral20": "#a6a6a6",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
-                                                "neutral5": "#e6e6e6",
+                                                "neutral5": "#dddddd",
                                                 "neutral50": "#838383",
                                                 "neutral60": "#6a6a6a",
                                                 "neutral70": "#515151",
@@ -2981,7 +3121,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           }
                                         >
                                           <div
-                                            className="css-et9nfk-control"
+                                            className="css-ghr2vn-control"
                                             onMouseDown={[Function]}
                                             onTouchEnd={[Function]}
                                           >
@@ -3100,12 +3240,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -3248,12 +3388,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3386,12 +3526,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3617,12 +3757,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -3760,12 +3900,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3907,12 +4047,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3941,7 +4081,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           "color": "#9b9b9b",
                                                         },
                                                         "boxSizing": "border-box",
-                                                        "color": "#cdcdcd",
+                                                        "color": "#a6a6a6",
                                                         "display": "flex",
                                                         "fontSize": "150%",
                                                         "label": "indicatorContainer",
@@ -4094,7 +4234,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 defaultValue="test"
                                 inputRef={[Function]}
@@ -4106,7 +4246,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   defaultValue="test"
                                   id="title-input2"
                                   label=""
@@ -4173,7 +4313,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="FormControl-sc-1amoaox-0 fKSsjP"
                                 componentClass="input"
                                 defaultValue="http://localhost:8080/system/"
                                 inputRef={[Function]}
@@ -4185,7 +4325,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                   defaultValue="http://localhost:8080/system/"
                                   id="value-input2"
                                   label=""
@@ -4306,7 +4446,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       "global": Object {
                                         "background": "#e8e8e8",
                                         "contentBackground": "#fff",
-                                        "inputBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
                                         "textAlt": "#fff",
@@ -4323,6 +4462,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "70": "#b4b4b4",
                                         "80": "#cdcdcd",
                                         "90": "#e6e6e6",
+                                      },
+                                      "input": Object {
+                                        "background": "#fff",
+                                        "backgroundDisabled": "#dddddd",
+                                        "border": "#a6a6a6",
+                                        "borderFocus": "#7894ce",
+                                        "boxShadow": "inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)",
+                                        "color": "#1f1f1f",
+                                        "colorDisabled": "#9b9b9b",
+                                        "placeholder": "#9b9b9b",
                                       },
                                       "table": Object {
                                         "background": "#fafafa",
@@ -4403,6 +4552,67 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     },
                                     "components": Object {
+                                      "aceEditor": Array [
+                                        ".ace_editor{border:1px solid ",
+                                        "#cdcdcd",
+                                        ";border-radius:5px;}.ace-graylog{background-color:",
+                                        "#fff",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";&.ace_multiselect .ace_selection.ace_start{box-shadow:0 0 3px 0 ",
+                                        "#fff",
+                                        ";}.ace_gutter{background:",
+                                        "#f3f3f3",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";}.ace_print-margin{width:1px;background:",
+                                        "#f3f3f3",
+                                        ";}.ace_cursor{color:",
+                                        "#a6a6a6",
+                                        ";}.ace_marker-layer{.ace_selection{background:",
+                                        "#b4b4b4",
+                                        ";}.ace_step{background:rgb(255,255,0);}.ace_bracket{margin:-1px 0 0 -1px;border:1px solid ",
+                                        "#b4b4b4",
+                                        ";}.ace_selected-word{border:1px solid ",
+                                        "#9b9b9b",
+                                        ";}.ace_active-line{background:",
+                                        "#e6e6e6",
+                                        ";}}.ace_gutter-active-line{background-color:",
+                                        "#cdcdcd",
+                                        ";}.ace_invisible{color:",
+                                        "#b4b4b4",
+                                        ";}.ace_keyword,.ace_meta,.ace_storage,.ace_storage.ace_type,.ace_support.ace_type{color:",
+                                        "#702785",
+                                        ";}.ace_keyword.ace_operator{color:",
+                                        "#00427f",
+                                        ";}.ace_constant.ace_character,.ace_constant.ace_language,.ace_constant.ace_numeric,.ace_keyword.ace_other.ace_unit,.ace_support.ace_constant,.ace_variable.ace_parameter{color:",
+                                        "#4b1a59",
+                                        ";}.ace_constant.ace_other{color:",
+                                        "#575757",
+                                        ";}.ace_invalid{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#c27878",
+                                        ";}.ace_invalid.ace_deprecated{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#702785",
+                                        ";}.ace_fold{background-color:",
+                                        "#0063be",
+                                        ";border-color:",
+                                        "#2d2d2d",
+                                        ";}.ace_entity.ace_name.ace_function,.ace_support.ace_function,.ace_variable{color:",
+                                        "#0063be",
+                                        ";}.ace_support.ace_class,.ace_support.ace_type{color:",
+                                        "#ab8d00",
+                                        ";}.ace_heading,.ace_markup.ace_heading,.ace_string{color:",
+                                        "#00752c",
+                                        ";}.ace_entity.ace_name.ace_tag,.ace_entity.ace_other.ace_attribute-name,.ace_meta.ace_tag,.ace_string.ace_regexp,.ace_variable{color:",
+                                        "#c27878",
+                                        ";}.ace_comment{color:",
+                                        "#737373",
+                                        ";}}",
+                                      ],
                                       "button": Array [
                                         Array [
                                           [Function],
@@ -4734,12 +4944,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "colors": Object {
                                             "danger": "#00427f",
                                             "dangerLight": "#bdc8e4",
-                                            "neutral0": "#ffffff",
+                                            "neutral0": "#fff",
                                             "neutral10": "#eff2f8",
-                                            "neutral20": "#cdcdcd",
+                                            "neutral20": "#a6a6a6",
                                             "neutral30": "#b4b4b4",
                                             "neutral40": "#9b9b9b",
-                                            "neutral5": "#e6e6e6",
+                                            "neutral5": "#dddddd",
                                             "neutral50": "#838383",
                                             "neutral60": "#6a6a6a",
                                             "neutral70": "#515151",
@@ -4886,12 +5096,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               "colors": Object {
                                                 "danger": "#00427f",
                                                 "dangerLight": "#bdc8e4",
-                                                "neutral0": "#ffffff",
+                                                "neutral0": "#fff",
                                                 "neutral10": "#eff2f8",
-                                                "neutral20": "#cdcdcd",
+                                                "neutral20": "#a6a6a6",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
-                                                "neutral5": "#e6e6e6",
+                                                "neutral5": "#dddddd",
                                                 "neutral50": "#838383",
                                                 "neutral60": "#6a6a6a",
                                                 "neutral70": "#515151",
@@ -4911,7 +5121,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           }
                                         >
                                           <div
-                                            className="css-et9nfk-control"
+                                            className="css-ghr2vn-control"
                                             onMouseDown={[Function]}
                                             onTouchEnd={[Function]}
                                           >
@@ -5030,12 +5240,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -5178,12 +5388,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5316,12 +5526,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5547,12 +5757,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -5690,12 +5900,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5837,12 +6047,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5871,7 +6081,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           "color": "#9b9b9b",
                                                         },
                                                         "boxSizing": "border-box",
-                                                        "color": "#cdcdcd",
+                                                        "color": "#a6a6a6",
                                                         "display": "flex",
                                                         "fontSize": "150%",
                                                         "label": "indicatorContainer",

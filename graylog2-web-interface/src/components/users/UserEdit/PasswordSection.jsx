@@ -85,7 +85,7 @@ const PasswordSection = ({ user: { username } }: Props) => {
                              required
                              labelClassName="col-sm-3"
                              wrapperClassName="col-sm-9" />
-            <Row>
+            <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
                   <Button bsStyle="success"

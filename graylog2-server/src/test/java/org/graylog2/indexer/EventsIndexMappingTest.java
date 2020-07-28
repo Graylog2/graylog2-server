@@ -18,28 +18,17 @@ package org.graylog2.indexer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.BeforeClass;
+import org.graylog2.utilities.AssertJsonPath;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,34 +42,8 @@ public class EventsIndexMappingTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    @BeforeClass
-    public static void classSetUp() {
-        Configuration.setDefaults(new Configuration.Defaults() {
-            private final JsonProvider jsonProvider = new JacksonJsonProvider(objectMapper);
-            private final MappingProvider mappingProvider = new JacksonMappingProvider(objectMapper);
-
-            @Override
-            public JsonProvider jsonProvider() {
-                return jsonProvider;
-            }
-
-            @Override
-            public Set<Option> options() {
-                return EnumSet.noneOf(Option.class);
-            }
-
-            @Override
-            public MappingProvider mappingProvider() {
-                return mappingProvider;
-            }
-        });
-    }
-
     private void assertJsonPath(Map<String, Object> map, Consumer<JsonPathAssert> consumer) throws Exception {
-        final DocumentContext context = JsonPath.parse(objectMapper.writeValueAsString(map));
-        final JsonPathAssert jsonPathAssert = JsonPathAssert.assertThat(context);
-
-        consumer.accept(jsonPathAssert);
+        AssertJsonPath.assertJsonPath(objectMapper.writeValueAsString(map), consumer);
     }
 
     private void assertStandardMappingValues(JsonPathAssert at) {
@@ -124,16 +87,16 @@ public class EventsIndexMappingTest {
 
     @Test
     public void templateWithES5() throws Exception {
-        final EventsIndexMapping mapping = new EventsIndexMapping(Version.valueOf("5.0.0"));
+        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("5.0.0"));
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
-            at.jsonPathAsString("$.template").isEqualTo("test_*");
+            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
             at.jsonPathAsInteger("$.order").isEqualTo(-1);
             assertStandardMappingValues(at);
         });
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*", 23), at -> {
-            at.jsonPathAsString("$.template").isEqualTo("test_*");
+            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
             at.jsonPathAsInteger("$.order").isEqualTo(23);
             assertStandardMappingValues(at);
         });
@@ -141,16 +104,16 @@ public class EventsIndexMappingTest {
 
     @Test
     public void templateWithES6() throws Exception {
-        final EventsIndexMapping mapping = new EventsIndexMapping(Version.valueOf("6.0.0"));
+        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("6.0.0"));
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
-            at.jsonPathAsListOf("$.index_patterns", String.class).isEqualTo(Collections.singletonList("test_*"));
+            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
             at.jsonPathAsInteger("$.order").isEqualTo(-1);
             assertStandardMappingValues(at);
         });
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*", 42), at -> {
-            at.jsonPathAsListOf("$.index_patterns", String.class).isEqualTo(Collections.singletonList("test_*"));
+            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
             at.jsonPathAsInteger("$.order").isEqualTo(42);
             assertStandardMappingValues(at);
         });
@@ -160,15 +123,11 @@ public class EventsIndexMappingTest {
     public void templateWithUnsupportedESVersions() {
         final String indexPattern = "test_*";
 
-        assertThatThrownBy(() -> new EventsIndexMapping(Version.valueOf("8.0.0")).toTemplate(indexSetConfig, indexPattern))
+        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("8.0.0")).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 8.0.0");
 
-        assertThatThrownBy(() -> new EventsIndexMapping(Version.valueOf("7.0.0")).toTemplate(indexSetConfig, indexPattern))
-                .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: 7.0.0");
-
-        assertThatThrownBy(() -> new EventsIndexMapping(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
+        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageContaining("Unsupported Elasticsearch version: 2.4.0");
     }

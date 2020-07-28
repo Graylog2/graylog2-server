@@ -24,7 +24,7 @@ const URLColumn = styled.div`
 
 const StyledFormControl: StyledComponent<{}, ThemeInterface, FormControl> = styled(FormControl)(({ theme }) => `
   &[readonly] {
-    background-color: ${theme.colors.global.inputBackground};
+    background-color: ${theme.colors.input.background};
   }
 `);
 

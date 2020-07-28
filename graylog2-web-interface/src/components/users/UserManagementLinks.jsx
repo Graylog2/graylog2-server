@@ -11,33 +11,31 @@ type Props = {
   userIsReadOnly: boolean,
 };
 
-const UserManagementLinks = ({ username, userIsReadOnly }: Props) => {
-  return (
-    <ButtonToolbar>
-      <LinkContainer to={Routes.SYSTEM.USERS.show(username)}>
-        <Button bsStyle="success">
-          View Details
-        </Button>
-      </LinkContainer>
-      {!userIsReadOnly && (
-        <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
-          <Button bsStyle="success">
-            Edit
-          </Button>
-        </LinkContainer>
-      )}
-      <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
-        <Button bsStyle="success">
-          Edit Tokens
-        </Button>
-      </LinkContainer>
-      <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-        <Button bsStyle="info">
-          Users Overview
-        </Button>
-      </LinkContainer>
-    </ButtonToolbar>
-  );
-};
+const UserManagementLinks = ({ username, userIsReadOnly }: Props) => (
+  <ButtonToolbar>
+    <LinkContainer to={Routes.SYSTEM.USERS.show(username)}>
+      <Button bsStyle="success">
+        View Details
+      </Button>
+    </LinkContainer>
+    {!userIsReadOnly && (
+    <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
+      <Button bsStyle="success">
+        Edit User
+      </Button>
+    </LinkContainer>
+    )}
+    <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
+      <Button bsStyle="success">
+        Edit Tokens
+      </Button>
+    </LinkContainer>
+    <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
+      <Button bsStyle="info">
+        Users Overview
+      </Button>
+    </LinkContainer>
+  </ButtonToolbar>
+);
 
 export default UserManagementLinks;

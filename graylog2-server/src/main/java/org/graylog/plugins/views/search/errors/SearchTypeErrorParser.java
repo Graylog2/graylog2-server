@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 public class SearchTypeErrorParser {
     public static SearchTypeError parse(Query query, String searchTypeId, ElasticsearchException ex) {
-
         final Integer resultWindowLimit = parseResultLimit(ex);
 
         if (resultWindowLimit != null)

@@ -76,13 +76,6 @@ public abstract class RelativeRange extends TimeRange {
         return new AutoValue_RelativeRange.Builder();
     }
 
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>of(
-                "type", RELATIVE,
-                "range", getRange());
-    }
-
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract RelativeRange build();

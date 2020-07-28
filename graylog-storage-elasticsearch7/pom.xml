@@ -18,7 +18,7 @@
 
     <properties>
         <it.es.version>7.6.2</it.es.version>
-        <elasticsearch.version>7.6.2</elasticsearch.version>
+        <elasticsearch.version>7.8.0-1</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -26,13 +26,6 @@
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-server</artifactId>
-            <version>${project.parent.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -44,31 +37,6 @@
             <groupId>org.graylog.shaded</groupId>
             <artifactId>elasticsearch7</artifactId>
             <version>${elasticsearch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>

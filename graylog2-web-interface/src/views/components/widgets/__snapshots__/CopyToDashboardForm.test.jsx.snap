@@ -91,7 +91,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -122,7 +122,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               No dashboards found
             </span>
             <div
-              class="text-center pagination-wrapper"
+              class="text-center pagination-wrapper "
             />
           </div>
           <div
@@ -240,7 +240,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 kmJcge form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -298,7 +298,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               </button>
             </div>
             <div
-              class="text-center pagination-wrapper"
+              class="text-center pagination-wrapper "
             />
           </div>
           <div

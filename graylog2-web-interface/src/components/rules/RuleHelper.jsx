@@ -239,11 +239,11 @@ class RuleHelper extends React.Component {
 }
 
 RuleHelper.propTypes = {
-  functionDescriptors: PropTypes.object,
+  functionDescriptors: PropTypes.array,
 };
 
 RuleHelper.defaultProps = {
-  functionDescriptors: PropTypes.undefined,
+  functionDescriptors: undefined,
 };
 
 export default connect(RuleHelper,
