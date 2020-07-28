@@ -16,6 +16,7 @@
  */
 package org.graylog.security.permissions;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
@@ -41,10 +42,9 @@ public abstract class GRNPermission implements Permission {
         return (other.type().equals(type()) && other.target().equals(target()));
     }
 
-    @Override
+    @JsonValue
     // This string representation is used in the UserSummary and exported to the frontend
-    // Don't change this!
-    public String toString() {
-        return type() + "|" + target().toString();
+    public String jsonValue() {
+        return type() + ":" + target().toString();
     }
 }

@@ -56,7 +56,6 @@ public abstract class UserSummary {
     public abstract List<WildcardPermission> permissions();
 
     @JsonProperty
-    @JsonSerialize(contentUsing = ToStringSerializer.class)
     public abstract List<GRNPermission> grnPermissions();
 
     @JsonProperty
