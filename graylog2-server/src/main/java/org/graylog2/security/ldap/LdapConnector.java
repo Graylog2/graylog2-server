@@ -62,7 +62,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -105,7 +104,7 @@ public class LdapConnector {
     }
 
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
-        config.setEnabledProtocols(enabledProtocols());
+        config.setEnabledProtocols(enabledTlsProtocols.toArray(new String[0]));
 
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
         connection.setTimeOut(connectionTimeout);
@@ -143,12 +142,6 @@ public class LdapConnector {
         connection.bind();
 
         return connection;
-    }
-
-    private String[] enabledProtocols() {
-        return Stream.concat(Stream.of("SSLv3"), enabledTlsProtocols.stream())
-                .distinct()
-                .toArray(String[]::new);
     }
 
     @Nullable
