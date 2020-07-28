@@ -122,7 +122,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               No dashboards found
             </span>
             <div
-              class="text-center pagination-wrapper"
+              class="text-center pagination-wrapper "
             />
           </div>
           <div
@@ -298,7 +298,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               </button>
             </div>
             <div
-              class="text-center pagination-wrapper"
+              class="text-center pagination-wrapper "
             />
           </div>
           <div
