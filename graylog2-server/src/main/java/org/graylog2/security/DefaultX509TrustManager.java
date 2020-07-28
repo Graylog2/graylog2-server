@@ -17,8 +17,10 @@
 package org.graylog2.security;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.assistedinject.Assisted;
 import org.bouncycastle.est.jcajce.JsseDefaultHostnameAuthorizer;
 
+import javax.inject.Inject;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
@@ -38,7 +40,8 @@ public class DefaultX509TrustManager extends X509ExtendedTrustManager {
     private final X509TrustManager defaultTrustManager;
     private final JsseDefaultHostnameAuthorizer authorizer;
 
-    public DefaultX509TrustManager(String host) throws NoSuchAlgorithmException, KeyStoreException {
+    @Inject
+    public DefaultX509TrustManager(@Assisted String host) throws NoSuchAlgorithmException, KeyStoreException {
         this(host, null);
     }
 
