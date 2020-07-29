@@ -7,6 +7,7 @@ import Routes from 'routing/Routes';
 import SharedEntity from 'logic/permissions/SharedEntity';
 
 type Props = {
+  capabilityTitle: string,
   sharedEntity: SharedEntity,
 };
 
@@ -38,20 +39,19 @@ const OwnersCell = ({ owners }: {owners: GranteesList}) => (
 );
 
 const SharedEntitiesOverviewItem = ({
+  capabilityTitle,
   sharedEntity: {
     owners,
     title,
     type,
   },
-}: Props) => {
-  return (
-    <tr key={title + type}>
-      <td className="limited">{title}</td>
-      <td className="limited">{type}</td>
-      <OwnersCell owners={owners} />
-      <td className="limited">Viewer</td>
-    </tr>
-  );
-};
+}: Props) => (
+  <tr key={title + type}>
+    <td className="limited">{title}</td>
+    <td className="limited">{type}</td>
+    <OwnersCell owners={owners} />
+    <td className="limited">{capabilityTitle}</td>
+  </tr>
+);
 
 export default SharedEntitiesOverviewItem;

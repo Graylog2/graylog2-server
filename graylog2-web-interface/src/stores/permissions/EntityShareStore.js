@@ -1,7 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
-import * as Immutable from 'immutable';
 
+// import * as Immutable from 'immutable';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -10,9 +10,9 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 // import type { GRN, SharedEntityType, UserSharedEntities } from 'logic/permissions/types';
 import type { GRN, UserSharedEntities } from 'logic/permissions/types';
 // import PaginationURL, { type AdditionalQueries } from 'util/PaginationURL';
+import permissionsMock from 'logic/permissions/mocked';
 import { type AdditionalQueries } from 'util/PaginationURL';
 import EntityShareState, { type EntityShareStateJson, type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
-import SharedEntity from 'logic/permissions/SharedEntity';
 
 type EntityShareStoreState = {
   state: EntityShareState,
@@ -105,46 +105,7 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       //   };
       // });
 
-      const mockedEntities = new Array(perPage).fill({
-        id: 'grn::::stream:57bc9188e62a2373778d9e03',
-        type: 'stream',
-        title: 'Security Data',
-        owners: [
-          {
-            id: 'grn::::user:jane',
-            type: 'user',
-            title: 'Jane Doe',
-          },
-        ],
-      });
-
-      const mockedResponse = {
-        additionalQueries: additionalQueries,
-        total: 230,
-        count: Math.round(230 / perPage),
-        page: page || 1,
-        per_page: perPage || 10,
-        query: query || '',
-        entities: mockedEntities,
-        context: {
-          user_capabilities: {
-            'grn::::stream:57bc9188e62a2373778d9e03': 'view',
-          },
-        },
-      };
-
-      const promise = Promise.resolve({
-        list: Immutable.List(mockedResponse.entities.map((se) => SharedEntity.fromJSON(se))),
-        context: { userCapabilities: mockedResponse.context.user_capabilities },
-        pagination: {
-          additionalQueries: mockedResponse.additionalQueries,
-          count: mockedResponse.count,
-          total: mockedResponse.total,
-          page: mockedResponse.page,
-          perPage: mockedResponse.per_page,
-          query: mockedResponse.query,
-        },
-      });
+      const promise = permissionsMock.searchPaginatedUserSharesResponse(page, perPage, query, additionalQueries);
       EntityShareActions.searchPaginatedUserShares.promise(promise);
 
       return promise;

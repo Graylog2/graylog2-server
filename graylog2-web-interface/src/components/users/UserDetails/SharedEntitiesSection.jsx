@@ -4,11 +4,11 @@ import { useState } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { EntityShareActions, type UserSharesPaginationType } from 'stores/permissions/EntityShareStore';
+import mockedPermissions from 'logic/permissions/mocked';
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import type { PaginatedUserSharesType } from 'stores/permissions/EntityShareStore';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 import User from 'logic/users/User';
-import type { UserSharedEntities } from 'logic/permissions/types';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
 import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
@@ -37,7 +37,7 @@ const _onPageChange = (pagination, fetchSharedEntities, setLoading) => (page, pe
 const SharedEntitiesSection = ({ paginatedUserShares: initialPaginatedUserShares, username }: Props) => {
   const [currentSearchQuery, setCurrentSearchQuery] = useState<string>(initialPaginatedUserShares?.pagination?.query || '');
   const [paginatedUserShares, setPaginatedUserShares] = useState<PaginatedUserSharesType>(initialPaginatedUserShares || { list: Immutable.List(), pagination: { total: 0 } });
-  const { list, pagination } = paginatedUserShares;
+  const { list, pagination, context } = paginatedUserShares;
   const [loading, setLoading] = useState(false);
 
   const _fetchSharedEntities = (newPage, newPerPage, newQuery, additonalQueries) => {
@@ -46,7 +46,12 @@ const SharedEntitiesSection = ({ paginatedUserShares: initialPaginatedUserShares
     });
   };
 
-  const _sharedEntityOverviewItem = (sharedEntity) => <SharedEntitiesOverviewItem sharedEntity={sharedEntity} />;
+  const _sharedEntityOverviewItem = (sharedEntity) => {
+    const capability = context?.userCapabilities?.[sharedEntity.id];
+    const capabilityTitle = mockedPermissions.availableCapabilities[capability];
+
+    return <SharedEntitiesOverviewItem sharedEntity={sharedEntity} capabilityTitle={capabilityTitle} />;
+  };
 
   const _handleSearch = (newQuery: string, resetLoading: () => void) => {
     setCurrentSearchQuery(newQuery || '');
@@ -61,7 +66,6 @@ const SharedEntitiesSection = ({ paginatedUserShares: initialPaginatedUserShares
   };
 
   const _handleFilter = (param: string, value: string) => _fetchSharedEntities(1, pagination.perPage, currentSearchQuery, { [param]: value });
-  console.log(paginatedUserShares);
 
   return (
     <SectionComponent title="Shared Entities" showLoading={loading}>
