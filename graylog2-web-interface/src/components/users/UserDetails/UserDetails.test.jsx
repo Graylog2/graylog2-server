@@ -1,10 +1,20 @@
 // @flow strict
-import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import { render, act } from 'wrappedTestingLibrary';
 
 import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
+
+const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), pagination: { total: 0 } });
+
+jest.mock('stores/roles/AuthzRolesStore', () => ({
+  AuthzRolesActions: {
+    loadForUser: jest.fn(() => mockAuthzRolesPromise),
+    loadPaginated: jest.fn(() => mockAuthzRolesPromise),
+  },
+}));
 
 const user = User
   .builder()
@@ -18,7 +28,7 @@ const user = User
   .build();
 
 describe('<UserDetails />', () => {
-  it('should display user profile', () => {
+  it('user profile should display profile information', async () => {
     const { getByText } = render(<UserDetails user={user} paginatedUserShares={undefined} />);
 
     expect(getByText(user.username)).not.toBeNull();
@@ -26,39 +36,51 @@ describe('<UserDetails />', () => {
     expect(getByText(user.email)).not.toBeNull();
     expect(getByText(user.clientAddress)).not.toBeNull();
     expect(getByText(user.lastActivity)).not.toBeNull();
+
+    await act(() => mockAuthzRolesPromise);
   });
 
   describe('user settings', () => {
-    it('should display timezone', () => {
+    it('should display timezone', async () => {
       const { getByText } = render(<UserDetails user={user} paginatedUserShares={undefined} />);
 
       expect(getByText(user.timezone)).not.toBeNull();
+
+      await act(() => mockAuthzRolesPromise);
     });
 
     describe('should display session timeout in a readable format', () => {
-      it('for seconds', () => {
+      it('for seconds', async () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
         const { getByText } = render(<UserDetails user={test} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Seconds')).not.toBeNull();
+
+        await act(() => mockAuthzRolesPromise);
       });
 
-      it('for minutes', () => {
+      it('for minutes', async () => {
         const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Minutes')).not.toBeNull();
+
+        await act(() => mockAuthzRolesPromise);
       });
 
-      it('for hours', () => {
+      it('for hours', async () => {
         const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Hours')).not.toBeNull();
+
+        await act(() => mockAuthzRolesPromise);
       });
 
-      it('for days', () => {
+      it('for days', async () => {
         const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Days')).not.toBeNull();
+
+        await act(() => mockAuthzRolesPromise);
       });
     });
   });
