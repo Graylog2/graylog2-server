@@ -104,7 +104,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
 <Input
   addonAfter={null}
   bsStyle={null}
-  buttonAfter={<ForwardRef />}
+  buttonAfter={<Button />}
   help=""
   id="inputWithButton"
   label=""
@@ -176,24 +176,22 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         <span
                           className="input-group-btn"
                         >
-                          <ForwardRef>
-                            <Button__StyledButton>
-                              <Button
-                                active={false}
-                                block={false}
-                                bsClass="btn"
-                                bsStyle="default"
-                                className="Button__StyledButton-c9cbmb-0 laZUlH"
+                          <Button>
+                            <Button
+                              active={false}
+                              block={false}
+                              bsClass="btn"
+                              bsStyle="default"
+                              className="Button-c9cbmb-0 bNulii"
+                              disabled={false}
+                            >
+                              <button
+                                className="Button-c9cbmb-0 bNulii btn btn-default"
                                 disabled={false}
-                              >
-                                <button
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-default"
-                                  disabled={false}
-                                  type="button"
-                                />
-                              </Button>
-                            </Button__StyledButton>
-                          </ForwardRef>
+                                type="button"
+                              />
+                            </Button>
+                          </Button>
                         </span>
                       </InputGroupButton>
                     </Button>

@@ -13,34 +13,29 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
   validPatternName={[Function]}
 >
   <span>
-    <ForwardRef
+    <Button
       bsStyle="success"
       onClick={[Function]}
     >
-      <Button__StyledButton
+      <Button
+        active={false}
+        block={false}
+        bsClass="btn"
         bsStyle="success"
+        className="Button-c9cbmb-0 bNulii"
+        disabled={false}
         onClick={[Function]}
       >
-        <Button
-          active={false}
-          block={false}
-          bsClass="btn"
-          bsStyle="success"
-          className="Button__StyledButton-c9cbmb-0 laZUlH"
+        <button
+          className="Button-c9cbmb-0 bNulii btn btn-success"
           disabled={false}
           onClick={[Function]}
+          type="button"
         >
-          <button
-            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-success"
-            disabled={false}
-            onClick={[Function]}
-            type="button"
-          >
-            Create pattern
-          </button>
-        </Button>
-      </Button__StyledButton>
-    </ForwardRef>
+          Create pattern
+        </button>
+      </Button>
+    </Button>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"
@@ -145,39 +140,33 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
   validPatternName={[Function]}
 >
   <span>
-    <ForwardRef
+    <Button
       bsSize="xs"
       bsStyle="info"
       onClick={[Function]}
     >
-      <Button__StyledButton
+      <Button
+        active={false}
+        block={false}
+        bsClass="btn"
         bsSize="xs"
         bsStyle="info"
+        className="Button-c9cbmb-0 bNulii"
+        disabled={false}
         onClick={[Function]}
       >
-        <Button
-          active={false}
-          block={false}
-          bsClass="btn"
-          bsSize="xs"
-          bsStyle="info"
-          className="Button__StyledButton-c9cbmb-0 laZUlH"
+        <button
+          className="Button-c9cbmb-0 bNulii btn btn-xs btn-info"
           disabled={false}
           onClick={[Function]}
+          type="button"
         >
-          <button
-            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-info"
-            disabled={false}
-            onClick={[Function]}
-            type="button"
-          >
-            <span>
-              Edit
-            </span>
-          </button>
-        </Button>
-      </Button__StyledButton>
-    </ForwardRef>
+          <span>
+            Edit
+          </span>
+        </button>
+      </Button>
+    </Button>
     <BootstrapModalForm
       bsSize="large"
       cancelButtonText="Cancel"

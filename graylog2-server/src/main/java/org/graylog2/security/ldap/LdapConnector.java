@@ -48,16 +48,12 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
@@ -78,13 +74,23 @@ public class LdapConnector {
     private static final String ATTRIBUTE_MEMBER_UID = "memberUid";
 
     private final int connectionTimeout;
+    private final Set<String> enabledTlsProtocols;
     private final LdapSettingsService ldapSettingsService;
+    private final TrustManagerProvider trustManagerProvider;
+
+    public interface TrustManagerProvider {
+        TrustManager create(String host) throws KeyStoreException, NoSuchAlgorithmException;
+    }
 
     @Inject
     public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout,
-                         LdapSettingsService ldapSettingsService) {
+                         @Named("enabled_tls_protocols") Set<String> enabledTlsProtocols,
+                         LdapSettingsService ldapSettingsService,
+                         TrustManagerProvider trustManagerProvider) {
         this.connectionTimeout = connectionTimeout;
+        this.enabledTlsProtocols = enabledTlsProtocols;
         this.ldapSettingsService = ldapSettingsService;
+        this.trustManagerProvider = trustManagerProvider;
     }
 
     public LdapNetworkConnection connect(LdapSettings settings) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
@@ -98,6 +104,8 @@ public class LdapConnector {
     }
 
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
+        config.setEnabledProtocols(enabledTlsProtocols.toArray(new String[0]));
+
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
         connection.setTimeOut(connectionTimeout);
 
@@ -439,7 +447,7 @@ public class LdapConnector {
         if (request.trustAllCertificates()) {
             config.setTrustManagers(new TrustAllX509TrustManager());
         } else {
-            config.setTrustManagers(createDefaultTrustManager());
+            config.setTrustManagers(trustManagerProvider.create(ldapUri.getHost()));
         }
 
         if (!isNullOrEmpty(request.systemUsername())) {
@@ -462,27 +470,17 @@ public class LdapConnector {
         return config;
     }
 
-    private TrustManager createDefaultTrustManager() throws KeyStoreException, NoSuchAlgorithmException {
-        final TrustManagerFactory tmf = TrustManagerFactory
-                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init((KeyStore) null);
-
-        return Arrays.stream(tmf.getTrustManagers())
-                .filter(trustManager -> trustManager instanceof X509TrustManager)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Unable to initialize default X509 trust manager."));
-    }
-
     private LdapConnectionConfig createConfig(LdapSettings ldapSettings) throws KeyStoreException, NoSuchAlgorithmException {
         final LdapConnectionConfig config = new LdapConnectionConfig();
-        config.setLdapHost(ldapSettings.getUri().getHost());
+        final String hostname = ldapSettings.getUri().getHost();
+        config.setLdapHost(hostname);
         config.setLdapPort(ldapSettings.getUri().getPort());
         config.setUseSsl(ldapSettings.getUri().getScheme().startsWith("ldaps"));
         config.setUseTls(ldapSettings.isUseStartTls());
         if (ldapSettings.isTrustAllCertificates()) {
             config.setTrustManagers(new TrustAllX509TrustManager());
         } else {
-            config.setTrustManagers(createDefaultTrustManager());
+            config.setTrustManagers(trustManagerProvider.create(hostname));
         }
         config.setName(ldapSettings.getSystemUserName());
         config.setCredentials(ldapSettings.getSystemPassword());

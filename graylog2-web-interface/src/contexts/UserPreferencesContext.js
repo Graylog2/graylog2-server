@@ -7,12 +7,14 @@ export type UserPreferences = {
   enableSmartSearch: boolean,
   updateUnfocussed: boolean,
   searchSidebarIsPinned: boolean,
+  dashboardSidebarIsPinned: boolean,
 };
 
 export const defaultUserPreferences = {
   enableSmartSearch: true,
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
+  dashboardSidebarIsPinned: false,
 };
 
 const UserPreferencesContext = React.createContext<UserPreferences>(defaultUserPreferences);

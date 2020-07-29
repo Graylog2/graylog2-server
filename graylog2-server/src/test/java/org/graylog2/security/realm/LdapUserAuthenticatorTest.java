@@ -16,6 +16,7 @@
  */
 package org.graylog2.security.realm;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.server.annotations.CreateLdapServer;
@@ -52,6 +53,7 @@ import org.junit.runner.RunWith;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,6 +96,7 @@ import static org.mockito.Mockito.when;
 )
 @ApplyLdifFiles("org/graylog2/security/ldap/base.ldif")
 public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
+    private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2", "TLSv1.3");
     private static final String ADMIN_DN = "uid=admin,ou=system";
     private static final String ADMIN_PASSWORD = "secret";
 
@@ -122,7 +125,7 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
         when(configuration.getPasswordSecret()).thenReturn(PASSWORD_SECRET);
 
         ldapSettingsService = mock(LdapSettingsService.class);
-        ldapConnector = new LdapConnector(10000, ldapSettingsService);
+        ldapConnector = new LdapConnector(10000, ENABLED_TLS_PROTOCOLS, ldapSettingsService, (host) -> null);
         userService = mock(UserService.class);
 
         ldapSettings = new LdapSettingsImpl(configuration, mock(RoleService.class));
