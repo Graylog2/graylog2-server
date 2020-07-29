@@ -1,8 +1,10 @@
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { Link } from 'react-router';
+import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
@@ -18,6 +20,19 @@ import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
 import FiltersSummary from './FiltersSummary';
 import style from './CollectorsAdministration.css';
+
+const HeaderComponentsWrapper = styled.div(({ theme }) => css`
+  float: right;
+  margin: 5px 0;
+
+  .btn-link {
+    color: ${theme.colors.variant.darker.default};
+  }
+`);
+
+const DisabledCollector = styled.div(({ theme }) => css`
+  color: ${theme.colors.variant.light.default};
+`);
 
 const CollectorsAdministration = createReactClass({
   propTypes: {
@@ -43,8 +58,10 @@ const CollectorsAdministration = createReactClass({
     };
   },
 
-  componentWillReceiveProps(nextProps) {
-    if (!lodash.isEqual(this.props.sidecarCollectorPairs, nextProps.sidecarCollectorPairs)) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { sidecarCollectorPairs } = this.props;
+
+    if (!lodash.isEqual(sidecarCollectorPairs, nextProps.sidecarCollectorPairs)) {
       this.setState({
         enabledCollectors: this.getEnabledCollectors(nextProps.sidecarCollectorPairs),
         selected: this.filterSelectedCollectors(nextProps.sidecarCollectorPairs),
@@ -53,7 +70,9 @@ const CollectorsAdministration = createReactClass({
   },
 
   componentDidUpdate() {
-    this.setSelectAllCheckboxState(this.selectAllInput, this.state.enabledCollectors, this.state.selected);
+    const { enabledCollectors, selected } = this.state;
+
+    this.setSelectAllCheckboxState(this.selectAllInput, enabledCollectors, selected);
   },
 
   // Filter out sidecars with no compatible collectors
@@ -77,21 +96,24 @@ const CollectorsAdministration = createReactClass({
   },
 
   filterSelectedCollectors(collectors) {
+    const { selected } = this.state;
     const filteredSidecarCollectorIds = collectors.map(({ collector, sidecar }) => this.sidecarCollectorId(sidecar, collector));
 
-    return this.state.selected.filter((sidecarCollectorId) => filteredSidecarCollectorIds.includes(sidecarCollectorId));
+    return selected.filter((sidecarCollectorId) => filteredSidecarCollectorIds.includes(sidecarCollectorId));
   },
 
   handleConfigurationChange(selectedConfigurations, doneCallback) {
     const { selected, enabledCollectors } = this.state;
+    const { onConfigurationChange } = this.props;
 
     const selectedSidecars = enabledCollectors
       .filter(({ sidecar, collector }) => selected.includes(this.sidecarCollectorId(sidecar, collector)));
 
-    this.props.onConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback);
+    onConfigurationChange(selectedSidecars, selectedConfigurations, doneCallback);
   },
 
   handleProcessAction(action, selectedSidecarCollectorPairs, doneCallback) {
+    const { onProcessAction } = this.props;
     const selectedCollectors = {};
 
     selectedSidecarCollectorPairs.forEach(({ sidecar, collector }) => {
@@ -102,13 +124,13 @@ const CollectorsAdministration = createReactClass({
       }
     });
 
-    this.props.onProcessAction(action, selectedCollectors, doneCallback);
+    onProcessAction(action, selectedCollectors, doneCallback);
   },
 
   formatHeader() {
     const { collectors, configurations, sidecarCollectorPairs } = this.props;
     const { selected, enabledCollectors } = this.state;
-    const selectedItems = this.state.selected.length;
+    const selectedItems = selected.length;
 
     const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => {
       return sidecarCollectorPairs.find(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId);
@@ -117,8 +139,13 @@ const CollectorsAdministration = createReactClass({
     let headerMenu;
 
     if (selectedItems === 0) {
+      const { filters, onFilter } = this.props;
+
       headerMenu = (
-        <CollectorsAdministrationFilters collectors={collectors} configurations={configurations} filters={this.props.filters} filter={this.props.onFilter} />
+        <CollectorsAdministrationFilters collectors={collectors}
+                                         configurations={configurations}
+                                         filters={filters}
+                                         filter={onFilter} />
       );
     } else {
       headerMenu = (
@@ -132,7 +159,7 @@ const CollectorsAdministration = createReactClass({
 
     return (
       <ControlledTableList.Header>
-        <div className={style.headerComponentsWrapper}>{headerMenu}</div>
+        <HeaderComponentsWrapper>{headerMenu}</HeaderComponentsWrapper>
 
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"
@@ -148,9 +175,11 @@ const CollectorsAdministration = createReactClass({
 
   handleSidecarCollectorSelect(sidecarCollectorId) {
     return (event) => {
+      const { selected } = this.state;
+
       const newSelection = (event.target.checked
-        ? lodash.union(this.state.selected, [sidecarCollectorId])
-        : lodash.without(this.state.selected, sidecarCollectorId));
+        ? lodash.union(selected, [sidecarCollectorId])
+        : lodash.without(selected, sidecarCollectorId));
 
       this.setState({ selected: newSelection });
     };
@@ -161,8 +190,9 @@ const CollectorsAdministration = createReactClass({
   },
 
   toggleSelectAll(event) {
+    const { enabledCollectors } = this.state;
     const newSelection = (event.target.checked
-      ? this.state.enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector))
+      ? enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector))
       : []);
 
     this.setState({ selected: newSelection });
@@ -171,7 +201,7 @@ const CollectorsAdministration = createReactClass({
   formatSidecarNoCollectors(sidecar) {
     return (
       <ControlledTableList.Item key={`sidecar-${sidecar.node_id}`}>
-        <div className={`${style.collectorEntry} ${style.disabledCollector} ${style.alignedInformation}`}>
+        <DisabledCollector className={`${style.collectorEntry} ${style.alignedInformation}`}>
           <Row>
             <Col md={12}>
               <h4 className="list-group-item-heading">
@@ -187,7 +217,7 @@ const CollectorsAdministration = createReactClass({
               </span>
             </Col>
           </Row>
-        </div>
+        </DisabledCollector>
       </ControlledTableList.Item>
     );
   },
@@ -196,6 +226,7 @@ const CollectorsAdministration = createReactClass({
     const sidecarCollectorId = this.sidecarCollectorId(sidecar, collector);
     const configAssignment = sidecar.assignments.find((assignment) => assignment.collector_id === collector.id) || {};
     const configuration = configurations.find((config) => config.id === configAssignment.configuration_id);
+    const { selected } = this.state;
     let collectorStatus = { status: null, message: null, id: null };
 
     try {
@@ -218,7 +249,7 @@ const CollectorsAdministration = createReactClass({
           <Input id={`${sidecarCollectorId}-checkbox`}
                  type="checkbox"
                  label={collector.name}
-                 checked={this.state.selected.includes(sidecarCollectorId)}
+                 checked={selected.includes(sidecarCollectorId)}
                  onChange={this.handleSidecarCollectorSelect(sidecarCollectorId)} />
         </Col>
         <Col lg={1} md={2} xs={3}>
@@ -263,15 +294,21 @@ const CollectorsAdministration = createReactClass({
   },
 
   handleSearch(query, callback) {
-    this.props.onQueryChange(query, callback());
+    const { onQueryChange } = this.props;
+
+    onQueryChange(query, callback());
   },
 
   handleReset() {
-    this.props.onQueryChange();
+    const { onQueryChange } = this.props;
+
+    onQueryChange();
   },
 
   handleResetFilters() {
-    this.props.onFilter();
+    const { onFilter } = this.props;
+
+    onFilter();
   },
 
   render() {
