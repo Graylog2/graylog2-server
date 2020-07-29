@@ -4,10 +4,10 @@ import { useCallback } from 'react';
 import { Field } from 'formik';
 
 import { Select } from 'components/common';
-import type { AvailableCapabilities } from 'logic/permissions/EntityShareState';
+import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import type { CapabilityType } from 'logic/permissions/types';
 
-const _capabilitiesOptions = (capabilities: AvailableCapabilities) => (
+const _capabilitiesOptions = (capabilities: CapabilitiesList) => (
   capabilities.map((capability) => (
     { label: capability.title, value: capability.id }
   )).toJS()
@@ -15,7 +15,7 @@ const _capabilitiesOptions = (capabilities: AvailableCapabilities) => (
 
 type Props = {
   onChange?: $PropertyType<CapabilityType, 'id'> => void,
-  capabilities: AvailableCapabilities,
+  capabilities: CapabilitiesList,
   title?: string,
 };
 

@@ -17,8 +17,8 @@ import SharedEntity from './SharedEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
 
-export type AvailableGrantees = Immutable.List<Grantee>;
-export type AvailableCapabilities = Immutable.List<Capability>;
+export type GranteesList = Immutable.List<Grantee>;
+export type CapabilitiesList = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare>;
 export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
@@ -64,8 +64,8 @@ const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>)
 
 type InternalState = {|
   entity: GRN,
-  availableGrantees: AvailableGrantees,
-  availableCapabilities: AvailableCapabilities,
+  availableGrantees: GranteesList,
+  availableCapabilities: CapabilitiesList,
   activeShares: ActiveShares,
   selectedGranteeCapabilities: SelectedGranteeCapabilities,
   missingDependencies: MissingDependencies,
