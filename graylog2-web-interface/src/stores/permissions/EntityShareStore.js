@@ -28,15 +28,17 @@ type EntityShareStoreState = {
 //   },
 // };
 
+export type UserSharesPaginationType = {
+  count: number,
+  total: number,
+  page: number,
+  perPage: number,
+  query: string,
+};
+
 export type PaginatedUserSharesType = {
   list: UserSharedEntities,
-  pagination: {
-    count: number,
-    total: number,
-    page: number,
-    perPage: number,
-    query: string,
-  },
+  pagination: UserSharesPaginationType,
   context: {
     userCapabilities: { [grn: GRN]: string },
   },

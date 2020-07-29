@@ -2,14 +2,13 @@
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import type { PaginatedUserSharesType } from 'stores/permissions/EntityShareStore';
 import type { ThemeInterface } from 'theme';
 import { SearchForm, Select } from 'components/common';
 
 type Props = {
-  onSearch: (query: string) => Promise<PaginatedUserSharesType>,
-  onReset: () => Promise<PaginatedUserSharesType>,
-  onFilter: (param: string, value: string) => Promise<PaginatedUserSharesType>,
+  onSearch: (query: string, resetLoading: () => void) => Promise<void>,
+  onReset: () => Promise<void>,
+  onFilter: (param: string, value: string) => Promise<void>,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
