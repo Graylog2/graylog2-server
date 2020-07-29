@@ -19,7 +19,7 @@ const user = User
 
 describe('<UserDetails />', () => {
   it('should display user profile', () => {
-    const { getByText } = render(<UserDetails user={user} />);
+    const { getByText } = render(<UserDetails user={user} paginatedUserShares={undefined} />);
 
     expect(getByText(user.username)).not.toBeNull();
     expect(getByText(user.fullName)).not.toBeNull();
@@ -30,7 +30,7 @@ describe('<UserDetails />', () => {
 
   describe('user settings', () => {
     it('should display timezone', () => {
-      const { getByText } = render(<UserDetails user={user} />);
+      const { getByText } = render(<UserDetails user={user} paginatedUserShares={undefined} />);
 
       expect(getByText(user.timezone)).not.toBeNull();
     });
@@ -38,25 +38,25 @@ describe('<UserDetails />', () => {
     describe('should display session timeout in a readable format', () => {
       it('for seconds', () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
-        const { getByText } = render(<UserDetails user={test} />);
+        const { getByText } = render(<UserDetails user={test} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Seconds')).not.toBeNull();
       });
 
       it('for minutes', () => {
-        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
+        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Minutes')).not.toBeNull();
       });
 
       it('for hours', () => {
-        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
+        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Hours')).not.toBeNull();
       });
 
       it('for days', () => {
-        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
+        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Days')).not.toBeNull();
       });

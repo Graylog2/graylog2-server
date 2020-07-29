@@ -13,7 +13,7 @@ import TeamsSection from './TeamSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
 
 type Props = {
-  paginatedUserShares: PaginatedUserSharesType,
+  paginatedUserShares: ?PaginatedUserSharesType,
   user: ?User,
 };
 
