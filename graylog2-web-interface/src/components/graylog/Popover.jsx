@@ -2,59 +2,61 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import chroma from 'chroma-js';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
-  const borderColor = chroma(theme.colors.gray[10]).alpha(0.2).css();
+  const borderColor = theme.colors.variant.light.default;
+  const arrowColor = theme.colors.variant.lightest.default;
 
   return css`
     background-color: ${theme.colors.global.contentBackground};
     border-color: ${borderColor};
+    padding: 0;
+
+    .popover-title {
+      background-color: ${arrowColor};
+      color: ${theme.colors.variant.darker.default};
+    }
 
     &.top > .arrow {
-      border-top-color: ${theme.utils.opacify(borderColor, 0.05)};
+      border-top-color: ${borderColor};
 
       &::after {
-        border-top-color: ${theme.colors.gray[100]};
+        border-top-color: ${arrowColor};
       }
     }
 
     &.right > .arrow {
-      border-right-color: ${theme.utils.opacify(borderColor, 0.05)};
+      border-right-color: ${borderColor};
 
       &::after {
-        border-right-color: ${theme.colors.gray[100]};
+        border-right-color: ${arrowColor};
       }
     }
 
     &.bottom > .arrow {
-      border-bottom-color: ${theme.utils.opacify(borderColor, 0.05)};
+      border-bottom-color: ${borderColor};
 
       &::after {
-        border-bottom-color: ${theme.colors.gray[100]};
+        border-bottom-color: ${arrowColor};
       }
     }
 
     &.left > .arrow {
-      border-left-color: ${theme.utils.opacify(borderColor, 0.05)};
+      border-left-color: ${borderColor};
 
       &::after {
-        border-left-color: ${theme.colors.gray[100]};
+        border-left-color: ${arrowColor};
       }
-    }
-
-    .popover-title {
-      background-color: ${theme.colors.gray[90]};
     }
   `;
 });
 
-const Popover = (allProps) => {
+const Popover = (props) => {
   return (
     <GraylogThemeProvider>
-      <StyledPopover {...allProps} />
+      <StyledPopover {...props} />
     </GraylogThemeProvider>
   );
 };
