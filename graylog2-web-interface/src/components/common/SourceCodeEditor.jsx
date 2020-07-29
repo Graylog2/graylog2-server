@@ -14,21 +14,15 @@ import PipelineRulesMode from 'components/rules/mode-pipeline';
 import ClipboardButton from './ClipboardButton';
 import Icon from './Icon';
 import './webpack-resolver';
+import './ace/theme-graylog';
 
-const SourceCodeContainer = styled.div(({ darkMode, resizable, theme }) => css`
-  .ace_editor {
-    border: 1px solid ${theme.colors.gray[80]};
-    border-radius: 5px;
-  }
-
+const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
   .react-resizable-handle {
-    /* Ensure resize handle is over text editor */
-    z-index: 100;
-
-    /* Make resize handle visible on a dark background */
-    filter: ${darkMode ? 'invert(100%) brightness(180%);' : 'none'};
+    z-index: 100; /* Ensure resize handle is over text editor */
     display: ${resizable ? 'block' : 'none'};
   }
+
+  ${theme.components.aceEditor}
 `);
 
 const Toolbar = styled.div(({ theme }) => css`
@@ -38,7 +32,12 @@ const Toolbar = styled.div(({ theme }) => css`
   border-radius: 5px 5px 0 0;
 
   .btn-link {
-    color: #333;
+    color: ${theme.colors.variant.default};
+
+    &.disabled,
+    &[disabled] {
+      color: ${theme.colors.variant.lighter.default};
+    }
   }
 
   & + ${SourceCodeContainer} {
@@ -72,18 +71,21 @@ class SourceCodeEditor extends React.Component {
     height: PropTypes.number,
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
+    /** Provides a ref associated to AceEditor component */
+    innerRef: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.shape({ current: PropTypes.any }),
+    ]),
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
     mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline']),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
-    /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */
+    /** Function called when the value of the text changes. It receives the new value and an event as arguments. */
     onChange: PropTypes.func,
     /** Specifies if the editor should be in read-only mode. */
     readOnly: PropTypes.bool,
     /** Specifies if the editor should be resizable by the user. */
     resizable: PropTypes.bool,
-    /** Specifies the theme to use for the editor. */
-    theme: PropTypes.oneOf(['light', 'dark']),
     /** Specifies if the editor should also include a toolbar. */
     toolbar: PropTypes.bool,
     /** Text to use in the editor. */
@@ -97,12 +99,12 @@ class SourceCodeEditor extends React.Component {
     focus: false,
     fontSize: 13,
     height: 200,
+    innerRef: undefined,
     mode: 'text',
     onChange: () => {},
     onLoad: () => {},
     readOnly: false,
     resizable: true,
-    theme: 'light',
     toolbar: true,
     value: '',
     width: Infinity,
@@ -198,7 +200,6 @@ class SourceCodeEditor extends React.Component {
   render() {
     const { height, width, selectedText } = this.state;
     const {
-      theme,
       resizable,
       toolbar,
       annotations,
@@ -206,6 +207,7 @@ class SourceCodeEditor extends React.Component {
       fontSize,
       mode,
       id,
+      innerRef,
       onLoad,
       onChange,
       readOnly,
@@ -258,9 +260,11 @@ class SourceCodeEditor extends React.Component {
                    minConstraints={[200, 200]}
                    onResize={this.handleResize}>
           <SourceCodeContainer style={{ height: height, width: validCssWidth }}
-                               darkMode={theme !== 'light'}
                                resizable={resizable}>
-            <AceEditor ref={(c) => { this.reactAce = c; }}
+            <AceEditor ref={(c) => {
+              this.reactAce = c;
+              if (innerRef) { innerRef.current = c; }
+            }}
                        annotations={annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
                        // Convert Windows line breaks to Unix. See issue #7889
@@ -268,7 +272,7 @@ class SourceCodeEditor extends React.Component {
                        focus={focus}
                        fontSize={fontSize}
                        mode={mode}
-                       theme={theme === 'light' ? 'tomorrow' : 'monokai'}
+                       theme="graylog"
                        name={id}
                        height="100%"
                        onLoad={onLoad}

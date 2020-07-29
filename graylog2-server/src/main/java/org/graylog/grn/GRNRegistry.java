@@ -15,6 +15,8 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog.grn;
+import org.graylog.events.processor.EventDefinition;
+import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Singleton;
 import java.util.Collection;
@@ -109,6 +111,18 @@ public class GRNRegistry {
         checkArgument(!isNullOrEmpty(entity), "entity cannot be null or empty");
 
         return newGRNBuilder(type).entity(entity).build();
+    }
+
+    public GRN ofEventDefinition(EventDefinition eventDefinition) {
+        return newGRN(GRNTypes.EVENT_DEFINITION, eventDefinition.id());
+    }
+
+    public GRN ofUser(User user) {
+        return newGRN(GRNTypes.USER, user.getName());
+    }
+
+    public boolean isUser(GRN grn) {
+        return grn.type().equals(GRNTypes.USER.type());
     }
 
     /**

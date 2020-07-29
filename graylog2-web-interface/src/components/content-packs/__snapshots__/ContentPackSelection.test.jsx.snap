@@ -112,7 +112,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="Name"
@@ -125,7 +125,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                     value=""
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="name"
                                       label="Name"
                                       maxLength={250}
@@ -219,7 +219,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="Summary"
@@ -232,7 +232,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                     value=""
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="summary"
                                       label="Summary"
                                       maxLength={250}
@@ -324,7 +324,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="textarea"
                                     inputRef={[Function]}
                                     label="Description"
@@ -336,7 +336,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                     value=""
                                   >
                                     <textarea
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="description"
                                       label="Description"
                                       name="description"
@@ -429,7 +429,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="Vendor"
@@ -442,7 +442,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                     value=""
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="vendor"
                                       label="Vendor"
                                       maxLength={250}
@@ -534,7 +534,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="URL"
@@ -546,7 +546,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                     value=""
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="url"
                                       label="URL"
                                       maxLength={250}
@@ -688,37 +688,30 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsStyle="default"
-                          className="submit-button"
+                          className="Button-c9cbmb-0 bNulii submit-button"
                           disabled={false}
                           type="submit"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
                             disabled={false}
                             type="submit"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Filter
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Filter
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                     <div
                       className="form-group"
@@ -728,37 +721,31 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        <Button__StyledButton
-                          className="reset-button"
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
+                          bsStyle="default"
+                          className="Button-c9cbmb-0 bNulii reset-button"
+                          disabled={false}
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Reset
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                   </form>
                 </div>
@@ -933,7 +920,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="Name"
@@ -946,7 +933,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                     value="name"
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="name"
                                       label="Name"
                                       maxLength={250}
@@ -1040,7 +1027,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="Summary"
@@ -1053,7 +1040,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                     value="summary"
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="summary"
                                       label="Summary"
                                       maxLength={250}
@@ -1145,7 +1132,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="textarea"
                                     inputRef={[Function]}
                                     label="Description"
@@ -1157,7 +1144,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                     value="description"
                                   >
                                     <textarea
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="description"
                                       label="Description"
                                       name="description"
@@ -1250,7 +1237,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="Vendor"
@@ -1263,7 +1250,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                     value="vendor"
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="vendor"
                                       label="Vendor"
                                       maxLength={250}
@@ -1355,7 +1342,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                 >
                                   <FormControl
                                     bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 kmJcge"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="input"
                                     inputRef={[Function]}
                                     label="URL"
@@ -1367,7 +1354,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                     value="http://example.com"
                                   >
                                     <input
-                                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                       id="url"
                                       label="URL"
                                       maxLength={250}
@@ -1559,37 +1546,30 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsStyle="default"
-                          className="submit-button"
+                          className="Button-c9cbmb-0 bNulii submit-button"
                           disabled={false}
                           type="submit"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
                             disabled={false}
                             type="submit"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Filter
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Filter
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                     <div
                       className="form-group"
@@ -1599,37 +1579,31 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        <Button__StyledButton
-                          className="reset-button"
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
+                          bsStyle="default"
+                          className="Button-c9cbmb-0 bNulii reset-button"
+                          disabled={false}
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Reset
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                   </form>
                 </div>

@@ -31,6 +31,12 @@ const LoadingSpinner = styled(Spinner)(({ theme }) => `
   font-size: ${theme.fonts.size.h3};
 `);
 
+const StyledPaginatedList = styled(PaginatedList)`
+  .pagination {
+    margin: 0;
+  }
+`;
+
 const _headerCellFormatter = (header) => {
   switch (header.toLocaleLowerCase()) {
     case 'client address':
@@ -95,9 +101,10 @@ const UsersOverview = () => {
           <p className="description">
             Found {total} registered users on the system.
           </p>
-          <PaginatedList onChange={_onPageChange(query, setLoading)} totalItems={total} activePage={page}>
+          <StyledPaginatedList onChange={_onPageChange(query, setLoading)} totalItems={total} activePage={page}>
             <DataTable id="users-overview"
                        className="table-hover"
+                       rowClassName="no-bm"
                        headers={headers}
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="fullName"
@@ -106,7 +113,7 @@ const UsersOverview = () => {
                        dataRowFormatter={_userOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Users" />
-          </PaginatedList>
+          </StyledPaginatedList>
         </Col>
       </Row>
     </Container>

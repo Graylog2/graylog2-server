@@ -85,7 +85,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   <FormControl
                     autoComplete="off"
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 kmJcge"
+                    className="FormControl-sc-1amoaox-0 fKSsjP"
                     componentClass="input"
                     inputRef={[Function]}
                     label="Filter pattern"
@@ -98,7 +98,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   >
                     <input
                       autoComplete="off"
-                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                       id="pattern-selector"
                       label="Filter pattern"
                       name="pattern-selector"
@@ -166,37 +166,31 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   <span
                     className="addButton"
                   >
-                    <ForwardRef
+                    <Button
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="primary"
+                        className="Button-c9cbmb-0 bNulii"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="xsmall"
-                          bsStyle="primary"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            Add
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
+                          Add
+                        </button>
+                      </Button>
+                    </Button>
                   </span>
                 </p>
               </span>
@@ -243,37 +237,31 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   <span
                     className="addButton"
                   >
-                    <ForwardRef
+                    <Button
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="primary"
+                        className="Button-c9cbmb-0 bNulii"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="xsmall"
-                          bsStyle="primary"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            Add
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
+                          Add
+                        </button>
+                      </Button>
+                    </Button>
                   </span>
                 </p>
               </span>
@@ -320,37 +308,31 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
                   <span
                     className="addButton"
                   >
-                    <ForwardRef
+                    <Button
                       bsSize="xsmall"
                       bsStyle="primary"
                       onClick={[Function]}
                     >
-                      <Button__StyledButton
+                      <Button
+                        active={false}
+                        block={false}
+                        bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="primary"
+                        className="Button-c9cbmb-0 bNulii"
+                        disabled={false}
                         onClick={[Function]}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
-                          bsSize="xsmall"
-                          bsStyle="primary"
-                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                        <button
+                          className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
                           disabled={false}
                           onClick={[Function]}
+                          type="button"
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-xs btn-primary"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            Add
-                          </button>
-                        </Button>
-                      </Button__StyledButton>
-                    </ForwardRef>
+                          Add
+                        </button>
+                      </Button>
+                    </Button>
                   </span>
                 </p>
               </span>
@@ -433,7 +415,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                   <FormControl
                     autoComplete="off"
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 kmJcge"
+                    className="FormControl-sc-1amoaox-0 fKSsjP"
                     componentClass="input"
                     inputRef={[Function]}
                     label="Filter pattern"
@@ -446,7 +428,7 @@ exports[`<GrokPatternFilter /> should render grok pattern input without patterns
                   >
                     <input
                       autoComplete="off"
-                      className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                       id="pattern-selector"
                       label="Filter pattern"
                       name="pattern-selector"

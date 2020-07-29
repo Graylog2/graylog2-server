@@ -28,6 +28,7 @@ import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -97,7 +98,7 @@ public class NotificationFacadeTest {
         );
         jobDefinitionService = mock(DBJobDefinitionService.class);
         stateService = mock(DBEventProcessorStateService.class);
-        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService);
+        eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class));
 
         notificationService = new DBNotificationService(mongodb.mongoConnection(), mapperProvider);
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());

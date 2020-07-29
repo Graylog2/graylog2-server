@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharing;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
+import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
@@ -59,6 +60,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,12 +162,11 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid ViewDTO dto) throws ValidationException {
+    public ViewDTO create(@ApiParam @Valid ViewDTO dto, @Context UserContext userContext) throws ValidationException {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD)) {
             checkPermission(RestPermissions.DASHBOARDS_CREATE);
         }
-        final String username = getCurrentUser() == null ? null : getCurrentUser().getName();
-        final ViewDTO savedDto = dbService.save(dto.toBuilder().owner(username).build());
+        final ViewDTO savedDto = dbService.saveWithOwner(dto.toBuilder().owner(userContext.getUsername()).build(), userContext.getUser());
         ensureUserPermissions(savedDto);
         return savedDto;
     }

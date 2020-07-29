@@ -416,7 +416,7 @@ class LdapComponent extends React.Component {
                            id="trust-all-certificates"
                            checked={ldapSettings.trust_all_certificates}
                            onChange={this._bindChecked}
-                           disabled={disabled} /> Allow self-signed certificates
+                           disabled={disabled} /> Allow untrusted certificates
                   </label>
                 </>
               </Input>

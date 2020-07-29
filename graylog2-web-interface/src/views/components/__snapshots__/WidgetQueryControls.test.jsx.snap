@@ -21,7 +21,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             <button
               aria-expanded="false"
               aria-haspopup="true"
-              class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 iEHPAt TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 cVrRCV dropdown-toggle btn btn-info"
+              class="DropdownButton-sc-1343dcx-0 TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 dsvoeu dropdown-toggle btn btn-info"
               id="timerange-type"
               role="button"
               type="button"
@@ -88,7 +88,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             
             <span>
               <select
-                class="FormControl-sc-1amoaox-0 kmJcge relative form-control"
+                class="FormControl-sc-1amoaox-0 fKSsjP relative form-control"
                 id="relative-timerange-selector"
                 label=""
                 name="timerange.range"
@@ -124,7 +124,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             class="css-1pcexqc-container"
           >
             <div
-              class="css-et9nfk-control"
+              class="css-ghr2vn-control"
             >
               <div
                 class="css-1hio1c"
@@ -164,7 +164,7 @@ exports[`WidgetQueryControls should do something 1`] = `
               >
                 <div
                   aria-hidden="true"
-                  style="color: rgb(205, 205, 205); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
+                  style="color: rgb(166, 166, 166); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
                 >
                   <svg
                     class="svg-inline--fa fa-caret-down"
@@ -196,7 +196,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           </a>
         </div>
         <button
-          class="Button__StyledButton-c9cbmb-0 laZUlH SearchButton__StyledButton-mm3q5z-0 feYjNC pull-left btn btn-success"
+          class="Button-c9cbmb-0 SearchButton__StyledButton-mm3q5z-0 WuJdQ pull-left btn btn-success"
           title="Perform search"
           type="submit"
         >

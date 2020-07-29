@@ -21,11 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
-
-import java.util.Map;
 
 @AutoValue
 @JsonTypeName(KeywordRange.KEYWORD)
@@ -85,14 +82,6 @@ public abstract class KeywordRange extends TimeRange {
         } catch (InvalidRangeParametersException e) {
             return null;
         }
-    }
-
-    @Override
-    public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>builder()
-                .put("type", KEYWORD)
-                .put("keyword", getKeyword())
-                .build();
     }
 
     @AutoValue.Builder

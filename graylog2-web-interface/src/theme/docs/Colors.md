@@ -5,6 +5,7 @@ _Click any color block below to copy the color path._
 ```jsx noeditor
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import chroma from 'chroma-js';
 
 import { colors } from 'theme';
 import ColorSwatch, { Swatch } from './Colors';
@@ -42,7 +43,7 @@ const SectionWrap = (mode, section) => {
     <>
       <Swatches>
         {getValues(mode, (name) => {
-          if (typeof mode[name] === 'string') {
+          if (typeof mode[name] === 'string' && chroma.valid(mode[name])) {
             const copyTextName = section === 'gray' ? `${section}[${name}]` : `${section}.${name}`;
 
             return (

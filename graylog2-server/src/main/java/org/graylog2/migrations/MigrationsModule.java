@@ -46,5 +46,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20191219090834_AddSourcesPage.class);
         addMigration(V20200102140000_UnifyEventSeriesId.class);
         addMigration(V20200226181600_EncryptAccessTokensMigration.class);
+        addMigration(V20200722110800_AddBuiltinRoles.class);
     }
 }

@@ -10,6 +10,7 @@ import MainDetailsGrid from './MainDetailsGrid';
 import RolesSection from './RolesSection';
 
 import SectionComponent from '../SectionComponent';
+import TeamsSection from "./TeamSection";
 
 type Props = {
   user: ?User,
@@ -28,8 +29,8 @@ const UserDetails = ({ user }: Props) => {
           <SettingsSection user={user} />
         </div>
         <div>
-          <SectionComponent title="Teams">Children</SectionComponent>
           <RolesSection user={user} />
+          <TeamsSection user={user} />
         </div>
       </MainDetailsGrid>
       <SectionComponent title="Entity Shares">Children</SectionComponent>

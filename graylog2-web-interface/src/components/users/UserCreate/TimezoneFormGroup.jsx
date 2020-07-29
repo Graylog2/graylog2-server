@@ -1,12 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { Field } from 'formik';
+import { FastField } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
 
 const TimezoneFormGroup = () => (
-  <Field name="timezone">
+  <FastField name="timezone">
     {({ field: { name, value, onChange } }) => (
       <Input id="timezone-select"
              label="Time Zone"
@@ -19,7 +19,7 @@ const TimezoneFormGroup = () => (
                         onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
       </Input>
     )}
-  </Field>
+  </FastField>
 );
 
 export default TimezoneFormGroup;

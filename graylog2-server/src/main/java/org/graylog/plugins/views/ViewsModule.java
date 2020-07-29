@@ -89,7 +89,7 @@ public abstract class ViewsModule extends VersionAwareModule {
         return sharingStrategyBinder().addBinding(type).to(sharingStrategy);
     }
 
-    protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder() {
+    protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder(Version version) {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {});
@@ -97,7 +97,7 @@ public abstract class ViewsModule extends VersionAwareModule {
     }
 
     protected ScopedBindingBuilder registerQueryBackend(Version version, String name, Class<? extends QueryBackend<? extends GeneratedQueryContext>> implementation) {
-        return queryBackendBinder().addBinding(name).to(implementation);
+        return queryBackendBinder(version).addBinding(name).to(implementation);
     }
 
     protected void registerESQueryDecorator(Class<? extends QueryStringDecorator> esQueryDecorator) {
@@ -108,7 +108,4 @@ public abstract class ViewsModule extends VersionAwareModule {
         return Multibinder.newSetBinder(binder(), QueryStringDecorator.class);
     }
 
-    private <T> MapBinder<Version, T> versionAwareBinder(Class<T> interfaceClass) {
-        return MapBinder.newMapBinder(binder(), Version.class, interfaceClass);
-    }
 }

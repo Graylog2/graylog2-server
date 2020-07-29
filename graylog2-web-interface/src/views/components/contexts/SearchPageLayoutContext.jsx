@@ -2,7 +2,9 @@
 import * as React from 'react';
 
 type SearchPageLayoutConfig = {
-  sidebar: { isPinned: boolean },
+  sidebar: {
+    isPinned: boolean,
+  },
 };
 
 export type SearchPageLayout = {

@@ -52,7 +52,7 @@ const UserEditPage = ({ params }: Props) => {
                              userIsReadOnly={loadedUser?.readOnly} />
       </PageHeader>
 
-      <UserEdit user={username === params?.username ? loadedUser : undefined} />
+      <UserEdit user={username === loadedUser?.username ? loadedUser : undefined} />
     </DocumentTitle>
   );
 };

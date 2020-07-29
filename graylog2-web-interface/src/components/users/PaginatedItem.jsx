@@ -1,15 +1,20 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css, type StyledComponent } from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { type ThemeInterface } from 'theme';
+import { IconButton } from 'components/common';
 
 import type { DescriptiveItem } from './PaginatedItemOverview';
 
-type Props = { item: DescriptiveItem };
+type Props = {
+  item: DescriptiveItem,
+  onDeleteItem?: (DescriptiveItem) => void,
+};
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
-  display: block;
+  display: flex;
   padding: 10px;
   background-color: ${theme.colors.table.background};
 
@@ -20,13 +25,37 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.s
 
 const Header = styled.h4`
   padding-bottom: 5px;
+  flex: 1;
 `;
 
-const PaginatedItem = ({ item: { name, description } }: Props) => (
-  <Container>
-    <Header>{name}</Header>
-    <span>{description}</span>
-  </Container>
-);
+const Description = styled.span`
+  flex: 2;
+`;
+
+const StyledDeleteButton = styled(IconButton)`
+  flex: 0;
+`;
+
+const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
+  const deleteButton = typeof onDeleteItem === 'function'
+    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="times" />
+    : null;
+
+  return (
+    <Container>
+      <Header>{name}</Header>
+      <Description>{description}</Description>
+      { deleteButton }
+    </Container>
+  );
+};
+
+PaginatedItem.defaultProps = {
+  onDeleteItem: undefined,
+};
+
+PaginatedItem.propTypes = {
+  onDeleteItem: PropTypes.func,
+};
 
 export default PaginatedItem;

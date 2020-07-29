@@ -19,6 +19,7 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -42,6 +43,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramC
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -58,8 +60,12 @@ import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.users.UserImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,6 +80,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DashboardV1FacadeTest {
 
@@ -94,7 +102,7 @@ public class DashboardV1FacadeTest {
                                   MongoJackObjectMapperProvider mapper,
                                   ClusterConfigService clusterConfigService) {
             super(mongoConnection, mapper, clusterConfigService,
-                    dto -> new ViewRequirements(Collections.emptySet(), dto));
+                    dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class));
         }
     }
 
@@ -106,6 +114,7 @@ public class DashboardV1FacadeTest {
     private final String newStreamId = "5def958063303ae5f68ebeaf";
     private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
     private ViewDTO viewDTO;
+    private UserService userService;
 
 
     @Before
@@ -128,9 +137,12 @@ public class DashboardV1FacadeTest {
                 new MongoJackObjectMapperProvider(objectMapper));
         viewService = new ViewFacadeTest.TestViewService(mongodb.mongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
+        userService = mock(UserService.class);
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        when(userService.load("testuser")).thenReturn(fakeUser);
         final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
         final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);
-        facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService);
+        facade = new DashboardV1Facade(objectMapper, searchDbService, entityConverter, viewService, userService);
         final URL resourceUrl = Resources.getResource(DashboardV1Facade.class, "content-pack-dashboard-v1.json");
         final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);
@@ -142,7 +154,7 @@ public class DashboardV1FacadeTest {
         nativeEntities.put(EntityDescriptor.create("58b3d55a-51ad-4b3e-865c-85776016a151", ModelTypes.STREAM_V1), stream);
 
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(entity,
-                ImmutableMap.of(), nativeEntities, "kmerz");
+                ImmutableMap.of(), nativeEntities, "testuser");
         assertThat(nativeEntity).isNotNull();
 
         viewDTO = nativeEntity.entity();

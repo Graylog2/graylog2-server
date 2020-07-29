@@ -31,7 +31,6 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNTypes;
 import org.graylog.security.GrantPermissionResolver;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -81,7 +80,8 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                            final EventBus serverEventBus,
                            final GRNRegistry grnRegistry,
-                           final GrantPermissionResolver grantPermissionResolver) {
+                           final GrantPermissionResolver grantPermissionResolver
+    ) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
@@ -235,7 +235,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public List<String> getPermissionsForUser(User user) {
-        final GRN principal = grnRegistry.newGRN(GRNTypes.USER.type(), user.getName());
+        final GRN principal = grnRegistry.ofUser(user);
         final ImmutableSet.Builder<String> permSet = ImmutableSet.<String>builder()
                 .addAll(user.getPermissions())
                 // The frontend cannot handle (and currently does not need) GRNPermissions. Thus we filter them

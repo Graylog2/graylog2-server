@@ -137,7 +137,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 kmJcge"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
                                   inputRef={[Function]}
                                   label="Config Key"
@@ -149,7 +149,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   value=""
                                 >
                                   <select
-                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="config_key"
                                     label="Config Key"
                                     name="config_key"
@@ -263,7 +263,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 kmJcge"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
                                   inputRef={[Function]}
                                   label="Parameter"
@@ -275,7 +275,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                   value=""
                                 >
                                   <select
-                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="parameter"
                                     label="Parameter"
                                     name="parameter"
@@ -342,35 +342,29 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               <div
                 className="col-sm-2 col-sm-offset-10"
               >
-                <ForwardRef
+                <Button
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="primary"
+                    className="Button-c9cbmb-0 bNulii"
                     disabled={true}
                     type="submit"
                   >
-                    <Button
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    <button
+                      className="Button-c9cbmb-0 bNulii btn btn-primary"
                       disabled={true}
                       type="submit"
                     >
-                      <button
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                        disabled={true}
-                        type="submit"
-                      >
-                        Apply
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Apply
+                    </button>
+                  </Button>
+                </Button>
               </div>
             </Col>
           </div>
@@ -514,37 +508,31 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                                     PORT
                                   </td>
                                   <td>
-                                    <ForwardRef
+                                    <Button
                                       bsSize="small"
                                       bsStyle="info"
                                       onClick={[Function]}
                                     >
-                                      <Button__StyledButton
+                                      <Button
+                                        active={false}
+                                        block={false}
+                                        bsClass="btn"
                                         bsSize="small"
                                         bsStyle="info"
+                                        className="Button-c9cbmb-0 bNulii"
+                                        disabled={false}
                                         onClick={[Function]}
                                       >
-                                        <Button
-                                          active={false}
-                                          block={false}
-                                          bsClass="btn"
-                                          bsSize="small"
-                                          bsStyle="info"
-                                          className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                        <button
+                                          className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
                                           disabled={false}
                                           onClick={[Function]}
+                                          type="button"
                                         >
-                                          <button
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                            disabled={false}
-                                            onClick={[Function]}
-                                            type="button"
-                                          >
-                                            Clear
-                                          </button>
-                                        </Button>
-                                      </Button__StyledButton>
-                                    </ForwardRef>
+                                          Clear
+                                        </button>
+                                      </Button>
+                                    </Button>
                                   </td>
                                 </tr>
                               </DataTableElement>
@@ -686,7 +674,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 kmJcge"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
                                   inputRef={[Function]}
                                   label="Config Key"
@@ -698,7 +686,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   value=""
                                 >
                                   <select
-                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="config_key"
                                     label="Config Key"
                                     name="config_key"
@@ -818,7 +806,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 kmJcge"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
                                   inputRef={[Function]}
                                   label="Parameter"
@@ -830,7 +818,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                                   value=""
                                 >
                                   <select
-                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="parameter"
                                     label="Parameter"
                                     name="parameter"
@@ -888,35 +876,29 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
               <div
                 className="col-sm-2 col-sm-offset-10"
               >
-                <ForwardRef
+                <Button
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="primary"
+                    className="Button-c9cbmb-0 bNulii"
                     disabled={true}
                     type="submit"
                   >
-                    <Button
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    <button
+                      className="Button-c9cbmb-0 bNulii btn btn-primary"
                       disabled={true}
                       type="submit"
                     >
-                      <button
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                        disabled={true}
-                        type="submit"
-                      >
-                        Apply
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Apply
+                    </button>
+                  </Button>
+                </Button>
               </div>
             </Col>
           </div>
@@ -1139,7 +1121,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 kmJcge"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
                                   inputRef={[Function]}
                                   label="Config Key"
@@ -1151,7 +1133,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   value=""
                                 >
                                   <select
-                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="config_key"
                                     label="Config Key"
                                     name="config_key"
@@ -1265,7 +1247,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                               >
                                 <FormControl
                                   bsClass="form-control"
-                                  className="FormControl-sc-1amoaox-0 kmJcge"
+                                  className="FormControl-sc-1amoaox-0 fKSsjP"
                                   componentClass="select"
                                   inputRef={[Function]}
                                   label="Parameter"
@@ -1277,7 +1259,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                                   value=""
                                 >
                                   <select
-                                    className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                    className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                                     id="parameter"
                                     label="Parameter"
                                     name="parameter"
@@ -1344,35 +1326,29 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
               <div
                 className="col-sm-2 col-sm-offset-10"
               >
-                <ForwardRef
+                <Button
                   bsStyle="primary"
                   disabled={true}
                   type="submit"
                 >
-                  <Button__StyledButton
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
                     bsStyle="primary"
+                    className="Button-c9cbmb-0 bNulii"
                     disabled={true}
                     type="submit"
                   >
-                    <Button
-                      active={false}
-                      block={false}
-                      bsClass="btn"
-                      bsStyle="primary"
-                      className="Button__StyledButton-c9cbmb-0 laZUlH"
+                    <button
+                      className="Button-c9cbmb-0 bNulii btn btn-primary"
                       disabled={true}
                       type="submit"
                     >
-                      <button
-                        className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-primary"
-                        disabled={true}
-                        type="submit"
-                      >
-                        Apply
-                      </button>
-                    </Button>
-                  </Button__StyledButton>
-                </ForwardRef>
+                      Apply
+                    </button>
+                  </Button>
+                </Button>
               </div>
             </Col>
           </div>

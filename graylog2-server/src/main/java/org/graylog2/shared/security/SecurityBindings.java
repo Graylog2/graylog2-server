@@ -17,10 +17,15 @@
 package org.graylog2.shared.security;
 
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
+import org.graylog2.security.DefaultX509TrustManager;
+import org.graylog2.security.ldap.LdapConnector;
+
+import javax.net.ssl.TrustManager;
 
 public class SecurityBindings extends PluginModule {
     @Override
@@ -28,6 +33,10 @@ public class SecurityBindings extends PluginModule {
         bind(Permissions.class).asEagerSingleton();
         bind(SessionCreator.class).in(Scopes.SINGLETON);
         addPermissions(RestPermissions.class);
+
+        install(new FactoryModuleBuilder()
+                .implement(TrustManager.class, DefaultX509TrustManager.class)
+                .build(LdapConnector.TrustManagerProvider.class));
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                       .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);

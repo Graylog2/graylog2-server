@@ -132,8 +132,7 @@ const placeholder = ({ theme }) => (base) => ({
 const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
   const borderWidth = isFocused ? 1 : base.borderWidth;
   const outline = isFocused ? 0 : base.outline;
-  const defaultBoxShadow = `inset 0 1px 1px ${theme.colors.variant.lightest.default}`;
-  const boxShadow = isFocused ? `${defaultBoxShadow}, 0 0 8px ${theme.colors.variant.lighter.info}` : defaultBoxShadow;
+  const boxShadow = isFocused ? theme.colors.input.boxShadow : null;
   const controlSize = size === 'small' ? controlSmall : controlNormal;
 
   return {
@@ -393,16 +392,16 @@ class Select extends React.Component<Props, State> {
       ...defaultTheme,
       colors: {
         ...defaultTheme.colors,
-        primary: theme.colors.variant.light.info,
+        primary: theme.colors.input.borderFocus,
         primary75: theme.colors.variant.light.default,
         primary50: theme.colors.variant.lighter.default,
         primary25: theme.colors.variant.lightest.default,
         danger: theme.colors.variant.darker.info,
         dangerLight: theme.colors.variant.lighter.info,
-        neutral0: theme.colors.gray[100],
-        neutral5: theme.colors.gray[90],
+        neutral0: theme.colors.input.background,
+        neutral5: theme.colors.input.backgroundDisabled,
         neutral10: theme.colors.variant.lightest.info,
-        neutral20: theme.colors.gray[80],
+        neutral20: theme.colors.input.border,
         neutral30: theme.colors.gray[70],
         neutral40: theme.colors.gray[60],
         neutral50: theme.colors.gray[50],
