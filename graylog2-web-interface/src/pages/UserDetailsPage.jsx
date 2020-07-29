@@ -33,10 +33,10 @@ const UserDetailsPage = ({ params }: Props) => {
 
   useEffect(() => {
     UsersActions.load(username);
-  });
+  }, []);
 
   return (
-    <DocumentTitle title={`User Detials ${username ?? ''}`}>
+    <DocumentTitle title={`User Details ${username ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
         <span>
           Overview of details like profile information, settings, teams and roles.

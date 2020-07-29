@@ -25,6 +25,7 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
+import java.util.Set;
 
 public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
     private static final String COLLECTION_NAME = "users";
@@ -42,6 +43,15 @@ public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
     public PaginatedList<UserOverviewDTO> findPaginated(SearchQuery searchQuery, int page,
                                                         int perPage, String sortField, String order) {
         final DBQuery.Query dbQuery = searchQuery.toDBQuery();
+        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
+        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    }
+
+    public PaginatedList<UserOverviewDTO> findPaginatedByUserName(SearchQuery searchQuery, int page,
+                                                                  int perPage, String sortField, String order,
+                                                                  Set<String> usernames) {
+        final DBQuery.Query dbQuery = searchQuery.toDBQuery()
+                .in(UserOverviewDTO.FIELD_USERNAME, usernames);
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
     }
