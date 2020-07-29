@@ -16,17 +16,19 @@ type Props = {
 const RolesSection = ({ user: { username } }: Props) => {
   const [loading, setLoading] = useState(false);
 
-  const _onLoad = ({ page, perPage, query }: PaginationInfo): Promise<?PaginatedListType> => {
+  const _onLoad = ({ page, perPage, query }: PaginationInfo, isSubscribed: boolean): Promise<?PaginatedListType> => {
     setLoading(true);
 
     return AuthzRolesActions.loadForUser(username, page, perPage, query)
       .then((response) => {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
 
         // $FlowFixMe Role has DescriptiveItem implemented!!!
         return response;
       }).catch((error) => {
-        if (error.additional.status === 404) {
+        if (error?.additional?.status === 404) {
           UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
             'Could not load roles for user');
         }
