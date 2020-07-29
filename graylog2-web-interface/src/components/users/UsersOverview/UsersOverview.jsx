@@ -91,7 +91,7 @@ const UsersOverview = () => {
         <SystemAdministrator adminUser={adminUser}
                              dataRowFormatter={_userOverviewItem}
                              headerCellFormatter={_headerCellFormatter}
-                             headers={headers} />
+                             headers={TABLE_HEADERS} />
       )}
       <Row className="content">
         <Col xs={12}>
