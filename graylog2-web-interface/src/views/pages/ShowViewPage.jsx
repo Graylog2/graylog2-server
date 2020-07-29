@@ -102,7 +102,6 @@ class ShowViewPage extends React.Component<Props, State> {
         this.setState({ hookComponent: e });
       },
     ).then((results) => {
-      console.log('results', results);
       this.setState({ loaded: true });
 
       return results;
