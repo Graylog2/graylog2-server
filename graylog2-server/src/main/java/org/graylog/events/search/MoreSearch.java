@@ -17,15 +17,14 @@
 package org.graylog.events.search;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
+import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.database.NotFoundException;
@@ -42,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -196,18 +194,6 @@ public class MoreSearch {
          * @param continueScrolling the boolean that can be set to {@code false} to stop the scroll query
          */
         void call(List<ResultMessage> messages, AtomicBoolean continueScrolling) throws EventProcessorException;
-    }
-
-    @VisibleForTesting
-    static String buildStreamFilter(Set<String> streams) {
-        checkArgument(streams != null, "streams parameter cannot be null");
-        checkArgument(!streams.isEmpty(), "streams parameter cannot be empty");
-
-        final String streamFilter = streams.stream()
-                .map(String::trim)
-                .map(stream -> String.format(Locale.ENGLISH, "streams:%s", stream))
-                .collect(Collectors.joining(" OR "));
-        return "(" + streamFilter + ")";
     }
 
     @AutoValue
