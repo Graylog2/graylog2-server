@@ -69,6 +69,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
     @GET
     @Path("my")
+    // TODO implement or remove.
     public Response get() {
         return Response.ok().build();
     }

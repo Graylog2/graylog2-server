@@ -33,7 +33,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 @Singleton
 public class GRNRegistry {
-    public static final String GLOBAL_USER_GRN = "grn::::builtin-team:everyone"; // TODO: Find a better name for the "everyone" grantee GRN type
+    // TODO: Find a better name for the "everyone" grantee GRN type
+    public GRN GLOBAL_USER_GRN() {
+        return newGRN(GRNTypes.BUILTIN_TEAM, "everyone");
+    }
 
     private final ConcurrentMap<String, GRNType> REGISTRY = new ConcurrentHashMap<>();
 
