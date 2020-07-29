@@ -28,10 +28,10 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _onPageChange = (query, setLoading) => (page, perPage) => {
+const _onPageChange = (pagination, fetchSharedEntities, setLoading) => (page, perPage) => {
   setLoading(true);
 
-  return EntityShareActions.searchPaginatedUserShares(page, perPage, query).then(() => setLoading(false));
+  return fetchSharedEntities(page, perPage, pagination.query, pagination.additionalQueries).then(() => setLoading(false));
 };
 
 const SharedEntitiesSection = ({ paginatedUserShares: initialPaginatedUserShares, username }: Props) => {
@@ -71,7 +71,7 @@ const SharedEntitiesSection = ({ paginatedUserShares: initialPaginatedUserShares
           <p className="description">
             Found {pagination.total} entities which got shared with the user.
           </p>
-          <StyledPaginatedList onChange={_onPageChange(pagination.query, setLoading)} totalItems={pagination.total} activePage={pagination.page}>
+          <StyledPaginatedList onChange={_onPageChange(pagination, _fetchSharedEntities, setLoading)} totalItems={pagination.total} activePage={pagination.page}>
             <DataTable id="user-shared-entities"
                        rowClassName="no-bm"
                        className="table-hover"

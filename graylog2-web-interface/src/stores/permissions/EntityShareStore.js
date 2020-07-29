@@ -7,8 +7,10 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GRN, SharedEntityType, UserSharedEntities } from 'logic/permissions/types';
-import PaginationURL, { type AdditionalQueries } from 'util/PaginationURL';
+// import type { GRN, SharedEntityType, UserSharedEntities } from 'logic/permissions/types';
+import type { GRN, UserSharedEntities } from 'logic/permissions/types';
+// import PaginationURL, { type AdditionalQueries } from 'util/PaginationURL';
+import { type AdditionalQueries } from 'util/PaginationURL';
 import EntityShareState, { type EntityShareStateJson, type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
 
@@ -16,24 +18,13 @@ type EntityShareStoreState = {
   state: EntityShareState,
 };
 
-// type PaginatedUserSharesResponse = {
-//   total: number,
-//   count: number,
-//   page: number,
-//   per_page: number,
-//   query: string,
-//   entities: Array<SharedEntityType>,
-//   context: {
-//     user_capabilities: { [grn: GRN]: string },
-//   },
-// };
-
 export type UserSharesPaginationType = {
   count: number,
   total: number,
   page: number,
   perPage: number,
   query: string,
+  additionalQueries?: AdditionalQueries,
 };
 
 export type PaginatedUserSharesType = {
@@ -128,9 +119,9 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       });
 
       const mockedResponse = {
-        ...additionalQueries,
-        total: 230 / perPage,
-        count: 230,
+        additionalQueries: additionalQueries,
+        total: 230,
+        count: Math.round(230 / perPage),
         page: page || 1,
         per_page: perPage || 10,
         query: query || '',
@@ -146,6 +137,7 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
         list: Immutable.List(mockedResponse.entities.map((se) => SharedEntity.fromJSON(se))),
         context: { userCapabilities: mockedResponse.context.user_capabilities },
         pagination: {
+          additionalQueries: mockedResponse.additionalQueries,
           count: mockedResponse.count,
           total: mockedResponse.total,
           page: mockedResponse.page,
