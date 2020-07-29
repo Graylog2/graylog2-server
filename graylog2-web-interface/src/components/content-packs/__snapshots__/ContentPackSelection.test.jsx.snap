@@ -630,6 +630,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             >
               <SearchForm
                 buttonLeftMargin={5}
+                className=""
                 focusAfterMount={false}
                 id="filter-input"
                 label={null}
@@ -649,7 +650,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 wrapperClass="search"
               >
                 <div
-                  className="search"
+                  className="search "
                   style={
                     Object {
                       "marginTop": 15,
@@ -1488,6 +1489,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             >
               <SearchForm
                 buttonLeftMargin={5}
+                className=""
                 focusAfterMount={false}
                 id="filter-input"
                 label={null}
@@ -1507,7 +1509,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 wrapperClass="search"
               >
                 <div
-                  className="search"
+                  className="search "
                   style={
                     Object {
                       "marginTop": 15,

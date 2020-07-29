@@ -377,6 +377,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -395,7 +396,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,

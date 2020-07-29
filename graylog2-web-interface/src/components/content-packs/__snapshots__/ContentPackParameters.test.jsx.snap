@@ -246,6 +246,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   </span>
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -264,7 +265,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -911,6 +912,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -929,7 +931,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -1673,6 +1675,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   </span>
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -1691,7 +1694,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -1975,6 +1978,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -1993,7 +1997,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
