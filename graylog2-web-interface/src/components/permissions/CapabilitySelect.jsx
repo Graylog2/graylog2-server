@@ -5,7 +5,7 @@ import { Field } from 'formik';
 
 import { Select } from 'components/common';
 import type { AvailableCapabilities } from 'logic/permissions/EntityShareState';
-import type { Capability } from 'logic/permissions/types';
+import type { CapabilityType } from 'logic/permissions/types';
 
 const _capabilitiesOptions = (capabilities: AvailableCapabilities) => (
   capabilities.map((capability) => (
@@ -14,7 +14,7 @@ const _capabilitiesOptions = (capabilities: AvailableCapabilities) => (
 );
 
 type Props = {
-  onChange?: $PropertyType<Capability, 'id'> => void,
+  onChange?: $PropertyType<CapabilityType, 'id'> => void,
   capabilities: AvailableCapabilities,
   title?: string,
 };

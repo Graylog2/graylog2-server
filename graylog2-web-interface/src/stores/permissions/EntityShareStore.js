@@ -7,10 +7,10 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GRN, ShareEntity as ShareEntityType } from 'logic/permissions/types';
+import type { GRN, SharedEntityType, UserSharedEntities } from 'logic/permissions/types';
 // import PaginationURL from 'util/PaginationURL';
 import EntityShareState, { type EntityShareStateJson, type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
-import ShareEntity from 'logic/permissions/ShareEntity';
+import SharedEntity from 'logic/permissions/SharedEntity';
 
 type EntityShareStoreState = {
   state: EntityShareState,
@@ -22,14 +22,21 @@ type EntityShareStoreState = {
 //   page: number,
 //   per_page: number,
 //   query: string,
-//   entities: Array<ShareEntityType>,
+//   entities: Array<SharedEntityType>,
 //   context: {
 //     user_capabilities: { [grn: GRN]: string },
 //   },
 // };
 
-type PaginatedUserSharesType = {
-  list: Immutable.List<ShareEntity>,
+export type PaginatedUserSharesType = {
+  list: UserSharedEntities,
+  pagination: {
+    count: number,
+    total: number,
+    page: number,
+    perPage: number,
+    query: string,
+  },
   context: {
     userCapabilities: { [grn: GRN]: string },
   },
@@ -54,6 +61,7 @@ export const EntityShareActions: EntityShareActionsType = singletonActions(
   () => Reflux.createActions({
     prepare: { asyncResult: true },
     update: { asyncResult: true },
+    searchPaginatedUserShares: { asyncResult: true },
   }),
 );
 
@@ -90,7 +98,7 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       // const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query);
       // const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUserSharesResponse) => {
       //   return {
-      //     list: Immutable.List(response.entities.map((se) => ShareEntity.fromJSON(se))),
+      //     list: Immutable.List(response.entities.map((se) => SharedEntity.fromJSON(se))),
       //     context: {
       //       userCapabilities: response.context.user_capabilities,
       //     },
@@ -104,26 +112,26 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       //   };
       // });
 
+      const mockedEntities = new Array(perPage).fill({
+        id: 'grn::::stream:57bc9188e62a2373778d9e03',
+        type: 'stream',
+        title: 'Security Data',
+        owners: [
+          {
+            id: 'grn::::user:jane',
+            type: 'user',
+            title: 'Jane Doe',
+          },
+        ],
+      });
+
       const mockedResponse = {
-        total: 1,
-        count: 1,
+        total: 230 / perPage,
+        count: 230,
         page: page || 1,
         per_page: perPage || 10,
         query: query || '',
-        entities: [
-          {
-            id: 'grn::::stream:57bc9188e62a2373778d9e03',
-            type: 'stream',
-            title: 'Security Data',
-            owners: [
-              {
-                id: 'grn::::user:jane',
-                type: 'user',
-                title: 'Jane Doe',
-              },
-            ],
-          },
-        ],
+        entities: mockedEntities,
         context: {
           user_capabilities: {
             'grn::::stream:57bc9188e62a2373778d9e03': 'view',
@@ -132,7 +140,7 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       };
 
       const promise = Promise.resolve({
-        list: Immutable.List(mockedResponse.entities.map((se) => ShareEntity.fromJSON(se))),
+        list: Immutable.List(mockedResponse.entities.map((se) => SharedEntity.fromJSON(se))),
         context: { userCapabilities: mockedResponse.context.user_capabilities },
         pagination: {
           count: mockedResponse.count,

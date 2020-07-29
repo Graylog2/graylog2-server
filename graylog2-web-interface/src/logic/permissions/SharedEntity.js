@@ -1,18 +1,18 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { ShareEntity as ShareEntityType } from 'logic/permissions/types';
+import type { SharedEntityType } from 'logic/permissions/types';
 
 import Grantee from './Grantee';
 
 type InternalState = {
-  id: $PropertyType<ShareEntityType, 'id'>,
+  id: $PropertyType<SharedEntityType, 'id'>,
   owners: Immutable.List<Grantee>,
-  title: $PropertyType<ShareEntityType, 'title'>,
-  type: $PropertyType<ShareEntityType, 'type'>,
+  title: $PropertyType<SharedEntityType, 'title'>,
+  type: $PropertyType<SharedEntityType, 'type'>,
 };
 
-export default class ShareEntity {
+export default class SharedEntity {
   _value: InternalState;
 
   constructor(
@@ -54,11 +54,11 @@ export default class ShareEntity {
     return { id, owners, title, type };
   }
 
-  static fromJSON(value: ShareEntityType): ShareEntity {
+  static fromJSON(value: SharedEntityType): SharedEntity {
     const { id, owners, title, type } = value;
     const formattedOwners = Immutable.fromJS(owners.map((o) => Grantee.fromJSON(o)));
 
-    return ShareEntity
+    return SharedEntity
       .builder()
       .id(id)
       .owners(formattedOwners)
@@ -99,9 +99,9 @@ class Builder {
     return new Builder(this.value.set('type', value));
   }
 
-  build(): ShareEntity {
+  build(): SharedEntity {
     const { id, owners, title, type } = this.value.toObject();
 
-    return new ShareEntity(id, owners, title, type);
+    return new SharedEntity(id, owners, title, type);
   }
 }

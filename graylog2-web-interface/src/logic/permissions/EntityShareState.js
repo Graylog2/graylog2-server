@@ -2,10 +2,10 @@
 import * as Immutable from 'immutable';
 
 import type {
-  Grantee as GranteeType,
-  Capability as CapabilityType,
-  ShareEntity as ShareEntityType,
-  ActiveShare as ActiveShareType,
+  GranteeType,
+  CapabilityType,
+  SharedEntityType,
+  ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -13,14 +13,14 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import Capability from './Capability';
 import Grantee from './Grantee';
 import ActiveShare from './ActiveShare';
-import ShareEntity from './ShareEntity';
+import SharedEntity from './SharedEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
 
 export type AvailableGrantees = Immutable.List<Grantee>;
 export type AvailableCapabilities = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare>;
-export type MissingDependencies = Immutable.Map<GRN, Immutable.List<ShareEntity>>;
+export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
@@ -39,7 +39,7 @@ const mockMissingDependencies = () => {
     .type('team')
     .build();
 
-  const missingDependecy = ShareEntity
+  const missingDependecy = SharedEntity
     .builder()
     .id('grn::::stream:57bc9188e62a2373778d9e03')
     .type('stream')
@@ -79,7 +79,7 @@ export type EntityShareStateJson = {|
   selected_grantee_capabilities: {|
     [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
   |} | {||},
-  missing_permissions_on_dependencies: {[GRN]: Array<ShareEntityType>},
+  missing_permissions_on_dependencies: {[GRN]: Array<SharedEntityType>},
 |};
 
 export default class EntityShareState {
@@ -204,7 +204,7 @@ export default class EntityShareState {
       Object.entries(missing_permissions_on_dependencies).map(
         ([granteeGRN, dependencyList]) => ({
           // $FlowFixMe: Object entries returns mixed value
-          [granteeGRN]: dependencyList.map((dependency) => ShareEntity.fromJSON(dependency)),
+          [granteeGRN]: dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)),
         }),
       ),
     );
