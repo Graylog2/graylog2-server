@@ -72,6 +72,39 @@ const valueContainer = (base) => ({
   minHeight: '30px',
 });
 
+const dropdownIndicator = (base, state) => ({
+  ...base,
+  padding: '0 6px',
+  fontSize: '150%',
+  transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
+});
+
+const clearIndicator = (base) => ({
+  ...base,
+  padding: '5px',
+});
+
+const singleValueAndPlaceholder = (theme) => (base) => ({
+  ...base,
+  lineHeight: '28px',
+  fontFamily: theme.fonts.family.body,
+  fontSize: theme.fonts.size.body,
+  fontWeight: 400,
+});
+
+const placeholder = ({ theme }) => (base) => ({
+  ...base,
+  lineHeight: '28px',
+  fontFamily: theme.fonts.family.body,
+  fontSize: theme.fonts.size.body,
+  fontWeight: 400,
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  maxWidth: '100%',
+  paddingRight: '20px',
+});
+
 type Props = {
   allowOptionCreation?: boolean,
   components: { [string]: ComponentType<any> },
@@ -134,6 +167,10 @@ const Select = ({
     multiValueRemove: multiValueRemove(theme),
     option,
     valueContainer,
+    dropdownIndicator,
+    clearIndicator,
+    singleValue: singleValueAndPlaceholder(theme),
+    placeholder: placeholder({ theme }),
   };
   const filterOption = createFilter({ ignoreCase, ignoreAccents });
 
@@ -142,16 +179,16 @@ const Select = ({
       ...defaultTheme,
       colors: {
         ...defaultTheme.colors,
-        primary: theme.colors.variant.light.info,
+        primary: theme.colors.input.borderFocus,
         primary75: theme.colors.variant.light.default,
         primary50: theme.colors.variant.lighter.default,
         primary25: theme.colors.variant.lightest.default,
         danger: theme.colors.variant.darker.info,
         dangerLight: theme.colors.variant.lighter.info,
-        neutral0: theme.colors.gray[100],
-        neutral5: theme.colors.gray[90],
+        neutral0: theme.colors.input.background,
+        neutral5: theme.colors.input.backgroundDisabled,
         neutral10: theme.colors.variant.lightest.info,
-        neutral20: theme.colors.gray[80],
+        neutral20: theme.colors.input.border,
         neutral30: theme.colors.gray[70],
         neutral40: theme.colors.gray[60],
         neutral50: theme.colors.gray[50],
