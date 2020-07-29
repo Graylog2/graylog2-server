@@ -58,7 +58,8 @@ const UserDetailsPage = ({ params }: Props) => {
                              userIsReadOnly={loadedUser?.readOnly} />
       </PageHeader>
 
-      <UserDetails user={username === loadedUser?.username ? loadedUser : undefined} initialPaginatedUserShares={paginatedUserShares} />
+      <UserDetails paginatedUserShares={paginatedUserShares}
+                   user={username === loadedUser?.username ? loadedUser : undefined} />
     </DocumentTitle>
   );
 };

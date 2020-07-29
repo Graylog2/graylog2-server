@@ -13,11 +13,11 @@ import TeamsSection from './TeamSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
 
 type Props = {
+  paginatedUserShares: PaginatedUserSharesType,
   user: ?User,
-  initialPaginatedUserShares: PaginatedUserSharesType,
 };
 
-const UserDetails = ({ user, initialPaginatedUserShares }: Props) => {
+const UserDetails = ({ user, paginatedUserShares }: Props) => {
   if (!user) {
     return <Spinner />;
   }
@@ -34,7 +34,8 @@ const UserDetails = ({ user, initialPaginatedUserShares }: Props) => {
           <TeamsSection user={user} />
         </div>
       </MainDetailsGrid>
-      <SharedEntitiesSection paginatedUserShares={initialPaginatedUserShares} username={user.username} />
+      <SharedEntitiesSection paginatedUserShares={paginatedUserShares}
+                             username={user.username} />
     </>
   );
 };

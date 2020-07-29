@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import type { GranteesList } from 'logic/permissions/EntityShareState';
 import Routes from 'routing/Routes';
+import type { GranteesList } from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
 
 type Props = {

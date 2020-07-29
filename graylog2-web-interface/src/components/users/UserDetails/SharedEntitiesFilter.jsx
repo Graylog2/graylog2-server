@@ -1,10 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import styled, { type StyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import type { ThemeInterface } from 'theme';
-import { SearchForm, Select } from 'components/common';
 import mockedPermissions from 'logic/permissions/mocked';
+import { SearchForm, Select } from 'components/common';
 
 type Props = {
   onSearch: (query: string, resetLoading: () => void) => Promise<void>,
@@ -12,12 +11,9 @@ type Props = {
   onFilter: (param: string, value: string) => Promise<void>,
 };
 
-const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
-  
-`;
-
 const StyledSearchForm = styled(SearchForm)`
   display: inline-block;
+
   margin-bottom: 10px;
   margin-right: 15px;
 `;
@@ -25,19 +21,21 @@ const StyledSearchForm = styled(SearchForm)`
 const Filters = styled.div`
   display: inline-block;
   vertical-align: top;
+
   margin-right: 15px;
   margin-bottom: 10px;
 `;
 
 const SelectWrapper = styled.div`
   display: inline-flex;
-  top: 0;
-  margin-left: 10px;
-  vertical-align: top;
   align-items: center;
-  white-space: nowrap;
+  vertical-align: top;
+
   width: 260px;
+  margin-left: 10px;
   margin-right: 10px;
+
+  white-space: nowrap;
 `;
 
 const StyledSelect = styled(Select)`
@@ -49,27 +47,28 @@ const entityTypeOptions = Object.entries(mockedPermissions.availabeEntityTypes).
 const capabilityOptions = Object.entries(mockedPermissions.availableCapabilities).map(([key, value]) => ({ label: value, value: key }));
 
 const SharedEntitiesFilter = ({ onSearch, onFilter, onReset }: Props) => (
-  <Container>
-    <StyledSearchForm onSearch={onSearch}
-                      onReset={onReset}
+  <>
+    <StyledSearchForm onReset={onReset}
+                      onSearch={onSearch}
                       placeholder="Filter by name"
-                      useLoadingState
-                      topMargin={0} />
+                      topMargin={0}
+                      useLoadingState />
+
     <Filters>
       <SelectWrapper>
         Entity types
-        <StyledSelect placeholder="Filter entity types"
-                      onChange={(entityType) => onFilter('entity_type', entityType)}
-                      options={entityTypeOptions} />
+        <StyledSelect onChange={(entityType) => onFilter('entity_type', entityType)}
+                      options={entityTypeOptions}
+                      placeholder="Filter entity types" />
       </SelectWrapper>
       <SelectWrapper>
         Capability
-        <StyledSelect placeholder="Filter capabilies"
-                      onChange={(capability) => onFilter('capability', capability)}
-                      options={capabilityOptions} />
+        <StyledSelect onChange={(capability) => onFilter('capability', capability)}
+                      options={capabilityOptions}
+                      placeholder="Filter capabilies" />
       </SelectWrapper>
     </Filters>
-  </Container>
+  </>
 );
 
 export default SharedEntitiesFilter;

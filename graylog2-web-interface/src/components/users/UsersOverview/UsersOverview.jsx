@@ -15,6 +15,8 @@ import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
 
+const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
     overflow-x: visible;
@@ -64,7 +66,6 @@ const UsersOverview = () => {
   } = useStore(UsersStore);
   const [loading, setLoading] = useState(false);
   const currentUser = useContext(CurrentUserContext);
-  const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
   const _isActiveItem = (user) => currentUser?.username === user.username;
   const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
@@ -105,7 +106,7 @@ const UsersOverview = () => {
             <DataTable id="users-overview"
                        className="table-hover"
                        rowClassName="no-bm"
-                       headers={headers}
+                       headers={TABLE_HEADERS}
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="fullName"
                        rows={users.toJS()}
