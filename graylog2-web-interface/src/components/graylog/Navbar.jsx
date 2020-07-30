@@ -26,22 +26,24 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   .navbar-nav {
     > li > a,
     > li > .btn-link {
-      color: ${theme.colors.variant.darker.default};
+      color: ${theme.colors.variant.darkest.default};
 
       &:hover,
       &:focus {
-        color: ${theme.colors.variant.default};
-        background-color: transparent;
+        color: ${theme.colors.variant.darker.default};
+        background-color: ${theme.colors.variant.lightest.default};
       }
     }
 
     > .active > a,
     > .active > .btn-link {
-      &,
+      color: ${theme.colors.variant.darker.default};
+      background-color: ${theme.colors.gray[90]};
+      
       &:hover,
       &:focus {
         color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.variant.lighter.default};
+        background-color: ${theme.colors.gray[80]};
       }
     }
 
@@ -60,8 +62,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       &,
       &:hover,
       &:focus {
-        color: ${theme.colors.variant.darker.default};
-        background-color: ${theme.colors.variant.lightest.default};
+        color: ${theme.colors.variant.darkest.default};
+        background-color: ${theme.colors.gray[90]};
       }
     }
 

@@ -28,20 +28,19 @@ const Title: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({
   padding: 0 10px;
   left: 100%;
   top: calc(50% - 13px);
-  height: 26px;
-  background-color: ${theme.colors.variant.lighter.info};
+  height: 25px;
+  background-color: ${theme.colors.variant.lightest.info};
+  border: 1px solid ${theme.colors.variant.light.info};
+  border-left: none;
   box-shadow: 3px 3px 3px ${theme.colors.global.navigationBoxShadow};
   z-index: 4;
   border-radius: 0 3px 3px 0;
   align-items: center;
 
   span {
-    background: ${theme.utils.contrastingColor(theme.colors.variant.lighter.info, 'AA')};
+    color: ${theme.colors.variant.darker.info};
     font-size: ${theme.fonts.size.body};
     font-weight: bold;
-    background-clip: text;
-    -webkit-background-clip: text; /* stylelint-disable-line property-no-vendor-prefix */
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
   }
 `);
@@ -57,7 +56,7 @@ const IconWrap: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.sp
   ::after {
     content: ' ';
     position: absolute;
-    right: -9px;
+    left: 82.5%;
     top: calc(50% - 9px);
     width: 18px;
     height: 18px;
@@ -73,11 +72,12 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
   text-align: center;
   cursor: pointer;
   font-size: ${theme.fonts.size.h3};
-  color: ${isSelected ? theme.colors.variant.dark.default : theme.colors.variant.darker.default};
-  background: ${isSelected ? theme.colors.variant.lighter.default : 'transparent'};
+  color: ${isSelected ? theme.colors.variant.darker.default : theme.colors.variant.darkest.default};
+  background: ${isSelected ? theme.colors.gray[90] : theme.colors.global.contentBackground};
 
   :hover {
-    background: ${isSelected ? theme.colors.variant.lighter.default : theme.colors.variant.lightest.default};
+    color: ${isSelected ? theme.colors.variant.darkest.default : theme.colors.variant.darker.default};
+    background: ${isSelected ? theme.colors.gray[80] : theme.colors.variant.lightest.default};
 
     ${Title} {
       display: ${(showTitleOnHover && !isSelected) ? 'flex' : 'none'};
@@ -91,14 +91,39 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
   :active {
     background: ${theme.colors.variant.lighter.default};
   }
+  
+  /* stylelint-disable indentation, selector-max-empty-lines */
+  ${(isSelected && !sidebarIsPinned) && css`
+    ::before,
+    ::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      height: 15px;
+      width: 5px;
+      background-color: ${theme.colors.global.contentBackground};
+    }
+
+    ::before {
+      transform: skewY(-45deg);
+      top: calc(50% - 12px);
+    }
+    
+    ::after {
+      transform: skewY(45deg);
+      bottom: calc(50% - 12px);
+    }
+  `}
+  /* stylelint-enable indentation, selector-max-empty-lines */
 
   ${IconWrap} {
-    overflow: ${isSelected ? 'unset' : 'hidden'};
+    overflow: hidden;
 
     ::after {
       display: ${isSelected ? 'block' : 'none'};
-      box-shadow: ${(isSelected && !sidebarIsPinned) ? `3px -3px 2px 0 ${theme.colors.global.navigationBoxShadow}` : 'none'};
-      background-color: ${isSelected ? theme.colors.variant.lighter.default : theme.colors.variant.lighter.info};
+      box-shadow: ${(isSelected && !sidebarIsPinned) ? `inset 2px -2px 2px 0 ${theme.colors.global.navigationBoxShadow}` : 'none'};
+      background-color: ${isSelected ? theme.colors.global.contentBackground : theme.colors.variant.lightest.info};
+      border: ${isSelected ? 'none' : `1px solid ${theme.colors.variant.light.info}`};
     }
   }
 `);

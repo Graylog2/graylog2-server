@@ -42,11 +42,11 @@ export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInter
 
   z-index: ${sidebarIsPinned ? 1030 : 3};
 
-  ${sidebarIsPinned ? css`
+  ${sidebarIsPinned && css`
     ::before {
       content: '';
       position: absolute;
-      top: 0px;
+      top: 0;
       right: -6px;
       height: 6px;
       width: 6px;
@@ -55,7 +55,7 @@ export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInter
       box-shadow: -6px -6px 0px 3px ${theme.colors.global.contentBackground};
       z-index: 4; /* to render over Sidebar ContentColumn */
     }
-  ` : ''}
+  `}
 
   > *:nth-child(1) {
     grid-column: 1;
@@ -96,6 +96,7 @@ const Title = styled.h1`
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+  line-height: 1.5;
 `;
 
 const OverlayToggle: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInterface, HTMLDivElement> = styled.div(({ theme, sidebarIsPinned }) => css`
