@@ -13,7 +13,7 @@ type Props = {
   onChange: (event: SyntheticInputEvent<HTMLLinkElement>) => void,
 };
 
-const PageSizeSelect = ({ pageSizes, pageSize, onChange, className = null }: Props) => (
+const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
   <div className={`${className ?? ''} form-inline page-size pull-right`}>
     <Input id="page-size" type="select" bsSize="small" label="Show" value={pageSize} onChange={onChange}>
       {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
@@ -29,7 +29,7 @@ PageSizeSelect.propTypes = {
 };
 
 PageSizeSelect.defaultProps = {
-  className: undefined,
+  className: '',
   pageSizes: PAGE_SIZES,
 };
 
