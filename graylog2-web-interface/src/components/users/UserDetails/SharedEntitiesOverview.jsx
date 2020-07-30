@@ -48,9 +48,9 @@ const SharedEntitiesOverview = ({ paginatedUserShares: initialPaginatedUserShare
     });
   };
 
-  const _handleSearch = (newQuery: string, resetLoading: () => void) => _fetchSharedEntities(1, pagination.perPage, newQuery).then(resetLoading);
-  const _handleSearchReset = () => _fetchSharedEntities(1, pagination.perPage, '');
-  const _handleFilter = (param: string, value: string) => _fetchSharedEntities(1, pagination.perPage, pagination.query, { [param]: value });
+  const _handleSearch = (newQuery: string, resetLoading: () => void) => _fetchSharedEntities(1, pagination.perPage, newQuery, pagination.additionalQueries).then(resetLoading);
+  const _handleSearchReset = () => _fetchSharedEntities(1, pagination.perPage, '', pagination.additionalQueries);
+  const _handleFilter = (param: string, value: string) => _fetchSharedEntities(1, pagination.perPage, pagination.query, { ...pagination.additionalQueries, [param]: value });
 
   return (
     <>
