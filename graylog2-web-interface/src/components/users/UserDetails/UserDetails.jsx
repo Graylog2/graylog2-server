@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { Spinner } from 'components/common';
 import User from 'logic/users/User';
-import type { PaginatedUserSharesType } from 'stores/permissions/EntityShareStore';
+import type { PaginatedUserSharesType } from 'actions/permissions/EntityShareActions';
 
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';

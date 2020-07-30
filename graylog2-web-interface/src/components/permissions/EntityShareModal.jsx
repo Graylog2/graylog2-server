@@ -6,7 +6,8 @@ import PropTypes from 'prop-types';
 import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
-import { EntityShareStore, EntityShareActions, type EntitySharePayload } from 'stores/permissions/EntityShareStore';
+import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import EntityShareSettings from './EntityShareSettings';
