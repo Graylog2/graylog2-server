@@ -9,7 +9,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
   >
     <Nav
       bsClass="nav"
-      className="Nav-dzawzr-0 dlxaEF"
+      className="Nav-dzawzr-0 inEWeN"
       justified={false}
       navbar={true}
       pullLeft={false}
@@ -17,7 +17,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
       stacked={false}
     >
       <ul
-        className="Nav-dzawzr-0 dlxaEF nav navbar-nav"
+        className="Nav-dzawzr-0 inEWeN nav navbar-nav"
         role={null}
       >
         <LinkContainer
