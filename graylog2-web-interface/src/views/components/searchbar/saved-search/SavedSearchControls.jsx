@@ -20,7 +20,8 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
-import ShareViewModal from 'views/components/views/ShareViewModal';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
 import type { UserJSON as User } from 'stores/users/UsersStore';
@@ -203,6 +204,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { viewStoreState: { view, dirty }, theme } = this.props;
 
     const loaded = (view && view.id);
+    const viewTypeLabel = ViewTypeLabel({ type: view.type });
     let savedSearchColor: string = '';
 
     if (loaded) {
@@ -277,7 +279,11 @@ class SavedSearchControls extends React.Component<Props, State> {
                                            onSave={onSaveView} />
                     )}
                     {showShareSearch && (
-                      <ShareViewModal show view={view} onClose={this.toggleShareSearch} currentUser={currentUser} />
+                      <EntityShareModal entityId={view.id}
+                                        entityType="search"
+                                        entityTitle={view.title}
+                                        description={`Search for a User or Team to add as collaborator on this ${viewTypeLabel}.`}
+                                        onClose={this.toggleShareSearch} />
                     )}
                   </ButtonGroup>
                 </div>

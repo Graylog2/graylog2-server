@@ -23,6 +23,7 @@ describe('SavedSearchControls', () => {
       // $FlowFixMe: allowing `undefined` on purpose
       .id(id)
       .title('title')
+      .type(View.Type.Search)
       .description('description')
       .search(Search.create().toBuilder().id('id-beef').build())
       .owner('owningUser')
@@ -159,6 +160,7 @@ describe('SavedSearchControls', () => {
         view: View.builder()
           .title('title')
           .description('description')
+          .type(View.Type.Search)
           .search(Search.create().toBuilder().id('id-beef').build())
           .id('id-beef')
           .build(),
@@ -174,6 +176,7 @@ describe('SavedSearchControls', () => {
     it('should render dirty', () => {
       const view = View.builder()
         .title('title')
+        .type(View.Type.Search)
         .description('description')
         .search(Search.create().toBuilder().id('id-beef').build())
         .id('id-beef')
