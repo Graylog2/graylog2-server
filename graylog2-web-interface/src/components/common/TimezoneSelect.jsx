@@ -25,13 +25,17 @@ class TimezoneSelect extends React.Component {
     onChange: PropTypes.func,
   };
 
-  getValue = () => {
-    return this.timezone.getValue();
-  };
+  static defaultProps = {
+    onChange: () => {},
+  }
 
   // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   _UNCLASSIFIED_AREA = 'Unclassified';
+
+  getValue = () => {
+    return this.timezone.getValue();
+  };
 
   _formatTimezones = () => {
     const timezones = {};
