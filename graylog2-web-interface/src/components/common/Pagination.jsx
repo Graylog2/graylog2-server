@@ -31,15 +31,15 @@ const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled
     > li {
       > a,
       > span {
-        color: ${theme.utils.readableColor(theme.colors.global.contentBackground)};
+        color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
         background-color: ${theme.colors.global.contentBackground};
-        border-color: ${theme.colors.gray[80]};
+        border-color: ${theme.colors.variant.light.default};
 
         &:hover,
         &:focus {
-          color: ${theme.utils.readableColor(theme.colors.gray[90])};
-          background-color: ${theme.colors.gray[90]};
-          border-color: ${theme.colors.gray[80]};
+          color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
+          background-color: ${theme.colors.variant.lighter.default};
+          border-color: ${theme.colors.variant.light.default};
         }
       }
 
@@ -48,7 +48,7 @@ const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled
         &,
         &:hover,
         &:focus {
-          color: ${theme.utils.readableColor(theme.colors.variant.lightest.info)};
+          color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.info)};
           background-color: ${theme.colors.variant.lightest.info};
           border-color: ${theme.colors.variant.lighter.info};
         }
@@ -61,9 +61,9 @@ const StyledBootstrapPagination: StyledComponent<{}, ThemeInterface, *> = styled
         > span,
         > span:hover,
         > span:focus {
-          color: ${theme.colors.gray[70]};
-          background-color: ${theme.colors.gray[100]};
-          border-color: ${theme.colors.gray[90]};
+          color: ${theme.colors.variant.light.default};
+          background-color: ${theme.colors.global.contentBackground};
+          border-color: ${theme.colors.variant.lighter.default};
         }
       }
     }
