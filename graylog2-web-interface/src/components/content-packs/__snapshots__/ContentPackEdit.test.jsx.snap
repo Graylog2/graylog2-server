@@ -1037,7 +1037,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     onSubmit={[Function]}
                                   >
                                     <div
-                                      className="form-group has-feedback"
+                                      className="form-group "
                                     >
                                       <input
                                         autoComplete="off"
@@ -2561,7 +2561,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     onSubmit={[Function]}
                                   >
                                     <div
-                                      className="form-group has-feedback"
+                                      className="form-group "
                                     >
                                       <input
                                         autoComplete="off"
