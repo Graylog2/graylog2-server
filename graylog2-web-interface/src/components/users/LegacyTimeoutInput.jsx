@@ -1,5 +1,5 @@
 /* eslint-disable  */
-// We will remove this file soon, it got replaced with the TimeoutInput
+// We will remove this file soon, it got replaced with the TimeoutInput component
 
 import PropTypes from 'prop-types';
 import React from 'react';
