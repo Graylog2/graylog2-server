@@ -23,9 +23,9 @@ const Container: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.s
   };
 `);
 
-const Header = styled.h4`
-  padding-bottom: 5px;
+const Header = styled.div`
   flex: 1;
+  margin-right: 5px;
 `;
 
 const Description = styled.span`
