@@ -23,8 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -51,14 +49,14 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
 
     @Test
     void writesMigrationCompletedAfterSuccess() {
-        final Set<String> modifiedIndices = ImmutableSet.of("some-index", "another-index");
-        when(elasticsearchAdapter.addGl2MessageIdFieldAlias(any())).thenReturn(modifiedIndices);
+        mockConfiguredEventPrefixes("events-prefix", "system-events-prefix");
 
         this.sut.upgrade();
 
         final V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted migrationCompleted = captureMigrationCompleted();
 
-        assertThat(migrationCompleted.modifiedIndices()).containsExactlyInAnyOrderElementsOf(modifiedIndices);
+        assertThat(migrationCompleted.modifiedIndexPrefixes())
+                .containsExactlyInAnyOrder("events-prefix", "system-events-prefix");
     }
 
     @Test

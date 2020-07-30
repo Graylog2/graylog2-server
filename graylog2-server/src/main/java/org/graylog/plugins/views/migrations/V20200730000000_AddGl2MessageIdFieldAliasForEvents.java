@@ -64,29 +64,29 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
                 elasticsearchConfig.getDefaultEventsIndexPrefix(),
                 elasticsearchConfig.getDefaultSystemEventsIndexPrefix());
 
-        final Set<String> modifiedIndices = elasticsearch.addGl2MessageIdFieldAlias(eventIndexPrefixes);
+        elasticsearch.addGl2MessageIdFieldAlias(eventIndexPrefixes);
 
-        writeMigrationCompleted(modifiedIndices);
+        writeMigrationCompleted(eventIndexPrefixes);
     }
 
     private boolean hasCompletedBefore() {
         return clusterConfigService.get(MigrationCompleted.class) != null;
     }
 
-    private void writeMigrationCompleted(Set<String> modifiedIndices) {
-        this.clusterConfigService.write(V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted.create(modifiedIndices));
+    private void writeMigrationCompleted(ImmutableSet<String> eventIndexPrefixes) {
+        this.clusterConfigService.write(V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted.create(eventIndexPrefixes));
     }
 
     public interface ElasticsearchAdapter {
-        Set<String> addGl2MessageIdFieldAlias(Set<String> indices);
+        void addGl2MessageIdFieldAlias(Set<String> indexPrefixes);
     }
 
     @JsonAutoDetect
     @AutoValue
     @WithBeanGetter
     public static abstract class MigrationCompleted {
-        @JsonProperty("modified_indices")
-        public abstract Set<String> modifiedIndices();
+        @JsonProperty("modified_index_prefixes")
+        public abstract Set<String> modifiedIndexPrefixes();
 
         @JsonCreator
         public static V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted create(@JsonProperty("modified_indices") final Set<String> modifiedIndices) {
