@@ -1,30 +1,39 @@
 // eslint-disable-next-line no-restricted-imports
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import chroma from 'chroma-js';
 
-const Modal = styled(BootstrapModal)(({ theme }) => css`
+const Dialog = css`
+  margin-top: 55px;
+  
   .modal-content {
-    background-color: ${theme.colors.global.contentBackground};
-    border-color: ${chroma(theme.colors.gray[10]).alpha(0.2).css()};
-
-    .modal-header {
-      border-bottom-color: ${theme.colors.gray[90]};
-    }
-
-    .modal-footer {
-      border-top-color: ${theme.colors.gray[90]};
-    }
+    background-color: ${({ theme }) => theme.colors.global.contentBackground};
+    border-color: ${({ theme }) => theme.colors.variant.light.default};
   }
+`;
 
-  .modal-title {
-    font-size: ${theme.fonts.size.h3};
+const Header = css`
+  border-bottom-color: ${({ theme }) => theme.colors.variant.light.default};
+      
+  button.close {
+    color: currentColor;
   }
+`;
 
-  .modal-dialog {
-    margin-top: 55px;
+const Title = css`
+  font-size: ${({ theme }) => theme.fonts.size.h3};
+`;
+
+const Footer = css`
+  border-top-color: ${({ theme }) => theme.colors.variant.light.default};
+`;
+
+const Body = css`
+  .form-group {
+    margin-bottom: 5px;
   }
+`;
 
+const Modal = styled(BootstrapModal)`
   .modal-backdrop {
     height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;
@@ -33,11 +42,47 @@ const Modal = styled(BootstrapModal)(({ theme }) => css`
   form {
     margin-bottom: 0;
   }
-
-  .modal-body .form-group {
-    margin-bottom: 5px;
+  
+  .modal-dialog {
+    ${Dialog}
   }
-`);
+
+  .modal-header {
+    ${Header}
+  }
+
+  .modal-footer {
+    ${Footer}
+  }
+
+  .modal-title {
+    ${Title}
+  }
+
+  .modal-body {
+    ${Body}
+  }
+`;
+
+Modal.Dialog = styled(BootstrapModal.Dialog)`
+  ${Dialog}
+`;
+
+Modal.Header = styled(BootstrapModal.Header)`
+  ${Header}
+`;
+
+Modal.Title = styled(BootstrapModal.Title)`
+  ${Title}
+`;
+
+Modal.Body = styled(BootstrapModal.Body)`
+  ${Body}
+`;
+
+Modal.Footer = styled(BootstrapModal.Footer)`
+  ${Footer}
+`;
 
 /** @component */
 export default Modal;

@@ -270,7 +270,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           backdrop="static"
           bsClass="modal"
           bsSize="large"
-          className="Modal-nuree8-0 hMPgsT"
+          className="Modal-nuree8-0 kdCabm"
           dialogComponentClass={[Function]}
           enforceFocus={true}
           keyboard={true}
@@ -940,7 +940,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           backdrop="static"
           bsClass="modal"
           bsSize="large"
-          className="Modal-nuree8-0 hMPgsT"
+          className="Modal-nuree8-0 kdCabm"
           dialogComponentClass={[Function]}
           enforceFocus={true}
           keyboard={true}
@@ -1405,7 +1405,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                     backdrop="static"
                                     bsClass="modal"
                                     bsSize="large"
-                                    className="Modal-nuree8-0 hMPgsT"
+                                    className="Modal-nuree8-0 kdCabm"
                                     dialogComponentClass={[Function]}
                                     enforceFocus={true}
                                     keyboard={true}
