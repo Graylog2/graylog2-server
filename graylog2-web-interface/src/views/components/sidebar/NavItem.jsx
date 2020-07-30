@@ -72,7 +72,7 @@ const Container: StyledComponent<ContainerProps, ThemeInterface, HTMLDivElement>
   text-align: center;
   cursor: pointer;
   font-size: ${theme.fonts.size.h3};
-  color: ${isSelected ? theme.colors.variant.darker.default : theme.colors.variant.darkest.default};
+  color: ${theme.colors.variant.darkest.default};
   background: ${isSelected ? theme.colors.gray[90] : theme.colors.global.contentBackground};
 
   :hover {

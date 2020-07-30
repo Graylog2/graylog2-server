@@ -37,7 +37,7 @@ export const Container: StyledComponent<{ sidebarIsPinned: boolean }, ThemeInter
 
   color: ${theme.colors.global.textDefault};
   background: ${theme.colors.global.contentBackground};
-  border-right: 1px solid ${theme.colors.gray[80]};
+  border-right: ${sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
   box-shadow: ${sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
   z-index: ${sidebarIsPinned ? 1030 : 3};
