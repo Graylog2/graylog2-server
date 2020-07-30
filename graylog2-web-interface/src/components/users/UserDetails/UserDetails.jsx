@@ -3,20 +3,21 @@ import * as React from 'react';
 
 import { Spinner } from 'components/common';
 import User from 'logic/users/User';
+import type { PaginatedUserSharesType } from 'stores/permissions/EntityShareStore';
 
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
 import MainDetailsGrid from './MainDetailsGrid';
 import RolesSection from './RolesSection';
-
-import SectionComponent from '../SectionComponent';
-import TeamsSection from "./TeamSection";
+import TeamsSection from './TeamSection';
+import SharedEntitiesSection from './SharedEntitiesSection';
 
 type Props = {
+  paginatedUserShares: ?PaginatedUserSharesType,
   user: ?User,
 };
 
-const UserDetails = ({ user }: Props) => {
+const UserDetails = ({ user, paginatedUserShares }: Props) => {
   if (!user) {
     return <Spinner />;
   }
@@ -33,7 +34,8 @@ const UserDetails = ({ user }: Props) => {
           <TeamsSection user={user} />
         </div>
       </MainDetailsGrid>
-      <SectionComponent title="Entity Shares">Children</SectionComponent>
+      <SharedEntitiesSection paginatedUserShares={paginatedUserShares}
+                             username={user.username} />
     </>
   );
 };

@@ -51,7 +51,6 @@ const UserEditPage = ({ params }: Props) => {
         <UserManagementLinks username={username}
                              userIsReadOnly={loadedUser?.readOnly} />
       </PageHeader>
-
       <UserEdit user={username === loadedUser?.username ? loadedUser : undefined} />
     </DocumentTitle>
   );

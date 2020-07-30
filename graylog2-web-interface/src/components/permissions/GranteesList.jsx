@@ -5,7 +5,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import { Pagination, PageSizeSelect } from 'components/common';
-import EntityShareState, { type ActiveShares, type AvailableCapabilities, type SelectedGrantees } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type ActiveShares, type CapabilitiesList, type SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
 import { type ThemeInterface } from 'theme';
@@ -46,7 +46,7 @@ const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => `
 
 type Props = {
   activeShares: ActiveShares,
-  availableCapabilities: AvailableCapabilities,
+  availableCapabilities: CapabilitiesList,
   className?: string,
   entityGRN: GRN,
   onDelete: (GRN) => Promise<EntityShareState>,

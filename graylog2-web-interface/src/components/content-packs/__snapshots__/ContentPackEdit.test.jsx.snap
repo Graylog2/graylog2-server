@@ -1005,6 +1005,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                             >
                               <SearchForm
                                 buttonLeftMargin={5}
+                                className=""
                                 focusAfterMount={false}
                                 id="filter-input"
                                 label={null}
@@ -1024,7 +1025,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 wrapperClass="search"
                               >
                                 <div
-                                  className="search"
+                                  className="search "
                                   style={
                                     Object {
                                       "marginTop": 15,
@@ -2528,6 +2529,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                             >
                               <SearchForm
                                 buttonLeftMargin={5}
+                                className=""
                                 focusAfterMount={false}
                                 id="filter-input"
                                 label={null}
@@ -2547,7 +2549,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 wrapperClass="search"
                               >
                                 <div
-                                  className="search"
+                                  className="search "
                                   style={
                                     Object {
                                       "marginTop": 15,
