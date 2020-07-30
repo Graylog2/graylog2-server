@@ -667,6 +667,17 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     margin-top: 6px;
   }
 
+  code {
+    color: ${theme.colors.variant.darker.danger};
+    background-color: ${theme.colors.variant.lightest.danger};
+  }
+
+  pre {
+    color: ${theme.colors.variant.darker.default};
+    background-color: ${theme.colors.variant.lightest.default};
+    border-color: ${theme.colors.variant.lighter.default};
+  }
+
   ${additionalStyles}
 `);
 
