@@ -885,6 +885,8 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 "contentBackground": "#fff",
                                 "link": "#702785",
                                 "linkHover": "#410057",
+                                "navigationBackground": "#fff",
+                                "navigationBoxShadow": "rgba(115,115,115,0.1)",
                                 "textAlt": "#fff",
                                 "textDefault": "#1f1f1f",
                               },
@@ -3224,7 +3226,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-1"
                                       pullRight={true}
                                       title="More Actions"
@@ -3263,7 +3265,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-1"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -3279,7 +3281,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-1"
                                                     onClick={[Function]}
@@ -3289,7 +3291,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-1"
                                                       onClick={[Function]}
@@ -3825,7 +3827,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-2"
                                       pullRight={true}
                                       title="More Actions"
@@ -3864,7 +3866,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-2"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -3880,7 +3882,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-2"
                                                     onClick={[Function]}
@@ -3890,7 +3892,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-2"
                                                       onClick={[Function]}
@@ -4392,7 +4394,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-3"
                                       pullRight={true}
                                       title="More Actions"
@@ -4431,7 +4433,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-3"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -4447,7 +4449,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-3"
                                                     onClick={[Function]}
@@ -4457,7 +4459,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-3"
                                                       onClick={[Function]}
@@ -4958,7 +4960,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-4"
                                       pullRight={true}
                                       title="More Actions"
@@ -4997,7 +4999,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-4"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -5013,7 +5015,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-4"
                                                     onClick={[Function]}
@@ -5023,7 +5025,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-4"
                                                       onClick={[Function]}
@@ -5525,7 +5527,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-5"
                                       pullRight={true}
                                       title="More Actions"
@@ -5564,7 +5566,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-5"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -5580,7 +5582,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-5"
                                                     onClick={[Function]}
@@ -5590,7 +5592,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-5"
                                                       onClick={[Function]}
@@ -6092,7 +6094,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-6"
                                       pullRight={true}
                                       title="More Actions"
@@ -6131,7 +6133,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-6"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -6147,7 +6149,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-6"
                                                     onClick={[Function]}
@@ -6157,7 +6159,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-6"
                                                       onClick={[Function]}
@@ -6659,7 +6661,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-7"
                                       pullRight={true}
                                       title="More Actions"
@@ -6698,7 +6700,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-7"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -6714,7 +6716,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-7"
                                                     onClick={[Function]}
@@ -6724,7 +6726,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-7"
                                                       onClick={[Function]}
@@ -7226,7 +7228,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-8"
                                       pullRight={true}
                                       title="More Actions"
@@ -7265,7 +7267,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-8"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -7281,7 +7283,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-8"
                                                     onClick={[Function]}
@@ -7291,7 +7293,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-8"
                                                       onClick={[Function]}
@@ -7792,7 +7794,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-9"
                                       pullRight={true}
                                       title="More Actions"
@@ -7831,7 +7833,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-9"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -7847,7 +7849,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-9"
                                                     onClick={[Function]}
@@ -7857,7 +7859,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-9"
                                                       onClick={[Function]}
@@ -8359,7 +8361,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                      className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                       id="more-actions-10"
                                       pullRight={true}
                                       title="More Actions"
@@ -8398,7 +8400,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 kOEHGs"
+                                                  className="DropdownButton-sc-1343dcx-0 gpHcNO"
                                                   id="more-actions-10"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -8414,7 +8416,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-10"
                                                     onClick={[Function]}
@@ -8424,7 +8426,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 kOEHGs dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 gpHcNO dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-10"
                                                       onClick={[Function]}
@@ -9192,6 +9194,8 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 "contentBackground": "#fff",
                                 "link": "#702785",
                                 "linkHover": "#410057",
+                                "navigationBackground": "#fff",
+                                "navigationBoxShadow": "rgba(115,115,115,0.1)",
                                 "textAlt": "#fff",
                                 "textDefault": "#1f1f1f",
                               },
@@ -11671,6 +11675,8 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                 "contentBackground": "#fff",
                                 "link": "#702785",
                                 "linkHover": "#410057",
+                                "navigationBackground": "#fff",
+                                "navigationBoxShadow": "rgba(115,115,115,0.1)",
                                 "textAlt": "#fff",
                                 "textDefault": "#1f1f1f",
                               },
@@ -13936,6 +13942,8 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                 "contentBackground": "#fff",
                                 "link": "#702785",
                                 "linkHover": "#410057",
+                                "navigationBackground": "#fff",
+                                "navigationBoxShadow": "rgba(115,115,115,0.1)",
                                 "textAlt": "#fff",
                                 "textDefault": "#1f1f1f",
                               },
