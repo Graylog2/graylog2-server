@@ -56,14 +56,16 @@ const SharedEntitiesFilter = ({ onSearch, onFilter, onReset }: Props) => (
 
     <Filters>
       <SelectWrapper>
-        Entity types
-        <StyledSelect onChange={(entityType) => onFilter('entity_type', entityType)}
+        <label htmlFor="entity-type-select">Entity Type</label>
+        <StyledSelect inputId="entity-type-select"
+                      onChange={(entityType) => onFilter('entity_type', entityType)}
                       options={entityTypeOptions}
                       placeholder="Filter entity types" />
       </SelectWrapper>
       <SelectWrapper>
-        Capability
-        <StyledSelect onChange={(capability) => onFilter('capability', capability)}
+        <label htmlFor="capability-select">Capability</label>
+        <StyledSelect inputId="capability-select"
+                      onChange={(capability) => onFilter('capability', capability)}
                       options={capabilityOptions}
                       placeholder="Filter capabilies" />
       </SelectWrapper>

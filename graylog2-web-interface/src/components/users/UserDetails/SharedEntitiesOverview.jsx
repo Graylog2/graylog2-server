@@ -65,7 +65,7 @@ const SharedEntitiesOverview = ({ paginatedUserShares: initialPaginatedUserShare
                      <SharedEntitiesFilter onSearch={_handleSearch}
                                            onReset={_handleSearchReset}
                                            onFilter={_handleFilter} />
-                       )}
+                   )}
                    dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
                    filterKeys={[]}
                    headers={TABLE_HEADERS}
