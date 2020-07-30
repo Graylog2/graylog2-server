@@ -89,7 +89,7 @@ const input = {
 
 /* eslint-disable prefer-destructuring */
 global.navigationBackground = global.contentBackground;
-global.navigationBoxShadow = chroma(gray[100]).alpha(0.1).css();
+global.navigationBoxShadow = chroma(variant.lightest.default).alpha(0.5).css();
 /* eslint-enable prefer-destructuring */
 
 const noire = {
