@@ -63,11 +63,11 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <h4>Assign Roles</h4>
+      <h3>Assign Roles</h3>
       <Container>
         <RolesSelector onSubmit={onUpdate} user={user} />
       </Container>
-      <h4>Selected Roles</h4>
+      <h3>Selected Roles</h3>
       <Container>
         <PaginatedItemOverview onLoad={_onLoad} overrideList={roles} onDeleteItem={onDeleteRole} />
       </Container>
