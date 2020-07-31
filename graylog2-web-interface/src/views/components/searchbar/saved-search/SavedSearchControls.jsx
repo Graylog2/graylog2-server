@@ -204,7 +204,7 @@ class SavedSearchControls extends React.Component<Props, State> {
     const { viewStoreState: { view, dirty }, theme } = this.props;
 
     const loaded = (view && view.id);
-    const viewTypeLabel = ViewTypeLabel({ type: view.type });
+    const viewTypeLabel = ViewTypeLabel({ type: view?.type });
     let savedSearchColor: string = '';
 
     if (loaded) {
