@@ -28,6 +28,8 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -35,14 +37,20 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
 
     private static final Logger LOG = LoggerFactory.getLogger(V20200730000000_AddGl2MessageIdFieldAliasForEvents.class);
 
+    private static final int MINIMUM_ELASTICSEARCH_VERSION = 7;
+
+    private final String elasticsearchMajorVersion;
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchAdapter elasticsearch;
     private final ElasticsearchConfiguration elasticsearchConfig;
 
+    @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEvents(
+            @Named("elasticsearch_version") String elasticsearchMajorVersion,
             ClusterConfigService clusterConfigService,
             ElasticsearchAdapter elasticsearch,
             ElasticsearchConfiguration elasticsearchConfig) {
+        this.elasticsearchMajorVersion = elasticsearchMajorVersion;
         this.clusterConfigService = clusterConfigService;
         this.elasticsearch = elasticsearch;
         this.elasticsearchConfig = elasticsearchConfig;
@@ -55,8 +63,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
 
     @Override
     public void upgrade() {
-        if (hasCompletedBefore()) {
-            LOG.debug("Migration already completed.");
+        if (shouldSkip()) {
             return;
         }
 
@@ -67,6 +74,20 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
         elasticsearch.addGl2MessageIdFieldAlias(eventIndexPrefixes);
 
         writeMigrationCompleted(eventIndexPrefixes);
+    }
+
+    private boolean shouldSkip() {
+        if (Integer.parseInt(elasticsearchMajorVersion) < MINIMUM_ELASTICSEARCH_VERSION) {
+            LOG.debug("Skipping migration, because Elasticsearch major version of {} " +
+                            "is lower than the required minimum version of {}.",
+                    elasticsearchMajorVersion, MINIMUM_ELASTICSEARCH_VERSION);
+            return true;
+        }
+        if (hasCompletedBefore()) {
+            LOG.debug("Migration already completed.");
+            return true;
+        }
+        return false;
     }
 
     private boolean hasCompletedBefore() {
@@ -89,8 +110,8 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
         public abstract Set<String> modifiedIndexPrefixes();
 
         @JsonCreator
-        public static V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted create(@JsonProperty("modified_indices") final Set<String> modifiedIndices) {
-            return new AutoValue_V20200730000000_AddGl2MessageIdFieldAliasForEvents_MigrationCompleted(modifiedIndices);
+        public static V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted create(@JsonProperty("modified_index_prefixes") final Set<String> modifiedIndexPrefixes) {
+            return new AutoValue_V20200730000000_AddGl2MessageIdFieldAliasForEvents_MigrationCompleted(modifiedIndexPrefixes);
         }
     }
 }

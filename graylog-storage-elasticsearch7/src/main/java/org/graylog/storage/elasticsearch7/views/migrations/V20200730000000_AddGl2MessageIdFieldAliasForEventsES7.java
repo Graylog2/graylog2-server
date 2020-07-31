@@ -8,6 +8,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelC
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog2.indexer.ElasticsearchException;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -19,6 +20,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7 implements V2
 
     private final RestHighLevelClient client;
 
+    @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEventsES7(RestHighLevelClient client) {
         this.client = client;
     }

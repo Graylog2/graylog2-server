@@ -21,6 +21,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +46,11 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
         elasticsearchAdapter = mock(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class);
         elasticsearchConfig = mock(ElasticsearchConfiguration.class);
         mockConfiguredEventPrefixes("something", "something else");
-        sut = new V20200730000000_AddGl2MessageIdFieldAliasForEvents(clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
+        sut = buildSut("7");
+    }
+
+    private V20200730000000_AddGl2MessageIdFieldAliasForEvents buildSut(String version) {
+        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(version, clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
     }
 
     @Test
@@ -77,6 +83,26 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
 
         verify(elasticsearchAdapter)
                 .addGl2MessageIdFieldAlias(ImmutableSet.of("events-prefix", "system-events-prefix"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"7", "8"})
+    void runsForElasticsearchVersion7OrAbove(String version) {
+        final V20200730000000_AddGl2MessageIdFieldAliasForEvents sut = buildSut(version);
+
+        sut.upgrade();
+
+        verify(elasticsearchAdapter).addGl2MessageIdFieldAlias(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"5", "6"})
+    void doesNotRunForElasticsearchVersionBelow7(String version) {
+        final V20200730000000_AddGl2MessageIdFieldAliasForEvents sut = buildSut(version);
+
+        sut.upgrade();
+
+        verify(elasticsearchAdapter, never()).addGl2MessageIdFieldAlias(any());
     }
 
     private void mockConfiguredEventPrefixes(String eventsPrefix, String systemEventsPrefix) {
