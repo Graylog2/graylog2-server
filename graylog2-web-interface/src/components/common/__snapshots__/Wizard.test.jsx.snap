@@ -310,7 +310,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 .c4.nav.nav-pills > li.active > a,
 .c4.nav.nav-pills > li.active > a:hover,
 .c4.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -1003,7 +1003,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 .c4.nav.nav-pills > li.active > a,
 .c4.nav.nav-pills > li.active > a:hover,
 .c4.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -1709,7 +1709,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 .c2.nav.nav-pills > li.active > a,
 .c2.nav.nav-pills > li.active > a:hover,
 .c2.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -2385,7 +2385,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 .c2.nav.nav-pills > li.active > a,
 .c2.nav.nav-pills > li.active > a:hover,
 .c2.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
