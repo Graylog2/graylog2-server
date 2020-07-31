@@ -23,6 +23,8 @@ import org.graylog2.plugin.Tools;
 
 import java.util.Map;
 
+import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
+
 public class EventsIndexMapping7 implements IndexMappingTemplate {
     @Override
     public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
@@ -98,6 +100,10 @@ public class EventsIndexMapping7 implements IndexMappingTemplate {
                         .put("properties", map()
                                 .put("id", map()
                                         .put("type", "keyword")
+                                        .build())
+                                .put(FIELD_GL2_MESSAGE_ID, map()
+                                        .put("type", "alias")
+                                        .put("path", "id")
                                         .build())
                                 .put("event_definition_type", map()
                                         .put("type", "keyword")
