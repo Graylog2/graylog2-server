@@ -66,7 +66,8 @@ const Sidebar = ({ searchPageLayout, results, children, queryId, sections, viewM
       <SidebarNavigation activeSection={activeSection}
                          setActiveSectionKey={setActiveSectionKey}
                          toggleSidebar={toggleSidebar}
-                         sections={sections} />
+                         sections={sections}
+                         sidebarIsPinned={sidebarIsPinned} />
       {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}

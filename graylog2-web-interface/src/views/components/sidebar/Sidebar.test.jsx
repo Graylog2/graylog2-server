@@ -302,7 +302,7 @@ describe('<Sidebar />', () => {
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
 
-    wrapper.find('div[children="Create"]').simulate('click');
+    wrapper.find('span[children="Create"]').simulate('click');
 
     expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
   });
@@ -320,7 +320,7 @@ describe('<Sidebar />', () => {
 
     wrapper.find('SidebarNavigation NavItem').first().simulate('click');
 
-    wrapper.find('div[children="Fields"]').simulate('click');
+    wrapper.find('span[children="Fields"]').simulate('click');
 
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
