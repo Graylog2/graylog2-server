@@ -17,6 +17,8 @@
 package org.graylog2.shared.users;
 
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.users.User;
 
@@ -56,6 +58,10 @@ public interface UserService extends PersistedService {
     Set<String> getRoleNames(User user);
 
     List<Permission> getPermissionsForUser(User user);
+
+    List<WildcardPermission> getWildcardPermissionsForUser(User user);
+
+    List<GRNPermission> getGRNPermissionsForUser(User user);
 
     Set<String> getUserPermissionsFromRoles(User user);
 

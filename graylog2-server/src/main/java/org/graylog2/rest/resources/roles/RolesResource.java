@@ -63,7 +63,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static javax.ws.rs.core.Response.status;
@@ -198,10 +197,8 @@ public class RolesResource extends RestResource {
             List<WildcardPermission> wildcardPermissions;
             List<GRNPermission> grnPermissions;
             if (isPermitted(RestPermissions.USERS_PERMISSIONSEDIT, user.getName())) {
-                wildcardPermissions = userService.getPermissionsForUser(user).stream()
-                        .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).collect(Collectors.toList());
-                grnPermissions = userService.getPermissionsForUser(user).stream()
-                        .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).collect(Collectors.toList());
+                wildcardPermissions = userService.getWildcardPermissionsForUser(user);
+                grnPermissions = userService.getGRNPermissionsForUser(user);
             } else {
                 wildcardPermissions = ImmutableList.of();
                 grnPermissions = ImmutableList.of();

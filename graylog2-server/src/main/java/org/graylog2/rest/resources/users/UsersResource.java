@@ -614,10 +614,8 @@ public class UsersResource extends RestResource {
         List<WildcardPermission> wildcardPermissions;
         List<GRNPermission> grnPermissions;
         if (includePermissions) {
-            wildcardPermissions = userService.getPermissionsForUser(user).stream()
-                    .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).collect(Collectors.toList());
-            grnPermissions = userService.getPermissionsForUser(user).stream()
-                    .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).collect(Collectors.toList());
+            wildcardPermissions = userService.getWildcardPermissionsForUser(user);
+            grnPermissions = userService.getGRNPermissionsForUser(user);
         } else {
             wildcardPermissions = ImmutableList.of();
             grnPermissions = ImmutableList.of();
