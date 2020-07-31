@@ -5,7 +5,8 @@ import styled from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
-import { EntityShareActions, type EntitySharePayload } from 'stores/permissions/EntityShareStore';
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
