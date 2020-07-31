@@ -53,7 +53,15 @@ export default class UserOverview {
     return this._value.username;
   }
 
+  get name() {
+    return this._value.username;
+  }
+
   get fullName() {
+    return this._value.fullName;
+  }
+
+  get description() {
     return this._value.fullName;
   }
 

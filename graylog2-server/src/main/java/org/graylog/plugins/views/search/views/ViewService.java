@@ -18,11 +18,13 @@ package org.graylog.plugins.views.search.views;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
@@ -44,15 +46,18 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
+    private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
                           MongoJackObjectMapperProvider mapper,
                           ClusterConfigService clusterConfigService,
-                          ViewRequirements.Factory viewRequirementsFactory) {
+                          ViewRequirements.Factory viewRequirementsFactory,
+                          EntityOwnershipService entityOwnerShipService) {
         super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
+        this.entityOwnerShipService = entityOwnerShipService;
     }
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
@@ -132,6 +137,12 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     @Override
     public Stream<ViewDTO> streamByIds(Set<String> idSet) {
         return super.streamByIds(idSet).map(this::requirementsForView);
+    }
+
+    public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
+        final ViewDTO savedObject = save(viewDTO);
+        entityOwnerShipService.registerNewView(savedObject.id(), user);
+        return savedObject;
     }
 
     @Override

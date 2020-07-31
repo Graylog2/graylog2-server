@@ -1,8 +1,9 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
 import { UsersActions, UsersStore } from 'stores/users/UsersStore';
@@ -29,14 +30,19 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const UserDetailsPage = ({ params }: Props) => {
   const { loadedUser } = useStore(UsersStore);
+  const [paginatedUserShares, setPaginatedUserShares] = useState();
   const username = params?.username;
 
   useEffect(() => {
     UsersActions.load(username);
-  });
+
+    EntityShareActions.searchPaginatedUserShares(username, 1, 10, '').then((response) => {
+      setPaginatedUserShares(response);
+    });
+  }, []);
 
   return (
-    <DocumentTitle title={`User Detials ${username ?? ''}`}>
+    <DocumentTitle title={`User Details ${username ?? ''}`}>
       <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
         <span>
           Overview of details like profile information, settings, teams and roles.
@@ -52,7 +58,8 @@ const UserDetailsPage = ({ params }: Props) => {
                              userIsReadOnly={loadedUser?.readOnly} />
       </PageHeader>
 
-      <UserDetails user={username === params?.username ? loadedUser : undefined} />
+      <UserDetails paginatedUserShares={paginatedUserShares}
+                   user={username === loadedUser?.username ? loadedUser : undefined} />
     </DocumentTitle>
   );
 };

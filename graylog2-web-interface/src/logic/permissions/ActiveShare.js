@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { ActiveShare as ActiveShareType } from 'logic/permissions/types';
+import type { ActiveShareType } from 'logic/permissions/types';
 
 type InternalState = ActiveShareType;
 

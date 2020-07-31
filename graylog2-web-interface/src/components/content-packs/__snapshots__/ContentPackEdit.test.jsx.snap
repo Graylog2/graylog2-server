@@ -297,39 +297,32 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                           <div
                             className="col-xs-6"
                           >
-                            <ForwardRef
+                            <Button
                               bsSize="small"
                               bsStyle="info"
                               disabled={true}
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
+                                className="Button-c9cbmb-0 bNulii"
                                 disabled={true}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="small"
-                                  bsStyle="info"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                    disabled={true}
-                                    onClick={[Function]}
-                                    type="button"
-                                  >
-                                    Previous
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
+                                  Previous
+                                </button>
+                              </Button>
+                            </Button>
                           </div>
                         </Col>
                         <Col
@@ -341,39 +334,32 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                           <div
                             className="text-right col-xs-6"
                           >
-                            <ForwardRef
+                            <Button
                               bsSize="small"
                               bsStyle="info"
                               disabled={true}
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
+                                className="Button-c9cbmb-0 bNulii"
                                 disabled={true}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="small"
-                                  bsStyle="info"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                    disabled={true}
-                                    onClick={[Function]}
-                                    type="button"
-                                  >
-                                    Next
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
+                                  Next
+                                </button>
+                              </Button>
+                            </Button>
                           </div>
                         </Col>
                       </div>
@@ -1019,6 +1005,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                             >
                               <SearchForm
                                 buttonLeftMargin={5}
+                                className=""
                                 focusAfterMount={false}
                                 id="filter-input"
                                 label={null}
@@ -1038,7 +1025,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 wrapperClass="search"
                               >
                                 <div
-                                  className="search"
+                                  className="search "
                                   style={
                                     Object {
                                       "marginTop": 15,
@@ -1077,37 +1064,30 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                         }
                                       }
                                     >
-                                      <ForwardRef
+                                      <Button
                                         bsStyle="default"
                                         className="submit-button"
                                         disabled={false}
                                         type="submit"
                                       >
-                                        <Button__StyledButton
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
                                           bsStyle="default"
-                                          className="submit-button"
+                                          className="Button-c9cbmb-0 bNulii submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                                          <button
+                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
-                                            <button
-                                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                                              disabled={false}
-                                              type="submit"
-                                            >
-                                              Filter
-                                            </button>
-                                          </Button>
-                                        </Button__StyledButton>
-                                      </ForwardRef>
+                                            Filter
+                                          </button>
+                                        </Button>
+                                      </Button>
                                     </div>
                                     <div
                                       className="form-group"
@@ -1117,37 +1097,31 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                         }
                                       }
                                     >
-                                      <ForwardRef
+                                      <Button
                                         className="reset-button"
                                         onClick={[Function]}
                                         type="reset"
                                       >
-                                        <Button__StyledButton
-                                          className="reset-button"
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
+                                          bsStyle="default"
+                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                                          <button
+                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
                                           >
-                                            <button
-                                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                                              disabled={false}
-                                              onClick={[Function]}
-                                              type="reset"
-                                            >
-                                              Reset
-                                            </button>
-                                          </Button>
-                                        </Button__StyledButton>
-                                      </ForwardRef>
+                                            Reset
+                                          </button>
+                                        </Button>
+                                      </Button>
                                     </div>
                                   </form>
                                 </div>
@@ -1806,39 +1780,32 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                           <div
                             className="col-xs-6"
                           >
-                            <ForwardRef
+                            <Button
                               bsSize="small"
                               bsStyle="info"
                               disabled={true}
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
+                                className="Button-c9cbmb-0 bNulii"
                                 disabled={true}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="small"
-                                  bsStyle="info"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                    disabled={true}
-                                    onClick={[Function]}
-                                    type="button"
-                                  >
-                                    Previous
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
+                                  Previous
+                                </button>
+                              </Button>
+                            </Button>
                           </div>
                         </Col>
                         <Col
@@ -1850,39 +1817,32 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                           <div
                             className="text-right col-xs-6"
                           >
-                            <ForwardRef
+                            <Button
                               bsSize="small"
                               bsStyle="info"
                               disabled={false}
                               onClick={[Function]}
                             >
-                              <Button__StyledButton
+                              <Button
+                                active={false}
+                                block={false}
+                                bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
+                                className="Button-c9cbmb-0 bNulii"
                                 disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button
-                                  active={false}
-                                  block={false}
-                                  bsClass="btn"
-                                  bsSize="small"
-                                  bsStyle="info"
-                                  className="Button__StyledButton-c9cbmb-0 laZUlH"
+                                <button
+                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
                                   disabled={false}
                                   onClick={[Function]}
+                                  type="button"
                                 >
-                                  <button
-                                    className="Button__StyledButton-c9cbmb-0 laZUlH btn btn-sm btn-info"
-                                    disabled={false}
-                                    onClick={[Function]}
-                                    type="button"
-                                  >
-                                    Next
-                                  </button>
-                                </Button>
-                              </Button__StyledButton>
-                            </ForwardRef>
+                                  Next
+                                </button>
+                              </Button>
+                            </Button>
                           </div>
                         </Col>
                       </div>
@@ -2569,6 +2529,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                             >
                               <SearchForm
                                 buttonLeftMargin={5}
+                                className=""
                                 focusAfterMount={false}
                                 id="filter-input"
                                 label={null}
@@ -2588,7 +2549,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 wrapperClass="search"
                               >
                                 <div
-                                  className="search"
+                                  className="search "
                                   style={
                                     Object {
                                       "marginTop": 15,
@@ -2627,37 +2588,30 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                         }
                                       }
                                     >
-                                      <ForwardRef
+                                      <Button
                                         bsStyle="default"
                                         className="submit-button"
                                         disabled={false}
                                         type="submit"
                                       >
-                                        <Button__StyledButton
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
                                           bsStyle="default"
-                                          className="submit-button"
+                                          className="Button-c9cbmb-0 bNulii submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                                          <button
+                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
-                                            <button
-                                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                                              disabled={false}
-                                              type="submit"
-                                            >
-                                              Filter
-                                            </button>
-                                          </Button>
-                                        </Button__StyledButton>
-                                      </ForwardRef>
+                                            Filter
+                                          </button>
+                                        </Button>
+                                      </Button>
                                     </div>
                                     <div
                                       className="form-group"
@@ -2667,37 +2621,31 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                         }
                                       }
                                     >
-                                      <ForwardRef
+                                      <Button
                                         className="reset-button"
                                         onClick={[Function]}
                                         type="reset"
                                       >
-                                        <Button__StyledButton
-                                          className="reset-button"
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
+                                          bsStyle="default"
+                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsStyle="default"
-                                            className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                                          <button
+                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
                                           >
-                                            <button
-                                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                                              disabled={false}
-                                              onClick={[Function]}
-                                              type="reset"
-                                            >
-                                              Reset
-                                            </button>
-                                          </Button>
-                                        </Button__StyledButton>
-                                      </ForwardRef>
+                                            Reset
+                                          </button>
+                                        </Button>
+                                      </Button>
                                     </div>
                                   </form>
                                 </div>

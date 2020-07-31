@@ -41,7 +41,7 @@ export type PaginatedListType = {
 };
 
 type Props = {
-  onLoad: (PaginationInfo) => Promise<?PaginatedListType>,
+  onLoad: (paginationInfo: PaginationInfo, isSubscribed: boolean) => Promise<?PaginatedListType>,
   overrideList?: PaginatedListType,
   onDeleteItem?: (DescriptiveItem) => void,
 };
@@ -66,7 +66,15 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
   useEffect(() => _setResponse(overrideList), [overrideList]);
 
   useEffect(() => {
-    onLoad(paginationInfo).then(_setResponse);
+    let isSubscribed = true;
+
+    onLoad(paginationInfo, isSubscribed).then((response) => {
+      if (isSubscribed) {
+        _setResponse(response);
+      }
+    });
+
+    return () => { isSubscribed = false; };
   }, []);
 
   const _onPageChange = (query) => (page, perPage) => {
@@ -76,7 +84,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
       page,
       perPage,
     };
-    onLoad(pageInfo).then(_setResponse);
+    onLoad(pageInfo, true).then(_setResponse);
   };
 
   const _onSearch = (query) => {
@@ -85,7 +93,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
       page: INITIAL_PAGE,
       query,
     };
-    onLoad(pageInfo).then(_setResponse);
+    onLoad(pageInfo, true).then(_setResponse);
   };
 
   const result = items && items.size > 0

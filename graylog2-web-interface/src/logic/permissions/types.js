@@ -1,27 +1,32 @@
 // @flow strict
+import * as Immutable from 'immutable';
+
+import SharedEntity from 'logic/permissions/SharedEntity';
 
 export type GRN = string;
 
-export type Capability = {|
+export type CapabilityType = {|
   id: GRN,
   title: 'Viewer' | 'Manager' | 'Owner',
 |};
 
-export type Grantee = {|
+export type GranteeType = {|
   id: GRN,
   title: string,
   type: 'global' | 'team' | 'user',
 |};
 
-export type ActiveShare = {|
+export type ActiveShareType = {|
   grant: GRN,
   grantee: GRN,
   capability: GRN,
 |};
 
-export type MissingDependency = {|
+export type SharedEntityType = {|
   id: GRN,
-  owners: Array<Grantee>,
+  owners: Array<GranteeType>,
   title: string,
   type: string,
 |};
+
+export type UserSharedEntities = Immutable.List<SharedEntity>;

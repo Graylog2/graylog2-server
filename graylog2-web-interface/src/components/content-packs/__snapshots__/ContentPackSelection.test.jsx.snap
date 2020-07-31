@@ -630,6 +630,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             >
               <SearchForm
                 buttonLeftMargin={5}
+                className=""
                 focusAfterMount={false}
                 id="filter-input"
                 label={null}
@@ -649,7 +650,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 wrapperClass="search"
               >
                 <div
-                  className="search"
+                  className="search "
                   style={
                     Object {
                       "marginTop": 15,
@@ -688,37 +689,30 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsStyle="default"
-                          className="submit-button"
+                          className="Button-c9cbmb-0 bNulii submit-button"
                           disabled={false}
                           type="submit"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
                             disabled={false}
                             type="submit"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Filter
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Filter
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                     <div
                       className="form-group"
@@ -728,37 +722,31 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        <Button__StyledButton
-                          className="reset-button"
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
+                          bsStyle="default"
+                          className="Button-c9cbmb-0 bNulii reset-button"
+                          disabled={false}
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Reset
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                   </form>
                 </div>
@@ -1501,6 +1489,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             >
               <SearchForm
                 buttonLeftMargin={5}
+                className=""
                 focusAfterMount={false}
                 id="filter-input"
                 label={null}
@@ -1520,7 +1509,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 wrapperClass="search"
               >
                 <div
-                  className="search"
+                  className="search "
                   style={
                     Object {
                       "marginTop": 15,
@@ -1559,37 +1548,30 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        <Button__StyledButton
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsStyle="default"
-                          className="submit-button"
+                          className="Button-c9cbmb-0 bNulii submit-button"
                           disabled={false}
                           type="submit"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH submit-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
                             disabled={false}
                             type="submit"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH submit-button btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Filter
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Filter
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                     <div
                       className="form-group"
@@ -1599,37 +1581,31 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         }
                       }
                     >
-                      <ForwardRef
+                      <Button
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        <Button__StyledButton
-                          className="reset-button"
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
+                          bsStyle="default"
+                          className="Button-c9cbmb-0 bNulii reset-button"
+                          disabled={false}
                           onClick={[Function]}
                           type="reset"
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 laZUlH reset-button"
+                          <button
+                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 laZUlH reset-button btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </Button__StyledButton>
-                      </ForwardRef>
+                            Reset
+                          </button>
+                        </Button>
+                      </Button>
                     </div>
                   </form>
                 </div>
