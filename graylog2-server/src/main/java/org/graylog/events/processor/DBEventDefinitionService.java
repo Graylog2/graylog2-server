@@ -71,6 +71,7 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
         } catch (Exception e) {
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
+        entityOwnerShipService.unregisterEventDefinition(id);
         return super.delete(id);
     }
 
