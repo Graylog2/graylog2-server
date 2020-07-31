@@ -1,6 +1,5 @@
 package org.graylog.storage.elasticsearch7.views.migrations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master.AcknowledgedResponse;
@@ -8,16 +7,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetInd
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.metadata.MappingMetadata;
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.IndicesAdapterES7;
-import org.graylog.storage.elasticsearch7.cat.CatApi;
-import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
-import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.ElasticsearchInstance;
-import org.graylog2.indexer.indices.IndexSettings;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,8 +23,6 @@ import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends ElasticsearchBaseTest {
 
-    private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-
     @Rule
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
@@ -41,12 +31,10 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
         return this.elasticsearch;
     }
 
-    private IndicesAdapterES7 indicesAdapter;
     private V20200730000000_AddGl2MessageIdFieldAliasForEventsES7 sut;
 
     @Before
     public void setUp() {
-        indicesAdapter = createIndicesAdapter();
         sut = new V20200730000000_AddGl2MessageIdFieldAliasForEventsES7(elasticsearch.restHighLevelClient());
     }
 
@@ -112,7 +100,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
 
     private void createIndicesWithIdMapping(String... indices) {
         for (String index : indices) {
-            indicesAdapter.create(index, IndexSettings.create(1, 0), null, null);
+            client().createIndex(index);
         }
 
         final PutMappingRequest putMappingRequest = new PutMappingRequest(indices).source(idMapping());
@@ -130,15 +118,5 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
 
     private ImmutableMap<String, Object> map(String key, Object value) {
         return ImmutableMap.of(key, value);
-    }
-
-    private IndicesAdapterES7 createIndicesAdapter() {
-        final ElasticsearchClient client = elasticsearch.elasticsearchClient();
-        return new IndicesAdapterES7(
-                client,
-                new StatsApi(objectMapper, client),
-                new CatApi(objectMapper, client),
-                new ClusterStateApi(objectMapper, client)
-        );
     }
 }
