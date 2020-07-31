@@ -86,6 +86,7 @@ class TimezoneSelect extends React.Component {
     return (
       <Select ref={(timezone) => { this.timezone = timezone; }}
               {...otherProps}
+              inputId="timezone-select"
               onChange={onChange}
               placeholder="Pick a time zone"
               options={timezones}

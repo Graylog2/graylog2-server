@@ -28,7 +28,7 @@ type AuthzRolesStoreState = {};
 type AuthzRolesStoreType = Store<AuthzRolesStoreState>;
 
 // eslint-disable-next-line camelcase
-const _responseToPaginatedList = ({ count, total, page, per_page, query, roles }: PaginatedResponse) => {
+const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [] }: PaginatedResponse) => {
   return {
     list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
     pagination: {

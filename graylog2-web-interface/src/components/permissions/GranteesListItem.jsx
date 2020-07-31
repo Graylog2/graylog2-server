@@ -5,7 +5,7 @@ import styled, { type StyledComponent } from 'styled-components';
 import { Formik, Form } from 'formik';
 
 import { type ThemeInterface } from 'theme';
-import EntityShareState, { type AvailableCapabilities } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import { Spinner, IconButton } from 'components/common';
 import Capability from 'logic/permissions/Capability';
@@ -65,7 +65,7 @@ const Actions = styled.div`
 `;
 
 type Props = {
-  availableCapabilities: AvailableCapabilities,
+  availableCapabilities: CapabilitiesList,
   currentGranteeState: CurrentGranteeState,
   grantee: SelectedGrantee,
   onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,

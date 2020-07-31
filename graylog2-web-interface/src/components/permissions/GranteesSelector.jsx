@@ -4,7 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import styled, { type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
-import EntityShareState, { type AvailableGrantees, type AvailableCapabilities } from 'logic/permissions/EntityShareState';
+import EntityShareState, { type GranteesList, type CapabilitiesList } from 'logic/permissions/EntityShareState';
 import Capability from 'logic/permissions/Capability';
 import Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/graylog';
@@ -20,8 +20,8 @@ export type SelectionRequest = {
 };
 
 type Props = {
-  availableGrantees: AvailableGrantees,
-  availableCapabilities: AvailableCapabilities,
+  availableGrantees: GranteesList,
+  availableCapabilities: CapabilitiesList,
   className?: string,
   onSubmit: SelectionRequest => Promise<EntityShareState>,
 };
@@ -69,13 +69,13 @@ const SubmitButton = styled(Button)`
   margin-left: 15px;
 `;
 
-const _granteesOptions = (grantees: AvailableGrantees) => {
+const _granteesOptions = (grantees: GranteesList) => {
   return grantees.map((grantee) => (
     { label: grantee.title, value: grantee.id, granteeType: grantee.type }
   )).toJS();
 };
 
-const _initialCapabilityId = (capabilities: AvailableCapabilities) => {
+const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   const initialCapabilityTitle = 'Viewer';
 
   return capabilities.find((capability) => capability.title === initialCapabilityTitle)?.id;

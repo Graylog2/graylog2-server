@@ -1,16 +1,38 @@
 // @flow strict
 import Reflux from 'reflux';
 
+// import * as Immutable from 'immutable';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GRN } from 'logic/permissions/types';
+// import type { GRN, SharedEntityType, UserSharedEntities } from 'logic/permissions/types';
+import type { GRN, UserSharedEntities } from 'logic/permissions/types';
+// import PaginationURL, { type AdditionalQueries } from 'util/PaginationURL';
+import permissionsMock from 'logic/permissions/mocked';
+import { type AdditionalQueries } from 'util/PaginationURL';
 import EntityShareState, { type EntityShareStateJson, type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 
 type EntityShareStoreState = {
   state: EntityShareState,
+};
+
+export type UserSharesPaginationType = {
+  count: number,
+  total: number,
+  page: number,
+  perPage: number,
+  query: string,
+  additionalQueries?: AdditionalQueries,
+};
+
+export type PaginatedUserSharesType = {
+  list: UserSharedEntities,
+  pagination: UserSharesPaginationType,
+  context: {
+    userCapabilities: { [grn: GRN]: string },
+  },
 };
 
 export type EntitySharePayload = {
@@ -20,6 +42,7 @@ export type EntitySharePayload = {
 type EntityShareActionsType = RefluxActions<{
   prepare: (GRN, ?EntitySharePayload) => Promise<EntityShareState>,
   update: (GRN, EntitySharePayload) => Promise<EntityShareState>,
+  searchPaginatedUserShares: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedUserSharesType>,
 }>;
 
 type EntityShareStoreType = Store<EntityShareStoreState>;
@@ -31,6 +54,7 @@ export const EntityShareActions: EntityShareActionsType = singletonActions(
   () => Reflux.createActions({
     prepare: { asyncResult: true },
     update: { asyncResult: true },
+    searchPaginatedUserShares: { asyncResult: true },
   }),
 );
 
@@ -59,6 +83,30 @@ export const EntityShareStore: EntityShareStoreType = singletonStore(
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
       EntityShareActions.update.promise(promise);
+
+      return promise;
+    },
+
+    searchPaginatedUserShares(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedUserSharesType> {
+      // const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
+      // const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUserSharesResponse) => {
+      //   return {
+      //     list: Immutable.List(response.entities.map((se) => SharedEntity.fromJSON(se))),
+      //     context: {
+      //       userCapabilities: response.context.user_capabilities,
+      //     },
+      //     pagination: {
+      //       count: response.count,
+      //       total: response.total,
+      //       page: response.page,
+      //       perPage: response.per_page,
+      //       query: response.query,
+      //     },
+      //   };
+      // });
+
+      const promise = permissionsMock.searchPaginatedUserSharesResponse(page, perPage, query, additionalQueries);
+      EntityShareActions.searchPaginatedUserShares.promise(promise);
 
       return promise;
     },

@@ -1,7 +1,7 @@
 // @flow strict
 import URI from 'urijs';
 
-type AdditionalQueries = { [string]: any };
+export type AdditionalQueries = { [string]: any };
 
 export default (destUrl: string, page: number, perPage: number, query: string, additional: AdditionalQueries = {}): string => {
   let uri = new URI(destUrl).addSearch('page', page)

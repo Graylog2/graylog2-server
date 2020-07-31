@@ -32,7 +32,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="modal-body"
           >
             <div
-              class="search"
+              class="search "
               style="margin-top: 15px;"
             >
               <form
@@ -137,7 +137,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
             class="modal-body"
           >
             <div
-              class="search"
+              class="search "
               style="margin-top: 15px;"
             >
               <form

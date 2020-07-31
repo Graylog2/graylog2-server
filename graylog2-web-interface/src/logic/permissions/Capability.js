@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { Capability as CapabilityType } from 'logic/permissions/types';
+import type { CapabilityType } from 'logic/permissions/types';
 
 type InternalState = CapabilityType;
 

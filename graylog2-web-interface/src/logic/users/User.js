@@ -266,10 +266,10 @@ export default class User {
       username,
       full_name: fullName,
       email,
-      permissions: permissions.toArray(),
+      permissions: permissions ? permissions.toArray() : [],
       timezone,
       preferences,
-      roles: roles.toArray(),
+      roles: roles ? roles.toArray() : [],
       read_only: readOnly,
       external,
       session_timeout_ms: sessionTimeoutMs,
@@ -392,7 +392,7 @@ class Builder {
 
   // eslint-disable-next-line no-undef
   sessionTimeoutMs(value: $PropertyType<InternalState, 'sessionTimeoutMs'>) {
-    return new Builder(this.value.set('sessionTimoutMs', value));
+    return new Builder(this.value.set('sessionTimeoutMs', value));
   }
 
   // eslint-disable-next-line no-undef

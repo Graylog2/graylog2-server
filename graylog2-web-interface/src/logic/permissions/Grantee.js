@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { Grantee as GranteeType } from 'logic/permissions/types';
+import type { GranteeType } from 'logic/permissions/types';
 
 import type { GranteeInterface } from './GranteeInterface';
 

@@ -28,6 +28,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -46,7 +47,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -339,6 +340,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
     </span>
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -357,7 +359,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -554,6 +556,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -572,7 +575,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -1039,6 +1042,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
     </span>
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -1057,7 +1061,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,

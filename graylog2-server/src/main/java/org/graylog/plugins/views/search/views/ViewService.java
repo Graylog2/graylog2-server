@@ -155,6 +155,13 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         }
     }
 
+    @Override
+    public int delete(String id) {
+        final int delete = super.delete(id);
+        entityOwnerShipService.unregisterView(id);
+        return delete;
+    }
+
     public ViewDTO update(ViewDTO viewDTO) {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
         final ViewDTO viewWithRequirements = requirementsForView(viewDTO);

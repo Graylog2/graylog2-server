@@ -90,6 +90,7 @@ const ApiRoutes = {
   EntityShareController: {
     prepare: (entityGRN) => { return { url: `/shares/entities/${entityGRN}/prepare` }; },
     update: (entityGRN) => { return { url: `/shares/entities/${entityGRN}` }; },
+    userSharesPaginated: (username) => { return { url: `/shares/user/${username}` }; },
   },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },
