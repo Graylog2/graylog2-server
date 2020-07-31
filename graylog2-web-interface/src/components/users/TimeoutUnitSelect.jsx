@@ -2,13 +2,13 @@ import React from 'react';
 
 class TimeoutUnitSelect extends React.Component {
   getValue = () => {
-    return this.session_timeout_unit.value;
+    return this.sessionTimeoutUnit.value;
   };
 
   render() {
     return (
       <select className="form-control"
-              ref={(session_timeout_unit) => { this.session_timeout_unit = session_timeout_unit; }}
+              ref={(sessionTimeoutUnit) => { this.sessionTimeoutUnit = sessionTimeoutUnit; }}
               data-testid="timeout-unit-select"
               {...this.props}>
         <option value={1000}>Seconds</option>

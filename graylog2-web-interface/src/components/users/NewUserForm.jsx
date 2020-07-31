@@ -1,3 +1,6 @@
+/* eslint-disable  */
+// We will remove this file soon, it got replaced with the UserCreate component
+
 import PropTypes from 'prop-types';
 import React from 'react';
 

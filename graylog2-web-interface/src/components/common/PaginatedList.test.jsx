@@ -29,7 +29,7 @@ describe('PaginatedList', () => {
     const onChangeStub = jest.fn();
     const { getByLabelText } = render(<PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}>The list</PaginatedList>);
 
-    const pageSizeInput = getByLabelText('Show:');
+    const pageSizeInput = getByLabelText('Show');
 
     fireEvent.change(pageSizeInput, { target: { value: 100 } });
 

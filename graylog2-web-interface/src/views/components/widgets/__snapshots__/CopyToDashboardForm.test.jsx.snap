@@ -77,8 +77,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               </form>
             </div>
             <div
-              class=" form-inline page-size"
-              style="float: right;"
+              class=" form-inline page-size pull-right"
             >
               <div
                 class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
@@ -87,13 +86,13 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                   for="page-size"
                 >
-                  Show:
+                  Show
                 </label>
                 <span>
                   <select
                     class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                     id="page-size"
-                    label="Show:"
+                    label="Show"
                     name="page-size"
                     placeholder=""
                     type="select"
@@ -226,8 +225,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               </form>
             </div>
             <div
-              class=" form-inline page-size"
-              style="float: right;"
+              class=" form-inline page-size pull-right"
             >
               <div
                 class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
@@ -236,13 +234,13 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                   for="page-size"
                 >
-                  Show:
+                  Show
                 </label>
                 <span>
                   <select
                     class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                     id="page-size"
-                    label="Show:"
+                    label="Show"
                     name="page-size"
                     placeholder=""
                     type="select"
