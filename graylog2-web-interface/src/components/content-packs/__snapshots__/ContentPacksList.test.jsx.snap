@@ -767,6 +767,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -779,12 +780,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 }
               >
                 <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                  className=" form-inline page-size pull-right"
                 >
                   <Input
                     addonAfter={null}
@@ -793,7 +789,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     buttonAfter={null}
                     help=""
                     id="page-size"
-                    label="Show:"
+                    label="Show"
                     onChange={[Function]}
                     placeholder=""
                     type="select"
@@ -826,7 +822,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                                   htmlFor="page-size"
                                 >
-                                  Show:
+                                  Show
                                 </label>
                               </ControlLabel>
                             </ControlLabel>
@@ -836,7 +832,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   bsSize="small"
                                   componentClass="select"
                                   inputRef={[Function]}
-                                  label="Show:"
+                                  label="Show"
                                   name="page-size"
                                   onChange={[Function]}
                                   placeholder=""
@@ -849,7 +845,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
@@ -859,7 +855,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     <select
                                       className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
-                                      label="Show:"
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
@@ -7003,6 +6999,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -7015,12 +7012,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                 }
               >
                 <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                  className=" form-inline page-size pull-right"
                 >
                   <Input
                     addonAfter={null}
@@ -7029,7 +7021,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     buttonAfter={null}
                     help=""
                     id="page-size"
-                    label="Show:"
+                    label="Show"
                     onChange={[Function]}
                     placeholder=""
                     type="select"
@@ -7062,7 +7054,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                                   htmlFor="page-size"
                                 >
-                                  Show:
+                                  Show
                                 </label>
                               </ControlLabel>
                             </ControlLabel>
@@ -7072,7 +7064,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   bsSize="small"
                                   componentClass="select"
                                   inputRef={[Function]}
-                                  label="Show:"
+                                  label="Show"
                                   name="page-size"
                                   onChange={[Function]}
                                   placeholder=""
@@ -7085,7 +7077,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
@@ -7095,7 +7087,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     <select
                                       className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
-                                      label="Show:"
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
@@ -7411,6 +7403,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -7423,12 +7416,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                 }
               >
                 <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                  className=" form-inline page-size pull-right"
                 >
                   <Input
                     addonAfter={null}
@@ -7437,7 +7425,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     buttonAfter={null}
                     help=""
                     id="page-size"
-                    label="Show:"
+                    label="Show"
                     onChange={[Function]}
                     placeholder=""
                     type="select"
@@ -7470,7 +7458,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                                   htmlFor="page-size"
                                 >
-                                  Show:
+                                  Show
                                 </label>
                               </ControlLabel>
                             </ControlLabel>
@@ -7480,7 +7468,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   bsSize="small"
                                   componentClass="select"
                                   inputRef={[Function]}
-                                  label="Show:"
+                                  label="Show"
                                   name="page-size"
                                   onChange={[Function]}
                                   placeholder=""
@@ -7493,7 +7481,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
@@ -7503,7 +7491,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     <select
                                       className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
-                                      label="Show:"
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
@@ -7605,6 +7593,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -7617,12 +7606,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                 }
               >
                 <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                  className=" form-inline page-size pull-right"
                 >
                   <Input
                     addonAfter={null}
@@ -7631,7 +7615,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     buttonAfter={null}
                     help=""
                     id="page-size"
-                    label="Show:"
+                    label="Show"
                     onChange={[Function]}
                     placeholder=""
                     type="select"
@@ -7664,7 +7648,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                                   htmlFor="page-size"
                                 >
-                                  Show:
+                                  Show
                                 </label>
                               </ControlLabel>
                             </ControlLabel>
@@ -7674,7 +7658,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   bsSize="small"
                                   componentClass="select"
                                   inputRef={[Function]}
-                                  label="Show:"
+                                  label="Show"
                                   name="page-size"
                                   onChange={[Function]}
                                   placeholder=""
@@ -7687,7 +7671,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
@@ -7697,7 +7681,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     <select
                                       className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
                                       id="page-size"
-                                      label="Show:"
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
