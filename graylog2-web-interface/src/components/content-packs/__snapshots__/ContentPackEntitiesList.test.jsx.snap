@@ -50,7 +50,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -327,7 +327,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"

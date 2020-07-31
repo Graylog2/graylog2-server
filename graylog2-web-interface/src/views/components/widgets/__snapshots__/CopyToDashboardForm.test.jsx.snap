@@ -39,7 +39,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 class="form-inline"
               >
                 <div
-                  class="form-group has-feedback"
+                  class="form-group "
                 >
                   <input
                     autocomplete="off"
@@ -187,7 +187,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 class="form-inline"
               >
                 <div
-                  class="form-group has-feedback"
+                  class="form-group "
                 >
                   <input
                     autocomplete="off"

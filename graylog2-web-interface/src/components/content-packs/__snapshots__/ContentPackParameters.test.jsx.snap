@@ -277,7 +277,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -943,7 +943,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -1706,7 +1706,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -2009,7 +2009,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"

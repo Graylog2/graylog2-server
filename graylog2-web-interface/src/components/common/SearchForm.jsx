@@ -202,7 +202,7 @@ class SearchForm extends React.Component {
     return (
       <div className={`${wrapperClass} ${className}`} style={{ marginTop: topMargin }}>
         <form className="form-inline" onSubmit={this._onSearch}>
-          <div className="form-group has-feedback">
+          <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
             {label && <label htmlFor="common-search-form-query-input" className="control-label">{label}</label>}
             <input id="common-search-form-query-input"
                    /* eslint-disable-next-line jsx-a11y/no-autofocus */

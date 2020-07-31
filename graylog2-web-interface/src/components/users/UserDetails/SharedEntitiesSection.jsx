@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 
+import type { PaginatedUserSharesType } from 'actions/permissions/EntityShareActions';
 import User from 'logic/users/User';
-import { type PaginatedUserSharesType } from 'stores/permissions/EntityShareStore';
 import { Spinner } from 'components/common';
 
 import SharedEntitiesOverview from './SharedEntitiesOverview';

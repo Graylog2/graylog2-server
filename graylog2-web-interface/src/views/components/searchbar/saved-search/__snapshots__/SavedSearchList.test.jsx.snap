@@ -39,7 +39,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                 class="form-inline"
               >
                 <div
-                  class="form-group has-feedback"
+                  class="form-group "
                 >
                   <input
                     autocomplete="off"
@@ -144,7 +144,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                 class="form-inline"
               >
                 <div
-                  class="form-group has-feedback"
+                  class="form-group "
                 >
                   <input
                     autocomplete="off"

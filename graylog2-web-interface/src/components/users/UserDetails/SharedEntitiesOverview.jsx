@@ -5,7 +5,8 @@ import styled from 'styled-components';
 
 import User from 'logic/users/User';
 import mockedPermissions from 'logic/permissions/mocked';
-import { EntityShareActions, type PaginatedUserSharesType } from 'stores/permissions/EntityShareStore';
+import type { PaginatedUserSharesType } from 'actions/permissions/EntityShareActions';
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import { DataTable, PaginatedList } from 'components/common';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';

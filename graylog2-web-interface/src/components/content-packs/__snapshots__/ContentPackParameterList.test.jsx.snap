@@ -59,7 +59,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -371,7 +371,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -587,7 +587,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -1073,7 +1073,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
