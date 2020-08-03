@@ -9,7 +9,7 @@ import fetch from 'logic/rest/FetchProvider';
 import type { Store } from 'stores/StoreTypes';
 import User from 'logic/users/User';
 import UserNotification from 'util/UserNotification';
-import UsersActions, { type ChangePasswordRequest } from 'actions/users/UsersActions';
+import UsersActions, { type ChangePasswordRequest, type Token } from 'actions/users/UsersActions';
 
 const UsersStore: Store<{}> = singletonStore(
   'Users',

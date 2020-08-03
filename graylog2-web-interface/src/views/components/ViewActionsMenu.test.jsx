@@ -3,7 +3,7 @@ import React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { viewsManager } from 'fixtures/users';
 
-import type { User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -63,7 +63,7 @@ jest.mock('views/stores/ViewSharingStore', () => ({
 }));
 
 describe('ViewActionsMenu', () => {
-  const SimpleViewActionMenu = ({ currentUser, ...props }: {currentUser?: User}) => (
+  const SimpleViewActionMenu = ({ currentUser, ...props }: {currentUser?: UserJSON}) => (
     <CurrentUserContext.Provider value={currentUser}>
       <ViewActionsMenu {...props} router={{}} />
     </CurrentUserContext.Provider>
