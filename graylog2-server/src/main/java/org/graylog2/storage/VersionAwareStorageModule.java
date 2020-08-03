@@ -31,18 +31,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
-import org.graylog2.storage.providers.ClusterAdapterProvider;
-import org.graylog2.storage.providers.CountsAdapterProvider;
-import org.graylog2.storage.providers.ElasticsearchBackendProvider;
-import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
-import org.graylog2.storage.providers.IndexToolsAdapterProvider;
-import org.graylog2.storage.providers.IndicesAdapterProvider;
-import org.graylog2.storage.providers.MessagesAdapterProvider;
-import org.graylog2.storage.providers.MoreSearchAdapterProvider;
-import org.graylog2.storage.providers.NodeAdapterProvider;
-import org.graylog2.storage.providers.SearchesAdapterProvider;
-import org.graylog2.storage.providers.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider;
-import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider;
+import org.graylog2.storage.providers.*;
 
 public class VersionAwareStorageModule extends AbstractModule {
     @Override
@@ -60,7 +49,12 @@ public class VersionAwareStorageModule extends AbstractModule {
                 .toProvider(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider.class);
         bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
-        bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {
-        }).toProvider(ElasticsearchBackendProvider.class);
+
+        bindQueryBackend();
+    }
+
+    private void bindQueryBackend() {
+        bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
+                .toProvider(ElasticsearchBackendProvider.class);
     }
 }
