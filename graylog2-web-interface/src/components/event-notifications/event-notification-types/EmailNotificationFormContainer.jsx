@@ -1,8 +1,9 @@
-import React from 'react';
+import * as React from 'react';
+import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 
@@ -19,9 +20,13 @@ class EmailNotificationFormContainer extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  state = {
-    users: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      users: undefined,
+    };
+  }
 
   componentDidMount() {
     this.loadUsers();
@@ -30,13 +35,11 @@ class EmailNotificationFormContainer extends React.Component {
   loadUsers = () => {
     const { currentUser } = this.props;
 
-    if (PermissionsMixin.isPermitted(currentUser.permissions, 'users:list')) {
+    if (isPermitted(currentUser.permissions, 'users:list')) {
       UsersStore.loadUsers()
-        .then((users) => {
-          this.setState({ users: users });
-        });
+        .then((users) => this.setState({ users }));
     } else {
-      this.setState({ users: [] });
+      this.setState({ users: Immutable.List() });
     }
   };
 
