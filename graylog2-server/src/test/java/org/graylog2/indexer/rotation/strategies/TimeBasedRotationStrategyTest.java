@@ -38,6 +38,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
 import static org.junit.Assert.assertEquals;
@@ -83,6 +84,19 @@ public class TimeBasedRotationStrategyTest {
     @After
     public void resetTimeProvider() {
         DateTimeUtils.setCurrentMillisSystem();
+    }
+
+    @Test
+    public void anchorCalculationShouldWorkWhenLastAnchorIsNotUTC() {
+        final DateTime initialTime = new DateTime(2020, 7, 31, 14, 48, 35, 0, DateTimeZone.UTC);
+
+        final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+
+        Period period = Period.months(1);
+        DateTime lastAnchor = initialTime.minusHours(1).withZone(DateTimeZone.forOffsetHours(2));
+        final DateTime monthAnchor = TimeBasedRotationStrategy.determineRotationPeriodAnchor(lastAnchor, period);
+        assertThat(monthAnchor).isEqualTo(DateTime.parse("2020-07-01T00:00:00.000Z"));
     }
 
     @Test
@@ -326,7 +340,7 @@ public class TimeBasedRotationStrategyTest {
 
         when(indexSetConfig1.id()).thenReturn("id1");
         when(indexSetConfig2.id()).thenReturn("id2");
-        
+
         when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
         when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
 
