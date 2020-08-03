@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
-import View, { type ViewType } from 'views/logic/views/View';
+import type { ViewType } from 'views/logic/views/View';
 import type { ThemeInterface } from 'theme';
 import { type SearchPageLayout } from 'views/components/contexts/SearchPageLayoutContext';
 import { type ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
