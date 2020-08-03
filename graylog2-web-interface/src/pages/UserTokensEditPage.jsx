@@ -10,7 +10,7 @@ import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
 import { UsersActions, UsersStore } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
-import { Headline } from 'components/users/SectionComponent';
+import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
 import UserManagementLinks from 'components/users/UserManagementLinks';
 import DocumentationLink from 'components/support/DocumentationLink';

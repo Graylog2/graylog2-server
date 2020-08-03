@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import User from 'logic/users/User';
-
-import SectionComponent from '../SectionComponent';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
   user: User,

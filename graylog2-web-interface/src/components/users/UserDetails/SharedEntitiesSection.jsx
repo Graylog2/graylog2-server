@@ -5,10 +5,9 @@ import { useState } from 'react';
 import type { PaginatedUserSharesType } from 'actions/permissions/EntityShareActions';
 import User from 'logic/users/User';
 import { Spinner } from 'components/common';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 import SharedEntitiesOverview from './SharedEntitiesOverview';
-
-import SectionComponent from '../SectionComponent';
 
 type Props = {
   username: $PropertyType<User, 'username'>,

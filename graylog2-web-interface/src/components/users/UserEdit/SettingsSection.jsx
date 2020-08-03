@@ -4,8 +4,8 @@ import { Formik, Form } from 'formik';
 
 import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
-import SectionComponent from '../SectionComponent';
 import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 

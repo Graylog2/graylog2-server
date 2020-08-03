@@ -3,7 +3,7 @@ import styled, { type StyledComponent, css } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
 
-const MainDetailsGrid: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
+const SectionGrid: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-column-gap: 40px;
@@ -13,4 +13,4 @@ const MainDetailsGrid: StyledComponent<{}, ThemeInterface, HTMLDivElement> = sty
   }
 `);
 
-export default MainDetailsGrid;
+export default SectionGrid;

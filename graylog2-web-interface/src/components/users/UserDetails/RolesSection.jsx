@@ -9,8 +9,7 @@ import PaginatedItemOverview, {
   type PaginationInfo,
   type PaginatedListType,
 } from 'components/common/PaginatedItemOverview';
-
-import SectionComponent from '../SectionComponent';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
   user: User,

@@ -16,7 +16,7 @@ import ProfileSection from './ProfileSection';
 import RolesSection from './RolesSection';
 import TeamsSection from './TeamsSection';
 
-import MainDetailsGrid from '../UserDetails/MainDetailsGrid';
+import SectionGrid from '../../common/Section/SectionGrid';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -49,7 +49,7 @@ const UserEdit = ({ user }: Props) => {
 
   return (
     <>
-      <MainDetailsGrid>
+      <SectionGrid>
         <div>
           <ProfileSection user={user}
                           onSubmit={(data) => _updateUser(data, currentUser, user)} />
@@ -63,7 +63,7 @@ const UserEdit = ({ user }: Props) => {
           <TeamsSection user={user}
                         onSubmit={(data) => _updateUser(data, currentUser, user)} />
         </div>
-      </MainDetailsGrid>
+      </SectionGrid>
     </>
   );
 };

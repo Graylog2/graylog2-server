@@ -14,10 +14,9 @@ import PaginatedItemOverview, {
   type PaginatedListType,
   type DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 import RolesSelector from './RolesSelector';
-
-import SectionComponent from '../SectionComponent';
 
 type Props = {
   user: User,
