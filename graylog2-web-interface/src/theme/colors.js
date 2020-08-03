@@ -2,6 +2,7 @@
 import PropTypes from 'prop-types';
 
 import teinte from './variants/teinte';
+import noire from './variants/noire';
 
 export type Colors = {
   brand: {
@@ -247,11 +248,18 @@ export const colorsPropTypes = PropTypes.shape({
   }),
 });
 
-const colors = {
-  ...teinte,
+type Modes = {
+  teinte: Colors,
+  noire: Colors,
+};
+
+const colors: Modes = {
+  teinte,
+  noire,
 };
 
 export default colors;
 export {
+  noire,
   teinte,
 };
