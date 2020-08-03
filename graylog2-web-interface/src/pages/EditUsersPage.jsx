@@ -6,8 +6,8 @@ import { Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import UserForm from 'components/users/UserForm';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
+import { UsersActions } from 'stores/users/UsersStore';
 
-const UsersStore = StoreProvider.getStore('Users');
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 class EditUsersPage extends React.Component {
@@ -34,7 +34,7 @@ class EditUsersPage extends React.Component {
   }
 
   _loadUser = (username) => {
-    UsersStore.load(username).then((user) => {
+    UsersActions.load(username).then((user) => {
       this.setState({ user: user.toJSON() });
     });
   };

@@ -17,10 +17,10 @@ import TimeoutInput from 'components/users/TimeoutInput';
 import EditRolesForm from 'components/users/EditRolesForm';
 import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
+import { UsersActions } from 'stores/users/UsersStore';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const UsersStore = StoreProvider.getStore('Users');
 
 const UserForm = createReactClass({
   displayName: 'UserForm',
@@ -103,7 +103,7 @@ const UserForm = createReactClass({
 
     request.password = this.inputs.password.getValue();
 
-    UsersStore.changePassword(this.props.user.username, request).then(() => {
+    UsersActions.changePassword(this.props.user.username, request).then(() => {
       UserNotification.success('Password updated successfully.', 'Success');
 
       if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
@@ -117,7 +117,7 @@ const UserForm = createReactClass({
   _updateUser(evt) {
     evt.preventDefault();
 
-    UsersStore.update(this.props.user.username, this.state.user).then(() => {
+    UsersActions.update(this.props.user.username, this.state.user).then(() => {
       UserNotification.success('User updated successfully.', 'Success');
 
       if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {

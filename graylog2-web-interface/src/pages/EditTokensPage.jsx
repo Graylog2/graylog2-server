@@ -7,8 +7,8 @@ import TokenList from 'components/users/TokenList';
 import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
+import { UsersActions } from 'stores/users/UsersStore';
 
-const UsersStore = StoreProvider.getStore('Users');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const EditTokensPage = createReactClass({
@@ -40,7 +40,7 @@ const EditTokensPage = createReactClass({
 
   _loadTokens(username) {
     if (this._canListTokens(username)) {
-      UsersStore.loadTokens(username).then((tokens) => {
+      UsersActions.loadTokens(username).then((tokens) => {
         this.setState({ tokens: tokens });
       });
     } else {
@@ -54,7 +54,7 @@ const EditTokensPage = createReactClass({
   },
 
   _deleteToken(tokenId, tokenName) {
-    const promise = UsersStore.deleteToken(this.props.params.username, tokenId, tokenName);
+    const promise = UsersActions.deleteToken(this.props.params.username, tokenId, tokenName);
 
     this.setState({ deletingToken: tokenId });
 
@@ -65,7 +65,7 @@ const EditTokensPage = createReactClass({
   },
 
   _createToken(tokenName) {
-    const promise = UsersStore.createToken(this.props.params.username, tokenName);
+    const promise = UsersActions.createToken(this.props.params.username, tokenName);
 
     this.setState({ creatingToken: true });
 

@@ -6,11 +6,11 @@ import { Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
+import { UsersActions } from 'stores/users/UsersStore';
 
 import EmailNotificationForm from './EmailNotificationForm';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
-const { UsersStore } = CombinedProvider.get('Users');
 
 class EmailNotificationFormContainer extends React.Component {
   static propTypes = {
@@ -36,7 +36,7 @@ class EmailNotificationFormContainer extends React.Component {
     const { currentUser } = this.props;
 
     if (isPermitted(currentUser.permissions, 'users:list')) {
-      UsersStore.loadUsers()
+      UsersActions.loadUsers()
         .then((users) => this.setState({ users }));
     } else {
       this.setState({ users: Immutable.List() });
