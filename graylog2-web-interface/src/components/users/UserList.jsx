@@ -51,7 +51,7 @@ const UserList = createReactClass({
 
     promise.done((users) => {
       this.setState({
-        users: users,
+        users: users.toJS().map((user) => user.toJSON()),
       });
     });
   },
@@ -221,6 +221,7 @@ const UserList = createReactClass({
 
   render() {
     const { roles, users } = this.state;
+    console.log(users);
     const filterKeys = ['username', 'full_name', 'email', 'client_address'];
     const headers = ['', 'Name', 'Username', 'Email Address', 'Client Address', 'Role', 'Actions'];
 
