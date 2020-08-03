@@ -1,9 +1,20 @@
 // @flow strict
 import Reflux from 'reflux';
 
+import User from 'logic/users/User';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
-import type { UserJSON as User, ChangePasswordRequest, Token } from 'stores/users/UsersStore';
+
+export type Token = {
+  token_name: string,
+  token: string,
+  last_access: string,
+};
+
+export type ChangePasswordRequest = {
+  old_password: string,
+  password: string,
+};
 
 type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,
