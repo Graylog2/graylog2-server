@@ -1,32 +1,12 @@
 // @flow strict
 import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-
-type StartPage = {
-  id: string,
-  type: string,
-};
-
-export type User = {
-  username: string,
-  id: string,
-  full_name: string,
-  email: string,
-  permissions: string[],
-  timezone: string,
-  preferences?: any,
-  roles: string[],
-
-  read_only: boolean,
-  external: boolean,
-  session_timeout_ms: number,
-
-  startpage?: StartPage,
-};
+import User from 'logic/users/User';
 
 type Token = {
   token_name: string,
@@ -41,17 +21,17 @@ type ChangePasswordRequest = {
 
 const UsersStore = Reflux.createStore({
   create(request: any): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.create().url);
+    const url = qualifyUrl(ApiRoutes.UsersApiController.create().url);
     const promise = fetch('POST', url, request);
 
     return promise;
   },
 
-  loadUsers(): Promise<User[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list().url);
+  loadUsers(): Promise<Immutable.List<User>> {
+    const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
     const promise = fetch('GET', url)
       .then(
-        (response) => response.users,
+        (response) => Immutable.List(response.users.map((user) => User.fromJSON(user))),
         (error) => {
           if (error.additional.status !== 404) {
             UserNotification.error(`Loading user list failed with status: ${error}`,
@@ -64,8 +44,8 @@ const UsersStore = Reflux.createStore({
   },
 
   load(username: string): Promise<User> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
-    const promise = fetch('GET', url);
+    const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
+    const promise = fetch('GET', url).then((loadedUser) => User.fromJSON(loadedUser));
 
     promise.catch((error) => {
       UserNotification.error(`Loading user failed with status: ${error}`,
@@ -76,7 +56,7 @@ const UsersStore = Reflux.createStore({
   },
 
   deleteUser(username: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(username)).url);
+    const url = qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(username)).url);
     const promise = fetch('DELETE', url);
 
     promise.then(() => {
@@ -92,21 +72,21 @@ const UsersStore = Reflux.createStore({
   },
 
   changePassword(username: string, request: ChangePasswordRequest): void {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
+    const url = qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
     const promise = fetch('PUT', url, request);
 
     return promise;
   },
 
   update(username: string, request: any): void {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
+    const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
     const promise = fetch('PUT', url, request);
 
     return promise;
   },
 
   createToken(username: string, tokenName: string): Promise<Token> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
+    const url = qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
       encodeURIComponent(tokenName)).url);
     const promise = fetch('POST', url);
 
@@ -114,7 +94,7 @@ const UsersStore = Reflux.createStore({
   },
 
   deleteToken(username: string, tokenId: string, tokenName: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
+    const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
       encodeURIComponent(tokenId)).url, {});
     const promise = fetch('DELETE', url);
 
@@ -131,7 +111,7 @@ const UsersStore = Reflux.createStore({
   },
 
   loadTokens(username: string): Promise<Token[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
+    const url = qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
     const promise = fetch('GET', url)
       .then(
         (response) => response.tokens,
