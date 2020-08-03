@@ -59,7 +59,7 @@ public class DefaultGranteeService implements GranteeService {
 
     private AvailableGrantee getGlobalGrantee() {
         return AvailableGrantee.create(
-                grnRegistry.GLOBAL_USER_GRN(),
+                grnRegistry.GLOBAL_USER_GRN,
                 "global",
                 "Everyone"
         );
