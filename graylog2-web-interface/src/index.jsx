@@ -10,7 +10,6 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import AppFacade from 'routing/AppFacade';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import CustomizationProvider from 'contexts/CustomizationProvider';
-import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import ViewsBindings from 'views/bindings';
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));
@@ -22,11 +21,9 @@ Reflux.setPromiseFactory((handlers) => new Promise(handlers));
 function renderAppContainer(appContainer) {
   ReactDOM.render(
     <CustomizationProvider>
-      <CurrentUserProvider>
-        <GraylogThemeProvider>
-          <AppFacade />
-        </GraylogThemeProvider>
-      </CurrentUserProvider>
+      <GraylogThemeProvider>
+        <AppFacade />
+      </GraylogThemeProvider>
     </CustomizationProvider>,
     appContainer,
   );

@@ -8,4 +8,6 @@ export type ThemeInterface = {
   colors: Colors,
   fonts: Fonts,
   utils: Utils,
+  mode: string,
+  changeMode: (string) => any,
 };

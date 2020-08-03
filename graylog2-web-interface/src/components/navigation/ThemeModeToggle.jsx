@@ -2,18 +2,17 @@
 /* eslint-disable camelcase */
 import * as React from 'react';
 import styled, { withTheme, type StyledComponent } from 'styled-components';
-import * as PropTypes from 'prop-types';
 
 import { Icon } from 'components/common';
 import { themePropTypes, type ThemeInterface } from 'theme';
 import {
-  PREFERENCES_THEME_MODE,
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
-import StoreProvider from 'injection/StoreProvider';
 
-const PreferencesStore = StoreProvider.getStore('Preferences');
+type Props = {
+  theme: ThemeInterface,
+};
 
 const ThemeModeToggleWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
@@ -88,19 +87,11 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
   }
 `);
 
-const ThemeModeToggle = ({ theme, username }) => {
-  const [userPreferences, setUserPreferences] = React.useState();
-
-  React.useEffect(() => {
-    PreferencesStore.loadUserPreferences(username, (preferences) => {
-      setUserPreferences(preferences);
-    });
-  }, [username]);
-
+const ThemeModeToggle = ({ theme }: Props) => {
   const toggleThemeMode = (event) => {
     const nextMode = event.target.checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
 
-    PreferencesStore.saveUserPreferences(username, { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode });
+    theme.changeMode(nextMode);
   };
 
   return (
@@ -120,7 +111,6 @@ const ThemeModeToggle = ({ theme, username }) => {
 
 ThemeModeToggle.propTypes = {
   theme: themePropTypes.isRequired,
-  username: PropTypes.string.isRequired,
 };
 
 export default withTheme(ThemeModeToggle);

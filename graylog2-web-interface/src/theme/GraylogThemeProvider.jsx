@@ -1,40 +1,55 @@
 /* eslint-disable camelcase */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
-import find from 'lodash/find';
 
+import { useStore } from 'stores/connect';
 import { breakpoints, colors, fonts, utils } from 'theme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import StoreProvider from 'injection/StoreProvider';
-import CurrentUserContext from 'contexts/CurrentUserContext';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import { PREFERENCES_THEME_MODE, THEME_MODE_LIGHT } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
 
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const PreferencesStore = StoreProvider.getStore('Preferences');
 
 const GraylogThemeProvider = ({ children }) => {
-  const currentUser = useContext(CurrentUserContext);
+  const [mode, setMode] = useState(DEFAULT_THEME_MODE);
+  const [themeColors, setThemeColors] = useState(colors[mode]);
+  const [userPreferences, setUserPreferences] = useState();
 
-  if (!currentUser) { return null; }
+  const currentUser = useStore(CurrentUserStore, (userStore) => {
+    setUserPreferences(userStore?.currentUser?.preferences);
 
-  const [mode, setMode] = useState(THEME_MODE_LIGHT);
-  const themeColors = colors[mode];
+    return userStore?.currentUser;
+  });
 
   useEffect(() => {
-    PreferencesStore.loadUserPreferences(currentUser.username, (preferences) => {
-      const themePreferences = find(preferences, (pref) => pref.name === PREFERENCES_THEME_MODE);
+    if (userPreferences) {
+      setMode(userPreferences[PREFERENCES_THEME_MODE] || DEFAULT_THEME_MODE);
+    }
+  }, [userPreferences]);
 
-      if (themePreferences) {
-        setMode(themePreferences.value);
-      }
-    });
-  }, [currentUser]);
+  useEffect(() => {
+    setThemeColors(colors[mode]);
+  }, [mode]);
+
+  const handleModeChange = (nextMode) => {
+    if (colors[nextMode]) {
+      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
+
+      setUserPreferences(nextPreferences);
+
+      PreferencesStore.saveUserPreferences(currentUser.username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
+    }
+  };
 
   return (
     <ThemeProvider theme={{
       mode,
+      changeMode: handleModeChange,
       breakpoints,
       colors: themeColors,
       fonts,
