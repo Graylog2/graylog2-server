@@ -35,7 +35,7 @@ class EditUsersPage extends React.Component {
 
   _loadUser = (username) => {
     UsersStore.load(username).then((user) => {
-      this.setState({ user: user });
+      this.setState({ user: user.toJSON() });
     });
   };
 
