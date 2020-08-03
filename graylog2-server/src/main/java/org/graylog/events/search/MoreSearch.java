@@ -147,7 +147,6 @@ public class MoreSearch {
         }
 
         moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
-        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, scrollTime, batchSize, resultCallback::call);
     }
 
     public Set<Stream> loadStreams(Set<String> streamIds) {
