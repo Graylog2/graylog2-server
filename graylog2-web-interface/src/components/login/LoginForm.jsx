@@ -57,11 +57,13 @@ const LoginForm = ({ onErrorChange }) => {
              id="username"
              type="text"
              placeholder="Username"
+             autoComplete="username"
              autoFocus />
 
       <Input ref={(password) => { passwordInput = password; }}
              id="password"
              type="password"
+             autoComplete="current-password"
              placeholder="Password" />
 
       <StyledFormGroup>
