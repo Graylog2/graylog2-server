@@ -27,10 +27,7 @@ import org.mockito.ArgumentCaptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
@@ -103,6 +100,19 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
         sut.upgrade();
 
         verify(elasticsearchAdapter, never()).addGl2MessageIdFieldAlias(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"5", "6"})
+    void deletesMigrationCompletedMarkerForElasticsearchVersionBelow7(String version) {
+        final V20200730000000_AddGl2MessageIdFieldAliasForEvents sut = buildSut(version);
+
+        when(clusterConfigService.get(V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted.class))
+                .thenReturn(V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted.create(ImmutableSet.of()));
+
+        sut.upgrade();
+
+        verify(clusterConfigService).remove(V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted.class);
     }
 
     private void mockConfiguredEventPrefixes(String eventsPrefix, String systemEventsPrefix) {

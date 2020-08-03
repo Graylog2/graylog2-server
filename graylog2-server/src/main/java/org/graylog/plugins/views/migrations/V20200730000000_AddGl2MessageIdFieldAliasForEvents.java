@@ -81,6 +81,11 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
             LOG.debug("Skipping migration, because Elasticsearch major version of {} " +
                             "is lower than the required minimum version of {}.",
                     elasticsearchMajorVersion, MINIMUM_ELASTICSEARCH_VERSION);
+            if (hasCompletedBefore()) {
+                // This must be a downgrade. We remove the completed marker, so indices created with this lower version
+                // would be fixed in case of another upgrade where this migration would then run again.
+                clusterConfigService.remove(MigrationCompleted.class);
+            }
             return true;
         }
         if (hasCompletedBefore()) {

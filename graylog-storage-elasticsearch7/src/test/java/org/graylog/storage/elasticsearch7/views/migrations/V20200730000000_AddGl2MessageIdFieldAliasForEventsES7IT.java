@@ -56,6 +56,17 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsES7IT extends Ela
         assertFieldAliasIsNotPresentForIndices("aaa_0", "aaa_1");
     }
 
+    @Test
+    public void addingFieldAliasesIsIdempotent() {
+        createIndicesWithIdMapping("aaa_0", "bbb_0");
+
+        sut.addGl2MessageIdFieldAlias(ImmutableSet.of("aaa"));
+        sut.addGl2MessageIdFieldAlias(ImmutableSet.of("aaa"));
+
+        assertFieldAliasIsPresentForIndices("aaa_0");
+        assertFieldAliasIsNotPresentForIndices("bbb_0");
+    }
+
     private void assertFieldAliasIsPresentForIndices(String... indices) {
         final GetIndexResponse response = getIndices(indices);
 
