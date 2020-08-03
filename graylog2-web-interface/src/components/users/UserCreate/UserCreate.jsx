@@ -17,7 +17,7 @@ import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
 
-import { Headline } from '../SectionComponent';
+import { Headline } from '../../common/Section/SectionComponent';
 
 const _onSubmit = (formData, setSubmitError) => {
   const data = { ...formData, permissions: [] };

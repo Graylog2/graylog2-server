@@ -5,9 +5,11 @@ import { useState } from 'react';
 import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-
-import PaginatedItemOverview, { type PaginationInfo, type PaginatedListType } from '../PaginatedItemOverview';
-import SectionComponent from '../SectionComponent';
+import PaginatedItemOverview, {
+  type PaginationInfo,
+  type PaginatedListType,
+} from 'components/common/PaginatedItemOverview';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
   user: User,
