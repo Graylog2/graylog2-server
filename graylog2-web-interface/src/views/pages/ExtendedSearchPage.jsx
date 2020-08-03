@@ -49,6 +49,8 @@ const GridContainer: StyledComponent<{ interactive: boolean }, void, HTMLDivElem
   ${({ interactive }) => (interactive ? css`
     height: calc(100vh - 50px);
     display: flex;
+    overflow: hidden;
+    
     > *:nth-child(2) {
       flex-grow: 1;
     }
