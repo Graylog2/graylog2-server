@@ -32,7 +32,7 @@ class UserMenu extends React.Component {
         <MenuItem header>{fullName}</MenuItem>
         <MenuItem divider />
         <MenuItem header>
-          <ThemeModeToggle />
+          <ThemeModeToggle username={loginName} />
         </MenuItem>
         <MenuItem divider />
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(loginName))}>

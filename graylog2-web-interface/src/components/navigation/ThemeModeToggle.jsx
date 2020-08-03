@@ -1,25 +1,26 @@
 // @flow strict
 /* eslint-disable camelcase */
-import React from 'react';
+import * as React from 'react';
 import styled, { withTheme, type StyledComponent } from 'styled-components';
+import * as PropTypes from 'prop-types';
 
-import CombinedProvider from 'injection/CombinedProvider';
 import { Icon } from 'components/common';
 import { themePropTypes, type ThemeInterface } from 'theme';
 import {
-  CUSTOMIZATION_THEME_MODE,
+  PREFERENCES_THEME_MODE,
   THEME_MODE_LIGHT,
   THEME_MODE_DARK,
 } from 'theme/constants';
+import StoreProvider from 'injection/StoreProvider';
 
-const { CustomizationsActions } = CombinedProvider.get('Customizations');
+const PreferencesStore = StoreProvider.getStore('Preferences');
 
 const ThemeModeToggleWrap: StyledComponent<{}, void, HTMLDivElement> = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const ModeIcon: StyledComponent<{currentMode: boolean}, ThemeInterface, SVGElement> = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
+const ModeIcon: StyledComponent<{currentMode: boolean}, ThemeInterface, typeof Icon> = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
   opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
   color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.default)};
 `;
@@ -87,15 +88,21 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
   }
 `);
 
-const updateThemeMode = (theme_mode) => CustomizationsActions.update(CUSTOMIZATION_THEME_MODE, { theme_mode });
+const ThemeModeToggle = ({ theme, username }) => {
+  const [userPreferences, setUserPreferences] = React.useState();
 
-const toggleThemeMode = (event) => {
-  const nextMode = event.target.checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+  React.useEffect(() => {
+    PreferencesStore.loadUserPreferences(username, (preferences) => {
+      setUserPreferences(preferences);
+    });
+  }, [username]);
 
-  updateThemeMode(nextMode);
-};
+  const toggleThemeMode = (event) => {
+    const nextMode = event.target.checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
 
-const ThemeModeToggle = ({ theme }) => {
+    PreferencesStore.saveUserPreferences(username, { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode });
+  };
+
   return (
     <ThemeModeToggleWrap>
       <ModeIcon name="sun" currentMode={theme.mode === THEME_MODE_LIGHT} />
@@ -113,6 +120,7 @@ const ThemeModeToggle = ({ theme }) => {
 
 ThemeModeToggle.propTypes = {
   theme: themePropTypes.isRequired,
+  username: PropTypes.string.isRequired,
 };
 
 export default withTheme(ThemeModeToggle);
