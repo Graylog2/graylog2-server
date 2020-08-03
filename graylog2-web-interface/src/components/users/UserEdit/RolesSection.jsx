@@ -8,12 +8,16 @@ import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { UsersActions } from 'stores/users/UsersStore';
+import PaginatedItemOverview, {
+  defaultPageInfo,
+  type PaginationInfo,
+  type PaginatedListType,
+  type DescriptiveItem,
+} from 'components/common/PaginatedItemOverview';
 
 import RolesSelector from './RolesSelector';
 
-import PaginatedItemOverview, { defaultPageInfo, type PaginationInfo, type PaginatedListType } from '../PaginatedItemOverview';
 import SectionComponent from '../SectionComponent';
-import type { DescriptiveItem } from '../PaginatedItemOverview';
 
 type Props = {
   user: User,
