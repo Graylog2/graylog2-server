@@ -36,7 +36,8 @@ class ContentPackParameterList extends React.Component {
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(newProps) {
     const { filter } = this.state;
 
     this._filterParameters(filter, newProps.contentPack.parameters);

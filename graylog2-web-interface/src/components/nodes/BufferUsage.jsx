@@ -36,7 +36,8 @@ const BufferUsage = createReactClass({
 
   mixins: [Reflux.connect(MetricsStore)],
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     const { nodeId } = this.props;
     const prefix = this._metricPrefix();
     const metricNames = [

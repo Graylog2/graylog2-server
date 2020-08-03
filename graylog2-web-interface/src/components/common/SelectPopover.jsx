@@ -85,7 +85,8 @@ class SelectPopover extends React.Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { items, selectedItems } = this.props;
     const { filterText } = this.state;
 

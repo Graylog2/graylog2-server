@@ -25,7 +25,8 @@ class EditUsersPage extends React.Component {
     this._loadUser(params.username);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { params } = this.props;
 
     if (params.username !== nextProps.params.username) {

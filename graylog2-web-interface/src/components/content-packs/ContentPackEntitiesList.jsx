@@ -34,7 +34,8 @@ class ContentPackEntitiesList extends React.Component {
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(newProps) {
     const { filter } = this.state;
 
     this._filterEntities(filter, newProps.contentPack.entities);

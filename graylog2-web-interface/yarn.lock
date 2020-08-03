@@ -8093,8 +8093,8 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
     react-addons-pure-render-mixin "15.6.2"
     react-bootstrap "0.33.1"
     react-dom "16.13.1"
-    react-router "3.2.1"
-    react-router-bootstrap "0.23.2"
+    react-router "3.2.6"
+    react-router-bootstrap "0.23.3"
     reflux "0.2.13"
     styled-components "5.1.1"
     webpack "4.43.0"
@@ -8281,12 +8281,7 @@ hmac-drbg@^1.0.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.1"
 
-hoist-non-react-statics@^2.3.1:
-  version "2.5.5"
-  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.5.tgz#c5903cf409c0dfd908f388e619d86b9c1174cb47"
-  integrity sha512-rqcy4pJo55FTTLWt+bU8ukscqHeE/e9KWvsOW2b/a3afxQZhwkQdT1rPPCJ0rYXdj4vNcasY8zHTH+jF/qStxw==
-
-hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.0.1, hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1:
+hoist-non-react-statics@^3.0.1, hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1, hoist-non-react-statics@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
@@ -12693,7 +12688,7 @@ prop-types-extra@^1.0.1:
     react-is "^16.3.2"
     warning "^4.0.0"
 
-prop-types@15.7.2, prop-types@15.x, prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@15.7.2, prop-types@15.x, prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -13161,7 +13156,7 @@ react-input-autosize@^2.2.1:
   dependencies:
     prop-types "^15.5.8"
 
-react-is@^16.12.0, react-is@^16.3.2, react-is@^16.7.0, react-is@^16.8.1:
+react-is@^16.12.0, react-is@^16.13.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
@@ -13268,24 +13263,25 @@ react-rnd@^10.1.1:
     react-draggable "4.2.0"
     tslib "1.10.0"
 
-react-router-bootstrap@0.23.2:
-  version "0.23.2"
-  resolved "https://registry.yarnpkg.com/react-router-bootstrap/-/react-router-bootstrap-0.23.2.tgz#0d04015d78f846c2e9afe4cc19b2a64b39d6f6ff"
-  integrity sha1-DQQBXXj4RsLpr+TMGbKmSznW9v8=
+react-router-bootstrap@0.23.3:
+  version "0.23.3"
+  resolved "https://registry.yarnpkg.com/react-router-bootstrap/-/react-router-bootstrap-0.23.3.tgz#970c35c53c04c61fb6b110d4ff651a7e8a73b2ba"
+  integrity sha1-lww1xTwExh+2sRDU/2Uafopzsro=
   dependencies:
     prop-types "^15.5.8"
 
-react-router@3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/react-router/-/react-router-3.2.1.tgz#b9a3279962bdfbe684c8bd0482b81ef288f0f244"
-  integrity sha512-SXkhC0nr3G0ltzVU07IN8jYl0bB6FsrDIqlLC9dK3SITXqyTJyM7yhXlUqs89w3Nqi5OkXsfRUeHX+P874HQrg==
+react-router@3.2.6:
+  version "3.2.6"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-3.2.6.tgz#cad202796a7bba3efc2100da453b3379c9d4aeb4"
+  integrity sha512-nlxtQE8B22hb/JxdaslI1tfZacxFU8x8BJryXOnR2RxB4vc01zuHYAHAIgmBkdk1kzXaA25hZxK6KAH/+CXArw==
   dependencies:
     create-react-class "^15.5.1"
     history "^3.0.0"
-    hoist-non-react-statics "^2.3.1"
+    hoist-non-react-statics "^3.3.2"
     invariant "^2.2.1"
     loose-envify "^1.2.0"
-    prop-types "^15.5.6"
+    prop-types "^15.7.2"
+    react-is "^16.13.0"
     warning "^3.0.0"
 
 react-select-event@^4.1.4:
