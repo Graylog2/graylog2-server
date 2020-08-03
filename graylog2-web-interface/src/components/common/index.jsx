@@ -37,6 +37,7 @@ export { default as PageSizeSelect } from './PageSizeSelect';
 export { default as PaginatedList } from './PaginatedList';
 export { default as Pluralize } from './Pluralize';
 export { default as ReactGridContainer } from './ReactGridContainer';
+export { default as ReadOnlyFormGroup } from './ReadOnlyFormGroup';
 export { default as Scratchpad } from './Scratchpad';
 export { default as ScrollButton } from './ScrollButton';
 export { default as SearchForm } from './SearchForm';
