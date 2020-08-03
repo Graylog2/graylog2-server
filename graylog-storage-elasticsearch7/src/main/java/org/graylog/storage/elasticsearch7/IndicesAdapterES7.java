@@ -159,7 +159,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         return creationDate
                 .map(Long::valueOf)
-                .map(DateTime::new);
+                .map(instant -> new DateTime(instant, DateTimeZone.UTC));
     }
 
     @Override
