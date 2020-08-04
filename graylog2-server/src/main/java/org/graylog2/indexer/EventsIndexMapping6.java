@@ -22,7 +22,7 @@ public class EventsIndexMapping6 extends EventsIndexMapping {
     @Override
     protected ImmutableMap<String, Object> buildMappings() {
         return map()
-                .put(IndexMapping.TYPE_MESSAGE, super.buildMappings()) // TODO: Type name is "message" because the index field type poller is using that
+                .put(IndexMapping.TYPE_MESSAGE, super.buildMappings())
                 .build();
     }
 }
