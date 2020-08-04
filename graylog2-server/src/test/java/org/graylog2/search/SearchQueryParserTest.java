@@ -30,6 +30,9 @@ import org.mongojack.internal.query.CollectionQueryCondition;
 import org.mongojack.internal.query.CompoundQueryCondition;
 import org.mongojack.internal.query.QueryCondition;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +51,23 @@ public class SearchQueryParserTest {
     public void explicitAllowedField() throws Exception {
         SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
         final SearchQuery query = parser.parse("name:foo");
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = query.getQueryMap();
+
+        assertThat(queryMap.size()).isEqualTo(1);
+        assertThat(queryMap.get("name")).containsOnly(new SearchQueryParser.FieldValue("foo", false));
+        assertThat(query.hasDisallowedKeys()).isFalse();
+        assertThat(query.getDisallowedKeys()).isEmpty();
+
+        final DBQuery.Query dbQuery = query.toDBQuery();
+        final Collection<String> fieldNamesUsed = extractFieldNames(dbQuery.conditions());
+        assertThat(fieldNamesUsed).containsExactly("name");
+    }
+
+    @Test
+    public void decodQuery() throws UnsupportedEncodingException {
+        SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
+        final String urlEncodedQuery = URLEncoder.encode("name:foo", StandardCharsets.UTF_8.name());
+        final SearchQuery query = parser.parse(urlEncodedQuery);
         final Multimap<String, SearchQueryParser.FieldValue> queryMap = query.getQueryMap();
 
         assertThat(queryMap.size()).isEqualTo(1);
