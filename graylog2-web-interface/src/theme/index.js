@@ -21,14 +21,11 @@ const themePropTypes = PropTypes.shape({
   utils: utilsPropTypes,
 });
 
-const themeModes: Array<string> = ['teinte'];
-
 export {
   breakpoints,
   colors,
   fonts,
   utils,
-  themeModes,
   themePropTypes,
 };
 
