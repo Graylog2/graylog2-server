@@ -11,6 +11,8 @@ import PaginatedItemOverview, {
 } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
+import RolesQueryHelp from '../RolesQueryHelp';
+
 type Props = {
   user: User,
 };
@@ -39,7 +41,7 @@ const RolesSection = ({ user: { username } }: Props) => {
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <PaginatedItemOverview onLoad={_onLoad} />
+      <PaginatedItemOverview onLoad={_onLoad} queryHelper={<RolesQueryHelp />} />
     </SectionComponent>
   );
 };

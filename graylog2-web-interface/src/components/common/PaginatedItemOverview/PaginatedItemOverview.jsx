@@ -44,12 +44,13 @@ type Props = {
   onLoad: (paginationInfo: PaginationInfo, isSubscribed: boolean) => Promise<?PaginatedListType>,
   overrideList?: PaginatedListType,
   onDeleteItem?: (DescriptiveItem) => void,
+  queryHelper?: React.Node,
 };
 
 const pageSizes = [5, 10, 30];
 export const defaultPageInfo = { page: INITIAL_PAGE, perPage: pageSizes[0], query: '', total: 0, count: 0 };
 
-const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) => {
+const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper }: Props) => {
   const [items, setItems] = useState();
   const [paginationInfo, setPaginationInfo] = useState(defaultPageInfo);
 
@@ -106,7 +107,11 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
                    totalItems={paginationInfo.total}
                    pageSizes={pageSizes}
                    activePage={paginationInfo.page}>
-      <SearchForm onSearch={_onSearch} label="Filter" placeholder="Enter query to filter" searchButtonLabel="Filter" />
+      <SearchForm onSearch={_onSearch}
+                  label="Filter"
+                  placeholder="Enter query to filter"
+                  queryHelpComponent={queryHelper}
+                  searchButtonLabel="Filter" />
       <Container>
         {result}
       </Container>
@@ -117,6 +122,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem }: Props) =>
 PaginatedItemOverview.defaultProps = {
   onDeleteItem: undefined,
   overrideList: undefined,
+  queryHelper: undefined,
 };
 
 export default PaginatedItemOverview;

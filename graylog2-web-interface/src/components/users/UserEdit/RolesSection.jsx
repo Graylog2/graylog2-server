@@ -17,6 +17,7 @@ import PaginatedItemOverview, {
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import RolesSelector from './RolesSelector';
+import RolesQueryHelp from '../RolesQueryHelp';
 
 type Props = {
   user: User,
@@ -72,7 +73,10 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       </Container>
       <h3>Selected Roles</h3>
       <Container>
-        <PaginatedItemOverview onLoad={_onLoad} overrideList={roles} onDeleteItem={onDeleteRole} />
+        <PaginatedItemOverview onLoad={_onLoad}
+                               overrideList={roles}
+                               onDeleteItem={onDeleteRole}
+                               queryHelper={<RolesQueryHelp />} />
       </Container>
     </SectionComponent>
   );
