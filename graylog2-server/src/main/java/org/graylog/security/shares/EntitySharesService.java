@@ -25,9 +25,9 @@ import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
-import org.graylog.security.entities.EntityDependency;
 import org.graylog.security.entities.EntityDependencyPermissionChecker;
 import org.graylog.security.entities.EntityDependencyResolver;
+import org.graylog.security.entities.EntityDescriptor;
 import org.graylog.security.shares.EntityShareResponse.ActiveShare;
 import org.graylog.security.shares.EntityShareResponse.AvailableCapability;
 import org.graylog2.plugin.database.users.User;
@@ -190,8 +190,8 @@ public class EntitySharesService {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private ImmutableMap<GRN, Collection<EntityDependency>> checkMissingPermissionsOnDependencies(GRN entity, GRN sharingUser, EntityShareRequest shareRequest) {
-        final ImmutableSet<EntityDependency> dependencies = entityDependencyResolver.resolve(entity);
+    private ImmutableMap<GRN, Collection<EntityDescriptor>> checkMissingPermissionsOnDependencies(GRN entity, GRN sharingUser, EntityShareRequest shareRequest) {
+        final ImmutableSet<EntityDescriptor> dependencies = entityDependencyResolver.resolve(entity);
         final ImmutableSet<GRN> selectedGrantees = shareRequest.selectedGranteeCapabilities()
                 .orElse(ImmutableMap.of()).keySet();
         return entityDependencyPermissionChecker.check(sharingUser, dependencies, selectedGrantees).asMap();

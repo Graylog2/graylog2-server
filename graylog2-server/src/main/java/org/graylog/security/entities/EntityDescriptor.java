@@ -27,8 +27,8 @@ import java.util.Collections;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = EntityDependency.Builder.class)
-public abstract class EntityDependency {
+@JsonDeserialize(builder = EntityDescriptor.Builder.class)
+public abstract class EntityDescriptor {
     @JsonProperty("id")
     public abstract GRN id();
 
@@ -43,7 +43,7 @@ public abstract class EntityDependency {
     @JsonProperty("owners")
     public abstract ImmutableSet<Owner> owners();
 
-    public static EntityDependency create(GRN id, String title, Set<Owner> owners) {
+    public static EntityDescriptor create(GRN id, String title, Set<Owner> owners) {
         return builder()
                 .id(id)
                 .title(title)
@@ -61,7 +61,7 @@ public abstract class EntityDependency {
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EntityDependency.Builder().owners(Collections.emptySet());
+            return new AutoValue_EntityDescriptor.Builder().owners(Collections.emptySet());
         }
 
         @JsonProperty("id")
@@ -73,7 +73,7 @@ public abstract class EntityDependency {
         @JsonProperty("owners")
         public abstract Builder owners(Set<Owner> owners);
 
-        public abstract EntityDependency build();
+        public abstract EntityDescriptor build();
     }
 
     @AutoValue
@@ -91,7 +91,7 @@ public abstract class EntityDependency {
 
         @JsonCreator
         public static Owner create(GRN id, String title) {
-            return new AutoValue_EntityDependency_Owner(id, title);
+            return new AutoValue_EntityDescriptor_Owner(id, title);
         }
     }
 }
