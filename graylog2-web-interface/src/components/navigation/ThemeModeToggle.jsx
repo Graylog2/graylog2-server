@@ -20,7 +20,7 @@ const ThemeModeToggleWrap: StyledComponent<{}, void, HTMLDivElement> = styled.di
 
 const ModeIcon: StyledComponent<{currentMode: boolean}, ThemeInterface, typeof Icon> = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
   opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
-  color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.default)};
+  color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
 `;
 
 const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.label(({ theme }) => css`
