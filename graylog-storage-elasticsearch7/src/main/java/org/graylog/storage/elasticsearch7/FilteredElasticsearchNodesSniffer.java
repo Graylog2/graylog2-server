@@ -1,5 +1,6 @@
 package org.graylog.storage.elasticsearch7;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Node;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
@@ -7,15 +8,18 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Elastics
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class FilteredElasticsearchNodesSniffer implements NodesSniffer {
-    private final ElasticsearchNodesSniffer nodesSniffer;
+    private final NodesSniffer nodesSniffer;
     private final String attribute;
     private final String value;
 
-    public FilteredElasticsearchNodesSniffer(RestClient restClient, long sniffRequestTimeoutMillis, ElasticsearchNodesSniffer.Scheme scheme, String filter) {
+    static FilteredElasticsearchNodesSniffer create(RestClient restClient, long sniffRequestTimeoutMillis, ElasticsearchNodesSniffer.Scheme scheme, String filter) {
+        final String attribute;
+        final String value;
         if (!Strings.isNullOrEmpty(filter)) {
             final String[] conditions = filter.split(":");
             if (conditions.length < 2) {
@@ -27,7 +31,16 @@ class FilteredElasticsearchNodesSniffer implements NodesSniffer {
             attribute = null;
             value = null;
         }
-        this.nodesSniffer = new ElasticsearchNodesSniffer(restClient, sniffRequestTimeoutMillis, scheme);
+        final NodesSniffer nodesSniffer = new ElasticsearchNodesSniffer(restClient, sniffRequestTimeoutMillis, scheme);
+
+        return new FilteredElasticsearchNodesSniffer(nodesSniffer, attribute, value);
+    }
+
+    @VisibleForTesting
+    FilteredElasticsearchNodesSniffer(NodesSniffer nodesSniffer, String attribute, String value) {
+        this.nodesSniffer = nodesSniffer;
+        this.attribute = attribute;
+        this.value = value;
     }
 
     @Override
@@ -39,7 +52,13 @@ class FilteredElasticsearchNodesSniffer implements NodesSniffer {
         }
 
         return nodes.stream()
-                .filter(node -> node.getAttributes().get(attribute).contains(value))
+                .filter(node -> nodeMatchesFilter(node, attribute, value))
                 .collect(Collectors.toList());
+    }
+
+    private boolean nodeMatchesFilter(Node node, String attribute, String value) {
+        return node.getAttributes()
+                .getOrDefault(attribute, Collections.emptyList())
+                .contains(value);
     }
 }

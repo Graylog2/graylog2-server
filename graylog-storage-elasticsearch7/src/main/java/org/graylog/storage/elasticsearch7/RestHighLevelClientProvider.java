@@ -66,7 +66,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
     }
 
     private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
-        final NodesSniffer nodesSniffer = new FilteredElasticsearchNodesSniffer(
+        final NodesSniffer nodesSniffer = FilteredElasticsearchNodesSniffer.create(
                 restClient,
                 TimeUnit.SECONDS.toMillis(5),
                 mapDefaultScheme(defaultSchemeForDiscoveredNodes),
