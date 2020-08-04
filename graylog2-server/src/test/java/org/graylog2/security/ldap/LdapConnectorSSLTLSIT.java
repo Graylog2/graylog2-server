@@ -193,12 +193,11 @@ public class LdapConnectorSSLTLSIT {
     }
 
     private void assertConnectionSuccess(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException, IOException {
-        final LdapNetworkConnection connection = ldapConnector.connect(request);
-        assertThat(connection.isAuthenticated()).isTrue();
-        assertThat(connection.isConnected()).isTrue();
-        assertThat(connection.isSecured()).isTrue();
-
-        connection.close();
+        try (final LdapNetworkConnection connection = ldapConnector.connect(request)) {
+            assertThat(connection.isAuthenticated()).isTrue();
+            assertThat(connection.isConnected()).isTrue();
+            assertThat(connection.isSecured()).isTrue();
+        }
     }
 
     private void mockTrustManagerWithSystemKeystore() throws KeyStoreException, NoSuchAlgorithmException {
