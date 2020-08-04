@@ -1,4 +1,5 @@
 // @flow strict
+import PropTypes from 'prop-types';
 
 import 'opensans-npm-webfont/open_sans.css';
 import 'opensans-npm-webfont/open_sans_italic.css';
@@ -25,6 +26,27 @@ export type Fonts = {
     h6: string,
   },
 };
+
+export const fontsPropTypes = PropTypes.shape({
+  family: PropTypes.shape({
+    body: PropTypes.string,
+    monospace: PropTypes.string,
+  }),
+  size: PropTypes.shape({
+    root: PropTypes.string,
+    body: PropTypes.string,
+    huge: PropTypes.string,
+    large: PropTypes.string,
+    small: PropTypes.string,
+    tiny: PropTypes.string,
+    h1: PropTypes.string,
+    h2: PropTypes.string,
+    h3: PropTypes.string,
+    h4: PropTypes.string,
+    h5: PropTypes.string,
+    h6: PropTypes.string,
+  }),
+});
 
 const family = {
   body: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
