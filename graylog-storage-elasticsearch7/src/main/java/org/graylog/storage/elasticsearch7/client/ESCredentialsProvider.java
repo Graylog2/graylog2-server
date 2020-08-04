@@ -35,7 +35,7 @@ public class ESCredentialsProvider implements Provider<CredentialsProvider> {
                             final String username = splittedUserInfo.next();
                             final String password = splittedUserInfo.hasNext() ? splittedUserInfo.next() : null;
                             credentialsProvider.setCredentials(
-                                    new AuthScope(hostUri.getHost(), hostUri.getPort(), AuthScope.ANY_REALM, hostUri.getScheme()),
+                                    new AuthScope(hostUri.getHost(), hostUri.getPort(), AuthScope.ANY_REALM, AuthScope.ANY_SCHEME),
                                     new UsernamePasswordCredentials(username, password)
                             );
                         }
