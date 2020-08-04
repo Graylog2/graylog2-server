@@ -6,7 +6,7 @@ import * as Immutable from 'immutable';
 
 import PaginatedList, { INITIAL_PAGE } from 'components/common/PaginatedList';
 import { type ThemeInterface } from 'theme';
-import { SearchForm } from 'components/common';
+import SearchForm from 'components/common/SearchForm';
 
 import PaginatedItem from './PaginatedItem';
 

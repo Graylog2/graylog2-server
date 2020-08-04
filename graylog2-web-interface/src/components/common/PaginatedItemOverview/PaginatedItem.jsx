@@ -4,7 +4,7 @@ import styled, { css, type StyledComponent } from 'styled-components';
 import PropTypes from 'prop-types';
 
 import { type ThemeInterface } from 'theme';
-import { IconButton } from 'components/common';
+import IconButton from 'components/common/IconButton';
 
 import type { DescriptiveItem } from './PaginatedItemOverview';
 
