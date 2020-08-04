@@ -169,7 +169,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       activeKey="selection"
                       bsClass="nav"
                       bsStyle="pills"
-                      className="Nav-dzawzr-0 cLvAaF"
+                      className="Nav-dzawzr-0 inEWeN"
                       justified={false}
                       onSelect={[Function]}
                       pullLeft={false}
@@ -177,7 +177,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       stacked={true}
                     >
                       <ul
-                        className="Nav-dzawzr-0 cLvAaF nav nav-pills nav-stacked"
+                        className="Nav-dzawzr-0 inEWeN nav nav-pills nav-stacked"
                         role={null}
                       >
                         <NavItem
@@ -1658,7 +1658,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       activeKey="selection"
                       bsClass="nav"
                       bsStyle="pills"
-                      className="Nav-dzawzr-0 cLvAaF"
+                      className="Nav-dzawzr-0 inEWeN"
                       justified={false}
                       onSelect={[Function]}
                       pullLeft={false}
@@ -1666,7 +1666,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       stacked={true}
                     >
                       <ul
-                        className="Nav-dzawzr-0 cLvAaF nav nav-pills nav-stacked"
+                        className="Nav-dzawzr-0 inEWeN nav nav-pills nav-stacked"
                         role={null}
                       >
                         <NavItem

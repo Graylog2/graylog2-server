@@ -1,10 +1,10 @@
 // @flow strict
 import PropTypes from 'prop-types';
 
-import breakpoints from './breakpoints';
-import colors from './colors';
-import fonts from './fonts';
-import utils from './utils';
+import breakpoints, { breakpointPropTypes } from './breakpoints';
+import colors, { colorsPropTypes } from './colors';
+import fonts, { fontsPropTypes } from './fonts';
+import utils, { utilsPropTypes } from './utils';
 import type { ThemeInterface } from './types';
 
 const theme: ThemeInterface = {
@@ -14,14 +14,14 @@ const theme: ThemeInterface = {
   fonts,
 };
 
-const themeModes: Array<string> = ['teinte'];
-
 const themePropTypes = PropTypes.shape({
-  breakpoints: PropTypes.object,
-  colors: PropTypes.object,
-  fonts: PropTypes.object,
-  utils: PropTypes.object,
+  breakpoints: breakpointPropTypes,
+  colors: colorsPropTypes,
+  fonts: fontsPropTypes,
+  utils: utilsPropTypes,
 });
+
+const themeModes: Array<string> = ['teinte'];
 
 export {
   breakpoints,

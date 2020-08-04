@@ -80,7 +80,7 @@ const Navigation = ({ location }) => {
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
-    <StyledNavbar inverse fluid fixedTop>
+    <StyledNavbar fluid fixedTop>
       <Navbar.Header>
         <Navbar.Brand>
           <LinkContainer to={Routes.STARTPAGE}>

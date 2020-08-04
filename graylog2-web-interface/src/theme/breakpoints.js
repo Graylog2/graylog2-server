@@ -1,4 +1,6 @@
 // @flow strict
+import PropTypes from 'prop-types';
+
 const sizes: {[string]: number} = {
   xs: 480,
   sm: 768,
@@ -28,6 +30,21 @@ export type Breakpoints = {
     lg: string,
   },
 };
+
+export const breakpointPropTypes = PropTypes.shape({
+  min: PropTypes.shape({
+    xs: PropTypes.string,
+    sm: PropTypes.string,
+    md: PropTypes.string,
+    lg: PropTypes.string,
+  }),
+  max: PropTypes.shape({
+    xs: PropTypes.string,
+    sm: PropTypes.string,
+    md: PropTypes.string,
+    lg: PropTypes.string,
+  }),
+});
 
 const breakpoints: Breakpoints = {
   min,

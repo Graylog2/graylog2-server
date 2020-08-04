@@ -109,8 +109,8 @@ class SearchForm extends React.Component {
     };
   }
 
-  // eslint-disable-next-line react/no-deprecated
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { query } = this.props;
 
     // The query might get reset outside of this component so we have to adjust the internal state

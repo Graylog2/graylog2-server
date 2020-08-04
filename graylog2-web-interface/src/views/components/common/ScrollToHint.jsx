@@ -9,7 +9,8 @@ export default class ScrollToHint extends React.Component {
     value: PropTypes.any.isRequired,
   };
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.element) {
       return;
     }

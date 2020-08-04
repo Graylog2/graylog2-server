@@ -26,7 +26,8 @@ const MetricsMapper = createReactClass({
     return {};
   },
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     Object.keys(this.props.map).forEach((name) => MetricsActions.addGlobal(this.props.map[name]));
   },
 

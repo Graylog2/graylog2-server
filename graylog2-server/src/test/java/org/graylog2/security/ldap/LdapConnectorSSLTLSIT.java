@@ -18,20 +18,18 @@ package org.graylog2.security.ldap;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.exception.LdapProtocolErrorException;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
-import org.apache.directory.ldap.client.api.exception.InvalidConnectionException;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import sun.security.provider.certpath.SunCertPathBuilderException;
 
 import javax.net.ssl.TrustManager;
 import java.io.File;
@@ -60,18 +58,19 @@ public class LdapConnectorSSLTLSIT {
     private static final String NETWORK_ALIAS = "ldapserver";
     private static final Integer PORT = 389;
     private static final Integer SSL_PORT = 636;
-    public static final String ADMIN_NAME = "cn=admin,dc=example,dc=org";
-    public static final String ADMIN_PASSWORD = "admin";
-    public static final String CERTS_PATH = "/container/service/slapd/assets/certs";
+    private static final String ADMIN_NAME = "cn=admin,dc=example,dc=org";
+    private static final String ADMIN_PASSWORD = "admin";
+    private static final String CONTAINER_CERTS_PATH = "/container/service/slapd/assets/certs";
+    private static final String LOCAL_CERTS_PATH = "certs";
 
-    private final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
+    private static final GenericContainer<?> container = new GenericContainer<>("osixia/openldap:1.4.0")
             .waitingFor(Wait.forLogMessage(".*slapd starting.*", 1))
             .withEnv("LDAP_TLS_VERIFY_CLIENT", "allow")
             .withEnv("LDAP_TLS_CRT_FILENAME", "server-cert.pem")
             .withEnv("LDAP_TLS_KEY_FILENAME", "server-key.pem")
             .withEnv("LDAP_TLS_CA_CRT_FILENAME", "CA-cert.pem")
             .withEnv("LDAP_TLS_DH_PARAM_FILENAME", "dhparam.pem")
-            .withFileSystemBind(resource("certs"), CERTS_PATH, BindMode.READ_ONLY)
+            .withFileSystemBind(customCerts(), CONTAINER_CERTS_PATH, BindMode.READ_ONLY)
             .withCommand("--copy-service")
             .withNetworkAliases(NETWORK_ALIAS)
             .withExposedPorts(PORT, SSL_PORT)
@@ -81,9 +80,13 @@ public class LdapConnectorSSLTLSIT {
 
     private LdapConnector ldapConnector;
 
+    @BeforeAll
+    static void beforeAll() {
+        container.start();
+    }
+
     @BeforeEach
     void setUp() throws KeyStoreException, NoSuchAlgorithmException {
-        container.start();
         final LdapSettingsService ldapSettingsService = mock(LdapSettingsService.class);
         this.trustManagerProvider = mock(LdapConnector.TrustManagerProvider.class);
 
@@ -96,10 +99,7 @@ public class LdapConnectorSSLTLSIT {
     void shouldNotConnectViaTLSToSelfSignedCertIfValidationIsRequested() throws Exception {
         final LdapTestConfigRequest request = createTLSTestRequest(false);
 
-        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
-                .isInstanceOf(LdapException.class)
-                .hasRootCauseInstanceOf(SunCertPathBuilderException.class)
-                .hasMessage("SSL handshake failed.");
+        assertConnectionFailure(request);
     }
 
     @Test
@@ -108,9 +108,7 @@ public class LdapConnectorSSLTLSIT {
 
         final LdapTestConfigRequest request = createRequest(internalUriWithIpAddress(), true, false);
 
-        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
-                .isInstanceOf(LdapException.class)
-                .hasMessage("PROTOCOL_ERROR: The server will disconnect!");
+        assertConnectionFailure(request);
     }
 
     @Test
@@ -130,12 +128,10 @@ public class LdapConnectorSSLTLSIT {
     }
 
     @Test
-    void shouldNotConnectViaSSLToSelfSignedCertIfValidationIsRequested() throws Exception {
+    void shouldNotConnectViaSSLToSelfSignedCertIfValidationIsRequested() {
         final LdapTestConfigRequest request = createSSLTestRequest(false);
 
-        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
-                .isInstanceOf(LdapProtocolErrorException.class)
-                .hasMessage("PROTOCOL_ERROR: The server will disconnect!");
+        assertConnectionFailure(request);
     }
 
     @Test
@@ -144,9 +140,7 @@ public class LdapConnectorSSLTLSIT {
 
         final LdapTestConfigRequest request = createRequest(internalSSLUriWithIpAddress(), false, false);
 
-        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request))
-                .isInstanceOf(InvalidConnectionException.class)
-                .hasMessage("SSL handshake failed.");
+        assertConnectionFailure(request);
     }
 
     @Test
@@ -194,11 +188,16 @@ public class LdapConnectorSSLTLSIT {
         );
     }
 
-    private void assertConnectionSuccess(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
-        final LdapNetworkConnection connection = ldapConnector.connect(request);
-        assertThat(connection.isAuthenticated()).isTrue();
-        assertThat(connection.isConnected()).isTrue();
-        assertThat(connection.isSecured()).isTrue();
+    private void assertConnectionFailure(LdapTestConfigRequest request) {
+        Assertions.assertThatThrownBy(() -> ldapConnector.connect(request)).isNotNull();
+    }
+
+    private void assertConnectionSuccess(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException, IOException {
+        try (final LdapNetworkConnection connection = ldapConnector.connect(request)) {
+            assertThat(connection.isAuthenticated()).isTrue();
+            assertThat(connection.isConnected()).isTrue();
+            assertThat(connection.isSecured()).isTrue();
+        }
     }
 
     private void mockTrustManagerWithSystemKeystore() throws KeyStoreException, NoSuchAlgorithmException {
@@ -225,8 +224,8 @@ public class LdapConnectorSSLTLSIT {
         }
     }
 
-    private String resource(String path) {
-        final URL resourceUrl = this.getClass().getResource(path);
+    private static String customCerts() {
+        final URL resourceUrl = LdapConnectorSSLTLSIT.class.getResource(LOCAL_CERTS_PATH);
         try {
             final File file = Paths.get(resourceUrl.toURI()).toFile();
             return file.getAbsolutePath();

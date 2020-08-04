@@ -37,7 +37,8 @@ class ConfigurationForm extends React.Component {
     this.state = this._copyStateFromProps(this.props);
   }
 
-  componentWillReceiveProps(props) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(props) {
     const { values = {} } = this.state || {};
     const newState = this._copyStateFromProps(props);
 

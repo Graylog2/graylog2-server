@@ -131,7 +131,8 @@ const TimeUnitInput = createReactClass({
     };
   },
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { units } = this.props;
 
     if (!lodash.isEqual(units, nextProps.units)) {

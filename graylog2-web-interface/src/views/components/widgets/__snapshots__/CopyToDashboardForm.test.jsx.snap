@@ -16,7 +16,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 hMPgsT in modal"
+      class="fade Modal-nuree8-0 kdCabm in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -29,7 +29,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
           role="document"
         >
           <div
-            class="modal-body"
+            class="Modal__Body-nuree8-4 lcHrgF modal-body"
           >
             <div
               class="search "
@@ -125,7 +125,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
             />
           </div>
           <div
-            class="modal-footer"
+            class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
           >
             <button
               class="Button-c9cbmb-0 bNulii btn btn-primary"
@@ -164,7 +164,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
       class="fade modal-backdrop in"
     />
     <div
-      class="fade Modal-nuree8-0 hMPgsT in modal"
+      class="fade Modal-nuree8-0 kdCabm in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -177,7 +177,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
           role="document"
         >
           <div
-            class="modal-body"
+            class="Modal__Body-nuree8-4 lcHrgF modal-body"
           >
             <div
               class="search "
@@ -300,7 +300,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
             />
           </div>
           <div
-            class="modal-footer"
+            class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
           >
             <button
               class="Button-c9cbmb-0 bNulii btn btn-primary"

@@ -159,7 +159,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         return creationDate
                 .map(Long::valueOf)
-                .map(DateTime::new);
+                .map(instant -> new DateTime(instant, DateTimeZone.UTC));
     }
 
     @Override
@@ -345,8 +345,9 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         final IndicesAliasesRequest.AliasActions addAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
                 .index(targetIndex)
                 .alias(aliasName);
-        final IndicesAliasesRequest.AliasActions removeAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE_INDEX)
-                .index(oldIndex);
+        final IndicesAliasesRequest.AliasActions removeAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE)
+                .index(oldIndex)
+                .alias(aliasName);
         final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest()
                 .addAliasAction(removeAlias)
                 .addAliasAction(addAlias);

@@ -26,7 +26,8 @@ class MessageShow extends React.Component {
     this.state = this._getImmutableProps(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState(this._getImmutableProps(nextProps));
   }
 
