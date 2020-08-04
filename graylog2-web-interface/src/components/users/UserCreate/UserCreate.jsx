@@ -27,7 +27,7 @@ const _onSubmit = (formData, setSubmitError) => {
 
   UsersActions.create(data).then(() => {
     UserNotification.success(`User ${formData.username} was created successfully.`, 'Success!');
-    history.replace(Routes.SYSTEM.USERS.OVERVIEW);
+    history.push(Routes.SYSTEM.USERS.OVERVIEW);
   }, (error) => setSubmitError(error));
 };
 
