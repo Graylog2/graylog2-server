@@ -26,7 +26,7 @@ import javax.inject.Inject;
 
 public class DefaultGranteeService implements GranteeService {
     private final UserService userService;
-    private final GRNRegistry grnRegistry;
+    protected final GRNRegistry grnRegistry;
 
     @Inject
     public DefaultGranteeService(UserService userService, GRNRegistry grnRegistry) {
@@ -50,7 +50,7 @@ public class DefaultGranteeService implements GranteeService {
                 // can remove themselves from an entity.
                 .filter(user -> !sharingUser.getId().equals(user.getId()))
                 .map(user -> AvailableGrantee.create(
-                        grnRegistry.newGRN("user", user.getName()).toString(),
+                        grnRegistry.newGRN("user", user.getName()),
                         "user",
                         user.getFullName()
                 ))
