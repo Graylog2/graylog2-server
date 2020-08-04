@@ -34,7 +34,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Singleton
 public class GRNRegistry {
     // TODO: Find a better name for the "everyone" grantee GRN type
-    public final GRN GLOBAL_USER_GRN = newGRN(GRNTypes.BUILTIN_TEAM, "everyone");
+    public static final GRN GLOBAL_USER_GRN = BUILTIN_TEAM.newGRNBuilder().entity("everyone").build();;
 
     private final ConcurrentMap<String, GRNType> REGISTRY = new ConcurrentHashMap<>();
 
