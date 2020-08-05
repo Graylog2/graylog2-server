@@ -106,16 +106,20 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees))).toArray();
     }
 
-    public GrantDTO create(GrantDTO grantDTO, @Nullable User currentUser) {
+    public GrantDTO create(GrantDTO grantDTO, String userName) {
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        final String userName = requireNonNull(currentUser, "currentUser cannot be null").getName();
-
         return super.save(grantDTO.toBuilder()
                 .createdBy(userName)
                 .createdAt(now)
                 .updatedBy(userName)
                 .updatedAt(now)
                 .build());
+    }
+
+    public GrantDTO create(GrantDTO grantDTO, @Nullable User currentUser) {
+        final String userName = requireNonNull(currentUser, "currentUser cannot be null").getName();
+
+        return create(grantDTO, userName);
     }
 
     public GrantDTO update(GrantDTO updatedGrant, @Nullable User currentUser) {

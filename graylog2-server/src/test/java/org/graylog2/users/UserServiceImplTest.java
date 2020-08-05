@@ -86,8 +86,8 @@ public class UserServiceImplTest {
     public void setUp() throws Exception {
         this.mongoConnection = mongodb.mongoConnection();
         this.configuration = new Configuration();
-        this.userFactory = new UserImplFactory(configuration);
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
+        this.userFactory = new UserImplFactory(configuration, permissions);
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
                 userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), grantPermissionResolver);
 
@@ -157,12 +157,14 @@ public class UserServiceImplTest {
         assertThat(userService.count()).isEqualTo(4L);
     }
 
-    class UserImplFactory implements UserImpl.Factory {
+    public static class UserImplFactory implements UserImpl.Factory {
         private final Configuration configuration;
+        private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
 
-        public UserImplFactory(Configuration configuration) {
+        public UserImplFactory(Configuration configuration, Permissions permissions) {
             this.configuration = configuration;
+            this.permissions = permissions;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
         }
@@ -194,7 +196,7 @@ public class UserServiceImplTest {
 
     @Test
     public void testGetRoleNames() throws Exception {
-        final UserImplFactory factory = new UserImplFactory(new Configuration());
+        final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions);
         final UserImpl user = factory.create(new HashMap<>());
         final Role role = createRole("Foo");
 
@@ -220,7 +222,7 @@ public class UserServiceImplTest {
                 accessTokenService, userFactory, permissionResolver,
                 serverEventBus, grnRegistry, grantPermissionResolver);
 
-        final UserImplFactory factory = new UserImplFactory(new Configuration());
+        final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions);
         final UserImpl user = factory.create(new HashMap<>());
         user.setName("user");
         final Role role = createRole("Foo");
