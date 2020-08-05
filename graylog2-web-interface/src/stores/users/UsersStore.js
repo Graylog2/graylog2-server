@@ -11,17 +11,8 @@ import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
 import User, { type UserJSON } from 'logic/users/User';
-import UsersActions, { type ChangePasswordRequest, type Token } from 'actions/users/UsersActions';
-
-import type { PaginatedResponseType, PaginationType } from '../PaginationTypes';
-
-const DEFAULT_PAGINATION = {
-  count: undefined,
-  total: undefined,
-  page: 1,
-  perPage: 10,
-  query: '',
-};
+import UsersActions, { type ChangePasswordRequest, type Token, type PaginatedUsers } from 'actions/users/UsersActions';
+import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
 type PaginatedResponse = PaginatedResponseType & {
   users: Array<UserJSON>,
@@ -30,14 +21,7 @@ type PaginatedResponse = PaginatedResponseType & {
   },
 };
 
-type PaginatedUsers = {
-  adminUser: ?UserOverview,
-  list: ?Immutable.List<UserOverview>,
-  pagination: PaginationType,
-};
-
 type UsersStoreState = {
-  paginatedList: PaginatedUsers,
   list: ?Immutable.List<UserOverview>,
   loadedUser: ?User,
 };
@@ -48,11 +32,6 @@ const UsersStore: UsersStoreType = singletonStore(
   'Users',
   () => Reflux.createStore({
     listenables: [UsersActions],
-    paginatedList: {
-      adminUser: undefined,
-      list: undefined,
-      pagination: DEFAULT_PAGINATION,
-    },
     list: undefined,
     loadedUser: undefined,
 
@@ -93,23 +72,17 @@ const UsersStore: UsersStoreType = singletonStore(
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedResponse) => {
-          this.paginatedList = {
-            adminUser: UserOverview.fromJSON(response.context.admin_user),
-            list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
-            pagination: {
-              count: response.count,
-              total: response.total,
-              page: response.page,
-              perPage: response.per_page,
-              query: response.query,
-            },
-          };
-
-          this._trigger();
-
-          return response.users;
-        })
+        .then((response: PaginatedResponse) => ({
+          adminUser: UserOverview.fromJSON(response.context.admin_user),
+          list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+          pagination: {
+            count: response.count,
+            total: response.total,
+            page: response.page,
+            perPage: response.per_page,
+            query: response.query,
+          },
+        }))
         .catch((errorThrown) => {
           UserNotification.error(`Loading user list failed with status: ${errorThrown}`,
             'Could not load user list');
@@ -217,7 +190,6 @@ const UsersStore: UsersStoreType = singletonStore(
     _state(): UsersStoreState {
       return {
         list: this.list,
-        paginatedList: this.paginatedList,
         loadedUser: this.loadedUser,
       };
     },

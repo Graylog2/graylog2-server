@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render } from 'wrappedTestingLibrary';
+import { render, act, waitFor } from 'wrappedTestingLibrary';
 import { alice, bob, adminUser } from 'fixtures/users';
 
 import { UsersActions } from 'stores/users/UsersStore';
@@ -9,24 +9,22 @@ import { UsersActions } from 'stores/users/UsersStore';
 import UsersOverview from './UsersOverview';
 
 const mockUsers = Immutable.List([alice, bob, adminUser]);
+const mockPaginatedUsersPromise = Promise.resolve({
+  list: mockUsers,
+  pagination: {
+    page: 1,
+    perPage: 10,
+    total: mockUsers.size,
+  },
+  adminUser: undefined,
+});
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersStore: {
     listen: jest.fn(),
-    getInitialState: jest.fn(() => ({
-      paginatedList: {
-        list: mockUsers,
-        pagination: {
-          page: 1,
-          perPage: 10,
-          total: mockUsers.size,
-        },
-        adminUser: undefined,
-      },
-    })),
   },
   UsersActions: {
-    searchPaginated: jest.fn(),
+    searchPaginated: jest.fn(() => mockPaginatedUsersPromise),
     deleteUser: jest.fn(),
   },
 }));
@@ -37,10 +35,10 @@ describe('UsersOverview', () => {
   });
 
   describe('should display table header', () => {
-    const displaysHeader = ({ header }) => {
+    const displaysHeader = async ({ header }) => {
       const { queryByText } = render(<UsersOverview />);
 
-      expect(queryByText(header)).not.toBeNull();
+      await waitFor(() => expect(queryByText(header)).not.toBeNull());
     };
 
     it.each`
@@ -55,11 +53,13 @@ describe('UsersOverview', () => {
   });
 
   describe('should display user', () => {
-    const displaysUserAttributes = ({ user }) => {
+    const displaysUserAttributes = async ({ user }) => {
       const { queryByText } = render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
 
-      attributes.forEach((attribute) => {
+      await act(() => mockPaginatedUsersPromise);
+
+      attributes.forEach(async (attribute) => {
         if (user[attribute]) {
           expect(queryByText(user[attribute])).not.toBeNull();
         }

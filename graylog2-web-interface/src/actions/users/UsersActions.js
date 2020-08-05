@@ -1,9 +1,12 @@
 // @flow strict
 import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 import User from 'logic/users/User';
+import UserOverview from 'logic/users/UserOverview';
+import type { PaginationType } from 'stores/PaginationTypes';
 
 export type Token = {
   token_name: string,
@@ -16,10 +19,16 @@ export type ChangePasswordRequest = {
   password: string,
 };
 
+export type PaginatedUsers = {
+  adminUser: ?UserOverview,
+  list: ?Immutable.List<UserOverview>,
+  pagination: PaginationType,
+};
+
 type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,
   loadUsers: () => Promise<User[]>,
-  searchPaginated: (page: number, perPage: number, query: string) => Promise<User[]>,
+  searchPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedUsers>,
   load: (username: string) => Promise<User>,
   deleteUser: (username: string) => Promise<string[]>,
   changePassword: (username: string, request: ChangePasswordRequest) => Promise<void>,
