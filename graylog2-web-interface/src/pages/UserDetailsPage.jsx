@@ -5,8 +5,7 @@ import { withRouter } from 'react-router';
 
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserDetails from 'components/users/UserDetails';
 import UserManagementLinks from 'components/users/UserManagementLinks';
@@ -29,12 +28,12 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 );
 
 const UserDetailsPage = ({ params }: Props) => {
-  const { loadedUser } = useStore(UsersStore);
   const [paginatedUserShares, setPaginatedUserShares] = useState();
+  const [loadedUser, setLoadedUser] = useState();
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username);
+    UsersActions.load(username).then(setLoadedUser);
 
     EntityShareActions.searchPaginatedUserShares(username, 1, 10, '').then((response) => {
       setPaginatedUserShares(response);
@@ -55,7 +54,7 @@ const UserDetailsPage = ({ params }: Props) => {
         </span>
 
         <UserManagementLinks username={username}
-                             userIsReadOnly={loadedUser?.readOnly} />
+                             userIsReadOnly={loadedUser?.readOnly ?? false} />
       </PageHeader>
 
       <UserDetails paginatedUserShares={paginatedUserShares}

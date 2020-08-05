@@ -27,7 +27,7 @@ export type PaginatedUsers = {
 
 type UsersActionsType = RefluxActions<{
   create: (request: any) => Promise<string[]>,
-  loadUsers: () => Promise<User[]>,
+  loadUsers: () => Promise<Immutable.List<User>>,
   searchPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedUsers>,
   load: (username: string) => Promise<User>,
   deleteUser: (username: string) => Promise<string[]>,
