@@ -78,7 +78,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
     }
 
     private boolean shouldSkip() {
-        if (elasticsearchVersion.sameOrHigher(MINIMUM_ELASTICSEARCH_VERSION)) {
+        if (!elasticsearchVersion.sameOrHigher(MINIMUM_ELASTICSEARCH_VERSION)) {
             LOG.debug("Skipping migration, because Elasticsearch major version of {} " +
                             "is lower than the required minimum version of {}.",
                     elasticsearchVersion, MINIMUM_ELASTICSEARCH_VERSION);
