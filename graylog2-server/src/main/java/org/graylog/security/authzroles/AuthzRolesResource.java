@@ -32,10 +32,12 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -86,6 +88,17 @@ public class AuthzRolesResource extends RestResource {
 
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginated(searchQuery, page, perPage,sort, order);
         return PaginatedResponse.create("roles", result, query);
+    }
+
+
+    @GET
+    @ApiOperation(value = "Get a single role")
+    @Path("/{roleId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public AuthzRoleDTO get(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
+        checkPermission(RestPermissions.ROLES_READ, roleId);
+        return authzRolesService.get(roleId).orElseThrow(
+                () -> new NotFoundException("Could not find role with id: " + roleId));
     }
 
     @GET
