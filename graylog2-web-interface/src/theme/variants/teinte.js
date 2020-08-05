@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 
-import { darken, lighten } from './util';
+import { darken, lighten, lightThemeRatio } from './util';
 
 const brand = {
   primary: '#ff3633',
@@ -44,13 +44,13 @@ const variant = {
 
 Object.keys(variant).forEach((name) => {
   if (typeof variant[name] === 'string') {
-    variant.light[name] = lighten(variant[name], 0.22);
-    variant.lighter[name] = lighten(variant[name], 0.55);
-    variant.lightest[name] = lighten(variant[name], 0.88);
+    variant.light[name] = lighten(variant[name], lightThemeRatio[0]);
+    variant.lighter[name] = lighten(variant[name], lightThemeRatio[1]);
+    variant.lightest[name] = lighten(variant[name], lightThemeRatio[2]);
 
-    variant.dark[name] = darken(variant[name], 0.22);
-    variant.darker[name] = darken(variant[name], 0.55);
-    variant.darkest[name] = darken(variant[name], 0.88);
+    variant.dark[name] = darken(variant[name], lightThemeRatio[0]);
+    variant.darker[name] = darken(variant[name], lightThemeRatio[1]);
+    variant.darkest[name] = darken(variant[name], lightThemeRatio[2]);
   }
 });
 
