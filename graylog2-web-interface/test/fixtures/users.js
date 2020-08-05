@@ -1,9 +1,9 @@
 // @flow strict
-import type { User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 
 /* eslint-disable import/prefer-default-export */
 
-export const viewsManager: User = {
+export const viewsManager: UserJSON = {
   email: '',
   external: false,
   full_name: 'Betty Holberton',
@@ -14,9 +14,12 @@ export const viewsManager: User = {
   session_timeout_ms: 28800000,
   timezone: 'UTC',
   username: 'betty',
+  session_active: false,
+  client_address: '127.0.0.1',
+  last_activity: '2020-01-01T10:40:05.376+0000',
 };
 
-export const admin: User = {
+export const admin: UserJSON = {
   email: '',
   external: false,
   full_name: 'Alonzo Church',
@@ -27,4 +30,7 @@ export const admin: User = {
   session_timeout_ms: 28800000,
   timezone: 'UTC',
   username: 'alonzo',
+  session_active: false,
+  client_address: '127.0.0.1',
+  last_activity: '2020-01-01T10:40:05.376+0000',
 };

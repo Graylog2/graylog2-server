@@ -10,12 +10,12 @@ import history from 'util/History';
 import StoreProvider from 'injection/StoreProvider';
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';
+import { UsersActions } from 'stores/users/UsersStore';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
 
 const RolesStore = StoreProvider.getStore('Roles');
-const UsersStore = StoreProvider.getStore('Users');
 
 class EditRolesForm extends React.Component {
   static propTypes = {
@@ -44,7 +44,7 @@ class EditRolesForm extends React.Component {
 
       userClone.roles = roles;
 
-      UsersStore.update(user.username, userClone).then(() => {
+      UsersActions.update(user.username, userClone).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
         history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }, () => {

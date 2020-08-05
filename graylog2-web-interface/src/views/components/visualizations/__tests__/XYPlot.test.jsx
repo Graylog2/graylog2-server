@@ -5,7 +5,7 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { viewsManager } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 
-import type { User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import XYPlot, { type Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -39,7 +39,7 @@ describe('XYPlot', () => {
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42] }];
   type SimpleXYPlotProps = {
-    currentUser?: User,
+    currentUser?: UserJSON,
     config?: $PropertyType<XYPlotProps, 'chartData'>,
     chartData?: $PropertyType<XYPlotProps, 'chartData'>,
     currentQuery?: $PropertyType<XYPlotProps, 'currentQuery'>,

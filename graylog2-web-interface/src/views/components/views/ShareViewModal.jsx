@@ -17,12 +17,12 @@ import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
-import type { User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 
 const RolesStore = StoreProvider.getStore('Roles');
 
 type Props = {
-  currentUser: ?User,
+  currentUser: ?UserJSON,
   onClose: (?ViewSharing) => void,
   view: View,
   show: boolean,
@@ -141,7 +141,7 @@ class ShareViewModal extends React.Component<Props, State> {
     this.setState({ viewSharing: specificUsers.toBuilder().users(users).build() });
   };
 
-  _isAdmin = (user: ?User) => (user?.roles.includes('Admin') || user?.permissions.includes('*'));
+  _isAdmin = (user: ?UserJSON) => (user?.roles.includes('Admin') || user?.permissions.includes('*'));
 
   render() {
     const { show, view } = this.props;

@@ -6,10 +6,8 @@ import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
 import { TimezoneSelect } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import ValidationsUtils from 'util/ValidationsUtils';
-
-const UsersStore = StoreProvider.getStore('Users');
+import { UsersActions } from 'stores/users/UsersStore';
 
 class NewUserForm extends React.Component {
   static propTypes = {
@@ -24,7 +22,7 @@ class NewUserForm extends React.Component {
   };
 
   componentDidMount() {
-    UsersStore.loadUsers().then((users) => {
+    UsersActions.loadUsers().then((users) => {
       this.setState({ users });
     });
   }
