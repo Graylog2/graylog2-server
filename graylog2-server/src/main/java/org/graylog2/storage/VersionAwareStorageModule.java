@@ -19,6 +19,7 @@ package org.graylog2.storage;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog2.indexer.IndexToolsAdapter;
@@ -41,6 +42,8 @@ import org.graylog2.storage.providers.MoreSearchAdapterProvider;
 import org.graylog2.storage.providers.NodeAdapterProvider;
 import org.graylog2.storage.providers.SearchesAdapterProvider;
 import org.graylog2.storage.providers.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider;
+import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider;
+
 
 public class VersionAwareStorageModule extends AbstractModule {
     @Override
@@ -54,7 +57,16 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(NodeAdapter.class).toProvider(NodeAdapterProvider.class);
         bind(IndexFieldTypePollerAdapter.class).toProvider(IndexFieldTypePollerAdapterProvider.class);
         bind(IndexToolsAdapter.class).toProvider(IndexToolsAdapterProvider.class);
-        bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).toProvider(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider.class);
-        bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {}).toProvider(ElasticsearchBackendProvider.class);
+        bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
+                .toProvider(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider.class);
+        bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
+                .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
+
+        bindQueryBackend();
+    }
+
+    private void bindQueryBackend() {
+        bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
+                .toProvider(ElasticsearchBackendProvider.class);
     }
 }

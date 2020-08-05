@@ -4,8 +4,10 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import io.searchbox.client.JestClient;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.storage.elasticsearch6.jest.JestClientProvider;
 import org.graylog.storage.elasticsearch6.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6;
+import org.graylog.storage.elasticsearch6.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES6;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
@@ -31,7 +33,10 @@ public class Elasticsearch6Module extends VersionAwareModule {
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterES6.class);
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES6.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterES6.class);
-        bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6.class);
+        bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
+                .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES6.class);
+        bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
+                .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES6.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
 
