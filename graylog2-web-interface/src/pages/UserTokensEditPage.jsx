@@ -11,7 +11,8 @@ import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
-import UserManagementLinks from 'components/users/UserManagementLinks';
+import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
@@ -82,7 +83,11 @@ const UserEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
+      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
+                  subactions={(
+                    <UserActionLinks username={username}
+                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
+                  )}>
         <span>
           You can create new tokens or delete old ones.
         </span>
@@ -93,8 +98,7 @@ const UserEditPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <UserManagementLinks username={username}
-                             userIsReadOnly={loadedUser?.readOnly ?? false} />
+        <UserOverviewLinks />
       </PageHeader>
 
       <Row className="content">

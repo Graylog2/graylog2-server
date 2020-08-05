@@ -126,7 +126,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
   }
 
   .actions-lg .actions-container {
-    height: 60px;
     margin-top: 10px;
     padding-left: 50px;
   }

@@ -10,7 +10,7 @@ const IconStack = styled.span(({ small, theme }) => css`
 
 const SupportLink = ({ small, children }) => {
   return (
-    <table className="description-tooltips" style={{ marginBottom: '10px' }}>
+    <table className="description-tooltips" style={{ marginBottom: '10px', display: 'inline' }}>
       <tbody>
         <tr>
           <td style={{ width: '40px' }}>
