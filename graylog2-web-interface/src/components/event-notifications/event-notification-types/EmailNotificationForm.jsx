@@ -74,7 +74,7 @@ class EmailNotificationForm extends React.Component {
   };
 
   formatUsers = (users) => {
-    return users.map((user) => ({ label: `${user.username} (${user.full_name})`, value: user.username }));
+    return users.map((user) => ({ label: `${user.username} (${user.fullName})`, value: user.username }));
   };
 
   render() {

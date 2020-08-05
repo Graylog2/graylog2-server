@@ -1,13 +1,12 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { UserJSON as User } from 'stores/users/UsersStore';
 import UserOverview from 'logic/users/UserOverview';
+import type { UserJSON } from 'logic/users/User';
 
 /* eslint-disable import/prefer-default-export */
 
-export const viewsManager: User = {
-  client_address: '127.0.0.1',
+export const viewsManager: UserJSON = {
   email: '',
   external: false,
   full_name: 'Betty Holberton',
@@ -20,9 +19,10 @@ export const viewsManager: User = {
   session_timeout_ms: 28800000,
   timezone: 'UTC',
   username: 'betty',
+  client_address: '127.0.0.1',
 };
 
-export const admin: User = {
+export const admin: UserJSON = {
   client_address: '127.0.0.1',
   email: '',
   external: false,

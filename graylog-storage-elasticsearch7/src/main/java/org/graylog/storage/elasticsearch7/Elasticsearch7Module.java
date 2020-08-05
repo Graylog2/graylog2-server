@@ -3,8 +3,10 @@ package org.graylog.storage.elasticsearch7;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7;
+import org.graylog.storage.elasticsearch7.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES7;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -28,7 +30,10 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterES7.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterES7.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterES7.class);
-        bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class).to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7.class);
+        bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
+                .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7.class);
+        bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
+                .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsES7.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 

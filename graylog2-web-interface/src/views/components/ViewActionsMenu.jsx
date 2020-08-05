@@ -18,7 +18,7 @@ import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as Permissions from 'views/Permissions';
 import View from 'views/logic/views/View';
-import type { UserJSON as User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -27,7 +27,7 @@ import ViewPropertiesModal from './views/ViewPropertiesModal';
 import IfDashboard from './dashboard/IfDashboard';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
-const _isAllowedToEdit = (view: View, currentUser: ?User) => isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
+const _isAllowedToEdit = (view: View, currentUser: ?UserJSON) => isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;

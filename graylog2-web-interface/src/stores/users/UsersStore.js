@@ -7,11 +7,11 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import UsersActions from 'actions/users/UsersActions';
 import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
-import User from 'logic/users/User';
+import User, { type UserJSON } from 'logic/users/User';
+import UsersActions, { type ChangePasswordRequest, type Token } from 'actions/users/UsersActions';
 
 import type { PaginatedResponseType, PaginationType } from '../PaginationTypes';
 
@@ -23,43 +23,6 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-type StartPage = {
-  id: string,
-  type: string,
-};
-
-export type UserJSON = {
-  username: string,
-  id: string,
-  full_name: string,
-  email: string,
-  permissions: string[],
-  timezone: string,
-  preferences?: any,
-  roles: string[],
-
-  read_only: boolean,
-  external: boolean,
-  session_timeout_ms: number,
-
-  startpage?: StartPage,
-
-  session_active: boolean,
-  client_address: string,
-  last_activity: string,
-};
-
-export type Token = {
-  token_name: string,
-  token: string,
-  last_access: string,
-};
-
-export type ChangePasswordRequest = {
-  old_password: string,
-  password: string,
-};
-
 type PaginatedResponse = PaginatedResponseType & {
   users: Array<UserJSON>,
   context: {
@@ -67,12 +30,14 @@ type PaginatedResponse = PaginatedResponseType & {
   },
 };
 
+type PaginatedUsers = {
+  adminUser: ?UserOverview,
+  list: ?Immutable.List<UserOverview>,
+  pagination: PaginationType,
+};
+
 type UsersStoreState = {
-  paginatedList: {
-    adminUser: ?UserOverview,
-    list: ?Immutable.List<UserOverview>,
-    pagination: PaginationType,
-  },
+  paginatedList: PaginatedUsers,
   list: ?Immutable.List<UserOverview>,
   loadedUser: ?User,
 };
@@ -98,36 +63,33 @@ const UsersStore: UsersStoreType = singletonStore(
     create(request: any): Promise<string[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.create().url);
       const promise = fetch('POST', url, request);
-
       UsersActions.create.promise(promise);
 
       return promise;
     },
 
-    loadUsers(): Promise<UserJSON[]> {
+    loadUsers(): Promise<Immutable.List<User>> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.list().url);
-      const promise = fetch('GET', url).then(
-        (response) => {
-          const { users } = response;
-          this.list = Immutable.List(response.users.map((user) => UserOverview.fromJSON(user)));
-          this._trigger();
+      const promise = fetch('GET', url).then(({ users }) => {
+        const usersList = Immutable.List(users.map((user) => UserOverview.fromJSON(user)));
+        this.list = usersList;
+        this._trigger();
 
-          return users;
-        },
-        (error) => {
-          if (error.additional.status !== 404) {
-            UserNotification.error(`Loading user list failed with status: ${error}`,
-              'Could not load user list');
-          }
-        },
-      );
+        return usersList;
+      },
+      (error) => {
+        if (error.additional.status !== 404) {
+          UserNotification.error(`Loading user list failed with status: ${error}`,
+            'Could not load user list');
+        }
+      });
 
       UsersActions.loadUsers.promise(promise);
 
       return promise;
     },
 
-    searchPaginated(page: number, perPage: number, query: string): Promise<UserJSON[]> {
+    searchPaginated(page: number, perPage: number, query: string): Promise<PaginatedUsers> {
       const url = PaginationURL(ApiRoutes.UsersApiController.paginated().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
@@ -158,7 +120,7 @@ const UsersStore: UsersStoreType = singletonStore(
       return promise;
     },
 
-    load(username: string): Promise<UserJSON> {
+    load(username: string): Promise<User> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
       const promise = fetch('GET', url);
 

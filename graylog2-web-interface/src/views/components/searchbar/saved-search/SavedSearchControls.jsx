@@ -24,7 +24,7 @@ import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import * as Permissions from 'views/Permissions';
-import type { UserJSON as User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/views/ViewPropertiesModal';
 
 import SavedSearchForm from './SavedSearchForm';
@@ -44,7 +44,7 @@ type State = {
   newTitle: string,
 };
 
-const _isAllowedToEdit = (view: View, currentUser: ?User) => (
+const _isAllowedToEdit = (view: View, currentUser: ?UserJSON) => (
   view.owner === currentUser?.username
   || isPermitted(currentUser?.permissions, [Permissions.View.Edit(view.id)])
 );

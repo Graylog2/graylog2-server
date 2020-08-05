@@ -5,7 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import type { UserJSON as User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 
 type Role = {
   name: string,
@@ -15,7 +15,7 @@ type Role = {
 
 type RoleMembership = {
   role: string,
-  users: User[],
+  users: UserJSON[],
 };
 
 const RolesStore = Reflux.createStore({

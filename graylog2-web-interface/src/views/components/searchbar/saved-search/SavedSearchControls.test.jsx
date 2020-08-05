@@ -11,7 +11,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import NewViewLoaderContext, { type NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import * as Permissions from 'views/Permissions';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import type { UserJSON as User } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 
 import SavedSearchControls from './SavedSearchControls';
@@ -35,7 +35,7 @@ describe('SavedSearchControls', () => {
   type SimpleSavedSearchControlsProps = {
     loadNewView?: NewViewLoaderContextType,
     onLoadView?: ViewLoaderContextType,
-    currentUser?: User,
+    currentUser?: UserJSON,
     viewStoreState?: ViewStoreState,
   };
 
