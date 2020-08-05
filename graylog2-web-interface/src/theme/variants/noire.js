@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 
-import { darken, lighten } from './util';
+import { darken, lighten, darkThemeRatio } from './util';
 
 const brand = {
   primary: '#ff3633',
@@ -44,13 +44,13 @@ const variant = {
 
 Object.keys(variant).forEach((name) => {
   if (typeof variant[name] === 'string') {
-    variant.light[name] = darken(variant[name], 0.22);
-    variant.lighter[name] = darken(variant[name], 0.55);
-    variant.lightest[name] = darken(variant[name], 0.88);
+    variant.light[name] = darken(variant[name], darkThemeRatio[0]);
+    variant.lighter[name] = darken(variant[name], darkThemeRatio[1]);
+    variant.lightest[name] = darken(variant[name], darkThemeRatio[2]);
 
-    variant.dark[name] = lighten(variant[name], 0.22);
-    variant.darker[name] = lighten(variant[name], 0.55);
-    variant.darkest[name] = lighten(variant[name], 0.88);
+    variant.dark[name] = lighten(variant[name], darkThemeRatio[0]);
+    variant.darker[name] = lighten(variant[name], darkThemeRatio[1]);
+    variant.darkest[name] = lighten(variant[name], darkThemeRatio[2]);
   }
 });
 
@@ -89,7 +89,7 @@ const input = {
 
 /* eslint-disable prefer-destructuring */
 global.navigationBackground = global.contentBackground;
-global.navigationBoxShadow = chroma(variant.lightest.default).alpha(0.5).css();
+global.navigationBoxShadow = chroma('#222').alpha(0.5).css();
 /* eslint-enable prefer-destructuring */
 
 const noire = {
