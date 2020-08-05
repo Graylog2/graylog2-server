@@ -67,6 +67,7 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.searches.ScrollCommand.NO_BATCHSIZE;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -492,7 +493,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ScrollResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null);
+        final ScrollResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, NO_BATCHSIZE);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.getQueryHash()).isNotEmpty();
