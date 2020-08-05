@@ -95,7 +95,6 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation(value = "Get a single role")
     @Path("/{roleId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions(RestPermissions.ROLES_READ)
     public AuthzRoleDTO get(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         checkPermission(RestPermissions.ROLES_READ, roleId);
         return authzRolesService.get(roleId).orElseThrow(
