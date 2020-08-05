@@ -11,12 +11,12 @@ import { UsersActions } from 'stores/users/UsersStore';
 import UserCreate from './UserCreate';
 
 const existingUser = alice;
-const mockLoadusersPromise = Promise.resolve(Immutable.List([alice]));
+const mockLoadUsersPromise = Promise.resolve(Immutable.List([alice]));
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
-    loadUsers: jest.fn(() => mockLoadusersPromise),
+    loadUsers: jest.fn(() => mockLoadUsersPromise),
   },
 }));
 
@@ -24,7 +24,7 @@ describe('<UserCreate />', () => {
   it('should create user', async () => {
     const { getByLabelText, getByPlaceholderText, getByText, getByTestId } = render(<UserCreate />);
 
-    await act(() => mockLoadusersPromise);
+    await act(() => mockLoadUsersPromise);
 
     const usernameInput = getByLabelText('Username');
     const fullNameInput = getByLabelText('Full Name');
@@ -63,7 +63,7 @@ describe('<UserCreate />', () => {
   it('should display warning if username is alreafy taken', async () => {
     const { getByLabelText, getByText } = render(<UserCreate />);
 
-    await act(() => mockLoadusersPromise);
+    await act(() => mockLoadUsersPromise);
 
     const usernameInput = getByLabelText('Username');
 
@@ -75,7 +75,7 @@ describe('<UserCreate />', () => {
   it('should display warning, if password repeat does not match password', async () => {
     const { getByPlaceholderText, getByText } = render(<UserCreate />);
 
-    await act(() => mockLoadusersPromise);
+    await act(() => mockLoadUsersPromise);
 
     const passwordInput = getByPlaceholderText('Password');
     const passwordRepeatInput = getByPlaceholderText('Repeat password');

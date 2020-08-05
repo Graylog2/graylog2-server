@@ -9,7 +9,7 @@ import { UsersActions } from 'stores/users/UsersStore';
 import UsersOverview from './UsersOverview';
 
 const mockUsers = Immutable.List([alice, bob, adminUser]);
-const mockPaginatedUsersPromise = Promise.resolve({
+const mockSearchPaginatedPromise = Promise.resolve({
   list: mockUsers,
   pagination: {
     page: 1,
@@ -24,7 +24,7 @@ jest.mock('stores/users/UsersStore', () => ({
     listen: jest.fn(),
   },
   UsersActions: {
-    searchPaginated: jest.fn(() => mockPaginatedUsersPromise),
+    searchPaginated: jest.fn(() => mockSearchPaginatedPromise),
     deleteUser: jest.fn(),
   },
 }));
@@ -57,7 +57,7 @@ describe('UsersOverview', () => {
       const { queryByText } = render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
 
-      await act(() => mockPaginatedUsersPromise);
+      await act(() => mockSearchPaginatedPromise);
 
       attributes.forEach(async (attribute) => {
         if (user[attribute]) {
