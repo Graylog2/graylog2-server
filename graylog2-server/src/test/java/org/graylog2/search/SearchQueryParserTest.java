@@ -64,7 +64,7 @@ public class SearchQueryParserTest {
     }
 
     @Test
-    public void decodQuery() throws UnsupportedEncodingException {
+    public void decodeQuery() throws UnsupportedEncodingException {
         SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
         final String urlEncodedQuery = URLEncoder.encode("name:foo", StandardCharsets.UTF_8.name());
         final SearchQuery query = parser.parse(urlEncodedQuery);
@@ -78,6 +78,18 @@ public class SearchQueryParserTest {
         final DBQuery.Query dbQuery = query.toDBQuery();
         final Collection<String> fieldNamesUsed = extractFieldNames(dbQuery.conditions());
         assertThat(fieldNamesUsed).containsExactly("name");
+    }
+
+    @Test
+    public void nullQuery() {
+        SearchQueryParser parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "id"));
+        final SearchQuery query = parser.parse(null);
+
+        assertThat(query.getQueryString()).isNullOrEmpty();
+
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = query.getQueryMap();
+
+        assertThat(queryMap.size()).isEqualTo(0);
     }
 
     @Test
