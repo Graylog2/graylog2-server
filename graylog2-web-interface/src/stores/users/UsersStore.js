@@ -122,11 +122,12 @@ const UsersStore: UsersStoreType = singletonStore(
 
     load(username: string): Promise<User> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url);
-      const promise = fetch('GET', url);
-
-      promise.then((loadedUser) => {
-        this.loadedUser = User.fromJSON(loadedUser);
+      const promise = fetch('GET', url).then((loadedUser) => {
+        const user = User.fromJSON(loadedUser);
+        this.loadedUser = user;
         this._trigger();
+
+        return user;
       }).catch((error) => {
         UserNotification.error(`Loading user failed with status: ${error}`,
           `Could not load user ${username}`);
