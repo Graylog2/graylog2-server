@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
+import type { UserJSON } from 'logic/users/User';
 import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -11,6 +12,7 @@ import PaginationURL from 'util/PaginationURL';
 import Role from 'logic/roles/Role';
 import type { RoleJSON } from 'logic/roles/Role';
 import AuthzRolesActions from 'actions/roles/AuthzRolesActions';
+import UserOverview from 'logic/users/UserOverview';
 
 import type { PaginatedResponseType, PaginationType } from '../PaginationTypes';
 
@@ -23,10 +25,33 @@ export type PaginatedListType = {
   pagination: PaginationType,
 };
 
+export type PaginatedUserListType = {
+  list: Immutable.List<UserOverview>,
+  pagination: PaginationType,
+};
+
+type PaginatedUserResponse = PaginatedResponseType & {
+  users: Array<UserJSON>,
+};
+
 // eslint-disable-next-line camelcase
 const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [] }: PaginatedResponse) => {
   return {
     list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
+    pagination: {
+      count,
+      total,
+      page,
+      perPage: per_page,
+      query,
+    },
+  };
+};
+
+// eslint-disable-next-line camelcase
+const _responseToPaginatedUserList = ({ count, total, page, per_page, query, users }: PaginatedUserResponse) => {
+  return {
+    list: Immutable.List(users.map((u) => UserOverview.fromJSON(u))),
     pagination: {
       count,
       total,
@@ -51,6 +76,15 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
+    load(roleId: $PropertyType<Role, 'id'>): Promise<Role> {
+      const url = qualifyUrl(ApiRoutes.AuthzRolesController.load(encodeURIComponent(roleId)).url);
+      const promise = fetch('GET', url).then(Role.fromJSON);
+
+      AuthzRolesActions.load.promise(promise);
+
+      return promise;
+    },
+
     loadForUser(username: string, page: number, perPage: number, query: string): Promise<PaginatedListType> {
       const url = PaginationURL(ApiRoutes.AuthzRolesController.loadForUser(username).url, page, perPage, query);
 
@@ -63,7 +97,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
     },
 
     loadPaginated(page: number, perPage: number, query: string): Promise<PaginatedListType> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.load().url, page, perPage, query);
+      const url = PaginationURL(ApiRoutes.AuthzRolesController.list().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url))
         .then(_responseToPaginatedList);
@@ -72,6 +106,36 @@ const AuthzRolesStore: Store<{}> = singletonStore(
 
       return promise;
     },
+
+    loadUsersForRole(roleId: string, page: number, perPage: number, query: string): Promise<PaginatedUserListType> {
+      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadUsersForTeam(roleId).url, page, perPage, query);
+
+      const promise = fetch('GET', qualifyUrl(url))
+        .then(_responseToPaginatedUserList);
+
+      AuthzRolesActions.loadUsersForRole.promise(promise);
+
+      return promise;
+    },
+
+    addMember(roleId: string, username: string): Promise<Role> {
+      const { url } = ApiRoutes.AuthzRolesController.addMember(roleId, username);
+      const promise = fetch('PUT', qualifyUrl(url)).then(Role.fromJSON);
+
+      AuthzRolesActions.addMember.promise(promise);
+
+      return promise;
+    },
+
+    removeMember(roleId: string, username: string): Promise<Role> {
+      const { url } = ApiRoutes.AuthzRolesController.removeMember(roleId, username);
+      const promise = fetch('PUT', qualifyUrl(url)).then(Role.fromJSON);
+
+      AuthzRolesActions.removeMember.promise(promise);
+
+      return promise;
+    },
+
   }),
 );
 

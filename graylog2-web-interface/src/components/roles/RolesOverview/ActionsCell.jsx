@@ -50,7 +50,11 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
       <ActtionsWrapper>
         <IfPermitted permissions={[`roles:edit:${roleName}`]}>
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(encodeURIComponent(roleId))}>
+<<<<<<< HEAD
             <Button id={`edit-role-${roleId}`} bsStyle="info" bsSize="xs" title={`Edit role ${roleName}`} type="button">
+=======
+            <Button id={`edit-role-${roleName}`} bsStyle="info" bsSize="xs" title={`Edit role ${roleName}`} type="button">
+>>>>>>> Implement RoleEdit
               Edit
             </Button>
           </LinkContainer>

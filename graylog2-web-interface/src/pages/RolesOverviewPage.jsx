@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import RolesOverview from 'components/roles/RolesOverview';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { Button } from 'components/graylog';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -20,11 +20,9 @@ const RolesOverviewPage = () => (
                            text="documentation" />
       </span>
 
-      <ButtonToolbar>
-        <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-          <Button bsStyle="info">Roles Overview</Button>
-        </LinkContainer>
-      </ButtonToolbar>
+      <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+        <Button bsStyle="info">Roles Overview</Button>
+      </LinkContainer>
     </PageHeader>
 
     <RolesOverview />

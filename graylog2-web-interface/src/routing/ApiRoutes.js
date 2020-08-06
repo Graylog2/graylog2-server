@@ -26,8 +26,12 @@ const ApiRoutes = {
   },
   AuthzRolesController: {
     delete: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
-    load: () => { return { url: '/authzRoles' }; },
+    load: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
+    list: () => { return { url: '/authzRoles' }; },
     loadForUser: (username) => { return { url: `/authzRoles/rolesForUser/${username}` }; },
+    loadUsersForTeam: (roleId) => { return { url: `/authzRoles/${roleId}/members` }; },
+    removeMember: (roleId, username) => { return { url: `/authzRoles/${roleId}/member/remove/${username}` }; },
+    addMember: (roleId, username) => { return { url: `/authzRoles/${roleId}/member/add/${username}` }; },
   },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
