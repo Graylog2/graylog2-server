@@ -112,8 +112,11 @@ const SystemMenu = ({ location }) => {
       <IfPermitted permissions={['loggers:read']}>
         <NavigationLink path={Routes.SYSTEM.LOGGING} description="Logging" />
       </IfPermitted>
-      <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
+      <IfPermitted permissions={['users:list']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
+      </IfPermitted>
+      <IfPermitted permissions={['roles:read']} anyPermissions>
+        <NavigationLink path={Routes.SYSTEM.ROLES.OVERVIEW} description="Roles" />
       </IfPermitted>
       <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} description="Authentication" />
