@@ -38,7 +38,7 @@ const UserDetailsPage = ({ params }: Props) => {
     EntityShareActions.searchPaginatedUserShares(username, 1, 10, '').then((response) => {
       setPaginatedUserShares(response);
     });
-  }, []);
+  }, [username]);
 
   return (
     <DocumentTitle title={`User Details ${username ?? ''}`}>

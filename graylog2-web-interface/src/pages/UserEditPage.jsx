@@ -32,7 +32,7 @@ const UserEditPage = ({ params }: Props) => {
 
   useEffect(() => {
     UsersActions.load(username).then(setLoadedUser);
-  });
+  }, [username]);
 
   return (
     <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
