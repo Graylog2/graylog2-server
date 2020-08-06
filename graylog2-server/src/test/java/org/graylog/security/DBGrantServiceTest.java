@@ -16,9 +16,9 @@
  */
 package org.graylog.security;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -68,6 +68,16 @@ public class DBGrantServiceTest {
 
     @Test
     @MongoDBFixtures("grants.json")
+    public void getForGrantee() {
+        final GRN jane = grnRegistry.newGRN("user", "jane");
+        final GRN john = grnRegistry.newGRN("user", "john");
+
+        assertThat(dbService.getForGrantee(jane)).hasSize(3);
+        assertThat(dbService.getForGrantee(john)).hasSize(2);
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
     public void getForTarget() {
         final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
         final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
@@ -84,6 +94,7 @@ public class DBGrantServiceTest {
 
         assertThat(dbService.getForTargetExcludingGrantee(stream, grantee)).hasSize(2);
     }
+
     @Test
     @MongoDBFixtures("grants.json")
     public void getOwnersForTargets() {
