@@ -1,8 +1,8 @@
 // @flow strict
 import PropTypes from 'prop-types';
 
-import teinte from './variants/teinte';
-import noire from './variants/noire';
+import teint from './variants/teint';
+import noir from './variants/noir';
 
 export type Colors = {
   brand: {
@@ -249,17 +249,17 @@ export const colorsPropTypes = PropTypes.shape({
 });
 
 type Modes = {
-  teinte: Colors,
-  noire: Colors,
+  teint: Colors,
+  noir: Colors,
 };
 
 const colors: Modes = {
-  teinte,
-  noire,
+  teint,
+  noir,
 };
 
 export default colors;
 export {
-  noire,
-  teinte,
+  noir,
+  teint,
 };

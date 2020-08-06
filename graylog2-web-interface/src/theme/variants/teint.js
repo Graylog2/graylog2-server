@@ -92,7 +92,7 @@ global.navigationBackground = global.contentBackground;
 global.navigationBoxShadow = chroma(variant.dark.default).alpha(0.25).css();
 /* eslint-enable prefer-destructuring */
 
-const teinte = {
+const teint = {
   brand,
   global,
   gray,
@@ -101,4 +101,4 @@ const teinte = {
   variant,
 };
 
-export default teinte;
+export default teint;

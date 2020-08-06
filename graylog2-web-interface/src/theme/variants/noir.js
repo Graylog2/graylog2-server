@@ -92,7 +92,7 @@ global.navigationBackground = global.contentBackground;
 global.navigationBoxShadow = chroma('#222').alpha(0.5).css();
 /* eslint-enable prefer-destructuring */
 
-const noire = {
+const noir = {
   brand,
   global,
   gray,
@@ -101,4 +101,4 @@ const noire = {
   variant,
 };
 
-export default noire;
+export default noir;

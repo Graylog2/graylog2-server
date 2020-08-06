@@ -1,8 +1,8 @@
 const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 const PREFERENCES_THEME_MODE = 'themeMode';
-const THEME_MODE_LIGHT = 'teinte';
-const THEME_MODE_DARK = 'noire';
+const THEME_MODE_LIGHT = 'teint';
+const THEME_MODE_DARK = 'noir';
 const DEFAULT_THEME_MODE = prefersDarkMode ? THEME_MODE_DARK : THEME_MODE_LIGHT;
 
 export {
