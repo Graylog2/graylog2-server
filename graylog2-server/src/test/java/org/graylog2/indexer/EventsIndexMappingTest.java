@@ -22,113 +22,90 @@ import com.revinate.assertj.json.JsonPathAssert;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.utilities.AssertJsonPath;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 public class EventsIndexMappingTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private IndexSetConfig indexSetConfig;
 
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private void assertJsonPath(Map<String, Object> map, Consumer<JsonPathAssert> consumer) throws Exception {
-        AssertJsonPath.assertJsonPath(objectMapper.writeValueAsString(map), consumer);
-    }
+    private static final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-    private void assertStandardMappingValues(JsonPathAssert at) {
-        at.jsonPathAsString("$.settings['index.refresh_interval']").isEqualTo("1s");
-
-        at.jsonPathAsBoolean("$.mappings.message._source.enabled").isTrue();
-        at.jsonPathAsBoolean("$.mappings.message.dynamic").isFalse();
-
-        at.jsonPathAsString("$.mappings.message.dynamic_templates[0]fields.path_match").isEqualTo("fields.*");
-        at.jsonPathAsString("$.mappings.message.dynamic_templates[0]fields.mapping.type").isEqualTo("keyword");
-        at.jsonPathAsBoolean("$.mappings.message.dynamic_templates[0]fields.mapping.doc_values").isTrue();
-        at.jsonPathAsBoolean("$.mappings.message.dynamic_templates[0]fields.mapping.index").isTrue();
-
-        at.jsonPathAsString("$.mappings.message.properties.id.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.event_definition_type.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.event_definition_id.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.origin_context.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.timestamp.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.message.properties.timestamp.format").isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
-        at.jsonPathAsString("$.mappings.message.properties.timestamp_processing.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.message.properties.timestamp_processing.format").isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
-        at.jsonPathAsString("$.mappings.message.properties.timerange_start.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.message.properties.timerange_start.format").isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
-        at.jsonPathAsString("$.mappings.message.properties.timerange_end.type").isEqualTo("date");
-        at.jsonPathAsString("$.mappings.message.properties.timerange_end.format").isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
-        at.jsonPathAsString("$.mappings.message.properties.streams.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.source_streams.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.message.type").isEqualTo("text");
-        at.jsonPathAsString("$.mappings.message.properties.message.analyzer").isEqualTo("standard");
-        at.jsonPathAsBoolean("$.mappings.message.properties.message.norms").isFalse();
-        at.jsonPathAsString("$.mappings.message.properties.message.fields.keyword.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.source.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.key.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.key_tuple.type").isEqualTo("keyword");
-        at.jsonPathAsString("$.mappings.message.properties.priority.type").isEqualTo("long");
-        at.jsonPathAsString("$.mappings.message.properties.alert.type").isEqualTo("boolean");
-        at.jsonPathAsString("$.mappings.message.properties.fields.type").isEqualTo("object");
-        at.jsonPathAsBoolean("$.mappings.message.properties.fields.dynamic").isTrue();
-        at.jsonPathAsString("$.mappings.message.properties.triggered_jobs.type").isEqualTo("keyword");
-    }
-
-    @Test
-    public void templateWithES5() throws Exception {
-        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("5.0.0"));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "5.0.0",
+            "6.0.0",
+            "7.0.0"
+    })
+    void createsValidMappingTemplates(String versionString) throws Exception {
+        final Version version = Version.valueOf(versionString);
+        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(version);
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
             at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
             at.jsonPathAsInteger("$.order").isEqualTo(-1);
-            assertStandardMappingValues(at);
+            assertStandardMappingValues(at, version);
         });
 
         assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*", 23), at -> {
             at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
             at.jsonPathAsInteger("$.order").isEqualTo(23);
-            assertStandardMappingValues(at);
+            assertStandardMappingValues(at, version);
         });
     }
 
-    @Test
-    public void templateWithES6() throws Exception {
-        final IndexMappingTemplate mapping = IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("6.0.0"));
-
-        assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*"), at -> {
-            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
-            at.jsonPathAsInteger("$.order").isEqualTo(-1);
-            assertStandardMappingValues(at);
-        });
-
-        assertJsonPath(mapping.toTemplate(indexSetConfig, "test_*", 42), at -> {
-            at.jsonPathAsString("$.index_patterns").isEqualTo("test_*");
-            at.jsonPathAsInteger("$.order").isEqualTo(42);
-            assertStandardMappingValues(at);
-        });
+    private void assertJsonPath(Map<String, Object> map, Consumer<JsonPathAssert> consumer) throws Exception {
+        AssertJsonPath.assertJsonPath(objectMapper.writeValueAsString(map), consumer);
     }
 
-    @Test
-    public void templateWithUnsupportedESVersions() {
-        final String indexPattern = "test_*";
+    private void assertStandardMappingValues(JsonPathAssert at, Version version) {
+        at.jsonPathAsString("$.settings['index.refresh_interval']").isEqualTo("1s");
 
-        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("8.0.0")).toTemplate(indexSetConfig, indexPattern))
-                .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: 8.0.0");
+        at.jsonPathAsBoolean(keyFor("_source.enabled", version)).isTrue();
+        at.jsonPathAsBoolean(keyFor("dynamic", version)).isFalse();
 
-        assertThatThrownBy(() -> IndexMappingFactory.eventsIndexMappingFor(Version.valueOf("2.4.0")).toTemplate(indexSetConfig, indexPattern))
-                .isInstanceOf(ElasticsearchException.class)
-                .hasMessageContaining("Unsupported Elasticsearch version: 2.4.0");
+        at.jsonPathAsString(keyFor("dynamic_templates[0]fields.path_match", version)).isEqualTo("fields.*");
+        at.jsonPathAsString(keyFor("dynamic_templates[0]fields.mapping.type", version)).isEqualTo("keyword");
+        at.jsonPathAsBoolean(keyFor("dynamic_templates[0]fields.mapping.doc_values", version)).isTrue();
+        at.jsonPathAsBoolean(keyFor("dynamic_templates[0]fields.mapping.index", version)).isTrue();
+
+        at.jsonPathAsString(keyFor("properties.id.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.event_definition_type.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.event_definition_id.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.origin_context.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.timestamp.type", version)).isEqualTo("date");
+        at.jsonPathAsString(keyFor("properties.timestamp.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timestamp_processing.type", version)).isEqualTo("date");
+        at.jsonPathAsString(keyFor("properties.timestamp_processing.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timerange_start.type", version)).isEqualTo("date");
+        at.jsonPathAsString(keyFor("properties.timerange_start.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.timerange_end.type", version)).isEqualTo("date");
+        at.jsonPathAsString(keyFor("properties.timerange_end.format", version)).isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
+        at.jsonPathAsString(keyFor("properties.streams.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.source_streams.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.message.type", version)).isEqualTo("text");
+        at.jsonPathAsString(keyFor("properties.message.analyzer", version)).isEqualTo("standard");
+        at.jsonPathAsBoolean(keyFor("properties.message.norms", version)).isFalse();
+        at.jsonPathAsString(keyFor("properties.message.fields.keyword.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.source.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.key.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.key_tuple.type", version)).isEqualTo("keyword");
+        at.jsonPathAsString(keyFor("properties.priority.type", version)).isEqualTo("long");
+        at.jsonPathAsString(keyFor("properties.alert.type", version)).isEqualTo("boolean");
+        at.jsonPathAsString(keyFor("properties.fields.type", version)).isEqualTo("object");
+        at.jsonPathAsBoolean(keyFor("properties.fields.dynamic", version)).isTrue();
+        at.jsonPathAsString(keyFor("properties.triggered_jobs.type", version)).isEqualTo("keyword");
+    }
+
+    private String keyFor(String keySuffix, Version version) {
+        if (version.greaterThanOrEqualTo(Version.valueOf("7.0.0"))) {
+            return "$.mappings." + keySuffix;
+        }
+        return "$.mappings.message." + keySuffix;
     }
 }
