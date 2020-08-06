@@ -1,11 +1,11 @@
 // @flow strict
 import chroma from 'chroma-js';
 
-export type ReadableColor = {
-  (string, void | string, void | string): string,
-};
+import type { Colors } from 'theme/colors';
 
-const readableColor = (colors) => (
+export type ReadableColor = (string, void | string, void | string) => string;
+
+const readableColor = (colors: Colors) => (
   hex: string,
   darkColor?: string = colors.global.textDefault,
   lightColor?: string = colors.global.textAlt,

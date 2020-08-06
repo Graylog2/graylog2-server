@@ -7,13 +7,6 @@ import fonts, { fontsPropTypes } from './fonts';
 import utils, { utilsPropTypes } from './utils';
 import type { ThemeInterface } from './types';
 
-const theme: ThemeInterface = {
-  breakpoints,
-  colors,
-  utils,
-  fonts,
-};
-
 const themePropTypes = PropTypes.shape({
   breakpoints: breakpointPropTypes,
   colors: colorsPropTypes,
@@ -30,5 +23,3 @@ export {
 };
 
 export type { ThemeInterface };
-
-export default theme;
