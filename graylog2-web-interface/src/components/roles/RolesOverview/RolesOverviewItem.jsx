@@ -22,7 +22,7 @@ const RolesOverviewItem = ({
   return (
     <tr key={id}>
       <td className="limited">
-        <Link to={Routes.SYSTEM.ROLES.show(id)}>
+        <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>
           {name}
         </Link>
       </td>

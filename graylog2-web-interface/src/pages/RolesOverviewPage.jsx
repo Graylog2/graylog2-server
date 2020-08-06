@@ -21,7 +21,7 @@ const RolesOverviewPage = () => (
       </span>
 
       <ButtonToolbar>
-        <LinkContainer to={Routes.SYSTEM.ROLES.OVERVIEW}>
+        <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
           <Button bsStyle="info">Roles Overview</Button>
         </LinkContainer>
       </ButtonToolbar>

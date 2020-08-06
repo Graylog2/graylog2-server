@@ -225,7 +225,7 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.USERS.edit(':username')} component={UserEditPage} />
               <Route path={Routes.SYSTEM.USERS.TOKENS.edit(':username')} component={UserTokensEditPage} />
 
-              <Route path={Routes.SYSTEM.ROLES.OVERVIEW} component={RolesOverviewPage} />
+              <Route path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
 
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} component={ProcessBufferDumpPage} />

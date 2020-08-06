@@ -116,7 +116,7 @@ const SystemMenu = ({ location }) => {
         <NavigationLink path={Routes.SYSTEM.USERS.OVERVIEW} description="Users and Teams" />
       </IfPermitted>
       <IfPermitted permissions={['roles:read']} anyPermissions>
-        <NavigationLink path={Routes.SYSTEM.ROLES.OVERVIEW} description="Roles" />
+        <NavigationLink path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} description="Roles" />
       </IfPermitted>
       <IfPermitted permissions={['users:list', 'roles:read']} anyPermissions>
         <NavigationLink path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} description="Authentication" />
