@@ -162,17 +162,17 @@ public class AuthzRolesResource extends RestResource {
     @Path("/rolesForUser/{username}")
     @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
-        @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
-        @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-        @ApiParam(name = "sort",
-                value = "The field to sort the result on",
-                required = true,
-                allowableValues = "name,description")
-        @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
-        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-        @DefaultValue("asc") @QueryParam("order") String order) {
+            @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
+            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @ApiParam(name = "sort",
+                    value = "The field to sort the result on",
+                    required = true,
+                    allowableValues = "name,description")
+            @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
+            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @DefaultValue("asc") @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
         try {
