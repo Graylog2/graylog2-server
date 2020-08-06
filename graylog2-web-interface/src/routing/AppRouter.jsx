@@ -56,6 +56,7 @@ import {
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
+  RoleDetailsPage,
   RoleEditPage,
   RolesOverviewPage,
   RolesPage,
@@ -227,6 +228,7 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.USERS.TOKENS.edit(':username')} component={UserTokensEditPage} />
 
               <Route path={Routes.SYSTEM.AUTHZROLES.OVERVIEW} component={RolesOverviewPage} />
+              <Route path={Routes.SYSTEM.AUTHZROLES.show(':roleId')} component={RoleDetailsPage} />
               <Route path={Routes.SYSTEM.AUTHZROLES.edit(':roleId')} component={RoleEditPage} />
 
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />

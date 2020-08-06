@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import RoleEdit from 'components/roles/RoleEdit';
-import Routes from 'routing/Routes';
+import RoleDetails from 'components/roles/RoleDetails';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
-import { Button } from 'components/graylog';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import DocsHelper from 'util/DocsHelper';
+import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { PageHeader, DocumentTitle } from 'components/common';
+import { Button } from 'components/graylog';
 import DocumentationLink from 'components/support/DocumentationLink';
+import Routes from 'routing/Routes';
 
 type Props = {
   params: {
@@ -19,17 +19,17 @@ type Props = {
   },
 };
 
-const PageTitle = ({ name }: {name: ?string}) => (
+const PageTitle = ({ fullName }: {fullName: ?string}) => (
   <>
-    Edit Role {name && (
+    Role Details {fullName && (
       <>
-        - <i>{name}</i>
+        - <i>{fullName}</i>
       </>
   )}
   </>
 );
 
-const RoleEditPage = ({ params }: Props) => {
+const RoleDetailsPage = ({ params }: Props) => {
   const [loadedRole, setLoadedRole] = useState();
   const roleId = params?.roleId;
 
@@ -38,10 +38,10 @@ const RoleEditPage = ({ params }: Props) => {
   }, [roleId]);
 
   return (
-    <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle name={loadedRole?.name} />}>
+    <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
+      <PageHeader title={<PageTitle fullName={loadedRole?.name} />}>
         <span>
-          You can assign the role to users.
+          Overview of details like name, description and assigned users.
         </span>
         <span>
           Learn more in the{' '}
@@ -54,9 +54,9 @@ const RoleEditPage = ({ params }: Props) => {
         {/* This needs to be defined for the page header, once we've merge the required PR */}
         <RoleActionLinks roleId={roleId} />
       </PageHeader>
-      <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
+      <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>
   );
 };
 
-export default withRouter(RoleEditPage);
+export default withRouter(RoleDetailsPage);
