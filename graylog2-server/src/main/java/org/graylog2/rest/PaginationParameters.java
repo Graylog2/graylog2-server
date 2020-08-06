@@ -64,20 +64,40 @@ public class PaginationParameters {
         return query;
     }
 
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
     public int getPage() {
         return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
     }
 
     public int getPerPage() {
         return perPage;
     }
 
+    public void setPerPage(int perPage) {
+        this.perPage = perPage;
+    }
+
     public String getSortBy() {
         return sortBy;
     }
 
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
     public String getOrder() {
         return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
     }
 
     @Override
