@@ -20,8 +20,9 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const PreferencesStore = StoreProvider.getStore('Preferences');
 
 const GraylogThemeProvider = ({ children }: Props) => {
-  const [mode, setMode] = React.useState(DEFAULT_THEME_MODE);
-  const [themeColors, setThemeColors] = React.useState(colors[mode]);
+  const [mode, setMode] = React.useState();
+  const [themeColors, setThemeColors] = React.useState();
+  const [theme, setTheme] = React.useState();
   const [userPreferences, setUserPreferences] = React.useState();
 
   const currentUser = useStore(CurrentUserStore, (userStore) => {
@@ -29,16 +30,6 @@ const GraylogThemeProvider = ({ children }: Props) => {
 
     return userStore?.currentUser;
   });
-
-  React.useEffect(() => {
-    if (userPreferences) {
-      setMode(userPreferences[PREFERENCES_THEME_MODE] || DEFAULT_THEME_MODE);
-    }
-  }, [userPreferences]);
-
-  React.useEffect(() => {
-    setThemeColors(colors[mode]);
-  }, [mode]);
 
   const handleModeChange = (nextMode) => {
     if (colors[nextMode]) {
@@ -50,28 +41,48 @@ const GraylogThemeProvider = ({ children }: Props) => {
     }
   };
 
-  const theme: ThemeInterface = {
-    mode,
-    changeMode: handleModeChange,
-    breakpoints,
-    colors: themeColors,
-    fonts,
-    components: {
-      button: buttonStyles({ colors: themeColors, utils }),
-      aceEditor: aceEditorStyles({ colors: themeColors }),
-    },
-    utils: {
-      ...utils,
-      colorLevel: utils.colorLevel(themeColors),
-      readableColor: utils.readableColor(themeColors),
-    },
-  };
+  React.useEffect(() => {
+    if (userPreferences) {
+      setMode(userPreferences[PREFERENCES_THEME_MODE] || DEFAULT_THEME_MODE);
+    } else {
+      setMode(DEFAULT_THEME_MODE);
+    }
+  }, [userPreferences]);
 
-  return (
+  React.useEffect(() => {
+    setThemeColors(colors[mode]);
+  }, [mode]);
+
+  React.useEffect(() => {
+    if (themeColors) {
+      const formattedUtils = {
+        ...utils,
+        colorLevel: utils.colorLevel(themeColors),
+        readableColor: utils.readableColor(themeColors),
+      };
+
+      const nextTheme: ThemeInterface = {
+        mode,
+        changeMode: handleModeChange,
+        breakpoints,
+        colors: themeColors,
+        fonts,
+        components: {
+          button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
+          aceEditor: aceEditorStyles({ colors: themeColors }),
+        },
+        utils: formattedUtils,
+      };
+
+      setTheme(nextTheme);
+    }
+  }, [themeColors]);
+
+  return theme ? (
     <ThemeProvider theme={theme}>
       {children}
     </ThemeProvider>
-  );
+  ) : null;
 };
 
 GraylogThemeProvider.propTypes = {
