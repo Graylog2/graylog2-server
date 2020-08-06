@@ -26,7 +26,7 @@ const ApiRoutes = {
   },
   AuthzRolesController: {
     load: () => { return { url: '/authzRoles' }; },
-    loadForUser: (username) => { return { url: `/authzRoles/${username}` }; },
+    loadForUser: (username) => { return { url: `/authzRoles/rolesForUser/${username}` }; },
   },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },

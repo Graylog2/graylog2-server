@@ -103,7 +103,7 @@ public class AuthzRolesResource extends RestResource {
 
     @GET
     @ApiOperation(value = "Get a paginated list roles for a user")
-    @Path("/{username}")
+    @Path("/rolesForUser/{username}")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.ROLES_READ)
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
