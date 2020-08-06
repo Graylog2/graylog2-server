@@ -16,17 +16,18 @@
  */
 package org.graylog.security.shares;
 
+import com.google.auto.value.AutoValue;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
+import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDescriptor;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.PaginationParameters;
-import org.graylog2.rest.models.PaginatedResponse;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -48,8 +49,8 @@ public class GranteeSharesService {
         this.descriptorService = descriptorService;
     }
 
-    public PaginatedResponse<EntityDescriptor> getPaginatedSharesFor(GRN grantee, PaginationParameters paginationParameters) {
-        final ImmutableSet<GrantDTO> grants = grantService.getForGranteesOrGlobal(Collections.singleton(grantee));
+    public SharesResponse getPaginatedSharesFor(GRN grantee, PaginationParameters paginationParameters) {
+        final ImmutableSet<GrantDTO> grants = grantService.getForGrantee(grantee);
 
         final List<EntityDescriptor> entityDescriptors = grants.stream()
                 .map(GrantDTO::target)
@@ -70,9 +71,9 @@ public class GranteeSharesService {
                 .map(EntityDescriptor::id)
                 .collect(Collectors.toSet());
 
-        final Map<String, Object> userCapabilities = grants.stream()
+        final Map<GRN, Capability> granteeCapabilities = grants.stream()
                 .filter(grant -> entityDescriptorsGRNs.contains(grant.target()))
-                .collect(Collectors.toMap(grant -> grant.target().toString(), GrantDTO::capability));
+                .collect(Collectors.toMap(GrantDTO::target, GrantDTO::capability));
 
         final PaginatedList<EntityDescriptor> paginatedList = new PaginatedList<>(
                 entityDescriptors,
@@ -81,7 +82,7 @@ public class GranteeSharesService {
                 paginationParameters.getPerPage()
         );
 
-        return PaginatedResponse.create("entities", paginatedList, Collections.singletonMap("grantee_capabilities", userCapabilities));
+        return SharesResponse.create(paginatedList, granteeCapabilities);
     }
 
     private Predicate<GRNDescriptor> queryPredicate(PaginationParameters paginationParameters) {
@@ -92,5 +93,16 @@ public class GranteeSharesService {
         }
 
         return descriptor -> descriptor.title().toLowerCase(Locale.US).contains(query);
+    }
+
+    @AutoValue
+    public static abstract class SharesResponse {
+        public abstract PaginatedList<EntityDescriptor> paginatedEntities();
+
+        public abstract Map<GRN, Capability> capabilities();
+
+        public static SharesResponse create(PaginatedList<EntityDescriptor> paginatedEntities, Map<GRN, Capability> capabilities) {
+            return new AutoValue_GranteeSharesService_SharesResponse(paginatedEntities, capabilities);
+        }
     }
 }

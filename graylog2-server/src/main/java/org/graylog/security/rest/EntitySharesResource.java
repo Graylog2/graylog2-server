@@ -55,6 +55,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
@@ -101,7 +102,9 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
-        return granteeSharesService.getPaginatedSharesFor(grnRegistry.ofUser(user), paginationParameters);
+        final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(grnRegistry.ofUser(user), paginationParameters);
+
+        return PaginatedResponse.create("entities", response.paginatedEntities(), Collections.singletonMap("grantee_capabilities", response.capabilities()));
     }
 
     @POST
