@@ -34,19 +34,19 @@ const TimeoutInput = createReactClass({
 
     return {
       sessionTimeoutNever: (value ? value === -1 : false),
-      value: (value ? Math.floor(value / unit) : 0),
+      value: (value ? Math.floor(value / Number(unit)) : 0),
       unit: unit,
     };
   },
 
   getValue() {
-    const { sessionTimeoutNever } = this.state;
+    const { sessionTimeoutNever, unit } = this.state;
 
     if (sessionTimeoutNever) {
       return -1;
     }
 
-    return (this.timeout.value * this.sessionTimeoutUnit.getValue());
+    return (this.timeout.input.value * Number(unit));
   },
 
   _estimateUnit(value) {
