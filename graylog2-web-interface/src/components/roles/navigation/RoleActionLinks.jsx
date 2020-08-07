@@ -12,12 +12,12 @@ type Props = {
 
 const RoleActionLinks = ({ roleId }: Props) => (
   <ButtonToolbar>
-    <LinkContainer to={Routes.SYSTEM.ROLES.show(roleId)}>
+    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.show(roleId)}>
       <Button bsStyle="success">
         View Details
       </Button>
     </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.ROLES.edit(roleId)}>
+    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(roleId)}>
       <Button bsStyle="success">
         Edit Role
       </Button>

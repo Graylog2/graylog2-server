@@ -39,7 +39,8 @@ const RoleDetailsPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedRole?.name} />}>
+      <PageHeader title={<PageTitle fullName={loadedRole?.name} />}
+                  subactions={<RoleActionLinks roleId={roleId} />}>
         <span>
           Overview of details like name, description and assigned users.
         </span>
@@ -51,8 +52,6 @@ const RoleDetailsPage = ({ params }: Props) => {
         <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
           <Button bsStyle="info">Roles Overview</Button>
         </LinkContainer>
-        {/* This needs to be defined for the page header, once we've merge the required PR */}
-        <RoleActionLinks roleId={roleId} />
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

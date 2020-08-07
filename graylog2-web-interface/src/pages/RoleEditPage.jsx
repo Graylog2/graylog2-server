@@ -39,7 +39,8 @@ const RoleEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle name={loadedRole?.name} />}>
+      <PageHeader title={<PageTitle name={loadedRole?.name} />}
+                  subactions={<RoleActionLinks roleId={roleId} />}>
         <span>
           You can assign the role to users.
         </span>
@@ -51,8 +52,6 @@ const RoleEditPage = ({ params }: Props) => {
         <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
           <Button bsStyle="info">Roles Overview</Button>
         </LinkContainer>
-        {/* This needs to be defined for the page header, once we've merge the required PR */}
-        <RoleActionLinks roleId={roleId} />
       </PageHeader>
       <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>
