@@ -3,9 +3,8 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Formik, Form } from 'formik';
 
-import { useStore } from 'stores/connect';
 import { Alert, Col, Row, Button } from 'components/graylog';
-import { UsersStore, UsersActions } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -40,11 +39,11 @@ const _validate = (values) => {
 };
 
 const UserCreate = () => {
-  const { list: users } = useStore(UsersStore);
+  const [users, setUsers] = useState();
   const [submitError, setSubmitError] = useState();
 
   useEffect(() => {
-    UsersActions.loadUsers();
+    UsersActions.loadUsers().then(setUsers);
   }, []);
 
   return (

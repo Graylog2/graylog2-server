@@ -7,8 +7,7 @@ import { Row, Col } from 'components/graylog';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
@@ -64,8 +63,8 @@ const _createToken = (tokenName, username, loadTokens, setCreatingToken) => {
 };
 
 const UserEditPage = ({ params }: Props) => {
-  const { loadedUser } = useStore(UsersStore);
   const currentUser = useContext(CurrentUserContext);
+  const [loadedUser, setLoadedUser] = useState();
   const [tokens, setTokens] = useState([]);
   const [deletingTokenId, setDeletingTokenId] = useState();
   const [creatingToken, setCreatingToken] = useState(false);
@@ -78,6 +77,7 @@ const UserEditPage = ({ params }: Props) => {
 
   useEffect(() => {
     loadTokens();
+    UsersActions.load(username).then(setLoadedUser);
   }, [currentUser, username]);
 
   return (
@@ -94,7 +94,7 @@ const UserEditPage = ({ params }: Props) => {
         </span>
 
         <UserManagementLinks username={username}
-                             userIsReadOnly={loadedUser?.readOnly} />
+                             userIsReadOnly={loadedUser?.readOnly ?? false} />
       </PageHeader>
 
       <Row className="content">
