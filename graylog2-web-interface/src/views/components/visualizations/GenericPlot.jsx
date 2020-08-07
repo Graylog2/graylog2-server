@@ -146,20 +146,26 @@ class GenericPlot extends React.Component<Props, State> {
       },
       legend: {
         orientation: 'h',
+        font: {
+          color: theme.colors.variant.darkest.default,
+        },
       },
       hoverlabel: {
         namelength: -1,
       },
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
       yaxis: {
         automargin: true,
+        gridcolor: theme.colors.variant.lightest.default,
         tickfont: {
-          color: theme.colors.gray[50],
+          color: theme.colors.variant.darkest.default,
         },
       },
       xaxis: {
         automargin: true,
         tickfont: {
-          color: theme.colors.gray[50],
+          color: theme.colors.variant.darkest.default,
         },
       },
     };
