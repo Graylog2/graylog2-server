@@ -9,24 +9,24 @@ const userQueryHelperPopover = (
     <p><strong>Available search fields</strong></p>
     <Table condensed>
       <thead>
-      <tr>
-        <th>Field</th>
-        <th>Description</th>
-      </tr>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>full_name</td>
-        <td>The full name of a user</td>
-      </tr>
-      <tr>
-        <td>username</td>
-        <td>The users login username.</td>
-      </tr>
-      <tr>
-        <td>email</td>
-        <td>The users email.</td>
-      </tr>
+        <tr>
+          <td>full_name</td>
+          <td>The full name of a user</td>
+        </tr>
+        <tr>
+          <td>username</td>
+          <td>The users login username.</td>
+        </tr>
+        <tr>
+          <td>email</td>
+          <td>The users email.</td>
+        </tr>
       </tbody>
     </Table>
     <p><strong>Examples</strong></p>
