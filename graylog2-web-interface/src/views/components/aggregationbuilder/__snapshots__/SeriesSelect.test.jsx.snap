@@ -74,7 +74,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
               "link": "#702785",
               "linkHover": "#410057",
               "navigationBackground": "#fff",
-              "navigationBoxShadow": "rgba(115,115,115,0.1)",
+              "navigationBoxShadow": "rgba(115,115,115,0.25)",
               "textAlt": "#fff",
               "textDefault": "#1f1f1f",
             },
