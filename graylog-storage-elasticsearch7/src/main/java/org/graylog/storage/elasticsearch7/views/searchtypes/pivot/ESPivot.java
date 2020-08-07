@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2020 Graylog, Inc.
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Server Side Public License, version 1,
  * as published by MongoDB, Inc.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * Server Side Public License for more details.
- *
+ * <p>
  * You should have received a copy of the Server Side Public License
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
@@ -25,14 +25,21 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min;
@@ -53,11 +60,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
@@ -65,11 +75,12 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
+    private static final String TERMS_SEPARATOR = "\u2E31";
 
     private static TimeRange allMessagesTimeRange() {
         try {
             return RelativeRange.create(0);
-        } catch (InvalidRangeParametersException e){
+        } catch (InvalidRangeParametersException e) {
             LOG.error("Unable to instantiate all messages timerange: ", e);
         }
         return null;
@@ -91,72 +102,37 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggTypes aggTypes = new AggTypes();
         contextMap.put(pivot.id(), aggTypes);
 
-        // holds the initial level aggregation to be added to the query
-        AggregationBuilder topLevelAggregation = null;
-        // holds the last complete bucket aggregation into which subsequent buckets get added
-        AggregationBuilder previousAggregation = null;
+        final List<AggregationBuilder> seriesAggregations = seriesStream(pivot, queryContext, "global rollup")
+                .collect(Collectors.toList());
 
         // add global rollup series if those were requested
         if (pivot.rollup()) {
-            seriesStream(pivot, queryContext, "global rollup")
+            seriesAggregations
                     .forEach(searchSourceBuilder::aggregation);
         }
 
-        final Iterator<BucketSpec> rowBuckets = pivot.rowGroups().iterator();
-        while (rowBuckets.hasNext()) {
-            final BucketSpec bucketSpec = rowBuckets.next();
+        final String rowsAggregationName = queryContext.nextName();
+        contextMap.put(pivot.id() + "-rows", rowsAggregationName);
 
-            final String name = queryContext.nextName();
-            LOG.debug("Creating row group aggregation '{}' as {}", bucketSpec.type(), name);
-            final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
-            if (handler == null) {
-                throw new IllegalArgumentException("Unknown row_group type " + bucketSpec.type());
-            }
-            final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
-            if (generatedAggregation.isPresent()) {
-                final AggregationBuilder aggregationBuilder = generatedAggregation.get();
-                if (topLevelAggregation == null) {
-                    topLevelAggregation = aggregationBuilder;
-                }
-                // always insert the series for the final row group, or for each one if explicit rollup was requested
-                if (!rowBuckets.hasNext() || pivot.rollup()) {
-                    seriesStream(pivot, queryContext, !rowBuckets.hasNext() ? "leaf row" : "row rollup")
-                            .forEach(aggregationBuilder::subAggregation);
-                }
-                if (previousAggregation != null) {
-                    previousAggregation.subAggregation(aggregationBuilder);
-                } else {
-                    searchSourceBuilder.aggregation(aggregationBuilder);
-                }
-                previousAggregation = aggregationBuilder;
-            }
-        }
-        final Iterator<BucketSpec> colBuckets = pivot.columnGroups().iterator();
-        while (colBuckets.hasNext()) {
-            final BucketSpec bucketSpec = colBuckets.next();
+        final List<BucketOrder> bucketOrder = orderListForPivot(pivot, queryContext);
+        final AggregationBuilder rowsAggregation = createAggregation(rowsAggregationName, pivot.rowGroups(), bucketOrder);
 
-            final String name = queryContext.nextName();
-            LOG.debug("Creating column group aggregation '{}' as {}", bucketSpec.type(), name);
-            final ESPivotBucketSpecHandler<? extends PivotSpec, ? extends Aggregation> handler = bucketHandlers.get(bucketSpec.type());
-            if (handler == null) {
-                throw new IllegalArgumentException("Unknown column_group type " + bucketSpec.type());
-            }
-            final Optional<AggregationBuilder> generatedAggregation = handler.createAggregation(name, pivot, bucketSpec, this, queryContext, query);
-            if (generatedAggregation.isPresent()) {
-                final AggregationBuilder aggregationBuilder = generatedAggregation.get();
-                // always insert the series for the final row group, or for each one if explicit rollup was requested
-                if (!colBuckets.hasNext() || pivot.rollup()) {
-                    seriesStream(pivot, queryContext, !colBuckets.hasNext() ? "leaf column" : "column rollup")
-                            .forEach(aggregationBuilder::subAggregation);
-                }
-                if (previousAggregation != null) {
-                    previousAggregation.subAggregation(aggregationBuilder);
-                } else {
-                    searchSourceBuilder.aggregation(aggregationBuilder);
-                }
-                previousAggregation = aggregationBuilder;
-            }
+        if (pivot.rollup()) {
+            seriesAggregations.forEach(rowsAggregation::subAggregation);
         }
+
+        searchSourceBuilder.aggregation(rowsAggregation);
+
+        if (!pivot.columnGroups().isEmpty()) {
+            final String columnsAggregationName = queryContext.nextName();
+            contextMap.put(pivot.id() + "-columns", columnsAggregationName);
+            final AggregationBuilder columnsAggregation = createAggregation(columnsAggregationName, pivot.columnGroups(), bucketOrder);
+
+            seriesAggregations.forEach(columnsAggregation::subAggregation);
+
+            rowsAggregation.subAggregation(columnsAggregation);
+        }
+
 
         final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
         final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
@@ -164,9 +140,50 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
 
-        if (topLevelAggregation == null) {
-            LOG.debug("No aggregations generated for {}", pivot);
-        }
+    }
+
+    private AggregationBuilder createAggregation(String name, List<BucketSpec> pivots, List<BucketOrder> bucketOrder) {
+        final String aggregationScript = createScript(pivots);
+
+        final TermsAggregationBuilder builder = AggregationBuilders.terms(name)
+                .script(new Script(aggregationScript));
+
+        return bucketOrder.isEmpty() ? builder : builder.order(bucketOrder);
+    }
+
+    private List<BucketOrder> orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext) {
+        return pivot.sort()
+                .stream()
+                .map(sortSpec -> {
+                    if (sortSpec instanceof PivotSort) {
+                        return BucketOrder.key(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                    }
+                    if (sortSpec instanceof SeriesSort) {
+                        final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
+                                .stream()
+                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .findFirst();
+                        return matchingSeriesSpec
+                                .map(seriesSpec -> {
+                                    if (seriesSpec.literal().equals("count()")) {
+                                        return BucketOrder.count(sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                    }
+                                    return BucketOrder.aggregation(esGeneratedQueryContext.seriesName(seriesSpec, pivot), sortSpec.direction().equals(SortSpec.Direction.Ascending));
+                                })
+                                .orElse(null);
+                    }
+
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private String createScript(List<BucketSpec> pivots) {
+        return pivots.stream()
+                .map(BucketSpec::field)
+                .map(field -> "doc['" + field + "'].value")
+                .collect(Collectors.joining(" + '" + TERMS_SEPARATOR + "' + "));
     }
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
@@ -221,11 +238,56 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         // first we iterate over all row groups (whose values generate a "key array", corresponding to the nesting level)
         // once we exhaust the row groups, we descend into the columns, which get added as values to their corresponding rows
         // on each nesting level and combination we have to check for series which we also add as values to the containing row
-        final HasAggregations initialResult = createInitialResult(queryResult);
 
-        processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), initialResult);
+        final String rowsAggName = queryContext.contextMap().get(pivot.id() + "-rows").toString();
+        final MultiBucketsAggregation rowsResult = queryResult.getAggregations().get(rowsAggName);
+        final List<PivotResult.Row> rows = rowsResult.getBuckets()
+                .stream()
+                .map(bucket -> {
+                    final ImmutableList<String> rowKeys = ImmutableList.copyOf(bucket.getKeyAsString().split(TERMS_SEPARATOR));
+                    final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(rowKeys)
+                            .source("leaf");
+                    if (pivot.rollup()) {
+                        pivot.series().stream()
+                                .flatMap(seriesSpec -> createRowValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec))
+                                .forEach(rowBuilder::addValue);
+                    }
+                    if (!pivot.columnGroups().isEmpty()) {
+                        final String columnsAggName = queryContext.contextMap().get(pivot.id() + "-columns").toString();
+                        final MultiBucketsAggregation columnsResult = bucket.getAggregations().get(columnsAggName);
+                        columnsResult.getBuckets().forEach(columnBucket -> {
+                            final ImmutableList<String> columnKeys = ImmutableList.copyOf(columnBucket.getKeyAsString().split(TERMS_SEPARATOR));
+                            pivot.series().stream()
+                                    .flatMap(seriesSpec -> createColumnValuesForSeries(pivot, queryResult, queryContext, columnBucket, seriesSpec, columnKeys))
+                                    .forEach(rowBuilder::addValue);
+                        });
+                    }
+                    return rowBuilder.build();
+                })
+                .collect(Collectors.toList());
+
+        resultBuilder.addAllRows(rows);
 
         return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
+    }
+
+    private Stream<PivotResult.Value> createRowValuesForSeries(Pivot pivot, SearchResponse queryResult, ESGeneratedQueryContext queryContext, MultiBucketsAggregation.Bucket bucket, SeriesSpec seriesSpec) {
+        return createValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec, true, "row-leaf", Collections.emptyList());
+    }
+
+    private Stream<PivotResult.Value> createColumnValuesForSeries(Pivot pivot, SearchResponse queryResult, ESGeneratedQueryContext queryContext, MultiBucketsAggregation.Bucket bucket, SeriesSpec seriesSpec, List<String> additionalKeys) {
+        return createValuesForSeries(pivot, queryResult, queryContext, bucket, seriesSpec, false, "col-leaf", additionalKeys);
+    }
+
+    private Stream<PivotResult.Value> createValuesForSeries(Pivot pivot, SearchResponse queryResult, ESGeneratedQueryContext queryContext, MultiBucketsAggregation.Bucket bucket, SeriesSpec seriesSpec, boolean rollup, String source, List<String> additionalKeys) {
+        final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
+        final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, bucket, queryContext);
+        final Collection<String> keys = ImmutableList.<String>builder()
+                .addAll(additionalKeys)
+                .add(seriesSpec.literal())
+                .build();
+        return seriesHandler.handleResult(pivot, seriesSpec, queryResult, series, this, queryContext)
+                .map(value -> PivotResult.Value.create(keys, value.value(), rollup, source));
     }
 
     private HasAggregations createInitialResult(SearchResponse queryResult) {

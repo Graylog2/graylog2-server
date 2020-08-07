@@ -42,6 +42,9 @@ public interface BucketSpec extends PivotSpec {
     @JsonProperty
     String type();
 
+    @JsonProperty
+    String field();
+
     @JsonAutoDetect
     class Fallback implements BucketSpec {
         @JsonProperty
@@ -51,6 +54,11 @@ public interface BucketSpec extends PivotSpec {
         @Override
         public String type() {
             return type;
+        }
+
+        @Override
+        public String field() {
+            return getProperties().get("field").toString();
         }
 
         @JsonAnySetter
