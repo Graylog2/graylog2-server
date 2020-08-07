@@ -36,10 +36,7 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.graylog2.plugin.DocsHelper;
-import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
-import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.shared.security.ldap.LdapEntry;
-import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +44,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.net.ssl.TrustManager;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Iterator;
@@ -74,38 +67,13 @@ public class LdapConnector {
     private static final String ATTRIBUTE_MEMBER_UID = "memberUid";
 
     private final int connectionTimeout;
-    private final Set<String> enabledTlsProtocols;
-    private final LdapSettingsService ldapSettingsService;
-    private final TrustManagerProvider trustManagerProvider;
-
-    public interface TrustManagerProvider {
-        TrustManager create(String host) throws KeyStoreException, NoSuchAlgorithmException;
-    }
 
     @Inject
-    public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout,
-                         @Named("enabled_tls_protocols") Set<String> enabledTlsProtocols,
-                         LdapSettingsService ldapSettingsService,
-                         TrustManagerProvider trustManagerProvider) {
+    public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
-        this.enabledTlsProtocols = enabledTlsProtocols;
-        this.ldapSettingsService = ldapSettingsService;
-        this.trustManagerProvider = trustManagerProvider;
-    }
-
-    public LdapNetworkConnection connect(LdapSettings settings) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
-        final LdapConnectionConfig config = createConfig(settings);
-        return connect(config);
-    }
-
-    public LdapNetworkConnection connect(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException {
-        final LdapConnectionConfig config = createConfig(request);
-        return connect(config);
     }
 
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
-        config.setEnabledProtocols(enabledTlsProtocols.toArray(new String[0]));
-
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
         connection.setTimeOut(connectionTimeout);
 
@@ -116,23 +84,24 @@ public class LdapConnector {
 
         // this will perform an anonymous bind if there were no system credentials
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("ldap-connector-%d").build();
-        @SuppressWarnings("UnstableApiUsage")
         final SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor(threadFactory));
-        @SuppressWarnings({"unchecked", "UnstableApiUsage"})
+        @SuppressWarnings("unchecked")
         final Callable<Boolean> timeLimitedConnection = timeLimiter.newProxy(
-                connection::connect,
-                Callable.class,
-                connectionTimeout,
-                TimeUnit.MILLISECONDS);
+                new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() throws Exception {
+                        return connection.connect();
+                    }
+                }, Callable.class,
+                connectionTimeout, TimeUnit.MILLISECONDS);
         try {
             final Boolean connected = timeLimitedConnection.call();
             if (!connected) {
                 return null;
             }
         } catch (UncheckedTimeoutException e) {
-            final String message = "Timed out connecting to LDAP server.";
-            LOG.error(message, e);
-            throw new LdapException(message, e.getCause());
+            LOG.error("Timed out connecting to LDAP server", e);
+            throw new LdapException("Could not connect to LDAP server", e.getCause());
         } catch (LdapException e) {
             throw e;
         } catch (Exception e) {
@@ -434,57 +403,5 @@ public class LdapConnector {
         }
         LOG.trace("Binding DN {} did not throw, connection authenticated: {}", principal, connection.isAuthenticated());
         return connection.isAuthenticated();
-    }
-
-    private LdapConnectionConfig createConfig(LdapTestConfigRequest request) throws KeyStoreException, NoSuchAlgorithmException {
-        final LdapConnectionConfig config = new LdapConnectionConfig();
-        final URI ldapUri = request.ldapUri();
-        config.setLdapHost(ldapUri.getHost());
-        config.setLdapPort(ldapUri.getPort());
-        config.setUseSsl(ldapUri.getScheme().startsWith("ldaps"));
-        config.setUseTls(request.useStartTls());
-
-        if (request.trustAllCertificates()) {
-            config.setTrustManagers(new TrustAllX509TrustManager());
-        } else {
-            config.setTrustManagers(trustManagerProvider.create(ldapUri.getHost()));
-        }
-
-        if (!isNullOrEmpty(request.systemUsername())) {
-            config.setName(request.systemUsername());
-
-            if (!isNullOrEmpty(request.systemPassword())) {
-                // Use the given password for the connection test
-                config.setCredentials(request.systemPassword());
-            } else {
-                // If the config request has a username but no password set, we have to use the password from the database.
-                // This is because we don't expose the plain-text password through the API anymore and the settings form
-                // doesn't submit a password.
-                final LdapSettings ldapSettings = ldapSettingsService.load();
-                if (ldapSettings != null && !isNullOrEmpty(ldapSettings.getSystemPassword())) {
-                    config.setCredentials(ldapSettings.getSystemPassword());
-                }
-            }
-        }
-
-        return config;
-    }
-
-    private LdapConnectionConfig createConfig(LdapSettings ldapSettings) throws KeyStoreException, NoSuchAlgorithmException {
-        final LdapConnectionConfig config = new LdapConnectionConfig();
-        final String hostname = ldapSettings.getUri().getHost();
-        config.setLdapHost(hostname);
-        config.setLdapPort(ldapSettings.getUri().getPort());
-        config.setUseSsl(ldapSettings.getUri().getScheme().startsWith("ldaps"));
-        config.setUseTls(ldapSettings.isUseStartTls());
-        if (ldapSettings.isTrustAllCertificates()) {
-            config.setTrustManagers(new TrustAllX509TrustManager());
-        } else {
-            config.setTrustManagers(trustManagerProvider.create(hostname));
-        }
-        config.setName(ldapSettings.getSystemUserName());
-        config.setCredentials(ldapSettings.getSystemPassword());
-
-        return config;
     }
 }

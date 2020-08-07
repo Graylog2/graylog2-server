@@ -26,7 +26,6 @@ public class UserFields {
 
     // Derived and Enriched Fields
     public static final String USER_CATEGORY = "user_category";
-    public static final String USER_NAME_MAPPED = "user_name_mapped";
     public static final String USER_PRIORITY = "user_priority";
     public static final String USER_PRIORITY_LEVEL = "user_priority_level";
     public static final String USER_TYPE = "user_type";

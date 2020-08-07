@@ -8,8 +8,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import MessageTable from './MessageTable';
-
-import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 const messages = [
@@ -81,26 +79,6 @@ describe('MessageTable', () => {
                                         selectedFields={Immutable.Set()}
                                         setLoadingState={() => {}}
                                         messages={messages} />);
-
-    const tableHeadFields = wrapper.find('Field').map((field) => field.text());
-
-    expect(tableHeadFields).toEqual(configFields);
-  });
-
-  it('renders config fields in table head in non interactive mode', () => {
-    const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input'];
-    const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
-    const wrapper = mount(
-      <InteractiveContext.Provider value={false}>
-        <MessageTable activeQueryId={activeQueryId}
-                      config={configWithFields}
-                      fields={Immutable.List(fields)}
-                      onSortChange={() => Promise.resolve()}
-                      selectedFields={Immutable.Set()}
-                      setLoadingState={() => {}}
-                      messages={messages} />
-      </InteractiveContext.Provider>,
-    );
 
     const tableHeadFields = wrapper.find('Field').map((field) => field.text());
     expect(tableHeadFields).toEqual(configFields);
