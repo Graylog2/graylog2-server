@@ -5,6 +5,7 @@ import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
 import type { StyledComponent } from 'styled-components';
 
+import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import Role from 'logic/roles/Role';
 import { type PaginatedListType } from 'components/common/PaginatedItemOverview';
 import UserOverview from 'logic/users/UserOverview';
@@ -58,6 +59,19 @@ const _isRequired = (field) => (value) => (!value ? `The ${field} is required` :
 const UsersSelector = ({ role, onSubmit }: Props) => {
   const [users, setUsers] = useState([]);
   const [options, setOptions] = useState([]);
+  const getUnlimited = [1, 0, ''];
+
+  const _loadUsers = () => UsersActions.searchPaginated(...getUnlimited)
+    .then(({ list }) => {
+      if (list) {
+        const resultUsers = list
+          .filter((u) => !u.roles.includes(role.name))
+          .map((u) => ({ label: u.name, value: u.name }));
+
+        setOptions(resultUsers);
+        setUsers(list);
+      }
+    });
 
   const onUpdate = ({ user }: { user: string }, { resetForm }) => {
     const userOverview = users.find((u) => u.username === user);
@@ -66,25 +80,19 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
       throw new Error(`Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`);
     }
 
-    onSubmit(userOverview).then(() => {
-      resetForm();
-    });
+    onSubmit(userOverview).then(() => { resetForm(); });
   };
 
   useEffect(() => {
-    const getUnlimited = [1, 0, ''];
+    _loadUsers();
 
-    UsersActions.searchPaginated(...getUnlimited)
-      .then(({ list }) => {
-        if (list) {
-          const resultUsers = list
-            .filter((u) => !role.users.includes(u.name))
-            .map((u) => ({ label: u.name, value: u.name }));
+    const unlistenAddMember = AuthzRolesActions.addMember.completed.listen(_loadUsers);
+    const unlistenRemoveMember = AuthzRolesActions.removeMember.completed.listen(_loadUsers);
 
-          setOptions(resultUsers);
-          setUsers(list);
-        }
-      });
+    return () => {
+      unlistenRemoveMember();
+      unlistenAddMember();
+    };
   }, [role]);
 
   return (

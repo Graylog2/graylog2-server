@@ -120,7 +120,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
 
     addMember(roleId: string, username: string): Promise<Role> {
       const { url } = ApiRoutes.AuthzRolesController.addMember(roleId, username);
-      const promise = fetch('PUT', qualifyUrl(url)).then(Role.fromJSON);
+      const promise = fetch('PUT', qualifyUrl(url));
 
       AuthzRolesActions.addMember.promise(promise);
 
@@ -129,7 +129,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
 
     removeMember(roleId: string, username: string): Promise<Role> {
       const { url } = ApiRoutes.AuthzRolesController.removeMember(roleId, username);
-      const promise = fetch('PUT', qualifyUrl(url)).then(Role.fromJSON);
+      const promise = fetch('DELETE', qualifyUrl(url));
 
       AuthzRolesActions.removeMember.promise(promise);
 
