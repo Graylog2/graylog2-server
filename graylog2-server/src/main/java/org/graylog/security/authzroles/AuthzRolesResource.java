@@ -189,7 +189,11 @@ public class AuthzRolesResource extends RestResource {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Add a user to a role")
+<<<<<<< HEAD
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
+=======
+    @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+>>>>>>> Fix annotations from @bernd
     @Path("{roleId}/assignee/{username}")
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
@@ -200,7 +204,11 @@ public class AuthzRolesResource extends RestResource {
     @DELETE
     @ApiOperation("Remove a member to a team")
     @Path("{roleId}/assignee/{username}")
+<<<<<<< HEAD
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
+=======
+    @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+>>>>>>> Fix annotations from @bernd
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
@@ -223,6 +231,7 @@ public class AuthzRolesResource extends RestResource {
         rolesUpdater.update(roles, roleId);
         user.setRoleIds(roles);
         userService.save(user);
+<<<<<<< HEAD
     }
 
     @DELETE
@@ -238,5 +247,7 @@ public class AuthzRolesResource extends RestResource {
             throw new NotAllowedException("Cannot delete read only role with id: " + roleId);
         }
         authzRolesService.delete(roleId);
+=======
+>>>>>>> Fix annotations from @bernd
     }
 }
