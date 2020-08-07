@@ -42,6 +42,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -51,7 +52,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Set;
 
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
@@ -189,32 +189,28 @@ public class AuthzRolesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Add a user to a role")
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
-    @Path("{roleId}/assignee/add/{username}")
-    public Response addUser(
+    @Path("{roleId}/assignee/{username}")
+    public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
-        checkPermission(USERS_EDIT, username);
-
-        final User user = userService.load(username);
-        if (user == null) {
-            throw new NotFoundException("Cannot find user with name: " + username);
-        }
-        authzRolesService.get(roleId).orElseThrow(() -> new NotFoundException("Cannot find role with id: " + roleId));
-        Set<String> roles = user.getRoleIds();
-        roles.add(roleId);
-        user.setRoleIds(roles);
-        userService.save(user);
-
-        return Response.ok().build();
+        updateUserRole(roleId, username, Set::add);
     }
 
-    @PUT
+    @DELETE
     @ApiOperation("Remove a member to a team")
-    @Path("{roleId}/assignee/remove/{username}")
+    @Path("{roleId}/assignee/{username}")
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
-    public Response removeUser(
+    public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
+        updateUserRole(roleId, username, Set::remove);
+    }
+
+    interface UpdateRoles {
+        boolean update(Set<String> roles, String roleId);
+    }
+
+    private void updateUserRole(String roleId, String username, UpdateRoles rolesUpdater) throws ValidationException {
         checkPermission(USERS_EDIT, username);
 
         final User user = userService.load(username);
@@ -223,10 +219,8 @@ public class AuthzRolesResource extends RestResource {
         }
         authzRolesService.get(roleId).orElseThrow(() -> new NotFoundException("Cannot find role with id: " + roleId));
         Set<String> roles = user.getRoleIds();
-        roles.remove(roleId);
+        rolesUpdater.update(roles, roleId);
         user.setRoleIds(roles);
         userService.save(user);
-
-        return Response.ok().build();
     }
 }
