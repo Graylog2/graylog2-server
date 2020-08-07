@@ -45,6 +45,7 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAllowedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -188,7 +189,7 @@ public class AuthzRolesResource extends RestResource {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Add a user to a role")
-    @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+    @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     @Path("{roleId}/assignee/{username}")
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
@@ -199,7 +200,7 @@ public class AuthzRolesResource extends RestResource {
     @DELETE
     @ApiOperation("Remove a member to a team")
     @Path("{roleId}/assignee/{username}")
-    @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+    @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
@@ -222,5 +223,20 @@ public class AuthzRolesResource extends RestResource {
         rolesUpdater.update(roles, roleId);
         user.setRoleIds(roles);
         userService.save(user);
+    }
+
+    @DELETE
+    @Path("{roleId}")
+    @AuditEvent(type = AuditEventTypes.ROLE_DELETE)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation("Delete a role")
+    public void delete(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
+        checkPermission(RestPermissions.ROLES_EDIT);
+        final AuthzRoleDTO roleDTO = authzRolesService.get(roleId).orElseThrow(
+                () -> new NotFoundException("Could not delete role with id: " + roleId));
+        if (roleDTO.readOnly()) {
+            throw new NotAllowedException("Cannot delete read only role with id: " + roleId);
+        }
+        authzRolesService.delete(roleId);
     }
 }
