@@ -27,6 +27,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
@@ -97,7 +98,8 @@ public abstract class UserOverviewDTO {
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_UserOverviewDTO.Builder();
+            return new AutoValue_UserOverviewDTO.Builder()
+                    .roles(Collections.emptySet());
         }
 
         @Id
