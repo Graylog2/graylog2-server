@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
+
+import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
 const TimeoutInput = createReactClass({
   displayName: 'TimeoutInput',
@@ -18,24 +21,28 @@ const TimeoutInput = createReactClass({
 
   getDefaultProps() {
     return {
-      value: 60 * 60 * 1000,
+      value: MS_HOUR,
       labelSize: 2,
       controlSize: 10,
+      onChange: () => {},
     };
   },
 
   getInitialState() {
-    const unit = this._estimateUnit(this.props.value);
+    const { value } = this.props;
+    const unit = this._estimateUnit(value);
 
     return {
-      sessionTimeoutNever: (this.props.value ? this.props.value === -1 : false),
-      value: (this.props.value ? Math.floor(this.props.value / unit) : 0),
+      sessionTimeoutNever: (value ? value === -1 : false),
+      value: (value ? Math.floor(value / unit) : 0),
       unit: unit,
     };
   },
 
   getValue() {
-    if (this.state.sessionTimeoutNever) {
+    const { sessionTimeoutNever } = this.state;
+
+    if (sessionTimeoutNever) {
       return -1;
     }
 
@@ -75,23 +82,28 @@ const TimeoutInput = createReactClass({
   },
 
   _notifyChange() {
-    if (typeof this.props.onChange === 'function') {
-      this.props.onChange(this.getValue());
+    const { onChange } = this.props;
+
+    if (typeof onChange === 'function') {
+      onChange(this.getValue());
     }
   },
 
   render() {
+    const { controlSize, labelSize } = this.props;
+    const { sessionTimeoutNever, unit, value } = this.state;
+
     return (
       <span>
         <Input type="checkbox"
                id="session-timeout-never"
                name="session_timeout_never"
-               labelClassName={`col-sm-${this.props.controlSize}`}
-               wrapperClassName={`col-sm-offset-${this.props.labelSize} col-sm-${this.props.controlSize}`}
+               labelClassName={`col-sm-${controlSize}`}
+               wrapperClassName={`col-sm-offset-${labelSize} col-sm-${controlSize}`}
                label="Sessions do not time out"
                help="When checked sessions never time out due to inactivity."
                onChange={this._onClick}
-               checked={this.state.sessionTimeoutNever} />
+               checked={sessionTimeoutNever} />
 
         <Input id="timeout-controls"
                label="Timeout"
@@ -107,8 +119,8 @@ const TimeoutInput = createReactClass({
                      name="timeout"
                      min={1}
                      data-validate="positive_number"
-                     disabled={this.state.sessionTimeoutNever}
-                     value={this.state.value}
+                     disabled={sessionTimeoutNever}
+                     value={value}
                      onChange={this._onChangeValue} />
             </Col>
             <Col sm={3}>
