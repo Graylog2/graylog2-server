@@ -549,13 +549,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                 >
                   <Popover
                     bsClass="popover"
-                    className="Popover__StyledPopover-wd1j0g-0 imQAUx"
+                    className="Popover__StyledPopover-wd1j0g-0 bNftVS"
                     id="saved-search-popover"
                     placement="right"
                     title="Name of search"
                   >
                     <div
-                      className="Popover__StyledPopover-wd1j0g-0 imQAUx popover right"
+                      className="Popover__StyledPopover-wd1j0g-0 bNftVS popover right"
                       id="saved-search-popover"
                       role="tooltip"
                       style={
@@ -1255,13 +1255,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                 >
                   <Popover
                     bsClass="popover"
-                    className="Popover__StyledPopover-wd1j0g-0 imQAUx"
+                    className="Popover__StyledPopover-wd1j0g-0 bNftVS"
                     id="saved-search-popover"
                     placement="right"
                     title="Name of search"
                   >
                     <div
-                      className="Popover__StyledPopover-wd1j0g-0 imQAUx popover right"
+                      className="Popover__StyledPopover-wd1j0g-0 bNftVS popover right"
                       id="saved-search-popover"
                       role="tooltip"
                       style={
@@ -1987,13 +1987,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                 >
                   <Popover
                     bsClass="popover"
-                    className="Popover__StyledPopover-wd1j0g-0 imQAUx"
+                    className="Popover__StyledPopover-wd1j0g-0 bNftVS"
                     id="saved-search-popover"
                     placement="right"
                     title="Name of search"
                   >
                     <div
-                      className="Popover__StyledPopover-wd1j0g-0 imQAUx popover right"
+                      className="Popover__StyledPopover-wd1j0g-0 bNftVS popover right"
                       id="saved-search-popover"
                       role="tooltip"
                       style={
