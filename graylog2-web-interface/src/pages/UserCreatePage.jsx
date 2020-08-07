@@ -2,16 +2,22 @@
 import * as React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import UserCreate from 'components/users/UserCreate';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { ButtonToolbar, Button } from 'components/graylog';
+import { Button } from 'components/graylog';
 import { PageHeader, DocumentTitle } from 'components/common';
+import UserCreate from 'components/users/UserCreate';
 import DocumentationLink from 'components/support/DocumentationLink';
+import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 
 const UserCreatePage = () => (
   <DocumentTitle title="Create New User">
-    <PageHeader title="Create New User">
+    <PageHeader title="Create New User"
+                subactions={(
+                  <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+                    <Button bsStyle="success">Create User</Button>
+                  </LinkContainer>
+                )}>
       <span>
         Use this page to create new Graylog users. The users and their permissions created here are not limited
         to the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
@@ -23,11 +29,7 @@ const UserCreatePage = () => (
                            text="documentation" />
       </span>
 
-      <ButtonToolbar>
-        <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-          <Button bsStyle="info">Users Overview</Button>
-        </LinkContainer>
-      </ButtonToolbar>
+      <UserOverviewLinks />
     </PageHeader>
 
     <UserCreate />

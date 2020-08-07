@@ -11,7 +11,7 @@ type Props = {
   userIsReadOnly: boolean,
 };
 
-const UserManagementLinks = ({ username, userIsReadOnly }: Props) => (
+const UserActionLinks = ({ username, userIsReadOnly }: Props) => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.USERS.show(username)}>
       <Button bsStyle="success">
@@ -30,12 +30,7 @@ const UserManagementLinks = ({ username, userIsReadOnly }: Props) => (
         Edit Tokens
       </Button>
     </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-      <Button bsStyle="info">
-        Users Overview
-      </Button>
-    </LinkContainer>
   </ButtonToolbar>
 );
 
-export default UserManagementLinks;
+export default UserActionLinks;

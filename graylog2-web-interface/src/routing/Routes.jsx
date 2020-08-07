@@ -260,7 +260,7 @@ defaultExport.unqualified = Routes;
  * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
  *
  */
-defaultExport.pluginRoute = (routeKey) => {
+defaultExport.pluginRoute = (routeKey, throwError = true) => {
   const pluginRoutes = {};
 
   PluginStore.exports('routes').forEach((pluginRoute) => {
@@ -288,11 +288,15 @@ defaultExport.pluginRoute = (routeKey) => {
 
   const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
 
-  if (!route) {
+  if (!route && throwError) {
     throw new Error(`Could not find plugin route '${routeKey}'.`);
   }
 
   return route;
+};
+
+defaultExport.getPluginRoute = (routeKey) => {
+  return defaultExport.pluginRoute(routeKey, false);
 };
 
 export default defaultExport;
