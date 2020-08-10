@@ -54,7 +54,7 @@ const SharedEntitiesOverview = ({ paginatedEntityShares: initialPaginatedEntityS
   return (
     <>
       <p className="description">
-        Found {pagination.total} entities which are shared with the ${entityType}.
+        Found {pagination.total} entities which are shared with the {entityType}.
       </p>
       <StyledPaginatedList activePage={pagination.page}
                            onChange={_onPageChange(pagination, _fetchSharedEntities, setLoading)}
