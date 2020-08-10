@@ -24,24 +24,18 @@ import javax.inject.Provider;
 import java.util.Map;
 
 public class VersionAwareProvider<T> implements Provider<T> {
-    private final String elasticsearchMajorVersion;
+    private final Version elasticsearchMajorVersion;
     private final Map<Version, Provider<T>> pluginBindings;
 
     @Inject
-    public VersionAwareProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
+    public VersionAwareProvider(@Named("elasticsearch_version") Version elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
         this.elasticsearchMajorVersion = elasticsearchMajorVersion;
         this.pluginBindings = pluginBindings;
     }
 
-    private static Version constructElasticsearchVersion(String elasticsearchVersion) {
-        final int majorVersion = Integer.parseInt(elasticsearchVersion);
-        return Version.from(majorVersion, 0, 0);
-    }
-
     @Override
     public T get() {
-        final Version desiredVersion = constructElasticsearchVersion(elasticsearchMajorVersion);
-        final Provider<T> provider = this.pluginBindings.get(desiredVersion);
+        final Provider<T> provider = this.pluginBindings.get(elasticsearchMajorVersion);
         if (provider == null) {
             throw new IllegalStateException("Incomplete Elasticsearch implementation for version \"" + elasticsearchMajorVersion + "\".");
         }

@@ -28,8 +28,8 @@ import java.util.Map;
 
 public class ElasticsearchBackendProvider extends VersionAwareProvider<QueryBackend<? extends GeneratedQueryContext>> {
     @Inject
-    public ElasticsearchBackendProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion,
+    public ElasticsearchBackendProvider(@Named("elasticsearch_version") Version version,
                                         Map<Version, Provider<QueryBackend<? extends GeneratedQueryContext>>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+        super(version, pluginBindings);
     }
 }

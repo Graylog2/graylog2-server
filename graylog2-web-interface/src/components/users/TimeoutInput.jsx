@@ -7,17 +7,14 @@ import { Row, Col, HelpBlock } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
+import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
+
 type Props = {
   value: number,
   onChange: (value: number) => void;
 };
 
 const _estimateUnit = (value) => {
-  const MS_DAY = 24 * 60 * 60 * 1000;
-  const MS_HOUR = 60 * 60 * 1000;
-  const MS_MINUTE = 60 * 1000;
-  const MS_SECOND = 1000;
-
   if (value === 0) {
     return MS_SECOND;
   }
@@ -40,7 +37,7 @@ const _estimateUnit = (value) => {
 const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
-  const [value, setValue] = useState(propsValue ? Math.floor(propsValue / unit) : 0);
+  const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
 
   const getValue = () => {
     if (sessionTimeoutNever) {
@@ -90,7 +87,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
             <input type="number"
                    id="timeout"
                    placeholder="Timeout amount"
-                   className="session-timeout-fields validatable form-control"
+                   className="validatable"
                    name="timeout"
                    min={1}
                    data-validate="positive_number"
@@ -99,9 +96,8 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                    onChange={_onChangeValue} />
           </Col>
           <Col xs={4}>
-            <TimeoutUnitSelect className="form-control session-timeout-fields"
-                               disabled={sessionTimeoutNever}
-                               value={unit}
+            <TimeoutUnitSelect disabled={sessionTimeoutNever}
+                               value={`${unit}`}
                                onChange={_onChangeUnit} />
           </Col>
           <Col xs={12}>
@@ -121,8 +117,8 @@ TimeoutInput.propTypes = {
 };
 
 TimeoutInput.defaultProps = {
-  value: 60 * 60 * 1000,
-  onChange: undefined,
+  value: MS_HOUR,
+  onChange: () => {},
 };
 
 export default TimeoutInput;

@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class IndexFieldTypePollerAdapterProvider extends VersionAwareProvider<IndexFieldTypePollerAdapter> {
     @Inject
-    public IndexFieldTypePollerAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<IndexFieldTypePollerAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public IndexFieldTypePollerAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<IndexFieldTypePollerAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

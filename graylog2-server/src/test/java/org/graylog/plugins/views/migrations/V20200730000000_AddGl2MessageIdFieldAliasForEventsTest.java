@@ -18,6 +18,7 @@ package org.graylog.plugins.views.migrations;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,11 +47,11 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
         elasticsearchAdapter = mock(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class);
         elasticsearchConfig = mock(ElasticsearchConfiguration.class);
         mockConfiguredEventPrefixes("something", "something else");
-        sut = buildSut("7");
+        sut = buildSut(7);
     }
 
-    private V20200730000000_AddGl2MessageIdFieldAliasForEvents buildSut(String version) {
-        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(version, clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
+    private V20200730000000_AddGl2MessageIdFieldAliasForEvents buildSut(int major) {
+        return new V20200730000000_AddGl2MessageIdFieldAliasForEvents(Version.from(major, 0, 0), clusterConfigService, elasticsearchAdapter, elasticsearchConfig);
     }
 
     @Test
@@ -86,8 +87,8 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"7", "8"})
-    void runsForElasticsearchVersion7OrAbove(String version) {
+    @ValueSource(ints = {7, 8})
+    void runsForElasticsearchVersion7OrAbove(int version) {
         final V20200730000000_AddGl2MessageIdFieldAliasForEvents sut = buildSut(version);
 
         sut.upgrade();
@@ -96,8 +97,8 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"5", "6"})
-    void doesNotRunForElasticsearchVersionBelow7(String version) {
+    @ValueSource(ints = {5, 6})
+    void doesNotRunForElasticsearchVersionBelow7(int version) {
         final V20200730000000_AddGl2MessageIdFieldAliasForEvents sut = buildSut(version);
 
         sut.upgrade();
@@ -106,8 +107,8 @@ class V20200730000000_AddGl2MessageIdFieldAliasForEventsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"5", "6"})
-    void deletesMigrationCompletedMarkerForElasticsearchVersionBelow7(String version) {
+    @ValueSource(ints = {5, 6})
+    void deletesMigrationCompletedMarkerForElasticsearchVersionBelow7(int version) {
         final V20200730000000_AddGl2MessageIdFieldAliasForEvents sut = buildSut(version);
 
         when(clusterConfigService.get(V20200730000000_AddGl2MessageIdFieldAliasForEvents.MigrationCompleted.class))

@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,20 +38,20 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
 
     private static final Logger LOG = LoggerFactory.getLogger(V20200730000000_AddGl2MessageIdFieldAliasForEvents.class);
 
-    private static final int MINIMUM_ELASTICSEARCH_VERSION = 7;
+    private static final Version MINIMUM_ELASTICSEARCH_VERSION = Version.from(7, 0, 0);
 
-    private final String elasticsearchMajorVersion;
+    private final Version elasticsearchVersion;
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchAdapter elasticsearch;
     private final ElasticsearchConfiguration elasticsearchConfig;
 
     @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEvents(
-            @Named("elasticsearch_version") String elasticsearchMajorVersion,
+            @Named("elasticsearch_version") Version elasticsearchVersion,
             ClusterConfigService clusterConfigService,
             ElasticsearchAdapter elasticsearch,
             ElasticsearchConfiguration elasticsearchConfig) {
-        this.elasticsearchMajorVersion = elasticsearchMajorVersion;
+        this.elasticsearchVersion = elasticsearchVersion;
         this.clusterConfigService = clusterConfigService;
         this.elasticsearch = elasticsearch;
         this.elasticsearchConfig = elasticsearchConfig;
@@ -77,10 +78,10 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
     }
 
     private boolean shouldSkip() {
-        if (Integer.parseInt(elasticsearchMajorVersion) < MINIMUM_ELASTICSEARCH_VERSION) {
+        if (!elasticsearchVersion.sameOrHigher(MINIMUM_ELASTICSEARCH_VERSION)) {
             LOG.debug("Skipping migration, because Elasticsearch major version of {} " +
                             "is lower than the required minimum version of {}.",
-                    elasticsearchMajorVersion, MINIMUM_ELASTICSEARCH_VERSION);
+                    elasticsearchVersion, MINIMUM_ELASTICSEARCH_VERSION);
             if (hasCompletedBefore()) {
                 // This must be a downgrade. We remove the completed marker, so indices created with this lower version
                 // would be fixed in case of another upgrade where this migration would then run again.

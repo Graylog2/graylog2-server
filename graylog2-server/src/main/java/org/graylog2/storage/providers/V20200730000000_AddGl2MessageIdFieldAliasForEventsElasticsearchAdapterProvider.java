@@ -29,8 +29,8 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdap
         extends VersionAwareProvider<V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter> {
     @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider(
-            @Named("elasticsearch_version") String elasticsearchMajorVersion,
+            @Named("elasticsearch_version") Version version,
             Map<Version, Provider<V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+        super(version, pluginBindings);
     }
 }

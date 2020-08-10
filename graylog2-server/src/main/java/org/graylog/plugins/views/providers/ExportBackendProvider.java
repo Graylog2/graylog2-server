@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class ExportBackendProvider extends VersionAwareProvider<ExportBackend> {
     @Inject
-    public ExportBackendProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<ExportBackend>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public ExportBackendProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<ExportBackend>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }
