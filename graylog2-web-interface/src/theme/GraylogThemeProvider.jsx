@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
 import { useStore } from 'stores/connect';
+import Store from 'logic/local-storage/Store';
 import { breakpoints, colors, fonts, utils, type ThemeInterface } from 'theme';
 import { usePrefersColorScheme } from 'hooks/useMatchMedia';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
@@ -33,20 +34,36 @@ const GraylogThemeProvider = ({ children }: Props) => {
     return userStore?.currentUser;
   });
 
+  const currentUserThemeMode = () => {
+    // eslint-disable-next-line camelcase
+    if (currentUser?.read_only) {
+      return Store.get(PREFERENCES_THEME_MODE);
+    }
+
+    return userPreferences && userPreferences[PREFERENCES_THEME_MODE];
+  };
+
   const handleModeChange = (nextMode) => {
     if (colors[nextMode]) {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
 
       setUserPreferences(nextPreferences);
 
-      PreferencesStore.saveUserPreferences(currentUser.username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
+      // eslint-disable-next-line camelcase
+      if (currentUser?.read_only) {
+        Store.set(PREFERENCES_THEME_MODE, nextMode);
+      } else {
+        PreferencesStore.saveUserPreferences(currentUser.username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
+      }
     }
   };
 
   React.useEffect(() => {
-    if (userPreferences && userPreferences[PREFERENCES_THEME_MODE]) {
-      setMode(userPreferences[PREFERENCES_THEME_MODE]);
-    } else if (window.matchMedia) {
+    const hasCurrentThemeMode = currentUserThemeMode();
+
+    if (hasCurrentThemeMode) {
+      setMode(hasCurrentThemeMode);
+    } else if (colorScheme) {
       setMode(colorScheme === 'light' ? THEME_MODE_LIGHT : THEME_MODE_DARK);
     } else {
       setMode(DEFAULT_THEME_MODE);
