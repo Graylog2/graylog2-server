@@ -24,32 +24,6 @@ export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
-const mockMissingDependencies = () => {
-  const owner1 = Grantee
-    .builder()
-    .id('grn::::user:jane')
-    .title('Jane Doe')
-    .type('user')
-    .build();
-
-  const owner2 = Grantee
-    .builder()
-    .id('grn::::team:reporting')
-    .title('Reporting')
-    .type('team')
-    .build();
-
-  const missingDependecy = SharedEntity
-    .builder()
-    .id('grn::::stream:57bc9188e62a2373778d9e03')
-    .type('stream')
-    .title('Security Data')
-    .owners(Immutable.List([owner1, owner2]))
-    .build();
-
-  return Immutable.Map({ 'grn::::team:abc123': Immutable.List([missingDependecy]) });
-};
-
 const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
   const granteesByType = grantees
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
@@ -99,7 +73,7 @@ export default class EntityShareState {
       availableCapabilities: availableCapabilities,
       activeShares,
       selectedGranteeCapabilities: selectedGranteeCapabilities,
-      missingDependencies: missingDependencies || mockMissingDependencies(),
+      missingDependencies: missingDependencies,
     };
   }
 
