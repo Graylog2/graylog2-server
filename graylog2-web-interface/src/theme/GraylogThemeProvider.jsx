@@ -5,12 +5,13 @@ import { ThemeProvider } from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import { breakpoints, colors, fonts, utils, type ThemeInterface } from 'theme';
+import { usePrefersColorScheme } from 'hooks/useMatchMedia';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import StoreProvider from 'injection/StoreProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, THEME_MODE_DARK, THEME_MODE_LIGHT } from './constants';
 
 type Props = {
   children: React.Node,
@@ -24,6 +25,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
   const [themeColors, setThemeColors] = React.useState();
   const [theme, setTheme] = React.useState();
   const [userPreferences, setUserPreferences] = React.useState();
+  const colorScheme = usePrefersColorScheme();
 
   const currentUser = useStore(CurrentUserStore, (userStore) => {
     setUserPreferences(userStore?.currentUser?.preferences);
@@ -42,12 +44,14 @@ const GraylogThemeProvider = ({ children }: Props) => {
   };
 
   React.useEffect(() => {
-    if (userPreferences) {
-      setMode(userPreferences[PREFERENCES_THEME_MODE] || DEFAULT_THEME_MODE);
+    if (userPreferences && userPreferences[PREFERENCES_THEME_MODE]) {
+      setMode(userPreferences[PREFERENCES_THEME_MODE]);
+    } else if (window.matchMedia) {
+      setMode(colorScheme === 'light' ? THEME_MODE_LIGHT : THEME_MODE_DARK);
     } else {
       setMode(DEFAULT_THEME_MODE);
     }
-  }, [userPreferences]);
+  }, [colorScheme, userPreferences]);
 
   React.useEffect(() => {
     setThemeColors(colors[mode]);
