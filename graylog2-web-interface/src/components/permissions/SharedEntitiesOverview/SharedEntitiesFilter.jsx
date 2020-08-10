@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import mockedPermissions from 'logic/permissions/mocked';
 import { SearchForm, Select } from 'components/common';
 
+import SharedEntitiesQueryHelper from './SharedEntitiesQueryHelper';
+
 type Props = {
   onSearch: (query: string, resetLoading: () => void) => Promise<void>,
   onReset: () => Promise<void>,
@@ -50,7 +52,8 @@ const SharedEntitiesFilter = ({ onSearch, onFilter, onReset }: Props) => (
   <>
     <StyledSearchForm onReset={onReset}
                       onSearch={onSearch}
-                      placeholder="Filter by name"
+                      placeholder="Enter query to filter"
+                      queryHelpComponent={<SharedEntitiesQueryHelper />}
                       topMargin={0}
                       useLoadingState />
 
