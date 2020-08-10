@@ -5,7 +5,7 @@ import Reflux from 'reflux';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import permissionsMock from 'logic/permissions/mocked';
-import EntityShareActions, { type EntitySharePayload, type PaginatedUserSharesType } from 'actions/permissions/EntityShareActions';
+import EntityShareActions, { type EntitySharePayload, type PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
 import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'views/logic/singleton';
@@ -52,7 +52,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    searchPaginatedUserShares(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedUserSharesType> {
+    searchPaginatedUserShares(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
       // const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
       // const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUserSharesResponse) => {
       //   return {
@@ -70,8 +70,17 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       //   };
       // });
 
-      const promise = permissionsMock.searchPaginatedUserSharesResponse(page, perPage, query, additionalQueries);
+      const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
       EntityShareActions.searchPaginatedUserShares.promise(promise);
+
+      return promise;
+    },
+
+    searchPaginatedTeamShares(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+      // Todo implmenet same code like for searchPaginatedUserShares, but with EntityShareController.teamSharesPaginated
+
+      const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
+      EntityShareActions.searchPaginatedTeamShares.promise(promise);
 
       return promise;
     },

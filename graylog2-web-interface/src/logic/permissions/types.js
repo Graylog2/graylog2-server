@@ -29,4 +29,4 @@ export type SharedEntityType = {|
   type: string,
 |};
 
-export type UserSharedEntities = Immutable.List<SharedEntity>;
+export type SharedEntities = Immutable.List<SharedEntity>;
