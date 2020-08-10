@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 // * https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 // * https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries
+// * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
 export default function useMatchMedia(query) {
   const mediaQueryList = window.matchMedia(query);
