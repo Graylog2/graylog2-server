@@ -17,7 +17,6 @@
 package org.graylog.security.shares;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
@@ -28,6 +27,8 @@ import org.graylog.security.GrantDTO;
 import org.graylog.security.entities.EntityDescriptor;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.PaginationParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -35,11 +36,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class GranteeSharesService {
+    private static final Logger LOG = LoggerFactory.getLogger(GranteeSharesService.class);
+
     private final DBGrantService grantService;
     private final GRNDescriptorService descriptorService;
 
@@ -49,13 +55,19 @@ public class GranteeSharesService {
         this.descriptorService = descriptorService;
     }
 
-    public SharesResponse getPaginatedSharesFor(GRN grantee, PaginationParameters paginationParameters) {
-        final ImmutableSet<GrantDTO> grants = grantService.getForGrantee(grantee);
+    public SharesResponse getPaginatedSharesFor(GRN grantee,
+                                                PaginationParameters paginationParameters,
+                                                String capabilityFilterString,
+                                                String entityTypeFilter) {
+        final Optional<Capability> capability = parseCapabilityFilter(capabilityFilterString);
+        final ImmutableSet<GrantDTO> grants = capability.map(c -> grantService.getForGranteeWithCapability(grantee, c))
+                .orElseGet(() -> grantService.getForGrantee(grantee));
 
         final List<EntityDescriptor> entityDescriptors = grants.stream()
                 .map(GrantDTO::target)
                 .map(descriptorService::getDescriptor)
                 .filter(queryPredicate(paginationParameters))
+                .filter(entityTypeFilterPredicate(entityTypeFilter))
                 .map(grnDescriptor -> EntityDescriptor.create(grnDescriptor.grn(), grnDescriptor.title(), Collections.emptySet()))
                 .sorted(Comparator.comparing(EntityDescriptor::title, (t1, t2) -> {
                     if (paginationParameters.getOrder().toLowerCase(Locale.US).equals("desc")) {
@@ -85,14 +97,39 @@ public class GranteeSharesService {
         return SharesResponse.create(paginatedList, granteeCapabilities);
     }
 
+    private Optional<Capability> parseCapabilityFilter(String capabilityFilterString) {
+        final String capabilityFilter = firstNonNull(capabilityFilterString, "").trim().toUpperCase(Locale.US);
+
+        if (capabilityFilter.isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(Capability.valueOf(capabilityFilter));
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Unknown capability", e);
+            return Optional.empty();
+        }
+    }
+
     private Predicate<GRNDescriptor> queryPredicate(PaginationParameters paginationParameters) {
-        final String query = MoreObjects.firstNonNull(paginationParameters.getQuery(), "").toLowerCase(Locale.US);
+        final String query = firstNonNull(paginationParameters.getQuery(), "").trim().toLowerCase(Locale.US);
 
         if (query.isEmpty()) {
             return descriptor -> true;
         }
 
         return descriptor -> descriptor.title().toLowerCase(Locale.US).contains(query);
+    }
+
+    private Predicate<GRNDescriptor> entityTypeFilterPredicate(String entityTypeFilter) {
+        final String type = firstNonNull(entityTypeFilter, "").trim().toLowerCase(Locale.US);
+
+        if (type.isEmpty()) {
+            return descriptor -> true;
+        }
+
+        return descriptor -> descriptor.grn().type().equals(type);
     }
 
     @AutoValue

@@ -87,7 +87,7 @@ class GranteeSharesServiceTest {
             @DisplayName("paginated shares")
             @Test
             void getPaginatedSharesForUser() {
-                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters);
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "", "");
 
                 assertThat(response.paginatedEntities()).hasSize(3);
                 assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(dashboard0, "Dashboard 0", Collections.emptySet()));
@@ -107,7 +107,37 @@ class GranteeSharesServiceTest {
                 // Only return entities that contain the value in the title
                 paginationParameters.setQuery("dashboard");
 
-                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters);
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "", "");
+
+                assertThat(response.paginatedEntities()).hasSize(1);
+                assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(dashboard0, "Dashboard 0", Collections.emptySet()));
+
+                assertThat(response.capabilities()).hasSize(1);
+                assertThat(response.capabilities().get(dashboard0)).isEqualTo(Capability.OWN);
+                assertThat(response.capabilities()).doesNotContainKey(dashboard1);
+                assertThat(response.capabilities()).doesNotContainKey(stream0);
+                assertThat(response.capabilities()).doesNotContainKey(stream1);
+            }
+
+            @DisplayName("paginated shares with capability filter")
+            @Test
+            void getPaginatedSharesForUserWithCapabilityFilter() {
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "viEw", "");
+
+                assertThat(response.paginatedEntities()).hasSize(1);
+                assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(stream0, "Stream 0", Collections.emptySet()));
+
+                assertThat(response.capabilities()).hasSize(1);
+                assertThat(response.capabilities().get(stream0)).isEqualTo(Capability.VIEW);
+                assertThat(response.capabilities()).doesNotContainKey(dashboard0);
+                assertThat(response.capabilities()).doesNotContainKey(dashboard1);
+                assertThat(response.capabilities()).doesNotContainKey(stream1);
+            }
+
+            @DisplayName("paginated shares with entity type filter")
+            @Test
+            void getPaginatedSharesForUserWithEntityTypeFilter() {
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "", "dashboard");
 
                 assertThat(response.paginatedEntities()).hasSize(1);
                 assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(dashboard0, "Dashboard 0", Collections.emptySet()));
@@ -126,7 +156,7 @@ class GranteeSharesServiceTest {
                 paginationParameters.setPerPage(2);
                 paginationParameters.setPage(2);
 
-                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters);
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "", "");
 
                 assertThat(response.paginatedEntities()).hasSize(1);
                 assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(stream1, "Stream 1", Collections.emptySet()));
@@ -144,7 +174,7 @@ class GranteeSharesServiceTest {
                 // Reverse sort order
                 paginationParameters.setOrder("desc");
 
-                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters);
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("jane"), paginationParameters, "", "");
 
                 assertThat(response.paginatedEntities()).hasSize(3);
                 assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(stream1, "Stream 1", Collections.emptySet()));
@@ -165,7 +195,7 @@ class GranteeSharesServiceTest {
             @DisplayName("paginated shares")
             @Test
             void getPaginatedSharesForUser() {
-                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("john"), paginationParameters);
+                final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(GRNTypes.USER.toGRN("john"), paginationParameters, "", "");
 
                 assertThat(response.paginatedEntities()).hasSize(2);
                 assertThat(response.paginatedEntities().get(0)).isEqualTo(EntityDescriptor.create(dashboard1, "Dashboard 1", Collections.emptySet()));
