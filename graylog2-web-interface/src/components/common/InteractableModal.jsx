@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled, { css } from 'styled-components';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import { Button } from 'components/graylog';
 import Icon from 'components/common/Icon';
@@ -27,10 +27,11 @@ const InteractableModalWrapper = styled.div`
 `;
 
 const StyledRnd = styled(Rnd)(({ theme }) => css`
-  box-shadow: 0 0 9px rgba(31, 31, 31, 0.25),
-    0 0 6px rgba(31, 31, 31, 0.25),
-    0 0 3px rgba(31, 31, 31, 0.25);
-  background-color: ${theme.colors.variant.lightest.default};
+  box-shadow: 0 0 9px ${theme.colors.global.navigationBoxShadow},
+    0 0 6px ${theme.colors.global.navigationBoxShadow},
+    0 0 3px ${theme.colors.global.navigationBoxShadow};
+  background-color: ${theme.colors.global.contentBackground};
+  border: 1px solid ${theme.colors.variant.lightest.default};
   border-radius: 3px;
   flex-direction: column;
   display: flex !important;
@@ -46,7 +47,7 @@ const Header = styled.header(({ theme }) => css`
   padding: 6px 12px 9px;
   display: flex;
   align-items: center;
-  background-color: ${theme.colors.global.background};
+  background-color: ${theme.colors.variant.lightest.default};
   border-bottom: 1px solid ${theme.colors.variant.lighter.default};
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
@@ -158,13 +159,10 @@ const InteractableModal = ({
     };
 
     const newCoords = {};
-
     const modalXWithNewWidth = innerWidth - boundingBox.right;
-
-    newCoords.x = Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left);
-
     const modalYWithNewHeight = innerHeight - boundingBox.bottom;
 
+    newCoords.x = Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left);
     newCoords.y = Math.max(Math.min(modalYWithNewHeight, currentY), boundingBox.top);
 
     handleDragStop(null, newCoords);

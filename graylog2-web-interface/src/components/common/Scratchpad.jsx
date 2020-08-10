@@ -26,9 +26,8 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
   resize: none;
   flex: 1;
   margin: 15px 0 7px;
-  border: 1px solid ${copied ? theme.colors.variant.success : theme.colors.gray[80]};
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
-    0 0 8px ${chroma(copied ? theme.colors.variant.success : theme.colors.gray[80]).alpha(0.4).css()};
+  border: 1px solid ${copied ? theme.colors.variant.success : theme.colors.variant.lighter.default};
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.075)${copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
   font-family: ${theme.fonts.family.monospace};
   font-size: ${theme.fonts.size.body};
