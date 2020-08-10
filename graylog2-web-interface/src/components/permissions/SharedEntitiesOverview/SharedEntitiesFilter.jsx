@@ -52,7 +52,6 @@ const SharedEntitiesFilter = ({ onSearch, onFilter, onReset }: Props) => (
   <>
     <StyledSearchForm onReset={onReset}
                       onSearch={onSearch}
-                      placeholder="Enter query to filter"
                       queryHelpComponent={<SharedEntitiesQueryHelper />}
                       topMargin={0}
                       useLoadingState />
