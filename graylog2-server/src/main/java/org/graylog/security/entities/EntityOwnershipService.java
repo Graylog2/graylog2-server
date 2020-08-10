@@ -49,8 +49,13 @@ public class EntityOwnershipService {
         registerNewEntity(grn, user);
     }
 
-    public void registerNewView(String id, User user) {
+    public void registerNewDashboard(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
+        registerNewEntity(grn, user);
+    }
+
+    public void registerNewSearch(String id, User user) {
+        final GRN grn = grnRegistry.newGRN(GRNTypes.SEARCH, id);
         registerNewEntity(grn, user);
     }
 
