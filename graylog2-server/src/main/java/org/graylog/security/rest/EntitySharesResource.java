@@ -95,8 +95,8 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @Path("user/{username}")
     public PaginatedResponse<EntityDescriptor> get(@ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters,
                                                    @ApiParam(name = "username", required = true) @PathParam("username") @NotBlank String username,
-                                                   @ApiParam(name = "capability") @QueryParam("capability") @DefaultValue("all") String capabilityFilter,
-                                                   @ApiParam(name = "entity_type") @QueryParam("entity_type") @DefaultValue("all") String entityTypeFilter) {
+                                                   @ApiParam(name = "capability") @QueryParam("capability") @DefaultValue("") String capabilityFilter,
+                                                   @ApiParam(name = "entity_type") @QueryParam("entity_type") @DefaultValue("") String entityTypeFilter) {
         if (!isPermitted(USERS_EDIT, username)) {
             throw new ForbiddenException("Couldn't access user " + username);
         }
