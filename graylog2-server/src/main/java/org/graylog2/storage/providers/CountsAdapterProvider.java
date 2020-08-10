@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class CountsAdapterProvider extends VersionAwareProvider<CountsAdapter> {
     @Inject
-    public CountsAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<CountsAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public CountsAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<CountsAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

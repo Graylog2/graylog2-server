@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class IndexToolsAdapterProvider extends VersionAwareProvider<IndexToolsAdapter> {
     @Inject
-    public IndexToolsAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<IndexToolsAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public IndexToolsAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<IndexToolsAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

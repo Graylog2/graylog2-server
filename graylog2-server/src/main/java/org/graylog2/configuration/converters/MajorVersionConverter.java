@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.providers;
+package org.graylog2.configuration.converters;
 
-import org.graylog.plugins.views.search.export.ExportBackend;
+import com.github.joschi.jadconfig.Converter;
 import org.graylog2.plugin.Version;
-import org.graylog2.storage.VersionAwareProvider;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import java.util.Map;
+public class MajorVersionConverter implements Converter<Version> {
+    @Override
+    public Version convertFrom(String value) {
+        final int majorVersion = Integer.parseInt(value);
+        return Version.from(majorVersion, 0, 0);
+    }
 
-public class ExportBackendProvider extends VersionAwareProvider<ExportBackend> {
-    @Inject
-    public ExportBackendProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<ExportBackend>> pluginBindings) {
-        super(version, pluginBindings);
+    @Override
+    public String convertTo(Version value) {
+        return value.toString();
     }
 }
