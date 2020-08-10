@@ -110,7 +110,7 @@ describe('<UserDetails />', () => {
       it('should fetch paginated user shares when using search', async () => {
         const { getByPlaceholderText, getByText } = render(<UserDetails user={user} paginatedUserShares={mockPaginatedUserShares} />);
 
-        const searchInput = getByPlaceholderText('Filter by name');
+        const searchInput = getByPlaceholderText('Enter search query...');
         const searchSubmitButton = getByText('Search');
 
         fireEvent.change(searchInput, { target: { value: 'the username' } });

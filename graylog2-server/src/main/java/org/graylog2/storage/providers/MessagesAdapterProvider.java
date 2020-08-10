@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class MessagesAdapterProvider extends VersionAwareProvider<MessagesAdapter> {
     @Inject
-    public MessagesAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<MessagesAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public MessagesAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<MessagesAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

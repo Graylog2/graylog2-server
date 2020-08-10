@@ -7,9 +7,9 @@ import history from 'util/History';
 import StoreProvider from 'injection/StoreProvider';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import NewUserForm from 'components/users/NewUserForm';
+import { UsersActions } from 'stores/users/UsersStore';
 
 const RolesStore = StoreProvider.getStore('Roles');
-const UsersStore = StoreProvider.getStore('Users');
 
 class CreateUsersPage extends React.Component {
   state = {
@@ -28,7 +28,7 @@ class CreateUsersPage extends React.Component {
     request.permissions = [];
     delete request['session-timeout-never'];
 
-    UsersStore.create(request).then(() => {
+    UsersActions.create(request).then(() => {
       UserNotification.success(`User ${request.username} was created successfully.`, 'Success!');
       history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
     }, () => {

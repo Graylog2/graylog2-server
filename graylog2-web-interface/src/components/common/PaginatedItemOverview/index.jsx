@@ -12,9 +12,6 @@ export type {
   DescriptiveItem,
 };
 
-export {
-  defaultPageInfo,
-  PaginatedItemOverview,
-};
+export { defaultPageInfo };
 
 export default PaginatedItemOverview;

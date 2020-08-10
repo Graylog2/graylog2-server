@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import {
@@ -14,7 +13,7 @@ import {
   Modal,
   Row,
 } from 'components/graylog';
-import { Pagination, PageSizeSelect, Select } from 'components/common';
+import { Pagination, PageSizeSelect } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
@@ -22,20 +21,6 @@ import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 
 import ContentPackInstall from './ContentPackInstall';
-
-const PageSizeSelector = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-
-  span {
-    margin-right: 3px;
-  }
-`;
-
-const StyledSizeSelect = styled(Select)`
-  width: 75px;
-`;
 
 class ContentPacksList extends React.Component {
   static propTypes = {

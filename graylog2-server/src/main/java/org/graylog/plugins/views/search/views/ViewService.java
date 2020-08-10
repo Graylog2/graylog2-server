@@ -141,7 +141,11 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
         final ViewDTO savedObject = save(viewDTO);
-        entityOwnerShipService.registerNewView(savedObject.id(), user);
+        if (viewDTO.type().equals(ViewDTO.Type.DASHBOARD)) {
+            entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
+        } else {
+            entityOwnerShipService.registerNewSearch(savedObject.id(), user);
+        }
         return savedObject;
     }
 

@@ -135,14 +135,15 @@ public class SearchQueryParser {
 
     public SearchQuery parse(String encodedQueryString) {
         String queryString = encodedQueryString;
+
+        if (Strings.isNullOrEmpty(queryString) || "*".equals(queryString)) {
+            return new SearchQuery(queryString);
+        }
+
         try {
             queryString = URLDecoder.decode(encodedQueryString, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             LOG.warn("Could not find correct character set for decoding: {}", e.getMessage());
-        }
-
-        if (Strings.isNullOrEmpty(queryString) || "*".equals(queryString)) {
-            return new SearchQuery(queryString);
         }
 
         final Matcher matcher = querySplitterMatcher(requireNonNull(queryString).trim());

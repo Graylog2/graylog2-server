@@ -134,8 +134,8 @@ public class RelativeSearchResource extends SearchResource {
         final TimeRange timeRange = buildRelativeTimeRange(range);
 
         final ScrollResult scroll = searches
-                .scroll(query, timeRange, batchSize, offset, fieldList, filter);
-        return buildChunkedOutput(scroll, limit);
+                .scroll(query, timeRange, limit, offset, fieldList, filter, batchSize);
+        return buildChunkedOutput(scroll);
     }
 
     @GET

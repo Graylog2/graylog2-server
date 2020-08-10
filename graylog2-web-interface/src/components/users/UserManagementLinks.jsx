@@ -19,11 +19,11 @@ const UserManagementLinks = ({ username, userIsReadOnly }: Props) => (
       </Button>
     </LinkContainer>
     {!userIsReadOnly && (
-    <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
-      <Button bsStyle="success">
-        Edit User
-      </Button>
-    </LinkContainer>
+      <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
+        <Button bsStyle="success">
+          Edit User
+        </Button>
+      </LinkContainer>
     )}
     <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
       <Button bsStyle="success">

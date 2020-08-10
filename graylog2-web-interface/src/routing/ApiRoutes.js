@@ -26,7 +26,7 @@ const ApiRoutes = {
   },
   AuthzRolesController: {
     load: () => { return { url: '/authzRoles' }; },
-    loadForUser: (username) => { return { url: `/authzRoles/${username}` }; },
+    loadForUser: (username) => { return { url: `/authzRoles/rolesForUser/${username}` }; },
   },
   CatalogsController: {
     showEntityIndex: () => { return { url: '/system/catalog' }; },
@@ -91,6 +91,7 @@ const ApiRoutes = {
     prepare: (entityGRN) => { return { url: `/shares/entities/${entityGRN}/prepare` }; },
     update: (entityGRN) => { return { url: `/shares/entities/${entityGRN}` }; },
     userSharesPaginated: (username) => { return { url: `/shares/user/${username}` }; },
+    teamSharesPaginated: (teamId) => { return { url: `/shares/team/${teamId}` }; },
   },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },

@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class ClusterAdapterProvider extends VersionAwareProvider<ClusterAdapter> {
     @Inject
-    public ClusterAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<ClusterAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public ClusterAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<ClusterAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

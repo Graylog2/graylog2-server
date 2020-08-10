@@ -1,15 +1,15 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserEdit from 'components/users/UserEdit';
 import DocumentationLink from 'components/support/DocumentationLink';
-import UserManagementLinks from 'components/users/UserManagementLinks';
+import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UserActionLinks from 'components/users/navigation/UserActionLinks';
 
 type Props = {
   params: {
@@ -28,16 +28,20 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 );
 
 const UserEditPage = ({ params }: Props) => {
-  const { loadedUser } = useStore(UsersStore);
+  const [loadedUser, setLoadedUser] = useState();
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username);
-  });
+    UsersActions.load(username).then(setLoadedUser);
+  }, [username]);
 
   return (
     <DocumentTitle title={`Edit User ${loadedUser?.fullName ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
+      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
+                  subactions={(
+                    <UserActionLinks username={username}
+                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
+                  )}>
         <span>
           You can change the user details and password here and assign roles and teams.
         </span>
@@ -48,8 +52,7 @@ const UserEditPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <UserManagementLinks username={username}
-                             userIsReadOnly={loadedUser?.readOnly} />
+        <UserOverviewLinks />
       </PageHeader>
       <UserEdit user={username === loadedUser?.username ? loadedUser : undefined} />
     </DocumentTitle>

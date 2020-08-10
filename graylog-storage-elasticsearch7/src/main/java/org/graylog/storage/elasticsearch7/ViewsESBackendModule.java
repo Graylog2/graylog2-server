@@ -100,7 +100,7 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
 
         bindExportBackend().to(ElasticsearchExportBackend.class);
-        bindRequestStrategy().to(org.graylog.storage.elasticsearch7.views.export.Scroll.class);
+        bindRequestStrategy().to(org.graylog.storage.elasticsearch7.views.export.SearchAfter.class);
     }
 
     private LinkedBindingBuilder<RequestStrategy> bindRequestStrategy() {

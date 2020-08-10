@@ -5,11 +5,11 @@ import { withRouter } from 'react-router';
 
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserDetails from 'components/users/UserDetails';
-import UserManagementLinks from 'components/users/UserManagementLinks';
+import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
@@ -29,21 +29,25 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 );
 
 const UserDetailsPage = ({ params }: Props) => {
-  const { loadedUser } = useStore(UsersStore);
   const [paginatedUserShares, setPaginatedUserShares] = useState();
+  const [loadedUser, setLoadedUser] = useState();
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username);
+    UsersActions.load(username).then(setLoadedUser);
 
     EntityShareActions.searchPaginatedUserShares(username, 1, 10, '').then((response) => {
       setPaginatedUserShares(response);
     });
-  }, []);
+  }, [username]);
 
   return (
     <DocumentTitle title={`User Details ${username ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
+      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
+                  subactions={(
+                    <UserActionLinks username={username}
+                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
+                  )}>
         <span>
           Overview of details like profile information, settings, teams and roles.
         </span>
@@ -54,8 +58,7 @@ const UserDetailsPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <UserManagementLinks username={username}
-                             userIsReadOnly={loadedUser?.readOnly} />
+        <UserOverviewLinks />
       </PageHeader>
 
       <UserDetails paginatedUserShares={paginatedUserShares}

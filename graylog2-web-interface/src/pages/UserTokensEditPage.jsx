@@ -7,12 +7,12 @@ import { Row, Col } from 'components/graylog';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
-import { useStore } from 'stores/connect';
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
-import UserManagementLinks from 'components/users/UserManagementLinks';
+import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
+import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 type Props = {
@@ -64,8 +64,8 @@ const _createToken = (tokenName, username, loadTokens, setCreatingToken) => {
 };
 
 const UserEditPage = ({ params }: Props) => {
-  const { loadedUser } = useStore(UsersStore);
   const currentUser = useContext(CurrentUserContext);
+  const [loadedUser, setLoadedUser] = useState();
   const [tokens, setTokens] = useState([]);
   const [deletingTokenId, setDeletingTokenId] = useState();
   const [creatingToken, setCreatingToken] = useState(false);
@@ -78,11 +78,16 @@ const UserEditPage = ({ params }: Props) => {
 
   useEffect(() => {
     loadTokens();
+    UsersActions.load(username).then(setLoadedUser);
   }, [currentUser, username]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}>
+      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
+                  subactions={(
+                    <UserActionLinks username={username}
+                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
+                  )}>
         <span>
           You can create new tokens or delete old ones.
         </span>
@@ -93,8 +98,7 @@ const UserEditPage = ({ params }: Props) => {
                              text="documentation" />
         </span>
 
-        <UserManagementLinks username={username}
-                             userIsReadOnly={loadedUser?.readOnly} />
+        <UserOverviewLinks />
       </PageHeader>
 
       <Row className="content">

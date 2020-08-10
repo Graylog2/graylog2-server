@@ -90,11 +90,25 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
   input.form-control,
   select.form-control,
   textarea.form-control {
-    color: ${theme.colors.gray[30]};
+    color: ${theme.colors.input.color};
+    background-color: ${theme.colors.input.background};
+    border-color: ${theme.colors.input.border};
     font-family: ${theme.fonts.family.body};
 
-    &:hover {
-      border-color: hsl(0, 0%, 70%);
+    &::placeholder {
+      color: ${theme.colors.input.placeholder};
+    }
+
+    &:focus {
+      border-color: ${theme.colors.input.borderFocus};
+      box-shadow: ${theme.colors.input.boxShadow};
+    }
+    
+    &[disabled],
+    &[readonly],
+    fieldset[disabled] & {
+      background-color: ${theme.colors.input.backgroundDisabled};
+      color: ${theme.colors.input.colorDisabled};
     }
   }
 
@@ -126,7 +140,6 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
   }
 
   .actions-lg .actions-container {
-    height: 60px;
     margin-top: 10px;
     padding-left: 50px;
   }

@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { UserJSON } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 
 type InternalState = {
   id: string,

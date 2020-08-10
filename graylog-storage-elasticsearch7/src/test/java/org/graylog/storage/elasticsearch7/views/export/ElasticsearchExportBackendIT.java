@@ -25,11 +25,14 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
+import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.ElasticsearchInstance;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -42,18 +45,29 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBaseTest {
+public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;
     private ElasticsearchExportBackend sut;
 
-    protected abstract RequestStrategy requestStrategy();
+    @Rule
+    public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
+
+    @Override
+    protected ElasticsearchInstance elasticsearch() {
+        return this.elasticsearch;
+    }
 
     @Before
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
 
         sut = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false);
+    }
+
+    private RequestStrategy requestStrategy() {
+        final ExportClient exportClient = new ExportClient(elasticsearch.elasticsearchClient());
+        return new SearchAfter(exportClient);
     }
 
     @Test
@@ -184,6 +198,19 @@ public abstract class ElasticsearchExportBackendITBase extends ElasticsearchBase
                 "timestamp",
                 "streams",
                 "_id");
+    }
+
+    @Test
+    public void sortsByTimestampDescending() {
+        importFixture("messages.json");
+
+        ExportMessagesCommand command = commandBuilderWithAllStreams().build();
+
+        runWithExpectedResult(command, "timestamp,source,message",
+                "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
+                "graylog_0, 2015-01-01T03:00:00.000Z, source-1, Hi",
+                "graylog_1, 2015-01-01T02:00:00.000Z, source-2, He",
+                "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha");
     }
 
     private Set<String> actualFieldNamesFrom(SimpleMessageChunk chunk) {

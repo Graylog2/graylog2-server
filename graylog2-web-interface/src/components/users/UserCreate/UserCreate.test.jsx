@@ -11,28 +11,26 @@ import { UsersActions } from 'stores/users/UsersStore';
 import UserCreate from './UserCreate';
 
 const existingUser = alice;
-const mockExistingUsers = Immutable.List([alice]);
+const mockLoadUsersPromise = Promise.resolve(Immutable.List([alice]));
 
 jest.mock('stores/users/UsersStore', () => ({
-  UsersStore: {
-    getInitialState: jest.fn(() => ({ list: mockExistingUsers })),
-    listen: jest.fn(),
-  },
   UsersActions: {
     create: jest.fn(() => Promise.resolve()),
-    loadUsers: jest.fn(() => Promise.resolve()),
+    loadUsers: jest.fn(() => mockLoadUsersPromise),
   },
 }));
 
 describe('<UserCreate />', () => {
   it('should create user', async () => {
-    const { getByLabelText, getByPlaceholderText, getByText, getByTestId } = render(<UserCreate />);
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<UserCreate />);
+
+    await act(() => mockLoadUsersPromise);
 
     const usernameInput = getByLabelText('Username');
     const fullNameInput = getByLabelText('Full Name');
     const emailInput = getByLabelText('E-Mail Address');
     const timeoutAmountInput = getByPlaceholderText('Timeout amount');
-    const timeoutUnitSelect = getByTestId('timeout-unit-select');
+    // const timeoutUnitSelect = getByTestId('Timeout unit');
     const timezoneSelect = getByLabelText('Time Zone');
     const passwordInput = getByPlaceholderText('Password');
     const passwordRepeatInput = getByPlaceholderText('Repeat password');
@@ -42,8 +40,8 @@ describe('<UserCreate />', () => {
     fireEvent.change(fullNameInput, { target: { value: 'The full name' } });
     fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
-    await selectEvent.openMenu(timeoutUnitSelect);
-    await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Hours'); });
+    // await selectEvent.openMenu(timeoutUnitSelect);
+    // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
     await selectEvent.openMenu(timezoneSelect);
     await act(async () => { await selectEvent.select(timezoneSelect, 'Berlin'); });
     fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
@@ -65,6 +63,8 @@ describe('<UserCreate />', () => {
   it('should display warning if username is alreafy taken', async () => {
     const { getByLabelText, getByText } = render(<UserCreate />);
 
+    await act(() => mockLoadUsersPromise);
+
     const usernameInput = getByLabelText('Username');
 
     fireEvent.change(usernameInput, { target: { value: existingUser.username } });
@@ -74,6 +74,8 @@ describe('<UserCreate />', () => {
 
   it('should display warning, if password repeat does not match password', async () => {
     const { getByPlaceholderText, getByText } = render(<UserCreate />);
+
+    await act(() => mockLoadUsersPromise);
 
     const passwordInput = getByPlaceholderText('Password');
     const passwordRepeatInput = getByPlaceholderText('Repeat password');

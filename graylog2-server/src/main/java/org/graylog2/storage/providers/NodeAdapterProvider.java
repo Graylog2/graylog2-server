@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class NodeAdapterProvider extends VersionAwareProvider<NodeAdapter> {
     @Inject
-    public NodeAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<NodeAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public NodeAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<NodeAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }
