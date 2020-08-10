@@ -78,6 +78,17 @@ public class DBGrantServiceTest {
 
     @Test
     @MongoDBFixtures("grants.json")
+    public void getForGranteeWithCapability() {
+        final GRN jane = grnRegistry.newGRN("user", "jane");
+        final GRN john = grnRegistry.newGRN("user", "john");
+
+        assertThat(dbService.getForGranteeWithCapability(jane, Capability.MANAGE)).hasSize(1);
+        assertThat(dbService.getForGranteeWithCapability(jane, Capability.OWN)).hasSize(1);
+        assertThat(dbService.getForGranteeWithCapability(john, Capability.VIEW)).hasSize(1);
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
     public void getForTarget() {
         final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
         final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
