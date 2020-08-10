@@ -27,7 +27,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
 
   useEffect(() => {
     EntityShareActions.prepare(entityGRN);
-  }, []);
+  }, [entityGRN]);
 
   const _handleSave = () => {
     setDisableSubmit(true);
