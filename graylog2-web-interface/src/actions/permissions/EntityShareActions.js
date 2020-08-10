@@ -2,12 +2,12 @@
 import Reflux from 'reflux';
 
 import type { RefluxActions } from 'stores/StoreTypes';
-import type { GRN, UserSharedEntities } from 'logic/permissions/types';
+import type { GRN, SharedEntities } from 'logic/permissions/types';
 import { type AdditionalQueries } from 'util/PaginationURL';
 import { singletonActions } from 'views/logic/singleton';
 import EntityShareState, { type SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 
-type UserSharesPaginationType = {
+type EntitySharesPaginationType = {
   count: number,
   total: number,
   page: number,
@@ -16,9 +16,9 @@ type UserSharesPaginationType = {
   additionalQueries?: AdditionalQueries,
 };
 
-export type PaginatedUserSharesType = {
-  list: UserSharedEntities,
-  pagination: UserSharesPaginationType,
+export type PaginatedEnititySharesType = {
+  list: SharedEntities,
+  pagination: EntitySharesPaginationType,
   context: {
     userCapabilities: { [grn: GRN]: string },
   },
@@ -31,7 +31,8 @@ export type EntitySharePayload = {
 type EntityShareActionsType = RefluxActions<{
   prepare: (GRN, ?EntitySharePayload) => Promise<EntityShareState>,
   update: (GRN, EntitySharePayload) => Promise<EntityShareState>,
-  searchPaginatedUserShares: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedUserSharesType>,
+  searchPaginatedUserShares: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
+  searchPaginatedTeamShares: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
 }>;
 
 const EntityShareActions: EntityShareActionsType = singletonActions(
@@ -40,6 +41,7 @@ const EntityShareActions: EntityShareActionsType = singletonActions(
     prepare: { asyncResult: true },
     update: { asyncResult: true },
     searchPaginatedUserShares: { asyncResult: true },
+    searchPaginatedTeamShares: { asyncResult: true },
   }),
 );
 
