@@ -55,4 +55,13 @@ public class PaginatedUserService extends PaginatedDbService<UserOverviewDTO> {
         final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
         return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
     }
+
+    public PaginatedList<UserOverviewDTO> findPaginatedByRole(SearchQuery searchQuery, int page,
+                                                              int perPage, String sortField, String order,
+                                                              String roleId) {
+        final DBQuery.Query dbQuery = searchQuery.toDBQuery()
+                .all(UserImpl.ROLES, roleId);
+        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
+        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    }
 }
