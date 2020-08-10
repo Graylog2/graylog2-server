@@ -8186,11 +8186,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0, graceful-fs@^4.2.2, 
   dependencies:
     "@babel/preset-env" "7.11.0"
     babel-eslint "9.0.0"
-<<<<<<< HEAD
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.0.0-SNAPSHOT-ce0ecec4-ca91-4c49-a1d8-43d96fe68f1b-1596629482611/node_modules/eslint-config-graylog"
-=======
-    eslint-config-graylog "file:packages/eslint-config-graylog"
->>>>>>> master
+    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-4.0.0-SNAPSHOT-d77b376e-de76-4bf2-9c06-832caa943eea-1597053801972/node_modules/eslint-config-graylog"
     html-webpack-plugin "^4.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.5.1"

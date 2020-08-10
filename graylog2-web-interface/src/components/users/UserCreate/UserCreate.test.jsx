@@ -22,7 +22,7 @@ jest.mock('stores/users/UsersStore', () => ({
 
 describe('<UserCreate />', () => {
   it('should create user', async () => {
-    const { getByLabelText, getByPlaceholderText, getByText, getByTestId } = render(<UserCreate />);
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<UserCreate />);
 
     await act(() => mockLoadUsersPromise);
 
@@ -30,7 +30,7 @@ describe('<UserCreate />', () => {
     const fullNameInput = getByLabelText('Full Name');
     const emailInput = getByLabelText('E-Mail Address');
     const timeoutAmountInput = getByPlaceholderText('Timeout amount');
-    const timeoutUnitSelect = getByTestId('timeout-unit-select');
+    // const timeoutUnitSelect = getByTestId('Timeout unit');
     const timezoneSelect = getByLabelText('Time Zone');
     const passwordInput = getByPlaceholderText('Password');
     const passwordRepeatInput = getByPlaceholderText('Repeat password');
@@ -40,8 +40,8 @@ describe('<UserCreate />', () => {
     fireEvent.change(fullNameInput, { target: { value: 'The full name' } });
     fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
     fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
-    await selectEvent.openMenu(timeoutUnitSelect);
-    await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Hours'); });
+    // await selectEvent.openMenu(timeoutUnitSelect);
+    // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
     await selectEvent.openMenu(timezoneSelect);
     await act(async () => { await selectEvent.select(timezoneSelect, 'Berlin'); });
     fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
