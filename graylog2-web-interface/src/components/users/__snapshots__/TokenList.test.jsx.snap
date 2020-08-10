@@ -391,11 +391,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <div
@@ -413,11 +413,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       <ListGroupItem__StyledListGroupItem>
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                           >
                             No items to display
                           </span>
@@ -892,11 +892,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         >
                           <ListGroupItem
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
                             listItem={false}
                           >
                             <span
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci list-group-item"
                             >
                               <ControlledTableListHeader__HeaderWrapper>
                                 <div
@@ -916,11 +916,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       <ListGroupItem__StyledListGroupItem>
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"
@@ -990,11 +990,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       <ListGroupItem__StyledListGroupItem>
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"

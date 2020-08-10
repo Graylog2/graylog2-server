@@ -139,14 +139,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
           >
             <ListGroupItem
               bsClass="list-group-item"
-              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
               header="COMMONMAC"
               id="list-item-0"
               listItem={false}
               onKeyDown={[Function]}
             >
               <span
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                 id="list-item-0"
                 onKeyDown={[Function]}
               >
@@ -210,14 +210,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
           >
             <ListGroupItem
               bsClass="list-group-item"
-              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
               header="DATA"
               id="list-item-1"
               listItem={false}
               onKeyDown={[Function]}
             >
               <span
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                 id="list-item-1"
                 onKeyDown={[Function]}
               >
@@ -281,14 +281,14 @@ exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`
           >
             <ListGroupItem
               bsClass="list-group-item"
-              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
               header="DATE"
               id="list-item-2"
               listItem={false}
               onKeyDown={[Function]}
             >
               <span
-                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                 id="list-item-2"
                 onKeyDown={[Function]}
               >
