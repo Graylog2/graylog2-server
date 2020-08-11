@@ -14,6 +14,23 @@ function getPluginFullName(fqcn) {
   return `plugin.${fqcn}`;
 }
 
+function prefixAssetPaths(fqcn, config) {
+  const rules = (config.module || {}).rules || [];
+
+  rules
+    .filter(rule => rule.loader === 'file-loader') // Only modify file-loader options!
+    .forEach(rule => {
+      if (!rule.options) {
+        rule.options = {};
+      }
+
+      // For file-loader loaders in plugins the default publicPath of
+      // "/assets" doesn't work so we need to make sure we set it to
+      // the plugin's asset path.
+      rule.options.publicPath = '/assets/plugin/' + fqcn;
+    });
+}
+
 function PluginWebpackConfig(fqcn, _options, additionalConfig) {
   const options = merge(defaultOptions, _options);
   const VENDOR_MANIFEST = require(path.resolve(_options.web_src_path, 'manifests', 'vendor-manifest.json'));
@@ -35,6 +52,9 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
       },
     }
   );
+
+  // Modify asset paths AFTER we merged the configs
+  prefixAssetPaths(fqcn, config);
 
   const entry = {};
   entry[getPluginFullName(fqcn)] = options.entry_path;
