@@ -16,9 +16,9 @@
  */
 package org.graylog.security;
 
+import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -68,6 +68,27 @@ public class DBGrantServiceTest {
 
     @Test
     @MongoDBFixtures("grants.json")
+    public void getForGrantee() {
+        final GRN jane = grnRegistry.newGRN("user", "jane");
+        final GRN john = grnRegistry.newGRN("user", "john");
+
+        assertThat(dbService.getForGrantee(jane)).hasSize(3);
+        assertThat(dbService.getForGrantee(john)).hasSize(2);
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
+    public void getForGranteeWithCapability() {
+        final GRN jane = grnRegistry.newGRN("user", "jane");
+        final GRN john = grnRegistry.newGRN("user", "john");
+
+        assertThat(dbService.getForGranteeWithCapability(jane, Capability.MANAGE)).hasSize(1);
+        assertThat(dbService.getForGranteeWithCapability(jane, Capability.OWN)).hasSize(1);
+        assertThat(dbService.getForGranteeWithCapability(john, Capability.VIEW)).hasSize(1);
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
     public void getForTarget() {
         final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
         final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
@@ -84,6 +105,7 @@ public class DBGrantServiceTest {
 
         assertThat(dbService.getForTargetExcludingGrantee(stream, grantee)).hasSize(2);
     }
+
     @Test
     @MongoDBFixtures("grants.json")
     public void getOwnersForTargets() {
@@ -92,10 +114,12 @@ public class DBGrantServiceTest {
 
         final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
         final GRN dashboard2 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0001");
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
 
-        assertThat(dbService.getOwnersForTargets(ImmutableSet.of(dashboard1, dashboard2))).satisfies(result -> {
+        assertThat(dbService.getOwnersForTargets(ImmutableSet.of(dashboard1, dashboard2, stream1))).satisfies(result -> {
             assertThat(result.get(dashboard1)).containsExactlyInAnyOrder(jane);
             assertThat(result.get(dashboard2)).containsExactlyInAnyOrder(john);
+            assertThat(result).doesNotContainKey(stream1);
         });
     }
 }

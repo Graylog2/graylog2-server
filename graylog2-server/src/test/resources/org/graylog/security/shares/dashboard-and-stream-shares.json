@@ -1,0 +1,110 @@
+{
+  "grants": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "grantee": "grn::::user:jane",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0000",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "grantee": "grn::::user:jane",
+      "capability": "manage",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "updated_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "expires_at": {
+        "$date": "2020-06-12T12:26:00Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "grantee": "grn::::user:john",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "updated_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "expires_at": {
+        "$date": "2020-06-12T12:26:00Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "grantee": "grn::::builtin-team:everyone",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "updated_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "expires_at": {
+        "$date": "2020-06-12T12:26:00Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0004"
+      },
+      "grantee": "grn::::user:jane",
+      "capability": "own",
+      "target": "grn::::dashboard:54e3deadbeefdeadbeef0000",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "updated_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "expires_at": {
+        "$date": "2020-06-12T12:26:00Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0005"
+      },
+      "grantee": "grn::::user:john",
+      "capability": "own",
+      "target": "grn::::dashboard:54e3deadbeefdeadbeef0001",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "updated_at": {
+        "$date": "2020-05-12T12:26:00Z"
+      },
+      "expires_at": {
+        "$date": "2020-06-12T12:26:00Z"
+      }
+    }
+  ]
+}
