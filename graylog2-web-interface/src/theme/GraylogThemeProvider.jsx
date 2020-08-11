@@ -5,8 +5,9 @@ import { ThemeProvider } from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
-import { breakpoints, colors, fonts, utils, type ThemeInterface } from 'theme';
-import { usePrefersColorScheme } from 'hooks/useMatchMedia';
+import { breakpoints, colors, fonts, utils } from 'theme';
+import type { ThemeInterface } from 'theme';
+import usePrefersColorScheme from 'hooks/usePrefersColorScheme';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import StoreProvider from 'injection/StoreProvider';
@@ -22,11 +23,11 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const PreferencesStore = StoreProvider.getStore('Preferences');
 
 const GraylogThemeProvider = ({ children }: Props) => {
-  const [mode, setMode] = React.useState();
-  const [themeColors, setThemeColors] = React.useState();
+  const colorScheme = usePrefersColorScheme();
   const [theme, setTheme] = React.useState();
   const [userPreferences, setUserPreferences] = React.useState();
-  const colorScheme = usePrefersColorScheme();
+  const [themeColors, setThemeColors] = React.useState();
+  const [mode, setMode] = React.useState(colorScheme);
 
   const currentUser = useStore(CurrentUserStore, (userStore) => {
     setUserPreferences(userStore?.currentUser?.preferences);
@@ -71,11 +72,13 @@ const GraylogThemeProvider = ({ children }: Props) => {
   }, [colorScheme, userPreferences]);
 
   React.useEffect(() => {
-    setThemeColors(colors[mode]);
+    if (mode) {
+      setThemeColors(colors[mode]);
+    }
   }, [mode]);
 
   React.useEffect(() => {
-    if (themeColors) {
+    if (mode && themeColors) {
       const formattedUtils = {
         ...utils,
         colorLevel: utils.colorLevel(themeColors),
