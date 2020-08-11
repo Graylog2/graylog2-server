@@ -1,45 +1,34 @@
 import { useState, useEffect } from 'react';
 
+import { THEME_MODE_DARK, THEME_MODE_LIGHT } from 'theme/constants';
+
 // * https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
 // * https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/Media_Queries/Testing_media_queries
 // * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
-export default function useMatchMedia(query) {
-  const mediaQueryList = window.matchMedia(query);
-  const [match, setMatch] = useState(mediaQueryList.matches);
+const usePrefersColorScheme = () => {
+  if (!window.matchMedia) {
+    return null;
+  }
 
-  useEffect(() => {
-    const handleMatchChange = (ev) => setMatch(ev.matches);
-
-    mediaQueryList.addListener(handleMatchChange);
-
-    return () => {
-      mediaQueryList.removeListener(handleMatchChange);
-    };
-  }, [query]);
-
-  return match;
-}
-
-export const usePrefersColorScheme = () => {
   const mqlLight = window.matchMedia('(prefers-color-scheme: light)');
   const mqlDark = window.matchMedia('(prefers-color-scheme: dark)');
-  const prefersLight = mqlLight.matches ? 'light' : null;
-  const prefersScheme = mqlDark.matches ? 'dark' : prefersLight;
+
+  const prefersScheme = mqlDark.matches ? THEME_MODE_DARK : THEME_MODE_LIGHT;
   const [scheme, setScheme] = useState(prefersScheme);
 
   useEffect(() => {
     if (window.matchMedia) {
       const handleLight = (ev) => {
         if (ev.matches) {
-          setScheme('light');
+          setScheme(THEME_MODE_LIGHT);
         }
       };
 
       const handleDark = (ev) => {
         if (ev.matches) {
-          setScheme('dark');
+          setScheme(THEME_MODE_DARK);
         }
       };
 
@@ -57,3 +46,5 @@ export const usePrefersColorScheme = () => {
 
   return scheme;
 };
+
+export default usePrefersColorScheme;
