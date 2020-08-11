@@ -148,7 +148,11 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
-        return db.find(DBQuery.in(GrantDTO.FIELD_TARGET, targets)).toArray().stream()
+        return db.find(DBQuery.and(
+                DBQuery.in(GrantDTO.FIELD_TARGET, targets),
+                DBQuery.is(GrantDTO.FIELD_CAPABILITY, Capability.OWN)
+        )).toArray()
+                .stream()
                 .collect(Collectors.groupingBy(
                         GrantDTO::target,
                         Collectors.mapping(GrantDTO::grantee, Collectors.toSet())

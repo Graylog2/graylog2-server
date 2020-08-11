@@ -114,10 +114,12 @@ public class DBGrantServiceTest {
 
         final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
         final GRN dashboard2 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0001");
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
 
-        assertThat(dbService.getOwnersForTargets(ImmutableSet.of(dashboard1, dashboard2))).satisfies(result -> {
+        assertThat(dbService.getOwnersForTargets(ImmutableSet.of(dashboard1, dashboard2, stream1))).satisfies(result -> {
             assertThat(result.get(dashboard1)).containsExactlyInAnyOrder(jane);
             assertThat(result.get(dashboard2)).containsExactlyInAnyOrder(john);
+            assertThat(result).doesNotContainKey(stream1);
         });
     }
 }
