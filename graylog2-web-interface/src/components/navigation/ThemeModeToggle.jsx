@@ -41,7 +41,7 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
     white-space: nowrap;
 
     &:checked + .slider {
-      background-color: ${theme.colors.variant.light.info};
+      background-color: ${theme.colors.variant.dark.default};
 
       &::before {
         transform: translate(16px, -50%);
@@ -53,7 +53,7 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
       cursor: not-allowed;
 
       &::before {
-        background-color: ${theme.colors.gray[80]};
+        background-color: ${theme.colors.variant.light.default};
       }
     }
   }
@@ -76,7 +76,7 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
       display: block;
       width: 18px;
       height: 18px;
-      background-color: #fff;
+      background-color: ${theme.colors.brand.secondary};
       box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.25), 0 2px 8px 0 rgba(32, 37, 50, 0.16);
       position: absolute;
       border-radius: 100%;
