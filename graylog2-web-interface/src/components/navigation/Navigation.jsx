@@ -123,13 +123,16 @@ const Navigation = ({ location }) => {
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
             <GlobalThroughput />
           </LinkContainer>
+
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
 
           <ScratchpadToggle />
+
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
+
           <UserMenu fullName={fullName} loginName={username} />
         </Nav>
       </Navbar.Collapse>
