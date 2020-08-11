@@ -34,9 +34,9 @@ const UserEditPage = ({ params }: Props) => {
   useEffect(() => {
     UsersActions.load(username);
 
-    const unlistenLoadeUser = UsersActions.load.completed.listen(setLoadedUser);
+    const unlistenLoadUser = UsersActions.load.completed.listen(setLoadedUser);
 
-    return () => { unlistenLoadeUser(); };
+    return () => { unlistenLoadUser(); };
   }, [username]);
 
   return (
