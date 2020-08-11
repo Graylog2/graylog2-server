@@ -32,7 +32,11 @@ const UserEditPage = ({ params }: Props) => {
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username).then(setLoadedUser);
+    UsersActions.load(username);
+
+    const unlistenLoadeUser = UsersActions.load.completed.listen(setLoadedUser);
+
+    return () => { unlistenLoadeUser(); };
   }, [username]);
 
   return (
