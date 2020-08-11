@@ -25,7 +25,6 @@ class TimeoutUnitSelect extends React.Component {
     return (
       <TimeoutSelect ref={(sessionTimeoutUnit) => { this.session_timeout_unit = sessionTimeoutUnit; }}
                      options={this.options}
-                     inputProps={{ 'data-testid': 'test-id' }}
                      {...this.props} />
     );
   }
