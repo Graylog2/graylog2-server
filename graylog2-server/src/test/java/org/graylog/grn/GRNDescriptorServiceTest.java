@@ -17,7 +17,10 @@
 package org.graylog.grn;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class GRNDescriptorServiceTest {
     private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
     private final GRN user = grnRegistry.newGRN("user", "jane");
+    private final GRN dashboard = grnRegistry.newGRN("dashboard", "abc123");
 
     @Test
     void getDescriptor() {
@@ -37,6 +41,22 @@ class GRNDescriptorServiceTest {
             assertThat(descriptor.grn()).isEqualTo(user);
             assertThat(descriptor.title()).isEqualTo("Jane Doe");
         });
+    }
+
+    @Test
+    void getDescriptors() {
+        final ImmutableMap<GRNType, GRNDescriptorProvider> providers =  ImmutableMap.of(
+                user.grnType(), grn -> GRNDescriptor.create(grn, "Jane Doe"),
+                dashboard.grnType(), grn -> GRNDescriptor.create(grn, "A Dashboard")
+        );
+        final GRNDescriptorService service = new GRNDescriptorService(providers);
+
+        final Set<GRNDescriptor> descriptors = service.getDescriptors(ImmutableSet.of(user, dashboard));
+
+        assertThat(descriptors).containsExactlyInAnyOrder(
+                GRNDescriptor.create(GRNTypes.USER.toGRN("jane"), "Jane Doe"),
+                GRNDescriptor.create(GRNTypes.DASHBOARD.toGRN("abc123"), "A Dashboard")
+        );
     }
 
     @Test
