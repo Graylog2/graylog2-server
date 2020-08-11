@@ -18,6 +18,7 @@ package org.graylog.security.shares;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
@@ -38,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -58,17 +60,20 @@ public class GranteeSharesService {
     public SharesResponse getPaginatedSharesFor(GRN grantee,
                                                 PaginationParameters paginationParameters,
                                                 String capabilityFilterString,
-                                                String entityTypeFilter) {
+                                                String entityTypeFilterString) {
         final Optional<Capability> capability = parseCapabilityFilter(capabilityFilterString);
         final ImmutableSet<GrantDTO> grants = capability.map(c -> grantService.getForGranteeWithCapability(grantee, c))
                 .orElseGet(() -> grantService.getForGrantee(grantee));
 
-        final List<EntityDescriptor> entityDescriptors = grants.stream()
-                .map(GrantDTO::target)
+        final Set<GRN> targets = grants.stream().map(GrantDTO::target).collect(Collectors.toSet());
+
+        final Map<GRN, Set<EntityDescriptor.Owner>> targetOwners = getTargetOwners(targets);
+
+        final List<EntityDescriptor> entityDescriptors = targets.stream()
                 .map(descriptorService::getDescriptor)
                 .filter(queryPredicate(paginationParameters))
-                .filter(entityTypeFilterPredicate(entityTypeFilter))
-                .map(grnDescriptor -> EntityDescriptor.create(grnDescriptor.grn(), grnDescriptor.title(), Collections.emptySet()))
+                .filter(entityTypeFilterPredicate(entityTypeFilterString))
+                .map(toEntityDescriptor(targetOwners))
                 .sorted(Comparator.comparing(EntityDescriptor::title, (t1, t2) -> {
                     if (paginationParameters.getOrder().toLowerCase(Locale.US).equals("desc")) {
                         return t2.compareTo(t1);
@@ -95,6 +100,28 @@ public class GranteeSharesService {
         );
 
         return SharesResponse.create(paginatedList, granteeCapabilities);
+    }
+
+    private Function<GRNDescriptor, EntityDescriptor> toEntityDescriptor(Map<GRN, Set<EntityDescriptor.Owner>> targetOwners) {
+        return grnDescriptor -> EntityDescriptor.create(
+                grnDescriptor.grn(),
+                grnDescriptor.title(),
+                targetOwners.getOrDefault(grnDescriptor.grn(), Collections.emptySet())
+        );
+    }
+
+    private Map<GRN, Set<EntityDescriptor.Owner>> getTargetOwners(Set<GRN> targets) {
+        return grantService.getOwnersForTargets(targets).entrySet()
+                .stream()
+                .map(entry -> Maps.immutableEntry(entry.getKey(), getOwners(entry)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private Set<EntityDescriptor.Owner> getOwners(Map.Entry<GRN, Set<GRN>> entry) {
+        return descriptorService.getDescriptors(entry.getValue())
+                .stream()
+                .map(descriptor -> EntityDescriptor.Owner.create(descriptor.grn(), descriptor.title()))
+                .collect(Collectors.toSet());
     }
 
     private Optional<Capability> parseCapabilityFilter(String capabilityFilterString) {
