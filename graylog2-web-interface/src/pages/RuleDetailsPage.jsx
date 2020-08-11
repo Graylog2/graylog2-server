@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
@@ -24,9 +25,11 @@ const RuleDetailsPage = createReactClass({
   mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules), Reflux.connect(PipelinesStore)],
 
   componentDidMount() {
-    if (this.props.params.ruleId !== 'new') {
+    const { params } = this.props;
+
+    if (params.ruleId !== 'new') {
       PipelinesActions.list();
-      RulesActions.get(this.props.params.ruleId);
+      RulesActions.get(params.ruleId);
     }
   },
 
@@ -47,7 +50,10 @@ const RuleDetailsPage = createReactClass({
   },
 
   _isLoading() {
-    return this.props.params.ruleId !== 'new' && !(this.state.rule && this.state.pipelines);
+    const { params } = this.props;
+    const { rule, pipelines } = this.state;
+
+    return params.ruleId !== 'new' && !(rule && pipelines);
   },
 
   render() {
@@ -55,17 +61,20 @@ const RuleDetailsPage = createReactClass({
       return <Spinner />;
     }
 
-    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter((pipeline) => {
-      return pipeline.stages.some((stage) => stage.rules.indexOf(this.state.rule.title) !== -1);
+    const { params } = this.props;
+    const { pipelines, rule } = this.state;
+
+    const pipelinesUsingRule = params.ruleId === 'new' ? [] : pipelines.filter((pipeline) => {
+      return pipeline.stages.some((stage) => stage.rules.indexOf(rule.title) !== -1);
     });
 
-    const pageTitle = (this.props.params.ruleId === 'new' ? 'New pipeline rule' : `Pipeline rule ${this.state.rule.title}`);
+    const pageTitle = (params.ruleId === 'new' ? 'New pipeline rule' : `Pipeline rule ${rule.title}`);
 
     return (
       <DocumentTitle title={pageTitle}>
-        <Rule rule={this.state.rule}
+        <Rule rule={rule}
               usedInPipelines={pipelinesUsingRule}
-              create={this.props.params.ruleId === 'new'}
+              create={params.ruleId === 'new'}
               onSave={this._save}
               validateRule={this._validateRule} />
       </DocumentTitle>

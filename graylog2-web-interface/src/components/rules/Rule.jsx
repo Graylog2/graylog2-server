@@ -14,19 +14,25 @@ import RuleHelper from './RuleHelper';
 class Rule extends React.Component {
   static propTypes = {
     rule: PropTypes.object,
-    usedInPipelines: PropTypes.array,
+    usedInPipelines: PropTypes.array.isRequired,
     create: PropTypes.bool,
     onSave: PropTypes.func.isRequired,
     validateRule: PropTypes.func.isRequired,
   };
 
+  static defaultProps = {
+    rule: undefined,
+    create: false,
+  }
+
   render() {
+    const { create, rule, usedInPipelines, onSave, validateRule } = this.props;
     let title;
 
-    if (this.props.create) {
+    if (create) {
       title = 'Create pipeline rule';
     } else {
-      title = <span>Pipeline rule <em>{this.props.rule.title}</em></span>;
+      title = <span>Pipeline rule <em>{rule.title}</em></span>;
     }
 
     return (
@@ -60,11 +66,11 @@ class Rule extends React.Component {
 
         <Row className="content">
           <Col md={6}>
-            <RuleForm rule={this.props.rule}
-                      usedInPipelines={this.props.usedInPipelines}
-                      create={this.props.create}
-                      onSave={this.props.onSave}
-                      validateRule={this.props.validateRule} />
+            <RuleForm rule={rule}
+                      usedInPipelines={usedInPipelines}
+                      create={create}
+                      onSave={onSave}
+                      validateRule={validateRule} />
           </Col>
           <Col md={6}>
             <RuleHelper />
