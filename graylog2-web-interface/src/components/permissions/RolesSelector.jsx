@@ -36,38 +36,38 @@ const _renderRoleOption = ({ label }: { label: string }) => (
   <RoleSelectOption>{label}</RoleSelectOption>
 );
 
+const _options = (roles: Immutable.List<Role>, user: User) => roles
+  .filter((r) => !user.roles.includes(r.name))
+  .toArray()
+  .map((r) => ({ label: r.name, value: r.name, role: r }));
+
+const _assignRole = (username, selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting) => {
+  const selectedRole = roles.find((r) => r.name === selectedRoleName);
+
+  if (!selectedRole) {
+    throw Error(`Role assigment for user ${username} failed, because role with name ${selectedRoleName ?? '(undefined)'} does not exist`);
+  }
+
+  setIsSubmitting(true);
+
+  onSubmit(selectedRole).then(() => {
+    setSelectedRoleName();
+    setIsSubmitting(false);
+  });
+};
+
 const RolesSelector = ({ user, onSubmit }: Props) => {
   const [roles, setRoles] = useState(Immutable.List());
   const [selectedRoleName, setSelectedRoleName] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const options = roles
-    .filter((r) => !user.roles.includes(r.name))
-    .toArray()
-    .map((r) => ({ label: r.name, value: r.name, role: r }));
-
-  const _assignRole = () => {
-    const selectedRole = roles.find((r) => r.name === selectedRoleName);
-
-    if (!selectedRole) {
-      throw Error(`Role assigment for user ${user.username} failed, because role with name ${selectedRoleName ?? '(undefined)'} does not exist`);
-    }
-
-    setIsSubmitting(true);
-
-    onSubmit(selectedRole).then(() => {
-      setSelectedRoleName();
-      setIsSubmitting(false);
-    });
-  };
+  const _onSubmit = () => _assignRole(user.username, selectedRoleName, roles, onSubmit, setSelectedRoleName, setIsSubmitting);
+  const options = _options(roles, user);
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesActions.loadPaginated(...getUnlimited)
-      .then((response: PaginatedListType) => {
-        const { list } = response;
-        setRoles(list);
-      });
+      .then(({ list }: PaginatedListType) => setRoles(list));
   }, [user]);
 
   return (
@@ -80,14 +80,13 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
                       placeholder="Search for roles"
                       value={selectedRoleName} />
         <SubmitButton bsStyle="success"
-                      onClick={_assignRole}
+                      onClick={_onSubmit}
                       disabled={isSubmitting || !selectedRoleName}
                       title="Assign Role"
                       type="submit">
           Assign Role
         </SubmitButton>
       </FormElements>
-
     </div>
   );
 };

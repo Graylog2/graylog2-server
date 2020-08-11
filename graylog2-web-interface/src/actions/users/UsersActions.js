@@ -21,7 +21,7 @@ export type ChangePasswordRequest = {
 
 export type PaginatedUsers = {
   adminUser: ?UserOverview,
-  list: ?Immutable.List<UserOverview>,
+  list: Immutable.List<UserOverview>,
   pagination: PaginationType,
 };
 
