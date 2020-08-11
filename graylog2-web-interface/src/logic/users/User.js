@@ -256,6 +256,10 @@ export default class User {
     );
   }
 
+  static empty() {
+    return User.create('', '', '', '', Immutable.List(), '', undefined, Immutable.List(), false, false, -1, undefined, false, '', '');
+  }
+
   toJSON(): UserJSON {
     const {
       id,

@@ -1,10 +1,16 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
 import { Formik, Form } from 'formik';
 
+import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
+import User from 'logic/users/User';
+import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
+import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Button } from 'components/graylog';
 import { UsersActions } from 'stores/users/UsersStore';
+import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -18,8 +24,8 @@ import UsernameFormGroup from './UsernameFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 
-const _onSubmit = (formData, setSubmitError) => {
-  const data = { ...formData, permissions: [] };
+const _onSubmit = (formData, roles, setSubmitError) => {
+  const data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
 
   setSubmitError(null);
@@ -40,16 +46,33 @@ const _validate = (values) => {
 
 const UserCreate = () => {
   const [users, setUsers] = useState();
+  const [user, setUser] = useState(User.empty());
   const [submitError, setSubmitError] = useState();
+  const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([{ name: 'Reader', description: '', id: '' }]));
 
   useEffect(() => {
     UsersActions.loadUsers().then(setUsers);
   }, []);
 
+  const _onAssignRole = (role: DescriptiveItem) => {
+    setSelectedRoles(selectedRoles.add(role));
+
+    return Promise.resolve(
+      setUser(user.toBuilder().roles(user.roles.toSet().add(role?.name).toList()).build()),
+    );
+  };
+
+  const _onUnassignRole = (role: DescriptiveItem) => {
+    setSelectedRoles(selectedRoles.remove(role));
+    setUser(user.toBuilder().roles(user.roles.toSet().remove(role?.name).toList()).build());
+  };
+
+  const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
+
   return (
     <Row className="content">
       <Col lg={8}>
-        <Formik onSubmit={(data) => _onSubmit(data, setSubmitError)}
+        <Formik onSubmit={(data) => _onSubmit(data, user.roles, setSubmitError)}
                 validate={_validate}
                 initialValues={{}}>
           {({ isSubmitting, isValid }) => (
@@ -64,6 +87,29 @@ const UserCreate = () => {
                 <Headline>Settings</Headline>
                 <TimeoutFormGroup />
                 <TimezoneFormGroup />
+              </div>
+              <div>
+                <Headline>Roles</Headline>
+                <Input id="roles-selector-input"
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9"
+                       label="Assign Roles">
+                  <RolesSelector onSubmit={_onAssignRole} user={user} />
+                </Input>
+
+                <Input id="selected-roles-overview"
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9"
+                       label="Selected Roles">
+                  <>
+                    {selectedRoles.map((role) => (
+                      <PaginatedItem item={role}
+                                     onDeleteItem={(data) => _onUnassignRole(data)}
+                                     key={role.id} />
+                    ))}
+                    {!hasValidRole && <Alert bsStyle="danger">You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.</Alert>}
+                  </>
+                </Input>
               </div>
               <div>
                 <Headline>Password</Headline>
@@ -82,7 +128,7 @@ const UserCreate = () => {
               <Row>
                 <Col xs={9} xsOffset={3}>
                   <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid}
+                          disabled={isSubmitting || !isValid || !hasValidRole}
                           title="Create User"
                           type="submit">
                     Create User
