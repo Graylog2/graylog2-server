@@ -5,6 +5,7 @@ import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { act } from 'react-dom/test-utils';
 import { alice } from 'fixtures/users';
+import { rolesList } from 'fixtures/roles';
 
 import { UsersActions } from 'stores/users/UsersStore';
 
@@ -12,6 +13,16 @@ import UserCreate from './UserCreate';
 
 const existingUser = alice;
 const mockLoadUsersPromise = Promise.resolve(Immutable.List([alice]));
+const mockLoadRolesPromise = Promise.resolve({
+  list: rolesList,
+  pagination: {
+    count: 0,
+    total: 0,
+    page: 0,
+    per_page: 0,
+    query: '',
+  },
+});
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
@@ -20,11 +31,18 @@ jest.mock('stores/users/UsersStore', () => ({
   },
 }));
 
+jest.mock('stores/roles/AuthzRolesStore', () => ({
+  AuthzRolesActions: {
+    loadPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
+  },
+}));
+
 describe('<UserCreate />', () => {
   it('should create user', async () => {
     const { getByLabelText, getByPlaceholderText, getByText } = render(<UserCreate />);
 
     await act(() => mockLoadUsersPromise);
+    await act(() => mockLoadRolesPromise);
 
     const usernameInput = getByLabelText('Username');
     const fullNameInput = getByLabelText('Full Name');
@@ -53,6 +71,7 @@ describe('<UserCreate />', () => {
       username: 'The username',
       full_name: 'The full name',
       timezone: 'Europe/Berlin',
+      roles: [],
       email: 'username@example.org',
       permissions: [],
       session_timeout_ms: 144000000,
@@ -64,6 +83,7 @@ describe('<UserCreate />', () => {
     const { getByLabelText, getByText } = render(<UserCreate />);
 
     await act(() => mockLoadUsersPromise);
+    await act(() => mockLoadRolesPromise);
 
     const usernameInput = getByLabelText('Username');
 
@@ -76,6 +96,7 @@ describe('<UserCreate />', () => {
     const { getByPlaceholderText, getByText } = render(<UserCreate />);
 
     await act(() => mockLoadUsersPromise);
+    await act(() => mockLoadRolesPromise);
 
     const passwordInput = getByPlaceholderText('Password');
     const passwordRepeatInput = getByPlaceholderText('Repeat password');

@@ -15,8 +15,7 @@ import PaginatedItemOverview, {
   type DescriptiveItem,
 } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
-
-import RolesSelector from './RolesSelector';
+import RolesSelector from 'components/permissions/RolesSelector';
 
 import RolesQueryHelp from '../RolesQueryHelp';
 
@@ -56,21 +55,29 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       });
   };
 
-  const onUpdate = (data) => onSubmit(data).then(() => {
+  const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
     _onLoad().then((response) => setRoles(response));
     UsersActions.load(username);
   });
 
+  const _onAssignRole = (newRole: DescriptiveItem) => {
+    const userRoles = user.roles;
+    const newRoles = userRoles.push(newRole.name).toJS();
+
+    return onRolesUpdate({ roles: newRoles });
+  };
+
   const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();
-    onUpdate({ roles: newUserRoles });
+
+    onRolesUpdate({ roles: newUserRoles });
   };
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
       <h3>Assign Roles</h3>
       <Container>
-        <RolesSelector onSubmit={onUpdate} user={user} />
+        <RolesSelector onSubmit={_onAssignRole} user={user} />
       </Container>
       <h3>Selected Roles</h3>
       <Container>

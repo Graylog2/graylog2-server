@@ -4,8 +4,6 @@ import * as Immutable from 'immutable';
 import UserOverview from 'logic/users/UserOverview';
 import type { UserJSON } from 'logic/users/User';
 
-/* eslint-disable import/prefer-default-export */
-
 export const viewsManager: UserJSON = {
   email: '',
   external: false,
