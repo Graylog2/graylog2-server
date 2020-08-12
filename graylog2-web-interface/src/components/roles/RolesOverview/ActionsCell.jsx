@@ -48,15 +48,15 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
   return (
     <td>
       <ActtionsWrapper>
-        <IfPermitted permissions={[`roles:edit:${roleId}`]}>
-          <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(encodeURIComponent(roleName))}>
+        <IfPermitted permissions={[`roles:edit:${roleName}`]}>
+          <LinkContainer to={Routes.SYSTEM.AUTHZROLES.edit(encodeURIComponent(roleId))}>
             <Button id={`edit-role-${roleId}`} bsStyle="info" bsSize="xs" title={`Edit role ${roleName}`} type="button">
               Edit
             </Button>
           </LinkContainer>
         </IfPermitted>
         {!readOnly && (
-          <IfPermitted permissions={[`roles:delete:${roleId}`]}>
+          <IfPermitted permissions={[`roles:delete:${roleName}`]}>
             &nbsp;
             <Button id={`delete-role-${roleId}`} bsStyle="danger" bsSize="xs" title={`Delete role ${roleName}`} onClick={_deleteRole} type="button">
               Delete
