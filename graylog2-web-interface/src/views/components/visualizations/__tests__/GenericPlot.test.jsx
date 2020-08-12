@@ -6,9 +6,19 @@ import ChartColorContext from '../ChartColorContext';
 import GenericPlot from '../GenericPlot';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
-jest.mock('components/common/ColorPicker', () => 'color-picker');
+// We need to mock the Popover, because it implements the GraylogThemeProvider which does not render its children
+jest.mock('components/graylog/Popover', () => {
+  return {
+    __esModule: true,
+    default: ({ children }: { children: React.Node }) => {
+      return <>{children}</>;
+    },
+  };
+});
+
 // eslint-disable-next-line global-require
 jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot'));
+jest.mock('components/common/ColorPicker', () => 'color-picker');
 
 describe('GenericPlot', () => {
   describe('adds onRelayout handler', () => {
