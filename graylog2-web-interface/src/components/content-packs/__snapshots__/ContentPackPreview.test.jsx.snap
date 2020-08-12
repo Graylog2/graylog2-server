@@ -866,10 +866,10 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               <Well>
                                 <Well
                                   bsClass="well"
-                                  className="Well-sc-19gs1oc-0 YXCuT"
+                                  className="Well-sc-19gs1oc-0 enTUtA"
                                 >
                                   <div
-                                    className="Well-sc-19gs1oc-0 YXCuT well"
+                                    className="Well-sc-19gs1oc-0 enTUtA well"
                                   >
                                     <div
                                       dangerouslySetInnerHTML={
