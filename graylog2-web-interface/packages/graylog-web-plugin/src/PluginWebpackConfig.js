@@ -1,3 +1,5 @@
+/* eslint-disable global-require,import/no-dynamic-require,no-param-reassign */
+
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const path = require('path');
@@ -18,8 +20,8 @@ function prefixAssetPaths(fqcn, config) {
   const rules = (config.module || {}).rules || [];
 
   rules
-    .filter(rule => rule.loader === 'file-loader') // Only modify file-loader options!
-    .forEach(rule => {
+    .filter((rule) => rule.loader === 'file-loader') // Only modify file-loader options!
+    .forEach((rule) => {
       if (!rule.options) {
         rule.options = {};
       }
@@ -27,7 +29,7 @@ function prefixAssetPaths(fqcn, config) {
       // For file-loader loaders in plugins the default publicPath of
       // "/assets" doesn't work so we need to make sure we set it to
       // the plugin's asset path.
-      rule.options.publicPath = '/assets/plugin/' + fqcn;
+      rule.options.publicPath = `/assets/plugin/${fqcn}`;
     });
 }
 
@@ -37,7 +39,7 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
 
   const plugins = [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
-    new HtmlWebpackPlugin({ filename: getPluginFullName(fqcn) + '.module.json', inject: false, template: path.resolve(_options.web_src_path, 'templates', 'module.json.template') }),
+    new HtmlWebpackPlugin({ filename: `${getPluginFullName(fqcn)}.module.json`, inject: false, template: path.resolve(_options.web_src_path, 'templates', 'module.json.template') }),
   ];
 
   const config = merge.smart(
@@ -48,9 +50,9 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
       },
       plugins: plugins,
       resolve: {
-        modules: [ path.resolve(options.entry_path, '..') ],
+        modules: [path.resolve(options.entry_path, '..')],
       },
-    }
+    },
   );
 
   // Modify asset paths AFTER we merged the configs
