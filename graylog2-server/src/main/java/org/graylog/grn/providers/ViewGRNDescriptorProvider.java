@@ -23,18 +23,18 @@ import org.graylog.plugins.views.search.views.ViewService;
 
 import javax.inject.Inject;
 
-public class DashboardGRNDescriptorProvider implements GRNDescriptorProvider {
+public class ViewGRNDescriptorProvider implements GRNDescriptorProvider {
     private final ViewService viewService;
 
     @Inject
-    public DashboardGRNDescriptorProvider(ViewService viewService) {
+    public ViewGRNDescriptorProvider(ViewService viewService) {
         this.viewService = viewService;
     }
 
     @Override
     public GRNDescriptor get(GRN grn) {
         return viewService.get(grn.entity())
-                .map(dashboard -> GRNDescriptor.create(grn, dashboard.title()))
-                .orElse(GRNDescriptor.create(grn, "ERROR: Dashboard for <" + grn.toString() + "> not found!"));
+                .map(viewDTO -> GRNDescriptor.create(grn, viewDTO.title()))
+                .orElse(GRNDescriptor.create(grn, "ERROR: View for <" + grn.toString() + "> not found!"));
     }
 }
