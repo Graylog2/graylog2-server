@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 
+import { getIdFromGRN } from 'logic/permissions/GRN';
 import Routes from 'routing/Routes';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
@@ -11,12 +12,14 @@ type Props = {
   sharedEntity: SharedEntity,
 };
 
-const _getOwnerLink = ({ type, title }) => {
+const _getOwnerLink = ({ type, id }) => {
+  const ownerId = getIdFromGRN(id, type);
+
   switch (type) {
     case 'user':
-      return Routes.SYSTEM.USERS.show(title);
+      return Routes.SYSTEM.USERS.show(ownerId);
     case 'team':
-      return Routes.SYSTEM.USERS.show(title); // need to be updated when page exists
+      return Routes.pluginRoute('SYSTEM_TEAMS_TEAMID')(ownerId);
     default:
       throw new Error(`Owner of entity has not supported type: ${type}`);
   }
