@@ -38,13 +38,19 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('<UserEdit />', () => {
+  const SutComponent = (props) => (
+    <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['*'] }}>
+      <UserEdit {...props} />
+    </CurrentUserContext.Provider>
+  );
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   describe('profile section', () => {
     it('should display username', async () => {
-      const { getByText } = render(<UserEdit user={user} />);
+      const { getByText } = render(<SutComponent user={user} />);
 
       expect(getByText(user.username)).not.toBeNull();
 
@@ -52,7 +58,7 @@ describe('<UserEdit />', () => {
     });
 
     it('should use user details as initial values', async () => {
-      const { getByText } = render(<UserEdit user={user} />);
+      const { getByText } = render(<SutComponent user={user} />);
 
       const submitButton = getByText('Update Profile');
 
@@ -65,7 +71,7 @@ describe('<UserEdit />', () => {
     });
 
     it('should allow full name and e-mail address change', async () => {
-      const { getByText, getByLabelText } = render(<UserEdit user={user} />);
+      const { getByText, getByLabelText } = render(<SutComponent user={user} />);
 
       const fullNameInput = getByLabelText('Full Name');
       const emailInput = getByLabelText('E-Mail Address');
@@ -85,7 +91,7 @@ describe('<UserEdit />', () => {
 
   describe('settings section', () => {
     it('should use user details as initial values', async () => {
-      const { getByText } = render(<UserEdit user={user} />);
+      const { getByText } = render(<SutComponent user={user} />);
 
       const submitButton = getByText('Update Settings');
 
@@ -98,7 +104,7 @@ describe('<UserEdit />', () => {
     });
 
     it('should allow session timeout name and timezone change', async () => {
-      const { getByText, getByLabelText, getByPlaceholderText } = render(<UserEdit user={user} />);
+      const { getByText, getByLabelText, getByPlaceholderText } = render(<SutComponent user={user} />);
 
       const timeoutAmountInput = getByPlaceholderText('Timeout amount');
       // const timeoutUnitSelect = getByLabelText('Timeout unit');
@@ -121,7 +127,7 @@ describe('<UserEdit />', () => {
 
   describe('password section', () => {
     it('should allow password change', async () => {
-      const { getByLabelText, getByText } = render(<UserEdit user={user} />);
+      const { getByLabelText, getByText } = render(<SutComponent user={user} />);
 
       const newPasswordInput = getByLabelText('New Password');
       const newPasswordRepeatInput = getByLabelText('Repeat Password');
@@ -137,18 +143,14 @@ describe('<UserEdit />', () => {
     });
 
     it('should require current password when current user is changing his password', async () => {
-      const { getByLabelText, getByText } = render(
-        <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['users:passwordchange:*'] }}>
-          <UserEdit user={user} />
-        </CurrentUserContext.Provider>,
-      );
+      const { getByLabelText, getByText } = render(<SutComponent user={user} />);
 
-      const oldPsswordInput = getByLabelText('Old Password');
+      const passwordInput = getByLabelText('Old Password');
       const newPasswordInput = getByLabelText('New Password');
       const newPasswordRepeatInput = getByLabelText('Repeat Password');
       const submitButton = getByText('Change Password');
 
-      fireEvent.change(oldPsswordInput, { target: { value: 'oldpassword' } });
+      fireEvent.change(passwordInput, { target: { value: 'oldpassword' } });
       fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
       fireEvent.click(submitButton);
@@ -160,7 +162,7 @@ describe('<UserEdit />', () => {
     });
 
     it('should display warning, if password repeat does not match password', async () => {
-      const { getByLabelText, getByText } = render(<UserEdit user={user} />);
+      const { getByLabelText, getByText } = render(<SutComponent user={user} />);
 
       const newPasswordInput = getByLabelText('New Password');
       const newPasswordRepeatInput = getByLabelText('Repeat Password');

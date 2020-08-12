@@ -5,6 +5,7 @@ import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { simplePaginatedUserShares } from 'fixtures/userEntityShares';
 import selectEvent from 'react-select-event';
 
+import CurrentUserContext from 'contexts/CurrentUserContext';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import User from 'logic/users/User';
 
@@ -38,12 +39,18 @@ const user = User
   .build();
 
 describe('<UserDetails />', () => {
+  const SutComponent = (props) => (
+    <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['*'] }}>
+      <UserDetails {...props} />
+    </CurrentUserContext.Provider>
+  );
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('user profile should display profile information', async () => {
-    const { getByText } = render(<UserDetails user={user} paginatedUserShares={undefined} />);
+    const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
 
     expect(getByText(user.username)).not.toBeNull();
     expect(getByText(user.fullName)).not.toBeNull();
@@ -56,7 +63,7 @@ describe('<UserDetails />', () => {
 
   describe('user settings', () => {
     it('should display timezone', async () => {
-      const { getByText } = render(<UserDetails user={user} paginatedUserShares={undefined} />);
+      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
 
       expect(getByText(user.timezone)).not.toBeNull();
 
@@ -66,7 +73,7 @@ describe('<UserDetails />', () => {
     describe('should display session timeout in a readable format', () => {
       it('for seconds', async () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
-        const { getByText } = render(<UserDetails user={test} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={test} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Seconds')).not.toBeNull();
 
@@ -74,7 +81,7 @@ describe('<UserDetails />', () => {
       });
 
       it('for minutes', async () => {
-        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Minutes')).not.toBeNull();
 
@@ -82,7 +89,7 @@ describe('<UserDetails />', () => {
       });
 
       it('for hours', async () => {
-        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Hours')).not.toBeNull();
 
@@ -90,7 +97,7 @@ describe('<UserDetails />', () => {
       });
 
       it('for days', async () => {
-        const { getByText } = render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} paginatedUserShares={undefined} />);
+        const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} paginatedUserShares={undefined} />);
 
         expect(getByText('10 Days')).not.toBeNull();
 
@@ -100,7 +107,7 @@ describe('<UserDetails />', () => {
 
     describe('shared entities section', () => {
       it('should list provided paginated user shares', async () => {
-        const { getAllByText } = render(<UserDetails user={user} paginatedUserShares={mockPaginatedUserShares} />);
+        const { getAllByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
 
         expect(getAllByText(mockPaginatedUserShares.list.first().title)).not.toBeNull();
 
@@ -108,7 +115,7 @@ describe('<UserDetails />', () => {
       });
 
       it('should fetch paginated user shares when using search', async () => {
-        const { getByPlaceholderText, getByText } = render(<UserDetails user={user} paginatedUserShares={mockPaginatedUserShares} />);
+        const { getByPlaceholderText, getByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
 
         const searchInput = getByPlaceholderText('Enter search query...');
         const searchSubmitButton = getByText('Search');
@@ -123,7 +130,7 @@ describe('<UserDetails />', () => {
 
       it('should fetch user shares when filtering by entity type', async () => {
         const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 3, perPage: 50, query: 'existing query' } };
-        const { getByLabelText } = render(<UserDetails user={user} paginatedUserShares={existingPaginatedUserShares} />);
+        const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
 
         const entityTypeSelect = getByLabelText('Entity Type');
         await selectEvent.openMenu(entityTypeSelect);
@@ -136,7 +143,7 @@ describe('<UserDetails />', () => {
 
       it('should fetch user shares when filtering by capability', async () => {
         const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 3, perPage: 50, query: 'existing query' } };
-        const { getByLabelText } = render(<UserDetails user={user} paginatedUserShares={existingPaginatedUserShares} />);
+        const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
 
         const capabilitySelect = getByLabelText('Capability');
         await selectEvent.openMenu(capabilitySelect);
