@@ -51,10 +51,10 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _onPageChange = (query, loadRoles, setLoading) => (page, perPage) => {
+const _onPageChange = (loadRoles, setLoading) => (page, perPage) => {
   setLoading(true);
 
-  return loadRoles(page, perPage, query).then(() => setLoading(false));
+  return loadRoles(page, perPage).then(() => setLoading(false));
 };
 
 const RolesOverview = () => {
@@ -67,14 +67,13 @@ const RolesOverview = () => {
   };
 
   const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
-  const _handleSearch = (newQuery) => _loadRoles(1, undefined, newQuery);
-  const _handleReset = () => _loadRoles(1, perPage, '');
+  const _handleSearch = (newQuery) => _loadRoles(DEFAULT_PAGINATION.page, undefined, newQuery);
 
   useEffect(() => {
-    _loadRoles();
+    _loadRoles(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
     const unlistenDeleteRole = AuthzRolesActions.deleteRole.completed.listen(() => {
-      _loadRoles();
+      _loadRoles(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
     return () => {
@@ -97,7 +96,7 @@ const RolesOverview = () => {
           <p className="description">
             Found {total} roles on the system.
           </p>
-          <StyledPaginatedList onChange={_onPageChange(query, _loadRoles, setLoading)} totalItems={total} activePage={page}>
+          <StyledPaginatedList onChange={_onPageChange(_loadRoles, setLoading)} totalItems={total} activePage={page}>
             <DataTable id="roles-overview"
                        className="table-hover"
                        rowClassName="no-bm"
@@ -105,7 +104,7 @@ const RolesOverview = () => {
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="name"
                        rows={roles.toJS()}
-                       customFilter={<RolesFilter onSearch={_handleSearch} onReset={_handleReset} />}
+                       customFilter={<RolesFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                        dataRowFormatter={_rolesOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Roles" />
