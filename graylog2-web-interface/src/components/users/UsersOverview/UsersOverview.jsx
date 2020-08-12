@@ -57,10 +57,10 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _onPageChange = (query, loadUsers, setLoading) => (page, perPage) => {
+const _onPageChange = (loadUsers, setLoading) => (page, perPage) => {
   setLoading(true);
 
-  return loadUsers(page, perPage, query).then(() => setLoading(false));
+  return loadUsers(page, perPage).then(() => setLoading(false));
 };
 
 const UsersOverview = () => {
@@ -72,20 +72,16 @@ const UsersOverview = () => {
   const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return UsersActions.searchPaginated(newPage, newPerPage, newQuery)
-      .then((newPaginatedUsers) => {
-        setPaginatedUsers(newPaginatedUsers);
-      });
+    return UsersActions.searchPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
   };
 
-  const _handleSearch = (newQuery) => _loadUsers(1, undefined, newQuery);
-  const _handleReset = () => _loadUsers(1, perPage, '');
+  const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);
 
   useEffect(() => {
-    _loadUsers();
+    _loadUsers(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
     const unlistenDeleteUser = UsersActions.deleteUser.completed.listen(() => {
-      _loadUsers();
+      _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
     return () => {
@@ -114,7 +110,7 @@ const UsersOverview = () => {
           <p className="description">
             Found {total} registered users on the system.
           </p>
-          <StyledPaginatedList onChange={_onPageChange(query, _loadUsers, setLoading)} totalItems={total} activePage={page}>
+          <StyledPaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
             <DataTable id="users-overview"
                        className="table-hover"
                        rowClassName="no-bm"
@@ -122,7 +118,7 @@ const UsersOverview = () => {
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="fullName"
                        rows={users.toJS()}
-                       customFilter={<UsersFilter onSearch={_handleSearch} onReset={_handleReset} />}
+                       customFilter={<UsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                        dataRowFormatter={_userOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Users" />
