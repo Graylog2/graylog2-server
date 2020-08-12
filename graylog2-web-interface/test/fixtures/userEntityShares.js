@@ -25,7 +25,7 @@ export const simplePaginatedUserShares = (page: number, perPage: number, query: 
   return {
     list: Immutable.List<SharedEntity>(sharedEnitites),
     context: {
-      userCapabilities: { 'grn::::stream:57bc9188e62a2373778d9e03': 'view' },
+      granteeCapabilities: { 'grn::::stream:57bc9188e62a2373778d9e03': 'view' },
     },
     pagination: {
       additionalQueries,

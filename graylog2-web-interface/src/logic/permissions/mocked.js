@@ -29,7 +29,7 @@ const searchPaginatedEntitySharesResponse = (page: number, perPage: number, quer
     query: query || '',
     entities: mockedEntities,
     context: {
-      user_capabilities: {
+      grantee_capabilities: {
         'grn::::stream:57bc9188e62a2373778d9e03': 'view',
       },
     },
@@ -37,7 +37,7 @@ const searchPaginatedEntitySharesResponse = (page: number, perPage: number, quer
 
   return Promise.resolve({
     list: Immutable.List<any>(mockedResponse.entities.map((se) => SharedEntity.fromJSON(se))),
-    context: { userCapabilities: mockedResponse.context.user_capabilities },
+    context: { granteeCapabilities: mockedResponse.context.grantee_capabilities },
     pagination: {
       additionalQueries: mockedResponse.additionalQueries,
       count: mockedResponse.count,
