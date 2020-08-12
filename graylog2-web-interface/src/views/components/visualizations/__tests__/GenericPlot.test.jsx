@@ -7,14 +7,8 @@ import GenericPlot from '../GenericPlot';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
 // We need to mock the Popover, because it implements the GraylogThemeProvider which does not render its children
-jest.mock('components/graylog/Popover', () => {
-  return {
-    __esModule: true,
-    default: ({ children }: { children: React.Node }) => {
-      return <>{children}</>;
-    },
-  };
-});
+// without CurrentUser & UserPreferences
+jest.mock('components/graylog/Popover');
 
 // eslint-disable-next-line global-require
 jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot'));
