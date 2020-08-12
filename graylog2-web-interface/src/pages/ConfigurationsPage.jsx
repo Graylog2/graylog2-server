@@ -29,11 +29,13 @@ const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
 class ConfigurationsPage extends React.Component {
-  state = {
-    loaded: false,
-  }
-
   checkLoadedTimer = undefined
+
+  constructor() {
+    super();
+
+    this.state = { loaded: false };
+  }
 
   componentDidMount() {
     style.use();
