@@ -40,7 +40,7 @@ public class Elasticsearch6Module extends VersionAwareModule {
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
 
-        bind(JestClient.class).toProvider(JestClientProvider.class);
+        bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
