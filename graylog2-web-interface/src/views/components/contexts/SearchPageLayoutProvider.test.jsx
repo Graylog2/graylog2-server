@@ -149,6 +149,7 @@ describe('CurrentUserPreferencesProvider', () => {
         { name: 'updateUnfocussed', value: false },
         { name: 'searchSidebarIsPinned', value: true },
         { name: 'dashboardSidebarIsPinned', value: false },
+        { name: 'themeMode', value: 'teint' },
       ],
       undefined,
       false,
