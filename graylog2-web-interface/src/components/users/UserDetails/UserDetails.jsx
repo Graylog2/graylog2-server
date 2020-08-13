@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
-import { Spinner } from 'components/common';
+import { IfPermitted, Spinner } from 'components/common';
 import User from 'logic/users/User';
 import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
 import SectionGrid from 'components/common/Section/SectionGrid';
@@ -25,14 +25,22 @@ const UserDetails = ({ user, paginatedUserShares }: Props) => {
   return (
     <>
       <SectionGrid>
-        <div>
-          <ProfileSection user={user} />
-          <SettingsSection user={user} />
-        </div>
-        <div>
-          <RolesSection user={user} />
-          <TeamsSection user={user} />
-        </div>
+        <IfPermitted permissions={`users:edit:${user.username}`}>
+          <div>
+            <ProfileSection user={user} />
+            <IfPermitted permissions="*">
+              <SettingsSection user={user} />
+            </IfPermitted>
+          </div>
+          <div>
+            <IfPermitted permissions={`users:rolesedit:${user.username}`}>
+              <RolesSection user={user} />
+            </IfPermitted>
+            <IfPermitted permissions={`teams:edit:${user.username}`}>
+              <TeamsSection user={user} />
+            </IfPermitted>
+          </div>
+        </IfPermitted>
       </SectionGrid>
       <SharedEntitiesSection paginatedUserShares={paginatedUserShares}
                              username={user.username} />

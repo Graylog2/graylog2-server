@@ -62,7 +62,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
 const Navigation = ({ location }) => {
   const currentUser = useContext(CurrentUserContext);
-  const { permissions, username, full_name: fullName } = currentUser || {};
+  const { permissions, username, full_name: fullName, read_only: readOnly } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
 
@@ -133,7 +133,7 @@ const Navigation = ({ location }) => {
 
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
 
-          <UserMenu fullName={fullName} loginName={username} />
+          <UserMenu fullName={fullName} loginName={username} readOnly={readOnly} />
         </Nav>
       </Navbar.Collapse>
     </StyledNavbar>
