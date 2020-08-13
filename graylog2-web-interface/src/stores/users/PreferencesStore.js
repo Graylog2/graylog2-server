@@ -41,8 +41,13 @@ const PreferencesStore = Reflux.createStore({
     const preferencesAsMap = {};
 
     preferences.forEach((element) => {
-      // TODO: Converting all preferences to booleans for now, we should change this when we support more types
-      preferencesAsMap[element.name] = element.value === true || element.value === 'true';
+      if (element.value === 'true') {
+        preferencesAsMap[element.name] = true;
+      } else if (element.value === 'false') {
+        preferencesAsMap[element.name] = false;
+      } else {
+        preferencesAsMap[element.name] = element.value;
+      }
     });
 
     return preferencesAsMap;

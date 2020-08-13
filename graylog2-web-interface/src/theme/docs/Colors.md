@@ -10,6 +10,10 @@ import chroma from 'chroma-js';
 import { colors } from 'theme';
 import ColorSwatch, { Swatch } from './Colors';
 
+const ModeTitle = styled.h3`
+  margin: 0 0 6px;
+`;
+
 const Section = styled.h4`
   margin: 0 0 6px;
 `;
@@ -81,11 +85,16 @@ const SectionWrap = (mode, section) => {
 const Colors = () => {
   return (
     <>
-      {getValues(colors, (section) => (
-        <>
-          <Section>{section}</Section>
-          {SectionWrap(colors[section], section)}
-        </>
+      {getValues(colors, (themeMode) => (
+<>
+        <ModeTitle key={`title-${themeMode}`}>{themeMode}</ModeTitle>
+        {getValues(colors[themeMode], (section) => (
+          <>
+            <Section key={`section-${section}`}>{section}</Section>
+            {SectionWrap(colors[themeMode][section], section)}
+          </>
+        ))}
+</>
       ))}
     </>
   );

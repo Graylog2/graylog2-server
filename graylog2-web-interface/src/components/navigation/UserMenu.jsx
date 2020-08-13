@@ -9,6 +9,8 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
+import ThemeModeToggle from './ThemeModeToggle';
+
 const SessionStore = StoreProvider.getStore('Session');
 const SessionActions = ActionsProvider.getActions('Session');
 
@@ -28,6 +30,10 @@ class UserMenu extends React.Component {
                    id="user-menu-dropdown"
                    noCaret>
         <MenuItem header>{fullName}</MenuItem>
+        <MenuItem divider />
+        <MenuItem header>
+          <ThemeModeToggle />
+        </MenuItem>
         <MenuItem divider />
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(loginName))}>
           <MenuItem>Edit profile</MenuItem>

@@ -20,7 +20,7 @@ export const utilsPropTypes = PropTypes.shape({
   readableColor: PropTypes.func,
 });
 
-const utils: Utils = {
+const utils = {
   colorLevel,
   contrastingColor,
   opacify,
