@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
@@ -24,10 +25,10 @@ const PreferencesStore = StoreProvider.getStore('Preferences');
 
 const GraylogThemeProvider = ({ children }: Props) => {
   const colorScheme = usePrefersColorScheme();
-  const [theme, setTheme] = React.useState();
-  const [userPreferences, setUserPreferences] = React.useState();
-  const [themeColors, setThemeColors] = React.useState();
-  const [mode, setMode] = React.useState(colorScheme);
+  const [theme, setTheme] = useState();
+  const [userPreferences, setUserPreferences] = useState();
+  const [themeColors, setThemeColors] = useState();
+  const [mode, setMode] = useState(colorScheme);
 
   const currentUser = useStore(CurrentUserStore, (userStore) => {
     setUserPreferences(userStore?.currentUser?.preferences);
@@ -59,7 +60,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const hasCurrentThemeMode = currentUserThemeMode();
 
     if (hasCurrentThemeMode) {
@@ -71,13 +72,13 @@ const GraylogThemeProvider = ({ children }: Props) => {
     }
   }, [colorScheme, userPreferences]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode) {
       setThemeColors(colors[mode]);
     }
   }, [mode]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (mode && themeColors) {
       const formattedUtils = {
         ...utils,
