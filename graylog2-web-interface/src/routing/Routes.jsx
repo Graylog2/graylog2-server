@@ -93,6 +93,11 @@ const Routes = {
       OVERVIEW: '/system/users',
       show: (username) => `/system/users/${username}`,
     },
+    AUTHZROLES: {
+      OVERVIEW: '/system/roles',
+      show: (roleId) => `/system/roles/${roleId}`,
+      edit: (roleId) => `/system/roles/edit/${roleId}`,
+    },
     LOOKUPTABLES: {
       OVERVIEW: '/system/lookuptables',
       CREATE: '/system/lookuptables/create',

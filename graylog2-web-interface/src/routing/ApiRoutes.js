@@ -25,6 +25,7 @@ const ApiRoutes = {
     list: () => { return { url: '/alerts/conditions' }; },
   },
   AuthzRolesController: {
+    delete: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
     load: () => { return { url: '/authzRoles' }; },
     loadForUser: (username) => { return { url: `/authzRoles/rolesForUser/${username}` }; },
   },

@@ -23,10 +23,6 @@ export type PaginatedListType = {
   pagination: PaginationType,
 };
 
-type AuthzRolesStoreState = {};
-
-type AuthzRolesStoreType = Store<AuthzRolesStoreState>;
-
 // eslint-disable-next-line camelcase
 const _responseToPaginatedList = ({ count, total, page, per_page, query, roles = [] }: PaginatedResponse) => {
   return {
@@ -41,10 +37,19 @@ const _responseToPaginatedList = ({ count, total, page, per_page, query, roles =
   };
 };
 
-const AuthzRolesStore: AuthzRolesStoreType = singletonStore(
+const AuthzRolesStore: Store<{}> = singletonStore(
   'AuthzRoles',
   () => Reflux.createStore({
     listenables: [AuthzRolesActions],
+
+    deleteUser(roleId: string): Promise<string[]> {
+      const url = qualifyUrl(ApiRoutes.AuthzRolesController.delete(encodeURIComponent(roleId)).url);
+      const promise = fetch('DELETE', url);
+
+      AuthzRolesActions.deleteRole.promise(promise);
+
+      return promise;
+    },
 
     loadForUser(username: string, page: number, perPage: number, query: string): Promise<PaginatedListType> {
       const url = PaginationURL(ApiRoutes.AuthzRolesController.loadForUser(username).url, page, perPage, query);
