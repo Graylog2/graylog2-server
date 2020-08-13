@@ -92,7 +92,6 @@ class Stream extends React.Component {
     this.setState({ showStreamRuleForm: true });
   };
 
-
   _closeEntityShareModal = () => {
     this.setState({ showEntityShareModal: false });
   };
