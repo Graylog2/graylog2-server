@@ -12,7 +12,7 @@ type RowContentType = {
 
 export const RowContentStyles = css(({ theme }: RowContentType) => css`
   background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.gray[80]};
+  border: 1px solid ${theme.colors.variant.lighter.default};
   margin-bottom: 9px;
   border-radius: 4px;
 `);
