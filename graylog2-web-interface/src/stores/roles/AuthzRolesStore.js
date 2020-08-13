@@ -67,7 +67,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
   () => Reflux.createStore({
     listenables: [AuthzRolesActions],
 
-    deleteUser(roleId: string): Promise<string[]> {
+    deleteRole(roleId: string): Promise<string[]> {
       const url = qualifyUrl(ApiRoutes.AuthzRolesController.delete(encodeURIComponent(roleId)).url);
       const promise = fetch('DELETE', url);
 
