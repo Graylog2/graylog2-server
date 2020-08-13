@@ -2,14 +2,12 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import { getIdFromGRN } from 'logic/permissions/GRN';
 import Routes from 'routing/Routes';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
-import SharedEntity from 'logic/permissions/SharedEntity';
+import { getIdFromGRN } from 'logic/permissions/GRN';
 
 type Props = {
-  capabilityTitle: string,
-  sharedEntity: SharedEntity,
+  owners: GranteesList,
 };
 
 const _getOwnerLink = ({ type, id }) => {
@@ -25,7 +23,7 @@ const _getOwnerLink = ({ type, id }) => {
   }
 };
 
-const OwnersCell = ({ owners }: {owners: GranteesList}) => (
+const OwnersCell = ({ owners }: Props) => (
   <td className="limited">
     {owners.map((owner, index) => {
       const link = _getOwnerLink(owner);
@@ -41,20 +39,4 @@ const OwnersCell = ({ owners }: {owners: GranteesList}) => (
   </td>
 );
 
-const SharedEntitiesOverviewItem = ({
-  capabilityTitle,
-  sharedEntity: {
-    owners,
-    title,
-    type,
-  },
-}: Props) => (
-  <tr key={title + type}>
-    <td className="limited">{title}</td>
-    <td className="limited">{type}</td>
-    <OwnersCell owners={owners} />
-    <td className="limited">{capabilityTitle}</td>
-  </tr>
-);
-
-export default SharedEntitiesOverviewItem;
+export default OwnersCell;
