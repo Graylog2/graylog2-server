@@ -27,11 +27,11 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
   >
     <Row
       bsClass="row"
-      className="Row-sc-3iisrt-0 gPzTHl"
+      className="Row-sc-3iisrt-0 iSaIhq"
       componentClass="div"
     >
       <div
-        className="Row-sc-3iisrt-0 gPzTHl row"
+        className="Row-sc-3iisrt-0 iSaIhq row"
       >
         <Col
           bsClass="col"
@@ -519,11 +519,11 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
   >
     <Row
       bsClass="row"
-      className="Row-sc-3iisrt-0 gPzTHl"
+      className="Row-sc-3iisrt-0 iSaIhq"
       componentClass="div"
     >
       <div
-        className="Row-sc-3iisrt-0 gPzTHl row"
+        className="Row-sc-3iisrt-0 iSaIhq row"
       >
         <Col
           bsClass="col"

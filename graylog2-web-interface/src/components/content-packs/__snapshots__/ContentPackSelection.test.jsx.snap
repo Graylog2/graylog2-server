@@ -25,11 +25,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -587,11 +587,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -613,11 +613,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -758,11 +758,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -833,11 +833,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1395,11 +1395,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1471,11 +1471,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1616,11 +1616,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
