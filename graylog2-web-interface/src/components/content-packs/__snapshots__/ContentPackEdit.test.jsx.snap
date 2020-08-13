@@ -1,6 +1,434 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
+.c3.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c3.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger[disabled],
+.c3.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-danger[disabled]:hover,
+.c3.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c3.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c3.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c3.btn-default[disabled],
+.c3.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-default[disabled]:hover,
+.c3.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c3.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c3.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c3.btn-info[disabled],
+.c3.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-info[disabled]:hover,
+.c3.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c3.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c3.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c3.btn-link[disabled],
+.c3.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-link[disabled]:hover,
+.c3.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c3.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c3.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c3.btn-primary[disabled],
+.c3.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-primary[disabled]:hover,
+.c3.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c3.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c3.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c3.btn-success[disabled],
+.c3.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-success[disabled]:hover,
+.c3.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c3.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c3.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c3.btn-warning[disabled],
+.c3.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c3.btn-warning[disabled]:hover,
+.c3.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c4 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c5.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c5.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c5.form-control[disabled],
+.c5.form-control[readonly],
+fieldset[disabled] .c5.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c5.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c6 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c2.nav > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c2.nav > li > a:hover,
+.c2.nav > li > a:focus {
+  background-color: #f3f3f3;
+}
+
+.c2.nav > li.disabled > a {
+  color: #a6a6a6;
+}
+
+.c2.nav > li.disabled > a:hover,
+.c2.nav > li.disabled > a:focus {
+  color: #a6a6a6;
+}
+
+.c2.nav .open > a,
+.c2.nav .open > a:hover,
+.c2.nav .open > a:focus {
+  background-color: #f3f3f3;
+  border-color: #702785;
+}
+
+.c2.nav.nav-pills > li.active > a,
+.c2.nav.nav-pills > li.active > a:hover,
+.c2.nav.nav-pills > li.active > a:focus {
+  color: rgb(234,229,236);
+  background-color: #702785;
+}
+
+.c2.nav .nav-tabs {
+  border-bottom-color: rgb(198,207,231);
+}
+
+.c2.nav .nav-tabs > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+  color: #1f1f1f;
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
+}
+
+.c2.nav .nav-tabs > li > a:hover {
+  background-color: #f3f3f3;
+  color: #1f1f1f;
+}
+
+.c2.nav .nav-tabs > li.active > a,
+.c2.nav .nav-tabs > li.active > a:hover,
+.c2.nav .nav-tabs > li.active > a:focus {
+  color: #1f1f1f;
+  background-color: #ffffff;
+  border-color: rgb(198,207,231);
+  border-bottom-color: transparent;
+}
+
+.c2.nav .nav-tabs > li.disabled > a,
+.c2.nav .nav-tabs > li.disabled > a:hover,
+.c2.nav .nav-tabs > li.disabled > a:focus {
+  color: #9b9b9b;
+  background-color: #ffffff;
+  border-color: #ffffff #ffffff rgb(198,207,231);
+  cursor: not-allowed;
+}
+
+.c2.nav.nav-justified > .active > a,
+.c2.nav.nav-justified > .active > a:hover,
+.c2.nav.nav-justified > .active > a:focus {
+  border-color: rgb(198,207,231);
+}
+
+.c0.content {
+  background-color: #fff;
+  border: 1px solid #d0d0d0;
+  margin-bottom: 9px;
+  border-radius: 4px;
+}
+
+.c1 {
+  border-right: #cdcdcd solid 1px;
+}
+
+@media (min-width:768px) {
+  .c2.nav.nav-justified > li > a {
+    border-bottom-color: rgb(198,207,231);
+  }
+
+  .c2.nav.nav-justified > .active > a,
+  .c2.nav.nav-justified > .active > a:hover,
+  .c2.nav.nav-justified > .active > a:focus {
+    border-bottom-color: #ffffff;
+  }
+}
+
 <ContentPackEdit
   appliedParameter={Object {}}
   contentPack={
@@ -140,23 +568,23 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       >
         <Row
           bsClass="row"
-          className="Row-sc-3iisrt-0 iSaIhq content"
+          className="c0 content"
           componentClass="div"
         >
           <div
-            className="Row-sc-3iisrt-0 iSaIhq content row"
+            className="c0 content row"
           >
             <Wizard__SubnavigationCol
               md={2}
             >
               <Col
                 bsClass="col"
-                className="Wizard__SubnavigationCol-sc-1jnediy-0 fUiXsj"
+                className="c1"
                 componentClass="div"
                 md={2}
               >
                 <div
-                  className="Wizard__SubnavigationCol-sc-1jnediy-0 fUiXsj col-md-2"
+                  className="c1 col-md-2"
                 >
                   <Nav
                     activeKey="selection"
@@ -169,7 +597,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       activeKey="selection"
                       bsClass="nav"
                       bsStyle="pills"
-                      className="Nav-dzawzr-0 inEWeN"
+                      className="c2"
                       justified={false}
                       onSelect={[Function]}
                       pullLeft={false}
@@ -177,7 +605,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       stacked={true}
                     >
                       <ul
-                        className="Nav-dzawzr-0 inEWeN nav nav-pills nav-stacked"
+                        className="c2 nav nav-pills nav-stacked"
                         role={null}
                       >
                         <NavItem
@@ -283,11 +711,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   <Row>
                     <Row
                       bsClass="row"
-                      className="Row-sc-3iisrt-0 iSaIhq"
+                      className="c0"
                       componentClass="div"
                     >
                       <div
-                        className="Row-sc-3iisrt-0 iSaIhq row"
+                        className="c0 row"
                       >
                         <Col
                           bsClass="col"
@@ -309,12 +737,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="c3"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="c3 btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -346,12 +774,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="c3"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="c3 btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -400,11 +828,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -450,21 +878,21 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="name"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="name"
                                                 >
                                                   Name
@@ -487,7 +915,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -500,7 +928,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -516,10 +944,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Required. Give a descriptive name for this content pack.
                                                     </span>
@@ -557,21 +985,21 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="summary"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="summary"
                                                 >
                                                   Summary
@@ -594,7 +1022,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -607,7 +1035,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -623,10 +1051,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Required. Give a short summary of the content pack.
                                                     </span>
@@ -663,21 +1091,21 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="description"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="description"
                                                 >
                                                   Description
@@ -699,7 +1127,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -711,7 +1139,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -726,10 +1154,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Give a long description of the content pack in markdown.
                                                     </span>
@@ -767,21 +1195,21 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="vendor"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="vendor"
                                                 >
                                                   Vendor
@@ -804,7 +1232,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -817,7 +1245,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -833,10 +1261,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                                     </span>
@@ -873,21 +1301,21 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="url"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="url"
                                                 >
                                                   URL
@@ -909,7 +1337,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -921,7 +1349,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -936,10 +1364,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Where can I find the content pack. e.g. github url
                                                     </span>
@@ -962,11 +1390,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -988,11 +1416,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -1074,12 +1502,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii submit-button"
+                                          className="c3 submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                                            className="c3 submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1106,13 +1534,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          className="c3 reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                                            className="c3 reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -1133,11 +1561,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -1199,11 +1627,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         <Row>
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq"
+                            className="c0"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row"
+                              className="c0 row"
                             >
                               <Col
                                 bsClass="col"
@@ -1345,6 +1773,501 @@ exports[`<ContentPackEdit /> should render spinner with no content pack 1`] = `
 `;
 
 exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
+.c3.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c3.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger[disabled],
+.c3.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-danger[disabled]:hover,
+.c3.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c3.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c3.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c3.btn-default[disabled],
+.c3.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-default[disabled]:hover,
+.c3.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c3.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c3.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c3.btn-info[disabled],
+.c3.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-info[disabled]:hover,
+.c3.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c3.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c3.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c3.btn-link[disabled],
+.c3.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-link[disabled]:hover,
+.c3.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c3.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c3.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c3.btn-primary[disabled],
+.c3.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-primary[disabled]:hover,
+.c3.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c3.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c3.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c3.btn-success[disabled],
+.c3.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-success[disabled]:hover,
+.c3.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c3.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c3.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c3.btn-warning[disabled],
+.c3.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c3.btn-warning[disabled]:hover,
+.c3.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c4 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c5.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c5.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c5.form-control[disabled],
+.c5.form-control[readonly],
+fieldset[disabled] .c5.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c5.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c6 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c2.nav > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c2.nav > li > a:hover,
+.c2.nav > li > a:focus {
+  background-color: #f3f3f3;
+}
+
+.c2.nav > li.disabled > a {
+  color: #a6a6a6;
+}
+
+.c2.nav > li.disabled > a:hover,
+.c2.nav > li.disabled > a:focus {
+  color: #a6a6a6;
+}
+
+.c2.nav .open > a,
+.c2.nav .open > a:hover,
+.c2.nav .open > a:focus {
+  background-color: #f3f3f3;
+  border-color: #702785;
+}
+
+.c2.nav.nav-pills > li.active > a,
+.c2.nav.nav-pills > li.active > a:hover,
+.c2.nav.nav-pills > li.active > a:focus {
+  color: rgb(234,229,236);
+  background-color: #702785;
+}
+
+.c2.nav .nav-tabs {
+  border-bottom-color: rgb(198,207,231);
+}
+
+.c2.nav .nav-tabs > li > a {
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+  color: #1f1f1f;
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
+}
+
+.c2.nav .nav-tabs > li > a:hover {
+  background-color: #f3f3f3;
+  color: #1f1f1f;
+}
+
+.c2.nav .nav-tabs > li.active > a,
+.c2.nav .nav-tabs > li.active > a:hover,
+.c2.nav .nav-tabs > li.active > a:focus {
+  color: #1f1f1f;
+  background-color: #ffffff;
+  border-color: rgb(198,207,231);
+  border-bottom-color: transparent;
+}
+
+.c2.nav .nav-tabs > li.disabled > a,
+.c2.nav .nav-tabs > li.disabled > a:hover,
+.c2.nav .nav-tabs > li.disabled > a:focus {
+  color: #9b9b9b;
+  background-color: #ffffff;
+  border-color: #ffffff #ffffff rgb(198,207,231);
+  cursor: not-allowed;
+}
+
+.c2.nav.nav-justified > .active > a,
+.c2.nav.nav-justified > .active > a:hover,
+.c2.nav.nav-justified > .active > a:focus {
+  border-color: rgb(198,207,231);
+}
+
+.c0.content {
+  background-color: #fff;
+  border: 1px solid #d0d0d0;
+  margin-bottom: 9px;
+  border-radius: 4px;
+}
+
+.c13 {
+  background-color: #f3f3f3;
+  border-color: #a6a6a6;
+  color: #575757;
+}
+
+.c7 {
+  font-size: 1rem;
+  line-height: 20px;
+}
+
+.c7 label {
+  min-height: 20px;
+  margin-bottom: 2px;
+  margin-right: 5px;
+}
+
+.c7 label * {
+  cursor: pointer;
+}
+
+.c8 {
+  display: inline-block;
+  width: 20px;
+  margin-right: 5px;
+}
+
+.c9.fa-stack {
+  cursor: pointer;
+  font-size: 1.125rem;
+  line-height: 20px;
+  width: 1em;
+  height: 1em;
+  vertical-align: text-top;
+}
+
+.c9.fa-stack:hover [class*="fa-"] {
+  color: #702785;
+  opacity: 1;
+}
+
+.c9 [class*="fa-"]:first-child {
+  opacity: 0;
+}
+
+.c9 [class*="fa-"]:first-child ~ [class*="fa-"]:hover {
+  color: #fff;
+}
+
+.c10 {
+  font-size: 1.125rem;
+}
+
+.c11 {
+  border: 0;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+}
+
+.c12 {
+  border-left: 1px #e6e6e6 solid;
+  margin-left: 35px;
+  margin-top: 10px;
+  padding-left: 5px;
+}
+
+.c1 {
+  border-right: #cdcdcd solid 1px;
+}
+
+@media (min-width:768px) {
+  .c2.nav.nav-justified > li > a {
+    border-bottom-color: rgb(198,207,231);
+  }
+
+  .c2.nav.nav-justified > .active > a,
+  .c2.nav.nav-justified > .active > a:hover,
+  .c2.nav.nav-justified > .active > a:focus {
+    border-bottom-color: #ffffff;
+  }
+}
+
 <ContentPackEdit
   appliedParameter={
     Object {
@@ -1628,23 +2551,23 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       >
         <Row
           bsClass="row"
-          className="Row-sc-3iisrt-0 iSaIhq content"
+          className="c0 content"
           componentClass="div"
         >
           <div
-            className="Row-sc-3iisrt-0 iSaIhq content row"
+            className="c0 content row"
           >
             <Wizard__SubnavigationCol
               md={2}
             >
               <Col
                 bsClass="col"
-                className="Wizard__SubnavigationCol-sc-1jnediy-0 fUiXsj"
+                className="c1"
                 componentClass="div"
                 md={2}
               >
                 <div
-                  className="Wizard__SubnavigationCol-sc-1jnediy-0 fUiXsj col-md-2"
+                  className="c1 col-md-2"
                 >
                   <Nav
                     activeKey="selection"
@@ -1657,7 +2580,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       activeKey="selection"
                       bsClass="nav"
                       bsStyle="pills"
-                      className="Nav-dzawzr-0 inEWeN"
+                      className="c2"
                       justified={false}
                       onSelect={[Function]}
                       pullLeft={false}
@@ -1665,7 +2588,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       stacked={true}
                     >
                       <ul
-                        className="Nav-dzawzr-0 inEWeN nav nav-pills nav-stacked"
+                        className="c2 nav nav-pills nav-stacked"
                         role={null}
                       >
                         <NavItem
@@ -1765,11 +2688,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   <Row>
                     <Row
                       bsClass="row"
-                      className="Row-sc-3iisrt-0 iSaIhq"
+                      className="c0"
                       componentClass="div"
                     >
                       <div
-                        className="Row-sc-3iisrt-0 iSaIhq row"
+                        className="c0 row"
                       >
                         <Col
                           bsClass="col"
@@ -1791,12 +2714,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="c3"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="c3 btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -1828,12 +2751,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="c3"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="c3 btn btn-sm btn-info"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -1923,11 +2846,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -1973,21 +2896,21 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="name"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="name"
                                                 >
                                                   Name
@@ -2010,7 +2933,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -2023,7 +2946,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Content Pack the movie"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -2039,10 +2962,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Required. Give a descriptive name for this content pack.
                                                     </span>
@@ -2080,21 +3003,21 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="summary"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="summary"
                                                 >
                                                   Summary
@@ -2117,7 +3040,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -2130,7 +3053,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="A old content pack"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -2146,10 +3069,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Required. Give a short summary of the content pack.
                                                     </span>
@@ -2186,21 +3109,21 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="description"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="description"
                                                 >
                                                   Description
@@ -2222,7 +3145,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -2234,7 +3157,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="## No one dares"
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -2249,10 +3172,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Give a long description of the content pack in markdown.
                                                     </span>
@@ -2290,21 +3213,21 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="vendor"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="vendor"
                                                 >
                                                   Vendor
@@ -2327,7 +3250,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -2340,7 +3263,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Beinstein"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -2356,10 +3279,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Required. Who did this content pack and how can they be reached, e.g. Name and email.
                                                     </span>
@@ -2396,21 +3319,21 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       >
                                         <FormGroup
                                           bsClass="form-group"
-                                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                                          className=""
                                           controlId="url"
                                           validationState={null}
                                         >
                                           <div
-                                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                            className="form-group"
                                           >
                                             <ControlLabel>
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                                className="c4"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                                  className="c4 control-label"
                                                   htmlFor="url"
                                                 >
                                                   URL
@@ -2432,7 +3355,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="c5"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -2444,7 +3367,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="http://beinstein.com"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="c5 form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -2459,10 +3382,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 <HelpBlock>
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fSaklp"
+                                                    className="c6"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                                                      className="c6 help-block"
                                                     >
                                                       Where can I find the content pack. e.g. github url
                                                     </span>
@@ -2485,11 +3408,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -2511,11 +3434,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -2597,12 +3520,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii submit-button"
+                                          className="c3 submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                                            className="c3 submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -2629,13 +3552,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          className="c3 reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                                            className="c3 reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -2656,11 +3579,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 iSaIhq"
+                        className="c0"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 iSaIhq row"
+                          className="c0 row"
                         >
                           <Col
                             bsClass="col"
@@ -2692,11 +3615,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       padded={false}
                                     >
                                       <li
-                                        className="ExpandableListItem__ItemWrap-sc-10hsq3a-0 wLlKR"
+                                        className=""
                                       >
                                         <ExpandableListItem__Container>
                                           <div
-                                            className="ExpandableListItem__Container-sc-10hsq3a-1 hYIMSn"
+                                            className="c7"
                                           >
                                             <Checkbox
                                               bsClass="checkbox"
@@ -2721,7 +3644,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             </Checkbox>
                                             <ExpandableListItem__Toggle>
                                               <div
-                                                className="ExpandableListItem__Toggle-sc-10hsq3a-2 xBomU"
+                                                className="c8"
                                               >
                                                 <ExpandableListItem__IconStack
                                                   className="fa-stack"
@@ -2729,7 +3652,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   tabIndex={0}
                                                 >
                                                   <div
-                                                    className="ExpandableListItem__IconStack-sc-10hsq3a-3 dEjoPz fa-stack"
+                                                    className="c9 fa-stack"
                                                     onClick={[Function]}
                                                     tabIndex={0}
                                                   >
@@ -2779,7 +3702,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                               className="header"
                                             >
                                               <span
-                                                className="ExpandableListItem__HeaderWrap-sc-10hsq3a-4 tDeuS header"
+                                                className="c10 header"
                                               >
                                                 <ExpandableListItem__Header
                                                   onClick={[Function]}
@@ -2787,7 +3710,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                   type="button"
                                                 >
                                                   <button
-                                                    className="ExpandableListItem__Header-sc-10hsq3a-5 cAgeBx"
+                                                    className="c11"
                                                     onClick={[Function]}
                                                     tabIndex={0}
                                                     type="button"
@@ -2801,7 +3724,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                         </ExpandableListItem__Container>
                                         <ExpandableListItem__ExpandableContent>
                                           <div
-                                            className="ExpandableListItem__ExpandableContent-sc-10hsq3a-7 hICkaB"
+                                            className="c12"
                                           />
                                         </ExpandableListItem__ExpandableContent>
                                       </li>
@@ -2876,11 +3799,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         <Row>
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq"
+                            className="c0"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row"
+                              className="c0 row"
                             >
                               <Col
                                 bsClass="col"
@@ -2984,10 +3907,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       <Well>
                                         <Well
                                           bsClass="well"
-                                          className="Well-sc-19gs1oc-0 enTUtA"
+                                          className="c13"
                                         >
                                           <div
-                                            className="Well-sc-19gs1oc-0 enTUtA well"
+                                            className="c13 well"
                                           >
                                             <div
                                               dangerouslySetInnerHTML={
