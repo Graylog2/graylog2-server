@@ -31,8 +31,8 @@ const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 class ConfigurationsPage extends React.Component {
   checkLoadedTimer = undefined
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = { loaded: false };
   }
