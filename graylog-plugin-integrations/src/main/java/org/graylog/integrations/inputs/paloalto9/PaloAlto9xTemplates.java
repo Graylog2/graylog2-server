@@ -158,7 +158,7 @@ public class PaloAlto9xTemplates {
         return toTemplate(fields);
     }
 
-    public static PaloAltoMessageTemplate globalProtectTemplate() {
+    public static PaloAltoMessageTemplate globalProtectPre913Template() {
         Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
 
         // Field 0 is FUTURE USE
@@ -205,6 +205,56 @@ public class PaloAlto9xTemplates {
 
         fields.add(create(PaloAlto9xFields.PAN_GP_HOSTNAME, 35, STRING));
 
+
+        return toTemplate(fields);
+    }
+
+    public static PaloAltoMessageTemplate globalProtect913Template() {
+        Set<PaloAltoFieldTemplate> fields = Sets.newHashSet();
+
+        // Field 0 is FUTURE USE
+        fields.add(create(EventFields.EVENT_RECEIVED_TIME, 1, STRING));
+        fields.add(create(HostFields.HOST_ID, 2, STRING));
+        fields.add(create(EventFields.EVENT_LOG_NAME, 3, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_LOG_SUBTYPE, 4, STRING));
+
+        // Field 5 is FUTURE USE
+        fields.add(create(Message.FIELD_TIMESTAMP, 6, STRING));
+        fields.add(create(HostFields.HOST_VIRTFW_ID, 7, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_EVENT_NAME, 8, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_TUNNEL_STAGE, 9, STRING));
+
+        fields.add(create(PaloAlto9xFields.PAN_AUTH_METHOD, 10, STRING));
+        fields.add(create(NetworkFields.NETWORK_TUNNEL_TYPE, 11, STRING));
+        fields.add(create(UserFields.USER_ID, 12, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_SOURCE_REGION, 13, STRING));
+        fields.add(create(SourceFields.SOURCE_HOSTNAME, 14, STRING));
+
+        fields.add(create(VendorFields.VENDOR_PUBLIC_IP, 15, STRING));
+        fields.add(create(VendorFields.VENDOR_PUBLIC_IPV6, 16, STRING));
+        fields.add(create(VendorFields.VENDOR_PRIVATE_IP, 17, STRING));
+        fields.add(create(VendorFields.VENDOR_PRIVATE_IPV6, 18, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_GP_HOSTID, 19, STRING));
+
+        // Field 20 is a repeat of Serial Number
+        fields.add(create(PaloAlto9xFields.PAN_GP_CLIENT_VERSION, 21, STRING));
+        fields.add(create(HostFields.HOST_TYPE, 22, STRING));
+        fields.add(create(HostFields.HOST_TYPE_VERSION, 23, STRING));
+        fields.add(create(EventFields.EVENT_REPEAT_COUNT, 24, LONG));
+
+        fields.add(create(PaloAlto9xFields.PAN_GP_REASON, 25, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_GP_ERROR, 26, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_GP_ERROR_EXTENDED, 27, STRING));
+        fields.add(create(VendorFields.VENDOR_EVENT_ACTION, 28, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_GP_LOCATION_NAME, 29, STRING));
+
+        fields.add(create(NetworkFields.NETWORK_TUNNEL_DURATION, 30, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_GP_CONNECT_METHOD, 31, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_GP_ERROR_CODE, 32, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_GP_HOSTNAME, 33, STRING));
+        fields.add(create(EventFields.EVENT_UID, 34, STRING));
+
+        fields.add(create(PaloAlto9xFields.PAN_LOG_PANORAMA, 35, STRING));
 
         return toTemplate(fields);
     }

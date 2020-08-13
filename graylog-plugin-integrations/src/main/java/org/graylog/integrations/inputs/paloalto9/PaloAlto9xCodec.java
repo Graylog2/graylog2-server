@@ -39,7 +39,8 @@ import java.nio.charset.StandardCharsets;
 
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.CONFIG;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.CORRELATION;
-import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.GLOBAL_PROTECT;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.GLOBAL_PROTECT_PRE_9_1_3;
+import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.GLOBAL_PROTECT_9_1_3;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.HIP;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.SYSTEM;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.THREAT;
@@ -98,10 +99,14 @@ public class PaloAlto9xCodec implements Codec {
             case "CORRELATION":
                 message.addFields(fieldProducer.parseFields(CORRELATION, p.fields()));
                 break;
+            case "GLOBALPROTECT":
+                // For PAN v9.1.3 and later, Global Protect has type in the expected position
+                message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_9_1_3, p.fields()));
+                break;
             default:
-                // Global Protect messages have message type in position 5 rather than position 3
+                //For PAN v9.1.2 and earlier, Global Protect has type in position 5 rather than position 3
                 if (p.fields().get(5).equals("GLOBALPROTECT")) {
-                    message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT, p.fields()));
+                    message.addFields(fieldProducer.parseFields(GLOBAL_PROTECT_PRE_9_1_3, p.fields()));
                     break;
                 } else {
                     LOG.error("Unsupported PAN type [{}]. Not adding any parsed fields.", p.panType());

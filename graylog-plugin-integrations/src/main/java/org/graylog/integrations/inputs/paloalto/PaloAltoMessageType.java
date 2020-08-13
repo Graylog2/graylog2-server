@@ -24,5 +24,6 @@ public enum PaloAltoMessageType {
     CONFIG,
     CORRELATION,
     HIP,
-    GLOBAL_PROTECT
+    GLOBAL_PROTECT_PRE_9_1_3,
+    GLOBAL_PROTECT_9_1_3
 }

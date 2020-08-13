@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 public class PaloAlto9xCodecTest {
     private static final String TEST_SOURCE = "Test Source";
     private static final DateTime TEST_DATE_TIME = DateTime.now();
-    private static final String TEST_RAW_MESSAGE = "Foo,Bar,Baz";
+    private static final String TEST_RAW_MESSAGE = "Foo,Bar,Baz,This,That,GLOBALPROTECT";
     private static final ImmutableList<String> TEST_FIELD_LIST = ImmutableList.of("Foo", "Bar", "Baz", "Three", "Four", "GLOBALPROTECT");
     private static final ImmutableMap<String,Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
             "field_two", "value_two",
@@ -77,7 +77,20 @@ public class PaloAlto9xCodecTest {
     }
 
     @Test
-    public void decode_runsSuccessfully_whenGoodGlobalProtectInput() {
+    public void decode_runsSuccessfully_whenGoodGlobalProtect90Input() {
+        givenGoodInputRawMessage();
+        givenPaloMessageType("GLOBALPROTECT 9.0");
+        givenStoreFullMessage(false);
+        givenGoodFieldProducer();
+
+        whenDecodeIsCalled();
+
+        thenPaloParserCalledWithPaloMessageType(PaloAltoMessageType.GLOBAL_PROTECT_PRE_9_1_3);
+        thenOutputMessageContainsExpectedFields(false);
+    }
+
+    @Test
+    public void decode_runsSuccessfully_whenGoodGlobalProtect913Input() {
         givenGoodInputRawMessage();
         givenPaloMessageType("GLOBALPROTECT");
         givenStoreFullMessage(false);
@@ -85,7 +98,7 @@ public class PaloAlto9xCodecTest {
 
         whenDecodeIsCalled();
 
-        thenPaloParserCalledWithPaloMessageType(PaloAltoMessageType.GLOBAL_PROTECT);
+        thenPaloParserCalledWithPaloMessageType(PaloAltoMessageType.GLOBAL_PROTECT_9_1_3);
         thenOutputMessageContainsExpectedFields(false);
     }
 
