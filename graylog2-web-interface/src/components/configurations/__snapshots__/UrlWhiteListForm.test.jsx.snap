@@ -1,6 +1,498 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UrlWhitelistForm render the UrlWhitelistForm component should create new instance 1`] = `
+.c1.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c1.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c1.btn-danger[disabled],
+.c1.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-danger[disabled]:hover,
+.c1.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c1.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c1.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c1.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c1.btn-default[disabled],
+.c1.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-default[disabled]:hover,
+.c1.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c1.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c1.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c1.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c1.btn-info[disabled],
+.c1.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-info[disabled]:hover,
+.c1.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c1.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c1.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c1.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c1.btn-link[disabled],
+.c1.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-link[disabled]:hover,
+.c1.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c1.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c1.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c1.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c1.btn-primary[disabled],
+.c1.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-primary[disabled]:hover,
+.c1.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c1.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c1.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c1.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c1.btn-success[disabled],
+.c1.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-success[disabled]:hover,
+.c1.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c1.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c1.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c1.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c1.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c1.btn-warning[disabled],
+.c1.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c1.btn-warning[disabled]:hover,
+.c1.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c3.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c3.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c3.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c3.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c3.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c3.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c3.form-control[disabled],
+.c3.form-control[readonly],
+fieldset[disabled] .c3.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c3.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c0 {
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #838383;
+}
+
+.c2 {
+  margin-top: 10px;
+}
+
+.c2.table > thead > tr > th,
+.c2.table > tbody > tr > th,
+.c2.table > tfoot > tr > th,
+.c2.table > thead > tr > td,
+.c2.table > tbody > tr > td,
+.c2.table > tfoot > tr > td {
+  border-top-color: #f0f0f0;
+}
+
+.c2.table > thead > tr > th {
+  border-bottom-color: #f0f0f0;
+}
+
+.c2.table > tbody > tr {
+  background-color: #fafafa;
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c2.table > tbody + tbody {
+  border-top-color: #f0f0f0;
+}
+
+.c2.table .table {
+  background-color: #fafafa;
+}
+
+.c2.table-bordered {
+  border-color: #f0f0f0;
+}
+
+.c2.table-bordered > thead > tr > td,
+.c2.table-bordered > tfoot > tr > td,
+.c2.table-bordered > tbody > tr > td,
+.c2.table-bordered > thead > tr > th,
+.c2.table-bordered > tfoot > tr > th,
+.c2.table-bordered > tbody > tr > th {
+  border-color: #f0f0f0;
+}
+
+.c2.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f0f0f0;
+}
+
+.c2.table-hover > tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+.c2.table > thead > tr > td.active,
+.c2.table > tfoot > tr > td.active,
+.c2.table > tbody > tr > td.active,
+.c2.table > thead > tr > th.active,
+.c2.table > tfoot > tr > th.active,
+.c2.table > tbody > tr > th.active,
+.c2.table > thead > tr.active > td,
+.c2.table > tfoot > tr.active > td,
+.c2.table > tbody > tr.active > td,
+.c2.table > thead > tr.active > th,
+.c2.table > tfoot > tr.active > th,
+.c2.table > tbody > tr.active > th {
+  background-color: #e6e6e6;
+}
+
+.c2.table-hover > tbody > tr > td.active:hover,
+.c2.table-hover > tbody > tr > th.active:hover,
+.c2.table-hover > tbody > tr.active:hover > td,
+.c2.table-hover > tbody > tr:hover > .active,
+.c2.table-hover > tbody > tr.active:hover > th {
+  background-color: #d0d0d0;
+}
+
+.c2.table > thead > tr > td.success,
+.c2.table > tfoot > tr > td.success,
+.c2.table > tbody > tr > td.success,
+.c2.table > thead > tr > th.success,
+.c2.table > tfoot > tr > th.success,
+.c2.table > tbody > tr > th.success,
+.c2.table > thead > tr.success > td,
+.c2.table > tfoot > tr.success > td,
+.c2.table > tbody > tr.success > td,
+.c2.table > thead > tr.success > th,
+.c2.table > tfoot > tr.success > th,
+.c2.table > tbody > tr.success > th {
+  background-color: #ddeddf;
+}
+
+.c2.table-hover > tbody > tr > td.success:hover,
+.c2.table-hover > tbody > tr > th.success:hover,
+.c2.table-hover > tbody > tr.success:hover > td,
+.c2.table-hover > tbody > tr:hover > .success,
+.c2.table-hover > tbody > tr.success:hover > th {
+  background-color: #bddec2;
+}
+
+.c2.table > thead > tr > td.info,
+.c2.table > tfoot > tr > td.info,
+.c2.table > tbody > tr > td.info,
+.c2.table > thead > tr > th.info,
+.c2.table > tfoot > tr > th.info,
+.c2.table > tbody > tr > th.info,
+.c2.table > thead > tr.info > td,
+.c2.table > tfoot > tr.info > td,
+.c2.table > tbody > tr.info > td,
+.c2.table > thead > tr.info > th,
+.c2.table > tfoot > tr.info > th,
+.c2.table > tbody > tr.info > th {
+  background-color: #dde2f0;
+}
+
+.c2.table-hover > tbody > tr > td.info:hover,
+.c2.table-hover > tbody > tr > th.info:hover,
+.c2.table-hover > tbody > tr.info:hover > td,
+.c2.table-hover > tbody > tr:hover > .info,
+.c2.table-hover > tbody > tr.info:hover > th {
+  background-color: #bdc8e4;
+}
+
+.c2.table > thead > tr > td.warning,
+.c2.table > tfoot > tr > td.warning,
+.c2.table > tbody > tr > td.warning,
+.c2.table > thead > tr > th.warning,
+.c2.table > tfoot > tr > th.warning,
+.c2.table > tbody > tr > th.warning,
+.c2.table > thead > tr.warning > td,
+.c2.table > tfoot > tr.warning > td,
+.c2.table > tbody > tr.warning > td,
+.c2.table > thead > tr.warning > th,
+.c2.table > tfoot > tr.warning > th,
+.c2.table > tbody > tr.warning > th {
+  background-color: #fff5dd;
+}
+
+.c2.table-hover > tbody > tr > td.warning:hover,
+.c2.table-hover > tbody > tr > th.warning:hover,
+.c2.table-hover > tbody > tr.warning:hover > td,
+.c2.table-hover > tbody > tr:hover > .warning,
+.c2.table-hover > tbody > tr.warning:hover > th {
+  background-color: #ffecbd;
+}
+
+.c2.table > thead > tr > td.danger,
+.c2.table > tfoot > tr > td.danger,
+.c2.table > tbody > tr > td.danger,
+.c2.table > thead > tr > th.danger,
+.c2.table > tfoot > tr > th.danger,
+.c2.table > tbody > tr > th.danger,
+.c2.table > thead > tr.danger > td,
+.c2.table > tfoot > tr.danger > td,
+.c2.table > tbody > tr.danger > td,
+.c2.table > thead > tr.danger > th,
+.c2.table > tfoot > tr.danger > th,
+.c2.table > tbody > tr.danger > th {
+  background-color: #eddddd;
+}
+
+.c2.table-hover > tbody > tr > td.danger:hover,
+.c2.table-hover > tbody > tr > th.danger:hover,
+.c2.table-hover > tbody > tr.danger:hover > td,
+.c2.table-hover > tbody > tr:hover > .danger,
+.c2.table-hover > tbody > tr.danger:hover > th {
+  background-color: #debdbd;
+}
+
 <UrlWhiteListForm
   disabled={false}
   onUpdate={[Function]}
@@ -49,12 +541,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       >
         <FormGroup
           bsClass="form-group"
-          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+          className=""
           controlId="whitelist-disabled"
           validationState={null}
         >
           <div
-            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+            className="form-group"
           >
             <InputWrapper>
               <span>
@@ -93,10 +585,10 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                 <HelpBlock>
                   <HelpBlock
                     bsClass="help-block"
-                    className="HelpBlock-i8is92-0 fSaklp"
+                    className="c0"
                   >
                     <span
-                      className="HelpBlock-i8is92-0 fSaklp help-block"
+                      className="c0 help-block"
                     >
                       Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk.
                     </span>
@@ -109,35 +601,30 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       </FormGroup__StyledFormGroup>
     </Component>
   </Input>
-  <ForwardRef
+  <Button
     bsSize="sm"
     onClick={[Function]}
   >
-    <Button__StyledButton
+    <Button
+      active={false}
+      block={false}
+      bsClass="btn"
       bsSize="sm"
+      bsStyle="default"
+      className="c1"
+      disabled={false}
       onClick={[Function]}
     >
-      <Button
-        active={false}
-        block={false}
-        bsClass="btn"
-        bsSize="sm"
-        bsStyle="default"
-        className="Button__StyledButton-c9cbmb-0 jHWfTP"
+      <button
+        className="c1 btn btn-sm btn-default"
         disabled={false}
         onClick={[Function]}
+        type="button"
       >
-        <button
-          className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-sm btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Add Url
-        </button>
-      </Button>
-    </Button__StyledButton>
-  </ForwardRef>
+        Add Url
+      </button>
+    </Button>
+  </Button>
   <UrlWhiteListForm__StyledTable
     bordered={true}
     striped={true}
@@ -145,14 +632,14 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
     <Table
       bordered={true}
       bsClass="table"
-      className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 kElzHR"
+      className="Table-ztr4bi-0 c2"
       condensed={false}
       hover={false}
       responsive={false}
       striped={true}
     >
       <table
-        className="Table-ztr4bi-0 UrlWhiteListForm__StyledTable-sc-1nddwv6-0 kElzHR table table-striped table-bordered"
+        className="Table-ztr4bi-0 c2 table table-striped table-bordered"
       >
         <thead>
           <tr>
@@ -212,12 +699,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="title-input0"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -234,7 +721,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="c3"
                                 componentClass="input"
                                 defaultValue="testam"
                                 inputRef={[Function]}
@@ -246,7 +733,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="c3 form-control"
                                   defaultValue="testam"
                                   id="title-input0"
                                   label=""
@@ -291,12 +778,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="value-input0"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -313,7 +800,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="c3"
                                 componentClass="input"
                                 defaultValue="http://localhost:8080/system/"
                                 inputRef={[Function]}
@@ -325,7 +812,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="c3 form-control"
                                   defaultValue="http://localhost:8080/system/"
                                   id="value-input0"
                                   label=""
@@ -367,12 +854,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="url-input-type-0"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -447,7 +934,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       "global": Object {
                                         "background": "#e8e8e8",
                                         "contentBackground": "#fff",
-                                        "inputBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
                                         "navigationBackground": "#fff",
@@ -466,6 +952,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "70": "#b4b4b4",
                                         "80": "#cdcdcd",
                                         "90": "#e6e6e6",
+                                      },
+                                      "input": Object {
+                                        "background": "#fff",
+                                        "backgroundDisabled": "#dddddd",
+                                        "border": "#a6a6a6",
+                                        "borderFocus": "#7894ce",
+                                        "boxShadow": "inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)",
+                                        "color": "#1f1f1f",
+                                        "colorDisabled": "#9b9b9b",
+                                        "placeholder": "#9b9b9b",
                                       },
                                       "table": Object {
                                         "background": "#fafafa",
@@ -546,27 +1042,354 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     },
                                     "components": Object {
+                                      "aceEditor": Array [
+                                        ".ace_editor{border:1px solid ",
+                                        "#cdcdcd",
+                                        ";border-radius:5px;}.ace-graylog{background-color:",
+                                        "#fff",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";&.ace_multiselect .ace_selection.ace_start{box-shadow:0 0 3px 0 ",
+                                        "#fff",
+                                        ";}.ace_gutter{background:",
+                                        "#f3f3f3",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";}.ace_print-margin{width:1px;background:",
+                                        "#f3f3f3",
+                                        ";}.ace_cursor{color:",
+                                        "#a6a6a6",
+                                        ";}.ace_marker-layer{.ace_selection{background:",
+                                        "#b4b4b4",
+                                        ";}.ace_step{background:rgb(255,255,0);}.ace_bracket{margin:-1px 0 0 -1px;border:1px solid ",
+                                        "#b4b4b4",
+                                        ";}.ace_selected-word{border:1px solid ",
+                                        "#9b9b9b",
+                                        ";}.ace_active-line{background:",
+                                        "#e6e6e6",
+                                        ";}}.ace_gutter-active-line{background-color:",
+                                        "#cdcdcd",
+                                        ";}.ace_invisible{color:",
+                                        "#b4b4b4",
+                                        ";}.ace_keyword,.ace_meta,.ace_storage,.ace_storage.ace_type,.ace_support.ace_type{color:",
+                                        "#702785",
+                                        ";}.ace_keyword.ace_operator{color:",
+                                        "#00427f",
+                                        ";}.ace_constant.ace_character,.ace_constant.ace_language,.ace_constant.ace_numeric,.ace_keyword.ace_other.ace_unit,.ace_support.ace_constant,.ace_variable.ace_parameter{color:",
+                                        "#4b1a59",
+                                        ";}.ace_constant.ace_other{color:",
+                                        "#575757",
+                                        ";}.ace_invalid{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#c27878",
+                                        ";}.ace_invalid.ace_deprecated{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#702785",
+                                        ";}.ace_fold{background-color:",
+                                        "#0063be",
+                                        ";border-color:",
+                                        "#2d2d2d",
+                                        ";}.ace_entity.ace_name.ace_function,.ace_support.ace_function,.ace_variable{color:",
+                                        "#0063be",
+                                        ";}.ace_support.ace_class,.ace_support.ace_type{color:",
+                                        "#ab8d00",
+                                        ";}.ace_heading,.ace_markup.ace_heading,.ace_string{color:",
+                                        "#00752c",
+                                        ";}.ace_entity.ace_name.ace_tag,.ace_entity.ace_other.ace_attribute-name,.ace_meta.ace_tag,.ace_string.ace_regexp,.ace_variable{color:",
+                                        "#c27878",
+                                        ";}.ace_comment{color:",
+                                        "#737373",
+                                        ";}}",
+                                      ],
                                       "button": Array [
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "danger",
+                                          "{background-color:",
+                                          "#ad0707",
+                                          ";border-color:",
+                                          "#b23939",
+                                          ";color:",
+                                          "rgb(252,249,249)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#a00e0e",
+                                          ";border-color:",
+                                          "#a53636",
+                                          ";color:",
+                                          "#e9e6e6",
+                                          ";}&.active{background-color:",
+                                          "#b75151",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,249,249)",
+                                          ";:hover{background-color:",
+                                          "#a94c4c",
+                                          ";border-color:",
+                                          "#ad5c5c",
+                                          ";color:",
+                                          "#e9e6e6",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#c07272",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,250,250)",
+                                          ";:hover{background-color:",
+                                          "#c07272",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,250,250)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "default",
+                                          "{background-color:",
+                                          "#e6e6e6",
+                                          ";border-color:",
+                                          "#e0e0e0",
+                                          ";color:",
+                                          "rgb(73,73,73)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#d4d4d4",
+                                          ";border-color:",
+                                          "#cfcfcf",
+                                          ";color:",
+                                          "#444444",
+                                          ";}&.active{background-color:",
+                                          "#dadada",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(49,49,49)",
+                                          ";:hover{background-color:",
+                                          "#cacaca",
+                                          ";border-color:",
+                                          "#c4c4c4",
+                                          ";color:",
+                                          "#2f2f2f",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#cecece",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(80,80,80)",
+                                          ";:hover{background-color:",
+                                          "#cecece",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(80,80,80)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "info",
+                                          "{background-color:",
+                                          "#0063be",
+                                          ";border-color:",
+                                          "#3970c2",
+                                          ";color:",
+                                          "rgb(249,250,252)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#0c5cb0",
+                                          ";border-color:",
+                                          "#3668b3",
+                                          ";color:",
+                                          "#e6e7e9",
+                                          ";}&.active{background-color:",
+                                          "#517cc5",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(249,250,252)",
+                                          ";:hover{background-color:",
+                                          "#4b73b6",
+                                          ";border-color:",
+                                          "#5c7dba",
+                                          ";color:",
+                                          "#e6e7e9",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#7290cd",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(250,251,253)",
+                                          ";:hover{background-color:",
+                                          "#7290cd",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(250,251,253)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "link",
+                                          "{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#ebebeb26",
+                                          ";border-color:",
+                                          "#ebebeb26",
+                                          ";color:",
+                                          "#68267b",
+                                          ";}&.active{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#410057",
+                                          ";:hover{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "#ebebeb26",
+                                          ";color:",
+                                          "#3d0c51",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";:hover{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "primary",
+                                          "{background-color:",
+                                          "#702785",
+                                          ";border-color:",
+                                          "#7b458e",
+                                          ";color:",
+                                          "rgb(234,229,236)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#68267b",
+                                          ";border-color:",
+                                          "#724083",
+                                          ";color:",
+                                          "#d8d3da",
+                                          ";}&.active{background-color:",
+                                          "#855996",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(250,249,251)",
+                                          ";:hover{background-color:",
+                                          "#7c538b",
+                                          ";border-color:",
+                                          "#846292",
+                                          ";color:",
+                                          "#e7e6e8",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#9877a5",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(251,250,251)",
+                                          ";:hover{background-color:",
+                                          "#9877a5",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(251,250,251)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "success",
+                                          "{background-color:",
+                                          "#00ae42",
+                                          ";border-color:",
+                                          "#39b356",
+                                          ";color:",
+                                          "rgb(249,252,249)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#0ca13e",
+                                          ";border-color:",
+                                          "#36a550",
+                                          ";color:",
+                                          "#e6e9e6",
+                                          ";}&.active{background-color:",
+                                          "#51b866",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(249,252,250)",
+                                          ";:hover{background-color:",
+                                          "#4baa5f",
+                                          ";border-color:",
+                                          "#5cae6c",
+                                          ";color:",
+                                          "#e6e9e7",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#72c180",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(250,252,250)",
+                                          ";:hover{background-color:",
+                                          "#72c180",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(250,252,250)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "warning",
+                                          "{background-color:",
+                                          "#ffd200",
+                                          ";border-color:",
+                                          "#f9cd07",
+                                          ";color:",
+                                          "rgb(57,47,0)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#ebc20c",
+                                          ";border-color:",
+                                          "#e6bd0e",
+                                          ";color:",
+                                          "#362d0c",
+                                          ";}&.active{background-color:",
+                                          "#f2c70a",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(54,45,2)",
+                                          ";:hover{background-color:",
+                                          "#e0b80f",
+                                          ";border-color:",
+                                          "#d9b310",
+                                          ";color:",
+                                          "#332b0c",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#e4bc0e",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(88,73,5)",
+                                          ";:hover{background-color:",
+                                          "#e4bc0e",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(88,73,5)",
+                                          ";}}}",
                                         ],
                                       ],
                                     },
@@ -877,12 +1700,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "colors": Object {
                                             "danger": "#00427f",
                                             "dangerLight": "#bdc8e4",
-                                            "neutral0": "#ffffff",
+                                            "neutral0": "#fff",
                                             "neutral10": "#eff2f8",
-                                            "neutral20": "#cdcdcd",
+                                            "neutral20": "#a6a6a6",
                                             "neutral30": "#b4b4b4",
                                             "neutral40": "#9b9b9b",
-                                            "neutral5": "#e6e6e6",
+                                            "neutral5": "#dddddd",
                                             "neutral50": "#838383",
                                             "neutral60": "#6a6a6a",
                                             "neutral70": "#515151",
@@ -1029,12 +1852,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               "colors": Object {
                                                 "danger": "#00427f",
                                                 "dangerLight": "#bdc8e4",
-                                                "neutral0": "#ffffff",
+                                                "neutral0": "#fff",
                                                 "neutral10": "#eff2f8",
-                                                "neutral20": "#cdcdcd",
+                                                "neutral20": "#a6a6a6",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
-                                                "neutral5": "#e6e6e6",
+                                                "neutral5": "#dddddd",
                                                 "neutral50": "#838383",
                                                 "neutral60": "#6a6a6a",
                                                 "neutral70": "#515151",
@@ -1054,7 +1877,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           }
                                         >
                                           <div
-                                            className="css-et9nfk-control"
+                                            className="css-ghr2vn-control"
                                             onMouseDown={[Function]}
                                             onTouchEnd={[Function]}
                                           >
@@ -1173,12 +1996,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -1321,12 +2144,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -1459,12 +2282,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -1690,12 +2513,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -1833,12 +2656,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -1980,12 +2803,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -2014,7 +2837,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           "color": "#9b9b9b",
                                                         },
                                                         "boxSizing": "border-box",
-                                                        "color": "#cdcdcd",
+                                                        "color": "#a6a6a6",
                                                         "display": "flex",
                                                         "fontSize": "150%",
                                                         "label": "indicatorContainer",
@@ -2063,48 +2886,44 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </Input>
             </td>
             <td>
-              <ForwardRef
+              <Button
                 onClick={[Function]}
               >
-                <Button__StyledButton
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="c1"
+                  disabled={false}
                   onClick={[Function]}
                 >
-                  <Button
-                    active={false}
-                    block={false}
-                    bsClass="btn"
-                    bsStyle="default"
-                    className="Button__StyledButton-c9cbmb-0 jHWfTP"
+                  <button
+                    className="c1 btn btn-default"
                     disabled={false}
                     onClick={[Function]}
+                    type="button"
                   >
-                    <button
-                      className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-default"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <Icon
+                      name="trash-alt"
+                      type="solid"
                     >
-                      <Icon
-                        name="trash-alt"
-                        type="solid"
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            Object {
-                              "iconName": "trash-alt",
-                              "prefix": "fas",
-                            }
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "trash-alt",
+                            "prefix": "fas",
                           }
-                        >
-                          <svg
-                            className="svg-inline--fa fa-trash-alt"
-                          />
-                        </FontAwesomeIcon>
-                      </Icon>
-                    </button>
-                  </Button>
-                </Button__StyledButton>
-              </ForwardRef>
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-trash-alt"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
+                  </button>
+                </Button>
+              </Button>
             </td>
           </tr>
           <tr
@@ -2145,12 +2964,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="title-input1"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -2167,7 +2986,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="c3"
                                 componentClass="input"
                                 defaultValue="test"
                                 inputRef={[Function]}
@@ -2179,7 +2998,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="c3 form-control"
                                   defaultValue="test"
                                   id="title-input1"
                                   label=""
@@ -2224,12 +3043,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="value-input1"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -2246,7 +3065,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="c3"
                                 componentClass="input"
                                 defaultValue="http://localhost:8080/system/"
                                 inputRef={[Function]}
@@ -2258,7 +3077,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="c3 form-control"
                                   defaultValue="http://localhost:8080/system/"
                                   id="value-input1"
                                   label=""
@@ -2300,12 +3119,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="url-input-type-1"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -2380,7 +3199,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       "global": Object {
                                         "background": "#e8e8e8",
                                         "contentBackground": "#fff",
-                                        "inputBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
                                         "navigationBackground": "#fff",
@@ -2399,6 +3217,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "70": "#b4b4b4",
                                         "80": "#cdcdcd",
                                         "90": "#e6e6e6",
+                                      },
+                                      "input": Object {
+                                        "background": "#fff",
+                                        "backgroundDisabled": "#dddddd",
+                                        "border": "#a6a6a6",
+                                        "borderFocus": "#7894ce",
+                                        "boxShadow": "inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)",
+                                        "color": "#1f1f1f",
+                                        "colorDisabled": "#9b9b9b",
+                                        "placeholder": "#9b9b9b",
                                       },
                                       "table": Object {
                                         "background": "#fafafa",
@@ -2479,27 +3307,354 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     },
                                     "components": Object {
+                                      "aceEditor": Array [
+                                        ".ace_editor{border:1px solid ",
+                                        "#cdcdcd",
+                                        ";border-radius:5px;}.ace-graylog{background-color:",
+                                        "#fff",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";&.ace_multiselect .ace_selection.ace_start{box-shadow:0 0 3px 0 ",
+                                        "#fff",
+                                        ";}.ace_gutter{background:",
+                                        "#f3f3f3",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";}.ace_print-margin{width:1px;background:",
+                                        "#f3f3f3",
+                                        ";}.ace_cursor{color:",
+                                        "#a6a6a6",
+                                        ";}.ace_marker-layer{.ace_selection{background:",
+                                        "#b4b4b4",
+                                        ";}.ace_step{background:rgb(255,255,0);}.ace_bracket{margin:-1px 0 0 -1px;border:1px solid ",
+                                        "#b4b4b4",
+                                        ";}.ace_selected-word{border:1px solid ",
+                                        "#9b9b9b",
+                                        ";}.ace_active-line{background:",
+                                        "#e6e6e6",
+                                        ";}}.ace_gutter-active-line{background-color:",
+                                        "#cdcdcd",
+                                        ";}.ace_invisible{color:",
+                                        "#b4b4b4",
+                                        ";}.ace_keyword,.ace_meta,.ace_storage,.ace_storage.ace_type,.ace_support.ace_type{color:",
+                                        "#702785",
+                                        ";}.ace_keyword.ace_operator{color:",
+                                        "#00427f",
+                                        ";}.ace_constant.ace_character,.ace_constant.ace_language,.ace_constant.ace_numeric,.ace_keyword.ace_other.ace_unit,.ace_support.ace_constant,.ace_variable.ace_parameter{color:",
+                                        "#4b1a59",
+                                        ";}.ace_constant.ace_other{color:",
+                                        "#575757",
+                                        ";}.ace_invalid{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#c27878",
+                                        ";}.ace_invalid.ace_deprecated{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#702785",
+                                        ";}.ace_fold{background-color:",
+                                        "#0063be",
+                                        ";border-color:",
+                                        "#2d2d2d",
+                                        ";}.ace_entity.ace_name.ace_function,.ace_support.ace_function,.ace_variable{color:",
+                                        "#0063be",
+                                        ";}.ace_support.ace_class,.ace_support.ace_type{color:",
+                                        "#ab8d00",
+                                        ";}.ace_heading,.ace_markup.ace_heading,.ace_string{color:",
+                                        "#00752c",
+                                        ";}.ace_entity.ace_name.ace_tag,.ace_entity.ace_other.ace_attribute-name,.ace_meta.ace_tag,.ace_string.ace_regexp,.ace_variable{color:",
+                                        "#c27878",
+                                        ";}.ace_comment{color:",
+                                        "#737373",
+                                        ";}}",
+                                      ],
                                       "button": Array [
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "danger",
+                                          "{background-color:",
+                                          "#ad0707",
+                                          ";border-color:",
+                                          "#b23939",
+                                          ";color:",
+                                          "rgb(252,249,249)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#a00e0e",
+                                          ";border-color:",
+                                          "#a53636",
+                                          ";color:",
+                                          "#e9e6e6",
+                                          ";}&.active{background-color:",
+                                          "#b75151",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,249,249)",
+                                          ";:hover{background-color:",
+                                          "#a94c4c",
+                                          ";border-color:",
+                                          "#ad5c5c",
+                                          ";color:",
+                                          "#e9e6e6",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#c07272",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,250,250)",
+                                          ";:hover{background-color:",
+                                          "#c07272",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,250,250)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "default",
+                                          "{background-color:",
+                                          "#e6e6e6",
+                                          ";border-color:",
+                                          "#e0e0e0",
+                                          ";color:",
+                                          "rgb(73,73,73)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#d4d4d4",
+                                          ";border-color:",
+                                          "#cfcfcf",
+                                          ";color:",
+                                          "#444444",
+                                          ";}&.active{background-color:",
+                                          "#dadada",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(49,49,49)",
+                                          ";:hover{background-color:",
+                                          "#cacaca",
+                                          ";border-color:",
+                                          "#c4c4c4",
+                                          ";color:",
+                                          "#2f2f2f",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#cecece",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(80,80,80)",
+                                          ";:hover{background-color:",
+                                          "#cecece",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(80,80,80)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "info",
+                                          "{background-color:",
+                                          "#0063be",
+                                          ";border-color:",
+                                          "#3970c2",
+                                          ";color:",
+                                          "rgb(249,250,252)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#0c5cb0",
+                                          ";border-color:",
+                                          "#3668b3",
+                                          ";color:",
+                                          "#e6e7e9",
+                                          ";}&.active{background-color:",
+                                          "#517cc5",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(249,250,252)",
+                                          ";:hover{background-color:",
+                                          "#4b73b6",
+                                          ";border-color:",
+                                          "#5c7dba",
+                                          ";color:",
+                                          "#e6e7e9",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#7290cd",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(250,251,253)",
+                                          ";:hover{background-color:",
+                                          "#7290cd",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(250,251,253)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "link",
+                                          "{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#ebebeb26",
+                                          ";border-color:",
+                                          "#ebebeb26",
+                                          ";color:",
+                                          "#68267b",
+                                          ";}&.active{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#410057",
+                                          ";:hover{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "#ebebeb26",
+                                          ";color:",
+                                          "#3d0c51",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";:hover{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "primary",
+                                          "{background-color:",
+                                          "#702785",
+                                          ";border-color:",
+                                          "#7b458e",
+                                          ";color:",
+                                          "rgb(234,229,236)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#68267b",
+                                          ";border-color:",
+                                          "#724083",
+                                          ";color:",
+                                          "#d8d3da",
+                                          ";}&.active{background-color:",
+                                          "#855996",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(250,249,251)",
+                                          ";:hover{background-color:",
+                                          "#7c538b",
+                                          ";border-color:",
+                                          "#846292",
+                                          ";color:",
+                                          "#e7e6e8",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#9877a5",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(251,250,251)",
+                                          ";:hover{background-color:",
+                                          "#9877a5",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(251,250,251)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "success",
+                                          "{background-color:",
+                                          "#00ae42",
+                                          ";border-color:",
+                                          "#39b356",
+                                          ";color:",
+                                          "rgb(249,252,249)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#0ca13e",
+                                          ";border-color:",
+                                          "#36a550",
+                                          ";color:",
+                                          "#e6e9e6",
+                                          ";}&.active{background-color:",
+                                          "#51b866",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(249,252,250)",
+                                          ";:hover{background-color:",
+                                          "#4baa5f",
+                                          ";border-color:",
+                                          "#5cae6c",
+                                          ";color:",
+                                          "#e6e9e7",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#72c180",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(250,252,250)",
+                                          ";:hover{background-color:",
+                                          "#72c180",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(250,252,250)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "warning",
+                                          "{background-color:",
+                                          "#ffd200",
+                                          ";border-color:",
+                                          "#f9cd07",
+                                          ";color:",
+                                          "rgb(57,47,0)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#ebc20c",
+                                          ";border-color:",
+                                          "#e6bd0e",
+                                          ";color:",
+                                          "#362d0c",
+                                          ";}&.active{background-color:",
+                                          "#f2c70a",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(54,45,2)",
+                                          ";:hover{background-color:",
+                                          "#e0b80f",
+                                          ";border-color:",
+                                          "#d9b310",
+                                          ";color:",
+                                          "#332b0c",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#e4bc0e",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(88,73,5)",
+                                          ";:hover{background-color:",
+                                          "#e4bc0e",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(88,73,5)",
+                                          ";}}}",
                                         ],
                                       ],
                                     },
@@ -2810,12 +3965,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "colors": Object {
                                             "danger": "#00427f",
                                             "dangerLight": "#bdc8e4",
-                                            "neutral0": "#ffffff",
+                                            "neutral0": "#fff",
                                             "neutral10": "#eff2f8",
-                                            "neutral20": "#cdcdcd",
+                                            "neutral20": "#a6a6a6",
                                             "neutral30": "#b4b4b4",
                                             "neutral40": "#9b9b9b",
-                                            "neutral5": "#e6e6e6",
+                                            "neutral5": "#dddddd",
                                             "neutral50": "#838383",
                                             "neutral60": "#6a6a6a",
                                             "neutral70": "#515151",
@@ -2962,12 +4117,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               "colors": Object {
                                                 "danger": "#00427f",
                                                 "dangerLight": "#bdc8e4",
-                                                "neutral0": "#ffffff",
+                                                "neutral0": "#fff",
                                                 "neutral10": "#eff2f8",
-                                                "neutral20": "#cdcdcd",
+                                                "neutral20": "#a6a6a6",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
-                                                "neutral5": "#e6e6e6",
+                                                "neutral5": "#dddddd",
                                                 "neutral50": "#838383",
                                                 "neutral60": "#6a6a6a",
                                                 "neutral70": "#515151",
@@ -2987,7 +4142,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           }
                                         >
                                           <div
-                                            className="css-et9nfk-control"
+                                            className="css-ghr2vn-control"
                                             onMouseDown={[Function]}
                                             onTouchEnd={[Function]}
                                           >
@@ -3106,12 +4261,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -3254,12 +4409,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3392,12 +4547,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3623,12 +4778,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -3766,12 +4921,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3913,12 +5068,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -3947,7 +5102,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           "color": "#9b9b9b",
                                                         },
                                                         "boxSizing": "border-box",
-                                                        "color": "#cdcdcd",
+                                                        "color": "#a6a6a6",
                                                         "display": "flex",
                                                         "fontSize": "150%",
                                                         "label": "indicatorContainer",
@@ -3996,48 +5151,44 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </Input>
             </td>
             <td>
-              <ForwardRef
+              <Button
                 onClick={[Function]}
               >
-                <Button__StyledButton
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="c1"
+                  disabled={false}
                   onClick={[Function]}
                 >
-                  <Button
-                    active={false}
-                    block={false}
-                    bsClass="btn"
-                    bsStyle="default"
-                    className="Button__StyledButton-c9cbmb-0 jHWfTP"
+                  <button
+                    className="c1 btn btn-default"
                     disabled={false}
                     onClick={[Function]}
+                    type="button"
                   >
-                    <button
-                      className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-default"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <Icon
+                      name="trash-alt"
+                      type="solid"
                     >
-                      <Icon
-                        name="trash-alt"
-                        type="solid"
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            Object {
-                              "iconName": "trash-alt",
-                              "prefix": "fas",
-                            }
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "trash-alt",
+                            "prefix": "fas",
                           }
-                        >
-                          <svg
-                            className="svg-inline--fa fa-trash-alt"
-                          />
-                        </FontAwesomeIcon>
-                      </Icon>
-                    </button>
-                  </Button>
-                </Button__StyledButton>
-              </ForwardRef>
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-trash-alt"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
+                  </button>
+                </Button>
+              </Button>
             </td>
           </tr>
           <tr
@@ -4078,12 +5229,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="title-input2"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -4100,7 +5251,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="c3"
                                 componentClass="input"
                                 defaultValue="test"
                                 inputRef={[Function]}
@@ -4112,7 +5263,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="c3 form-control"
                                   defaultValue="test"
                                   id="title-input2"
                                   label=""
@@ -4157,12 +5308,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="value-input2"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -4179,7 +5330,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 kmJcge"
+                                className="c3"
                                 componentClass="input"
                                 defaultValue="http://localhost:8080/system/"
                                 inputRef={[Function]}
@@ -4191,7 +5342,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                 type="text"
                               >
                                 <input
-                                  className="FormControl-sc-1amoaox-0 kmJcge form-control"
+                                  className="c3 form-control"
                                   defaultValue="http://localhost:8080/system/"
                                   id="value-input2"
                                   label=""
@@ -4233,12 +5384,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   >
                     <FormGroup
                       bsClass="form-group"
-                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                      className=""
                       controlId="url-input-type-2"
                       validationState={null}
                     >
                       <div
-                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        className="form-group"
                       >
                         <InputWrapper>
                           <span>
@@ -4313,7 +5464,6 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       "global": Object {
                                         "background": "#e8e8e8",
                                         "contentBackground": "#fff",
-                                        "inputBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
                                         "navigationBackground": "#fff",
@@ -4332,6 +5482,16 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "70": "#b4b4b4",
                                         "80": "#cdcdcd",
                                         "90": "#e6e6e6",
+                                      },
+                                      "input": Object {
+                                        "background": "#fff",
+                                        "backgroundDisabled": "#dddddd",
+                                        "border": "#a6a6a6",
+                                        "borderFocus": "#7894ce",
+                                        "boxShadow": "inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(120,148,206,0.4)",
+                                        "color": "#1f1f1f",
+                                        "colorDisabled": "#9b9b9b",
+                                        "placeholder": "#9b9b9b",
                                       },
                                       "table": Object {
                                         "background": "#fafafa",
@@ -4412,27 +5572,354 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                       },
                                     },
                                     "components": Object {
+                                      "aceEditor": Array [
+                                        ".ace_editor{border:1px solid ",
+                                        "#cdcdcd",
+                                        ";border-radius:5px;}.ace-graylog{background-color:",
+                                        "#fff",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";&.ace_multiselect .ace_selection.ace_start{box-shadow:0 0 3px 0 ",
+                                        "#fff",
+                                        ";}.ace_gutter{background:",
+                                        "#f3f3f3",
+                                        ";color:",
+                                        "#2d2d2d",
+                                        ";}.ace_print-margin{width:1px;background:",
+                                        "#f3f3f3",
+                                        ";}.ace_cursor{color:",
+                                        "#a6a6a6",
+                                        ";}.ace_marker-layer{.ace_selection{background:",
+                                        "#b4b4b4",
+                                        ";}.ace_step{background:rgb(255,255,0);}.ace_bracket{margin:-1px 0 0 -1px;border:1px solid ",
+                                        "#b4b4b4",
+                                        ";}.ace_selected-word{border:1px solid ",
+                                        "#9b9b9b",
+                                        ";}.ace_active-line{background:",
+                                        "#e6e6e6",
+                                        ";}}.ace_gutter-active-line{background-color:",
+                                        "#cdcdcd",
+                                        ";}.ace_invisible{color:",
+                                        "#b4b4b4",
+                                        ";}.ace_keyword,.ace_meta,.ace_storage,.ace_storage.ace_type,.ace_support.ace_type{color:",
+                                        "#702785",
+                                        ";}.ace_keyword.ace_operator{color:",
+                                        "#00427f",
+                                        ";}.ace_constant.ace_character,.ace_constant.ace_language,.ace_constant.ace_numeric,.ace_keyword.ace_other.ace_unit,.ace_support.ace_constant,.ace_variable.ace_parameter{color:",
+                                        "#4b1a59",
+                                        ";}.ace_constant.ace_other{color:",
+                                        "#575757",
+                                        ";}.ace_invalid{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#c27878",
+                                        ";}.ace_invalid.ace_deprecated{color:",
+                                        "#fff",
+                                        ";background-color:",
+                                        "#702785",
+                                        ";}.ace_fold{background-color:",
+                                        "#0063be",
+                                        ";border-color:",
+                                        "#2d2d2d",
+                                        ";}.ace_entity.ace_name.ace_function,.ace_support.ace_function,.ace_variable{color:",
+                                        "#0063be",
+                                        ";}.ace_support.ace_class,.ace_support.ace_type{color:",
+                                        "#ab8d00",
+                                        ";}.ace_heading,.ace_markup.ace_heading,.ace_string{color:",
+                                        "#00752c",
+                                        ";}.ace_entity.ace_name.ace_tag,.ace_entity.ace_other.ace_attribute-name,.ace_meta.ace_tag,.ace_string.ace_regexp,.ace_variable{color:",
+                                        "#c27878",
+                                        ";}.ace_comment{color:",
+                                        "#737373",
+                                        ";}}",
+                                      ],
                                       "button": Array [
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "danger",
+                                          "{background-color:",
+                                          "#ad0707",
+                                          ";border-color:",
+                                          "#b23939",
+                                          ";color:",
+                                          "rgb(252,249,249)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#a00e0e",
+                                          ";border-color:",
+                                          "#a53636",
+                                          ";color:",
+                                          "#e9e6e6",
+                                          ";}&.active{background-color:",
+                                          "#b75151",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,249,249)",
+                                          ";:hover{background-color:",
+                                          "#a94c4c",
+                                          ";border-color:",
+                                          "#ad5c5c",
+                                          ";color:",
+                                          "#e9e6e6",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#c07272",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,250,250)",
+                                          ";:hover{background-color:",
+                                          "#c07272",
+                                          ";border-color:",
+                                          "#bc6363",
+                                          ";color:",
+                                          "rgb(252,250,250)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "default",
+                                          "{background-color:",
+                                          "#e6e6e6",
+                                          ";border-color:",
+                                          "#e0e0e0",
+                                          ";color:",
+                                          "rgb(73,73,73)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#d4d4d4",
+                                          ";border-color:",
+                                          "#cfcfcf",
+                                          ";color:",
+                                          "#444444",
+                                          ";}&.active{background-color:",
+                                          "#dadada",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(49,49,49)",
+                                          ";:hover{background-color:",
+                                          "#cacaca",
+                                          ";border-color:",
+                                          "#c4c4c4",
+                                          ";color:",
+                                          "#2f2f2f",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#cecece",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(80,80,80)",
+                                          ";:hover{background-color:",
+                                          "#cecece",
+                                          ";border-color:",
+                                          "#d4d4d4",
+                                          ";color:",
+                                          "rgb(80,80,80)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "info",
+                                          "{background-color:",
+                                          "#0063be",
+                                          ";border-color:",
+                                          "#3970c2",
+                                          ";color:",
+                                          "rgb(249,250,252)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#0c5cb0",
+                                          ";border-color:",
+                                          "#3668b3",
+                                          ";color:",
+                                          "#e6e7e9",
+                                          ";}&.active{background-color:",
+                                          "#517cc5",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(249,250,252)",
+                                          ";:hover{background-color:",
+                                          "#4b73b6",
+                                          ";border-color:",
+                                          "#5c7dba",
+                                          ";color:",
+                                          "#e6e7e9",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#7290cd",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(250,251,253)",
+                                          ";:hover{background-color:",
+                                          "#7290cd",
+                                          ";border-color:",
+                                          "#6386c9",
+                                          ";color:",
+                                          "rgb(250,251,253)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "link",
+                                          "{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#ebebeb26",
+                                          ";border-color:",
+                                          "#ebebeb26",
+                                          ";color:",
+                                          "#68267b",
+                                          ";}&.active{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#410057",
+                                          ";:hover{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "#ebebeb26",
+                                          ";color:",
+                                          "#3d0c51",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";:hover{background-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";border-color:",
+                                          "rgba(255, 255, 255, 0)",
+                                          ";color:",
+                                          "#702785",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "primary",
+                                          "{background-color:",
+                                          "#702785",
+                                          ";border-color:",
+                                          "#7b458e",
+                                          ";color:",
+                                          "rgb(234,229,236)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#68267b",
+                                          ";border-color:",
+                                          "#724083",
+                                          ";color:",
+                                          "#d8d3da",
+                                          ";}&.active{background-color:",
+                                          "#855996",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(250,249,251)",
+                                          ";:hover{background-color:",
+                                          "#7c538b",
+                                          ";border-color:",
+                                          "#846292",
+                                          ";color:",
+                                          "#e7e6e8",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#9877a5",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(251,250,251)",
+                                          ";:hover{background-color:",
+                                          "#9877a5",
+                                          ";border-color:",
+                                          "#8f699d",
+                                          ";color:",
+                                          "rgb(251,250,251)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "success",
+                                          "{background-color:",
+                                          "#00ae42",
+                                          ";border-color:",
+                                          "#39b356",
+                                          ";color:",
+                                          "rgb(249,252,249)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#0ca13e",
+                                          ";border-color:",
+                                          "#36a550",
+                                          ";color:",
+                                          "#e6e9e6",
+                                          ";}&.active{background-color:",
+                                          "#51b866",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(249,252,250)",
+                                          ";:hover{background-color:",
+                                          "#4baa5f",
+                                          ";border-color:",
+                                          "#5cae6c",
+                                          ";color:",
+                                          "#e6e9e7",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#72c180",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(250,252,250)",
+                                          ";:hover{background-color:",
+                                          "#72c180",
+                                          ";border-color:",
+                                          "#63bc74",
+                                          ";color:",
+                                          "rgb(250,252,250)",
+                                          ";}}}",
                                         ],
                                         Array [
-                                          [Function],
+                                          "&.btn-",
+                                          "warning",
+                                          "{background-color:",
+                                          "#ffd200",
+                                          ";border-color:",
+                                          "#f9cd07",
+                                          ";color:",
+                                          "rgb(57,47,0)",
+                                          ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
+                                          "#ebc20c",
+                                          ";border-color:",
+                                          "#e6bd0e",
+                                          ";color:",
+                                          "#362d0c",
+                                          ";}&.active{background-color:",
+                                          "#f2c70a",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(54,45,2)",
+                                          ";:hover{background-color:",
+                                          "#e0b80f",
+                                          ";border-color:",
+                                          "#d9b310",
+                                          ";color:",
+                                          "#332b0c",
+                                          ";}}&[disabled],&.disabled{background-color:",
+                                          "#e4bc0e",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(88,73,5)",
+                                          ";:hover{background-color:",
+                                          "#e4bc0e",
+                                          ";border-color:",
+                                          "#ebc20c",
+                                          ";color:",
+                                          "rgb(88,73,5)",
+                                          ";}}}",
                                         ],
                                       ],
                                     },
@@ -4743,12 +6230,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           "colors": Object {
                                             "danger": "#00427f",
                                             "dangerLight": "#bdc8e4",
-                                            "neutral0": "#ffffff",
+                                            "neutral0": "#fff",
                                             "neutral10": "#eff2f8",
-                                            "neutral20": "#cdcdcd",
+                                            "neutral20": "#a6a6a6",
                                             "neutral30": "#b4b4b4",
                                             "neutral40": "#9b9b9b",
-                                            "neutral5": "#e6e6e6",
+                                            "neutral5": "#dddddd",
                                             "neutral50": "#838383",
                                             "neutral60": "#6a6a6a",
                                             "neutral70": "#515151",
@@ -4895,12 +6382,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                               "colors": Object {
                                                 "danger": "#00427f",
                                                 "dangerLight": "#bdc8e4",
-                                                "neutral0": "#ffffff",
+                                                "neutral0": "#fff",
                                                 "neutral10": "#eff2f8",
-                                                "neutral20": "#cdcdcd",
+                                                "neutral20": "#a6a6a6",
                                                 "neutral30": "#b4b4b4",
                                                 "neutral40": "#9b9b9b",
-                                                "neutral5": "#e6e6e6",
+                                                "neutral5": "#dddddd",
                                                 "neutral50": "#838383",
                                                 "neutral60": "#6a6a6a",
                                                 "neutral70": "#515151",
@@ -4920,7 +6407,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           }
                                         >
                                           <div
-                                            className="css-et9nfk-control"
+                                            className="css-ghr2vn-control"
                                             onMouseDown={[Function]}
                                             onTouchEnd={[Function]}
                                           >
@@ -5039,12 +6526,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -5187,12 +6674,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5325,12 +6812,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5556,12 +7043,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                   "colors": Object {
                                                     "danger": "#00427f",
                                                     "dangerLight": "#bdc8e4",
-                                                    "neutral0": "#ffffff",
+                                                    "neutral0": "#fff",
                                                     "neutral10": "#eff2f8",
-                                                    "neutral20": "#cdcdcd",
+                                                    "neutral20": "#a6a6a6",
                                                     "neutral30": "#b4b4b4",
                                                     "neutral40": "#9b9b9b",
-                                                    "neutral5": "#e6e6e6",
+                                                    "neutral5": "#dddddd",
                                                     "neutral50": "#838383",
                                                     "neutral60": "#6a6a6a",
                                                     "neutral70": "#515151",
@@ -5699,12 +7186,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5846,12 +7333,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                       "colors": Object {
                                                         "danger": "#00427f",
                                                         "dangerLight": "#bdc8e4",
-                                                        "neutral0": "#ffffff",
+                                                        "neutral0": "#fff",
                                                         "neutral10": "#eff2f8",
-                                                        "neutral20": "#cdcdcd",
+                                                        "neutral20": "#a6a6a6",
                                                         "neutral30": "#b4b4b4",
                                                         "neutral40": "#9b9b9b",
-                                                        "neutral5": "#e6e6e6",
+                                                        "neutral5": "#dddddd",
                                                         "neutral50": "#838383",
                                                         "neutral60": "#6a6a6a",
                                                         "neutral70": "#515151",
@@ -5880,7 +7367,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                                           "color": "#9b9b9b",
                                                         },
                                                         "boxSizing": "border-box",
-                                                        "color": "#cdcdcd",
+                                                        "color": "#a6a6a6",
                                                         "display": "flex",
                                                         "fontSize": "150%",
                                                         "label": "indicatorContainer",
@@ -5929,82 +7416,73 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
               </Input>
             </td>
             <td>
-              <ForwardRef
+              <Button
                 onClick={[Function]}
               >
-                <Button__StyledButton
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="c1"
+                  disabled={false}
                   onClick={[Function]}
                 >
-                  <Button
-                    active={false}
-                    block={false}
-                    bsClass="btn"
-                    bsStyle="default"
-                    className="Button__StyledButton-c9cbmb-0 jHWfTP"
+                  <button
+                    className="c1 btn btn-default"
                     disabled={false}
                     onClick={[Function]}
+                    type="button"
                   >
-                    <button
-                      className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-default"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <Icon
+                      name="trash-alt"
+                      type="solid"
                     >
-                      <Icon
-                        name="trash-alt"
-                        type="solid"
-                      >
-                        <FontAwesomeIcon
-                          icon={
-                            Object {
-                              "iconName": "trash-alt",
-                              "prefix": "fas",
-                            }
+                      <FontAwesomeIcon
+                        icon={
+                          Object {
+                            "iconName": "trash-alt",
+                            "prefix": "fas",
                           }
-                        >
-                          <svg
-                            className="svg-inline--fa fa-trash-alt"
-                          />
-                        </FontAwesomeIcon>
-                      </Icon>
-                    </button>
-                  </Button>
-                </Button__StyledButton>
-              </ForwardRef>
+                        }
+                      >
+                        <svg
+                          className="svg-inline--fa fa-trash-alt"
+                        />
+                      </FontAwesomeIcon>
+                    </Icon>
+                  </button>
+                </Button>
+              </Button>
             </td>
           </tr>
         </tbody>
       </table>
     </Table>
   </UrlWhiteListForm__StyledTable>
-  <ForwardRef
+  <Button
     bsSize="sm"
     onClick={[Function]}
   >
-    <Button__StyledButton
+    <Button
+      active={false}
+      block={false}
+      bsClass="btn"
       bsSize="sm"
+      bsStyle="default"
+      className="c1"
+      disabled={false}
       onClick={[Function]}
     >
-      <Button
-        active={false}
-        block={false}
-        bsClass="btn"
-        bsSize="sm"
-        bsStyle="default"
-        className="Button__StyledButton-c9cbmb-0 jHWfTP"
+      <button
+        className="c1 btn btn-sm btn-default"
         disabled={false}
         onClick={[Function]}
+        type="button"
       >
-        <button
-          className="Button__StyledButton-c9cbmb-0 jHWfTP btn btn-sm btn-default"
-          disabled={false}
-          onClick={[Function]}
-          type="button"
-        >
-          Add Url
-        </button>
-      </Button>
-    </Button__StyledButton>
-  </ForwardRef>
+        Add Url
+      </button>
+    </Button>
+  </Button>
 </UrlWhiteListForm>
 `;

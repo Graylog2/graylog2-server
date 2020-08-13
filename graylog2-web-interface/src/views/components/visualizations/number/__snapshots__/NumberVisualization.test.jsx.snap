@@ -1,6 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NumberVisualization should render a number visualization 1`] = `
+.c0 {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
 <NumberVisualization
   config={
     Object {
@@ -73,11 +102,11 @@ exports[`NumberVisualization should render a number visualization 1`] = `
 >
   <NumberVisualization__SingleItemGrid>
     <div
-      className="NumberVisualization__SingleItemGrid-lb6dwm-1 fdCxSw"
+      className="c0"
     >
       <NumberVisualization__NumberBox>
         <div
-          className="NumberVisualization__NumberBox-lb6dwm-2 fqPkzh"
+          className="c1"
         >
           <SizeMe
             monitorHeight={true}

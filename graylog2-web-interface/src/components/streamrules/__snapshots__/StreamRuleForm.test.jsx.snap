@@ -3,7 +3,396 @@
 exports[`StreamRuleForm should render an empty StreamRuleForm 1`] = `
 Object {
   "asFragment": [Function],
-  "baseElement": <body
+  "baseElement": .c8.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c8.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c8.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c8.btn-danger[disabled],
+.c8.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c8.btn-danger[disabled]:hover,
+.c8.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c8.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c8.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c8.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c8.btn-default[disabled],
+.c8.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c8.btn-default[disabled]:hover,
+.c8.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c8.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c8.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c8.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c8.btn-info[disabled],
+.c8.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c8.btn-info[disabled]:hover,
+.c8.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c8.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c8.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c8.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c8.btn-link[disabled],
+.c8.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c8.btn-link[disabled]:hover,
+.c8.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c8.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c8.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c8.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c8.btn-primary[disabled],
+.c8.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c8.btn-primary[disabled]:hover,
+.c8.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c8.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c8.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c8.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c8.btn-success[disabled],
+.c8.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c8.btn-success[disabled]:hover,
+.c8.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c8.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c8.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c8.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c8.btn-warning[disabled],
+.c8.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c8.btn-warning[disabled]:hover,
+.c8.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c4 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c5.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c5.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c5.form-control[disabled],
+.c5.form-control[readonly],
+fieldset[disabled] .c5.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c5.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c0 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c0 form {
+  margin-bottom: 0;
+}
+
+.c0 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c0 .modal-dialog .modal-content {
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c0 .modal-header {
+  border-bottom-color: #a6a6a6;
+}
+
+.c0 .modal-header button.close {
+  color: currentColor;
+}
+
+.c0 .modal-footer {
+  border-top-color: #a6a6a6;
+}
+
+.c0 .modal-title {
+  font-size: 1.424rem;
+}
+
+.c0 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+.c1 {
+  border-bottom-color: #a6a6a6;
+}
+
+.c1 button.close {
+  color: currentColor;
+}
+
+.c2 {
+  font-size: 1.424rem;
+}
+
+.c3 .form-group {
+  margin-bottom: 5px;
+}
+
+.c7 {
+  border-top-color: #a6a6a6;
+}
+
+.c6 {
+  background-color: #f3f3f3;
+  border-color: #a6a6a6;
+  color: #575757;
+}
+
+<body
     class="modal-open"
     style="padding-right: 0px;"
   >
@@ -18,7 +407,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 kdCabm in modal"
+        class="fade c0 in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -31,7 +420,7 @@ Object {
             role="document"
           >
             <div
-              class="Modal__Header-nuree8-2 ziWto modal-header"
+              class="c1 modal-header"
             >
               <button
                 class="close"
@@ -49,7 +438,7 @@ Object {
                 </span>
               </button>
               <h4
-                class="Modal__Title-nuree8-3 hdjHMk modal-title"
+                class="c2 modal-title"
               >
                 Bach
               </h4>
@@ -59,7 +448,7 @@ Object {
               id="StreamRuleForm"
             >
               <div
-                class="Modal__Body-nuree8-4 lcHrgF modal-body"
+                class="c3 modal-body"
               >
                 <div
                   class="container-fluid"
@@ -70,17 +459,17 @@ Object {
                     >
                       <div />
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                          class="c4 control-label"
                           for="Type"
                         >
                           Type
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="c5 form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -134,17 +523,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                          class="c4 control-label"
                           for="Value"
                         >
                           Value
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="c5 form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -157,7 +546,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <span>
                           <div
@@ -180,17 +569,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                          class="c4 control-label"
                           for="Description"
                         >
                           Description (optional)
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="c5 form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -225,7 +614,7 @@ Object {
                       class="col-md-4"
                     >
                       <div
-                        class="Well-sc-19gs1oc-0 enTUtA matcher-github well well-sm"
+                        class="c6 matcher-github well well-sm"
                       >
                         The server will try to convert to strings or numbers based on the matcher type as well as it can.
                         <br />
@@ -255,16 +644,16 @@ Object {
                 </div>
               </div>
               <div
-                class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
+                class="c7 modal-footer"
               >
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-default"
+                  class="c8 btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-primary"
+                  class="c8 btn btn-primary"
                   type="submit"
                 >
                   Save
@@ -343,7 +732,396 @@ Object {
     <div
       aria-hidden="true"
     />
-    <div
+    .c8.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c8.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c8.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c8.btn-danger[disabled],
+.c8.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c8.btn-danger[disabled]:hover,
+.c8.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c8.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c8.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c8.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c8.btn-default[disabled],
+.c8.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c8.btn-default[disabled]:hover,
+.c8.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c8.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c8.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c8.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c8.btn-info[disabled],
+.c8.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c8.btn-info[disabled]:hover,
+.c8.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c8.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c8.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c8.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c8.btn-link[disabled],
+.c8.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c8.btn-link[disabled]:hover,
+.c8.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c8.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c8.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c8.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c8.btn-primary[disabled],
+.c8.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c8.btn-primary[disabled]:hover,
+.c8.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c8.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c8.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c8.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c8.btn-success[disabled],
+.c8.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c8.btn-success[disabled]:hover,
+.c8.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c8.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c8.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c8.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c8.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c8.btn-warning[disabled],
+.c8.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c8.btn-warning[disabled]:hover,
+.c8.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c4 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c5.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c5.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c5.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c5.form-control[disabled],
+.c5.form-control[readonly],
+fieldset[disabled] .c5.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c5.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c0 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c0 form {
+  margin-bottom: 0;
+}
+
+.c0 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c0 .modal-dialog .modal-content {
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c0 .modal-header {
+  border-bottom-color: #a6a6a6;
+}
+
+.c0 .modal-header button.close {
+  color: currentColor;
+}
+
+.c0 .modal-footer {
+  border-top-color: #a6a6a6;
+}
+
+.c0 .modal-title {
+  font-size: 1.424rem;
+}
+
+.c0 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+.c1 {
+  border-bottom-color: #a6a6a6;
+}
+
+.c1 button.close {
+  color: currentColor;
+}
+
+.c2 {
+  font-size: 1.424rem;
+}
+
+.c3 .form-group {
+  margin-bottom: 5px;
+}
+
+.c7 {
+  border-top-color: #a6a6a6;
+}
+
+.c6 {
+  background-color: #f3f3f3;
+  border-color: #a6a6a6;
+  color: #575757;
+}
+
+<div
       aria-hidden="true"
       role="dialog"
     >
@@ -351,7 +1129,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 kdCabm in modal"
+        class="fade c0 in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -364,7 +1142,7 @@ Object {
             role="document"
           >
             <div
-              class="Modal__Header-nuree8-2 ziWto modal-header"
+              class="c1 modal-header"
             >
               <button
                 class="close"
@@ -382,7 +1160,7 @@ Object {
                 </span>
               </button>
               <h4
-                class="Modal__Title-nuree8-3 hdjHMk modal-title"
+                class="c2 modal-title"
               >
                 Bach
               </h4>
@@ -392,7 +1170,7 @@ Object {
               id="StreamRuleForm"
             >
               <div
-                class="Modal__Body-nuree8-4 lcHrgF modal-body"
+                class="c3 modal-body"
               >
                 <div
                   class="container-fluid"
@@ -405,17 +1183,17 @@ Object {
                         field_1
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                          class="c4 control-label"
                           for="Type"
                         >
                           Type
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="c5 form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -469,17 +1247,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                          class="c4 control-label"
                           for="Value"
                         >
                           Value
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="c5 form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -492,7 +1270,7 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <span>
                           <div
@@ -515,17 +1293,17 @@ Object {
                         </span>
                       </div>
                       <div
-                        class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                        class="form-group"
                       >
                         <label
-                          class="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                          class="c4 control-label"
                           for="Description"
                         >
                           Description (optional)
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="c5 form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -562,7 +1340,7 @@ Object {
                       class="col-md-4"
                     >
                       <div
-                        class="Well-sc-19gs1oc-0 enTUtA matcher-github well well-sm"
+                        class="c6 matcher-github well well-sm"
                       >
                         The server will try to convert to strings or numbers based on the matcher type as well as it can.
                         <br />
@@ -592,16 +1370,16 @@ Object {
                 </div>
               </div>
               <div
-                class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
+                class="c7 modal-footer"
               >
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-default"
+                  class="c8 btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-primary"
+                  class="c8 btn btn-primary"
                   type="submit"
                 >
                   Save
