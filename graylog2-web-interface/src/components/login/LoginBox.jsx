@@ -7,10 +7,15 @@ import { Col, Row } from 'components/graylog';
 const LoginCol = styled(Col)(({ theme }) => css`
   padding: 15px;
   background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.gray[80]};
+  border: 1px solid ${theme.colors.variant.light.default};
   border-radius: 4px;
-  box-shadow: 0 0 21px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 0 21px ${theme.colors.global.navigationBoxShadow};
   margin-top: 120px;
+  
+  legend {
+    color: ${theme.colors.variant.darker.default};
+    border-color: ${theme.colors.variant.dark.default};
+  }
 `);
 
 const LoginBox = ({ children }) => {

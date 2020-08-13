@@ -7,13 +7,6 @@ import fonts, { fontsPropTypes } from './fonts';
 import utils, { utilsPropTypes } from './utils';
 import type { ThemeInterface } from './types';
 
-const theme: ThemeInterface = {
-  breakpoints,
-  colors,
-  utils,
-  fonts,
-};
-
 const themePropTypes = PropTypes.shape({
   breakpoints: breakpointPropTypes,
   colors: colorsPropTypes,
@@ -21,17 +14,12 @@ const themePropTypes = PropTypes.shape({
   utils: utilsPropTypes,
 });
 
-const themeModes: Array<string> = ['teinte'];
-
 export {
   breakpoints,
   colors,
   fonts,
   utils,
-  themeModes,
   themePropTypes,
 };
 
 export type { ThemeInterface };
-
-export default theme;

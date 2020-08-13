@@ -5,7 +5,6 @@ import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';
-import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import 'bootstrap/less/bootstrap.less';
 import 'toastr/toastr.less';
@@ -41,7 +40,6 @@ const AppFacade = ({ currentUser, server, sessionId }) => {
 
   return (
     <>
-      <GlobalThemeStyles />
       {Page}
     </>
   );

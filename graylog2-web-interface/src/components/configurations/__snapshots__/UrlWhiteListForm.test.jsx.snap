@@ -432,6 +432,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "xs": "480px",
                                       },
                                     },
+                                    "changeMode": [Function],
                                     "colors": Object {
                                       "brand": Object {
                                         "primary": "#ff3633",
@@ -920,7 +921,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "tiny": "0.79rem",
                                       },
                                     },
-                                    "mode": "teinte",
+                                    "mode": "teint",
                                     "utils": Object {
                                       "colorLevel": [Function],
                                       "contrastingColor": [Function],
@@ -2696,6 +2697,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "xs": "480px",
                                       },
                                     },
+                                    "changeMode": [Function],
                                     "colors": Object {
                                       "brand": Object {
                                         "primary": "#ff3633",
@@ -3184,7 +3186,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "tiny": "0.79rem",
                                       },
                                     },
-                                    "mode": "teinte",
+                                    "mode": "teint",
                                     "utils": Object {
                                       "colorLevel": [Function],
                                       "contrastingColor": [Function],
@@ -4960,6 +4962,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "xs": "480px",
                                       },
                                     },
+                                    "changeMode": [Function],
                                     "colors": Object {
                                       "brand": Object {
                                         "primary": "#ff3633",
@@ -5448,7 +5451,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "tiny": "0.79rem",
                                       },
                                     },
-                                    "mode": "teinte",
+                                    "mode": "teint",
                                     "utils": Object {
                                       "colorLevel": [Function],
                                       "contrastingColor": [Function],

@@ -10,6 +10,8 @@ import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
+import ThemeModeToggle from './ThemeModeToggle';
+
 const SessionStore = StoreProvider.getStore('Session');
 const SessionActions = ActionsProvider.getActions('Session');
 
@@ -20,12 +22,6 @@ type Props = {
 };
 
 const UserMenu = ({ fullName, loginName, readOnly = true }: Props) => {
-  const onLogoutClicked = () => {
-    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
-      history.push(Routes.STARTPAGE);
-    });
-  };
-
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(encodeURIComponent(loginName))
     : Routes.SYSTEM.USERS.edit(encodeURIComponent(loginName));
@@ -33,12 +29,22 @@ const UserMenu = ({ fullName, loginName, readOnly = true }: Props) => {
     ? 'Show profile'
     : 'Edit profile';
 
+  const onLogoutClicked = () => {
+    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
+      history.push(Routes.STARTPAGE);
+    });
+  };
+
   return (
     <NavDropdown title={<Icon name="user" size="lg" />}
                  aria-label={fullName}
                  id="user-menu-dropdown"
                  noCaret>
       <MenuItem header>{fullName}</MenuItem>
+      <MenuItem divider />
+      <MenuItem header>
+        <ThemeModeToggle />
+      </MenuItem>
       <MenuItem divider />
       <LinkContainer to={route}>
         <MenuItem>{label}</MenuItem>

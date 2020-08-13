@@ -12,7 +12,16 @@ import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/V
 
 import AggregationControls from './AggregationControls';
 
-jest.mock('stores/connect', () => (x) => x);
+jest.mock('stores/connect', () => {
+  const originalModule = jest.requireActual('stores/connect');
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    default: (x) => x,
+  };
+});
+
 jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select');
 
 jest.mock('graylog-web-plugin/plugin', () => ({

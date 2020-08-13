@@ -62,6 +62,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
               "xs": "480px",
             },
           },
+          "changeMode": [Function],
           "colors": Object {
             "brand": Object {
               "primary": "#ff3633",
@@ -550,7 +551,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
               "tiny": "0.79rem",
             },
           },
-          "mode": "teinte",
+          "mode": "teint",
           "utils": Object {
             "colorLevel": [Function],
             "contrastingColor": [Function],
