@@ -1,6 +1,8 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css, withTheme, type StyledComponent } from 'styled-components';
+import debounce from 'lodash/debounce';
 
 import { Icon } from 'components/common';
 import { themePropTypes, type ThemeInterface } from 'theme';
@@ -87,23 +89,46 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
 `);
 
 const ThemeModeToggle = ({ theme }: Props) => {
-  const toggleThemeMode = (event) => {
-    const nextMode = event.target.checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+  const [currentMode, setCurrentMode] = useState(theme.mode);
+  const [loadingTheme, setLoadingTheme] = useState(false);
 
-    theme.changeMode(nextMode);
+  useEffect(() => {
+    if (currentMode !== theme.mode) {
+      theme.changeMode(currentMode);
+    }
+  }, [currentMode]);
+
+  useEffect(() => {
+    if (loadingTheme) {
+      setLoadingTheme(false);
+    }
+  }, [theme]);
+
+  const debouncedThemeMode = debounce((checked) => {
+    setCurrentMode(checked ? THEME_MODE_DARK : THEME_MODE_LIGHT);
+  }, 500);
+
+  const toggleThemeMode = (event) => {
+    event.persist();
+    setLoadingTheme(true);
+    debouncedThemeMode(event.target.checked);
   };
+
+  const loadingLightMode = currentMode === THEME_MODE_DARK && loadingTheme;
+  const loadingDarkMode = currentMode === THEME_MODE_LIGHT && loadingTheme;
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name="sun" currentMode={theme.mode === THEME_MODE_LIGHT} />
+      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'} spin={loadingLightMode} currentMode={currentMode === THEME_MODE_LIGHT} />
       <Toggle>
         <input value={THEME_MODE_DARK}
                type="checkbox"
                onChange={toggleThemeMode}
-               checked={theme.mode === THEME_MODE_DARK} />
+               checked={currentMode === THEME_MODE_DARK}
+               disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name="moon" currentMode={theme.mode === THEME_MODE_DARK} />
+      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'} spin={loadingDarkMode} currentMode={currentMode === THEME_MODE_DARK} />
     </ThemeModeToggleWrap>
   );
 };
