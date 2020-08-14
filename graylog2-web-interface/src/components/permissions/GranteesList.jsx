@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+import SharedEntity from 'logic/permissions/SharedEntity';
 import type { GRN } from 'logic/permissions/types';
 import { Pagination, PageSizeSelect } from 'components/common';
 import { Alert } from 'components/graylog';
@@ -54,7 +55,7 @@ type Props = {
   availableCapabilities: CapabilitiesList,
   className?: string,
   entityGRN: GRN,
-  entityType: string,
+  entityType: $PropertyType<SharedEntity, 'type'>,
   onDelete: (GRN) => Promise<EntityShareState>,
   onCapabilityChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
@@ -79,7 +80,6 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, e
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
   const showPageSizeSelect = totalGrantees > initialPageSize;
-  console.log(paginatedGrantees);
 
   return (
     <div className={className}>

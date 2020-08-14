@@ -8,15 +8,16 @@ import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import EntityShareSettings from './EntityShareSettings';
 
 type Props = {
   description: string,
-  entityId: string,
-  entityTitle: string,
-  entityType: string,
+  entityId: $PropertyType<SharedEntity, 'id'>,
+  entityTitle: $PropertyType<SharedEntity, 'title'>,
+  entityType: $PropertyType<SharedEntity, 'type'>,
   onClose: () => void,
 };
 

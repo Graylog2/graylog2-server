@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
@@ -16,7 +17,7 @@ import ShareableEnityURL from './ShareableEnityURL';
 type Props = {
   description: $PropertyType<Props, 'description'>,
   entityGRN: GRN,
-  entityType: string,
+  entityType: $PropertyType<SharedEntity, 'type'>,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
 };
