@@ -127,7 +127,7 @@ describe('<UserDetails />', () => {
       });
 
       it('should fetch user shares when filtering by entity type', async () => {
-        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 3, perPage: 50, query: 'existing query' } };
+        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 1, perPage: 50, query: 'existing query' } };
         const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
         await act(() => mockAuthzRolesPromise);
 
@@ -139,7 +139,7 @@ describe('<UserDetails />', () => {
       });
 
       it('should fetch user shares when filtering by capability', async () => {
-        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 3, perPage: 50, query: 'existing query' } };
+        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 1, perPage: 50, query: 'existing query' } };
         const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
         await act(() => mockAuthzRolesPromise);
 
