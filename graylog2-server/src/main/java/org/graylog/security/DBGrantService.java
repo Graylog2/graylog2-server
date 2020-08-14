@@ -58,6 +58,11 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1));
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_TARGET, 1));
+        db.createIndex(
+                new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1)
+                        .append(GrantDTO.FIELD_CAPABILITY, 1)
+                        .append(GrantDTO.FIELD_TARGET, 1),
+                new BasicDBObject("unique", true));
         // TODO: Add more indices
 
         // TODO: Inline migration for development. Must be removed before shipping 4.0 GA!
