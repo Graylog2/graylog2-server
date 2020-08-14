@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Link } from 'react-router';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
-import { getShowRouteFromGRN } from 'logic/permissions/grn';
+import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
 import OwnersCell from './OwnersCell';
 
