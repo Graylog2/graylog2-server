@@ -122,4 +122,20 @@ public class DBGrantServiceTest {
             assertThat(result).doesNotContainKey(stream1);
         });
     }
+
+    @Test
+    @MongoDBFixtures("grants.json")
+    public void hasGrantFor() {
+        final GRN jane = grnRegistry.parse("grn::::user:jane");
+        final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
+        final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
+
+        assertThat(dbService.hasGrantFor(jane, Capability.VIEW, stream1)).isTrue();
+        assertThat(dbService.hasGrantFor(jane, Capability.MANAGE, stream2)).isTrue();
+        assertThat(dbService.hasGrantFor(jane, Capability.OWN, dashboard1)).isTrue();
+
+        assertThat(dbService.hasGrantFor(jane, Capability.MANAGE, stream1)).isFalse();
+        assertThat(dbService.hasGrantFor(jane, Capability.VIEW, dashboard1)).isFalse();
+    }
 }
