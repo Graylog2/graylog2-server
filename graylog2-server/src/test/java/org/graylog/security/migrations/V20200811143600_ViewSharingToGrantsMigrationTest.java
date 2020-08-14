@@ -87,7 +87,7 @@ class V20200811143600_ViewSharingToGrantsMigrationTest {
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);
 
-        this.migration = new V20200811143600_ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, grnRegistry, userService, roleService, "admin", viewService);
+        this.migration = new V20200811143600_ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService);
     }
 
     private void assertDeletedViewSharing(String id) {

@@ -21,7 +21,6 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -54,7 +53,6 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
 
     private final DBGrantService grantService;
     private final MongoCollection<Document> collection;
-    private final GRNRegistry grnRegistry;
     private final UserService userService;
     private final RoleService roleService;
     private final String rootUsername;
@@ -63,14 +61,12 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
     @Inject
     public V20200811143600_ViewSharingToGrantsMigration(MongoConnection mongoConnection,
                                                         DBGrantService grantService,
-                                                        GRNRegistry grnRegistry,
                                                         UserService userService,
                                                         RoleService roleService,
                                                         @Named("root_username") String rootUsername,
                                                         ViewService viewService) {
 
         this.grantService = grantService;
-        this.grnRegistry = grnRegistry;
         this.userService = userService;
         this.roleService = roleService;
         this.rootUsername = rootUsername;
