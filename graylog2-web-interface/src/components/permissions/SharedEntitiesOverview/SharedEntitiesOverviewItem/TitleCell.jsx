@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import { getIdFromGRN } from 'logic/permissions/GRN';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
 import Routes from 'routing/Routes';
 import SharedEntity from 'logic/permissions/SharedEntity';
 
@@ -13,7 +13,7 @@ type Props = {
 };
 
 const _getTitleLink = (id, type) => {
-  const entityId = getIdFromGRN(id, type);
+  const { id: entityId } = getValuesFromGRN(id);
 
   switch (type) {
     case 'dashboard':

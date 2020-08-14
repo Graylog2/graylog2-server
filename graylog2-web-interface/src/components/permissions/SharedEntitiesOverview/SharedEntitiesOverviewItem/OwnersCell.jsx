@@ -8,7 +8,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import Routes from 'routing/Routes';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
-import { getIdFromGRN } from 'logic/permissions/GRN';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
 
 type Props = {
   owners: GranteesList,
@@ -17,7 +17,7 @@ type Props = {
 const TitleWithLink = ({ to, title }: { to: string, title: string }) => <Link to={to}>{title}</Link>;
 
 const _getOwnerTitle = ({ type, id, title }, userPermissions) => {
-  const ownerId = getIdFromGRN(id, type);
+  const { id: ownerId } = getValuesFromGRN(id);
 
   switch (type) {
     case 'user':
