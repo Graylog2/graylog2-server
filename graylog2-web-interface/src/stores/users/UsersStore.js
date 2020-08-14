@@ -55,7 +55,7 @@ const UsersStore: Store<{}> = singletonStore(
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedResponse) => ({
-          adminUser: UserOverview.fromJSON(response.context.admin_user),
+          adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
           list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
           pagination: {
             count: response.count,
