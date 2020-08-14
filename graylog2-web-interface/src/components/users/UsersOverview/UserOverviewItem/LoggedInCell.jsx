@@ -11,7 +11,6 @@ import LoggedInIcon from '../../LoggedInIcon';
 
 type Props = {
   lastActivity: $PropertyType<UserOverview, 'lastActivity'>,
-  clientAddress: $PropertyType<UserOverview, 'clientAddress'>,
   sessionActive: $PropertyType<UserOverview, 'sessionActive'>,
 };
 
@@ -20,19 +19,22 @@ const Td: StyledComponent<{}, ThemeInterface, HTMLTableCellElement> = styled.td`
   text-align: right;
 `;
 
-const LoggedInCell = ({ lastActivity, clientAddress, sessionActive }: Props) => (
+const LoggedInInfo = ({ lastActivity }: { lastActivity: $PropertyType<UserOverview, 'lastActivity'> }) => (
+  <OverlayTrigger trigger={['hover', 'focus']}
+                  placement="right"
+                  overlay={(
+                    <Popover id="session-badge-details" title="Logged in">
+                      <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
+                    </Popover>
+                  )}
+                  rootClose>
+    <LoggedInIcon active />
+  </OverlayTrigger>
+);
+
+const LoggedInCell = ({ lastActivity, sessionActive }: Props) => (
   <Td>
-    <OverlayTrigger trigger={['hover', 'focus']}
-                    placement="right"
-                    overlay={(
-                      <Popover id="session-badge-details" title={sessionActive ? 'Logged in' : 'Logged out'}>
-                        <div>Last activity: {lastActivity ? <Timestamp dateTime={lastActivity} relative /> : '-'}</div>
-                        <div>Client address: {clientAddress ?? '-'}</div>
-                      </Popover>
-                    )}
-                    rootClose>
-      <LoggedInIcon active={sessionActive} />
-    </OverlayTrigger>
+    {sessionActive ? <LoggedInInfo lastActivity={lastActivity} /> : <LoggedInIcon active={false} />}
   </Td>
 );
 

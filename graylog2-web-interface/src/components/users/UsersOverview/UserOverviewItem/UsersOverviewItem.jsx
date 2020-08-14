@@ -30,7 +30,6 @@ const UsersOverviewItem = ({
   return (
     <tr key={username} className={isActive ? 'active' : ''}>
       <LoggedInCell lastActivity={lastActivity}
-                    clientAddress={clientAddress}
                     sessionActive={sessionActive} />
       <td className="limited">
         <Link to={Routes.SYSTEM.USERS.show(username)}>
