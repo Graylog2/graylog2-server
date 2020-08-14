@@ -16,6 +16,7 @@ import ShareableEnityURL from './ShareableEnityURL';
 type Props = {
   description: $PropertyType<Props, 'description'>,
   entityGRN: GRN,
+  entityType: string,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
 };
@@ -49,6 +50,7 @@ const EntityShareSettings = ({
   },
   description,
   entityGRN,
+  entityType,
   setDisableSubmit,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
@@ -96,6 +98,7 @@ const EntityShareSettings = ({
         <GranteesList activeShares={activeShares}
                       availableCapabilities={availableCapabilities}
                       entityGRN={entityGRN}
+                      entityType={entityType}
                       onDelete={_handleDeletion}
                       onCapabilityChange={_handleSelection}
                       selectedGrantees={selectedGrantees}

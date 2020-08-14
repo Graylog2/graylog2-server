@@ -5,6 +5,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import { Pagination, PageSizeSelect } from 'components/common';
+import { Alert } from 'components/graylog';
 import EntityShareState, { type ActiveShares, type CapabilitiesList, type SelectedGrantees } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
@@ -53,6 +54,7 @@ type Props = {
   availableCapabilities: CapabilitiesList,
   className?: string,
   entityGRN: GRN,
+  entityType: string,
   onDelete: (GRN) => Promise<EntityShareState>,
   onCapabilityChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
@@ -69,7 +71,7 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
   return selectedGrantees.slice(begin, end);
 };
 
-const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, availableCapabilities, selectedGrantees, className, title }: Props) => {
+const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, entityType, availableCapabilities, selectedGrantees, className, title }: Props) => {
   const initialPageSize = PageSizeSelect.defaultPageSizes[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,6 +79,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, a
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
   const showPageSizeSelect = totalGrantees > initialPageSize;
+  console.log(paginatedGrantees);
 
   return (
     <div className={className}>
@@ -86,21 +89,25 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityGRN, a
           <StyledPageSizeSelect onChange={(event) => setPageSize(Number(event.target.value))} pageSize={pageSize} />
         )}
       </Header>
-      <List>
-        {paginatedGrantees.map((grantee) => {
-          const currentGranteeState = grantee.currentState(activeShares);
+      {paginatedGrantees.size > 0 ? (
+        <List>
+          {paginatedGrantees.map((grantee) => {
+            const currentGranteeState = grantee.currentState(activeShares);
 
-          return (
-            <GranteesListItem availableCapabilities={availableCapabilities}
-                              currentGranteeState={currentGranteeState}
-                              entityGRN={entityGRN}
-                              grantee={grantee}
-                              key={grantee.id}
-                              onDelete={onDelete}
-                              onCapabilityChange={onCapabilityChange} />
-          );
-        })}
-      </List>
+            return (
+              <GranteesListItem availableCapabilities={availableCapabilities}
+                                currentGranteeState={currentGranteeState}
+                                entityGRN={entityGRN}
+                                grantee={grantee}
+                                key={grantee.id}
+                                onDelete={onDelete}
+                                onCapabilityChange={onCapabilityChange} />
+            );
+          })}
+        </List>
+      ) : (
+        <Alert>This {entityType} has no collaborators.</Alert>
+      )}
       <PaginationWrapper>
         <StyledPagination totalPages={totalPages}
                           currentPage={currentPage}

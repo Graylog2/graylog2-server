@@ -50,6 +50,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
         {(entityShareState && entityShareState.entity === entityGRN) ? (
           <EntityShareSettings description={description}
                                entityGRN={entityGRN}
+                               entityType={entityType}
                                entityShareState={entityShareState}
                                setDisableSubmit={setDisableSubmit} />
         ) : (
