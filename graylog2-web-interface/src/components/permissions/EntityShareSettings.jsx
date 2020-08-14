@@ -88,8 +88,6 @@ const EntityShareSettings = ({
         <p>
           {description}
         </p>
-      </Section>
-      <Section>
         <GranteesSelector availableGrantees={filteredGrantees}
                           availableCapabilities={availableCapabilities}
                           onSubmit={_handleSelection} />

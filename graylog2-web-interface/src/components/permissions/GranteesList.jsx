@@ -31,6 +31,9 @@ const List: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ 
 const PaginationWrapper = styled.ul`
   display: flex;
   justify-content: center;
+  .pagination {
+    margin 10px 0 0 0;
+  }
 `;
 
 const StyledPagination = styled(Pagination)`
