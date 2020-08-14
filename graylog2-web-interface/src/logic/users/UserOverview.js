@@ -13,7 +13,7 @@ type InternalState = {
   external: boolean,
   sessionActive: boolean,
   clientAddress: string,
-  lastActivity: string,
+  lastActivity: ?string,
 };
 
 export default class UserOverview {

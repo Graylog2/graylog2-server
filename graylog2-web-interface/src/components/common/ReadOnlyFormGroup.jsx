@@ -6,7 +6,7 @@ import { Col, Row } from 'components/graylog';
 
 type Props = {
   label: React.Node,
-  value: React.Node,
+  value: ?React.Node,
 };
 
 const ValueCol = styled(Col)`
