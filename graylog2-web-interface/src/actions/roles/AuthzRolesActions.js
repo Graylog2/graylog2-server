@@ -7,8 +7,8 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 type AuthzRolesActionsType = RefluxActions<{
-  deleteRole: (roleId: string) => Promise<void>,
   addMember: (roleId: string, username: string) => Promise<Role>,
+  deleteRole: (roleId: string) => Promise<void>,
   removeMember: (roleId: string, username: string) => Promise<Role>,
   loadUsersForRole: (roleId: string, page: number, perPage: number, query: string) => Promise<PaginatedUserListType>,
   load: (roleId: string) => Promise<Role>,
