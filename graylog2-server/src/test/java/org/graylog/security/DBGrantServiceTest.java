@@ -147,13 +147,18 @@ public class DBGrantServiceTest {
 
     @Test
     public void createWithGrantDTOAndUserObject() {
+        final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         final GRN grantee = GRNTypes.USER.toGRN("jane");
         final GRN target = GRNTypes.DASHBOARD.toGRN("54e3deadbeefdeadbeef0000");
         final User user = mock(User.class);
 
         when(user.getName()).thenReturn("john");
 
-        final GrantDTO grantDTO = GrantDTO.of(grantee, Capability.OWN, target);
+        final GrantDTO grantDTO = GrantDTO.of(grantee, Capability.OWN, target).toBuilder()
+                // Ensure that the time tests work
+                .createdAt(now.minusHours(1))
+                .updatedAt(now.minusHours(1))
+                .build();
         final GrantDTO grant = dbService.create(grantDTO, user);
 
         assertThat(grant.id()).isNotBlank();
