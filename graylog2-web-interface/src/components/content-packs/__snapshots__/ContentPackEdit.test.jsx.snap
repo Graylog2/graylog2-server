@@ -140,11 +140,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       >
         <Row
           bsClass="row"
-          className="Row-sc-3iisrt-0 gPzTHl content"
+          className="Row-sc-3iisrt-0 iSaIhq content"
           componentClass="div"
         >
           <div
-            className="Row-sc-3iisrt-0 gPzTHl content row"
+            className="Row-sc-3iisrt-0 iSaIhq content row"
           >
             <Wizard__SubnavigationCol
               md={2}
@@ -283,11 +283,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   <Row>
                     <Row
                       bsClass="row"
-                      className="Row-sc-3iisrt-0 gPzTHl"
+                      className="Row-sc-3iisrt-0 iSaIhq"
                       componentClass="div"
                     >
                       <div
-                        className="Row-sc-3iisrt-0 gPzTHl row"
+                        className="Row-sc-3iisrt-0 iSaIhq row"
                       >
                         <Col
                           bsClass="col"
@@ -400,11 +400,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -962,11 +962,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -988,11 +988,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -1134,11 +1134,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -1200,11 +1200,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         <Row>
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl"
+                            className="Row-sc-3iisrt-0 iSaIhq"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row"
+                              className="Row-sc-3iisrt-0 iSaIhq row"
                             >
                               <Col
                                 bsClass="col"
@@ -1629,11 +1629,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       >
         <Row
           bsClass="row"
-          className="Row-sc-3iisrt-0 gPzTHl content"
+          className="Row-sc-3iisrt-0 iSaIhq content"
           componentClass="div"
         >
           <div
-            className="Row-sc-3iisrt-0 gPzTHl content row"
+            className="Row-sc-3iisrt-0 iSaIhq content row"
           >
             <Wizard__SubnavigationCol
               md={2}
@@ -1766,11 +1766,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   <Row>
                     <Row
                       bsClass="row"
-                      className="Row-sc-3iisrt-0 gPzTHl"
+                      className="Row-sc-3iisrt-0 iSaIhq"
                       componentClass="div"
                     >
                       <div
-                        className="Row-sc-3iisrt-0 gPzTHl row"
+                        className="Row-sc-3iisrt-0 iSaIhq row"
                       >
                         <Col
                           bsClass="col"
@@ -1924,11 +1924,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2486,11 +2486,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2512,11 +2512,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2658,11 +2658,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2878,11 +2878,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         <Row>
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl"
+                            className="Row-sc-3iisrt-0 iSaIhq"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row"
+                              className="Row-sc-3iisrt-0 iSaIhq row"
                             >
                               <Col
                                 bsClass="col"

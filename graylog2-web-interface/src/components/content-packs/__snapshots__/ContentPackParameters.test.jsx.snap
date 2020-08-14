@@ -61,11 +61,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -832,11 +832,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1536,11 +1536,11 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1944,11 +1944,11 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"

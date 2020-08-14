@@ -356,7 +356,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
@@ -1049,7 +1049,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
@@ -1755,7 +1755,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
@@ -2431,7 +2431,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
