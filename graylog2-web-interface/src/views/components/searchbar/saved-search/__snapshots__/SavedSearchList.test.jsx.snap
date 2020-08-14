@@ -182,7 +182,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
               </form>
             </div>
             <div
-              class=" form-inline page-size pull-right"
+              class="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
             >
               <div
                 class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
