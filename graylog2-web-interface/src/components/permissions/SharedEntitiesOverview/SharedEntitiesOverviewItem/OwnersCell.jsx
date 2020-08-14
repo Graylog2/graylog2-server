@@ -6,9 +6,8 @@ import { Link } from 'react-router';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import { isPermitted } from 'util/PermissionsMixin';
 import CurrentUserContext from 'contexts/CurrentUserContext';
-import Routes from 'routing/Routes';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
-import { getValuesFromGRN } from 'logic/permissions/GRN';
+import { getShowRouteFromGRN } from 'logic/permissions/GRN';
 
 type Props = {
   owners: GranteesList,
@@ -17,17 +16,17 @@ type Props = {
 const TitleWithLink = ({ to, title }: { to: string, title: string }) => <Link to={to}>{title}</Link>;
 
 const _getOwnerTitle = ({ type, id, title }, userPermissions) => {
-  const { id: ownerId } = getValuesFromGRN(id);
+  const link = getShowRouteFromGRN(id);
 
   switch (type) {
     case 'user':
       if (!isPermitted(userPermissions, 'users:list')) return title;
 
-      return <TitleWithLink to={Routes.SYSTEM.USERS.show(ownerId)} title={title} />;
+      return <TitleWithLink to={link} title={title} />;
     case 'team':
       if (!isPermitted(userPermissions, 'teams:list')) return title;
 
-      return <TitleWithLink to={Routes.pluginRoute('SYSTEM_TEAMS_TEAMID')(ownerId)} title={title} />;
+      return <TitleWithLink to={link} title={title} />;
     default:
       throw new Error(`Owner of entity has not supported type: ${type}`);
   }

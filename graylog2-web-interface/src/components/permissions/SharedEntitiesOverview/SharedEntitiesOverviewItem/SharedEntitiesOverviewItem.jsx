@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
+import { Link } from 'react-router';
 
 import SharedEntity from 'logic/permissions/SharedEntity';
+import { getShowRouteFromGRN } from 'logic/permissions/grn';
 
 import OwnersCell from './OwnersCell';
-import TitleCell from './TitleCell';
 
 type Props = {
   capabilityTitle: string,
@@ -21,7 +22,9 @@ const SharedEntitiesOverviewItem = ({
   },
 }: Props) => (
   <tr key={title + type}>
-    <TitleCell title={title} type={type} id={id} />
+    <td className="limited">
+      <Link to={getShowRouteFromGRN(id)}>{title}</Link>
+    </td>
     <td className="limited">{type}</td>
     <OwnersCell owners={owners} />
     <td className="limited">{capabilityTitle}</td>
