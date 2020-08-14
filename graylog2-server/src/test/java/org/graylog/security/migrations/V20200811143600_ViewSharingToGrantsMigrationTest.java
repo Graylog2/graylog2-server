@@ -23,6 +23,7 @@ import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -40,6 +41,7 @@ import java.util.Collections;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(MockitoExtension.class)
+@MongoDBFixtures("view-sharings.json")
 class V20200811143600_ViewSharingToGrantsMigrationTest {
     private V20200811143600_ViewSharingToGrantsMigration migration;
 
