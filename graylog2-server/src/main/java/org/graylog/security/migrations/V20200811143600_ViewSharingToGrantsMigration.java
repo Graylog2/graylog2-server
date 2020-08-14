@@ -119,7 +119,7 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
     }
 
     private void migrateUsers(String viewId, Collection<String> users) {
-        LOG.debug("Migrate users for view {}: {}", viewId, users);
+        LOG.info("Migrate users for view {} to grants: {}", viewId, users);
 
         final GRN target = getTarget(viewId);
 
@@ -129,7 +129,7 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
     }
 
     private void migrateRoles(String viewId, Collection<String> roleNames) {
-        LOG.debug("Migrate roles for view {}: {}", viewId, roleNames);
+        LOG.info("Migrate roles for view {} to grants: {}", viewId, roleNames);
 
         final GRN target = getTarget(viewId);
 
@@ -153,7 +153,7 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
     }
 
     private void migrateAllOfInstance(String viewId) {
-        LOG.debug("Migrate all-of-instance for view {}", viewId);
+        LOG.info("Migrate all-of-instance for view {} to grants", viewId);
 
         final GRN target = getTarget(viewId);
 
@@ -180,6 +180,7 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
     }
 
     private void deleteViewSharing(ObjectId id) {
+        LOG.debug("Removing obsolete view sharing document {}", id);
         collection.deleteOne(Filters.eq("_id", id));
     }
 }
