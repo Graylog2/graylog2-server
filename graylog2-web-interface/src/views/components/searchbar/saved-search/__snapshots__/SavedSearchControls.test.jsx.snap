@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`SavedSearchControls Button handling has "Share search" option which should be hidden if search is unsaved 1`] = `null`;
+
 exports[`SavedSearchControls render the SavedSearchControls should render dirty 1`] = `
 <button
   className="Button-c9cbmb-0 kLwsUP btn btn-default"

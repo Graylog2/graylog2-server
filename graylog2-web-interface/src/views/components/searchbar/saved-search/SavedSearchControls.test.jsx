@@ -135,12 +135,12 @@ describe('SavedSearchControls', () => {
         expect(shareSearch).not.toBeDisabled();
       });
 
-      it('which should be disabled if search is unsaved', () => {
+      it('which should be hidden if search is unsaved', () => {
         const wrapper = mount(<SimpleSavedSearchControls />);
 
         const shareSearch = wrapper.find('MenuItem[title="Share search"]');
 
-        expect(shareSearch).toBeDisabled();
+        expect(shareSearch).toMatchSnapshot();
       });
     });
   });

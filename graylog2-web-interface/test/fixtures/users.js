@@ -12,6 +12,7 @@ export const viewsManager: UserJSON = {
   id: 'user-id-1',
   last_activity: '2020-01-01T10:40:05.376+0000',
   permissions: ['dashboards:edit:view-id', 'view:edit:view-id'],
+  grn_permissions: ['entity:own:grn::::dashboard:view-id', 'entity:own:grn::::view:view-id', 'entity:own:grn::::search:some-id'],
   read_only: true,
   roles: ['Views Manager'],
   session_active: true,
