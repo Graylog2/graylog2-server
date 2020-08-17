@@ -32,13 +32,13 @@ const buttonStyles = ({ colors, utils }) => {
     const disabledBorder = isLink ? variants.link : chroma.mix(variantColor, buttonAdjustColor, 0.15);
     const disabledColor = isLink ? colors.global.link : utils.contrastingColor(disabledBackground, 'AA');
 
-    const hoverBackground = mixColor(defaultBackground);
-    const hoverBorderColor = mixColor(defaultBorder);
-    const hoverColor = mixColor(defaultColor);
+    const hoverBackground = isLink ? 'transparent' : mixColor(defaultBackground);
+    const hoverBorderColor = isLink ? 'transparent' : mixColor(defaultBorder);
+    const hoverColor = isLink ? colors.global.linkHover : mixColor(defaultColor);
 
-    const activeHoverBackground = mixColor(activeBackground);
-    const activeHoverBorderColor = mixColor(activeBorder);
-    const activeHoverColor = mixColor(activeColor);
+    const activeHoverBackground = isLink ? 'transparent' : mixColor(activeBackground);
+    const activeHoverBorderColor = isLink ? 'transparent' : mixColor(activeBorder);
+    const activeHoverColor = isLink ? colors.global.linkHover : mixColor(activeColor);
 
     return css`
       &.btn-${variant} {
