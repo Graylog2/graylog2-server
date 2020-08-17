@@ -6,41 +6,68 @@ import styled, { css } from 'styled-components';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
+const arrowSize = 10;
 const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
-  &.top .tooltip-arrow {
-    bottom: 0;
+  &.in {
+    opacity: 1;
+    filter: drop-shadow(0 0 3px ${theme.colors.variant.lighter.default});
   }
 
-  &.top .tooltip-arrow,
-  &.top-left .tooltip-arrow,
-  &.top-right .tooltip-arrow {
-    border-top-color: ${theme.colors.gray[10]};
+  &.top {
+    transform: translate(-50%, -100%);
+  
+    .tooltip-arrow {
+      border-top-color: ${theme.colors.global.contentBackground};
+      border-width: ${arrowSize}px ${arrowSize}px 0;
+      margin-left: -${arrowSize}px;
+      bottom: -${arrowSize / 2}px;
+    }
+  }
+  
+  &.right {
+    transform: translateY(-50%);
+    
+    .tooltip-arrow {
+      border-right-color: ${theme.colors.global.contentBackground};
+      border-width: ${arrowSize}px ${arrowSize}px ${arrowSize}px 0;
+      margin-top: -${arrowSize}px;
+      left: -${arrowSize / 2}px;
+    }
   }
 
-  &.right .tooltip-arrow {
-    border-right-color: ${theme.colors.gray[10]};
+  &.bottom {
+    transform: translateX(-50%);
+  
+    .tooltip-arrow {
+      border-bottom-color: ${theme.colors.global.contentBackground};
+      border-width: 0 ${arrowSize}px ${arrowSize}px;
+      margin-left: -${arrowSize}px;
+      top: -${arrowSize / 2}px;
+    }
   }
-
-  &.left .tooltip-arrow {
-    border-left-color: ${theme.colors.gray[10]};
+  
+  &.left {
+    transform: translate(-100%, -50%);
+    
+    .tooltip-arrow {
+      border-left-color: ${theme.colors.global.contentBackground};
+      border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
+      margin-top: -${arrowSize}px;
+      right: -${arrowSize / 2}px;
+    } 
   }
-
-  &.bottom .tooltip-arrow,
-  &.bottom-left .tooltip-arrow,
-  &.bottom-right .tooltip-arrow {
-    border-bottom-color: ${theme.colors.gray[10]};
-  }
-
+  
   .tooltip-inner {
-    color: ${theme.utils.readableColor(theme.colors.gray[10])};
-    background-color: ${theme.colors.gray[10]};
+    color: ${theme.colors.global.textDefault};
+    background-color: ${theme.colors.global.contentBackground};
     max-width: 300px;
+    opacity: 1;
 
     .datapoint-info {
       text-align: left;
 
       .date {
-        color: ${theme.colors.gray[90]};
+        color: ${theme.colors.variant.darkest.default};
       }
     }
   }
