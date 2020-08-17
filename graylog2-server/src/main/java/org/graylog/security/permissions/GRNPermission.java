@@ -19,7 +19,6 @@ package org.graylog.security.permissions;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
 import org.apache.shiro.authz.Permission;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.grn.GRN;
 
 @AutoValue
@@ -34,13 +33,6 @@ public abstract class GRNPermission implements Permission {
 
     @Override
     public boolean implies(Permission p) {
-        // The admin permission also implies access to every GRNPermission
-        if ((p instanceof WildcardPermission)) {
-            if (((WildcardPermission)p).equals(new WildcardPermission("*"))) {
-                return true;
-            }
-        }
-
         // GRNPermissions only supports comparisons with other GRNPermissions
         if (!(p instanceof GRNPermission)) {
             return false;

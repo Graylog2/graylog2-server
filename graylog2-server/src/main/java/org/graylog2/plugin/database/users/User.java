@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.database.users;
 
+import org.apache.shiro.authz.Permission;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.joda.time.DateTimeZone;
@@ -45,6 +46,8 @@ public interface User extends Persisted {
     String getEmail();
 
     List<String> getPermissions();
+
+    Set<Permission> getObjectPermissions();
 
     Map<String, Object> getPreferences();
 
