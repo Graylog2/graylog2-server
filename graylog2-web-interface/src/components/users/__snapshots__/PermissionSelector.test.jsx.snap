@@ -393,7 +393,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={false}
                                                       style={
                                                         Object {
@@ -403,7 +403,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="submit"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -431,7 +431,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -442,7 +442,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="button"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -615,12 +615,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -639,12 +639,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -780,12 +780,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -804,12 +804,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -1134,7 +1134,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={false}
                                                       style={
                                                         Object {
@@ -1144,7 +1144,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="submit"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -1172,7 +1172,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -1183,7 +1183,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="button"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -1356,12 +1356,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -1380,12 +1380,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -1521,12 +1521,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -1545,12 +1545,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -2070,7 +2070,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={false}
                                                       style={
                                                         Object {
@@ -2080,7 +2080,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="submit"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -2108,7 +2108,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -2119,7 +2119,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="button"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -2292,12 +2292,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="info"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-info active"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-info active"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -2316,12 +2316,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -2457,12 +2457,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -2481,12 +2481,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="info"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-info active"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-info active"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -2811,7 +2811,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={false}
                                                       style={
                                                         Object {
@@ -2821,7 +2821,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="submit"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={false}
                                                         style={
                                                           Object {
@@ -2849,7 +2849,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       block={false}
                                                       bsClass="btn"
                                                       bsStyle="default"
-                                                      className="Button-c9cbmb-0 bNulii"
+                                                      className="Button-c9cbmb-0 kLwsUP"
                                                       disabled={true}
                                                       onClick={[Function]}
                                                       style={
@@ -2860,7 +2860,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="button"
                                                     >
                                                       <button
-                                                        className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                        className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                         disabled={true}
                                                         onClick={[Function]}
                                                         style={
@@ -3033,12 +3033,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -3057,12 +3057,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -3198,12 +3198,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="info"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-info active"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-info active"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"
@@ -3222,12 +3222,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                                   block={false}
                                                                   bsClass="btn"
                                                                   bsStyle="default"
-                                                                  className="Button-c9cbmb-0 bNulii"
+                                                                  className="Button-c9cbmb-0 kLwsUP"
                                                                   disabled={false}
                                                                   onClick={[Function]}
                                                                 >
                                                                   <button
-                                                                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                                                                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                                                                     disabled={false}
                                                                     onClick={[Function]}
                                                                     type="button"

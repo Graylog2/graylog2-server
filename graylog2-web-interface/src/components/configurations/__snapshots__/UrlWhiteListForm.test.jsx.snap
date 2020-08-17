@@ -119,12 +119,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       bsClass="btn"
       bsSize="sm"
       bsStyle="default"
-      className="Button-c9cbmb-0 bNulii"
+      className="Button-c9cbmb-0 kLwsUP"
       disabled={false}
       onClick={[Function]}
     >
       <button
-        className="Button-c9cbmb-0 bNulii btn btn-sm btn-default"
+        className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-default"
         disabled={false}
         onClick={[Function]}
         type="button"
@@ -745,11 +745,11 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           ";color:",
                                           "#702785",
                                           ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";border-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";color:",
-                                          "#68267b",
+                                          "#410057",
                                           ";}&.active{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
@@ -759,9 +759,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           ";:hover{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";color:",
-                                          "#3d0c51",
+                                          "#410057",
                                           ";}}&[disabled],&.disabled{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
@@ -2402,12 +2402,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 bNulii"
+                  className="Button-c9cbmb-0 kLwsUP"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -3010,11 +3010,11 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           ";color:",
                                           "#702785",
                                           ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";border-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";color:",
-                                          "#68267b",
+                                          "#410057",
                                           ";}&.active{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
@@ -3024,9 +3024,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           ";:hover{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";color:",
-                                          "#3d0c51",
+                                          "#410057",
                                           ";}}&[disabled],&.disabled{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
@@ -4667,12 +4667,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 bNulii"
+                  className="Button-c9cbmb-0 kLwsUP"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -5275,11 +5275,11 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           ";color:",
                                           "#702785",
                                           ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";border-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";color:",
-                                          "#68267b",
+                                          "#410057",
                                           ";}&.active{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
@@ -5289,9 +5289,9 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                           ";:hover{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
-                                          "#ebebeb26",
+                                          "transparent",
                                           ";color:",
-                                          "#3d0c51",
+                                          "#410057",
                                           ";}}&[disabled],&.disabled{background-color:",
                                           "rgba(255, 255, 255, 0)",
                                           ";border-color:",
@@ -6932,12 +6932,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 bNulii"
+                  className="Button-c9cbmb-0 kLwsUP"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="Button-c9cbmb-0 bNulii btn btn-default"
+                    className="Button-c9cbmb-0 kLwsUP btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -6978,12 +6978,12 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
       bsClass="btn"
       bsSize="sm"
       bsStyle="default"
-      className="Button-c9cbmb-0 bNulii"
+      className="Button-c9cbmb-0 kLwsUP"
       disabled={false}
       onClick={[Function]}
     >
       <button
-        className="Button-c9cbmb-0 bNulii btn btn-sm btn-default"
+        className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-default"
         disabled={false}
         onClick={[Function]}
         type="button"

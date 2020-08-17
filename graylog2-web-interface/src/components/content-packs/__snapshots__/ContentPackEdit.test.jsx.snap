@@ -309,12 +309,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -346,12 +346,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -1074,12 +1074,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii submit-button"
+                                          className="Button-c9cbmb-0 kLwsUP submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1106,13 +1106,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          className="Button-c9cbmb-0 kLwsUP reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -1791,12 +1791,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -1828,12 +1828,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -2597,12 +2597,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii submit-button"
+                                          className="Button-c9cbmb-0 kLwsUP submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -2629,13 +2629,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          className="Button-c9cbmb-0 kLwsUP reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"

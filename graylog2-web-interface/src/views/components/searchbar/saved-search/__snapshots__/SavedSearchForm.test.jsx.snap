@@ -358,11 +358,11 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                           ";color:",
                           "#702785",
                           ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";border-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";color:",
-                          "#68267b",
+                          "#410057",
                           ";}&.active{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
@@ -372,9 +372,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                           ";:hover{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";color:",
-                          "#3d0c51",
+                          "#410057",
                           ";}}&[disabled],&.disabled{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
@@ -550,13 +550,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                 >
                   <Popover
                     bsClass="popover"
-                    className="Popover__StyledPopover-wd1j0g-0 bNftVS"
+                    className="Popover__StyledPopover-wd1j0g-0 krOjdX"
                     id="saved-search-popover"
                     placement="right"
                     title="Name of search"
                   >
                     <div
-                      className="Popover__StyledPopover-wd1j0g-0 bNftVS popover right"
+                      className="Popover__StyledPopover-wd1j0g-0 krOjdX popover right"
                       id="saved-search-popover"
                       role="tooltip"
                       style={
@@ -654,13 +654,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                               block={false}
                               bsClass="btn"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-info"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -678,12 +678,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-default"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -1065,11 +1065,11 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                           ";color:",
                           "#702785",
                           ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";border-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";color:",
-                          "#68267b",
+                          "#410057",
                           ";}&.active{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
@@ -1079,9 +1079,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                           ";:hover{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";color:",
-                          "#3d0c51",
+                          "#410057",
                           ";}}&[disabled],&.disabled{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
@@ -1257,13 +1257,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                 >
                   <Popover
                     bsClass="popover"
-                    className="Popover__StyledPopover-wd1j0g-0 bNftVS"
+                    className="Popover__StyledPopover-wd1j0g-0 krOjdX"
                     id="saved-search-popover"
                     placement="right"
                     title="Name of search"
                   >
                     <div
-                      className="Popover__StyledPopover-wd1j0g-0 bNftVS popover right"
+                      className="Popover__StyledPopover-wd1j0g-0 krOjdX popover right"
                       id="saved-search-popover"
                       role="tooltip"
                       style={
@@ -1360,13 +1360,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                               block={false}
                               bsClass="btn"
                               bsStyle="primary"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-primary"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -1387,13 +1387,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                               block={false}
                               bsClass="btn"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={true}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-info"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="submit"
@@ -1411,12 +1411,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-default"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -1798,11 +1798,11 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                           ";color:",
                           "#702785",
                           ";transition:background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;:hover{background-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";border-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";color:",
-                          "#68267b",
+                          "#410057",
                           ";}&.active{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
@@ -1812,9 +1812,9 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                           ";:hover{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
-                          "#ebebeb26",
+                          "transparent",
                           ";color:",
-                          "#3d0c51",
+                          "#410057",
                           ";}}&[disabled],&.disabled{background-color:",
                           "rgba(255, 255, 255, 0)",
                           ";border-color:",
@@ -1990,13 +1990,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                 >
                   <Popover
                     bsClass="popover"
-                    className="Popover__StyledPopover-wd1j0g-0 bNftVS"
+                    className="Popover__StyledPopover-wd1j0g-0 krOjdX"
                     id="saved-search-popover"
                     placement="right"
                     title="Name of search"
                   >
                     <div
-                      className="Popover__StyledPopover-wd1j0g-0 bNftVS popover right"
+                      className="Popover__StyledPopover-wd1j0g-0 krOjdX popover right"
                       id="saved-search-popover"
                       role="tooltip"
                       style={
@@ -2093,13 +2093,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="primary"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-primary"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -2120,13 +2120,13 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="info"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-info"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -2144,12 +2144,12 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 bNulii button"
+                              className="Button-c9cbmb-0 kLwsUP button"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 bNulii button btn btn-default"
+                                className="Button-c9cbmb-0 kLwsUP button btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
