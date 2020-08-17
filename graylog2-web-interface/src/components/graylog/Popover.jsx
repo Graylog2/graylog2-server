@@ -45,7 +45,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.bottom {
-      transform: translateX(-100%);
+      transform: translateX(-50%);
       
       > .arrow {
         border-bottom-color: ${borderColor};
