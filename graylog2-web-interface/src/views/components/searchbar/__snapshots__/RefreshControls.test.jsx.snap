@@ -1,626 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: false and interval: 1000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -641,18 +21,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -662,12 +42,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -701,7 +81,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -735,7 +115,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -750,7 +130,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -760,7 +140,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -770,7 +150,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Not updating
                                     </div>
@@ -1052,626 +432,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: false and interval: 300000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -1692,18 +452,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -1713,12 +473,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -1752,7 +512,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -1786,7 +546,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -1801,7 +561,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -1811,7 +571,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -1821,7 +581,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Not updating
                                     </div>
@@ -2103,626 +863,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 1000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -2743,18 +883,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -2764,12 +904,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -2814,7 +954,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -2859,7 +999,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -2874,7 +1014,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -2884,7 +1024,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -2894,7 +1034,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>
@@ -3189,626 +1329,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 2000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -3829,18 +1349,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -3850,12 +1370,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -3900,7 +1420,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -3945,7 +1465,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -3960,7 +1480,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -3970,7 +1490,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -3980,7 +1500,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>
@@ -4275,626 +1795,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 5000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -4915,18 +1815,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -4936,12 +1836,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -4986,7 +1886,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -5031,7 +1931,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -5046,7 +1946,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -5056,7 +1956,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -5066,7 +1966,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>
@@ -5361,626 +2261,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 10000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -6001,18 +2281,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -6022,12 +2302,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -6072,7 +2352,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -6117,7 +2397,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -6132,7 +2412,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -6142,7 +2422,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -6152,7 +2432,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>
@@ -6447,626 +2727,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 30000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -7087,18 +2747,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -7108,12 +2768,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -7158,7 +2818,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -7203,7 +2863,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -7218,7 +2878,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -7228,7 +2888,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -7238,7 +2898,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>
@@ -7533,626 +3193,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 60000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -8173,18 +3213,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -8194,12 +3234,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -8244,7 +3284,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -8289,7 +3329,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -8304,7 +3344,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -8314,7 +3354,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -8324,7 +3364,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>
@@ -8619,626 +3659,6 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 `;
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 300000 1`] = `
-.c2.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c2.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c2.btn-danger[disabled],
-.c2.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-danger[disabled]:hover,
-.c2.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c2.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c2.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c2.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c2.btn-default[disabled],
-.c2.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-default[disabled]:hover,
-.c2.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c2.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c2.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c2.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c2.btn-info[disabled],
-.c2.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-info[disabled]:hover,
-.c2.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c2.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c2.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c2.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c2.btn-link[disabled],
-.c2.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-link[disabled]:hover,
-.c2.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c2.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c2.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c2.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c2.btn-primary[disabled],
-.c2.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-primary[disabled]:hover,
-.c2.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c2.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c2.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c2.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c2.btn-success[disabled],
-.c2.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-success[disabled]:hover,
-.c2.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c2.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c2.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c2.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c2.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c2.btn-warning[disabled],
-.c2.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c2.btn-warning[disabled]:hover,
-.c2.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3 ~ .dropdown-menu {
-  background-color: #fff;
-  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
-}
-
-.c3 ~ .dropdown-menu > li > a {
-  color: #1f1f1f;
-}
-
-.c3 ~ .dropdown-menu > li > a:hover,
-.c3 ~ .dropdown-menu > li > a:focus {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a {
-  color: #575757;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .active > a:hover,
-.c3 ~ .dropdown-menu > .active > a:focus {
-  color: #2d2d2d;
-  background-color: #d0d0d0;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c3 ~ .dropdown-menu > .disabled > a:hover,
-.c3 ~ .dropdown-menu > .disabled > a:focus {
-  color: #737373;
-  background-color: #f3f3f3;
-}
-
-.c0 {
-  max-width: 100%;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c1 > .btn-group .btn:first-child {
-  max-width: 100%;
-}
-
-.c4 {
-  display: inline-block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: calc(100% - 9px);
-  vertical-align: inherit;
-}
-
 <Component
   refreshConfig={
     Object {
@@ -9259,18 +3679,18 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       className="pull-right"
     >
       <div
-        className="c0 pull-right"
+        className="RefreshControls__ControlsContainer-sc-1pygk8n-0 cBMEOQ pull-right"
       >
         <RefreshControls__FlexibleButtonGroup>
           <ButtonGroup
             block={false}
             bsClass="btn-group"
-            className="c1"
+            className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER"
             justified={false}
             vertical={false}
           >
             <div
-              className="c1 btn-group"
+              className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 rpAER btn-group"
             >
               <Button
                 onClick={[Function]}
@@ -9280,12 +3700,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="c2"
+                  className="Button-c9cbmb-0 bNulii"
                   disabled={false}
                   onClick={[Function]}
                 >
                   <button
-                    className="c2 btn btn-default"
+                    className="Button-c9cbmb-0 bNulii btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -9330,7 +3750,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                 }
               >
                 <DropdownButton
-                  className="c3"
+                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                   id="refresh-options-dropdown"
                   title={
                     <RefreshControls__ButtonLabel>
@@ -9375,7 +3795,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                             <DropdownToggle
                               bsClass="dropdown-toggle"
                               bsRole="toggle"
-                              className="c3"
+                              className="DropdownButton-sc-1343dcx-0 dAnLDc"
                               id="refresh-options-dropdown"
                               key=".0"
                               onClick={[Function]}
@@ -9390,7 +3810,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="c3 dropdown-toggle"
+                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                 disabled={false}
                                 id="refresh-options-dropdown"
                                 onClick={[Function]}
@@ -9400,7 +3820,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 <button
                                   aria-expanded={false}
                                   aria-haspopup={true}
-                                  className="c3 dropdown-toggle btn btn-default"
+                                  className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-default"
                                   disabled={false}
                                   id="refresh-options-dropdown"
                                   onClick={[Function]}
@@ -9410,7 +3830,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
                                 >
                                   <RefreshControls__ButtonLabel>
                                     <div
-                                      className="c4"
+                                      className="RefreshControls__ButtonLabel-sc-1pygk8n-2 eWVOVO"
                                     >
                                       Update every 
                                       <span>

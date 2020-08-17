@@ -1,107 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NotificationBadge renders count when there are notifications 1`] = `
-.c3 {
-  background-color: #ad0707;
-  color: #fff;
-}
-
-.c0.nav > li > a {
-  -webkit-transition: background-color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out;
-}
-
-.c0.nav > li > a:hover,
-.c0.nav > li > a:focus {
-  background-color: #f3f3f3;
-}
-
-.c0.nav > li.disabled > a {
-  color: #a6a6a6;
-}
-
-.c0.nav > li.disabled > a:hover,
-.c0.nav > li.disabled > a:focus {
-  color: #a6a6a6;
-}
-
-.c0.nav .open > a,
-.c0.nav .open > a:hover,
-.c0.nav .open > a:focus {
-  background-color: #f3f3f3;
-  border-color: #702785;
-}
-
-.c0.nav.nav-pills > li.active > a,
-.c0.nav.nav-pills > li.active > a:hover,
-.c0.nav.nav-pills > li.active > a:focus {
-  color: rgb(234,229,236);
-  background-color: #702785;
-}
-
-.c0.nav .nav-tabs {
-  border-bottom-color: rgb(198,207,231);
-}
-
-.c0.nav .nav-tabs > li > a {
-  -webkit-transition: background-color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out;
-  color: #1f1f1f;
-  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
-}
-
-.c0.nav .nav-tabs > li > a:hover {
-  background-color: #f3f3f3;
-  color: #1f1f1f;
-}
-
-.c0.nav .nav-tabs > li.active > a,
-.c0.nav .nav-tabs > li.active > a:hover,
-.c0.nav .nav-tabs > li.active > a:focus {
-  color: #1f1f1f;
-  background-color: #ffffff;
-  border-color: rgb(198,207,231);
-  border-bottom-color: transparent;
-}
-
-.c0.nav .nav-tabs > li.disabled > a,
-.c0.nav .nav-tabs > li.disabled > a:hover,
-.c0.nav .nav-tabs > li.disabled > a:focus {
-  color: #9b9b9b;
-  background-color: #ffffff;
-  border-color: #ffffff #ffffff rgb(198,207,231);
-  cursor: not-allowed;
-}
-
-.c0.nav.nav-justified > .active > a,
-.c0.nav.nav-justified > .active > a:hover,
-.c0.nav.nav-justified > .active > a:focus {
-  border-color: rgb(198,207,231);
-}
-
-.navbar-default .navbar-nav > .c2 > a:hover,
-.navbar-default .navbar-nav > .c2 > a:focus {
-  background: transparent;
-}
-
-.c1 a:hover {
-  border: 0;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-}
-
-@media (min-width:768px) {
-  .c0.nav.nav-justified > li > a {
-    border-bottom-color: rgb(198,207,231);
-  }
-
-  .c0.nav.nav-justified > .active > a,
-  .c0.nav.nav-justified > .active > a:hover,
-  .c0.nav.nav-justified > .active > a:focus {
-    border-bottom-color: #ffffff;
-  }
-}
-
 <NotificationBadge
   total={42}
 >
@@ -110,7 +9,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
   >
     <Nav
       bsClass="nav"
-      className="c0"
+      className="Nav-dzawzr-0 inEWeN"
       justified={false}
       navbar={true}
       pullLeft={false}
@@ -118,7 +17,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
       stacked={false}
     >
       <ul
-        className="c0 nav navbar-nav"
+        className="Nav-dzawzr-0 inEWeN nav navbar-nav"
         role={null}
       >
         <LinkContainer
@@ -135,26 +34,26 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           >
             <InactiveNavItem
               action="push"
-              className="c1"
+              className="NotificationBadge__StyledInactiveNavItem-c049cm-0 gOUgbI"
               onClick={[Function]}
               onSelect={null}
             >
               <InactiveNavItem__StyledInactiveNav
                 action="push"
-                className="c1"
+                className="NotificationBadge__StyledInactiveNavItem-c049cm-0 gOUgbI"
                 onClick={[Function]}
                 onSelect={null}
               >
                 <NavItem
                   action="push"
                   active={false}
-                  className="c2 c1"
+                  className="InactiveNavItem__StyledInactiveNav-sc-1si1drr-0 keTUUI NotificationBadge__StyledInactiveNavItem-c049cm-0 gOUgbI"
                   disabled={false}
                   onClick={[Function]}
                   onSelect={null}
                 >
                   <li
-                    className="c2 c1"
+                    className="InactiveNavItem__StyledInactiveNav-sc-1si1drr-0 keTUUI NotificationBadge__StyledInactiveNavItem-c049cm-0 gOUgbI"
                     role="presentation"
                   >
                     <SafeAnchor
@@ -181,12 +80,12 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-                              className="c3"
+                              className="Badge__StyledBadge-sc-4gzqz0-0 hzBIb"
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-                                className="c3 badge badge-danger"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 hzBIb badge badge-danger"
                                 id="notification-badge"
                               >
                                 42
