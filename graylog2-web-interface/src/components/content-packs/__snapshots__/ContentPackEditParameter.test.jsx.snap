@@ -1,58 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
-.c0 {
-  color: #1f1f1f;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
-}
-
-.c1.form-control {
-  color: #1f1f1f;
-  background-color: #fff;
-  border-color: #a6a6a6;
-}
-
-.c1.form-control::-webkit-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::-moz-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:-ms-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:focus {
-  border-color: #7894ce;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
-}
-
-.c1.form-control[disabled],
-.c1.form-control[readonly],
-fieldset[disabled] .c1.form-control {
-  background-color: #dddddd;
-  color: #9b9b9b;
-}
-
-.c1.form-control ~ .form-control-feedback.glyphicon {
-  display: none;
-}
-
-.c2 {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  color: #838383;
-}
-
 <ContentPackEditParameter
   onUpdateParameter={[Function]}
   parameters={
@@ -103,21 +51,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="title"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="title"
                       >
                         Title
@@ -140,7 +88,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Title"
@@ -153,7 +101,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
                             label="Title"
                             maxLength={250}
@@ -169,10 +117,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a descriptive title for this content pack.
                           </span>
@@ -210,21 +158,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="name"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="name"
                       >
                         Name
@@ -247,7 +195,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Name"
@@ -260,7 +208,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
                             label="Name"
                             maxLength={250}
@@ -276,10 +224,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             This is used as the parameter reference and must not contain a space.
                           </span>
@@ -317,21 +265,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="description"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="description"
                       >
                         Description
@@ -354,7 +302,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Description"
@@ -367,7 +315,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
                             label="Description"
                             maxLength={250}
@@ -383,10 +331,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a description explaining what will be done with this parameter.
                           </span>
@@ -424,21 +372,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="type"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="type"
                       >
                         Value Type
@@ -461,7 +409,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="select"
                           disabled={false}
                           inputRef={[Function]}
@@ -474,7 +422,7 @@ fieldset[disabled] .c1.form-control {
                           value="string"
                         >
                           <select
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={false}
                             id="type"
                             label="Value Type"
@@ -511,10 +459,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give the type of the parameter.
                           </span>
@@ -551,21 +499,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="default_value"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="default_value"
                       >
                         Default value
@@ -587,7 +535,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Default value"
@@ -599,7 +547,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
                             label="Default value"
                             maxLength={250}
@@ -614,10 +562,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a default value if the parameter is not optional.
                           </span>
@@ -637,58 +585,6 @@ fieldset[disabled] .c1.form-control {
 `;
 
 exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
-.c0 {
-  color: #1f1f1f;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
-}
-
-.c1.form-control {
-  color: #1f1f1f;
-  background-color: #fff;
-  border-color: #a6a6a6;
-}
-
-.c1.form-control::-webkit-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::-moz-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:-ms-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:focus {
-  border-color: #7894ce;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
-}
-
-.c1.form-control[disabled],
-.c1.form-control[readonly],
-fieldset[disabled] .c1.form-control {
-  background-color: #dddddd;
-  color: #9b9b9b;
-}
-
-.c1.form-control ~ .form-control-feedback.glyphicon {
-  display: none;
-}
-
-.c2 {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  color: #838383;
-}
-
 <ContentPackEditParameter
   onUpdateParameter={[Function]}
   parameterToEdit={
@@ -748,21 +644,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="title"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="title"
                       >
                         Title
@@ -785,7 +681,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Title"
@@ -798,7 +694,7 @@ fieldset[disabled] .c1.form-control {
                           value="A parameter title"
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
                             label="Title"
                             maxLength={250}
@@ -814,10 +710,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a descriptive title for this content pack.
                           </span>
@@ -855,21 +751,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="name"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="name"
                       >
                         Name
@@ -892,7 +788,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Name"
@@ -905,7 +801,7 @@ fieldset[disabled] .c1.form-control {
                           value="A parameter name"
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
                             label="Name"
                             maxLength={250}
@@ -921,10 +817,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             This is used as the parameter reference and must not contain a space.
                           </span>
@@ -962,21 +858,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="description"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="description"
                       >
                         Description
@@ -999,7 +895,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Description"
@@ -1012,7 +908,7 @@ fieldset[disabled] .c1.form-control {
                           value="A parameter descriptions"
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
                             label="Description"
                             maxLength={250}
@@ -1028,10 +924,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a description explaining what will be done with this parameter.
                           </span>
@@ -1069,21 +965,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="type"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="type"
                       >
                         Value Type
@@ -1106,7 +1002,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="select"
                           disabled={true}
                           inputRef={[Function]}
@@ -1119,7 +1015,7 @@ fieldset[disabled] .c1.form-control {
                           value="string"
                         >
                           <select
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={true}
                             id="type"
                             label="Value Type"
@@ -1156,10 +1052,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give the type of the parameter.
                           </span>
@@ -1196,21 +1092,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="default_value"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="default_value"
                       >
                         Default value
@@ -1232,7 +1128,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Default value"
@@ -1244,7 +1140,7 @@ fieldset[disabled] .c1.form-control {
                           value="test"
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
                             label="Default value"
                             maxLength={250}
@@ -1259,10 +1155,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a default value if the parameter is not optional.
                           </span>
@@ -1282,58 +1178,6 @@ fieldset[disabled] .c1.form-control {
 `;
 
 exports[`<ContentPackEditParameters /> should render with empty parameters 1`] = `
-.c0 {
-  color: #1f1f1f;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
-}
-
-.c1.form-control {
-  color: #1f1f1f;
-  background-color: #fff;
-  border-color: #a6a6a6;
-}
-
-.c1.form-control::-webkit-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::-moz-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:-ms-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:focus {
-  border-color: #7894ce;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
-}
-
-.c1.form-control[disabled],
-.c1.form-control[readonly],
-fieldset[disabled] .c1.form-control {
-  background-color: #dddddd;
-  color: #9b9b9b;
-}
-
-.c1.form-control ~ .form-control-feedback.glyphicon {
-  display: none;
-}
-
-.c2 {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  color: #838383;
-}
-
 <ContentPackEditParameter
   onUpdateParameter={[Function]}
   parameters={Array []}
@@ -1374,21 +1218,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="title"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="title"
                       >
                         Title
@@ -1411,7 +1255,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Title"
@@ -1424,7 +1268,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="title"
                             label="Title"
                             maxLength={250}
@@ -1440,10 +1284,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a descriptive title for this content pack.
                           </span>
@@ -1481,21 +1325,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="name"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="name"
                       >
                         Name
@@ -1518,7 +1362,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Name"
@@ -1531,7 +1375,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="name"
                             label="Name"
                             maxLength={250}
@@ -1547,10 +1391,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             This is used as the parameter reference and must not contain a space.
                           </span>
@@ -1588,21 +1432,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="description"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="description"
                       >
                         Description
@@ -1625,7 +1469,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Description"
@@ -1638,7 +1482,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="description"
                             label="Description"
                             maxLength={250}
@@ -1654,10 +1498,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a description explaining what will be done with this parameter.
                           </span>
@@ -1695,21 +1539,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="type"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="type"
                       >
                         Value Type
@@ -1732,7 +1576,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="select"
                           disabled={false}
                           inputRef={[Function]}
@@ -1745,7 +1589,7 @@ fieldset[disabled] .c1.form-control {
                           value="string"
                         >
                           <select
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             disabled={false}
                             id="type"
                             label="Value Type"
@@ -1782,10 +1626,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give the type of the parameter.
                           </span>
@@ -1822,21 +1666,21 @@ fieldset[disabled] .c1.form-control {
             >
               <FormGroup
                 bsClass="form-group"
-                className=""
+                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
                 controlId="default_value"
                 validationState={null}
               >
                 <div
-                  className="form-group"
+                  className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
                 >
                   <ControlLabel>
                     <ControlLabel
                       bsClass="control-label"
-                      className="c0"
+                      className="ControlLabel-sc-1edmum5-0 jKzIRX"
                       srOnly={false}
                     >
                       <label
-                        className="c0 control-label"
+                        className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                         htmlFor="default_value"
                       >
                         Default value
@@ -1858,7 +1702,7 @@ fieldset[disabled] .c1.form-control {
                       >
                         <FormControl
                           bsClass="form-control"
-                          className="c1"
+                          className="FormControl-sc-1amoaox-0 fKSsjP"
                           componentClass="input"
                           inputRef={[Function]}
                           label="Default value"
@@ -1870,7 +1714,7 @@ fieldset[disabled] .c1.form-control {
                           value=""
                         >
                           <input
-                            className="c1 form-control"
+                            className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                             id="default_value"
                             label="Default value"
                             maxLength={250}
@@ -1885,10 +1729,10 @@ fieldset[disabled] .c1.form-control {
                       <HelpBlock>
                         <HelpBlock
                           bsClass="help-block"
-                          className="c2"
+                          className="HelpBlock-i8is92-0 fSaklp"
                         >
                           <span
-                            className="c2 help-block"
+                            className="HelpBlock-i8is92-0 fSaklp help-block"
                           >
                             Give a default value if the parameter is not optional.
                           </span>

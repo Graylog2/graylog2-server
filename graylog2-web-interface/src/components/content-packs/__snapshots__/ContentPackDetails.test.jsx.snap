@@ -1,19 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackDetails /> should render with content pack 1`] = `
-.c0.content {
-  background-color: #fff;
-  border: 1px solid #d0d0d0;
-  margin-bottom: 9px;
-  border-radius: 4px;
-}
-
-.c1 {
-  background-color: #f3f3f3;
-  border-color: #a6a6a6;
-  color: #575757;
-}
-
 <ContentPackDetails
   constraints={Array []}
   contentPack={
@@ -37,11 +24,11 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
   <Row>
     <Row
       bsClass="row"
-      className="c0"
+      className="Row-sc-3iisrt-0 iSaIhq"
       componentClass="div"
     >
       <div
-        className="c0 row"
+        className="Row-sc-3iisrt-0 iSaIhq row"
       >
         <Col
           bsClass="col"
@@ -145,10 +132,10 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                 <Well>
                   <Well
                     bsClass="well"
-                    className="c1"
+                    className="Well-sc-19gs1oc-0 enTUtA"
                   >
                     <div
-                      className="c1 well"
+                      className="Well-sc-19gs1oc-0 enTUtA well"
                     >
                       <div
                         dangerouslySetInnerHTML={
@@ -175,13 +162,6 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
 `;
 
 exports[`<ContentPackDetails /> should render with content pack without a description 1`] = `
-.c0.content {
-  background-color: #fff;
-  border: 1px solid #d0d0d0;
-  margin-bottom: 9px;
-  border-radius: 4px;
-}
-
 <ContentPackDetails
   constraints={Array []}
   contentPack={
@@ -207,11 +187,11 @@ exports[`<ContentPackDetails /> should render with content pack without a descri
   <Row>
     <Row
       bsClass="row"
-      className="c0"
+      className="Row-sc-3iisrt-0 iSaIhq"
       componentClass="div"
     >
       <div
-        className="c0 row"
+        className="Row-sc-3iisrt-0 iSaIhq row"
       >
         <Col
           bsClass="col"

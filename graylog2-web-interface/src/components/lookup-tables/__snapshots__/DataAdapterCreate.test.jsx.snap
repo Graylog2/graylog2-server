@@ -1,13 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<DataAdapterCreate /> should render for types with defined frontend components 1`] = `
-.c0.content {
-  background-color: #fff;
-  border: 1px solid #d0d0d0;
-  margin-bottom: 9px;
-  border-radius: 4px;
-}
-
 <DataAdapterCreate
   saved={[Function]}
   types={
@@ -26,11 +19,11 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
     >
       <Row
         bsClass="row"
-        className="c0 content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="c0 content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"
@@ -106,13 +99,6 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
 `;
 
 exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
-.c0.content {
-  background-color: #fff;
-  border: 1px solid #d0d0d0;
-  margin-bottom: 9px;
-  border-radius: 4px;
-}
-
 <DataAdapterCreate
   saved={[Function]}
   types={Object {}}
@@ -125,11 +111,11 @@ exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
     >
       <Row
         bsClass="row"
-        className="c0 content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="c0 content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"
@@ -191,13 +177,6 @@ exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
 `;
 
 exports[`<DataAdapterCreate /> with mocked console.error should render for types without defined frontend components 1`] = `
-.c0.content {
-  background-color: #fff;
-  border: 1px solid #d0d0d0;
-  margin-bottom: 9px;
-  border-radius: 4px;
-}
-
 <DataAdapterCreate
   saved={[Function]}
   types={
@@ -216,11 +195,11 @@ exports[`<DataAdapterCreate /> with mocked console.error should render for types
     >
       <Row
         bsClass="row"
-        className="c0 content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="c0 content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"

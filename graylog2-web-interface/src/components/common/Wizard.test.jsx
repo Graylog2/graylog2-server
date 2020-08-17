@@ -7,6 +7,7 @@ import { Nav } from 'components/graylog';
 import Wizard from 'components/common/Wizard';
 
 import 'helpers/mocking/react-dom_mock';
+import 'jest-styled-components';
 
 describe('<Wizard />', () => {
   const steps = [

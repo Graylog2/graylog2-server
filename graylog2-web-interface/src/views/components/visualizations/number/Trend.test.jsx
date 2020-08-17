@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
+import 'jest-styled-components';
 
 import Trend, { TREND_BAD, TREND_GOOD, TREND_NEUTRAL } from './Trend';
 

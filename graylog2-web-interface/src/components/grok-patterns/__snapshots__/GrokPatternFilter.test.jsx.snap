@@ -1,423 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<GrokPatternFilter /> should render grok pattern input with patterns 1`] = `
-.c3.btn-danger {
-  background-color: #ad0707;
-  border-color: #b23939;
-  color: rgb(252,249,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-danger:hover {
-  background-color: #a00e0e;
-  border-color: #a53636;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger.active {
-  background-color: #b75151;
-  border-color: #bc6363;
-  color: rgb(252,249,249);
-}
-
-.c3.btn-danger.active:hover {
-  background-color: #a94c4c;
-  border-color: #ad5c5c;
-  color: #e9e6e6;
-}
-
-.c3.btn-danger[disabled],
-.c3.btn-danger.disabled {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-danger[disabled]:hover,
-.c3.btn-danger.disabled:hover {
-  background-color: #c07272;
-  border-color: #bc6363;
-  color: rgb(252,250,250);
-}
-
-.c3.btn-default {
-  background-color: #e6e6e6;
-  border-color: #e0e0e0;
-  color: rgb(73,73,73);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-default:hover {
-  background-color: #d4d4d4;
-  border-color: #cfcfcf;
-  color: #444444;
-}
-
-.c3.btn-default.active {
-  background-color: #dadada;
-  border-color: #d4d4d4;
-  color: rgb(49,49,49);
-}
-
-.c3.btn-default.active:hover {
-  background-color: #cacaca;
-  border-color: #c4c4c4;
-  color: #2f2f2f;
-}
-
-.c3.btn-default[disabled],
-.c3.btn-default.disabled {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-default[disabled]:hover,
-.c3.btn-default.disabled:hover {
-  background-color: #cecece;
-  border-color: #d4d4d4;
-  color: rgb(80,80,80);
-}
-
-.c3.btn-info {
-  background-color: #0063be;
-  border-color: #3970c2;
-  color: rgb(249,250,252);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-info:hover {
-  background-color: #0c5cb0;
-  border-color: #3668b3;
-  color: #e6e7e9;
-}
-
-.c3.btn-info.active {
-  background-color: #517cc5;
-  border-color: #6386c9;
-  color: rgb(249,250,252);
-}
-
-.c3.btn-info.active:hover {
-  background-color: #4b73b6;
-  border-color: #5c7dba;
-  color: #e6e7e9;
-}
-
-.c3.btn-info[disabled],
-.c3.btn-info.disabled {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-info[disabled]:hover,
-.c3.btn-info.disabled:hover {
-  background-color: #7290cd;
-  border-color: #6386c9;
-  color: rgb(250,251,253);
-}
-
-.c3.btn-link {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
-}
-
-.c3.btn-link.active {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #410057;
-}
-
-.c3.btn-link.active:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
-}
-
-.c3.btn-link[disabled],
-.c3.btn-link.disabled {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-link[disabled]:hover,
-.c3.btn-link.disabled:hover {
-  background-color: rgba(255,255,255,0);
-  border-color: rgba(255,255,255,0);
-  color: #702785;
-}
-
-.c3.btn-primary {
-  background-color: #702785;
-  border-color: #7b458e;
-  color: rgb(234,229,236);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-primary:hover {
-  background-color: #68267b;
-  border-color: #724083;
-  color: #d8d3da;
-}
-
-.c3.btn-primary.active {
-  background-color: #855996;
-  border-color: #8f699d;
-  color: rgb(250,249,251);
-}
-
-.c3.btn-primary.active:hover {
-  background-color: #7c538b;
-  border-color: #846292;
-  color: #e7e6e8;
-}
-
-.c3.btn-primary[disabled],
-.c3.btn-primary.disabled {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-primary[disabled]:hover,
-.c3.btn-primary.disabled:hover {
-  background-color: #9877a5;
-  border-color: #8f699d;
-  color: rgb(251,250,251);
-}
-
-.c3.btn-success {
-  background-color: #00ae42;
-  border-color: #39b356;
-  color: rgb(249,252,249);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-success:hover {
-  background-color: #0ca13e;
-  border-color: #36a550;
-  color: #e6e9e6;
-}
-
-.c3.btn-success.active {
-  background-color: #51b866;
-  border-color: #63bc74;
-  color: rgb(249,252,250);
-}
-
-.c3.btn-success.active:hover {
-  background-color: #4baa5f;
-  border-color: #5cae6c;
-  color: #e6e9e7;
-}
-
-.c3.btn-success[disabled],
-.c3.btn-success.disabled {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-success[disabled]:hover,
-.c3.btn-success.disabled:hover {
-  background-color: #72c180;
-  border-color: #63bc74;
-  color: rgb(250,252,250);
-}
-
-.c3.btn-warning {
-  background-color: #ffd200;
-  border-color: #f9cd07;
-  color: rgb(57,47,0);
-  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
-}
-
-.c3.btn-warning:hover {
-  background-color: #ebc20c;
-  border-color: #e6bd0e;
-  color: #362d0c;
-}
-
-.c3.btn-warning.active {
-  background-color: #f2c70a;
-  border-color: #ebc20c;
-  color: rgb(54,45,2);
-}
-
-.c3.btn-warning.active:hover {
-  background-color: #e0b80f;
-  border-color: #d9b310;
-  color: #332b0c;
-}
-
-.c3.btn-warning[disabled],
-.c3.btn-warning.disabled {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c3.btn-warning[disabled]:hover,
-.c3.btn-warning.disabled:hover {
-  background-color: #e4bc0e;
-  border-color: #ebc20c;
-  color: rgb(88,73,5);
-}
-
-.c0 {
-  color: #1f1f1f;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
-}
-
-.c1.form-control {
-  color: #1f1f1f;
-  background-color: #fff;
-  border-color: #a6a6a6;
-}
-
-.c1.form-control::-webkit-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::-moz-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:-ms-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:focus {
-  border-color: #7894ce;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
-}
-
-.c1.form-control[disabled],
-.c1.form-control[readonly],
-fieldset[disabled] .c1.form-control {
-  background-color: #dddddd;
-  color: #9b9b9b;
-}
-
-.c1.form-control ~ .form-control-feedback.glyphicon {
-  display: none;
-}
-
-.c2 {
-  background-color: #fff;
-  border-color: #d0d0d0;
-}
-
-.c2 .list-group-item-heading {
-  font-weight: bold;
-}
-
-a.c2,
-button.c2 {
-  color: #702785;
-}
-
-a.c2 .list-group-item-heading,
-button.c2 .list-group-item-heading {
-  color: #2d2d2d;
-  font-weight: bold;
-}
-
-a.c2:hover:not(.disabled),
-button.c2:hover:not(.disabled),
-a.c2:focus:not(.disabled),
-button.c2:focus:not(.disabled) {
-  background-color: #f3f3f3;
-  color: #410057;
-}
-
-a.c2:hover:not(.disabled).active,
-button.c2:hover:not(.disabled).active,
-a.c2:focus:not(.disabled).active,
-button.c2:focus:not(.disabled).active {
-  color: #2d2d2d;
-  background-color: #f3f3f3;
-  border-color: #f3f3f3;
-}
-
-a.c2:hover:not(.disabled) .list-group-item-heading,
-button.c2:hover:not(.disabled) .list-group-item-heading,
-a.c2:focus:not(.disabled) .list-group-item-heading,
-button.c2:focus:not(.disabled) .list-group-item-heading {
-  color: #1f1f1f;
-}
-
-.c2.disabled,
-.c2.disabled:hover,
-.c2.disabled:focus {
-  color: #828282;
-  background-color: #f3f3f3;
-}
-
-.c2.disabled .list-group-item-heading,
-.c2.disabled:hover .list-group-item-heading,
-.c2.disabled:focus .list-group-item-heading {
-  color: inherit;
-  font-weight: bold;
-}
-
-.c2.disabled .list-group-item-text,
-.c2.disabled:hover .list-group-item-text,
-.c2.disabled:focus .list-group-item-text {
-  color: #828282;
-}
-
-.c2.active,
-.c2.active:hover,
-.c2.active:focus {
-  color: #575757;
-  background-color: #eff2f8;
-  border-color: #eff2f8;
-  z-index: auto;
-}
-
-.c2.active .list-group-item-heading,
-.c2.active:hover .list-group-item-heading,
-.c2.active:focus .list-group-item-heading,
-.c2.active .list-group-item-heading > small,
-.c2.active:hover .list-group-item-heading > small,
-.c2.active:focus .list-group-item-heading > small,
-.c2.active .list-group-item-heading > .small,
-.c2.active:hover .list-group-item-heading > .small,
-.c2.active:focus .list-group-item-heading > .small {
-  color: inherit;
-  font-weight: bold;
-}
-
-.c2.active .list-group-item-text,
-.c2.active:hover .list-group-item-text,
-.c2.active:focus .list-group-item-text {
-  color: #9b7ca8;
-}
-
 <GrokPatternFilter
   addToPattern={[Function]}
   patterns={
@@ -464,21 +47,21 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
       >
         <FormGroup
           bsClass="filterFormGroup"
-          className=""
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
           controlId="pattern-selector"
           validationState={null}
         >
           <div
-            className="filterFormGroup"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy filterFormGroup"
           >
             <ControlLabel>
               <ControlLabel
                 bsClass="control-label"
-                className="c0"
+                className="ControlLabel-sc-1edmum5-0 jKzIRX"
                 srOnly={false}
               >
                 <label
-                  className="c0 control-label"
+                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                   htmlFor="pattern-selector"
                 >
                   Filter pattern
@@ -502,7 +85,7 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
                   <FormControl
                     autoComplete="off"
                     bsClass="form-control"
-                    className="c1"
+                    className="FormControl-sc-1amoaox-0 fKSsjP"
                     componentClass="input"
                     inputRef={[Function]}
                     label="Filter pattern"
@@ -515,7 +98,7 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
                   >
                     <input
                       autoComplete="off"
-                      className="c1 form-control"
+                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                       id="pattern-selector"
                       label="Filter pattern"
                       name="pattern-selector"
@@ -556,14 +139,14 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
           >
             <ListGroupItem
               bsClass="list-group-item"
-              className="c2"
+              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
               header="COMMONMAC"
               id="list-item-0"
               listItem={false}
               onKeyDown={[Function]}
             >
               <span
-                className="c2 list-group-item"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                 id="list-item-0"
                 onKeyDown={[Function]}
               >
@@ -594,12 +177,12 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="primary"
-                        className="c3"
+                        className="Button-c9cbmb-0 bNulii"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="c3 btn btn-xs btn-primary"
+                          className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -627,14 +210,14 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
           >
             <ListGroupItem
               bsClass="list-group-item"
-              className="c2"
+              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
               header="DATA"
               id="list-item-1"
               listItem={false}
               onKeyDown={[Function]}
             >
               <span
-                className="c2 list-group-item"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                 id="list-item-1"
                 onKeyDown={[Function]}
               >
@@ -665,12 +248,12 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="primary"
-                        className="c3"
+                        className="Button-c9cbmb-0 bNulii"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="c3 btn btn-xs btn-primary"
+                          className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -698,14 +281,14 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
           >
             <ListGroupItem
               bsClass="list-group-item"
-              className="c2"
+              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
               header="DATE"
               id="list-item-2"
               listItem={false}
               onKeyDown={[Function]}
             >
               <span
-                className="c2 list-group-item"
+                className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                 id="list-item-2"
                 onKeyDown={[Function]}
               >
@@ -736,12 +319,12 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="primary"
-                        className="c3"
+                        className="Button-c9cbmb-0 bNulii"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="c3 btn btn-xs btn-primary"
+                          className="Button-c9cbmb-0 bNulii btn btn-xs btn-primary"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -763,51 +346,6 @@ button.c2:focus:not(.disabled) .list-group-item-heading {
 `;
 
 exports[`<GrokPatternFilter /> should render grok pattern input without patterns 1`] = `
-.c0 {
-  color: #1f1f1f;
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
-}
-
-.c1.form-control {
-  color: #1f1f1f;
-  background-color: #fff;
-  border-color: #a6a6a6;
-}
-
-.c1.form-control::-webkit-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::-moz-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:-ms-input-placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control::placeholder {
-  color: #9b9b9b;
-}
-
-.c1.form-control:focus {
-  border-color: #7894ce;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
-}
-
-.c1.form-control[disabled],
-.c1.form-control[readonly],
-fieldset[disabled] .c1.form-control {
-  background-color: #dddddd;
-  color: #9b9b9b;
-}
-
-.c1.form-control ~ .form-control-feedback.glyphicon {
-  display: none;
-}
-
 <GrokPatternFilter
   addToPattern={[Function]}
   patterns={Array []}
@@ -839,21 +377,21 @@ fieldset[disabled] .c1.form-control {
       >
         <FormGroup
           bsClass="filterFormGroup"
-          className=""
+          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
           controlId="pattern-selector"
           validationState={null}
         >
           <div
-            className="filterFormGroup"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy filterFormGroup"
           >
             <ControlLabel>
               <ControlLabel
                 bsClass="control-label"
-                className="c0"
+                className="ControlLabel-sc-1edmum5-0 jKzIRX"
                 srOnly={false}
               >
                 <label
-                  className="c0 control-label"
+                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
                   htmlFor="pattern-selector"
                 >
                   Filter pattern
@@ -877,7 +415,7 @@ fieldset[disabled] .c1.form-control {
                   <FormControl
                     autoComplete="off"
                     bsClass="form-control"
-                    className="c1"
+                    className="FormControl-sc-1amoaox-0 fKSsjP"
                     componentClass="input"
                     inputRef={[Function]}
                     label="Filter pattern"
@@ -890,7 +428,7 @@ fieldset[disabled] .c1.form-control {
                   >
                     <input
                       autoComplete="off"
-                      className="c1 form-control"
+                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
                       id="pattern-selector"
                       label="Filter pattern"
                       name="pattern-selector"

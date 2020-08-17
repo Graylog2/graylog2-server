@@ -1,12 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<WidgetGrid /> should render with minimal props 1`] = `
-.c0 {
-  color: #1f1f1f;
-  margin: 0;
-  width: 100%;
-}
-
 <ConnectStoresWrapper[WidgetGrid] stores=titles
   allFields={Immutable.List []}
   data={Object {}}
@@ -35,7 +29,7 @@ exports[`<WidgetGrid /> should render with minimal props 1`] = `
       <div>
         <WidgetGrid__DashboardWrap>
           <div
-            className="c0"
+            className="WidgetGrid__DashboardWrap-sc-1bqopuh-0 eqiRTu"
           >
             <span
               width={200}

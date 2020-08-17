@@ -1,7 +1,6 @@
 // @flow strict
 import { configure, mount, shallow, type ReactWrapper, type ShallowWrapper } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import 'jest-styled-components';
 
 import WrappingContainer from './WrappingContainer';
 
