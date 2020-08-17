@@ -1,6 +1,872 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPacksList /> should render with content packs 1`] = `
+.c3.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c3.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger[disabled],
+.c3.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-danger[disabled]:hover,
+.c3.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c3.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c3.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c3.btn-default[disabled],
+.c3.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-default[disabled]:hover,
+.c3.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c3.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c3.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c3.btn-info[disabled],
+.c3.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-info[disabled]:hover,
+.c3.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c3.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c3.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c3.btn-link[disabled],
+.c3.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-link[disabled]:hover,
+.c3.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c3.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c3.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c3.btn-primary[disabled],
+.c3.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-primary[disabled]:hover,
+.c3.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c3.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c3.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c3.btn-success[disabled],
+.c3.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-success[disabled]:hover,
+.c3.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c3.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c3.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c3.btn-warning[disabled],
+.c3.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c3.btn-warning[disabled]:hover,
+.c3.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c1 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c12.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c12.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c12.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c12.btn-danger[disabled],
+.c12.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c12.btn-danger[disabled]:hover,
+.c12.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c12.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c12.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c12.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c12.btn-default[disabled],
+.c12.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c12.btn-default[disabled]:hover,
+.c12.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c12.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c12.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c12.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c12.btn-info[disabled],
+.c12.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c12.btn-info[disabled]:hover,
+.c12.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c12.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c12.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c12.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c12.btn-link[disabled],
+.c12.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c12.btn-link[disabled]:hover,
+.c12.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c12.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c12.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c12.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c12.btn-primary[disabled],
+.c12.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c12.btn-primary[disabled]:hover,
+.c12.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c12.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c12.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c12.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c12.btn-success[disabled],
+.c12.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c12.btn-success[disabled]:hover,
+.c12.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c12.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c12.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c12.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c12.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c12.btn-warning[disabled],
+.c12.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c12.btn-warning[disabled]:hover,
+.c12.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c12 ~ .dropdown-menu {
+  background-color: #fff;
+  box-shadow: 0 3px 3px rgba(115,115,115,0.25);
+}
+
+.c12 ~ .dropdown-menu > li > a {
+  color: #1f1f1f;
+}
+
+.c12 ~ .dropdown-menu > li > a:hover,
+.c12 ~ .dropdown-menu > li > a:focus {
+  color: #575757;
+  background-color: #f3f3f3;
+}
+
+.c12 ~ .dropdown-menu > .active > a {
+  color: #575757;
+  background-color: #f3f3f3;
+}
+
+.c12 ~ .dropdown-menu > .active > a:hover,
+.c12 ~ .dropdown-menu > .active > a:focus {
+  color: #2d2d2d;
+  background-color: #d0d0d0;
+}
+
+.c12 ~ .dropdown-menu > .disabled > a {
+  color: #737373;
+  background-color: #f3f3f3;
+}
+
+.c12 ~ .dropdown-menu > .disabled > a:hover,
+.c12 ~ .dropdown-menu > .disabled > a:focus {
+  color: #737373;
+  background-color: #f3f3f3;
+}
+
+.c2.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c2.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c2.form-control[disabled],
+.c2.form-control[readonly],
+fieldset[disabled] .c2.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c2.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c8 {
+  background-color: #fff;
+  border-color: #d0d0d0;
+}
+
+.c8 .list-group-item-heading {
+  font-weight: bold;
+}
+
+a.c8,
+button.c8 {
+  color: #702785;
+}
+
+a.c8 .list-group-item-heading,
+button.c8 .list-group-item-heading {
+  color: #2d2d2d;
+  font-weight: bold;
+}
+
+a.c8:hover:not(.disabled),
+button.c8:hover:not(.disabled),
+a.c8:focus:not(.disabled),
+button.c8:focus:not(.disabled) {
+  background-color: #f3f3f3;
+  color: #410057;
+}
+
+a.c8:hover:not(.disabled).active,
+button.c8:hover:not(.disabled).active,
+a.c8:focus:not(.disabled).active,
+button.c8:focus:not(.disabled).active {
+  color: #2d2d2d;
+  background-color: #f3f3f3;
+  border-color: #f3f3f3;
+}
+
+a.c8:hover:not(.disabled) .list-group-item-heading,
+button.c8:hover:not(.disabled) .list-group-item-heading,
+a.c8:focus:not(.disabled) .list-group-item-heading,
+button.c8:focus:not(.disabled) .list-group-item-heading {
+  color: #1f1f1f;
+}
+
+.c8.disabled,
+.c8.disabled:hover,
+.c8.disabled:focus {
+  color: #828282;
+  background-color: #f3f3f3;
+}
+
+.c8.disabled .list-group-item-heading,
+.c8.disabled:hover .list-group-item-heading,
+.c8.disabled:focus .list-group-item-heading {
+  color: inherit;
+  font-weight: bold;
+}
+
+.c8.disabled .list-group-item-text,
+.c8.disabled:hover .list-group-item-text,
+.c8.disabled:focus .list-group-item-text {
+  color: #828282;
+}
+
+.c8.active,
+.c8.active:hover,
+.c8.active:focus {
+  color: #575757;
+  background-color: #eff2f8;
+  border-color: #eff2f8;
+  z-index: auto;
+}
+
+.c8.active .list-group-item-heading,
+.c8.active:hover .list-group-item-heading,
+.c8.active:focus .list-group-item-heading,
+.c8.active .list-group-item-heading > small,
+.c8.active:hover .list-group-item-heading > small,
+.c8.active:focus .list-group-item-heading > small,
+.c8.active .list-group-item-heading > .small,
+.c8.active:hover .list-group-item-heading > .small,
+.c8.active:focus .list-group-item-heading > .small {
+  color: inherit;
+  font-weight: bold;
+}
+
+.c8.active .list-group-item-text,
+.c8.active:hover .list-group-item-text,
+.c8.active:focus .list-group-item-text {
+  color: #9b7ca8;
+}
+
+.c11 .modal-backdrop {
+  height: 100000%;
+  z-index: 1030;
+}
+
+.c11 form {
+  margin-bottom: 0;
+}
+
+.c11 .modal-dialog {
+  margin-top: 55px;
+}
+
+.c11 .modal-dialog .modal-content {
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c11 .modal-header {
+  border-bottom-color: #a6a6a6;
+}
+
+.c11 .modal-header button.close {
+  color: currentColor;
+}
+
+.c11 .modal-footer {
+  border-top-color: #a6a6a6;
+}
+
+.c11 .modal-title {
+  font-size: 1.424rem;
+}
+
+.c11 .modal-body .form-group {
+  margin-bottom: 5px;
+}
+
+.c0.content {
+  background-color: #fff;
+  border: 1px solid #d0d0d0;
+  margin-bottom: 9px;
+  border-radius: 4px;
+}
+
+.c7 {
+  background-color: #f3f3f3;
+  font-size: 1rem;
+  color: rgb(77,77,77);
+  padding: 0 15px;
+}
+
+.c7 .form-group {
+  margin: 0;
+}
+
+.c9 {
+  margin: 10px 0;
+  min-height: 20px;
+}
+
+.c4.pagination {
+  font-size: 0.889rem;
+}
+
+.c4.pagination > li > a,
+.c4.pagination > li > span {
+  color: rgb(81,81,81);
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c4.pagination > li > a:hover,
+.c4.pagination > li > span:hover,
+.c4.pagination > li > a:focus,
+.c4.pagination > li > span:focus {
+  color: rgb(47,47,47);
+  background-color: #d0d0d0;
+  border-color: #a6a6a6;
+}
+
+.c4.pagination > li.active > a,
+.c4.pagination > li.active > span,
+.c4.pagination > li.active > a:hover,
+.c4.pagination > li.active > span:hover,
+.c4.pagination > li.active > a:focus,
+.c4.pagination > li.active > span:focus {
+  color: rgb(76,77,78);
+  background-color: #eff2f8;
+  border-color: #bdc8e4;
+}
+
+.c4.pagination > li.disabled > a,
+.c4.pagination > li.disabled > a:hover,
+.c4.pagination > li.disabled > a:focus,
+.c4.pagination > li.disabled > span,
+.c4.pagination > li.disabled > span:hover,
+.c4.pagination > li.disabled > span:focus {
+  color: #a6a6a6;
+  background-color: #fff;
+  border-color: #d0d0d0;
+}
+
+.c10 {
+  margin-left: 4px;
+  background-color: #009a3a;
+  color: #1f1f1f;
+}
+
+.c5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c5 span {
+  margin-right: 3px;
+}
+
+.c6 {
+  width: 75px;
+}
+
 <ContentPacksList
   contentPackMetadata={
     Object {
@@ -137,11 +1003,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 iSaIhq row-sm"
+        className="c0 row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+          className="c0 row-sm row"
         >
           <Col
             bsClass="col"
@@ -319,21 +1185,21 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                              className=""
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                className="form-group"
                               >
                                 <ControlLabel>
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                    className="c1"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                      className="c1 control-label"
                                       htmlFor="content-packs-filter"
                                     >
                                       Filter
@@ -356,7 +1222,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 fKSsjP"
+                                        className="c2"
                                         componentClass="input"
                                         inputRef={[Function]}
                                         label="Filter"
@@ -365,7 +1231,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         type="text"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                          className="c2 form-control"
                                           id="content-packs-filter"
                                           label="Filter"
                                           name="content-packs-filter"
@@ -395,7 +1261,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button-c9cbmb-0 bNulii"
+                        className="c3"
                         disabled={false}
                         style={
                           Object {
@@ -405,7 +1271,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         type="submit"
                       >
                         <button
-                          className="Button-c9cbmb-0 bNulii btn btn-default"
+                          className="c3 btn btn-default"
                           disabled={false}
                           style={
                             Object {
@@ -433,7 +1299,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button-c9cbmb-0 bNulii"
+                        className="c3"
                         disabled={true}
                         onClick={[Function]}
                         style={
@@ -444,7 +1310,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         type="button"
                       >
                         <button
-                          className="Button-c9cbmb-0 bNulii btn btn-default"
+                          className="c3 btn btn-default"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -504,11 +1370,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   >
                     <Pagination
                       bsClass="pagination"
-                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz"
+                      className="c4"
                       data-testid="graylog-pagination"
                     >
                       <ul
-                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz pagination"
+                        className="c4 pagination"
                         data-testid="graylog-pagination"
                       >
                         <Component
@@ -768,7 +1634,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             >
               <ContentPacksList__PageSizeSelector>
                 <span
-                  className="ContentPacksList__PageSizeSelector-dqllb7-0 fIwAPM"
+                  className="c5"
                 >
                   <span>
                     Show:
@@ -799,7 +1665,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     value="10"
                   >
                     <WithTheme(Select)
-                      className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                      className="c6"
                       clearable={false}
                       onChange={[Function]}
                       options={
@@ -827,7 +1693,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       <Select
                         allowCreate={false}
                         autoFocus={false}
-                        className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                        className="c6"
                         clearable={false}
                         components={null}
                         delimiter=","
@@ -1378,7 +2244,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         <StateManager
                           allowCreate={false}
                           autoFocus={false}
-                          className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                          className="c6"
                           components={
                             Object {
                               "DropdownIndicator": [Function],
@@ -1452,7 +2318,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             backspaceRemovesValue={true}
                             blurInputOnSelect={true}
                             captureMenuScroll={false}
-                            className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                            className="c6"
                             closeMenuOnScroll={false}
                             closeMenuOnSelect={true}
                             components={
@@ -1546,7 +2412,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             valueKey="value"
                           >
                             <SelectContainer
-                              className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                              className="c6"
                               clearValue={[Function]}
                               cx={[Function]}
                               getStyles={[Function]}
@@ -1591,7 +2457,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   "backspaceRemovesValue": true,
                                   "blurInputOnSelect": true,
                                   "captureMenuScroll": false,
-                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                   "closeMenuOnScroll": false,
                                   "closeMenuOnSelect": true,
                                   "components": Object {
@@ -1710,7 +2576,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                               }
                             >
                               <div
-                                className="css-1pcexqc-container ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                                className="css-1pcexqc-container c6"
                                 onKeyDown={[Function]}
                               >
                                 <Control
@@ -1760,7 +2626,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       "backspaceRemovesValue": true,
                                       "blurInputOnSelect": true,
                                       "captureMenuScroll": false,
-                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                       "closeMenuOnScroll": false,
                                       "closeMenuOnSelect": true,
                                       "components": Object {
@@ -1921,7 +2787,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -2086,7 +2952,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -2232,7 +3098,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -2481,7 +3347,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -2641,7 +3507,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -2805,7 +3671,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -2993,22 +3859,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <ControlledTableListHeader>
                 <ControlledTableListHeader__StyledListGroupItem>
                   <ForwardRef
-                    className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
+                    className="c7"
                   >
                     <ListGroupItem__StyledListGroupItem
-                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
+                      className="c7"
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
+                        className="c8 c7"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci list-group-item"
+                          className="c8 c7 list-group-item"
                         >
                           <ControlledTableListHeader__HeaderWrapper>
                             <div
-                              className="ControlledTableListHeader__HeaderWrapper-tr2y34-1 fnWrsM"
+                              className="c9"
                             />
                           </ControlledTableListHeader__HeaderWrapper>
                         </span>
@@ -3024,22 +3890,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -3089,12 +3955,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               >
                                                 <Badge
                                                   bsClass="badge"
-                                                  className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bQPnQg"
+                                                  className="Badge__StyledBadge-sc-4gzqz0-0 c10"
                                                   pullRight={false}
                                                   status="installed"
                                                 >
                                                   <span
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bQPnQg badge"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 c10 badge"
                                                     status="installed"
                                                   >
                                                     installed
@@ -3131,12 +3997,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -3165,7 +4031,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -3227,7 +4093,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-1"
                                       pullRight={true}
                                       title="More Actions"
@@ -3266,7 +4132,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-1"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -3282,7 +4148,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-1"
                                                     onClick={[Function]}
@@ -3292,7 +4158,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-1"
                                                       onClick={[Function]}
@@ -3528,7 +4394,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -3592,11 +4458,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -3625,22 +4491,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -3690,12 +4556,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               >
                                                 <Badge
                                                   bsClass="badge"
-                                                  className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bQPnQg"
+                                                  className="Badge__StyledBadge-sc-4gzqz0-0 c10"
                                                   pullRight={false}
                                                   status="installed"
                                                 >
                                                   <span
-                                                    className="Badge__StyledBadge-sc-4gzqz0-0 ContentPackStatus__StatusBadge-sc-1rzjx64-0 bQPnQg badge"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 c10 badge"
                                                     status="installed"
                                                   >
                                                     installed
@@ -3732,12 +4598,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -3766,7 +4632,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -3828,7 +4694,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-2"
                                       pullRight={true}
                                       title="More Actions"
@@ -3867,7 +4733,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-2"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -3883,7 +4749,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-2"
                                                     onClick={[Function]}
@@ -3893,7 +4759,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-2"
                                                       onClick={[Function]}
@@ -4129,7 +4995,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4193,11 +5059,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -4226,22 +5092,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -4299,12 +5165,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -4333,7 +5199,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -4395,7 +5261,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-3"
                                       pullRight={true}
                                       title="More Actions"
@@ -4434,7 +5300,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-3"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -4450,7 +5316,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-3"
                                                     onClick={[Function]}
@@ -4460,7 +5326,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-3"
                                                       onClick={[Function]}
@@ -4696,7 +5562,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4760,11 +5626,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -4792,22 +5658,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -4865,12 +5731,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -4899,7 +5765,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -4961,7 +5827,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-4"
                                       pullRight={true}
                                       title="More Actions"
@@ -5000,7 +5866,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-4"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -5016,7 +5882,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-4"
                                                     onClick={[Function]}
@@ -5026,7 +5892,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-4"
                                                       onClick={[Function]}
@@ -5262,7 +6128,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -5326,11 +6192,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -5359,22 +6225,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -5432,12 +6298,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -5466,7 +6332,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -5528,7 +6394,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-5"
                                       pullRight={true}
                                       title="More Actions"
@@ -5567,7 +6433,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-5"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -5583,7 +6449,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-5"
                                                     onClick={[Function]}
@@ -5593,7 +6459,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-5"
                                                       onClick={[Function]}
@@ -5829,7 +6695,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -5893,11 +6759,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -5926,22 +6792,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -5999,12 +6865,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -6033,7 +6899,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -6095,7 +6961,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-6"
                                       pullRight={true}
                                       title="More Actions"
@@ -6134,7 +7000,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-6"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -6150,7 +7016,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-6"
                                                     onClick={[Function]}
@@ -6160,7 +7026,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-6"
                                                       onClick={[Function]}
@@ -6396,7 +7262,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -6460,11 +7326,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -6493,22 +7359,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -6566,12 +7432,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -6600,7 +7466,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -6662,7 +7528,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-7"
                                       pullRight={true}
                                       title="More Actions"
@@ -6701,7 +7567,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-7"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -6717,7 +7583,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-7"
                                                     onClick={[Function]}
@@ -6727,7 +7593,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-7"
                                                       onClick={[Function]}
@@ -6963,7 +7829,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -7027,11 +7893,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -7060,22 +7926,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -7133,12 +7999,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -7167,7 +8033,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -7229,7 +8095,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-8"
                                       pullRight={true}
                                       title="More Actions"
@@ -7268,7 +8134,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-8"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -7284,7 +8150,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-8"
                                                     onClick={[Function]}
@@ -7294,7 +8160,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-8"
                                                       onClick={[Function]}
@@ -7530,7 +8396,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -7594,11 +8460,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -7626,22 +8492,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -7699,12 +8565,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -7733,7 +8599,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -7795,7 +8661,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-9"
                                       pullRight={true}
                                       title="More Actions"
@@ -7834,7 +8700,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-9"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -7850,7 +8716,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-9"
                                                     onClick={[Function]}
@@ -7860,7 +8726,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-9"
                                                       onClick={[Function]}
@@ -8096,7 +8962,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -8160,11 +9026,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -8193,22 +9059,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
+                      className="c8"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
+                        className="c8 list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
+                            className="c0 row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+                              className="c0 row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -8266,12 +9132,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 bNulii"
+                                      className="c3"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                        className="c3 btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -8300,7 +9166,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 kdCabm"
+                                        className="c11"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -8362,7 +9228,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                      className="c12"
                                       id="more-actions-10"
                                       pullRight={true}
                                       title="More Actions"
@@ -8401,7 +9267,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                                  className="c12"
                                                   id="more-actions-10"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -8417,7 +9283,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                                    className="c12 dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-10"
                                                     onClick={[Function]}
@@ -8427,7 +9293,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
+                                                      className="c12 dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-10"
                                                       onClick={[Function]}
@@ -8663,7 +9529,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 kdCabm"
+                                          className="c11"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -8727,11 +9593,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
+                            className="c0 row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
+                              className="c0 row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -8763,11 +9629,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 iSaIhq row-sm"
+        className="c0 row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+          className="c0 row-sm row"
         >
           <Col
             bsClass="col"
@@ -8814,11 +9680,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   >
                     <Pagination
                       bsClass="pagination"
-                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz"
+                      className="c4"
                       data-testid="graylog-pagination"
                     >
                       <ul
-                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz pagination"
+                        className="c4 pagination"
                         data-testid="graylog-pagination"
                       >
                         <Component
@@ -9078,7 +9944,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             >
               <ContentPacksList__PageSizeSelector>
                 <span
-                  className="ContentPacksList__PageSizeSelector-dqllb7-0 fIwAPM"
+                  className="c5"
                 >
                   <span>
                     Show:
@@ -9109,7 +9975,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     value="10"
                   >
                     <WithTheme(Select)
-                      className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                      className="c6"
                       clearable={false}
                       onChange={[Function]}
                       options={
@@ -9137,7 +10003,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       <Select
                         allowCreate={false}
                         autoFocus={false}
-                        className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                        className="c6"
                         clearable={false}
                         components={null}
                         delimiter=","
@@ -9688,7 +10554,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         <StateManager
                           allowCreate={false}
                           autoFocus={false}
-                          className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                          className="c6"
                           components={
                             Object {
                               "DropdownIndicator": [Function],
@@ -9762,7 +10628,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             backspaceRemovesValue={true}
                             blurInputOnSelect={true}
                             captureMenuScroll={false}
-                            className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                            className="c6"
                             closeMenuOnScroll={false}
                             closeMenuOnSelect={true}
                             components={
@@ -9856,7 +10722,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             valueKey="value"
                           >
                             <SelectContainer
-                              className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                              className="c6"
                               clearValue={[Function]}
                               cx={[Function]}
                               getStyles={[Function]}
@@ -9901,7 +10767,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   "backspaceRemovesValue": true,
                                   "blurInputOnSelect": true,
                                   "captureMenuScroll": false,
-                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                   "closeMenuOnScroll": false,
                                   "closeMenuOnSelect": true,
                                   "components": Object {
@@ -10020,7 +10886,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                               }
                             >
                               <div
-                                className="css-1pcexqc-container ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                                className="css-1pcexqc-container c6"
                                 onKeyDown={[Function]}
                               >
                                 <Control
@@ -10070,7 +10936,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       "backspaceRemovesValue": true,
                                       "blurInputOnSelect": true,
                                       "captureMenuScroll": false,
-                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                       "closeMenuOnScroll": false,
                                       "closeMenuOnSelect": true,
                                       "components": Object {
@@ -10231,7 +11097,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -10396,7 +11262,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -10542,7 +11408,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -10791,7 +11657,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -10951,7 +11817,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -11115,7 +11981,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c6",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -11296,6 +12162,361 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
 `;
 
 exports[`<ContentPacksList /> should render with empty content packs 1`] = `
+.c3.btn-danger {
+  background-color: #ad0707;
+  border-color: #b23939;
+  color: rgb(252,249,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-danger:hover {
+  background-color: #a00e0e;
+  border-color: #a53636;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger.active {
+  background-color: #b75151;
+  border-color: #bc6363;
+  color: rgb(252,249,249);
+}
+
+.c3.btn-danger.active:hover {
+  background-color: #a94c4c;
+  border-color: #ad5c5c;
+  color: #e9e6e6;
+}
+
+.c3.btn-danger[disabled],
+.c3.btn-danger.disabled {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-danger[disabled]:hover,
+.c3.btn-danger.disabled:hover {
+  background-color: #c07272;
+  border-color: #bc6363;
+  color: rgb(252,250,250);
+}
+
+.c3.btn-default {
+  background-color: #e6e6e6;
+  border-color: #e0e0e0;
+  color: rgb(73,73,73);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-default:hover {
+  background-color: #d4d4d4;
+  border-color: #cfcfcf;
+  color: #444444;
+}
+
+.c3.btn-default.active {
+  background-color: #dadada;
+  border-color: #d4d4d4;
+  color: rgb(49,49,49);
+}
+
+.c3.btn-default.active:hover {
+  background-color: #cacaca;
+  border-color: #c4c4c4;
+  color: #2f2f2f;
+}
+
+.c3.btn-default[disabled],
+.c3.btn-default.disabled {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-default[disabled]:hover,
+.c3.btn-default.disabled:hover {
+  background-color: #cecece;
+  border-color: #d4d4d4;
+  color: rgb(80,80,80);
+}
+
+.c3.btn-info {
+  background-color: #0063be;
+  border-color: #3970c2;
+  color: rgb(249,250,252);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-info:hover {
+  background-color: #0c5cb0;
+  border-color: #3668b3;
+  color: #e6e7e9;
+}
+
+.c3.btn-info.active {
+  background-color: #517cc5;
+  border-color: #6386c9;
+  color: rgb(249,250,252);
+}
+
+.c3.btn-info.active:hover {
+  background-color: #4b73b6;
+  border-color: #5c7dba;
+  color: #e6e7e9;
+}
+
+.c3.btn-info[disabled],
+.c3.btn-info.disabled {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-info[disabled]:hover,
+.c3.btn-info.disabled:hover {
+  background-color: #7290cd;
+  border-color: #6386c9;
+  color: rgb(250,251,253);
+}
+
+.c3.btn-link {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-link:hover {
+  background-color: #ebebeb26;
+  border-color: #ebebeb26;
+  color: #68267b;
+}
+
+.c3.btn-link.active {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #410057;
+}
+
+.c3.btn-link.active:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: #ebebeb26;
+  color: #3d0c51;
+}
+
+.c3.btn-link[disabled],
+.c3.btn-link.disabled {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-link[disabled]:hover,
+.c3.btn-link.disabled:hover {
+  background-color: rgba(255,255,255,0);
+  border-color: rgba(255,255,255,0);
+  color: #702785;
+}
+
+.c3.btn-primary {
+  background-color: #702785;
+  border-color: #7b458e;
+  color: rgb(234,229,236);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-primary:hover {
+  background-color: #68267b;
+  border-color: #724083;
+  color: #d8d3da;
+}
+
+.c3.btn-primary.active {
+  background-color: #855996;
+  border-color: #8f699d;
+  color: rgb(250,249,251);
+}
+
+.c3.btn-primary.active:hover {
+  background-color: #7c538b;
+  border-color: #846292;
+  color: #e7e6e8;
+}
+
+.c3.btn-primary[disabled],
+.c3.btn-primary.disabled {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-primary[disabled]:hover,
+.c3.btn-primary.disabled:hover {
+  background-color: #9877a5;
+  border-color: #8f699d;
+  color: rgb(251,250,251);
+}
+
+.c3.btn-success {
+  background-color: #00ae42;
+  border-color: #39b356;
+  color: rgb(249,252,249);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-success:hover {
+  background-color: #0ca13e;
+  border-color: #36a550;
+  color: #e6e9e6;
+}
+
+.c3.btn-success.active {
+  background-color: #51b866;
+  border-color: #63bc74;
+  color: rgb(249,252,250);
+}
+
+.c3.btn-success.active:hover {
+  background-color: #4baa5f;
+  border-color: #5cae6c;
+  color: #e6e9e7;
+}
+
+.c3.btn-success[disabled],
+.c3.btn-success.disabled {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-success[disabled]:hover,
+.c3.btn-success.disabled:hover {
+  background-color: #72c180;
+  border-color: #63bc74;
+  color: rgb(250,252,250);
+}
+
+.c3.btn-warning {
+  background-color: #ffd200;
+  border-color: #f9cd07;
+  color: rgb(57,47,0);
+  -webkit-transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out,border 150ms ease-in-out,color 150ms ease-in-out;
+}
+
+.c3.btn-warning:hover {
+  background-color: #ebc20c;
+  border-color: #e6bd0e;
+  color: #362d0c;
+}
+
+.c3.btn-warning.active {
+  background-color: #f2c70a;
+  border-color: #ebc20c;
+  color: rgb(54,45,2);
+}
+
+.c3.btn-warning.active:hover {
+  background-color: #e0b80f;
+  border-color: #d9b310;
+  color: #332b0c;
+}
+
+.c3.btn-warning[disabled],
+.c3.btn-warning.disabled {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c3.btn-warning[disabled]:hover,
+.c3.btn-warning.disabled:hover {
+  background-color: #e4bc0e;
+  border-color: #ebc20c;
+  color: rgb(88,73,5);
+}
+
+.c1 {
+  color: #1f1f1f;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.c2.form-control {
+  color: #1f1f1f;
+  background-color: #fff;
+  border-color: #a6a6a6;
+}
+
+.c2.form-control::-webkit-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control::-moz-placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control:-ms-input-placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control::placeholder {
+  color: #9b9b9b;
+}
+
+.c2.form-control:focus {
+  border-color: #7894ce;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(120,148,206,0.4);
+}
+
+.c2.form-control[disabled],
+.c2.form-control[readonly],
+fieldset[disabled] .c2.form-control {
+  background-color: #dddddd;
+  color: #9b9b9b;
+}
+
+.c2.form-control ~ .form-control-feedback.glyphicon {
+  display: none;
+}
+
+.c0.content {
+  background-color: #fff;
+  border: 1px solid #d0d0d0;
+  margin-bottom: 9px;
+  border-radius: 4px;
+}
+
+.c4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.c4 span {
+  margin-right: 3px;
+}
+
+.c5 {
+  width: 75px;
+}
+
 <ContentPacksList
   contentPackMetadata={Object {}}
   contentPacks={Array []}
@@ -11308,11 +12529,11 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 iSaIhq row-sm"
+        className="c0 row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+          className="c0 row-sm row"
         >
           <Col
             bsClass="col"
@@ -11379,21 +12600,21 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           >
                             <FormGroup
                               bsClass="form-group"
-                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                              className=""
                               controlId="content-packs-filter"
                               validationState={null}
                             >
                               <div
-                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                                className="form-group"
                               >
                                 <ControlLabel>
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                    className="c1"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                      className="c1 control-label"
                                       htmlFor="content-packs-filter"
                                     >
                                       Filter
@@ -11416,7 +12637,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 fKSsjP"
+                                        className="c2"
                                         componentClass="input"
                                         inputRef={[Function]}
                                         label="Filter"
@@ -11425,7 +12646,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                         type="text"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                          className="c2 form-control"
                                           id="content-packs-filter"
                                           label="Filter"
                                           name="content-packs-filter"
@@ -11455,7 +12676,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button-c9cbmb-0 bNulii"
+                        className="c3"
                         disabled={false}
                         style={
                           Object {
@@ -11465,7 +12686,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                         type="submit"
                       >
                         <button
-                          className="Button-c9cbmb-0 bNulii btn btn-default"
+                          className="c3 btn btn-default"
                           disabled={false}
                           style={
                             Object {
@@ -11493,7 +12714,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="default"
-                        className="Button-c9cbmb-0 bNulii"
+                        className="c3"
                         disabled={true}
                         onClick={[Function]}
                         style={
@@ -11504,7 +12725,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                         type="button"
                       >
                         <button
-                          className="Button-c9cbmb-0 bNulii btn btn-default"
+                          className="c3 btn btn-default"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -11560,7 +12781,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             >
               <ContentPacksList__PageSizeSelector>
                 <span
-                  className="ContentPacksList__PageSizeSelector-dqllb7-0 fIwAPM"
+                  className="c4"
                 >
                   <span>
                     Show:
@@ -11591,7 +12812,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     value="10"
                   >
                     <WithTheme(Select)
-                      className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                      className="c5"
                       clearable={false}
                       onChange={[Function]}
                       options={
@@ -11619,7 +12840,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       <Select
                         allowCreate={false}
                         autoFocus={false}
-                        className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                        className="c5"
                         clearable={false}
                         components={null}
                         delimiter=","
@@ -12170,7 +13391,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                         <StateManager
                           allowCreate={false}
                           autoFocus={false}
-                          className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                          className="c5"
                           components={
                             Object {
                               "DropdownIndicator": [Function],
@@ -12244,7 +13465,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             backspaceRemovesValue={true}
                             blurInputOnSelect={true}
                             captureMenuScroll={false}
-                            className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                            className="c5"
                             closeMenuOnScroll={false}
                             closeMenuOnSelect={true}
                             components={
@@ -12338,7 +13559,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             valueKey="value"
                           >
                             <SelectContainer
-                              className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                              className="c5"
                               clearValue={[Function]}
                               cx={[Function]}
                               getStyles={[Function]}
@@ -12383,7 +13604,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   "backspaceRemovesValue": true,
                                   "blurInputOnSelect": true,
                                   "captureMenuScroll": false,
-                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                   "closeMenuOnScroll": false,
                                   "closeMenuOnSelect": true,
                                   "components": Object {
@@ -12502,7 +13723,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                               }
                             >
                               <div
-                                className="css-1pcexqc-container ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                                className="css-1pcexqc-container c5"
                                 onKeyDown={[Function]}
                               >
                                 <Control
@@ -12552,7 +13773,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       "backspaceRemovesValue": true,
                                       "blurInputOnSelect": true,
                                       "captureMenuScroll": false,
-                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                       "closeMenuOnScroll": false,
                                       "closeMenuOnSelect": true,
                                       "components": Object {
@@ -12713,7 +13934,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -12878,7 +14099,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -13024,7 +14245,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -13273,7 +14494,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -13433,7 +14654,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -13597,7 +14818,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -13781,11 +15002,11 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 iSaIhq row-sm"
+        className="c0 row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
+          className="c0 row-sm row"
         >
           <Col
             bsClass="col"
@@ -13828,7 +15049,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             >
               <ContentPacksList__PageSizeSelector>
                 <span
-                  className="ContentPacksList__PageSizeSelector-dqllb7-0 fIwAPM"
+                  className="c4"
                 >
                   <span>
                     Show:
@@ -13859,7 +15080,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     value="10"
                   >
                     <WithTheme(Select)
-                      className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                      className="c5"
                       clearable={false}
                       onChange={[Function]}
                       options={
@@ -13887,7 +15108,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       <Select
                         allowCreate={false}
                         autoFocus={false}
-                        className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                        className="c5"
                         clearable={false}
                         components={null}
                         delimiter=","
@@ -14438,7 +15659,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                         <StateManager
                           allowCreate={false}
                           autoFocus={false}
-                          className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                          className="c5"
                           components={
                             Object {
                               "DropdownIndicator": [Function],
@@ -14512,7 +15733,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             backspaceRemovesValue={true}
                             blurInputOnSelect={true}
                             captureMenuScroll={false}
-                            className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                            className="c5"
                             closeMenuOnScroll={false}
                             closeMenuOnSelect={true}
                             components={
@@ -14606,7 +15827,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             valueKey="value"
                           >
                             <SelectContainer
-                              className="ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                              className="c5"
                               clearValue={[Function]}
                               cx={[Function]}
                               getStyles={[Function]}
@@ -14651,7 +15872,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   "backspaceRemovesValue": true,
                                   "blurInputOnSelect": true,
                                   "captureMenuScroll": false,
-                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                  "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                   "closeMenuOnScroll": false,
                                   "closeMenuOnSelect": true,
                                   "components": Object {
@@ -14770,7 +15991,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                               }
                             >
                               <div
-                                className="css-1pcexqc-container ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ"
+                                className="css-1pcexqc-container c5"
                                 onKeyDown={[Function]}
                               >
                                 <Control
@@ -14820,7 +16041,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       "backspaceRemovesValue": true,
                                       "blurInputOnSelect": true,
                                       "captureMenuScroll": false,
-                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                      "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                       "closeMenuOnScroll": false,
                                       "closeMenuOnSelect": true,
                                       "components": Object {
@@ -14981,7 +16202,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -15146,7 +16367,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -15292,7 +16513,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -15541,7 +16762,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           "backspaceRemovesValue": true,
                                           "blurInputOnSelect": true,
                                           "captureMenuScroll": false,
-                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                          "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                           "closeMenuOnScroll": false,
                                           "closeMenuOnSelect": true,
                                           "components": Object {
@@ -15701,7 +16922,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {
@@ -15865,7 +17086,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                               "backspaceRemovesValue": true,
                                               "blurInputOnSelect": true,
                                               "captureMenuScroll": false,
-                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 fGxDJQ",
+                                              "className": "ContentPacksList__StyledSizeSelect-dqllb7-1 c5",
                                               "closeMenuOnScroll": false,
                                               "closeMenuOnSelect": true,
                                               "components": Object {

@@ -1,6 +1,297 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DataTable renders column pivot header without offset when rollup is disabled 1`] = `
+.c0 {
+  padding-right: 13px;
+  width: 100%;
+}
+
+.c1 {
+  position: relative;
+  font-size: 0.889rem;
+  margin-top: 15px;
+  margin-bottom: 60px;
+  border-collapse: collapse;
+  padding-left: 13px;
+  width: 100%;
+  word-break: break-all;
+}
+
+.c1.table > thead > tr > th,
+.c1.table > tbody > tr > th,
+.c1.table > tfoot > tr > th,
+.c1.table > thead > tr > td,
+.c1.table > tbody > tr > td,
+.c1.table > tfoot > tr > td {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table > thead > tr > th {
+  border-bottom-color: #f0f0f0;
+}
+
+.c1.table > tbody > tr {
+  background-color: #fafafa;
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c1.table > tbody + tbody {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table .table {
+  background-color: #fafafa;
+}
+
+.c1.table-bordered {
+  border-color: #f0f0f0;
+}
+
+.c1.table-bordered > thead > tr > td,
+.c1.table-bordered > tfoot > tr > td,
+.c1.table-bordered > tbody > tr > td,
+.c1.table-bordered > thead > tr > th,
+.c1.table-bordered > tfoot > tr > th,
+.c1.table-bordered > tbody > tr > th {
+  border-color: #f0f0f0;
+}
+
+.c1.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f0f0f0;
+}
+
+.c1.table-hover > tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+.c1.table > thead > tr > td.active,
+.c1.table > tfoot > tr > td.active,
+.c1.table > tbody > tr > td.active,
+.c1.table > thead > tr > th.active,
+.c1.table > tfoot > tr > th.active,
+.c1.table > tbody > tr > th.active,
+.c1.table > thead > tr.active > td,
+.c1.table > tfoot > tr.active > td,
+.c1.table > tbody > tr.active > td,
+.c1.table > thead > tr.active > th,
+.c1.table > tfoot > tr.active > th,
+.c1.table > tbody > tr.active > th {
+  background-color: #e6e6e6;
+}
+
+.c1.table-hover > tbody > tr > td.active:hover,
+.c1.table-hover > tbody > tr > th.active:hover,
+.c1.table-hover > tbody > tr.active:hover > td,
+.c1.table-hover > tbody > tr:hover > .active,
+.c1.table-hover > tbody > tr.active:hover > th {
+  background-color: #d0d0d0;
+}
+
+.c1.table > thead > tr > td.success,
+.c1.table > tfoot > tr > td.success,
+.c1.table > tbody > tr > td.success,
+.c1.table > thead > tr > th.success,
+.c1.table > tfoot > tr > th.success,
+.c1.table > tbody > tr > th.success,
+.c1.table > thead > tr.success > td,
+.c1.table > tfoot > tr.success > td,
+.c1.table > tbody > tr.success > td,
+.c1.table > thead > tr.success > th,
+.c1.table > tfoot > tr.success > th,
+.c1.table > tbody > tr.success > th {
+  background-color: #ddeddf;
+}
+
+.c1.table-hover > tbody > tr > td.success:hover,
+.c1.table-hover > tbody > tr > th.success:hover,
+.c1.table-hover > tbody > tr.success:hover > td,
+.c1.table-hover > tbody > tr:hover > .success,
+.c1.table-hover > tbody > tr.success:hover > th {
+  background-color: #bddec2;
+}
+
+.c1.table > thead > tr > td.info,
+.c1.table > tfoot > tr > td.info,
+.c1.table > tbody > tr > td.info,
+.c1.table > thead > tr > th.info,
+.c1.table > tfoot > tr > th.info,
+.c1.table > tbody > tr > th.info,
+.c1.table > thead > tr.info > td,
+.c1.table > tfoot > tr.info > td,
+.c1.table > tbody > tr.info > td,
+.c1.table > thead > tr.info > th,
+.c1.table > tfoot > tr.info > th,
+.c1.table > tbody > tr.info > th {
+  background-color: #dde2f0;
+}
+
+.c1.table-hover > tbody > tr > td.info:hover,
+.c1.table-hover > tbody > tr > th.info:hover,
+.c1.table-hover > tbody > tr.info:hover > td,
+.c1.table-hover > tbody > tr:hover > .info,
+.c1.table-hover > tbody > tr.info:hover > th {
+  background-color: #bdc8e4;
+}
+
+.c1.table > thead > tr > td.warning,
+.c1.table > tfoot > tr > td.warning,
+.c1.table > tbody > tr > td.warning,
+.c1.table > thead > tr > th.warning,
+.c1.table > tfoot > tr > th.warning,
+.c1.table > tbody > tr > th.warning,
+.c1.table > thead > tr.warning > td,
+.c1.table > tfoot > tr.warning > td,
+.c1.table > tbody > tr.warning > td,
+.c1.table > thead > tr.warning > th,
+.c1.table > tfoot > tr.warning > th,
+.c1.table > tbody > tr.warning > th {
+  background-color: #fff5dd;
+}
+
+.c1.table-hover > tbody > tr > td.warning:hover,
+.c1.table-hover > tbody > tr > th.warning:hover,
+.c1.table-hover > tbody > tr.warning:hover > td,
+.c1.table-hover > tbody > tr:hover > .warning,
+.c1.table-hover > tbody > tr.warning:hover > th {
+  background-color: #ffecbd;
+}
+
+.c1.table > thead > tr > td.danger,
+.c1.table > tfoot > tr > td.danger,
+.c1.table > tbody > tr > td.danger,
+.c1.table > thead > tr > th.danger,
+.c1.table > tfoot > tr > th.danger,
+.c1.table > tbody > tr > th.danger,
+.c1.table > thead > tr.danger > td,
+.c1.table > tfoot > tr.danger > td,
+.c1.table > tbody > tr.danger > td,
+.c1.table > thead > tr.danger > th,
+.c1.table > tfoot > tr.danger > th,
+.c1.table > tbody > tr.danger > th {
+  background-color: #eddddd;
+}
+
+.c1.table-hover > tbody > tr > td.danger:hover,
+.c1.table-hover > tbody > tr > th.danger:hover,
+.c1.table-hover > tbody > tr.danger:hover > td,
+.c1.table-hover > tbody > tr:hover > .danger,
+.c1.table-hover > tbody > tr.danger:hover > th {
+  background-color: #debdbd;
+}
+
+.c1 thead > tr {
+  color: #fff;
+}
+
+.c1 td,
+.c1 th {
+  position: relative;
+  left: 13px;
+}
+
+.c1 > thead th {
+  border: 0;
+  font-size: 0.889rem;
+  font-weight: normal;
+  background-color: #1f1f1f;
+  white-space: nowrap;
+}
+
+.c1 tr {
+  border: 0 !important;
+}
+
+.c1 tbody.message-group {
+  border-top: 0;
+}
+
+.c1 tbody.message-group-toggled {
+  border-left: 7px solid #7894ce;
+}
+
+.c1 tbody.message-highlight {
+  border-left: 7px solid #78c385;
+}
+
+.c1 tr.fields-row {
+  cursor: pointer;
+}
+
+.c1 tr.fields-row td {
+  min-width: 50px;
+  padding-top: 10px;
+}
+
+.c1 tr.message-row td {
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 5px;
+  font-family: "Roboto Mono",Menlo,Monaco,Consolas,"Courier New",monospace;
+  color: #0057a8;
+}
+
+.c1 tr.message-row {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.c1 tr.message-row .message-wrapper {
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em;
+  overflow: hidden;
+}
+
+.c1 tr.message-row .message-wrapper::after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  width: 99%;
+  left: 5px;
+  top: 4.5em;
+  height: 1.5em;
+  background: linear-gradient(to bottom,rgba(255,255,255,0),rgb(255,255,255) 95%);
+}
+
+.c1 tr.message-detail-row {
+  display: none;
+}
+
+.c1 tr.message-detail-row td {
+  padding-top: 5px;
+  border-top: 0;
+}
+
+.c1 tr.message-detail-row .row {
+  margin-right: 0;
+}
+
+.c1 tr.message-detail-row div[class*="col-"] {
+  padding-right: 0;
+}
+
+.c1 th i.sort-order-desc {
+  position: relative;
+  top: -1px;
+}
+
+.c1 th i.sort-order-item {
+  margin-right: 2px;
+  color: #1f1f1f;
+  visibility: hidden;
+}
+
+.c1 th i.sort-order-active,
+.c1 th:hover i.sort-order-item {
+  color: #fff;
+}
+
+.c2 {
+  color: currentColor;
+  opacity: 1;
+}
+
 <ConnectStoresWrapper[DataTable] stores=currentView
   config={
     Object {
@@ -164,7 +455,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
         <MessagesTable>
           <MessagesTable__MessagesContainer>
             <div
-              className="MessagesTable__MessagesContainer-ptthov-0 jnWTJn"
+              className="c0"
             >
               <MessagesTable__StyledTable
                 condensed={true}
@@ -172,14 +463,14 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 c1"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 c1 table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -404,7 +695,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -484,7 +775,7 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -985,6 +1276,292 @@ exports[`DataTable renders column pivot header without offset when rollup is dis
 `;
 
 exports[`DataTable should render with empty data 1`] = `
+.c0 {
+  padding-right: 13px;
+  width: 100%;
+}
+
+.c1 {
+  position: relative;
+  font-size: 0.889rem;
+  margin-top: 15px;
+  margin-bottom: 60px;
+  border-collapse: collapse;
+  padding-left: 13px;
+  width: 100%;
+  word-break: break-all;
+}
+
+.c1.table > thead > tr > th,
+.c1.table > tbody > tr > th,
+.c1.table > tfoot > tr > th,
+.c1.table > thead > tr > td,
+.c1.table > tbody > tr > td,
+.c1.table > tfoot > tr > td {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table > thead > tr > th {
+  border-bottom-color: #f0f0f0;
+}
+
+.c1.table > tbody > tr {
+  background-color: #fafafa;
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c1.table > tbody + tbody {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table .table {
+  background-color: #fafafa;
+}
+
+.c1.table-bordered {
+  border-color: #f0f0f0;
+}
+
+.c1.table-bordered > thead > tr > td,
+.c1.table-bordered > tfoot > tr > td,
+.c1.table-bordered > tbody > tr > td,
+.c1.table-bordered > thead > tr > th,
+.c1.table-bordered > tfoot > tr > th,
+.c1.table-bordered > tbody > tr > th {
+  border-color: #f0f0f0;
+}
+
+.c1.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f0f0f0;
+}
+
+.c1.table-hover > tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+.c1.table > thead > tr > td.active,
+.c1.table > tfoot > tr > td.active,
+.c1.table > tbody > tr > td.active,
+.c1.table > thead > tr > th.active,
+.c1.table > tfoot > tr > th.active,
+.c1.table > tbody > tr > th.active,
+.c1.table > thead > tr.active > td,
+.c1.table > tfoot > tr.active > td,
+.c1.table > tbody > tr.active > td,
+.c1.table > thead > tr.active > th,
+.c1.table > tfoot > tr.active > th,
+.c1.table > tbody > tr.active > th {
+  background-color: #e6e6e6;
+}
+
+.c1.table-hover > tbody > tr > td.active:hover,
+.c1.table-hover > tbody > tr > th.active:hover,
+.c1.table-hover > tbody > tr.active:hover > td,
+.c1.table-hover > tbody > tr:hover > .active,
+.c1.table-hover > tbody > tr.active:hover > th {
+  background-color: #d0d0d0;
+}
+
+.c1.table > thead > tr > td.success,
+.c1.table > tfoot > tr > td.success,
+.c1.table > tbody > tr > td.success,
+.c1.table > thead > tr > th.success,
+.c1.table > tfoot > tr > th.success,
+.c1.table > tbody > tr > th.success,
+.c1.table > thead > tr.success > td,
+.c1.table > tfoot > tr.success > td,
+.c1.table > tbody > tr.success > td,
+.c1.table > thead > tr.success > th,
+.c1.table > tfoot > tr.success > th,
+.c1.table > tbody > tr.success > th {
+  background-color: #ddeddf;
+}
+
+.c1.table-hover > tbody > tr > td.success:hover,
+.c1.table-hover > tbody > tr > th.success:hover,
+.c1.table-hover > tbody > tr.success:hover > td,
+.c1.table-hover > tbody > tr:hover > .success,
+.c1.table-hover > tbody > tr.success:hover > th {
+  background-color: #bddec2;
+}
+
+.c1.table > thead > tr > td.info,
+.c1.table > tfoot > tr > td.info,
+.c1.table > tbody > tr > td.info,
+.c1.table > thead > tr > th.info,
+.c1.table > tfoot > tr > th.info,
+.c1.table > tbody > tr > th.info,
+.c1.table > thead > tr.info > td,
+.c1.table > tfoot > tr.info > td,
+.c1.table > tbody > tr.info > td,
+.c1.table > thead > tr.info > th,
+.c1.table > tfoot > tr.info > th,
+.c1.table > tbody > tr.info > th {
+  background-color: #dde2f0;
+}
+
+.c1.table-hover > tbody > tr > td.info:hover,
+.c1.table-hover > tbody > tr > th.info:hover,
+.c1.table-hover > tbody > tr.info:hover > td,
+.c1.table-hover > tbody > tr:hover > .info,
+.c1.table-hover > tbody > tr.info:hover > th {
+  background-color: #bdc8e4;
+}
+
+.c1.table > thead > tr > td.warning,
+.c1.table > tfoot > tr > td.warning,
+.c1.table > tbody > tr > td.warning,
+.c1.table > thead > tr > th.warning,
+.c1.table > tfoot > tr > th.warning,
+.c1.table > tbody > tr > th.warning,
+.c1.table > thead > tr.warning > td,
+.c1.table > tfoot > tr.warning > td,
+.c1.table > tbody > tr.warning > td,
+.c1.table > thead > tr.warning > th,
+.c1.table > tfoot > tr.warning > th,
+.c1.table > tbody > tr.warning > th {
+  background-color: #fff5dd;
+}
+
+.c1.table-hover > tbody > tr > td.warning:hover,
+.c1.table-hover > tbody > tr > th.warning:hover,
+.c1.table-hover > tbody > tr.warning:hover > td,
+.c1.table-hover > tbody > tr:hover > .warning,
+.c1.table-hover > tbody > tr.warning:hover > th {
+  background-color: #ffecbd;
+}
+
+.c1.table > thead > tr > td.danger,
+.c1.table > tfoot > tr > td.danger,
+.c1.table > tbody > tr > td.danger,
+.c1.table > thead > tr > th.danger,
+.c1.table > tfoot > tr > th.danger,
+.c1.table > tbody > tr > th.danger,
+.c1.table > thead > tr.danger > td,
+.c1.table > tfoot > tr.danger > td,
+.c1.table > tbody > tr.danger > td,
+.c1.table > thead > tr.danger > th,
+.c1.table > tfoot > tr.danger > th,
+.c1.table > tbody > tr.danger > th {
+  background-color: #eddddd;
+}
+
+.c1.table-hover > tbody > tr > td.danger:hover,
+.c1.table-hover > tbody > tr > th.danger:hover,
+.c1.table-hover > tbody > tr.danger:hover > td,
+.c1.table-hover > tbody > tr:hover > .danger,
+.c1.table-hover > tbody > tr.danger:hover > th {
+  background-color: #debdbd;
+}
+
+.c1 thead > tr {
+  color: #fff;
+}
+
+.c1 td,
+.c1 th {
+  position: relative;
+  left: 13px;
+}
+
+.c1 > thead th {
+  border: 0;
+  font-size: 0.889rem;
+  font-weight: normal;
+  background-color: #1f1f1f;
+  white-space: nowrap;
+}
+
+.c1 tr {
+  border: 0 !important;
+}
+
+.c1 tbody.message-group {
+  border-top: 0;
+}
+
+.c1 tbody.message-group-toggled {
+  border-left: 7px solid #7894ce;
+}
+
+.c1 tbody.message-highlight {
+  border-left: 7px solid #78c385;
+}
+
+.c1 tr.fields-row {
+  cursor: pointer;
+}
+
+.c1 tr.fields-row td {
+  min-width: 50px;
+  padding-top: 10px;
+}
+
+.c1 tr.message-row td {
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 5px;
+  font-family: "Roboto Mono",Menlo,Monaco,Consolas,"Courier New",monospace;
+  color: #0057a8;
+}
+
+.c1 tr.message-row {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.c1 tr.message-row .message-wrapper {
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em;
+  overflow: hidden;
+}
+
+.c1 tr.message-row .message-wrapper::after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  width: 99%;
+  left: 5px;
+  top: 4.5em;
+  height: 1.5em;
+  background: linear-gradient(to bottom,rgba(255,255,255,0),rgb(255,255,255) 95%);
+}
+
+.c1 tr.message-detail-row {
+  display: none;
+}
+
+.c1 tr.message-detail-row td {
+  padding-top: 5px;
+  border-top: 0;
+}
+
+.c1 tr.message-detail-row .row {
+  margin-right: 0;
+}
+
+.c1 tr.message-detail-row div[class*="col-"] {
+  padding-right: 0;
+}
+
+.c1 th i.sort-order-desc {
+  position: relative;
+  top: -1px;
+}
+
+.c1 th i.sort-order-item {
+  margin-right: 2px;
+  color: #1f1f1f;
+  visibility: hidden;
+}
+
+.c1 th i.sort-order-active,
+.c1 th:hover i.sort-order-item {
+  color: #fff;
+}
+
 <ConnectStoresWrapper[DataTable] stores=currentView
   config={
     Object {
@@ -1060,7 +1637,7 @@ exports[`DataTable should render with empty data 1`] = `
         <MessagesTable>
           <MessagesTable__MessagesContainer>
             <div
-              className="MessagesTable__MessagesContainer-ptthov-0 jnWTJn"
+              className="c0"
             >
               <MessagesTable__StyledTable
                 condensed={true}
@@ -1068,14 +1645,14 @@ exports[`DataTable should render with empty data 1`] = `
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 c1"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 c1 table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -1103,6 +1680,297 @@ exports[`DataTable should render with empty data 1`] = `
 `;
 
 exports[`DataTable should render with filled data with rollup 1`] = `
+.c0 {
+  padding-right: 13px;
+  width: 100%;
+}
+
+.c1 {
+  position: relative;
+  font-size: 0.889rem;
+  margin-top: 15px;
+  margin-bottom: 60px;
+  border-collapse: collapse;
+  padding-left: 13px;
+  width: 100%;
+  word-break: break-all;
+}
+
+.c1.table > thead > tr > th,
+.c1.table > tbody > tr > th,
+.c1.table > tfoot > tr > th,
+.c1.table > thead > tr > td,
+.c1.table > tbody > tr > td,
+.c1.table > tfoot > tr > td {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table > thead > tr > th {
+  border-bottom-color: #f0f0f0;
+}
+
+.c1.table > tbody > tr {
+  background-color: #fafafa;
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c1.table > tbody + tbody {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table .table {
+  background-color: #fafafa;
+}
+
+.c1.table-bordered {
+  border-color: #f0f0f0;
+}
+
+.c1.table-bordered > thead > tr > td,
+.c1.table-bordered > tfoot > tr > td,
+.c1.table-bordered > tbody > tr > td,
+.c1.table-bordered > thead > tr > th,
+.c1.table-bordered > tfoot > tr > th,
+.c1.table-bordered > tbody > tr > th {
+  border-color: #f0f0f0;
+}
+
+.c1.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f0f0f0;
+}
+
+.c1.table-hover > tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+.c1.table > thead > tr > td.active,
+.c1.table > tfoot > tr > td.active,
+.c1.table > tbody > tr > td.active,
+.c1.table > thead > tr > th.active,
+.c1.table > tfoot > tr > th.active,
+.c1.table > tbody > tr > th.active,
+.c1.table > thead > tr.active > td,
+.c1.table > tfoot > tr.active > td,
+.c1.table > tbody > tr.active > td,
+.c1.table > thead > tr.active > th,
+.c1.table > tfoot > tr.active > th,
+.c1.table > tbody > tr.active > th {
+  background-color: #e6e6e6;
+}
+
+.c1.table-hover > tbody > tr > td.active:hover,
+.c1.table-hover > tbody > tr > th.active:hover,
+.c1.table-hover > tbody > tr.active:hover > td,
+.c1.table-hover > tbody > tr:hover > .active,
+.c1.table-hover > tbody > tr.active:hover > th {
+  background-color: #d0d0d0;
+}
+
+.c1.table > thead > tr > td.success,
+.c1.table > tfoot > tr > td.success,
+.c1.table > tbody > tr > td.success,
+.c1.table > thead > tr > th.success,
+.c1.table > tfoot > tr > th.success,
+.c1.table > tbody > tr > th.success,
+.c1.table > thead > tr.success > td,
+.c1.table > tfoot > tr.success > td,
+.c1.table > tbody > tr.success > td,
+.c1.table > thead > tr.success > th,
+.c1.table > tfoot > tr.success > th,
+.c1.table > tbody > tr.success > th {
+  background-color: #ddeddf;
+}
+
+.c1.table-hover > tbody > tr > td.success:hover,
+.c1.table-hover > tbody > tr > th.success:hover,
+.c1.table-hover > tbody > tr.success:hover > td,
+.c1.table-hover > tbody > tr:hover > .success,
+.c1.table-hover > tbody > tr.success:hover > th {
+  background-color: #bddec2;
+}
+
+.c1.table > thead > tr > td.info,
+.c1.table > tfoot > tr > td.info,
+.c1.table > tbody > tr > td.info,
+.c1.table > thead > tr > th.info,
+.c1.table > tfoot > tr > th.info,
+.c1.table > tbody > tr > th.info,
+.c1.table > thead > tr.info > td,
+.c1.table > tfoot > tr.info > td,
+.c1.table > tbody > tr.info > td,
+.c1.table > thead > tr.info > th,
+.c1.table > tfoot > tr.info > th,
+.c1.table > tbody > tr.info > th {
+  background-color: #dde2f0;
+}
+
+.c1.table-hover > tbody > tr > td.info:hover,
+.c1.table-hover > tbody > tr > th.info:hover,
+.c1.table-hover > tbody > tr.info:hover > td,
+.c1.table-hover > tbody > tr:hover > .info,
+.c1.table-hover > tbody > tr.info:hover > th {
+  background-color: #bdc8e4;
+}
+
+.c1.table > thead > tr > td.warning,
+.c1.table > tfoot > tr > td.warning,
+.c1.table > tbody > tr > td.warning,
+.c1.table > thead > tr > th.warning,
+.c1.table > tfoot > tr > th.warning,
+.c1.table > tbody > tr > th.warning,
+.c1.table > thead > tr.warning > td,
+.c1.table > tfoot > tr.warning > td,
+.c1.table > tbody > tr.warning > td,
+.c1.table > thead > tr.warning > th,
+.c1.table > tfoot > tr.warning > th,
+.c1.table > tbody > tr.warning > th {
+  background-color: #fff5dd;
+}
+
+.c1.table-hover > tbody > tr > td.warning:hover,
+.c1.table-hover > tbody > tr > th.warning:hover,
+.c1.table-hover > tbody > tr.warning:hover > td,
+.c1.table-hover > tbody > tr:hover > .warning,
+.c1.table-hover > tbody > tr.warning:hover > th {
+  background-color: #ffecbd;
+}
+
+.c1.table > thead > tr > td.danger,
+.c1.table > tfoot > tr > td.danger,
+.c1.table > tbody > tr > td.danger,
+.c1.table > thead > tr > th.danger,
+.c1.table > tfoot > tr > th.danger,
+.c1.table > tbody > tr > th.danger,
+.c1.table > thead > tr.danger > td,
+.c1.table > tfoot > tr.danger > td,
+.c1.table > tbody > tr.danger > td,
+.c1.table > thead > tr.danger > th,
+.c1.table > tfoot > tr.danger > th,
+.c1.table > tbody > tr.danger > th {
+  background-color: #eddddd;
+}
+
+.c1.table-hover > tbody > tr > td.danger:hover,
+.c1.table-hover > tbody > tr > th.danger:hover,
+.c1.table-hover > tbody > tr.danger:hover > td,
+.c1.table-hover > tbody > tr:hover > .danger,
+.c1.table-hover > tbody > tr.danger:hover > th {
+  background-color: #debdbd;
+}
+
+.c1 thead > tr {
+  color: #fff;
+}
+
+.c1 td,
+.c1 th {
+  position: relative;
+  left: 13px;
+}
+
+.c1 > thead th {
+  border: 0;
+  font-size: 0.889rem;
+  font-weight: normal;
+  background-color: #1f1f1f;
+  white-space: nowrap;
+}
+
+.c1 tr {
+  border: 0 !important;
+}
+
+.c1 tbody.message-group {
+  border-top: 0;
+}
+
+.c1 tbody.message-group-toggled {
+  border-left: 7px solid #7894ce;
+}
+
+.c1 tbody.message-highlight {
+  border-left: 7px solid #78c385;
+}
+
+.c1 tr.fields-row {
+  cursor: pointer;
+}
+
+.c1 tr.fields-row td {
+  min-width: 50px;
+  padding-top: 10px;
+}
+
+.c1 tr.message-row td {
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 5px;
+  font-family: "Roboto Mono",Menlo,Monaco,Consolas,"Courier New",monospace;
+  color: #0057a8;
+}
+
+.c1 tr.message-row {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.c1 tr.message-row .message-wrapper {
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em;
+  overflow: hidden;
+}
+
+.c1 tr.message-row .message-wrapper::after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  width: 99%;
+  left: 5px;
+  top: 4.5em;
+  height: 1.5em;
+  background: linear-gradient(to bottom,rgba(255,255,255,0),rgb(255,255,255) 95%);
+}
+
+.c1 tr.message-detail-row {
+  display: none;
+}
+
+.c1 tr.message-detail-row td {
+  padding-top: 5px;
+  border-top: 0;
+}
+
+.c1 tr.message-detail-row .row {
+  margin-right: 0;
+}
+
+.c1 tr.message-detail-row div[class*="col-"] {
+  padding-right: 0;
+}
+
+.c1 th i.sort-order-desc {
+  position: relative;
+  top: -1px;
+}
+
+.c1 th i.sort-order-item {
+  margin-right: 2px;
+  color: #1f1f1f;
+  visibility: hidden;
+}
+
+.c1 th i.sort-order-active,
+.c1 th:hover i.sort-order-item {
+  color: #fff;
+}
+
+.c2 {
+  color: currentColor;
+  opacity: 1;
+}
+
 <ConnectStoresWrapper[DataTable] stores=currentView
   config={
     Object {
@@ -1284,7 +2152,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
         <MessagesTable>
           <MessagesTable__MessagesContainer>
             <div
-              className="MessagesTable__MessagesContainer-ptthov-0 jnWTJn"
+              className="c0"
             >
               <MessagesTable__StyledTable
                 condensed={true}
@@ -1292,14 +2160,14 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 c1"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 c1 table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -1473,7 +2341,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         timestamp
@@ -1553,7 +2421,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -1633,7 +2501,7 @@ exports[`DataTable should render with filled data with rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         count()
@@ -2324,6 +3192,297 @@ exports[`DataTable should render with filled data with rollup 1`] = `
 `;
 
 exports[`DataTable should render with filled data without rollup 1`] = `
+.c0 {
+  padding-right: 13px;
+  width: 100%;
+}
+
+.c1 {
+  position: relative;
+  font-size: 0.889rem;
+  margin-top: 15px;
+  margin-bottom: 60px;
+  border-collapse: collapse;
+  padding-left: 13px;
+  width: 100%;
+  word-break: break-all;
+}
+
+.c1.table > thead > tr > th,
+.c1.table > tbody > tr > th,
+.c1.table > tfoot > tr > th,
+.c1.table > thead > tr > td,
+.c1.table > tbody > tr > td,
+.c1.table > tfoot > tr > td {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table > thead > tr > th {
+  border-bottom-color: #f0f0f0;
+}
+
+.c1.table > tbody > tr {
+  background-color: #fafafa;
+  -webkit-transition: background-color 150ms ease-in-out;
+  transition: background-color 150ms ease-in-out;
+}
+
+.c1.table > tbody + tbody {
+  border-top-color: #f0f0f0;
+}
+
+.c1.table .table {
+  background-color: #fafafa;
+}
+
+.c1.table-bordered {
+  border-color: #f0f0f0;
+}
+
+.c1.table-bordered > thead > tr > td,
+.c1.table-bordered > tfoot > tr > td,
+.c1.table-bordered > tbody > tr > td,
+.c1.table-bordered > thead > tr > th,
+.c1.table-bordered > tfoot > tr > th,
+.c1.table-bordered > tbody > tr > th {
+  border-color: #f0f0f0;
+}
+
+.c1.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f0f0f0;
+}
+
+.c1.table-hover > tbody > tr:hover {
+  background-color: #f5f5f5;
+}
+
+.c1.table > thead > tr > td.active,
+.c1.table > tfoot > tr > td.active,
+.c1.table > tbody > tr > td.active,
+.c1.table > thead > tr > th.active,
+.c1.table > tfoot > tr > th.active,
+.c1.table > tbody > tr > th.active,
+.c1.table > thead > tr.active > td,
+.c1.table > tfoot > tr.active > td,
+.c1.table > tbody > tr.active > td,
+.c1.table > thead > tr.active > th,
+.c1.table > tfoot > tr.active > th,
+.c1.table > tbody > tr.active > th {
+  background-color: #e6e6e6;
+}
+
+.c1.table-hover > tbody > tr > td.active:hover,
+.c1.table-hover > tbody > tr > th.active:hover,
+.c1.table-hover > tbody > tr.active:hover > td,
+.c1.table-hover > tbody > tr:hover > .active,
+.c1.table-hover > tbody > tr.active:hover > th {
+  background-color: #d0d0d0;
+}
+
+.c1.table > thead > tr > td.success,
+.c1.table > tfoot > tr > td.success,
+.c1.table > tbody > tr > td.success,
+.c1.table > thead > tr > th.success,
+.c1.table > tfoot > tr > th.success,
+.c1.table > tbody > tr > th.success,
+.c1.table > thead > tr.success > td,
+.c1.table > tfoot > tr.success > td,
+.c1.table > tbody > tr.success > td,
+.c1.table > thead > tr.success > th,
+.c1.table > tfoot > tr.success > th,
+.c1.table > tbody > tr.success > th {
+  background-color: #ddeddf;
+}
+
+.c1.table-hover > tbody > tr > td.success:hover,
+.c1.table-hover > tbody > tr > th.success:hover,
+.c1.table-hover > tbody > tr.success:hover > td,
+.c1.table-hover > tbody > tr:hover > .success,
+.c1.table-hover > tbody > tr.success:hover > th {
+  background-color: #bddec2;
+}
+
+.c1.table > thead > tr > td.info,
+.c1.table > tfoot > tr > td.info,
+.c1.table > tbody > tr > td.info,
+.c1.table > thead > tr > th.info,
+.c1.table > tfoot > tr > th.info,
+.c1.table > tbody > tr > th.info,
+.c1.table > thead > tr.info > td,
+.c1.table > tfoot > tr.info > td,
+.c1.table > tbody > tr.info > td,
+.c1.table > thead > tr.info > th,
+.c1.table > tfoot > tr.info > th,
+.c1.table > tbody > tr.info > th {
+  background-color: #dde2f0;
+}
+
+.c1.table-hover > tbody > tr > td.info:hover,
+.c1.table-hover > tbody > tr > th.info:hover,
+.c1.table-hover > tbody > tr.info:hover > td,
+.c1.table-hover > tbody > tr:hover > .info,
+.c1.table-hover > tbody > tr.info:hover > th {
+  background-color: #bdc8e4;
+}
+
+.c1.table > thead > tr > td.warning,
+.c1.table > tfoot > tr > td.warning,
+.c1.table > tbody > tr > td.warning,
+.c1.table > thead > tr > th.warning,
+.c1.table > tfoot > tr > th.warning,
+.c1.table > tbody > tr > th.warning,
+.c1.table > thead > tr.warning > td,
+.c1.table > tfoot > tr.warning > td,
+.c1.table > tbody > tr.warning > td,
+.c1.table > thead > tr.warning > th,
+.c1.table > tfoot > tr.warning > th,
+.c1.table > tbody > tr.warning > th {
+  background-color: #fff5dd;
+}
+
+.c1.table-hover > tbody > tr > td.warning:hover,
+.c1.table-hover > tbody > tr > th.warning:hover,
+.c1.table-hover > tbody > tr.warning:hover > td,
+.c1.table-hover > tbody > tr:hover > .warning,
+.c1.table-hover > tbody > tr.warning:hover > th {
+  background-color: #ffecbd;
+}
+
+.c1.table > thead > tr > td.danger,
+.c1.table > tfoot > tr > td.danger,
+.c1.table > tbody > tr > td.danger,
+.c1.table > thead > tr > th.danger,
+.c1.table > tfoot > tr > th.danger,
+.c1.table > tbody > tr > th.danger,
+.c1.table > thead > tr.danger > td,
+.c1.table > tfoot > tr.danger > td,
+.c1.table > tbody > tr.danger > td,
+.c1.table > thead > tr.danger > th,
+.c1.table > tfoot > tr.danger > th,
+.c1.table > tbody > tr.danger > th {
+  background-color: #eddddd;
+}
+
+.c1.table-hover > tbody > tr > td.danger:hover,
+.c1.table-hover > tbody > tr > th.danger:hover,
+.c1.table-hover > tbody > tr.danger:hover > td,
+.c1.table-hover > tbody > tr:hover > .danger,
+.c1.table-hover > tbody > tr.danger:hover > th {
+  background-color: #debdbd;
+}
+
+.c1 thead > tr {
+  color: #fff;
+}
+
+.c1 td,
+.c1 th {
+  position: relative;
+  left: 13px;
+}
+
+.c1 > thead th {
+  border: 0;
+  font-size: 0.889rem;
+  font-weight: normal;
+  background-color: #1f1f1f;
+  white-space: nowrap;
+}
+
+.c1 tr {
+  border: 0 !important;
+}
+
+.c1 tbody.message-group {
+  border-top: 0;
+}
+
+.c1 tbody.message-group-toggled {
+  border-left: 7px solid #7894ce;
+}
+
+.c1 tbody.message-highlight {
+  border-left: 7px solid #78c385;
+}
+
+.c1 tr.fields-row {
+  cursor: pointer;
+}
+
+.c1 tr.fields-row td {
+  min-width: 50px;
+  padding-top: 10px;
+}
+
+.c1 tr.message-row td {
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 5px;
+  font-family: "Roboto Mono",Menlo,Monaco,Consolas,"Courier New",monospace;
+  color: #0057a8;
+}
+
+.c1 tr.message-row {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.c1 tr.message-row .message-wrapper {
+  line-height: 1.5em;
+  white-space: pre-line;
+  max-height: 6em;
+  overflow: hidden;
+}
+
+.c1 tr.message-row .message-wrapper::after {
+  content: "";
+  text-align: right;
+  position: absolute;
+  width: 99%;
+  left: 5px;
+  top: 4.5em;
+  height: 1.5em;
+  background: linear-gradient(to bottom,rgba(255,255,255,0),rgb(255,255,255) 95%);
+}
+
+.c1 tr.message-detail-row {
+  display: none;
+}
+
+.c1 tr.message-detail-row td {
+  padding-top: 5px;
+  border-top: 0;
+}
+
+.c1 tr.message-detail-row .row {
+  margin-right: 0;
+}
+
+.c1 tr.message-detail-row div[class*="col-"] {
+  padding-right: 0;
+}
+
+.c1 th i.sort-order-desc {
+  position: relative;
+  top: -1px;
+}
+
+.c1 th i.sort-order-item {
+  margin-right: 2px;
+  color: #1f1f1f;
+  visibility: hidden;
+}
+
+.c1 th i.sort-order-active,
+.c1 th:hover i.sort-order-item {
+  color: #fff;
+}
+
+.c2 {
+  color: currentColor;
+  opacity: 1;
+}
+
 <ConnectStoresWrapper[DataTable] stores=currentView
   config={
     Object {
@@ -2505,7 +3664,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
         <MessagesTable>
           <MessagesTable__MessagesContainer>
             <div
-              className="MessagesTable__MessagesContainer-ptthov-0 jnWTJn"
+              className="c0"
             >
               <MessagesTable__StyledTable
                 condensed={true}
@@ -2513,14 +3672,14 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                 <Table
                   bordered={false}
                   bsClass="table"
-                  className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG"
+                  className="Table-ztr4bi-0 c1"
                   condensed={true}
                   hover={false}
                   responsive={false}
                   striped={false}
                 >
                   <table
-                    className="Table-ztr4bi-0 MessagesTable__StyledTable-ptthov-1 gHFVJG table table-condensed"
+                    className="Table-ztr4bi-0 c1 table table-condensed"
                   >
                     <thead>
                       <Headers
@@ -2694,7 +3853,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         timestamp
@@ -2774,7 +3933,7 @@ exports[`DataTable should render with filled data without rollup 1`] = `
                                       disabled={false}
                                     >
                                       <span
-                                        className="FieldActions__FieldElement-vd9gu3-0 gnaEIv field-element"
+                                        className="c2 field-element"
                                         disabled={false}
                                       >
                                         count()
