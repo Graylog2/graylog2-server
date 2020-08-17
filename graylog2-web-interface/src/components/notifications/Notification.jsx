@@ -9,6 +9,10 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
+const StyledButton = styled(Button)`
+  float: right;
+`;
+
 const StyledAlert = styled(Alert)(({ theme }) => css`
   margin-top: 10px;
 
@@ -50,7 +54,9 @@ class Notification extends React.Component {
 
     return (
       <StyledAlert bsStyle="danger">
-        <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>
+        <StyledButton className="delete-notification" bsStyle="link" onClick={this._onClose}>
+          <Icon name="times" />
+        </StyledButton>
 
         <NotificationHead>
           <Icon name="bolt" />{' '}
