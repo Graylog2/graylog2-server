@@ -12,7 +12,7 @@ export type UserJSON = {
   external: boolean,
   full_name: string,
   id: string,
-  last_activity: string,
+  last_activity: ?string,
   permissions: string[],
   preferences?: any,
   read_only: boolean,
@@ -20,7 +20,7 @@ export type UserJSON = {
   session_active: boolean,
   session_timeout_ms: number,
   startpage?: StartPage,
-  timezone: string,
+  timezone: ?string,
   username: string,
 };
 
@@ -30,7 +30,7 @@ type InternalState = {
   fullName: string,
   email: string,
   permissions: Immutable.List<string>,
-  timezone: string,
+  timezone: ?string,
   preferences?: any,
   roles: Immutable.List<string>,
   readOnly: boolean,
@@ -39,7 +39,7 @@ type InternalState = {
   startpage?: StartPage,
   sessionActive: boolean,
   clientAddress: string,
-  lastActivity: string,
+  lastActivity: ?string,
 };
 
 export default class User {

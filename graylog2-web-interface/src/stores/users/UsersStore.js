@@ -5,9 +5,9 @@ import * as Immutable from 'immutable';
 import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
+import { singletonStore } from 'views/logic/singleton';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { singletonStore } from 'views/logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
 import User, { type UserJSON } from 'logic/users/User';
@@ -55,7 +55,7 @@ const UsersStore: Store<{}> = singletonStore(
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedResponse) => ({
-          adminUser: UserOverview.fromJSON(response.context.admin_user),
+          adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
           list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
           pagination: {
             count: response.count,
