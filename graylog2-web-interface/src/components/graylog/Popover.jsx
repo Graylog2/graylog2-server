@@ -66,7 +66,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
           border-left-color: ${arrowColor};
         }
       }
-     }
+    }
   `;
 });
 
