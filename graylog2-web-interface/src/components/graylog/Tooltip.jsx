@@ -54,7 +54,7 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
       border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
       margin-top: -${arrowSize}px;
       right: -${arrowSize / 2}px;
-    } 
+    }
   }
   
   .tooltip-inner {

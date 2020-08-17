@@ -71,8 +71,6 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
 });
 
 const Popover = (props) => {
-  console.log('Popover props', props);
-
   return (
     <GraylogThemeProvider>
       <StyledPopover {...props} />
