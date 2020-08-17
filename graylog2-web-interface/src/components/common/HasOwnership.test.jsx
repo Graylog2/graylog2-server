@@ -10,10 +10,10 @@ import HasOwnership from './HasOwnership';
 
 type Props = {
   children: React.Node,
-  currentUser: {
+  currentUser: {|
     grn_permissions: string[],
     permissions: string[],
-  },
+  |},
   id: string,
   type: string,
 };

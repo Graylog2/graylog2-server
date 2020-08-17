@@ -31,7 +31,7 @@ const HasOwnership = ({ children, id, type }: Props) => {
 };
 
 HasOwnership.propTypes = {
-  /**  Children to render if user has entity of entity */
+  /** Children to render if user has ownership of the entity */
   children: PropTypes.node,
   /** The id string which shows entity */
   id: PropTypes.string,
