@@ -622,7 +622,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      className="FormControl-sc-1amoaox-0 cmyoyp"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -630,7 +630,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render create new 1`]
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                        className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
@@ -1329,7 +1329,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      className="FormControl-sc-1amoaox-0 cmyoyp"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -1337,7 +1337,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render disabled creat
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                        className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"
@@ -2062,7 +2062,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                   >
                                     <FormControl
                                       bsClass="form-control"
-                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      className="FormControl-sc-1amoaox-0 cmyoyp"
                                       componentClass="input"
                                       onChange={[Function]}
                                       placeholder="Enter title"
@@ -2070,7 +2070,7 @@ exports[`SavedSearchForm render the SavedSearchForm should render save 1`] = `
                                       value="new Title"
                                     >
                                       <input
-                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                        className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                         onChange={[Function]}
                                         placeholder="Enter title"
                                         type="text"

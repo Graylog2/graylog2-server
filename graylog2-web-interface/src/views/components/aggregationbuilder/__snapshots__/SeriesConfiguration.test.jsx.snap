@@ -48,14 +48,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
             >
               <FormControl
                 bsClass="form-control"
-                className="FormControl-sc-1amoaox-0 fKSsjP"
+                className="FormControl-sc-1amoaox-0 cmyoyp"
                 componentClass="input"
                 onChange={[Function]}
                 type="text"
                 value="count()"
               >
                 <input
-                  className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                  className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                   onChange={[Function]}
                   type="text"
                   value="count()"
