@@ -9,7 +9,7 @@ import { createGRN } from 'logic/permissions/GRN';
 import HasOwnership from './HasOwnership';
 
 type Props = {
-  children: React.Node,
+  children: React.Node | { disabled: boolean } => React.Node,
   currentUser: {|
     grn_permissions: string[],
     permissions: string[],
@@ -26,6 +26,13 @@ describe('HasOwnership', () => {
       </HasOwnership>
     </CurrentUserContext.Provider>
   );
+
+  // eslint-disable-next-line react/prop-types
+  const DisabledComponent = ({ disabled }: { disabled: boolean}) => {
+    return disabled
+      ? <span>disabled</span>
+      : <span>enabled</span>;
+  };
 
   const type = 'stream';
   const id = '000000000001';
@@ -112,5 +119,18 @@ describe('HasOwnership', () => {
     );
 
     expect(queryByText('Lovecraft')).toBeTruthy();
+  });
+
+  it('should disable children when configured', () => {
+    const user = { grn_permissions: [otherGrnPermission], permissions: [] };
+    const { queryByText } = render(
+      <SimpleHasOwnership currentUser={user} id={id} type={type} disableChildren>
+        {({ disabled }) => (
+          <DisabledComponent disabled={disabled} />
+        )}
+      </SimpleHasOwnership>,
+    );
+
+    expect(queryByText('disabled')).toBeTruthy();
   });
 });

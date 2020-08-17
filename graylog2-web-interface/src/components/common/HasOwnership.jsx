@@ -7,12 +7,13 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import { createGRN } from 'logic/permissions/GRN';
 
 type Props = {
-  children: React.Node,
+  children: React.Node | ({ disabled: boolean }) => React.Node,
   id: string,
   type: string,
+  disableChildren: boolean,
 };
 
-const HasOwnership = ({ children, id, type }: Props) => {
+const HasOwnership = ({ children, id, type, disableChildren }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const entity = createGRN(id, type);
   const ownership = `entity:own:${entity}`;
@@ -23,8 +24,16 @@ const HasOwnership = ({ children, id, type }: Props) => {
     const isAdmin = permissions.includes(adminPermission);
 
     if (grnPermissions.includes(ownership) || isAdmin) {
+      if (disableChildren && typeof children === 'function') {
+        return <>{ children({ disabled: false }) } </>;
+      }
+
       return children;
     }
+  }
+
+  if (disableChildren && typeof children === 'function') {
+    return <>{ children({ disabled: true }) } </>;
   }
 
   return null;
@@ -32,11 +41,20 @@ const HasOwnership = ({ children, id, type }: Props) => {
 
 HasOwnership.propTypes = {
   /** Children to render if user has ownership of the entity */
-  children: PropTypes.node,
+  children: PropTypes.oneOfType([
+    PropTypes.node,
+    PropTypes.func,
+  ]).isRequired,
   /** The id string which shows entity */
-  id: PropTypes.string,
+  id: PropTypes.string.isRequired,
   /** The type of the entity e.g dashboard, stream */
-  type: PropTypes.string,
+  type: PropTypes.string.isRequired,
+  /** Will add disabled=true as a prop to the child in stead of not rendering it */
+  disableChildren: PropTypes.bool,
+};
+
+HasOwnership.defaultProps = {
+  disableChildren: false,
 };
 
 export default HasOwnership;
