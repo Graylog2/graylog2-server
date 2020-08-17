@@ -61,7 +61,7 @@ const UserList = createReactClass({
   },
 
   deleteUser(username) {
-    const promise = UsersActions.deleteUser(username);
+    const promise = UsersActions.delete(username);
 
     promise.done(() => {
       this.loadUsers();

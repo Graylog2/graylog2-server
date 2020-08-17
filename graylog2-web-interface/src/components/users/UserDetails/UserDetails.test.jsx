@@ -16,14 +16,14 @@ const mockPaginatedUserShares = simplePaginatedUserShares(1, 10, '');
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
-    loadForUser: jest.fn(() => mockAuthzRolesPromise),
-    loadPaginated: jest.fn(() => mockAuthzRolesPromise),
+    loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
+    loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
   },
 }));
 
 jest.mock('stores/permissions/EntityShareStore', () => ({
   EntityShareActions: {
-    searchPaginatedUserShares: jest.fn(() => Promise.resolve(mockPaginatedUserShares)),
+    loadUserSharesPaginated: jest.fn(() => Promise.resolve(mockPaginatedUserShares)),
   },
 }));
 
@@ -128,7 +128,7 @@ describe('<UserDetails />', () => {
         fireEvent.change(searchInput, { target: { value: 'the username' } });
         fireEvent.click(searchSubmitButton);
 
-        await waitFor(() => expect(EntityShareActions.searchPaginatedUserShares).toHaveBeenCalledWith(user.username, 1, 10, 'the username', undefined));
+        await waitFor(() => expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 10, 'the username', undefined));
 
         await act(() => mockAuthzRolesPromise);
       });
@@ -141,7 +141,7 @@ describe('<UserDetails />', () => {
         await selectEvent.openMenu(entityTypeSelect);
         await act(async () => { await selectEvent.select(entityTypeSelect, 'Dashboard'); });
 
-        expect(EntityShareActions.searchPaginatedUserShares).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { entity_type: 'dashboard' });
+        expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { entity_type: 'dashboard' });
 
         await act(() => mockAuthzRolesPromise);
       });
@@ -154,7 +154,7 @@ describe('<UserDetails />', () => {
         await selectEvent.openMenu(capabilitySelect);
         await act(async () => { await selectEvent.select(capabilitySelect, 'Manager'); });
 
-        expect(EntityShareActions.searchPaginatedUserShares).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { capability: 'manage' });
+        expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { capability: 'manage' });
 
         await act(() => mockAuthzRolesPromise);
       });

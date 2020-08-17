@@ -63,7 +63,7 @@ const RolesOverview = () => {
   const { list: roles, pagination: { page, perPage, query, total } } = paginatedRoles;
 
   const _loadRoles = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthzRolesActions.loadPaginated(newPage, newPerPage, newQuery).then(setPaginatedRoles);
+    return AuthzRolesActions.loadRolesPaginated(newPage, newPerPage, newQuery).then(setPaginatedRoles);
   };
 
   const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;
@@ -72,7 +72,7 @@ const RolesOverview = () => {
   useEffect(() => {
     _loadRoles(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
-    const unlistenDeleteRole = AuthzRolesActions.deleteRole.completed.listen(() => {
+    const unlistenDeleteRole = AuthzRolesActions.delete.completed.listen(() => {
       _loadRoles(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 

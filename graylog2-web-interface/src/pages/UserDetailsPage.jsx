@@ -36,7 +36,7 @@ const UserDetailsPage = ({ params }: Props) => {
   useEffect(() => {
     UsersActions.load(username).then(setLoadedUser);
 
-    EntityShareActions.searchPaginatedUserShares(username, 1, 10, '').then((response) => {
+    EntityShareActions.loadUserSharesPaginated(username, 1, 10, '').then((response) => {
       setPaginatedUserShares(response);
     });
   }, [username]);

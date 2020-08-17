@@ -23,7 +23,7 @@ const RolesSection = ({ user: { username } }: Props) => {
   const _onLoad = ({ page, perPage, query }: PaginationInfo, isSubscribed: boolean): Promise<?PaginatedListType> => {
     setLoading(true);
 
-    return AuthzRolesActions.loadForUser(username, page, perPage, query)
+    return AuthzRolesActions.loadRolesForUser(username, page, perPage, query)
       .then((response) => {
         if (isSubscribed) {
           setLoading(false);

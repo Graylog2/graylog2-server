@@ -25,7 +25,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
   const _deleteRole = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete role ${roleName}?`)) {
-      AuthzRolesActions.deleteRole(roleId).then(() => {
+      AuthzRolesActions.delete(roleId).then(() => {
         UserNotification.success(`Role "${roleName}" was deleted successfully`);
       }, () => {
         UserNotification.error(`There was an error deleting the role "${roleName}"`);
@@ -35,7 +35,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
       //   if (membership.users.length !== 0) {
       //     UserNotification.error(`Cannot delete role ${roleName}. It is still assigned to ${membership.users.length} users.`);
       //   } else {
-      //     AuthzRolesActions.deleteRole(roleId).then(() => {
+      //     AuthzRolesActions.delete(roleId).then(() => {
       //       UserNotification.success(`Role "${roleName}" was deleted successfully`);
       //     }, () => {
       //       UserNotification.error(`There was an error deleting the role "${roleName}"`);

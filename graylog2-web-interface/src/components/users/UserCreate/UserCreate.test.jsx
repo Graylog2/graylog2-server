@@ -33,7 +33,7 @@ jest.mock('stores/users/UsersStore', () => ({
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
-    loadPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
+    loadRolesPaginated: jest.fn(() => Promise.resolve(mockLoadRolesPromise)),
   },
 }));
 

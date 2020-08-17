@@ -16,7 +16,7 @@ type Props = {
 
 const SharedEntitiesSection = ({ paginatedUserShares, username }: Props) => {
   const [loading, setLoading] = useState(false);
-  const _searchPaginated = (newPage, newPerPage, newQuery, additonalQueries) => EntityShareActions.searchPaginatedUserShares(username, newPage, newPerPage, newQuery, additonalQueries);
+  const _searchPaginated = (newPage, newPerPage, newQuery, additonalQueries) => EntityShareActions.loadUserSharesPaginated(username, newPage, newPerPage, newQuery, additonalQueries);
 
   return (
     <SectionComponent title="Shared Entities" showLoading={loading}>
