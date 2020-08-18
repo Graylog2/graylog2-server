@@ -77,7 +77,7 @@ module.exports = {
   ],
   usageMode: 'collapse',
   styleguideComponents: {
-    Wrapper: path.join(__dirname, 'test/StyleguideWrapper'),
+    Wrapper: path.join(__dirname, 'src/theme/docs/StyleguideWrapper'),
   },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
@@ -88,6 +88,11 @@ module.exports = {
   },
   theme: {
     sidebarWidth: 300,
+    color: {
+      baseBackground: 'transparent',
+      base: 'inherit',
+      sidebarBackground: 'transparent',
+    },
   },
   skipComponentsWithoutExample: true,
 };
