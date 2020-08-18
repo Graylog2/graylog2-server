@@ -57,7 +57,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                    class="Button-c9cbmb-0 kLwsUP submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -68,7 +68,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                    class="Button-c9cbmb-0 kLwsUP reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -92,7 +92,7 @@ exports[`SavedSearchList render the SavedSearchList should render empty 1`] = `
             class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 bNulii btn btn-default"
+              class="Button-c9cbmb-0 kLwsUP btn btn-default"
               type="button"
             >
               Cancel
@@ -162,7 +162,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                    class="Button-c9cbmb-0 kLwsUP submit-button btn btn-default"
                     type="submit"
                   >
                     Search
@@ -173,7 +173,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                    class="Button-c9cbmb-0 kLwsUP reset-button btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -195,7 +195,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 cmyoyp form-control input-sm"
                     id="page-size"
                     label="Show"
                     name="page-size"
@@ -250,7 +250,7 @@ exports[`SavedSearchList render the SavedSearchList should render with views 1`]
             class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 bNulii btn btn-default"
+              class="Button-c9cbmb-0 kLwsUP btn btn-default"
               type="button"
             >
               Cancel

@@ -20,35 +20,51 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
       color: ${theme.colors.variant.darkest.default};
     }
 
-    &.top > .arrow {
-      border-top-color: ${borderColor};
-
-      &::after {
-        border-top-color: ${arrowColor};
+    &.top {
+      transform: translate(-50%, -100%);
+    
+      > .arrow {
+        border-top-color: ${borderColor};
+  
+        &::after {
+          border-top-color: ${arrowColor};
+        }
       }
     }
 
-    &.right > .arrow {
-      border-right-color: ${borderColor};
-
-      &::after {
-        border-right-color: ${arrowColor};
+    &.right {
+      transform: translateY(-50%);
+      
+      > .arrow {
+        border-right-color: ${borderColor};
+  
+        &::after {
+          border-right-color: ${arrowColor};
+        }
       }
     }
 
-    &.bottom > .arrow {
-      border-bottom-color: ${borderColor};
-
-      &::after {
-        border-bottom-color: ${arrowColor};
+    &.bottom {
+      transform: translateX(-50%);
+      
+      > .arrow {
+        border-bottom-color: ${borderColor};
+  
+        &::after {
+          border-bottom-color: ${arrowColor};
+        }
       }
     }
 
-    &.left > .arrow {
-      border-left-color: ${borderColor};
-
-      &::after {
-        border-left-color: ${arrowColor};
+    &.left {
+      transform: translate(-100%, -50%);
+      
+      > .arrow {
+        border-left-color: ${borderColor};
+  
+        &::after {
+          border-left-color: ${arrowColor};
+        }
       }
     }
   `;

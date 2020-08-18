@@ -239,12 +239,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="primary"
-                                  className="Button-c9cbmb-0 bNulii"
+                                  className="Button-c9cbmb-0 kLwsUP"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 bNulii btn btn-sm btn-primary"
+                                    className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-primary"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -264,12 +264,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="info"
-                                  className="Button-c9cbmb-0 bNulii"
+                                  className="Button-c9cbmb-0 kLwsUP"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                    className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"

@@ -21,7 +21,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             <button
               aria-expanded="false"
               aria-haspopup="true"
-              class="DropdownButton-sc-1343dcx-0 TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 gAJAex dropdown-toggle btn btn-info"
+              class="DropdownButton-sc-1343dcx-0 TimeRangeDropdownButton__StyledDropdownButton-sc-1rmks06-0 kICkPk dropdown-toggle btn btn-info"
               id="timerange-type"
               role="button"
               type="button"
@@ -88,7 +88,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             
             <span>
               <select
-                class="FormControl-sc-1amoaox-0 fKSsjP relative form-control"
+                class="FormControl-sc-1amoaox-0 cmyoyp relative form-control"
                 id="relative-timerange-selector"
                 label=""
                 name="timerange.range"
@@ -196,7 +196,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           </a>
         </div>
         <button
-          class="Button-c9cbmb-0 SearchButton__StyledButton-mm3q5z-0 WuJdQ pull-left btn btn-success"
+          class="Button-c9cbmb-0 SearchButton__StyledButton-mm3q5z-0 kCPtzl pull-left btn btn-success"
           title="Perform search"
           type="submit"
         >

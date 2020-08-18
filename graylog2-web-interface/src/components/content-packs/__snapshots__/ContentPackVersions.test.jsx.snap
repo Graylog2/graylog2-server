@@ -304,12 +304,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="success"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-success"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-success"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -327,7 +327,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               <DropdownButton
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                className="DropdownButton-sc-1343dcx-0 ffHANd"
                                 id="action-1"
                                 title="Actions"
                               >
@@ -367,7 +367,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                             bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                            className="DropdownButton-sc-1343dcx-0 ffHANd"
                                             id="action-1"
                                             key=".0"
                                             onClick={[Function]}
@@ -383,7 +383,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               bsClass="btn"
                                               bsSize="small"
                                               bsStyle="info"
-                                              className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                              className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle"
                                               disabled={false}
                                               id="action-1"
                                               onClick={[Function]}
@@ -393,7 +393,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               <button
                                                 aria-expanded={false}
                                                 aria-haspopup={true}
-                                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-info"
+                                                className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
                                                 id="action-1"
                                                 onClick={[Function]}
@@ -777,12 +777,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="success"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-success"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-success"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -800,7 +800,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               <DropdownButton
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                className="DropdownButton-sc-1343dcx-0 ffHANd"
                                 id="action-2"
                                 title="Actions"
                               >
@@ -840,7 +840,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                             bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                            className="DropdownButton-sc-1343dcx-0 ffHANd"
                                             id="action-2"
                                             key=".0"
                                             onClick={[Function]}
@@ -856,7 +856,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               bsClass="btn"
                                               bsSize="small"
                                               bsStyle="info"
-                                              className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                              className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle"
                                               disabled={false}
                                               id="action-2"
                                               onClick={[Function]}
@@ -866,7 +866,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               <button
                                                 aria-expanded={false}
                                                 aria-haspopup={true}
-                                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-info"
+                                                className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
                                                 id="action-2"
                                                 onClick={[Function]}
@@ -1250,12 +1250,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="success"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-success"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-success"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -1273,7 +1273,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               <DropdownButton
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                className="DropdownButton-sc-1343dcx-0 ffHANd"
                                 id="action-3"
                                 title="Actions"
                               >
@@ -1313,7 +1313,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                             bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                            className="DropdownButton-sc-1343dcx-0 ffHANd"
                                             id="action-3"
                                             key=".0"
                                             onClick={[Function]}
@@ -1329,7 +1329,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               bsClass="btn"
                                               bsSize="small"
                                               bsStyle="info"
-                                              className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                              className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle"
                                               disabled={false}
                                               id="action-3"
                                               onClick={[Function]}
@@ -1339,7 +1339,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               <button
                                                 aria-expanded={false}
                                                 aria-haspopup={true}
-                                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-info"
+                                                className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
                                                 id="action-3"
                                                 onClick={[Function]}
@@ -1723,12 +1723,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="success"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-success"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-success"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -1746,7 +1746,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               <DropdownButton
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                className="DropdownButton-sc-1343dcx-0 ffHANd"
                                 id="action-4"
                                 title="Actions"
                               >
@@ -1786,7 +1786,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                             bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 dAnLDc"
+                                            className="DropdownButton-sc-1343dcx-0 ffHANd"
                                             id="action-4"
                                             key=".0"
                                             onClick={[Function]}
@@ -1802,7 +1802,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               bsClass="btn"
                                               bsSize="small"
                                               bsStyle="info"
-                                              className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
+                                              className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle"
                                               disabled={false}
                                               id="action-4"
                                               onClick={[Function]}
@@ -1812,7 +1812,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                               <button
                                                 aria-expanded={false}
                                                 aria-haspopup={true}
-                                                className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-info"
+                                                className="DropdownButton-sc-1343dcx-0 ffHANd dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
                                                 id="action-4"
                                                 onClick={[Function]}

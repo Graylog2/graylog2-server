@@ -15,13 +15,13 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
         block={false}
         bsClass="btn"
         bsStyle="success"
-        className="Button-c9cbmb-0 bNulii button"
+        className="Button-c9cbmb-0 kLwsUP button"
         disabled={false}
         id="upload-content-pack-button"
         onClick={[Function]}
       >
         <button
-          className="Button-c9cbmb-0 bNulii button btn btn-success"
+          className="Button-c9cbmb-0 kLwsUP button btn btn-success"
           disabled={false}
           id="upload-content-pack-button"
           onClick={[Function]}

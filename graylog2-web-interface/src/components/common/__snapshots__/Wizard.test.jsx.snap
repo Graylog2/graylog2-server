@@ -130,9 +130,9 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 }
 
 .c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
+  background-color: transparent;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link.active {
@@ -143,8 +143,8 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 
 .c3.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link[disabled],
@@ -823,9 +823,9 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 }
 
 .c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
+  background-color: transparent;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link.active {
@@ -836,8 +836,8 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 
 .c3.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link[disabled],
@@ -1529,9 +1529,9 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 }
 
 .c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
+  background-color: transparent;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link.active {
@@ -1542,8 +1542,8 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 
 .c3.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link[disabled],
@@ -2205,9 +2205,9 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 }
 
 .c3.btn-link:hover {
-  background-color: #ebebeb26;
-  border-color: #ebebeb26;
-  color: #68267b;
+  background-color: transparent;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link.active {
@@ -2218,8 +2218,8 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 
 .c3.btn-link.active:hover {
   background-color: rgba(255,255,255,0);
-  border-color: #ebebeb26;
-  color: #3d0c51;
+  border-color: transparent;
+  color: #410057;
 }
 
 .c3.btn-link[disabled],
