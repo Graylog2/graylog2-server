@@ -70,6 +70,7 @@ const UserList = createReactClass({
 
   _deleteUserFunction(username) {
     return () => {
+      // eslint-disable-next-line no-alert
       if (window.confirm(`Do you really want to delete user ${username}?`)) {
         this.deleteUser(username);
       }
