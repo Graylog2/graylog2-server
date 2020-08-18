@@ -1,7 +1,7 @@
 Color utilities can be found at
 
 ```js static
-import { util } from 'theme';`
+import { util } from 'theme';
 ```
 
 ## colorLevel
@@ -16,26 +16,10 @@ Recreating [`color-level`](https://github.com/twbs/bootstrap/blob/08ba61e276a639
 
 Negative numbers render a lighter color, positive numbers get darker. Check out the follow example to see some samples of this in action.
 
-```js
-import { colors, utils } from 'theme';
-import ColorSwatch from './Colors';
+```jsx harmony
+import { ColorLevelExample } from './Utilities';
 
-const { info, primary } = colors.variant;
-
-<>
-  <p>
-    <ColorSwatch name='info -5' color={utils.colorLevel(info, -5)} />
-    <ColorSwatch name='info' color={info} />
-    <ColorSwatch name='info +5' color={utils.colorLevel(info, 5)} />
-  </p>
-  <p>
-    <ColorSwatch name='primary -8' color={utils.colorLevel(primary, -8)} />
-    <ColorSwatch name='primary -2' color={utils.colorLevel(primary, -2)} />
-    <ColorSwatch name='primary' color={primary} />
-    <ColorSwatch name='primary +2' color={utils.colorLevel(primary, 2)} />
-    <ColorSwatch name='primary +8' color={utils.colorLevel(primary, 8)} />
-  </p>
-</>
+<ColorLevelExample />;
 ```
 
 ## contrastingColor
@@ -47,32 +31,10 @@ Accepts a color and [WCAG](https://www.w3.org/TR/WCAG21/#distinguishable) level,
 **`wcagLevel`**
   - defaults: "AAA" -Based on the [contrast calculations recommended by W3](https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced.html). (available levels: "AA", "AALarge", "AAA", "AAALarge")
 
-```js
-import { colors, utils } from 'theme';
-import ColorSwatch from './Colors';
+```jsx harmony
+import { ContrastingColorExample } from './Utilities';
 
-const { info, primary } = colors.variant;
-const { textDefault } = colors.global;
-
-<>
-  <p>
-    <ColorSwatch name='info AAA' color={utils.contrastingColor(info)} />
-    <ColorSwatch name='info' color={info} />
-    <ColorSwatch name='info AA' color={utils.contrastingColor(info, 'AA')} />
-  </p>
-  <p>
-    <ColorSwatch name='textDefault AAALarge' color={utils.contrastingColor(textDefault, 'AAALarge')} />
-    <ColorSwatch name='textDefault AAA' color={utils.contrastingColor(textDefault)} />
-    <ColorSwatch name='textDefault' color={textDefault} />
-    <ColorSwatch name='textDefault AALarge' color={utils.contrastingColor(textDefault, 'AALarge')} />
-    <ColorSwatch name='textDefault AA' color={utils.contrastingColor(textDefault, 'AA')} />
-  </p>
-  <p>
-    <ColorSwatch name='primary AAA' color={utils.contrastingColor(primary)} />
-    <ColorSwatch name='primary' color={primary} />
-    <ColorSwatch name='primary AA' color={utils.contrastingColor(primary, 'AA')} />
-  </p>
-</>
+<ContrastingColorExample />;
 ```
 
 ## readableColor
@@ -87,24 +49,8 @@ Generating a readable color following [W3C specs for readability](https://www.w3
 **`lightColor`**
   - defaults: Currently `color.global.textAlt`
 
-```js
-import { colors, utils } from 'theme';
-import ColorSwatch from './Colors';
+```jsx harmony
+import { ReadableColorExample } from './Utilities';
 
-const { info, primary } = colors.variant;
-const { textDefault } = colors.global;
-
-<>
-  <p>
-    <ColorSwatch name='info' color={info} />
-    <ColorSwatch name='info readableColor' color={utils.readableColor(info)} />
-  </p>
-  <p>
-    <ColorSwatch name='textDefault' color={textDefault} />
-    <ColorSwatch name='textDefault readableColor' color={utils.readableColor(textDefault)} />
-  </p>
-  <p>
-    <ColorSwatch name='primary' color={primary} />
-    <ColorSwatch name='primary readableColor' color={utils.readableColor(primary)} />
-  </p>
-</>
+<ReadableColorExample />;
+```
