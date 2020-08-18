@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTheme } from 'styled-components';
 
-import ColorSwatch from './Colors';
+import ColorSwatch from './ColorSwatch';
 
 export const ColorLevelExample = withTheme(({ theme }) => {
   const { info, primary } = theme.colors.variant;
