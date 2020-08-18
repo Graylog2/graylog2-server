@@ -1,110 +1,88 @@
-import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import ClipboardJS from 'clipboard';
+import React from 'react';
+import styled, { withTheme } from 'styled-components';
+import chroma from 'chroma-js';
 
-import { Tooltip } from 'components/graylog';
+import ColorSwatch, { Swatch } from './ColorSwatch';
 
-const Name = styled.span`
-  flex: 1;
-  font-weight: bold;
-  text-align: left;
+const Section = styled.h4`
+  margin: 0 0 6px;
 `;
 
-const Value = styled.span`
-  text-align: right;
-  opacity: 0.5;
-  transition: opacity 150ms ease-in-out;
-`;
-
-const StyledTooltip = styled(Tooltip).attrs((props) => ({
-  /* stylelint-disable property-no-unknown */
-  className: props.opened ? 'in' : '',
-  /* stylelint-enable property-no-unknown */
-}))(({ opened }) => css`
-  display: ${opened ? 'block' : 'none'};
-`);
-
-const Wrapped = styled.div`
-  flex: 1;
-  position: relative;
-`;
-
-const Swatch = styled.button(({ color, theme }) => css`
-  height: 60px;
-  background-color: ${color};
-  border: 1px solid #222;
-  color: ${theme.utils.readableColor(color)};
-  cursor: pointer;
+const Swatches = styled.div`
   display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 3px 6px;
-  width: 100%;
+  margin: 0 0 15px;
+  flex-wrap: wrap;
+`;
 
-  &:hover {
-    ${Value} {
-      opacity: 1;
+const StyledColorSwatch = styled(ColorSwatch)`
+  flex-basis: ${(props) => (props.section === 'global' ? '100px' : '1px')};
+  max-width: ${(props) => (props.section === 'global' ? '200px' : 'auto')};
+
+  ${Swatch} {
+    margin-right: 6px;
+    margin-bottom: 3px;
+
+    &:last-of-type {
+      margin: 0;
     }
   }
-`);
+`;
 
-const ColorSwatch = ({ className, color, name, copyText }) => {
-  const [opened, setOpened] = useState(false);
-  const swatchRef = useRef();
-  let clipboard;
+const getValues = (data = {}, callback = () => {}) => {
+  return Object.keys(data).map((key) => callback(key));
+};
 
-  useEffect(() => {
-    if (ClipboardJS.isSupported() && !!copyText) {
-      clipboard = new ClipboardJS(swatchRef.current, {});
-
-      clipboard.on('success', () => {
-        setOpened(true);
-
-        setTimeout(() => {
-          setOpened(false);
-        }, 1000);
-      });
-    }
-
-    return () => {
-      if (clipboard) {
-        clipboard.destroy();
-      }
-    };
-  }, []);
-
+const SectionWrap = (mode, section) => {
   return (
-    <Wrapped className={className}>
-      <StyledTooltip placement="top"
-                     opened={opened}
-                     positionTop={-32}
-                     id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
-        Copied!
-      </StyledTooltip>
+    <React.Fragment key={`swatches-${section}`}>
+      <Swatches>
+        {getValues(mode, (name) => {
+          if (typeof mode[name] === 'string' && chroma.valid(mode[name])) {
+            const copyTextName = section === 'gray' ? `${section}[${name}]` : `${section}.${name}`;
 
-      <Swatch color={color}
-              data-clipboard-button
-              data-clipboard-text={copyText}
-              ref={swatchRef}>
-        <Name>{name}</Name>
-        <Value>{color}</Value>
-      </Swatch>
-    </Wrapped>
+            return (
+              <StyledColorSwatch name={name}
+                                 section={section}
+                                 color={mode[name]}
+                                 copyText={`theme.colors.${copyTextName}`}
+                                 key={`color-swatch-${section}-${copyTextName}`} />
+            );
+          }
+        })}
+      </Swatches>
+
+      <div>
+        {getValues(mode, (name) => typeof mode[name] === 'object' && (
+        <React.Fragment key={`swatches-${section}-${name}`}>
+          <Section>{section} &mdash; {name}</Section>
+
+          <Swatches>
+            {getValues(mode[name], (subname) => (
+              <StyledColorSwatch name={subname}
+                                 section={section}
+                                 color={mode[name][subname]}
+                                 copyText={`theme.colors.${section}.${name}.${subname}`}
+                                 key={`color-swatch-${section}-${name}-${subname}`} />
+            ))}
+          </Swatches>
+        </React.Fragment>
+        ))}
+      </div>
+    </React.Fragment>
   );
 };
 
-ColorSwatch.propTypes = {
-  className: PropTypes.string,
-  color: PropTypes.string.isRequired,
-  copyText: PropTypes.string,
-  name: PropTypes.string,
+const Colors = ({ theme }) => {
+  return (
+    <>
+      {getValues(theme.colors, (section) => (
+        <React.Fragment key={`section-${section}`}>
+          <Section>{section}</Section>
+          {SectionWrap(theme.colors[section], section)}
+        </React.Fragment>
+      ))}
+    </>
+  );
 };
 
-ColorSwatch.defaultProps = {
-  className: undefined,
-  copyText: undefined,
-  name: '',
-};
-
-export default ColorSwatch;
+export default withTheme(Colors);
