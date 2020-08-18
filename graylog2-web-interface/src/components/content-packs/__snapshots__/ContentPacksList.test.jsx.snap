@@ -779,70 +779,60 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   ]
                 }
               >
-                <div
+                <PageSizeSelect__Wrapper
                   className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show"
@@ -852,9 +842,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
                                       label="Show"
                                       name="page-size"
                                       onChange={[Function]}
@@ -862,41 +855,52 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
@@ -7011,70 +7015,60 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   ]
                 }
               >
-                <div
+                <PageSizeSelect__Wrapper
                   className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show"
@@ -7084,9 +7078,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
                                       label="Show"
                                       name="page-size"
                                       onChange={[Function]}
@@ -7094,41 +7091,52 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
@@ -7415,70 +7423,60 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                   ]
                 }
               >
-                <div
+                <PageSizeSelect__Wrapper
                   className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show"
@@ -7488,9 +7486,12 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
                                       label="Show"
                                       name="page-size"
                                       onChange={[Function]}
@@ -7498,41 +7499,52 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
@@ -7605,70 +7617,60 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                   ]
                 }
               >
-                <div
+                <PageSizeSelect__Wrapper
                   className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
                                     label="Show"
@@ -7678,9 +7680,12 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
                                       label="Show"
                                       name="page-size"
                                       onChange={[Function]}
@@ -7688,41 +7693,52 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
