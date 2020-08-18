@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { createGlobalStyle, css, ThemeProvider } from 'styled-components';
 import noop from 'lodash/noop';
@@ -128,41 +128,71 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 `);
 
-const StyleguideWrapper = ({ children }) => {
-  const currentMode = (Store.get(LOCAL_STORE_NAME) || PREFERENCES_THEME_MODE) || THEME_MODE_LIGHT;
-  const themeColors = colors[currentMode];
+const StyleguideThemeProvider = ({ children }) => {
+  const [mode, setMode] = useState();
+  const [themeColors, setThemeColors] = useState();
+  const [theme, setTheme] = useState();
+
+  const changeMode = (nextMode) => Promise.resolve().then(() => {
+    if (colors[nextMode]) {
+      Store.set(LOCAL_STORE_NAME, nextMode);
+      setMode(nextMode);
+
+      return { [LOCAL_STORE_NAME]: nextMode };
+    }
+
+    return null;
+  });
 
   const formattedUtils = {
     ...utils,
-    colorLevel: utils.colorLevel(themeColors),
-    readableColor: utils.readableColor(themeColors),
+    colorLevel: themeColors ? utils.colorLevel(themeColors) : noop,
+    readableColor: themeColors ? utils.readableColor(themeColors) : noop,
   };
 
-  const theme = useMemo(() => ({
-    mode: currentMode,
-    changeMode: noop,
-    breakpoints,
-    colors: themeColors,
-    fonts,
-    components: {
-      button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-      aceEditor: aceEditorStyles({ colors: themeColors }),
-    },
-    utils: formattedUtils,
-  }), [currentMode]);
+  const themeMemo = useMemo(() => (themeColors ? (
+    {
+      mode,
+      changeMode,
+      breakpoints,
+      colors: themeColors,
+      fonts,
+      components: {
+        button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
+        aceEditor: aceEditorStyles({ colors: themeColors }),
+      },
+      utils: formattedUtils,
+    }
+  ) : null), [themeColors]);
 
-  return (
+  useEffect(() => {
+    setMode((Store.get(LOCAL_STORE_NAME) || PREFERENCES_THEME_MODE) || THEME_MODE_LIGHT);
+  }, []);
+
+  useEffect(() => {
+    if (mode) {
+      setThemeColors(colors[mode]);
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    if (themeColors) {
+      setTheme(themeMemo);
+    }
+  }, [themeColors]);
+
+  return theme ? (
     <ThemeProvider theme={theme}>
       <>
         <GlobalThemeStyles />
         {children}
       </>
     </ThemeProvider>
-  );
+  ) : null;
 };
 
-StyleguideWrapper.propTypes = {
+StyleguideThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export default StyleguideWrapper;
+export default StyleguideThemeProvider;
