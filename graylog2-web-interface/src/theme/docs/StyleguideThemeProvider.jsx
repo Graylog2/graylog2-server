@@ -1,32 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { createGlobalStyle, css, ThemeProvider } from 'styled-components';
+import noop from 'lodash/noop';
 
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import { breakpoints, colors, fonts, utils } from 'theme/index';
-import { THEME_MODE_LIGHT, THEME_MODE_DARK } from 'theme/constants';
+import { PREFERENCES_THEME_MODE, THEME_MODE_LIGHT } from 'theme/constants';
+import Store from 'logic/local-storage/Store';
 
-const themeColors = colors[THEME_MODE_DARK];
-const formattedUtils = {
-  ...utils,
-  colorLevel: utils.colorLevel(themeColors),
-  readableColor: utils.readableColor(themeColors),
-};
-
-const theme = {
-  mode: THEME_MODE_DARK,
-  changeMode: () => {},
-  breakpoints,
-  colors: themeColors,
-  fonts,
-  components: {
-    button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-    aceEditor: aceEditorStyles({ colors: themeColors }),
-  },
-  utils: formattedUtils,
-};
-
+const LOCAL_STORE_NAME = 'styleguide-theme-mode';
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   html {
     font-size: ${theme.fonts.size.root} !important; /* override Bootstrap default */
@@ -146,6 +129,28 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 `);
 
 const StyleguideWrapper = ({ children }) => {
+  const currentMode = (Store.get(LOCAL_STORE_NAME) || PREFERENCES_THEME_MODE) || THEME_MODE_LIGHT;
+  const themeColors = colors[currentMode];
+
+  const formattedUtils = {
+    ...utils,
+    colorLevel: utils.colorLevel(themeColors),
+    readableColor: utils.readableColor(themeColors),
+  };
+
+  const theme = useMemo(() => ({
+    mode: currentMode,
+    changeMode: noop,
+    breakpoints,
+    colors: themeColors,
+    fonts,
+    components: {
+      button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
+      aceEditor: aceEditorStyles({ colors: themeColors }),
+    },
+    utils: formattedUtils,
+  }), [currentMode]);
+
   return (
     <ThemeProvider theme={theme}>
       <>
