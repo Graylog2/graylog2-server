@@ -24,11 +24,11 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
   <Row>
     <Row
       bsClass="row"
-      className="Row-sc-3iisrt-0 gPzTHl"
+      className="Row-sc-3iisrt-0 iSaIhq"
       componentClass="div"
     >
       <div
-        className="Row-sc-3iisrt-0 gPzTHl row"
+        className="Row-sc-3iisrt-0 iSaIhq row"
       >
         <Col
           bsClass="col"
@@ -132,10 +132,10 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                 <Well>
                   <Well
                     bsClass="well"
-                    className="Well-sc-19gs1oc-0 YXCuT"
+                    className="Well-sc-19gs1oc-0 enTUtA"
                   >
                     <div
-                      className="Well-sc-19gs1oc-0 YXCuT well"
+                      className="Well-sc-19gs1oc-0 enTUtA well"
                     >
                       <div
                         dangerouslySetInnerHTML={
@@ -187,11 +187,11 @@ exports[`<ContentPackDetails /> should render with content pack without a descri
   <Row>
     <Row
       bsClass="row"
-      className="Row-sc-3iisrt-0 gPzTHl"
+      className="Row-sc-3iisrt-0 iSaIhq"
       componentClass="div"
     >
       <div
-        className="Row-sc-3iisrt-0 gPzTHl row"
+        className="Row-sc-3iisrt-0 iSaIhq row"
       >
         <Col
           bsClass="col"

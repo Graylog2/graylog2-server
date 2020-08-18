@@ -16,7 +16,8 @@ class MetricsComponent extends React.Component {
 
   state = { filter: this.props.filter };
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.filter !== this.props.filter) {
       this.setState({ filter: nextProps.filter });
     }

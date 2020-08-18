@@ -1,4 +1,6 @@
 // @flow strict
+import PropTypes from 'prop-types';
+
 import colorLevel, { type ColorLevel } from './colorLevel';
 import contrastingColor, { type ContrastingColor } from './contrastingColor';
 import opacify, { type Opacify } from './opacify';
@@ -11,7 +13,14 @@ export type Utils = {
   readableColor: ReadableColor,
 };
 
-const utils: Utils = {
+export const utilsPropTypes = PropTypes.shape({
+  colorLevel: PropTypes.func,
+  contrastingColor: PropTypes.func,
+  opacify: PropTypes.func,
+  readableColor: PropTypes.func,
+});
+
+const utils = {
   colorLevel,
   contrastingColor,
   opacify,

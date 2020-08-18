@@ -10,7 +10,8 @@ import { Icon } from 'components/common';
 import HoverForHelp from './HoverForHelp';
 
 const StyledDescriptionBox = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.gray[90]};
+  background-color: ${theme.colors.variant.lightest.default};
+  border: 1px solid ${theme.colors.variant.lighter.default};
   padding: 10px;
   margin: 5px;
   border-radius: 6px;

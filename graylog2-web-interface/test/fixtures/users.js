@@ -1,13 +1,11 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import { readerPermissions } from 'fixtures/permissions';
 
-import type { UserJSON as User } from 'stores/users/UsersStore';
-import UserOverview from 'logic/users/UserOverview';
+import User from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 
-/* eslint-disable import/prefer-default-export */
-
-export const viewsManager: User = {
-  client_address: '127.0.0.1',
+export const viewsManager: UserJSON = {
   email: '',
   external: false,
   full_name: 'Betty Holberton',
@@ -20,9 +18,10 @@ export const viewsManager: User = {
   session_timeout_ms: 28800000,
   timezone: 'UTC',
   username: 'betty',
+  client_address: '127.0.0.1',
 };
 
-export const admin: User = {
+export const admin: UserJSON = {
   client_address: '127.0.0.1',
   email: '',
   external: false,
@@ -38,40 +37,46 @@ export const admin: User = {
   username: 'alonzo',
 };
 
-export const alice = UserOverview.builder()
+export const alice = User.builder()
   .id('alice-id')
   .username('alice')
   .fullName('Alice Schwarzer')
   .email('alice@example.org')
-  .roles(Immutable.List(['Admin', 'Reader']))
+  .permissions(Immutable.List(readerPermissions('alice')))
+  .roles(Immutable.List(['Reader']))
   .readOnly(false)
   .external(false)
   .sessionActive(true)
+  .sessionTimeoutMs(10000000000)
   .clientAddress('127.0.0.1')
   .build();
 
-export const bob = UserOverview.builder()
+export const bob = User.builder()
   .id('bob-id')
   .username('bob')
   .fullName('Bob Bobson')
   .email('bob@example.org')
-  .roles(Immutable.List(['Admin', 'Reader']))
+  .permissions(Immutable.List(readerPermissions('bob')))
+  .roles(Immutable.List(['Reader']))
   .readOnly(false)
   .external(true)
   .sessionActive(false)
+  .sessionTimeoutMs(10000000000)
   .clientAddress('172.0.0.1')
   .build();
 
-export const adminUser = UserOverview.builder()
+export const adminUser = User.builder()
   .id('admin-id')
   .username('admin')
   .fullName('Administrator')
   .email('admin@example.org')
+  .permissions(Immutable.List(['*']))
   .roles(Immutable.List(['Admin', 'Reader']))
   .readOnly(false)
   .external(true)
   .sessionActive(true)
+  .sessionTimeoutMs(10000000000)
   .clientAddress('192.168.0.1')
   .build();
 
-export const userList = Immutable.List<UserOverview>([adminUser, bob, alice]);
+export const userList = Immutable.List<User>([adminUser, bob, alice]);

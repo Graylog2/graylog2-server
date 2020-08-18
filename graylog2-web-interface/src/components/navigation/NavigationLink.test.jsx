@@ -3,9 +3,9 @@ import { mount, shallow } from 'wrappedEnzyme';
 
 import NavigationLink from './NavigationLink';
 
-import URLUtils from '../../util/URLUtils';
+import { appPrefixed } from '../../util/URLUtils';
 
-jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path) }));
+jest.mock('util/URLUtils', () => ({ appPrefixed: jest.fn((path) => path), qualifyUrl: jest.fn((path) => path) }));
 
 describe('NavigationLink', () => {
   it('renders with simple props', () => {
@@ -22,12 +22,12 @@ describe('NavigationLink', () => {
   });
 
   it('does not prefix URL with app prefix', () => {
-    URLUtils.appPrefixed.mockImplementation((path) => `/someprefix${path}`);
+    appPrefixed.mockImplementation((path) => `/someprefix${path}`);
     const wrapper = shallow(<NavigationLink description="Hello there!" path="/hello" someProp={42} />);
     const linkContainer = wrapper.find('LinkContainer');
 
     expect(linkContainer.props().to).not.toContain('/someprefix');
-    expect(URLUtils.appPrefixed).not.toHaveBeenCalled();
+    expect(appPrefixed).not.toHaveBeenCalled();
   });
 
   it('renders with NavItem if toplevel', () => {

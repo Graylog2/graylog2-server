@@ -23,6 +23,12 @@ jest.mock('injection/CombinedProvider', () => ({
     },
     Messages: { MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) } },
     Streams: { StreamsStore: { listStreams: (...args) => mockListStreams(...args) } },
+    CurrentUser: {
+      CurrentUserStore: MockStore(),
+    },
+    Preferences: {
+      PreferencesStore: MockStore(),
+    },
   }[type])),
 }));
 

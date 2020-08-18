@@ -2,9 +2,9 @@
 import * as React from 'react';
 
 import User from 'logic/users/User';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
-import SectionComponent from '../SectionComponent';
-import ReadOnlyFormGroup from '../form/ReadOnlyFormGroup';
+import ReadOnlyFormGroup from '../../common/ReadOnlyFormGroup';
 
 type Props = {
   user: User,

@@ -48,10 +48,10 @@ public class EntityDependencyPermissionChecker {
      * @param selectedGrantees the selected grantees
      * @return dependencies that grantees cannot access, grouped by grantee
      */
-    public ImmutableMultimap<GRN, EntityDependency> check(GRN sharingUser,
-                                                          ImmutableSet<EntityDependency> dependencies,
+    public ImmutableMultimap<GRN, EntityDescriptor> check(GRN sharingUser,
+                                                          ImmutableSet<EntityDescriptor> dependencies,
                                                           ImmutableSet<GRN> selectedGrantees) {
-        final ImmutableMultimap.Builder<GRN, EntityDependency> deniedDependencies = ImmutableMultimap.builder();
+        final ImmutableMultimap.Builder<GRN, EntityDescriptor> deniedDependencies = ImmutableMultimap.builder();
         final GranteeAuthorizer sharerAuthorizer = granteeAuthorizerFactory.create(sharingUser);
 
         for (final GRN grantee : selectedGrantees) {
@@ -60,7 +60,7 @@ public class EntityDependencyPermissionChecker {
             // The same for the "everyone" grantee, we only check if  the "everyone" grantee has access to a dependency.
             final GranteeAuthorizer granteeAuthorizer = granteeAuthorizerFactory.create(grantee);
 
-            for (final EntityDependency dependency : dependencies) {
+            for (final EntityDescriptor dependency : dependencies) {
                 // We can only expose missing dependencies that the sharing user can read to avoid
                 // leaking information to the sharing user.
                 if (cannotView(sharerAuthorizer, dependency)) {
@@ -76,7 +76,7 @@ public class EntityDependencyPermissionChecker {
         return deniedDependencies.build();
     }
 
-    private boolean cannotView(GranteeAuthorizer authorizer, EntityDependency dependency) {
+    private boolean cannotView(GranteeAuthorizer authorizer, EntityDescriptor dependency) {
         final Optional<CapabilityDescriptor> capabilityDescriptor = builtinCapabilities.get(Capability.VIEW);
 
         return capabilityDescriptor.map(CapabilityDescriptor::permissions)

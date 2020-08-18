@@ -17,7 +17,10 @@
 package org.graylog.grn;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Provides GRN descriptor instances.
@@ -42,5 +45,15 @@ public class GRNDescriptorService {
             throw new IllegalStateException("Missing GRN descriptor provider for GRN type: " + grn.type());
         }
         return provider.get(grn);
+    }
+
+    /**
+     * Returns descriptors for the given GRN collection.
+     *
+     * @param grns collection of GRNs
+     * @return the descriptors for the given GRNs
+     */
+    public Set<GRNDescriptor> getDescriptors(Collection<GRN> grns) {
+        return grns.stream().map(this::getDescriptor).collect(Collectors.toSet());
     }
 }

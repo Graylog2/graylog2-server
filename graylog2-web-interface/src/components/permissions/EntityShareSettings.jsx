@@ -5,7 +5,9 @@ import styled from 'styled-components';
 
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
-import { EntityShareActions, type EntitySharePayload } from 'stores/permissions/EntityShareStore';
+import SharedEntity from 'logic/permissions/SharedEntity';
+import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -15,6 +17,7 @@ import ShareableEnityURL from './ShareableEnityURL';
 type Props = {
   description: $PropertyType<Props, 'description'>,
   entityGRN: GRN,
+  entityType: $PropertyType<SharedEntity, 'type'>,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
 };
@@ -48,6 +51,7 @@ const EntityShareSettings = ({
   },
   description,
   entityGRN,
+  entityType,
   setDisableSubmit,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
@@ -87,8 +91,6 @@ const EntityShareSettings = ({
         <p>
           {description}
         </p>
-      </Section>
-      <Section>
         <GranteesSelector availableGrantees={filteredGrantees}
                           availableCapabilities={availableCapabilities}
                           onSubmit={_handleSelection} />
@@ -97,6 +99,7 @@ const EntityShareSettings = ({
         <GranteesList activeShares={activeShares}
                       availableCapabilities={availableCapabilities}
                       entityGRN={entityGRN}
+                      entityType={entityType}
                       onDelete={_handleDeletion}
                       onCapabilityChange={_handleSelection}
                       selectedGrantees={selectedGrantees}

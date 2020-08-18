@@ -364,12 +364,13 @@ public abstract class IndicesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void retrievesCreationTimeOfIndex() {
+    public void retrievesCreationTimeOfIndexInUTC() {
         final String index = client().createRandomIndex("foo");
 
         final Optional<DateTime> creationDate = indices.indexCreationDate(index);
 
-        assertThat(creationDate).isNotEmpty();
+        assertThat(creationDate).hasValueSatisfying(dt ->
+                assertThat(dt.getZone()).isEqualTo(DateTimeZone.UTC));
     }
 
     @Test

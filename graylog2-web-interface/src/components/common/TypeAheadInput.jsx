@@ -63,7 +63,8 @@ class TypeAheadInput extends React.Component {
     this._updateTypeahead(this.props);
   }
 
-  componentWillReceiveProps(newProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(newProps) {
     this._destroyTypeahead();
     this._updateTypeahead(newProps);
   }

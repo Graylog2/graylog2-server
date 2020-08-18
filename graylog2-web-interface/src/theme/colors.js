@@ -1,5 +1,8 @@
 // @flow strict
-import teinte from './variants/teinte';
+import PropTypes from 'prop-types';
+
+import teint from './variants/teint';
+import noir from './variants/noir';
 
 export type Colors = {
   brand: {
@@ -10,8 +13,11 @@ export type Colors = {
   global: {
     background: string,
     contentBackground: string,
+    inputBackground: string,
     link: string,
     linkHover: string,
+    navigationBackground: string,
+    navigationBoxShadow: string,
     textAlt: string,
     textDefault: string,
   },
@@ -115,11 +121,145 @@ export type Colors = {
   },
 };
 
-const colors = {
-  ...teinte,
+export const colorsPropTypes = PropTypes.shape({
+  brand: PropTypes.shape({
+    primary: PropTypes.string,
+    secondary: PropTypes.string,
+    tertiary: PropTypes.string,
+  }),
+  global: PropTypes.shape({
+    background: PropTypes.string,
+    contentBackground: PropTypes.string,
+    inputBackground: PropTypes.string,
+    link: PropTypes.string,
+    linkHover: PropTypes.string,
+    navigationBackground: PropTypes.string,
+    navigationBoxShadow: PropTypes.string,
+    textAlt: PropTypes.string,
+    textDefault: PropTypes.string,
+  }),
+  gray: PropTypes.shape({
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    10: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    20: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    30: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    40: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    50: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    60: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    70: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    80: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    90: PropTypes.string,
+    // $FlowFixMe Non-string literal property keys not supported. [unsupported-syntax]
+    100: PropTypes.string,
+  }),
+  input: PropTypes.shape({
+    background: PropTypes.string,
+    backgroundDisabled: PropTypes.string,
+    border: PropTypes.string,
+    borderFocus: PropTypes.string,
+    boxShadow: PropTypes.string,
+    color: PropTypes.string,
+    colorDisabled: PropTypes.string,
+  }),
+  table: PropTypes.shape({
+    background: PropTypes.string,
+    backgroundAlt: PropTypes.string,
+    backgroundHover: PropTypes.string,
+    variant: PropTypes.shape({
+      active: PropTypes.string,
+      danger: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    variantHover: PropTypes.shape({
+      active: PropTypes.string,
+      danger: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+  }),
+  variant: PropTypes.shape({
+    danger: PropTypes.string,
+    dark: PropTypes.shape({
+      danger: PropTypes.string,
+      default: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    darker: PropTypes.shape({
+      danger: PropTypes.string,
+      default: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    darkest: PropTypes.shape({
+      danger: PropTypes.string,
+      default: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    default: PropTypes.string,
+    info: PropTypes.string,
+    light: PropTypes.shape({
+      danger: PropTypes.string,
+      default: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    lighter: PropTypes.shape({
+      danger: PropTypes.string,
+      default: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    lightest: PropTypes.shape({
+      danger: PropTypes.string,
+      default: PropTypes.string,
+      info: PropTypes.string,
+      primary: PropTypes.string,
+      success: PropTypes.string,
+      warning: PropTypes.string,
+    }),
+    primary: PropTypes.string,
+    success: PropTypes.string,
+    warning: PropTypes.string,
+  }),
+});
+
+type Modes = {
+  teint: Colors,
+  noir: Colors,
+};
+
+const colors: Modes = {
+  teint,
+  noir,
 };
 
 export default colors;
 export {
-  teinte,
+  noir,
+  teint,
 };

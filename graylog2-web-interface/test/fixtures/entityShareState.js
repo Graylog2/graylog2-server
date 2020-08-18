@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import EntityShareState, { type MissingDependencies } from 'logic/permissions/EntityShareState';
 import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
-import MissingDependency from 'logic/permissions/MissingDependency';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import ActiveShare from 'logic/permissions/ActiveShare';
 
 // grantees
@@ -72,7 +72,7 @@ const activeShares = Immutable.List([janeIsOwner]);
 const janeIsSelected = Immutable.Map({ [janeIsOwner.grantee]: janeIsOwner.capability });
 
 // missing dependencies
-const missingDependecy = MissingDependency
+const missingDependecy = SharedEntity
   .builder()
   .id('grn::::stream:57bc9188e62a2373778d9e03')
   .type('stream')

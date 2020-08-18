@@ -11,11 +11,13 @@ class MessageFieldExtractorActions extends React.Component {
     message: PropTypes.object.isRequired,
   };
 
-  componentWillMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this._refreshExtractorRoutes(this.props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this._refreshExtractorRoutes(nextProps);
   }
 

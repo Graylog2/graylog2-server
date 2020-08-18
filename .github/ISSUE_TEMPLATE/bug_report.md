@@ -37,6 +37,7 @@ assignees: ''
 <!--- Include as many relevant details about the environment you experienced the bug in -->
 
 * Graylog Version:
+* Java Version:
 * Elasticsearch Version:
 * MongoDB Version:
 * Operating System:

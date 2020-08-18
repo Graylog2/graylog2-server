@@ -49,8 +49,13 @@ public class EntityOwnershipService {
         registerNewEntity(grn, user);
     }
 
-    public void registerNewView(String id, User user) {
+    public void registerNewDashboard(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
+        registerNewEntity(grn, user);
+    }
+
+    public void registerNewSearch(String id, User user) {
+        final GRN grn = grnRegistry.newGRN(GRNTypes.SEARCH, id);
         registerNewEntity(grn, user);
     }
 
@@ -66,5 +71,15 @@ public class EntityOwnershipService {
                 .target(entity)
                 .grantee(grnRegistry.ofUser(user))
                 .build(), user);
+    }
+
+    public void unregisterView(String id) {
+        final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
+        dbGrantService.deleteForTarget(grn);
+    }
+
+    public void unregisterEventDefinition(String id) {
+        final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, id);
+        dbGrantService.deleteForTarget(grn);
     }
 }

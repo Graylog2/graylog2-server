@@ -28,6 +28,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -46,7 +47,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -58,7 +59,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -280,7 +281,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           backdrop="static"
           bsClass="modal"
           bsSize="large"
-          className="Modal-nuree8-0 hMPgsT"
+          className="Modal-nuree8-0 kdCabm"
           dialogComponentClass={[Function]}
           enforceFocus={true}
           keyboard={true}
@@ -339,6 +340,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
     </span>
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -357,7 +359,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -369,7 +371,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -554,6 +556,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -572,7 +575,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -584,7 +587,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -980,7 +983,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           backdrop="static"
           bsClass="modal"
           bsSize="large"
-          className="Modal-nuree8-0 hMPgsT"
+          className="Modal-nuree8-0 kdCabm"
           dialogComponentClass={[Function]}
           enforceFocus={true}
           keyboard={true}
@@ -1039,6 +1042,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
     </span>
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -1057,7 +1061,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -1069,7 +1073,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -1465,7 +1469,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                     backdrop="static"
                                     bsClass="modal"
                                     bsSize="large"
-                                    className="Modal-nuree8-0 hMPgsT"
+                                    className="Modal-nuree8-0 kdCabm"
                                     dialogComponentClass={[Function]}
                                     enforceFocus={true}
                                     keyboard={true}

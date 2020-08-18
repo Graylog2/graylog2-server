@@ -35,11 +35,11 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"

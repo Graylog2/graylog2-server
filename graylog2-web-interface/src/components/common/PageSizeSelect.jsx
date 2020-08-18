@@ -1,8 +1,16 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled, { type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
+
+const Wrapper: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
+  && .form-group {
+    margin-bottom: 0
+  }
+`;
 
 const PAGE_SIZES = [10, 50, 100];
 
@@ -14,11 +22,11 @@ type Props = {
 };
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
-  <div className={`${className ?? ''} form-inline page-size`} style={{ float: 'right' }}>
-    <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={onChange}>
+  <Wrapper className={`${className ?? ''} form-inline page-size pull-right`}>
+    <Input id="page-size" type="select" bsSize="small" label="Show" value={pageSize} onChange={onChange}>
       {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
     </Input>
-  </div>
+  </Wrapper>
 );
 
 PageSizeSelect.propTypes = {
@@ -29,7 +37,7 @@ PageSizeSelect.propTypes = {
 };
 
 PageSizeSelect.defaultProps = {
-  className: undefined,
+  className: '',
   pageSizes: PAGE_SIZES,
 };
 

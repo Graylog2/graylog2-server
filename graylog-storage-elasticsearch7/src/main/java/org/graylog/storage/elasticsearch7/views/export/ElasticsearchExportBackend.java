@@ -138,8 +138,7 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private TermsQueryBuilder streamsFilter(ExportMessagesCommand command) {
-        Set<String> streams = requestStrategy.removeUnsupportedStreams(command.streams());
-        return termsQuery(Message.FIELD_STREAMS, streams);
+        return termsQuery(Message.FIELD_STREAMS, command.streams());
     }
 
     private Set<String> indicesFor(ExportMessagesCommand command) {

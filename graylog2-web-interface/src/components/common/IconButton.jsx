@@ -42,7 +42,7 @@ const handleClick = (onClick) => {
 };
 
 const IconButton = ({ title, onClick, focusable, className, ...rest }: Props) => (
-  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className}>
+  <Wrapper tabIndex={focusable ? 0 : -1} title={title} onClick={() => handleClick(onClick)} className={className} type="button">
     <Icon {...rest} />
   </Wrapper>
 );

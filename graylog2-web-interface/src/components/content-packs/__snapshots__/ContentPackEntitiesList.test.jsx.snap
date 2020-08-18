@@ -19,6 +19,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -37,7 +38,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -49,7 +50,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -295,6 +296,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
     <br />
     <SearchForm
       buttonLeftMargin={5}
+      className=""
       focusAfterMount={false}
       label={null}
       loadingLabel="Loading..."
@@ -313,7 +315,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
       wrapperClass="search"
     >
       <div
-        className="search"
+        className="search "
         style={
           Object {
             "marginTop": 15,
@@ -325,7 +327,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
           onSubmit={[Function]}
         >
           <div
-            className="form-group has-feedback"
+            className="form-group "
           >
             <input
               autoComplete="off"
@@ -802,7 +804,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 hMPgsT"
+                              className="Modal-nuree8-0 kdCabm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -875,7 +877,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 hMPgsT"
+                              className="Modal-nuree8-0 kdCabm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1088,7 +1090,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 hMPgsT"
+                              className="Modal-nuree8-0 kdCabm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1161,7 +1163,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 hMPgsT"
+                              className="Modal-nuree8-0 kdCabm"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}

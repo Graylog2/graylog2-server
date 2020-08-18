@@ -49,7 +49,8 @@ class SelectableList extends React.Component {
     idKey: 'value',
   };
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.selectedOptions !== nextProps.selectedOptions) {
       this.select.clearValue();
     }

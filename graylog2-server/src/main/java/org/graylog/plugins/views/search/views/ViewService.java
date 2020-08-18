@@ -141,7 +141,11 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
         final ViewDTO savedObject = save(viewDTO);
-        entityOwnerShipService.registerNewView(savedObject.id(), user);
+        if (viewDTO.type().equals(ViewDTO.Type.DASHBOARD)) {
+            entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
+        } else {
+            entityOwnerShipService.registerNewSearch(savedObject.id(), user);
+        }
         return savedObject;
     }
 
@@ -153,6 +157,13 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
         }
+    }
+
+    @Override
+    public int delete(String id) {
+        final int delete = super.delete(id);
+        entityOwnerShipService.unregisterView(id);
+        return delete;
     }
 
     public ViewDTO update(ViewDTO viewDTO) {

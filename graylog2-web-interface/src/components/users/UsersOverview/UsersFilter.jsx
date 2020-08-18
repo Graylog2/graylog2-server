@@ -2,23 +2,30 @@
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { UsersActions } from 'stores/users/UsersStore';
 import type { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
+
+import UserQueryHelper from '../UsersQueryHelper';
+
+type Props = {
+  onSearch: (query: string) => Promise<void>,
+  onReset: () => Promise<void>,
+};
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   margin-bottom: 10px;
 `;
 
-const UsersFilter = ({ perPage }: { perPage: number }) => {
-  const handleSearch = (newQuery, resetLoading) => UsersActions.searchPaginated(1, perPage, newQuery).then(resetLoading);
-  const handleReset = () => UsersActions.searchPaginated(1, perPage, '');
+const UsersFilter = ({ onSearch, onReset }: Props) => {
+  const _handleSearch = (newQuery, resetLoading) => onSearch(newQuery).then(resetLoading);
+  const queryHelper = <UserQueryHelper />;
 
   return (
     <Container>
-      <SearchForm onSearch={handleSearch}
-                  onReset={handleReset}
+      <SearchForm onSearch={_handleSearch}
+                  onReset={onReset}
                   useLoadingState
+                  queryHelpComponent={queryHelper}
                   topMargin={0} />
     </Container>
   );

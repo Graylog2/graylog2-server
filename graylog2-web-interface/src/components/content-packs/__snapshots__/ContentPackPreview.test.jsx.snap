@@ -22,11 +22,11 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -59,11 +59,11 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                 <Row>
                   <Row
                     bsClass="row"
-                    className="Row-sc-3iisrt-0 gPzTHl"
+                    className="Row-sc-3iisrt-0 iSaIhq"
                     componentClass="div"
                   >
                     <div
-                      className="Row-sc-3iisrt-0 gPzTHl row"
+                      className="Row-sc-3iisrt-0 iSaIhq row"
                     >
                       <Col
                         bsClass="col"
@@ -263,6 +263,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -281,7 +282,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -293,7 +294,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -464,6 +465,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -482,7 +484,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -494,7 +496,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -648,11 +650,11 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -751,11 +753,11 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -788,11 +790,11 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                 <Row>
                   <Row
                     bsClass="row"
-                    className="Row-sc-3iisrt-0 gPzTHl"
+                    className="Row-sc-3iisrt-0 iSaIhq"
                     componentClass="div"
                   >
                     <div
-                      className="Row-sc-3iisrt-0 gPzTHl row"
+                      className="Row-sc-3iisrt-0 iSaIhq row"
                     >
                       <Col
                         bsClass="col"
@@ -896,10 +898,10 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                               <Well>
                                 <Well
                                   bsClass="well"
-                                  className="Well-sc-19gs1oc-0 YXCuT"
+                                  className="Well-sc-19gs1oc-0 enTUtA"
                                 >
                                   <div
-                                    className="Well-sc-19gs1oc-0 YXCuT well"
+                                    className="Well-sc-19gs1oc-0 enTUtA well"
                                   >
                                     <div
                                       dangerouslySetInnerHTML={
@@ -1025,6 +1027,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -1043,7 +1046,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -1055,7 +1058,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -1226,6 +1229,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -1244,7 +1248,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -1256,7 +1260,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -1410,11 +1414,11 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"

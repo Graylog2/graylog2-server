@@ -47,6 +47,9 @@ const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
+const RoleDetailsPage = loadAsync(() => import('./RoleDetailsPage'));
+const RoleEditPage = loadAsync(() => import('./RoleEditPage'));
+const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RolesPage = loadAsync(() => import('./RolesPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
@@ -129,6 +132,9 @@ export {
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
+  RoleDetailsPage,
+  RoleEditPage,
+  RolesOverviewPage,
   RolesPage,
   RuleDetailsPage,
   RulesPage,

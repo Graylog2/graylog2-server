@@ -1,3 +1,6 @@
+/* eslint-disable  */
+// We will remove this file soon, it got replaced with the UserCreate component
+
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -6,10 +9,8 @@ import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';
 import LegacyTimeoutInput from 'components/users/LegacyTimeoutInput';
 import { TimezoneSelect } from 'components/common';
-import StoreProvider from 'injection/StoreProvider';
 import ValidationsUtils from 'util/ValidationsUtils';
-
-const UsersStore = StoreProvider.getStore('Users');
+import { UsersActions } from 'stores/users/UsersStore';
 
 class NewUserForm extends React.Component {
   static propTypes = {
@@ -24,7 +25,7 @@ class NewUserForm extends React.Component {
   };
 
   componentDidMount() {
-    UsersStore.loadUsers().then((users) => {
+    UsersActions.loadUsers().then((users) => {
       this.setState({ users });
     });
   }

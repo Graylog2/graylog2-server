@@ -1,39 +1,49 @@
 // @flow strict
 import * as React from 'react';
 
-import { Spinner } from 'components/common';
+import { IfPermitted, Spinner } from 'components/common';
 import User from 'logic/users/User';
+import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
+import SectionGrid from 'components/common/Section/SectionGrid';
 
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
-import MainDetailsGrid from './MainDetailsGrid';
 import RolesSection from './RolesSection';
-
-import SectionComponent from '../SectionComponent';
-import TeamsSection from "./TeamSection";
+import TeamsSection from './TeamSection';
+import SharedEntitiesSection from './SharedEntitiesSection';
 
 type Props = {
+  paginatedUserShares: ?PaginatedEnititySharesType,
   user: ?User,
 };
 
-const UserDetails = ({ user }: Props) => {
+const UserDetails = ({ user, paginatedUserShares }: Props) => {
   if (!user) {
     return <Spinner />;
   }
 
   return (
     <>
-      <MainDetailsGrid>
-        <div>
-          <ProfileSection user={user} />
-          <SettingsSection user={user} />
-        </div>
-        <div>
-          <RolesSection user={user} />
-          <TeamsSection user={user} />
-        </div>
-      </MainDetailsGrid>
-      <SectionComponent title="Entity Shares">Children</SectionComponent>
+      <SectionGrid>
+        <IfPermitted permissions={`users:edit:${user.username}`}>
+          <div>
+            <ProfileSection user={user} />
+            <IfPermitted permissions="*">
+              <SettingsSection user={user} />
+            </IfPermitted>
+          </div>
+          <div>
+            <IfPermitted permissions={`users:rolesedit:${user.username}`}>
+              <RolesSection user={user} />
+            </IfPermitted>
+            <IfPermitted permissions={`teams:edit:${user.username}`}>
+              <TeamsSection user={user} />
+            </IfPermitted>
+          </div>
+        </IfPermitted>
+      </SectionGrid>
+      <SharedEntitiesSection paginatedUserShares={paginatedUserShares}
+                             username={user.username} />
     </>
   );
 };

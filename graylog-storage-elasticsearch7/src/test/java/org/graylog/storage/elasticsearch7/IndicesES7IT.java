@@ -13,8 +13,11 @@ import org.graylog2.indexer.indices.IndicesIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IndicesES7IT extends IndicesIT {
     @Rule
@@ -54,5 +57,21 @@ public class IndicesES7IT extends IndicesIT {
                 "template", indexWildcard,
                 "mappings", mapping
         );
+    }
+
+    // Prevent accidental use of AliasActions.Type.REMOVE_INDEX,
+    // as despite being an *Alias* Action, it actually deletes an index!
+    @Test
+    public void cyclingAliasLeavesOldIndexInPlace() {
+        final String deflector = "indices_it_deflector";
+
+        final String index1 = client().createRandomIndex("indices_it_");
+        final String index2 = client().createRandomIndex("indices_it_");
+
+        client().addAliasMapping(index1, deflector);
+
+        indices.cycleAlias(deflector, index2, index1);
+
+        assertThat(indices.exists(index1)).isTrue();
     }
 }

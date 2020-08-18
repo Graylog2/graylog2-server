@@ -120,7 +120,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
             throw new IllegalArgumentException("Could not determine rotation stride length.");
         }
 
-        final DateTime anchorTime = MoreObjects.firstNonNull(lastAnchor, Tools.nowUTC());
+        final DateTime anchorTime = anchorTimeFrom(lastAnchor);
 
         final DateTimeField field = largestStrideType.getField(anchorTime.getChronology());
         // use normalized here to make sure we actually have the largestStride type available! see https://github.com/Graylog2/graylog2-server/issues/836
@@ -136,6 +136,13 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final long difference = fieldValueInUnit % periodValue;
         final long newValue = field.add(fieldValue, -1 * difference);
         return new DateTime(newValue, DateTimeZone.UTC);
+    }
+
+    private static DateTime anchorTimeFrom(@Nullable DateTime lastAnchor) {
+        if (lastAnchor != null && !lastAnchor.getZone().equals(DateTimeZone.UTC)) {
+            return lastAnchor.withZone(DateTimeZone.UTC);
+        }
+        return MoreObjects.firstNonNull(lastAnchor, Tools.nowUTC());
     }
 
     @Nullable

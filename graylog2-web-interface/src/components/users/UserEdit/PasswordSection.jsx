@@ -11,9 +11,9 @@ import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
 import FormikFormGroup from '../form/FormikFormGroup';
-import SectionComponent from '../SectionComponent';
 import { validatePasswords } from '../UserCreate/PasswordFormGroup';
 
 type Props = {

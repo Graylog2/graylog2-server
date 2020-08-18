@@ -7,17 +7,14 @@ import { Row, Col, HelpBlock } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
+import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
+
 type Props = {
   value: number,
   onChange: (value: number) => void;
 };
 
 const _estimateUnit = (value) => {
-  const MS_DAY = 24 * 60 * 60 * 1000;
-  const MS_HOUR = 60 * 60 * 1000;
-  const MS_MINUTE = 60 * 1000;
-  const MS_SECOND = 1000;
-
   if (value === 0) {
     return MS_SECOND;
   }
@@ -40,14 +37,14 @@ const _estimateUnit = (value) => {
 const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
-  const [value, setValue] = useState(propsValue ? Math.floor(propsValue / unit) : 0);
+  const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
 
   const getValue = () => {
     if (sessionTimeoutNever) {
       return -1;
     }
 
-    return (value * unit);
+    return (value * Number(unit));
   };
 
   useEffect(() => {
@@ -64,8 +61,8 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     setValue(evt.target.value);
   };
 
-  const _onChangeUnit = (evt) => {
-    setUnit(evt.target.value);
+  const _onChangeUnit = (newUnit: string) => {
+    setUnit(newUnit);
   };
 
   return (
@@ -74,41 +71,44 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9"
              label="Sessions Timeout">
-        <Row className="no-bm">
-          <Col xs={12}>
-            <Input type="checkbox"
-                   id="session-timeout-never"
-                   name="session_timeout_never"
-                   label="Sessions do not time out"
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9"
-                   help="When checked sessions never time out due to inactivity."
-                   onChange={_onClick}
-                   checked={sessionTimeoutNever} />
-          </Col>
-          <Col xs={3}>
-            <input type="number"
-                   id="timeout"
-                   className="session-timeout-fields validatable form-control"
-                   name="timeout"
-                   min={1}
-                   data-validate="positive_number"
-                   disabled={sessionTimeoutNever}
-                   value={value}
-                   onChange={_onChangeValue} />
-          </Col>
-          <Col xs={4}>
-            <TimeoutUnitSelect className="form-control session-timeout-fields"
-                               disabled={sessionTimeoutNever}
-                               value={unit}
-                               onChange={_onChangeUnit} />
-          </Col>
-          <Col xs={12}>
-            <HelpBlock>
-              Session automatically end after this amount of time, unless they are actively used.
-            </HelpBlock>
-          </Col>
-        </Row>
+        <>
+          <Input type="checkbox"
+                 id="session-timeout-never"
+                 name="session_timeout_never"
+                 label="Sessions do not time out"
+                 help="When checked sessions never time out due to inactivity."
+                 formGroupClassName="no-bm"
+                 onChange={_onClick}
+                 checked={sessionTimeoutNever} />
+
+          <div className="clearfix">
+            <Col xs={2}>
+              <Input type="number"
+                     id="timeout"
+                     placeholder="Timeout amount"
+                     className="validatable"
+                     name="timeout"
+                     min={1}
+                     formGroupClassName="form-group no-bm"
+                     data-validate="positive_number"
+                     disabled={sessionTimeoutNever}
+                     value={value}
+                     onChange={_onChangeValue} />
+            </Col>
+            <Col xs={4}>
+              <TimeoutUnitSelect disabled={sessionTimeoutNever}
+                                 value={`${unit}`}
+                                 onChange={_onChangeUnit} />
+            </Col>
+            <Row className="no-bm">
+              <Col xs={12}>
+                <HelpBlock>
+                  Session automatically end after this amount of time, unless they are actively used.
+                </HelpBlock>
+              </Col>
+            </Row>
+          </div>
+        </>
       </Input>
     </>
   );
@@ -120,8 +120,8 @@ TimeoutInput.propTypes = {
 };
 
 TimeoutInput.defaultProps = {
-  value: 60 * 60 * 1000,
-  onChange: undefined,
+  value: MS_HOUR,
+  onChange: () => {},
 };
 
 export default TimeoutInput;

@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.security.Capability;
-import org.graylog.security.entities.EntityDependency;
+import org.graylog.security.entities.EntityDescriptor;
 import org.graylog2.plugin.rest.ValidationResult;
 
 import java.util.Collection;
@@ -54,7 +54,7 @@ public abstract class EntityShareResponse {
     public abstract ImmutableMap<GRN, Capability> selectedGranteeCapabilities();
 
     @JsonProperty("missing_permissions_on_dependencies")
-    public abstract ImmutableMap<GRN, Collection<EntityDependency>> missingPermissionsOnDependencies();
+    public abstract ImmutableMap<GRN, Collection<EntityDescriptor>> missingPermissionsOnDependencies();
 
     @JsonProperty("validation_result")
     public abstract ValidationResult validationResult();
@@ -93,7 +93,7 @@ public abstract class EntityShareResponse {
         public abstract Builder selectedGranteeCapabilities(Map<GRN, Capability> selectedGranteeCapabilities);
 
         @JsonProperty("missing_permissions_on_dependencies")
-        public abstract Builder missingPermissionsOnDependencies(Map<GRN, Collection<EntityDependency>> missingDependencies);
+        public abstract Builder missingPermissionsOnDependencies(Map<GRN, Collection<EntityDescriptor>> missingDependencies);
 
         @JsonProperty("validation_result")
         public abstract Builder validationResult(ValidationResult validationResult);
@@ -104,7 +104,7 @@ public abstract class EntityShareResponse {
     @AutoValue
     public static abstract class AvailableGrantee {
         @JsonProperty("id")
-        public abstract String id();
+        public abstract GRN grn();
 
         @JsonProperty("type")
         public abstract String type();
@@ -113,10 +113,10 @@ public abstract class EntityShareResponse {
         public abstract String title();
 
         @JsonCreator
-        public static AvailableGrantee create(@JsonProperty("id") String id,
+        public static AvailableGrantee create(@JsonProperty("id") GRN grn,
                                               @JsonProperty("type") String type,
                                               @JsonProperty("title") String title) {
-            return new AutoValue_EntityShareResponse_AvailableGrantee(id, type, title);
+            return new AutoValue_EntityShareResponse_AvailableGrantee(grn, type, title);
         }
     }
 

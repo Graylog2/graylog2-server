@@ -18,7 +18,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 hMPgsT in modal"
+        class="fade Modal-nuree8-0 kdCabm in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -31,7 +31,7 @@ Object {
             role="document"
           >
             <div
-              class="modal-header"
+              class="Modal__Header-nuree8-2 ziWto modal-header"
             >
               <button
                 class="close"
@@ -49,7 +49,7 @@ Object {
                 </span>
               </button>
               <h4
-                class="modal-title"
+                class="Modal__Title-nuree8-3 hdjHMk modal-title"
               >
                 Bach
               </h4>
@@ -59,7 +59,7 @@ Object {
               id="StreamRuleForm"
             >
               <div
-                class="modal-body"
+                class="Modal__Body-nuree8-4 lcHrgF modal-body"
               >
                 <div
                   class="container-fluid"
@@ -225,7 +225,7 @@ Object {
                       class="col-md-4"
                     >
                       <div
-                        class="Well-sc-19gs1oc-0 YXCuT matcher-github well well-sm"
+                        class="Well-sc-19gs1oc-0 enTUtA matcher-github well well-sm"
                       >
                         The server will try to convert to strings or numbers based on the matcher type as well as it can.
                         <br />
@@ -255,7 +255,7 @@ Object {
                 </div>
               </div>
               <div
-                class="modal-footer"
+                class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
               >
                 <button
                   class="Button-c9cbmb-0 bNulii btn btn-default"
@@ -351,7 +351,7 @@ Object {
         class="fade modal-backdrop in"
       />
       <div
-        class="fade Modal-nuree8-0 hMPgsT in modal"
+        class="fade Modal-nuree8-0 kdCabm in modal"
         role="dialog"
         style="display: block; padding-right: 0px;"
         tabindex="-1"
@@ -364,7 +364,7 @@ Object {
             role="document"
           >
             <div
-              class="modal-header"
+              class="Modal__Header-nuree8-2 ziWto modal-header"
             >
               <button
                 class="close"
@@ -382,7 +382,7 @@ Object {
                 </span>
               </button>
               <h4
-                class="modal-title"
+                class="Modal__Title-nuree8-3 hdjHMk modal-title"
               >
                 Bach
               </h4>
@@ -392,7 +392,7 @@ Object {
               id="StreamRuleForm"
             >
               <div
-                class="modal-body"
+                class="Modal__Body-nuree8-4 lcHrgF modal-body"
               >
                 <div
                   class="container-fluid"
@@ -562,7 +562,7 @@ Object {
                       class="col-md-4"
                     >
                       <div
-                        class="Well-sc-19gs1oc-0 YXCuT matcher-github well well-sm"
+                        class="Well-sc-19gs1oc-0 enTUtA matcher-github well well-sm"
                       >
                         The server will try to convert to strings or numbers based on the matcher type as well as it can.
                         <br />
@@ -592,7 +592,7 @@ Object {
                 </div>
               </div>
               <div
-                class="modal-footer"
+                class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
               >
                 <button
                   class="Button-c9cbmb-0 bNulii btn btn-default"

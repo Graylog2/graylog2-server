@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider extends VersionAwareProvider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState> {
     @Inject
-    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<V20170607164210_MigrateReopenedIndicesToAliases.ClusterState>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

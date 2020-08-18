@@ -3,9 +3,8 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { UsersActions, UsersStore } from 'stores/users/UsersStore';
+import { UsersActions } from 'stores/users/UsersStore';
 import { type ThemeInterface } from 'theme';
-import { useStore } from 'stores/connect';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { DataTable, Spinner, PaginatedList } from 'components/common';
 import { Col, Row } from 'components/graylog';
@@ -14,6 +13,16 @@ import UserOverviewItem from './UserOverviewItem';
 import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
+
+const DEFAULT_PAGINATION = {
+  count: undefined,
+  total: undefined,
+  page: 1,
+  perPage: 10,
+  query: '',
+};
+
+const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
   .data-table {
@@ -48,31 +57,31 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _onPageChange = (query, setLoading) => (page, perPage) => {
+const _onPageChange = (loadUsers, setLoading) => (page, perPage) => {
   setLoading(true);
 
-  return UsersActions.searchPaginated(page, perPage, query).then(() => setLoading(false));
+  return loadUsers(page, perPage).then(() => setLoading(false));
 };
 
 const UsersOverview = () => {
-  const {
-    paginatedList: {
-      adminUser,
-      list: users,
-      pagination: { page, perPage, query, total },
-    },
-  } = useStore(UsersStore);
-  const [loading, setLoading] = useState(false);
   const currentUser = useContext(CurrentUserContext);
-  const headers = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+  const [loading, setLoading] = useState(false);
+  const [paginatedUsers, setPaginatedUsers] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
+  const { adminUser, list: users, pagination: { page, perPage, query, total } } = paginatedUsers;
   const _isActiveItem = (user) => currentUser?.username === user.username;
   const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
+  const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
+    return UsersActions.searchPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
+  };
+
+  const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);
+
   useEffect(() => {
-    UsersActions.searchPaginated(page, perPage, query);
+    _loadUsers(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
     const unlistenDeleteUser = UsersActions.deleteUser.completed.listen(() => {
-      UsersActions.searchPaginated(page, perPage, query);
+      _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
     return () => {
@@ -90,7 +99,7 @@ const UsersOverview = () => {
         <SystemAdministrator adminUser={adminUser}
                              dataRowFormatter={_userOverviewItem}
                              headerCellFormatter={_headerCellFormatter}
-                             headers={headers} />
+                             headers={TABLE_HEADERS} />
       )}
       <Row className="content">
         <Col xs={12}>
@@ -101,15 +110,15 @@ const UsersOverview = () => {
           <p className="description">
             Found {total} registered users on the system.
           </p>
-          <StyledPaginatedList onChange={_onPageChange(query, setLoading)} totalItems={total} activePage={page}>
+          <StyledPaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
             <DataTable id="users-overview"
                        className="table-hover"
                        rowClassName="no-bm"
-                       headers={headers}
+                       headers={TABLE_HEADERS}
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="fullName"
                        rows={users.toJS()}
-                       customFilter={<UsersFilter perPage={perPage} />}
+                       customFilter={<UsersFilter onSearch={_handleSearch} onReset={() => _handleSearch('')} />}
                        dataRowFormatter={_userOverviewItem}
                        filterKeys={[]}
                        filterLabel="Filter Users" />

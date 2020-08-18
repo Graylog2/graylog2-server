@@ -6,8 +6,8 @@ import { Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import UserForm from 'components/users/UserForm';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';
+import { UsersActions } from 'stores/users/UsersStore';
 
-const UsersStore = StoreProvider.getStore('Users');
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 class EditUsersPage extends React.Component {
@@ -25,7 +25,8 @@ class EditUsersPage extends React.Component {
     this._loadUser(params.username);
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const { params } = this.props;
 
     if (params.username !== nextProps.params.username) {
@@ -34,8 +35,8 @@ class EditUsersPage extends React.Component {
   }
 
   _loadUser = (username) => {
-    UsersStore.load(username).then((user) => {
-      this.setState({ user: user });
+    UsersActions.load(username).then((user) => {
+      this.setState({ user: user.toJSON() });
     });
   };
 

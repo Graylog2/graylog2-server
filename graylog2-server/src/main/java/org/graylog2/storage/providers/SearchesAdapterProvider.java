@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class SearchesAdapterProvider extends VersionAwareProvider<SearchesAdapter> {
     @Inject
-    public SearchesAdapterProvider(@Named("elasticsearch_version") String elasticsearchMajorVersion, Map<Version, Provider<SearchesAdapter>> pluginBindings) {
-        super(elasticsearchMajorVersion, pluginBindings);
+    public SearchesAdapterProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<SearchesAdapter>> pluginBindings) {
+        super(version, pluginBindings);
     }
 }

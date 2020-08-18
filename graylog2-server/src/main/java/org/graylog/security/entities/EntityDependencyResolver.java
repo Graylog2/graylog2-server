@@ -26,7 +26,6 @@ import org.graylog.security.DBGrantService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import javax.annotation.Nullable;
@@ -55,13 +54,13 @@ public class EntityDependencyResolver {
         this.grantService = grantService;
     }
 
-    public ImmutableSet<EntityDependency> resolve(GRN entity) {
+    public ImmutableSet<EntityDescriptor> resolve(GRN entity) {
         // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
         final ImmutableMap<GRN, String> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
                 .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(), EntityExcerpt::title));
 
-        final Set<EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(EntityDescriptor.builder()
+        final Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
                 .id(ModelId.of(entity.entity()))
                 .type(ModelType.of(entity.type(), "2")) // TODO: Any way of NOT hardcoding the version here?
                 .build()));
@@ -74,7 +73,7 @@ public class EntityDependencyResolver {
         final Map<GRN, Set<GRN>> targetOwners = grantService.getOwnersForTargets(dependencies);
 
         return dependencies.stream()
-                .map(dependency -> EntityDependency.create(
+                .map(dependency -> EntityDescriptor.create(
                         dependency,
                         entityExcerpts.get(dependency),
                         getOwners(targetOwners.get(dependency))
@@ -82,10 +81,10 @@ public class EntityDependencyResolver {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    private Set<EntityDependency.Owner> getOwners(@Nullable Set<GRN> owners) {
+    private Set<EntityDescriptor.Owner> getOwners(@Nullable Set<GRN> owners) {
         return firstNonNull(owners, Collections.<GRN>emptySet()).stream()
                 .map(descriptorService::getDescriptor)
-                .map(descriptor -> EntityDependency.Owner.create(descriptor.grn(), descriptor.title()))
+                .map(descriptor -> EntityDescriptor.Owner.create(descriptor.grn(), descriptor.title()))
                 .collect(Collectors.toSet());
     }
 }

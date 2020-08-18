@@ -58,6 +58,11 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1));
         db.createIndex(new BasicDBObject(GrantDTO.FIELD_TARGET, 1));
+        db.createIndex(
+                new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1)
+                        .append(GrantDTO.FIELD_CAPABILITY, 1)
+                        .append(GrantDTO.FIELD_TARGET, 1),
+                new BasicDBObject("unique", true));
         // TODO: Add more indices
 
         // TODO: Inline migration for development. Must be removed before shipping 4.0 GA!
@@ -79,7 +84,19 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     public ImmutableSet<GrantDTO> getForGranteesOrGlobal(Set<GRN> grantees) {
         return streamQuery(DBQuery.or(
                 DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees),
-                DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN)
+                DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
+        )).collect(ImmutableSet.toImmutableSet());
+    }
+
+    public ImmutableSet<GrantDTO> getForGrantee(GRN grantee) {
+        return streamQuery(DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public ImmutableSet<GrantDTO> getForGranteeWithCapability(GRN grantee, Capability capability) {
+        return streamQuery(DBQuery.and(
+                DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee),
+                DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability)
         )).collect(ImmutableSet.toImmutableSet());
     }
 
@@ -124,6 +141,10 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
         return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).toArray();
     }
 
+    public int deleteForTarget(GRN target) {
+        return db.remove(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).getN();
+    }
+
     public List<GrantDTO> getForTargetExcludingGrantee(GRN target, GRN grantee) {
         return db.find(DBQuery.and(
                 DBQuery.is(GrantDTO.FIELD_TARGET, target.toString()),
@@ -132,7 +153,11 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
-        return db.find(DBQuery.in(GrantDTO.FIELD_TARGET, targets)).toArray().stream()
+        return db.find(DBQuery.and(
+                DBQuery.in(GrantDTO.FIELD_TARGET, targets),
+                DBQuery.is(GrantDTO.FIELD_CAPABILITY, Capability.OWN)
+        )).toArray()
+                .stream()
                 .collect(Collectors.groupingBy(
                         GrantDTO::target,
                         Collectors.mapping(GrantDTO::grantee, Collectors.toSet())

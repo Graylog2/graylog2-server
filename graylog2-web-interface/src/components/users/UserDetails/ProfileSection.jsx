@@ -2,9 +2,9 @@
 import * as React from 'react';
 
 import User from 'logic/users/User';
+import SectionComponent from 'components/common/Section/SectionComponent';
+import ReadOnlyFormGroup from 'components/common/ReadOnlyFormGroup';
 
-import SectionComponent from '../SectionComponent';
-import ReadOnlyFormGroup from '../form/ReadOnlyFormGroup';
 import LoggedInIcon from '../LoggedInIcon';
 
 type Props = {

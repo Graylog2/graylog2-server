@@ -140,11 +140,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       >
         <Row
           bsClass="row"
-          className="Row-sc-3iisrt-0 gPzTHl content"
+          className="Row-sc-3iisrt-0 iSaIhq content"
           componentClass="div"
         >
           <div
-            className="Row-sc-3iisrt-0 gPzTHl content row"
+            className="Row-sc-3iisrt-0 iSaIhq content row"
           >
             <Wizard__SubnavigationCol
               md={2}
@@ -169,7 +169,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       activeKey="selection"
                       bsClass="nav"
                       bsStyle="pills"
-                      className="Nav-dzawzr-0 cLvAaF"
+                      className="Nav-dzawzr-0 inEWeN"
                       justified={false}
                       onSelect={[Function]}
                       pullLeft={false}
@@ -177,7 +177,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       stacked={true}
                     >
                       <ul
-                        className="Nav-dzawzr-0 cLvAaF nav nav-pills nav-stacked"
+                        className="Nav-dzawzr-0 inEWeN nav nav-pills nav-stacked"
                         role={null}
                       >
                         <NavItem
@@ -283,11 +283,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   <Row>
                     <Row
                       bsClass="row"
-                      className="Row-sc-3iisrt-0 gPzTHl"
+                      className="Row-sc-3iisrt-0 iSaIhq"
                       componentClass="div"
                     >
                       <div
-                        className="Row-sc-3iisrt-0 gPzTHl row"
+                        className="Row-sc-3iisrt-0 iSaIhq row"
                       >
                         <Col
                           bsClass="col"
@@ -400,11 +400,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -962,11 +962,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -988,11 +988,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -1005,6 +1005,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                             >
                               <SearchForm
                                 buttonLeftMargin={5}
+                                className=""
                                 focusAfterMount={false}
                                 id="filter-input"
                                 label={null}
@@ -1024,7 +1025,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 wrapperClass="search"
                               >
                                 <div
-                                  className="search"
+                                  className="search "
                                   style={
                                     Object {
                                       "marginTop": 15,
@@ -1036,7 +1037,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                     onSubmit={[Function]}
                                   >
                                     <div
-                                      className="form-group has-feedback"
+                                      className="form-group "
                                     >
                                       <input
                                         autoComplete="off"
@@ -1133,11 +1134,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -1199,11 +1200,11 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                         <Row>
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl"
+                            className="Row-sc-3iisrt-0 iSaIhq"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row"
+                              className="Row-sc-3iisrt-0 iSaIhq row"
                             >
                               <Col
                                 bsClass="col"
@@ -1628,11 +1629,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       >
         <Row
           bsClass="row"
-          className="Row-sc-3iisrt-0 gPzTHl content"
+          className="Row-sc-3iisrt-0 iSaIhq content"
           componentClass="div"
         >
           <div
-            className="Row-sc-3iisrt-0 gPzTHl content row"
+            className="Row-sc-3iisrt-0 iSaIhq content row"
           >
             <Wizard__SubnavigationCol
               md={2}
@@ -1657,7 +1658,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       activeKey="selection"
                       bsClass="nav"
                       bsStyle="pills"
-                      className="Nav-dzawzr-0 cLvAaF"
+                      className="Nav-dzawzr-0 inEWeN"
                       justified={false}
                       onSelect={[Function]}
                       pullLeft={false}
@@ -1665,7 +1666,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       stacked={true}
                     >
                       <ul
-                        className="Nav-dzawzr-0 cLvAaF nav nav-pills nav-stacked"
+                        className="Nav-dzawzr-0 inEWeN nav nav-pills nav-stacked"
                         role={null}
                       >
                         <NavItem
@@ -1765,11 +1766,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   <Row>
                     <Row
                       bsClass="row"
-                      className="Row-sc-3iisrt-0 gPzTHl"
+                      className="Row-sc-3iisrt-0 iSaIhq"
                       componentClass="div"
                     >
                       <div
-                        className="Row-sc-3iisrt-0 gPzTHl row"
+                        className="Row-sc-3iisrt-0 iSaIhq row"
                       >
                         <Col
                           bsClass="col"
@@ -1923,11 +1924,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2485,11 +2486,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2511,11 +2512,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2528,6 +2529,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                             >
                               <SearchForm
                                 buttonLeftMargin={5}
+                                className=""
                                 focusAfterMount={false}
                                 id="filter-input"
                                 label={null}
@@ -2547,7 +2549,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 wrapperClass="search"
                               >
                                 <div
-                                  className="search"
+                                  className="search "
                                   style={
                                     Object {
                                       "marginTop": 15,
@@ -2559,7 +2561,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     onSubmit={[Function]}
                                   >
                                     <div
-                                      className="form-group has-feedback"
+                                      className="form-group "
                                     >
                                       <input
                                         autoComplete="off"
@@ -2656,11 +2658,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     <Row>
                       <Row
                         bsClass="row"
-                        className="Row-sc-3iisrt-0 gPzTHl"
+                        className="Row-sc-3iisrt-0 iSaIhq"
                         componentClass="div"
                       >
                         <div
-                          className="Row-sc-3iisrt-0 gPzTHl row"
+                          className="Row-sc-3iisrt-0 iSaIhq row"
                         >
                           <Col
                             bsClass="col"
@@ -2876,11 +2878,11 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                         <Row>
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl"
+                            className="Row-sc-3iisrt-0 iSaIhq"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row"
+                              className="Row-sc-3iisrt-0 iSaIhq row"
                             >
                               <Col
                                 bsClass="col"
@@ -2984,10 +2986,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       <Well>
                                         <Well
                                           bsClass="well"
-                                          className="Well-sc-19gs1oc-0 YXCuT"
+                                          className="Well-sc-19gs1oc-0 enTUtA"
                                         >
                                           <div
-                                            className="Well-sc-19gs1oc-0 YXCuT well"
+                                            className="Well-sc-19gs1oc-0 enTUtA well"
                                           >
                                             <div
                                               dangerouslySetInnerHTML={

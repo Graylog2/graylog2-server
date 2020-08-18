@@ -137,11 +137,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl row-sm"
+        className="Row-sc-3iisrt-0 iSaIhq row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
         >
           <Col
             bsClass="col"
@@ -504,11 +504,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   >
                     <Pagination
                       bsClass="pagination"
-                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz"
                       data-testid="graylog-pagination"
                     >
                       <ul
-                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm pagination"
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz pagination"
                         data-testid="graylog-pagination"
                       >
                         <Component
@@ -767,6 +767,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -778,129 +779,128 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   ]
                 }
               >
-                <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                <PageSizeSelect__Wrapper
+                  className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show:"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
-                                      label="Show:"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
@@ -919,18 +919,18 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <ControlledTableListHeader>
                 <ControlledTableListHeader__StyledListGroupItem>
                   <ForwardRef
-                    className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gaqdPi"
+                    className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
                   >
                     <ListGroupItem__StyledListGroupItem
-                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gaqdPi"
+                      className="ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gaqdPi"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX ControlledTableListHeader__StyledListGroupItem-tr2y34-0 gaqdPi list-group-item"
+                          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz ControlledTableListHeader__StyledListGroupItem-tr2y34-0 LwXci list-group-item"
                         >
                           <ControlledTableListHeader__HeaderWrapper>
                             <div
@@ -950,22 +950,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -1091,7 +1091,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -1153,7 +1153,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-1"
                                       pullRight={true}
                                       title="More Actions"
@@ -1192,7 +1192,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-1"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -1208,7 +1208,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-1"
                                                     onClick={[Function]}
@@ -1218,7 +1218,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-1"
                                                       onClick={[Function]}
@@ -1454,7 +1454,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -1518,11 +1518,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -1551,22 +1551,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -1692,7 +1692,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -1754,7 +1754,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-2"
                                       pullRight={true}
                                       title="More Actions"
@@ -1793,7 +1793,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-2"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -1809,7 +1809,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-2"
                                                     onClick={[Function]}
@@ -1819,7 +1819,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-2"
                                                       onClick={[Function]}
@@ -2055,7 +2055,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2119,11 +2119,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -2152,22 +2152,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -2259,7 +2259,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -2321,7 +2321,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-3"
                                       pullRight={true}
                                       title="More Actions"
@@ -2360,7 +2360,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-3"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -2376,7 +2376,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-3"
                                                     onClick={[Function]}
@@ -2386,7 +2386,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-3"
                                                       onClick={[Function]}
@@ -2622,7 +2622,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2686,11 +2686,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -2718,22 +2718,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -2825,7 +2825,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -2887,7 +2887,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-4"
                                       pullRight={true}
                                       title="More Actions"
@@ -2926,7 +2926,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-4"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -2942,7 +2942,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-4"
                                                     onClick={[Function]}
@@ -2952,7 +2952,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-4"
                                                       onClick={[Function]}
@@ -3188,7 +3188,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -3252,11 +3252,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -3285,22 +3285,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -3392,7 +3392,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -3454,7 +3454,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-5"
                                       pullRight={true}
                                       title="More Actions"
@@ -3493,7 +3493,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-5"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -3509,7 +3509,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-5"
                                                     onClick={[Function]}
@@ -3519,7 +3519,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-5"
                                                       onClick={[Function]}
@@ -3755,7 +3755,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -3819,11 +3819,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -3852,22 +3852,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -3959,7 +3959,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -4021,7 +4021,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-6"
                                       pullRight={true}
                                       title="More Actions"
@@ -4060,7 +4060,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-6"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -4076,7 +4076,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-6"
                                                     onClick={[Function]}
@@ -4086,7 +4086,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-6"
                                                       onClick={[Function]}
@@ -4322,7 +4322,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4386,11 +4386,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -4419,22 +4419,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -4526,7 +4526,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -4588,7 +4588,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-7"
                                       pullRight={true}
                                       title="More Actions"
@@ -4627,7 +4627,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-7"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -4643,7 +4643,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-7"
                                                     onClick={[Function]}
@@ -4653,7 +4653,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-7"
                                                       onClick={[Function]}
@@ -4889,7 +4889,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -4953,11 +4953,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -4986,22 +4986,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -5093,7 +5093,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -5155,7 +5155,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-8"
                                       pullRight={true}
                                       title="More Actions"
@@ -5194,7 +5194,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-8"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -5210,7 +5210,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-8"
                                                     onClick={[Function]}
@@ -5220,7 +5220,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-8"
                                                       onClick={[Function]}
@@ -5456,7 +5456,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -5520,11 +5520,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -5552,22 +5552,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -5659,7 +5659,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -5721,7 +5721,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-9"
                                       pullRight={true}
                                       title="More Actions"
@@ -5760,7 +5760,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-9"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -5776,7 +5776,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-9"
                                                     onClick={[Function]}
@@ -5786,7 +5786,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-9"
                                                       onClick={[Function]}
@@ -6022,7 +6022,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -6086,11 +6086,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -6119,22 +6119,22 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   <ListGroupItem__StyledListGroupItem>
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX"
+                      className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz"
                       listItem={false}
                     >
                       <span
-                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 fIiBmX list-group-item"
+                        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 igrVmz list-group-item"
                       >
                         <Row
                           className="row-sm"
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm row"
                             >
                               <Col
                                 bsClass="col"
@@ -6226,7 +6226,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         backdrop="static"
                                         bsClass="modal"
                                         bsSize="large"
-                                        className="Modal-nuree8-0 hMPgsT"
+                                        className="Modal-nuree8-0 kdCabm"
                                         dialogComponentClass={[Function]}
                                         enforceFocus={true}
                                         keyboard={true}
@@ -6288,7 +6288,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   >
                                     <DropdownButton
                                       bsSize="small"
-                                      className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                      className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                       id="more-actions-10"
                                       pullRight={true}
                                       title="More Actions"
@@ -6327,7 +6327,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                   bsClass="dropdown-toggle"
                                                   bsRole="toggle"
                                                   bsSize="small"
-                                                  className="DropdownButton-sc-1343dcx-0 jHYVsD"
+                                                  className="DropdownButton-sc-1343dcx-0 dAnLDc"
                                                   id="more-actions-10"
                                                   key=".0"
                                                   onClick={[Function]}
@@ -6343,7 +6343,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     bsClass="btn"
                                                     bsSize="small"
                                                     bsStyle="default"
-                                                    className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle"
+                                                    className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle"
                                                     disabled={false}
                                                     id="more-actions-10"
                                                     onClick={[Function]}
@@ -6353,7 +6353,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     <button
                                                       aria-expanded={false}
                                                       aria-haspopup={true}
-                                                      className="DropdownButton-sc-1343dcx-0 jHYVsD dropdown-toggle btn btn-sm btn-default"
+                                                      className="DropdownButton-sc-1343dcx-0 dAnLDc dropdown-toggle btn btn-sm btn-default"
                                                       disabled={false}
                                                       id="more-actions-10"
                                                       onClick={[Function]}
@@ -6589,7 +6589,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 hMPgsT"
+                                          className="Modal-nuree8-0 kdCabm"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -6653,11 +6653,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                         >
                           <Row
                             bsClass="row"
-                            className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary"
+                            className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary"
                             componentClass="div"
                           >
                             <div
-                              className="Row-sc-3iisrt-0 gPzTHl row-sm content-packs-summary row"
+                              className="Row-sc-3iisrt-0 iSaIhq row-sm content-packs-summary row"
                             >
                               <Col
                                 bsClass="col"
@@ -6689,11 +6689,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl row-sm"
+        className="Row-sc-3iisrt-0 iSaIhq row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
         >
           <Col
             bsClass="col"
@@ -6740,11 +6740,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   >
                     <Pagination
                       bsClass="pagination"
-                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm"
+                      className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz"
                       data-testid="graylog-pagination"
                     >
                       <ul
-                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 dPTPdm pagination"
+                        className="Pagination__StyledBootstrapPagination-aj0t2h-0 beYNSz pagination"
                         data-testid="graylog-pagination"
                       >
                         <Component
@@ -7003,6 +7003,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -7014,129 +7015,128 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                   ]
                 }
               >
-                <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                <PageSizeSelect__Wrapper
+                  className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show:"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
-                                      label="Show:"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
@@ -7160,11 +7160,11 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl row-sm"
+        className="Row-sc-3iisrt-0 iSaIhq row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
         >
           <Col
             bsClass="col"
@@ -7411,6 +7411,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -7422,129 +7423,128 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                   ]
                 }
               >
-                <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                <PageSizeSelect__Wrapper
+                  className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show:"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
-                                      label="Show:"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>
@@ -7559,11 +7559,11 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl row-sm"
+        className="Row-sc-3iisrt-0 iSaIhq row-sm"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row-sm row"
+          className="Row-sc-3iisrt-0 iSaIhq row-sm row"
         >
           <Col
             bsClass="col"
@@ -7605,6 +7605,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               className="text-right col-md-2"
             >
               <PageSizeSelect
+                className=""
                 onChange={[Function]}
                 pageSize={10}
                 pageSizes={
@@ -7616,129 +7617,128 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                   ]
                 }
               >
-                <div
-                  className=" form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+                <PageSizeSelect__Wrapper
+                  className=" form-inline page-size pull-right"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={10}
+                  <div
+                    className="PageSizeSelect__Wrapper-sc-1cb2t0d-0 jAxfhr  form-inline page-size pull-right"
                   >
-                    <Component
-                      controlId="page-size"
-                      validationState={null}
+                    <Input
+                      addonAfter={null}
+                      bsSize="small"
+                      bsStyle={null}
+                      buttonAfter={null}
+                      help=""
+                      id="page-size"
+                      label="Show"
+                      onChange={[Function]}
+                      placeholder=""
+                      type="select"
+                      value={10}
                     >
-                      <FormGroup__StyledFormGroup
+                      <Component
                         controlId="page-size"
                         validationState={null}
                       >
-                        <FormGroup
-                          bsClass="form-group"
-                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                        <FormGroup__StyledFormGroup
                           controlId="page-size"
                           validationState={null}
                         >
-                          <div
-                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                          <FormGroup
+                            bsClass="form-group"
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy"
+                            controlId="page-size"
+                            validationState={null}
                           >
-                            <ControlLabel>
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jKzIRX"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
-                                  htmlFor="page-size"
+                            <div
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 giUuGy form-group"
+                            >
+                              <ControlLabel>
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 jKzIRX"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 jKzIRX control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show
+                                  </label>
+                                </ControlLabel>
                               </ControlLabel>
-                            </ControlLabel>
-                            <InputWrapper>
-                              <span>
-                                <FormControl
-                                  bsSize="small"
-                                  componentClass="select"
-                                  inputRef={[Function]}
-                                  label="Show:"
-                                  name="page-size"
-                                  onChange={[Function]}
-                                  placeholder=""
-                                  type="select"
-                                  value={10}
-                                >
+                              <InputWrapper>
+                                <span>
                                   <FormControl
-                                    bsClass="form-control"
                                     bsSize="small"
-                                    className="FormControl-sc-1amoaox-0 fKSsjP"
                                     componentClass="select"
                                     inputRef={[Function]}
-                                    label="Show:"
+                                    label="Show"
                                     name="page-size"
                                     onChange={[Function]}
                                     placeholder=""
                                     type="select"
                                     value={10}
                                   >
-                                    <select
-                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
-                                      id="page-size"
-                                      label="Show:"
+                                    <FormControl
+                                      bsClass="form-control"
+                                      bsSize="small"
+                                      className="FormControl-sc-1amoaox-0 fKSsjP"
+                                      componentClass="select"
+                                      inputRef={[Function]}
+                                      label="Show"
                                       name="page-size"
                                       onChange={[Function]}
                                       placeholder=""
                                       type="select"
                                       value={10}
                                     >
-                                      <option
-                                        key="option-10"
+                                      <select
+                                        className="FormControl-sc-1amoaox-0 fKSsjP form-control input-sm"
+                                        id="page-size"
+                                        label="Show"
+                                        name="page-size"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="select"
                                         value={10}
                                       >
-                                        10
-                                      </option>
-                                      <option
-                                        key="option-25"
-                                        value={25}
-                                      >
-                                        25
-                                      </option>
-                                      <option
-                                        key="option-50"
-                                        value={50}
-                                      >
-                                        50
-                                      </option>
-                                      <option
-                                        key="option-100"
-                                        value={100}
-                                      >
-                                        100
-                                      </option>
-                                    </select>
+                                        <option
+                                          key="option-10"
+                                          value={10}
+                                        >
+                                          10
+                                        </option>
+                                        <option
+                                          key="option-25"
+                                          value={25}
+                                        >
+                                          25
+                                        </option>
+                                        <option
+                                          key="option-50"
+                                          value={50}
+                                        >
+                                          50
+                                        </option>
+                                        <option
+                                          key="option-100"
+                                          value={100}
+                                        >
+                                          100
+                                        </option>
+                                      </select>
+                                    </FormControl>
                                   </FormControl>
-                                </FormControl>
-                              </span>
-                            </InputWrapper>
-                          </div>
-                        </FormGroup>
-                      </FormGroup__StyledFormGroup>
-                    </Component>
-                  </Input>
-                </div>
+                                </span>
+                              </InputWrapper>
+                            </div>
+                          </FormGroup>
+                        </FormGroup__StyledFormGroup>
+                      </Component>
+                    </Input>
+                  </div>
+                </PageSizeSelect__Wrapper>
               </PageSizeSelect>
             </div>
           </Col>

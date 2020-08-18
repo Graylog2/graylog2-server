@@ -5,9 +5,13 @@ import { useState } from 'react';
 import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import PaginatedItemOverview, {
+  type PaginationInfo,
+  type PaginatedListType,
+} from 'components/common/PaginatedItemOverview';
+import SectionComponent from 'components/common/Section/SectionComponent';
 
-import PaginatedItemOverview, { type PaginationInfo, type PaginatedListType } from '../PaginatedItemOverview';
-import SectionComponent from '../SectionComponent';
+import RolesQueryHelp from '../RolesQueryHelp';
 
 type Props = {
   user: User,
@@ -16,17 +20,19 @@ type Props = {
 const RolesSection = ({ user: { username } }: Props) => {
   const [loading, setLoading] = useState(false);
 
-  const _onLoad = ({ page, perPage, query }: PaginationInfo): Promise<?PaginatedListType> => {
+  const _onLoad = ({ page, perPage, query }: PaginationInfo, isSubscribed: boolean): Promise<?PaginatedListType> => {
     setLoading(true);
 
     return AuthzRolesActions.loadForUser(username, page, perPage, query)
       .then((response) => {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
 
         // $FlowFixMe Role has DescriptiveItem implemented!!!
         return response;
       }).catch((error) => {
-        if (error.additional.status === 404) {
+        if (error?.additional?.status === 404) {
           UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
             'Could not load roles for user');
         }
@@ -35,7 +41,7 @@ const RolesSection = ({ user: { username } }: Props) => {
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <PaginatedItemOverview onLoad={_onLoad} />
+      <PaginatedItemOverview onLoad={_onLoad} queryHelper={<RolesQueryHelp />} />
     </SectionComponent>
   );
 };

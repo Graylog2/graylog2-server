@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { IfPermitted } from 'components/common';
 import User from 'logic/users/User';
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/graylog';
@@ -19,22 +20,28 @@ const UserManagementLinks = ({ username, userIsReadOnly }: Props) => (
       </Button>
     </LinkContainer>
     {!userIsReadOnly && (
-    <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
-      <Button bsStyle="success">
-        Edit User
-      </Button>
-    </LinkContainer>
+      <IfPermitted permissions="users:edit">
+        <LinkContainer to={Routes.SYSTEM.USERS.edit(username)}>
+          <Button bsStyle="success">
+            Edit User
+          </Button>
+        </LinkContainer>
+      </IfPermitted>
     )}
-    <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
-      <Button bsStyle="success">
-        Edit Tokens
-      </Button>
-    </LinkContainer>
-    <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
-      <Button bsStyle="info">
-        Users Overview
-      </Button>
-    </LinkContainer>
+    <IfPermitted permissions="users:tokenlist">
+      <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(username)}>
+        <Button bsStyle="success">
+          Edit Tokens
+        </Button>
+      </LinkContainer>
+    </IfPermitted>
+    <IfPermitted permissions="users:list">
+      <LinkContainer to={Routes.SYSTEM.USERS.OVERVIEW}>
+        <Button bsStyle="info">
+          Users Overview
+        </Button>
+      </LinkContainer>
+    </IfPermitted>
   </ButtonToolbar>
 );
 

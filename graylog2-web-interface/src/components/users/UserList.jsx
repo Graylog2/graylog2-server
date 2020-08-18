@@ -10,11 +10,11 @@ import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { DataTable, Spinner, Timestamp, Icon } from 'components/common';
+import { UsersActions } from 'stores/users/UsersStore';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import UserListStyle from '!style!css!./UserList.css';
 
-const UsersStore = StoreProvider.getStore('Users');
 const RolesStore = StoreProvider.getStore('Roles');
 
 const ActiveIcon = styled(Icon)(({ theme }) => css`
@@ -47,11 +47,11 @@ const UserList = createReactClass({
   },
 
   loadUsers() {
-    const promise = UsersStore.loadUsers();
+    const promise = UsersActions.loadUsers();
 
     promise.done((users) => {
       this.setState({
-        users: users,
+        users: users.toJS().map((user) => user.toJSON()),
       });
     });
   },
@@ -61,7 +61,7 @@ const UserList = createReactClass({
   },
 
   deleteUser(username) {
-    const promise = UsersStore.deleteUser(username);
+    const promise = UsersActions.deleteUser(username);
 
     promise.done(() => {
       this.loadUsers();

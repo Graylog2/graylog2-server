@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Button, Col, Panel, Row } from 'components/graylog';
@@ -20,13 +20,15 @@ const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
 `;
 
-const matchColor = (matches) => (matches ? '#00AE42' : '#AD0707');
-
 const MatchIcon = styled(({ empty, matches, ...props }) => <Icon {...props} />)(
-  ({ empty, matches }) => ({
-    color: empty ? '#0063BE' : matchColor(matches),
-    marginRight: '3px',
-  }),
+  ({ empty, matches, theme }) => {
+    const matchColor = matches ? theme.colors.variant.success : theme.colors.variant.danger;
+
+    return css`
+      color: ${empty ? theme.colors.variant.info : matchColor};
+      margin-right: 3px;
+    `;
+  },
 );
 
 const StyledSpinner = styled(Spinner)`

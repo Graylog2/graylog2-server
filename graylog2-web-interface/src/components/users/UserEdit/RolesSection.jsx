@@ -8,12 +8,16 @@ import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { UsersActions } from 'stores/users/UsersStore';
+import PaginatedItemOverview, {
+  defaultPageInfo,
+  type PaginationInfo,
+  type PaginatedListType,
+  type DescriptiveItem,
+} from 'components/common/PaginatedItemOverview';
+import SectionComponent from 'components/common/Section/SectionComponent';
+import RolesSelector from 'components/permissions/RolesSelector';
 
-import RolesSelector from './RolesSelector';
-
-import PaginatedItemOverview, { defaultPageInfo, type PaginationInfo, type PaginatedListType } from '../PaginatedItemOverview';
-import SectionComponent from '../SectionComponent';
-import type { DescriptiveItem } from '../PaginatedItemOverview';
+import RolesQueryHelp from '../RolesQueryHelp';
 
 type Props = {
   user: User,
@@ -51,25 +55,36 @@ const RolesSection = ({ user, onSubmit }: Props) => {
       });
   };
 
-  const onUpdate = (data) => onSubmit(data).then(() => {
+  const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
     _onLoad().then((response) => setRoles(response));
     UsersActions.load(username);
   });
 
+  const _onAssignRole = (newRole: DescriptiveItem) => {
+    const userRoles = user.roles;
+    const newRoles = userRoles.push(newRole.name).toJS();
+
+    return onRolesUpdate({ roles: newRoles });
+  };
+
   const onDeleteRole = (role: DescriptiveItem) => {
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();
-    onUpdate({ roles: newUserRoles });
+
+    onRolesUpdate({ roles: newUserRoles });
   };
 
   return (
     <SectionComponent title="Roles" showLoading={loading}>
-      <h4>Assign Roles</h4>
+      <h3>Assign Roles</h3>
       <Container>
-        <RolesSelector onSubmit={onUpdate} user={user} />
+        <RolesSelector onSubmit={_onAssignRole} user={user} />
       </Container>
-      <h4>Selected Roles</h4>
+      <h3>Selected Roles</h3>
       <Container>
-        <PaginatedItemOverview onLoad={_onLoad} overrideList={roles} onDeleteItem={onDeleteRole} />
+        <PaginatedItemOverview onLoad={_onLoad}
+                               overrideList={roles}
+                               onDeleteItem={onDeleteRole}
+                               queryHelper={<RolesQueryHelp />} />
       </Container>
     </SectionComponent>
   );

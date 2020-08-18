@@ -6,16 +6,18 @@ import PropTypes from 'prop-types';
 import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
-import { EntityShareStore, EntityShareActions, type EntitySharePayload } from 'stores/permissions/EntityShareStore';
+import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 
 import EntityShareSettings from './EntityShareSettings';
 
 type Props = {
   description: string,
-  entityId: string,
-  entityTitle: string,
-  entityType: string,
+  entityId: $PropertyType<SharedEntity, 'id'>,
+  entityTitle: $PropertyType<SharedEntity, 'title'>,
+  entityType: $PropertyType<SharedEntity, 'type'>,
   onClose: () => void,
 };
 
@@ -26,7 +28,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
 
   useEffect(() => {
     EntityShareActions.prepare(entityGRN);
-  }, []);
+  }, [entityGRN]);
 
   const _handleSave = () => {
     setDisableSubmit(true);
@@ -46,9 +48,10 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
                            showModal
                            title={<>Sharing: {entityType}: <i>{entityTitle}</i></>}>
       <>
-        {entityShareState ? (
+        {(entityShareState && entityShareState.entity === entityGRN) ? (
           <EntityShareSettings description={description}
                                entityGRN={entityGRN}
+                               entityType={entityType}
                                entityShareState={entityShareState}
                                setDisableSubmit={setDisableSubmit} />
         ) : (

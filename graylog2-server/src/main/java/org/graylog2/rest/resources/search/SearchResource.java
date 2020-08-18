@@ -148,11 +148,11 @@ public abstract class SearchResource extends RestResource {
         }
     }
 
-    protected ChunkedOutput<ScrollResult.ScrollChunk> buildChunkedOutput(final ScrollResult scroll, int limit) {
+    protected ChunkedOutput<ScrollResult.ScrollChunk> buildChunkedOutput(final ScrollResult scroll) {
         final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
 
         LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
-        Runnable scrollIterationAction = createScrollChunkProducer(scroll, output, limit);
+        Runnable scrollIterationAction = createScrollChunkProducer(scroll, output);
         // TODO use a shared executor for async responses here instead of a single thread that's not limited
         new Thread(scrollIterationAction).start();
         return output;
@@ -188,39 +188,27 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected Runnable createScrollChunkProducer(final ScrollResult scroll,
-                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output,
-                                                 final int limit) {
-        return new Runnable() {
-            private int collectedHits = 0;
-
-            @Override
-            public void run() {
-                try {
-                    ScrollResult.ScrollChunk chunk = scroll.nextChunk();
-                    while (chunk != null) {
-                        LOG.debug("[{}] Writing scroll chunk with {} messages",
-                            scroll.getQueryHash(),
-                            chunk.getMessages().size());
-                        if (output.isClosed()) {
-                            LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
-                                scroll.getQueryHash());
-                            scroll.cancel();
-                            return;
-                        }
-                        output.write(chunk);
-                        collectedHits += chunk.getMessages().size();
-                        if (limit != 0 && collectedHits >= limit) {
-                            scroll.cancel();
-                            output.close();
-                            return;
-                        }
-                        chunk = scroll.nextChunk();
+                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output) {
+        return () -> {
+            try {
+                ScrollResult.ScrollChunk chunk = scroll.nextChunk();
+                while (chunk != null) {
+                    LOG.debug("[{}] Writing scroll chunk with {} messages",
+                        scroll.getQueryHash(),
+                        chunk.getMessages().size());
+                    if (output.isClosed()) {
+                        LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
+                            scroll.getQueryHash());
+                        scroll.cancel();
+                        return;
                     }
-                    LOG.debug("[{}] Reached end of scroll result.", scroll.getQueryHash());
-                    output.close();
-                } catch (IOException e) {
-                    LOG.warn("[{}] Could not close chunked output stream for query scroll.", scroll.getQueryHash());
+                    output.write(chunk);
+                    chunk = scroll.nextChunk();
                 }
+                LOG.debug("[{}] Reached end of scroll result.", scroll.getQueryHash());
+                output.close();
+            } catch (IOException e) {
+                LOG.warn("[{}] Could not close chunked output stream for query scroll.", scroll.getQueryHash());
             }
         };
     }

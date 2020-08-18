@@ -62,7 +62,7 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
 
 const Navigation = ({ location }) => {
   const currentUser = useContext(CurrentUserContext);
-  const { permissions, username, full_name: fullName } = currentUser || {};
+  const { permissions, username, full_name: fullName, read_only: readOnly } = currentUser || {};
 
   const pluginExports = PluginStore.exports('navigation');
 
@@ -80,7 +80,7 @@ const Navigation = ({ location }) => {
   const pluginItems = PluginStore.exports('navigationItems');
 
   return (
-    <StyledNavbar inverse fluid fixedTop>
+    <StyledNavbar fluid fixedTop>
       <Navbar.Header>
         <Navbar.Brand>
           <LinkContainer to={Routes.STARTPAGE}>
@@ -120,17 +120,20 @@ const Navigation = ({ location }) => {
         <NotificationBadge />
 
         <Nav navbar pullRight className="header-meta-nav">
+          <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+            <GlobalThroughput />
+          </LinkContainer>
+
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
             {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
           </InactiveNavItem>
 
-          <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-            <GlobalThroughput />
-          </LinkContainer>
           <ScratchpadToggle />
+
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
-          <UserMenu fullName={fullName} loginName={username} />
+
+          <UserMenu fullName={fullName} loginName={username} readOnly={readOnly} />
         </Nav>
       </Navbar.Collapse>
     </StyledNavbar>

@@ -49,11 +49,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -176,11 +176,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -308,11 +308,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -377,6 +377,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -395,7 +396,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -407,7 +408,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -730,7 +731,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 hMPgsT"
+                                            className="Modal-nuree8-0 kdCabm"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}

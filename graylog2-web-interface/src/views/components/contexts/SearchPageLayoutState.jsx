@@ -14,7 +14,7 @@ const { PreferencesActions } = CombinedProvider.get('Preferences');
 type Props = {
   children: ({
     setLayoutState: (stateKey: string, value: boolean) => void,
-    getLayoutState: (stateKey: string, ddefaultValue: boolean) => boolean,
+    getLayoutState: (stateKey: string, defaultValue: boolean) => boolean,
   }) => React.Node,
 };
 

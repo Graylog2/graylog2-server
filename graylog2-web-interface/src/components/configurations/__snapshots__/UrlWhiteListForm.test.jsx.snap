@@ -432,6 +432,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "xs": "480px",
                                       },
                                     },
+                                    "changeMode": [Function],
                                     "colors": Object {
                                       "brand": Object {
                                         "primary": "#ff3633",
@@ -443,6 +444,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "contentBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
+                                        "navigationBackground": "#fff",
+                                        "navigationBoxShadow": "rgba(115,115,115,0.25)",
                                         "textAlt": "#fff",
                                         "textDefault": "#1f1f1f",
                                       },
@@ -918,7 +921,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "tiny": "0.79rem",
                                       },
                                     },
-                                    "mode": "teinte",
+                                    "mode": "teint",
                                     "utils": Object {
                                       "colorLevel": [Function],
                                       "contrastingColor": [Function],
@@ -2694,6 +2697,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "xs": "480px",
                                       },
                                     },
+                                    "changeMode": [Function],
                                     "colors": Object {
                                       "brand": Object {
                                         "primary": "#ff3633",
@@ -2705,6 +2709,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "contentBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
+                                        "navigationBackground": "#fff",
+                                        "navigationBoxShadow": "rgba(115,115,115,0.25)",
                                         "textAlt": "#fff",
                                         "textDefault": "#1f1f1f",
                                       },
@@ -3180,7 +3186,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "tiny": "0.79rem",
                                       },
                                     },
-                                    "mode": "teinte",
+                                    "mode": "teint",
                                     "utils": Object {
                                       "colorLevel": [Function],
                                       "contrastingColor": [Function],
@@ -4956,6 +4962,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "xs": "480px",
                                       },
                                     },
+                                    "changeMode": [Function],
                                     "colors": Object {
                                       "brand": Object {
                                         "primary": "#ff3633",
@@ -4967,6 +4974,8 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "contentBackground": "#fff",
                                         "link": "#702785",
                                         "linkHover": "#410057",
+                                        "navigationBackground": "#fff",
+                                        "navigationBoxShadow": "rgba(115,115,115,0.25)",
                                         "textAlt": "#fff",
                                         "textDefault": "#1f1f1f",
                                       },
@@ -5442,7 +5451,7 @@ exports[`UrlWhitelistForm render the UrlWhitelistForm component should create ne
                                         "tiny": "0.79rem",
                                       },
                                     },
-                                    "mode": "teinte",
+                                    "mode": "teint",
                                     "utils": Object {
                                       "colorLevel": [Function],
                                       "contrastingColor": [Function],

@@ -61,11 +61,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -187,7 +187,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         backdrop="static"
                         bsClass="modal"
                         bsSize="large"
-                        className="Modal-nuree8-0 hMPgsT"
+                        className="Modal-nuree8-0 kdCabm"
                         dialogComponentClass={[Function]}
                         enforceFocus={true}
                         keyboard={true}
@@ -246,6 +246,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   </span>
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -264,7 +265,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -276,7 +277,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -672,7 +673,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   backdrop="static"
                                                   bsClass="modal"
                                                   bsSize="large"
-                                                  className="Modal-nuree8-0 hMPgsT"
+                                                  className="Modal-nuree8-0 kdCabm"
                                                   dialogComponentClass={[Function]}
                                                   enforceFocus={true}
                                                   keyboard={true}
@@ -769,7 +770,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       autoFocus={true}
                       backdrop="static"
                       bsClass="modal"
-                      className="Modal-nuree8-0 hMPgsT"
+                      className="Modal-nuree8-0 kdCabm"
                       dialogComponentClass={[Function]}
                       enforceFocus={true}
                       keyboard={true}
@@ -831,11 +832,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -911,6 +912,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -929,7 +931,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -941,7 +943,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -1372,7 +1374,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 hMPgsT"
+                                            className="Modal-nuree8-0 kdCabm"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -1445,7 +1447,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             backdrop="static"
                                             bsClass="modal"
                                             bsSize="large"
-                                            className="Modal-nuree8-0 hMPgsT"
+                                            className="Modal-nuree8-0 kdCabm"
                                             dialogComponentClass={[Function]}
                                             enforceFocus={true}
                                             keyboard={true}
@@ -1534,11 +1536,11 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1614,7 +1616,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         backdrop="static"
                         bsClass="modal"
                         bsSize="large"
-                        className="Modal-nuree8-0 hMPgsT"
+                        className="Modal-nuree8-0 kdCabm"
                         dialogComponentClass={[Function]}
                         enforceFocus={true}
                         keyboard={true}
@@ -1673,6 +1675,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   </span>
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -1691,7 +1694,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -1703,7 +1706,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"
@@ -1879,7 +1882,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       autoFocus={true}
                       backdrop="static"
                       bsClass="modal"
-                      className="Modal-nuree8-0 hMPgsT"
+                      className="Modal-nuree8-0 kdCabm"
                       dialogComponentClass={[Function]}
                       enforceFocus={true}
                       keyboard={true}
@@ -1941,11 +1944,11 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
     <Row>
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl"
+        className="Row-sc-3iisrt-0 iSaIhq"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl row"
+          className="Row-sc-3iisrt-0 iSaIhq row"
         >
           <Col
             bsClass="col"
@@ -1975,6 +1978,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                   <br />
                   <SearchForm
                     buttonLeftMargin={5}
+                    className=""
                     focusAfterMount={false}
                     label={null}
                     loadingLabel="Loading..."
@@ -1993,7 +1997,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                     wrapperClass="search"
                   >
                     <div
-                      className="search"
+                      className="search "
                       style={
                         Object {
                           "marginTop": 15,
@@ -2005,7 +2009,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         onSubmit={[Function]}
                       >
                         <div
-                          className="form-group has-feedback"
+                          className="form-group "
                         >
                           <input
                             autoComplete="off"

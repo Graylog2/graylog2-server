@@ -310,7 +310,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 .c4.nav.nav-pills > li.active > a,
 .c4.nav.nav-pills > li.active > a:hover,
 .c4.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -322,7 +322,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c4.nav .nav-tabs > li > a:hover {
@@ -356,7 +356,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
@@ -1003,7 +1003,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 .c4.nav.nav-pills > li.active > a,
 .c4.nav.nav-pills > li.active > a:hover,
 .c4.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -1015,7 +1015,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c4.nav .nav-tabs > li > a:hover {
@@ -1049,7 +1049,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
@@ -1709,7 +1709,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 .c2.nav.nav-pills > li.active > a,
 .c2.nav.nav-pills > li.active > a:hover,
 .c2.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -1721,7 +1721,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c2.nav .nav-tabs > li > a:hover {
@@ -1755,7 +1755,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }
@@ -2385,7 +2385,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 .c2.nav.nav-pills > li.active > a,
 .c2.nav.nav-pills > li.active > a:hover,
 .c2.nav.nav-pills > li.active > a:focus {
-  color: #fff;
+  color: rgb(234,229,236);
   background-color: #702785;
 }
 
@@ -2397,7 +2397,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
   -webkit-transition: background-color 150ms ease-in-out;
   transition: background-color 150ms ease-in-out;
   color: #1f1f1f;
-  border-color: #f3f3f3 #f3f3f3 rgb(198,207,231);
+  border-color: #d0d0d0 #d0d0d0 rgb(198,207,231);
 }
 
 .c2.nav .nav-tabs > li > a:hover {
@@ -2431,7 +2431,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
 
 .c0.content {
   background-color: #fff;
-  border: 1px solid #cdcdcd;
+  border: 1px solid #d0d0d0;
   margin-bottom: 9px;
   border-radius: 4px;
 }

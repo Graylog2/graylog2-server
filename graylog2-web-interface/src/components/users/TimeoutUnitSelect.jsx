@@ -1,18 +1,31 @@
 import React from 'react';
+import styled from 'styled-components';
+
+import { Select } from 'components/common';
+
+import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
+
+const TimeoutSelect = styled(Select)`
+  width: 150px;
+`;
 
 class TimeoutUnitSelect extends React.Component {
+  options = [
+    { value: `${MS_SECOND}`, label: 'Seconds' },
+    { value: `${MS_MINUTE}`, label: 'Minutes' },
+    { value: `${MS_HOUR}`, label: 'Hours' },
+    { value: `${MS_DAY}`, label: 'Days' },
+  ];
+
   getValue = () => {
-    return this.session_timeout_unit.value;
+    return this.sessionTimeoutUnit.value;
   };
 
   render() {
     return (
-      <select className="form-control" ref={(session_timeout_unit) => { this.session_timeout_unit = session_timeout_unit; }} {...this.props}>
-        <option value={1000}>Seconds</option>
-        <option value={60 * 1000}>Minutes</option>
-        <option value={60 * 60 * 1000}>Hours</option>
-        <option value={24 * 60 * 60 * 1000}>Days</option>
-      </select>
+      <TimeoutSelect ref={(sessionTimeoutUnit) => { this.session_timeout_unit = sessionTimeoutUnit; }}
+                     options={this.options}
+                     {...this.props} />
     );
   }
 }

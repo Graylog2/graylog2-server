@@ -2,10 +2,10 @@
 import * as Immutable from 'immutable';
 
 import type {
-  Grantee as GranteeType,
-  Capability as CapabilityType,
-  MissingDependency as MissingDependencyType,
-  ActiveShare as ActiveShareType,
+  GranteeType,
+  CapabilityType,
+  SharedEntityType,
+  ActiveShareType,
   GRN,
 } from 'logic/permissions/types';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -13,42 +13,16 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import Capability from './Capability';
 import Grantee from './Grantee';
 import ActiveShare from './ActiveShare';
-import MissingDependency from './MissingDependency';
+import SharedEntity from './SharedEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
 
-export type AvailableGrantees = Immutable.List<Grantee>;
-export type AvailableCapabilities = Immutable.List<Capability>;
+export type GranteesList = Immutable.List<Grantee>;
+export type CapabilitiesList = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare>;
-export type MissingDependencies = Immutable.Map<GRN, Immutable.List<MissingDependency>>;
+export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
 export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
-
-const mockMissingDependencies = () => {
-  const owner1 = Grantee
-    .builder()
-    .id('grn::::user:jane')
-    .title('Jane Doe')
-    .type('user')
-    .build();
-
-  const owner2 = Grantee
-    .builder()
-    .id('grn::::team:reporting')
-    .title('Reporting')
-    .type('team')
-    .build();
-
-  const missingDependecy = MissingDependency
-    .builder()
-    .id('grn::::stream:57bc9188e62a2373778d9e03')
-    .type('stream')
-    .title('Security Data')
-    .owners(Immutable.List([owner1, owner2]))
-    .build();
-
-  return Immutable.Map({ 'grn::::team:abc123': Immutable.List([missingDependecy]) });
-};
 
 const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>): Immutable.List<T> => {
   const granteesByType = grantees
@@ -64,8 +38,8 @@ const _sortAndOrderGrantees = <T: GranteeInterface>(grantees: Immutable.List<T>)
 
 type InternalState = {|
   entity: GRN,
-  availableGrantees: AvailableGrantees,
-  availableCapabilities: AvailableCapabilities,
+  availableGrantees: GranteesList,
+  availableCapabilities: CapabilitiesList,
   activeShares: ActiveShares,
   selectedGranteeCapabilities: SelectedGranteeCapabilities,
   missingDependencies: MissingDependencies,
@@ -79,7 +53,7 @@ export type EntityShareStateJson = {|
   selected_grantee_capabilities: {|
     [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
   |} | {||},
-  missing_permissions_on_dependencies: {[GRN]: Array<MissingDependencyType>},
+  missing_permissions_on_dependencies: {[GRN]: Array<SharedEntityType>},
 |};
 
 export default class EntityShareState {
@@ -99,7 +73,7 @@ export default class EntityShareState {
       availableCapabilities: availableCapabilities,
       activeShares,
       selectedGranteeCapabilities: selectedGranteeCapabilities,
-      missingDependencies: missingDependencies || mockMissingDependencies(),
+      missingDependencies: missingDependencies,
     };
   }
 
@@ -204,7 +178,7 @@ export default class EntityShareState {
       Object.entries(missing_permissions_on_dependencies).map(
         ([granteeGRN, dependencyList]) => ({
           // $FlowFixMe: Object entries returns mixed value
-          [granteeGRN]: dependencyList.map((dependency) => MissingDependency.fromJSON(dependency)),
+          [granteeGRN]: dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)),
         }),
       ),
     );

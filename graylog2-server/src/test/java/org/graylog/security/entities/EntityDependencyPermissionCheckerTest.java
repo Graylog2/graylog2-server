@@ -78,15 +78,15 @@ public class EntityDependencyPermissionCheckerTest {
         });
     }
 
-    private ImmutableMultimap<GRN, EntityDependency> runCheck(boolean isSharingUserAuthorized, boolean isGranteeUserAuthorized) {
+    private ImmutableMultimap<GRN, EntityDescriptor> runCheck(boolean isSharingUserAuthorized, boolean isGranteeUserAuthorized) {
         final GRN granteeUser = grnRegistry.newGRN("user", "john");
         final GRN sharingUser = grnRegistry.newGRN("user", "jane");
         final GRN stream = grnRegistry.newGRN("stream", "54e3deadbeefdeadbeef0001");
         final GranteeAuthorizer sharingUserAuthorizer = mock(GranteeAuthorizer.class);
         final GranteeAuthorizer granteeUserAuthorizer = mock(GranteeAuthorizer.class);
         final ImmutableSet<GRN> selectedGrantees = ImmutableSet.of(granteeUser);
-        final EntityDependency dependency = EntityDependency.create(stream, "Title", ImmutableSet.of());
-        final ImmutableSet<EntityDependency> dependencies = ImmutableSet.of(dependency);
+        final EntityDescriptor dependency = EntityDescriptor.create(stream, "Title", ImmutableSet.of());
+        final ImmutableSet<EntityDescriptor> dependencies = ImmutableSet.of(dependency);
 
         when(userAuthorizerFactory.create(sharingUser)).thenReturn(sharingUserAuthorizer);
         when(userAuthorizerFactory.create(granteeUser)).thenReturn(granteeUserAuthorizer);
@@ -94,7 +94,7 @@ public class EntityDependencyPermissionCheckerTest {
         when(sharingUserAuthorizer.isPermitted(anyString(), any(GRN.class))).thenReturn(isSharingUserAuthorized);
         when(granteeUserAuthorizer.isPermitted("streams:read", stream)).thenReturn(isGranteeUserAuthorized);
 
-        final ImmutableMultimap<GRN, EntityDependency> checkResult = resolver.check(sharingUser, dependencies, selectedGrantees);
+        final ImmutableMultimap<GRN, EntityDescriptor> checkResult = resolver.check(sharingUser, dependencies, selectedGrantees);
 
         verify(sharingUserAuthorizer, times(1)).isPermitted("streams:read", stream);
         verifyNoMoreInteractions(sharingUserAuthorizer);

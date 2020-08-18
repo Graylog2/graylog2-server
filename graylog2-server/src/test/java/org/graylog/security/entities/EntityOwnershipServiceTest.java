@@ -16,6 +16,7 @@
  */
 package org.graylog.security.entities;
 
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
@@ -44,7 +45,7 @@ class EntityOwnershipServiceTest {
     }
 
     @Test
-    void registerNewView() {
+    void registerNewEventDefinition() {
         final User mockUser = mock(User.class);
         when(mockUser.getName()).thenReturn("mockuser");
 
@@ -60,6 +61,19 @@ class EntityOwnershipServiceTest {
             assertThat(g.target().entity()).isEqualTo("1234");
             assertThat(g.grantee().type()).isEqualTo(GRNTypes.USER.type());
             assertThat(g.grantee().entity()).isEqualTo("mockuser");
+        });
+    }
+
+    @Test
+    void unregisterView() {
+        entityOwnershipService.unregisterView("1234");
+
+        ArgumentCaptor<GRN> grn = ArgumentCaptor.forClass(GRN.class);
+        verify(dbGrantService).deleteForTarget(grn.capture());
+
+        assertThat(grn.getValue()).satisfies(g -> {
+            assertThat(g.type()).isEqualTo(GRNTypes.DASHBOARD.type());
+            assertThat(g.entity()).isEqualTo("1234");
         });
     }
 }

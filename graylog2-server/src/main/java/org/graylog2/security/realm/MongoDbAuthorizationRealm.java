@@ -17,13 +17,13 @@
 package org.graylog2.security.realm;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.List;
+import java.util.Set;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
@@ -68,11 +68,9 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
             return new SimpleAuthorizationInfo();
         } else {
             final SimpleAuthorizationInfo info = new UserAuthorizationInfo(user);
-            final List<String> permissions = user.getPermissions();
 
-            if (permissions != null) {
-                info.setStringPermissions(Sets.newHashSet(permissions));
-            }
+            final Set<Permission> permissions = user.getObjectPermissions();
+            info.setObjectPermissions(permissions);
             info.setRoles(user.getRoleIds());
 
             LOG.debug("User {} has permissions: {}", principals, permissions);

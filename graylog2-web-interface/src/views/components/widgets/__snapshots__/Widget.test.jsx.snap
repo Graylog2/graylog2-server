@@ -21,6 +21,7 @@ exports[`<Widget /> should render with empty props 1`] = `
             class="IconButton__Wrapper-sc-1q956yw-0 lipzWf"
             tabindex="0"
             title="Stretch width"
+            type="button"
           >
             <svg
               class="svg-inline--fa fa-arrows-alt-h"
@@ -37,6 +38,7 @@ exports[`<Widget /> should render with empty props 1`] = `
                   class="IconButton__Wrapper-sc-1q956yw-0 lipzWf"
                   tabindex="0"
                   title="Open actions dropdown"
+                  type="button"
                 >
                   <svg
                     class="svg-inline--fa fa-chevron-down"

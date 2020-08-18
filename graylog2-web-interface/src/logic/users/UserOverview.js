@@ -1,7 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { UserJSON } from 'stores/users/UsersStore';
+import type { UserJSON } from 'logic/users/User';
 
 type InternalState = {
   id: string,
@@ -13,7 +13,7 @@ type InternalState = {
   external: boolean,
   sessionActive: boolean,
   clientAddress: string,
-  lastActivity: string,
+  lastActivity: ?string,
 };
 
 export default class UserOverview {
@@ -53,7 +53,15 @@ export default class UserOverview {
     return this._value.username;
   }
 
+  get name() {
+    return this._value.username;
+  }
+
   get fullName() {
+    return this._value.fullName;
+  }
+
+  get description() {
     return this._value.fullName;
   }
 

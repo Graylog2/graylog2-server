@@ -32,9 +32,9 @@ public abstract class RestResourceWithOwnerCheck extends RestResource implements
 
     protected void checkOwnership(GRN entity) {
         if (!isOwner(entity)) {
-            LOG.info("Not authorized to access resource <{}>. User <{}> is missing permission <{}:{}>",
+            LOG.info("Not authorized to access entity <{}>. User <{}> is missing permission <{}:{}>",
                     entity, getSubject().getPrincipal(), RestPermissions.ENTITY_OWN, entity);
-            throw new ForbiddenException("Not authorized to access resource <" + entity + ">");
+            throw new ForbiddenException("Not authorized to access entity <" + entity + ">");
         }
     }
 

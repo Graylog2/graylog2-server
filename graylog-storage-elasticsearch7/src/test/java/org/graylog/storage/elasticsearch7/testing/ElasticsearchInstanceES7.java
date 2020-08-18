@@ -3,6 +3,8 @@ package org.graylog.storage.elasticsearch7.testing;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.shaded.elasticsearch7.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.RestHighLevelClientProvider;
 import org.graylog.testing.elasticsearch.Client;
@@ -12,7 +14,6 @@ import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
-import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.net.URI;
 
@@ -22,21 +23,23 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstanceES7.class);
     private static final String DEFAULT_VERSION = "7.8.0";
 
+    private final RestHighLevelClient restHighLevelClient;
     private final ElasticsearchClient elasticsearchClient;
     private final Client client;
     private final FixtureImporter fixtureImporter;
 
     protected ElasticsearchInstanceES7(String image, Version version, Network network) {
         super(image, version, network);
-        this.elasticsearchClient = elasticsearchClientFrom(this.container);
+        this.restHighLevelClient = buildRestClient();
+        this.elasticsearchClient = new ElasticsearchClient(this.restHighLevelClient);
         this.client = new ClientES7(this.elasticsearchClient);
         this.fixtureImporter = new FixtureImporterES7(this.elasticsearchClient);
     }
 
-    private ElasticsearchClient elasticsearchClientFrom(ElasticsearchContainer container) {
-        final RestHighLevelClientProvider clientProvider = new RestHighLevelClientProvider(
+    private RestHighLevelClient buildRestClient() {
+        return new RestHighLevelClientProvider(
                 mock(GracefulShutdownService.class),
-                ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
+                ImmutableList.of(URI.create("http://" + this.container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -47,9 +50,10 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
                 null,
                 Duration.seconds(60),
                 "http",
-                false);
-
-        return new ElasticsearchClient(clientProvider.get());
+                false,
+                false,
+                new BasicCredentialsProvider())
+                .get();
     }
 
     public static ElasticsearchInstanceES7 create() {
@@ -81,5 +85,9 @@ public class ElasticsearchInstanceES7 extends ElasticsearchInstance {
 
     public ElasticsearchClient elasticsearchClient() {
         return this.elasticsearchClient;
+    }
+
+    public RestHighLevelClient restHighLevelClient() {
+        return this.restHighLevelClient;
     }
 }
