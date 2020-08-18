@@ -10,10 +10,10 @@ type Props = {
   children: React.Node | ({ disabled: boolean }) => React.Node,
   id: string,
   type: string,
-  disableChildren: boolean,
+  hideChildren: boolean,
 };
 
-const HasOwnership = ({ children, id, type, disableChildren }: Props) => {
+const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
   const currentUser = useContext(CurrentUserContext);
   const entity = createGRN(id, type);
   const ownership = `entity:own:${entity}`;
@@ -24,7 +24,7 @@ const HasOwnership = ({ children, id, type, disableChildren }: Props) => {
     const isAdmin = permissions.includes(adminPermission);
 
     if (grnPermissions.includes(ownership) || isAdmin) {
-      if (disableChildren && typeof children === 'function') {
+      if (!hideChildren && typeof children === 'function') {
         return <>{ children({ disabled: false }) } </>;
       }
 
@@ -32,7 +32,7 @@ const HasOwnership = ({ children, id, type, disableChildren }: Props) => {
     }
   }
 
-  if (disableChildren && typeof children === 'function') {
+  if (!hideChildren && typeof children === 'function') {
     return <>{ children({ disabled: true }) } </>;
   }
 
@@ -50,11 +50,11 @@ HasOwnership.propTypes = {
   /** The type of the entity e.g dashboard, stream */
   type: PropTypes.string.isRequired,
   /** Will add disabled=true as a prop to the child in stead of not rendering it */
-  disableChildren: PropTypes.bool,
+  hideChildren: PropTypes.bool,
 };
 
 HasOwnership.defaultProps = {
-  disableChildren: false,
+  hideChildren: false,
 };
 
 export default HasOwnership;

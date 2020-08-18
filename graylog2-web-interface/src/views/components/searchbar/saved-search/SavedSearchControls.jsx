@@ -265,9 +265,11 @@ class SavedSearchControls extends React.Component<Props, State> {
                       </MenuItem>
                       <MenuItem divider />
                       <HasOwnership id={view.id} type="search">
-                        <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit}>
-                          <Icon name="share-alt" /> Share
-                        </MenuItem>
+                        {({ disabled }) => (
+                          <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit || disabled}>
+                            <Icon name="share-alt" /> Share
+                          </MenuItem>
+                        )}
                       </HasOwnership>
                     </DropdownButton>
                     {showCSVExport && (

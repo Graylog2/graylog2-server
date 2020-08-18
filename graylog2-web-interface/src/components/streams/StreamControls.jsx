@@ -86,9 +86,11 @@ const StreamControls = createReactClass({
           </MenuItem>
 
           <HasOwnership id={stream.id} type="stream">
-            <MenuItem key={`share-${stream.id}`} onSelect={onShare}>
-              Share
-            </MenuItem>
+            {({ disabled }) => (
+              <MenuItem key={`share-${stream.id}`} onSelect={onShare} disabled={disabled}>
+                Share
+              </MenuItem>
+            )}
           </HasOwnership>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`divider-${stream.id}`} divider />

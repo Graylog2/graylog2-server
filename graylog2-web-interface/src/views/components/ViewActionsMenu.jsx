@@ -68,9 +68,11 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
           <Icon name="edit" /> Edit metadata
         </MenuItem>
         <HasOwnership id={view.id} type="dashboard">
-          <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
-            <Icon name="share-alt" /> Share
-          </MenuItem>
+          {({ disabled }) => (
+            <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit || disabled}>
+              <Icon name="share-alt" /> Share
+            </MenuItem>
+          )}
         </HasOwnership>
         <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
