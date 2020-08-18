@@ -29,7 +29,7 @@ describe('<ContentPackVersions />', () => {
   it('should render with content pack versions', () => {
     const wrapper = mount(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should fire on change when clicked on a version', () => {

@@ -24,7 +24,7 @@ describe('SeriesSelect', () => {
   it('renders with minimal props', () => {
     const wrapper = mount(<SeriesSelect series={[]} onChange={() => true} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('renders given series', () => {

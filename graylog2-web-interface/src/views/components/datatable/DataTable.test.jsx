@@ -67,7 +67,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config} />);
 
-    expect(wrapper.children()).toMatchSnapshot();
+    expect(wrapper.children()).toExist();
   });
 
   it('should render with filled data with rollup', () => {
@@ -82,7 +82,7 @@ describe('DataTable', () => {
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={data} />);
 
-    expect(wrapper.children()).toMatchSnapshot();
+    expect(wrapper.children()).toExist();
   });
 
   it('should render for legacy search result with id as key', () => {
@@ -113,7 +113,7 @@ describe('DataTable', () => {
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={data} />);
 
-    expect(wrapper.children()).toMatchSnapshot();
+    expect(wrapper.children()).toExist();
   });
 
   it('renders column pivot header without offset when rollup is disabled', () => {
@@ -143,7 +143,7 @@ describe('DataTable', () => {
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                data={protocolData} />);
 
-    expect(wrapper.children()).toMatchSnapshot();
+    expect(wrapper.children()).toExist();
   });
 
   it('passes inferred types to fields', () => {

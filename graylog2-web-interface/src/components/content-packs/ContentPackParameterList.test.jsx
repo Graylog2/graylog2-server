@@ -13,7 +13,7 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder().build();
     const wrapper = mount(<ContentPackParameterList contentPack={contentPack} readOnly />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with parameters with readOnly', () => {
@@ -29,14 +29,14 @@ describe('<ContentPackParameterList />', () => {
       .build();
     const wrapper = mount(<ContentPackParameterList contentPack={contentPack} readOnly />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with empty parameters without readOnly', () => {
     const contentPack = ContentPack.builder().build();
     const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with parameters without readOnly', () => {
@@ -52,7 +52,7 @@ describe('<ContentPackParameterList />', () => {
       .build();
     const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should delete a parameter', () => {

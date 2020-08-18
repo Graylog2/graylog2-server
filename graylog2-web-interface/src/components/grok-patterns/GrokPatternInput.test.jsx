@@ -14,13 +14,13 @@ describe('<GrokPatternInput />', () => {
   it('should render grok pattern input without patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render grok pattern input with patterns', () => {
     const wrapper = mount(<GrokPatternInput patterns={grokPatterns} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should add a grok pattern when selected', () => {

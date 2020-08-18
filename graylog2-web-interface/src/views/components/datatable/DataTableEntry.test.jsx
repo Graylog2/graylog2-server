@@ -64,7 +64,7 @@ describe('DataTableEntry', () => {
     ));
 
     expect(wrapper).not.toBeEmptyRender();
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('provides field types for fields and series', () => {

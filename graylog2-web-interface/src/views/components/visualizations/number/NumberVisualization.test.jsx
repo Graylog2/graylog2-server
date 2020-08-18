@@ -71,7 +71,7 @@ describe('NumberVisualization', () => {
   it('should render a number visualization', () => {
     const wrapper = mount(<SimplifiedNumberVisualization />);
 
-    expect(wrapper.find(NumberVisualization)).toMatchSnapshot();
+    expect(wrapper.find(NumberVisualization)).toExist();
   });
 
   it('calls render completion callback after first render', (done) => {

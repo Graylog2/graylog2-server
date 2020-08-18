@@ -21,7 +21,7 @@ describe('SavedSearchForm', () => {
                                              target={() => {}}
                                              saveSearch={() => {}} />);
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper).toExist();
     });
 
     it('should render save', () => {
@@ -34,7 +34,7 @@ describe('SavedSearchForm', () => {
                                              target={() => {}}
                                              saveSearch={() => {}} />);
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper).toExist();
     });
 
     it('should render disabled create new', () => {
@@ -47,7 +47,7 @@ describe('SavedSearchForm', () => {
                                              target={() => {}}
                                              saveSearch={() => {}} />);
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper).toExist();
     });
   });
 

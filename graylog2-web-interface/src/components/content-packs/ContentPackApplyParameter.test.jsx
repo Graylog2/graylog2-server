@@ -28,7 +28,7 @@ describe('<ContentPackApplyParameter />', () => {
                                                      parameters={[parameter]}
                                                      appliedParameter={[appliedParameter]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with readOnly', () => {
@@ -36,13 +36,13 @@ describe('<ContentPackApplyParameter />', () => {
                                                      parameters={[parameter]}
                                                      appliedParameter={[appliedParameterReadOnly]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with minimal props', () => {
     const wrapper = mount(<ContentPackApplyParameter entity={entity} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should apply a parameter', () => {

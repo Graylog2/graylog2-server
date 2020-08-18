@@ -29,7 +29,7 @@ describe('<ContentPacksList />', () => {
   it('should render with empty content packs', () => {
     const wrapper = mount(<ContentPacksList contentPacks={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with content packs', () => {
@@ -39,7 +39,7 @@ describe('<ContentPacksList />', () => {
     };
     const wrapper = mount(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should do pagination', () => {

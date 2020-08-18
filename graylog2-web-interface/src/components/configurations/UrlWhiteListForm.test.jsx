@@ -46,7 +46,7 @@ describe('UrlWhitelistForm', () => {
                                         disabled={config.disabled}
                                         onUpdate={() => {}} />);
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper).toExist();
     });
 
     it('should display Url form list table', () => {
