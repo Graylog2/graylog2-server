@@ -16,11 +16,9 @@
  */
 package org.graylog2.security;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog2.shared.users.Role;
@@ -29,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -40,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Singleton
 public class InMemoryRolePermissionResolver implements RolePermissionResolver {
@@ -65,14 +63,13 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
     public Collection<Permission> resolvePermissionsInRole(String roleId) {
         final Set<String> permissions = resolveStringPermission(roleId);
 
-        // copy to avoid reiterating all the time
-        return Sets.newHashSet(Collections2.transform(permissions, new Function<String, Permission>() {
-            @Nullable
-            @Override
-            public Permission apply(@Nullable String input) {
-                return new WildcardPermission(input);
+        return permissions.stream().map(p -> {
+            if (p.equals("*")) {
+                return new AllPermission();
+            } else {
+                return new WildcardPermission(p);
             }
-        }));
+        }).collect(Collectors.toList());
     }
 
     @Nonnull
