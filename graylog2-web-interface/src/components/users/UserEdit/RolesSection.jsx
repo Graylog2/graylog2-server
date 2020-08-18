@@ -37,7 +37,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   const _onLoad = ({ page, perPage, query }: PaginationInfo = defaultPageInfo): Promise<PaginatedListType> => {
     setLoading(true);
 
-    return AuthzRolesActions.loadForUser(username, page, perPage, query)
+    return AuthzRolesActions.loadRolesForUser(username, page, perPage, query)
       .then((response) => {
         setLoading(false);
 

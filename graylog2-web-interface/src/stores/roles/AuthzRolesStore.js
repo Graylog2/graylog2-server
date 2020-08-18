@@ -67,15 +67,6 @@ const AuthzRolesStore: Store<{}> = singletonStore(
   () => Reflux.createStore({
     listenables: [AuthzRolesActions],
 
-    deleteRole(roleId: string): Promise<string[]> {
-      const url = qualifyUrl(ApiRoutes.AuthzRolesController.delete(encodeURIComponent(roleId)).url);
-      const promise = fetch('DELETE', url);
-
-      AuthzRolesActions.deleteRole.promise(promise);
-
-      return promise;
-    },
-
     load(roleId: $PropertyType<Role, 'id'>): Promise<Role> {
       const url = qualifyUrl(ApiRoutes.AuthzRolesController.load(encodeURIComponent(roleId)).url);
       const promise = fetch('GET', url).then(Role.fromJSON);
@@ -85,35 +76,11 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadForUser(username: string, page: number, perPage: number, query: string): Promise<PaginatedListType> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadForUser(username).url, page, perPage, query);
+    delete(roleId: string): Promise<string[]> {
+      const url = qualifyUrl(ApiRoutes.AuthzRolesController.delete(encodeURIComponent(roleId)).url);
+      const promise = fetch('DELETE', url);
 
-      const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedList);
-
-      AuthzRolesActions.loadForUser.promise(promise);
-
-      return promise;
-    },
-
-    loadPaginated(page: number, perPage: number, query: string): Promise<PaginatedListType> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.list().url, page, perPage, query);
-
-      const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedList);
-
-      AuthzRolesActions.loadPaginated.promise(promise);
-
-      return promise;
-    },
-
-    loadUsersForRole(roleId: string, page: number, perPage: number, query: string): Promise<PaginatedUserListType> {
-      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadUsersForRole(roleId).url, page, perPage, query);
-
-      const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedUserList);
-
-      AuthzRolesActions.loadUsersForRole.promise(promise);
+      AuthzRolesActions.delete.promise(promise);
 
       return promise;
     },
@@ -136,6 +103,38 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
+    loadUsersForRole(roleId: string, page: number, perPage: number, query: string): Promise<PaginatedUserListType> {
+      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadUsersForRole(roleId).url, page, perPage, query);
+
+      const promise = fetch('GET', qualifyUrl(url))
+        .then(_responseToPaginatedUserList);
+
+      AuthzRolesActions.loadUsersForRole.promise(promise);
+
+      return promise;
+    },
+
+    loadRolesForUser(username: string, page: number, perPage: number, query: string): Promise<PaginatedListType> {
+      const url = PaginationURL(ApiRoutes.AuthzRolesController.loadRolesForUser(username).url, page, perPage, query);
+
+      const promise = fetch('GET', qualifyUrl(url))
+        .then(_responseToPaginatedList);
+
+      AuthzRolesActions.loadRolesForUser.promise(promise);
+
+      return promise;
+    },
+
+    loadRolesPaginated(page: number, perPage: number, query: string): Promise<PaginatedListType> {
+      const url = PaginationURL(ApiRoutes.AuthzRolesController.list().url, page, perPage, query);
+
+      const promise = fetch('GET', qualifyUrl(url))
+        .then(_responseToPaginatedList);
+
+      AuthzRolesActions.loadRolesPaginated.promise(promise);
+
+      return promise;
+    },
   }),
 );
 

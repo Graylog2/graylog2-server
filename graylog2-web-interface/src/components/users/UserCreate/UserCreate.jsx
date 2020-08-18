@@ -8,7 +8,7 @@ import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
 import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
 import RolesSelector from 'components/permissions/RolesSelector';
-import { Alert, Col, Row, Button } from 'components/graylog';
+import { Alert, Col, Row, Button, ButtonToolbar } from 'components/graylog';
 import { UsersActions } from 'stores/users/UsersStore';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
@@ -68,6 +68,7 @@ const UserCreate = () => {
     setUser(user.toBuilder().roles(user.roles.toSet().remove(role?.name).toList()).build());
   };
 
+  const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
   return (
@@ -128,12 +129,15 @@ const UserCreate = () => {
               )}
               <Row>
                 <Col xs={9} xsOffset={3}>
-                  <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid || !hasValidRole}
-                          title="Create User"
-                          type="submit">
-                    Create User
-                  </Button>
+                  <ButtonToolbar>
+                    <Button bsStyle="success"
+                            disabled={isSubmitting || !isValid || !hasValidRole}
+                            title="Create User"
+                            type="submit">
+                      Create User
+                    </Button>
+                    <Button type="button" onClick={_handleCancel}>Cancel</Button>
+                  </ButtonToolbar>
                 </Col>
               </Row>
             </Form>

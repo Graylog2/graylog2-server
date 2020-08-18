@@ -7,30 +7,32 @@ import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 type AuthzRolesActionsType = RefluxActions<{
+  load: (roleId: string) => Promise<Role>,
+  delete: (roleId: string) => Promise<void>,
   addMember: (roleId: string, username: string) => Promise<Role>,
-  deleteRole: (roleId: string) => Promise<void>,
   removeMember: (roleId: string, username: string) => Promise<Role>,
   loadUsersForRole: (roleId: string, page: number, perPage: number, query: string) => Promise<PaginatedUserListType>,
-  load: (roleId: string) => Promise<Role>,
-  loadForUser: (username: string,
-                page: number,
-                perPage: number,
-                query: string) => Promise<PaginatedListType>,
-  loadPaginated: (page: number,
-                  perPage: number,
-                  query: string) => Promise<PaginatedListType>,
+  loadRolesForUser: (
+    username: string,
+    page: number,
+    perPage: number,
+    query: string) => Promise<PaginatedListType>,
+  loadRolesPaginated: (
+    page: number,
+    perPage: number,
+    query: string) => Promise<PaginatedListType>,
 }>;
 
 const AuthzRolesActions: AuthzRolesActionsType = singletonActions(
   'AuthzRoles',
   () => Reflux.createActions({
+    load: { asyncResult: true },
+    delete: { asyncResult: true },
     addMember: { asyncResult: true },
     removeMember: { asyncResult: true },
     loadUsersForRole: { asyncResult: true },
-    deleteRole: { asyncResult: true },
-    load: { asyncResult: true },
-    loadForUser: { asyncResult: true },
-    loadPaginated: { asyncResult: true },
+    loadRolesForUser: { asyncResult: true },
+    loadRolesPaginated: { asyncResult: true },
   }),
 );
 

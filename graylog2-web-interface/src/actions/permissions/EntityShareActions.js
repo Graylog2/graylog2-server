@@ -31,8 +31,8 @@ export type EntitySharePayload = {
 type EntityShareActionsType = RefluxActions<{
   prepare: (GRN, ?EntitySharePayload) => Promise<EntityShareState>,
   update: (GRN, EntitySharePayload) => Promise<EntityShareState>,
-  searchPaginatedUserShares: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
-  searchPaginatedTeamShares: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
+  loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
+  loadTeamSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
 }>;
 
 const EntityShareActions: EntityShareActionsType = singletonActions(
@@ -40,8 +40,8 @@ const EntityShareActions: EntityShareActionsType = singletonActions(
   () => Reflux.createActions({
     prepare: { asyncResult: true },
     update: { asyncResult: true },
-    searchPaginatedUserShares: { asyncResult: true },
-    searchPaginatedTeamShares: { asyncResult: true },
+    loadUserSharesPaginated: { asyncResult: true },
+    loadTeamSharesPaginated: { asyncResult: true },
   }),
 );
 

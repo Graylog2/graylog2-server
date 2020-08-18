@@ -3,8 +3,6 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import history from 'util/History';
-import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Button, Row, Col } from 'components/graylog';
@@ -28,16 +26,12 @@ const _validate = (values) => {
   return errors;
 };
 
-const _onSubmit = (formData, username, currentUser) => {
+const _onSubmit = (formData, username) => {
   const data = { ...formData };
   delete data.password_repeat;
 
   return UsersActions.changePassword(username, data).then(() => {
     UserNotification.success('Password updated successfully.', 'Success');
-
-    if (isPermitted(currentUser?.permissions, ['users:list'])) {
-      history.replace(Routes.SYSTEM.USERS.OVERVIEW);
-    }
   }, () => {
     UserNotification.error('Could not update password. Please verify that your current password is correct.', 'Updating password failed');
   });
@@ -54,7 +48,7 @@ const PasswordSection = ({ user: { username } }: Props) => {
 
   return (
     <SectionComponent title="Password">
-      <Formik onSubmit={(formData) => _onSubmit(formData, username, currentUser)}
+      <Formik onSubmit={(formData) => _onSubmit(formData, username)}
               validate={_validate}
               initialValues={{}}>
         {({ isSubmitting, isValid }) => (

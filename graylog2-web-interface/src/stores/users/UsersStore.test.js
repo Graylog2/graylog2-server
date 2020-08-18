@@ -39,7 +39,7 @@ describe('UsersStore', () => {
     });
   });
 
-  describe('searchPaginated', () => {
+  describe('loadUsersPaginated', () => {
     it('should load paginated json users and return result with value classes', async (done) => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
 
@@ -51,7 +51,7 @@ describe('UsersStore', () => {
         ...paginationJSON,
       }));
 
-      UsersActions.searchPaginated(pagination.page, pagination.perPage, pagination.query).then((result) => {
+      UsersActions.loadUsersPaginated(pagination.page, pagination.perPage, pagination.query).then((result) => {
         expect(result).toStrictEqual({ list: userOverviewList, adminUser: admin, pagination });
 
         done();
@@ -69,7 +69,7 @@ describe('UsersStore', () => {
         ...paginationJSON,
       }));
 
-      UsersActions.searchPaginated(pagination.page, pagination.perPage, pagination.query).then((result) => {
+      UsersActions.loadUsersPaginated(pagination.page, pagination.perPage, pagination.query).then((result) => {
         expect(result).toStrictEqual({ list: userOverviewList, adminUser: undefined, pagination });
 
         done();

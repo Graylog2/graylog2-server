@@ -52,7 +52,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    searchPaginatedUserShares(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+    loadUserSharesPaginated(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
       // const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
       // const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUserSharesResponse) => {
       //   return {
@@ -71,16 +71,16 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       // });
 
       const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
-      EntityShareActions.searchPaginatedUserShares.promise(promise);
+      EntityShareActions.loadUserSharesPaginated.promise(promise);
 
       return promise;
     },
 
-    searchPaginatedTeamShares(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
-      // Todo implmenet same code like for searchPaginatedUserShares, but with EntityShareController.teamSharesPaginated
+    loadTeamSharesPaginated(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+      // Todo implement same code like for loadUserSharesPaginated, but with EntityShareController.teamSharesPaginated
 
       const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
-      EntityShareActions.searchPaginatedTeamShares.promise(promise);
+      EntityShareActions.loadTeamSharesPaginated.promise(promise);
 
       return promise;
     },
