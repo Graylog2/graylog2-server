@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 const glob = require('glob');
 const path = require('path');
 const merge = require('webpack-merge');
@@ -28,21 +26,8 @@ process.env.web_src_path = path.resolve(__dirname);
 // eslint-disable-next-line import/no-dynamic-require
 const webpackConfig = require(path.resolve(__dirname, './webpack.config.js'));
 
-function getPluginName(pluginConfig) {
-  const packageConfig = path.join(path.dirname(pluginConfig), 'package.json');
-
-  if (fs.existsSync(packageConfig)) {
-    // If a package.json file exists (should normally be the case) use the package name for pluginName
-    const pkg = JSON.parse(fs.readFileSync(packageConfig, 'utf8'));
-
-    return pkg.name.replace(/\s+/g, '');
-  }
-
-  // Otherwise just use the directory name of the webpack config file
-  return path.basename(path.dirname(pluginConfig));
-}
-
 const mergedPluginConfigs = pluginConfigs
+  // eslint-disable-next-line global-require,import/no-dynamic-require
   .map((configFile) => require(configFile))
   .reduce((config, pluginConfig) => merge.smart(config, pluginConfig), {});
 
