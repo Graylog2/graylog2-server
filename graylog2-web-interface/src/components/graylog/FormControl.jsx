@@ -3,7 +3,7 @@ import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 const FormControl = styled(BootstrapFormControl)(({ theme }) => css`
-  &.form-control {
+  &.form-control:not([type="range"]) {
     color: ${theme.colors.input.color};
     background-color: ${theme.colors.input.background};
     border-color: ${theme.colors.input.border};

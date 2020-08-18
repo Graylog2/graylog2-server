@@ -118,14 +118,14 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                     block={false}
                     bsClass="btn"
                     bsStyle="success"
-                    className="Button-c9cbmb-0 bNulii"
+                    className="Button-c9cbmb-0 kLwsUP"
                     disabled={false}
                     onClick={[Function]}
                     type="submit"
                   >
                     <button
                       action="push"
-                      className="Button-c9cbmb-0 bNulii btn btn-success"
+                      className="Button-c9cbmb-0 kLwsUP btn btn-success"
                       disabled={false}
                       onClick={[Function]}
                       type="submit"

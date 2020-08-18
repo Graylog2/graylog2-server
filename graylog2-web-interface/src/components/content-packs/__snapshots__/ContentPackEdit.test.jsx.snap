@@ -309,12 +309,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -346,12 +346,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -487,7 +487,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -500,7 +500,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -594,7 +594,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -607,7 +607,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -699,7 +699,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -711,7 +711,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -804,7 +804,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -817,7 +817,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -909,7 +909,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -921,7 +921,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -1074,12 +1074,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii submit-button"
+                                          className="Button-c9cbmb-0 kLwsUP submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1106,13 +1106,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          className="Button-c9cbmb-0 kLwsUP reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -1791,12 +1791,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={true}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={true}
                                   onClick={[Function]}
                                   type="button"
@@ -1828,12 +1828,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 bsClass="btn"
                                 bsSize="small"
                                 bsStyle="info"
-                                className="Button-c9cbmb-0 bNulii"
+                                className="Button-c9cbmb-0 kLwsUP"
                                 disabled={false}
                                 onClick={[Function]}
                               >
                                 <button
-                                  className="Button-c9cbmb-0 bNulii btn btn-sm btn-info"
+                                  className="Button-c9cbmb-0 kLwsUP btn btn-sm btn-info"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="button"
@@ -2010,7 +2010,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -2023,7 +2023,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Content Pack the movie"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -2117,7 +2117,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -2130,7 +2130,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="A old content pack"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -2222,7 +2222,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -2234,7 +2234,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="## No one dares"
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -2327,7 +2327,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -2340,7 +2340,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Beinstein"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -2432,7 +2432,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 fKSsjP"
+                                                    className="FormControl-sc-1amoaox-0 cmyoyp"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -2444,7 +2444,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="http://beinstein.com"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                                                      className="FormControl-sc-1amoaox-0 cmyoyp form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -2597,12 +2597,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii submit-button"
+                                          className="Button-c9cbmb-0 kLwsUP submit-button"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii submit-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP submit-button btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -2629,13 +2629,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="Button-c9cbmb-0 bNulii reset-button"
+                                          className="Button-c9cbmb-0 kLwsUP reset-button"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 bNulii reset-button btn btn-default"
+                                            className="Button-c9cbmb-0 kLwsUP reset-button btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"

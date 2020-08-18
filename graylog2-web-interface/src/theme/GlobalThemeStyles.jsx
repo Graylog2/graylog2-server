@@ -691,6 +691,12 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
     background-color: ${theme.colors.variant.lightest.default};
     border-color: ${theme.colors.variant.lighter.default};
   }
+  
+  input[type="range"],
+  input[type="range"]:focus {
+    box-shadow: none;
+    height: auto;
+  }
 
   ${additionalStyles}
 `);

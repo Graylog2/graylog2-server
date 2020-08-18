@@ -80,7 +80,7 @@ Object {
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="FormControl-sc-1amoaox-0 cmyoyp form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -144,7 +144,7 @@ Object {
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="FormControl-sc-1amoaox-0 cmyoyp form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -190,7 +190,7 @@ Object {
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="FormControl-sc-1amoaox-0 cmyoyp form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -258,13 +258,13 @@ Object {
                 class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
               >
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-default"
+                  class="Button-c9cbmb-0 kLwsUP btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-primary"
+                  class="Button-c9cbmb-0 kLwsUP btn btn-primary"
                   type="submit"
                 >
                   Save
@@ -415,7 +415,7 @@ Object {
                         </label>
                         <span>
                           <select
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="FormControl-sc-1amoaox-0 cmyoyp form-control"
                             data-testid="rule-type-selection"
                             id="Type"
                             label="Type"
@@ -479,7 +479,7 @@ Object {
                         </label>
                         <span>
                           <input
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="FormControl-sc-1amoaox-0 cmyoyp form-control"
                             id="Value"
                             label="Value"
                             name="value"
@@ -525,7 +525,7 @@ Object {
                         </label>
                         <span>
                           <textarea
-                            class="FormControl-sc-1amoaox-0 fKSsjP form-control"
+                            class="FormControl-sc-1amoaox-0 cmyoyp form-control"
                             id="Description"
                             label="Description (optional)"
                             name="description"
@@ -595,13 +595,13 @@ Object {
                 class="Modal__Footer-nuree8-5 iuOcrF modal-footer"
               >
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-default"
+                  class="Button-c9cbmb-0 kLwsUP btn btn-default"
                   type="button"
                 >
                   Cancel
                 </button>
                 <button
-                  class="Button-c9cbmb-0 bNulii btn btn-primary"
+                  class="Button-c9cbmb-0 kLwsUP btn btn-primary"
                   type="submit"
                 >
                   Save
