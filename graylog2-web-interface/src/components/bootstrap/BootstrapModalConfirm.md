@@ -1,45 +1,44 @@
-```js
-import createReactClass from 'create-react-class';
+```jsx
 import { Button } from 'components/graylog';
 
-const BootstrapModalConfirmExample = createReactClass({
-  getInitialState() {
-    return {
-      confirmed: undefined,
-    };
-  },
-
-  openConfirmation() {
-    this.modal.open();
-  },
-
-  onCancel() {
-    this.setState({ confirmed: false });
-  },
-
-  onConfirm(callback) {
-    this.setState({ confirmed: true });
-    callback();
-  },
-
-  render() {
-    const { confirmed } = this.state;
-    return (
-      <div>
-        <p className={confirmed ? 'bg-success' : 'bg-danger'}>
-          {confirmed === undefined ? 'You did not open the confirmation yet' : confirmed ? 'You confirmed the action' : 'You did not confirm the action' }
-        </p>
-        <Button onClick={this.openConfirmation}>Open confirmation</Button>
-        <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
-                               title="Confirm this"
-                               onConfirm={this.onConfirm}
-                               onCancel={this.onCancel}>
-           Are you sure you want to do this?
-        </BootstrapModalConfirm>
-      </div>
-    );
+const BootstrapModalConfirmExample = () => {
+  const [confirmed, setConfirmed] = React.useState();
+  const modalRef = React.useRef();
+  
+  const openConfirmation = () => {
+    modalRef.current.open();
   }
-});
+  
+  const onCancel = () => {
+    setConfirmed(false);
+  } 
+
+  const onConfirm = (callback = () => {}) => {
+    setConfirmed(true);
+    callback();
+  }
+
+  const message = confirmed === undefined 
+    ? 'You did not open the confirmation yet' 
+    : confirmed 
+      ? 'You confirmed the action' 
+      : 'You did not confirm the action'
+
+  return (
+    <div>
+      <p className={confirmed ? 'bg-success' : 'bg-danger'}>
+        {message}
+      </p>
+      <Button onClick={openConfirmation}>Open confirmation</Button>
+      <BootstrapModalConfirm ref={modalRef}
+                             title="Confirm this"
+                             onConfirm={onConfirm}
+                             onCancel={onCancel}>
+         Are you sure you want to do this?
+      </BootstrapModalConfirm>
+    </div>
+  );
+}
 
 <BootstrapModalConfirmExample />
 ```
