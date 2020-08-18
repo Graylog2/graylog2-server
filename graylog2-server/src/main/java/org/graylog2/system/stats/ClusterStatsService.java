@@ -112,10 +112,8 @@ public class ClusterStatsService {
     }
 
     public LdapStats ldapStats() {
-        int numberOfRoles = 0;
-        LdapSettings ldapSettings = null;
-        numberOfRoles = roleService.loadAll().size();
-        ldapSettings = ldapSettingsService.load();
+        int numberOfRoles = roleService.loadAll().size();
+        LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null) {
             return LdapStats.create(false,
                                     false,

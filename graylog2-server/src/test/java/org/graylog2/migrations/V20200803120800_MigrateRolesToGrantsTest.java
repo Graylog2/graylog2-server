@@ -16,7 +16,6 @@
  */
 package org.graylog2.migrations;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -31,8 +30,11 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog.testing.GRNExtension;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -40,7 +42,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -49,12 +50,11 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserServiceImplTest;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.annotation.Nullable;
 import javax.validation.Validator;
@@ -70,17 +70,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class V20200803120800_MigrateRolesToGrantsTest {
+@ExtendWith(MongoDBExtension.class)
+@ExtendWith(MongoJackExtension.class)
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(GRNExtension.class)
+@MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
+class V20200803120800_MigrateRolesToGrantsTest {
     private V20200803120800_MigrateRolesToGrants migration;
     private RoleService roleService;
     private DBGrantService dbGrantService;
-    private ObjectMapper objectMapper;
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private Permissions permissions;
@@ -88,16 +86,17 @@ public class V20200803120800_MigrateRolesToGrantsTest {
     @Mock
     private Validator validator;
     private GRNRegistry grnRegistry;
+
     private UserService userService;
 
-    @Before
-    public void setUp() {
-        objectMapper = new ObjectMapperProvider().get();
-        final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    @BeforeEach
+    void setUp(MongoDBTestService mongodb,
+                      MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                      GRNRegistry grnRegistry) {
         when(permissions.readerBasePermissions()).thenReturn(ImmutableSet.of());
         when(validator.validate(any())).thenReturn(ImmutableSet.of());
 
-        grnRegistry = GRNRegistry.createWithBuiltinTypes();
+        this.grnRegistry = grnRegistry;
 
         roleService = new RoleServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider, permissions, validator);
 
@@ -108,8 +107,7 @@ public class V20200803120800_MigrateRolesToGrantsTest {
     }
 
     @Test
-    @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
-    public void migrateSimpleRole() throws NotFoundException {
+    void migrateSimpleRole() throws NotFoundException {
 
         final User testuser1 = userService.load("testuser1");
         assertThat(testuser1).isNotNull();
@@ -141,7 +139,6 @@ public class V20200803120800_MigrateRolesToGrantsTest {
     }
 
     @Test
-    @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
     public void nonMigratableRole() throws NotFoundException {
 
         final User testuser3 = userService.load("testuser3");
@@ -161,7 +158,6 @@ public class V20200803120800_MigrateRolesToGrantsTest {
     }
 
     @Test
-    @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
     public void partlyMigratableRole() throws NotFoundException {
 
         final User testuser4 = userService.load("testuser3");
