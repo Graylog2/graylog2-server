@@ -67,7 +67,7 @@ const UserCreate = () => {
     setUser(user.toBuilder().roles(user.roles.toSet().remove(role?.name).toList()).build());
   };
 
-  const handleCancel = () => history.goBack();
+  const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
   const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
   return (
@@ -135,7 +135,7 @@ const UserCreate = () => {
                             type="submit">
                       Create User
                     </Button>
-                    <Button type="button" onClick={handleCancel}>Cancel</Button>
+                    <Button type="button" onClick={_handleCancel}>Cancel</Button>
                   </ButtonToolbar>
                 </Col>
               </Row>
