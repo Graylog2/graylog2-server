@@ -8,6 +8,8 @@ import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 
 describe('<ContentPackVersions />', () => {
+  // TODO: Should be replaced with call to `jest.mock` instead.
+  // eslint-disable-next-line import/no-named-as-default-member
   URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
   const contentPackRev = ContentPack.builder()
     .id('1')

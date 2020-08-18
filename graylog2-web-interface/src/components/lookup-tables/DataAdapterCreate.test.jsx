@@ -49,13 +49,16 @@ describe('<DataAdapterCreate />', () => {
   });
 
   describe('with mocked console.error', () => {
+    // eslint-disable-next-line no-console
     const consoleError = console.error;
 
     beforeAll(() => {
+      // eslint-disable-next-line no-console
       console.error = jest.fn();
     });
 
     afterAll(() => {
+      // eslint-disable-next-line no-console
       console.error = consoleError;
     });
 
@@ -69,6 +72,7 @@ describe('<DataAdapterCreate />', () => {
       const wrapper = mount(<DataAdapterCreate saved={callback} types={types} />);
 
       expect(wrapper).toExist();
+      // eslint-disable-next-line no-console
       expect(console.error.mock.calls.length).toBe(1);
     });
   });

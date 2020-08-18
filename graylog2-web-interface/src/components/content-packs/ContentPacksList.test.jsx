@@ -6,6 +6,8 @@ import URLUtils from 'util/URLUtils';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {
+  // TODO: Should be replaced with call to `jest.mock` instead.
+  // eslint-disable-next-line import/no-named-as-default-member
   URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
 
   const contentPacks = [
