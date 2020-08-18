@@ -1,5 +1,6 @@
 package org.graylog.storage.elasticsearch6;
 
+import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import io.searchbox.client.JestClient;
@@ -40,7 +41,7 @@ public class Elasticsearch6Module extends VersionAwareModule {
 
         install(new FactoryModuleBuilder().build(ScrollResultES6.Factory.class));
 
-        bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
+        bind(JestClient.class).toProvider(JestClientProvider.class).in(Scopes.SINGLETON);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
