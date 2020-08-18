@@ -1,5 +1,6 @@
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
 const path = require('path');
+
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = {
@@ -85,4 +86,8 @@ module.exports = {
     resolve: webpackConfig.resolve,
     resolveLoader: webpackConfig.resolveLoader,
   },
+  theme: {
+    sidebarWidth: 300,
+  },
+  skipComponentsWithoutExample: true,
 };
