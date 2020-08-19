@@ -6,12 +6,11 @@ import { Formik, Form } from 'formik';
 
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem';
 import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Button, ButtonToolbar } from 'components/graylog';
-import { UsersActions } from 'stores/users/UsersStore';
 import { Input } from 'components/bootstrap';
-import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
@@ -30,8 +29,7 @@ const _onSubmit = (formData, roles, setSubmitError) => {
 
   setSubmitError(null);
 
-  UsersActions.create(data).then(() => {
-    UserNotification.success(`User ${formData.username} was created successfully.`, 'Success!');
+  UsersDomain.create(data).then(() => {
     history.push(Routes.SYSTEM.USERS.OVERVIEW);
   }, (error) => setSubmitError(error));
 };
@@ -52,7 +50,7 @@ const UserCreate = () => {
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
   useEffect(() => {
-    UsersActions.loadUsers().then(setUsers);
+    UsersDomain.loadUsers().then((newUsers) => { if (newUsers) setUsers(newUsers); });
   }, []);
 
   const _onAssignRole = (role: DescriptiveItem) => {

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 
 import DocsHelper from 'util/DocsHelper';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserEdit from 'components/users/UserEdit';
@@ -32,7 +33,7 @@ const UserEditPage = ({ params }: Props) => {
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username);
+    UsersDomain.load(username);
 
     const unlistenLoadUser = UsersActions.load.completed.listen(setLoadedUser);
 

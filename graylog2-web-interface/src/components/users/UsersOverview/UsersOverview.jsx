@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useEffect, useContext, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import { type ThemeInterface } from 'theme';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -72,7 +73,9 @@ const UsersOverview = () => {
   const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return UsersActions.loadUsersPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
+    return UsersDomain.loadUsersPaginated(newPage, newPerPage, newQuery).then((newPaginatedUsers) => {
+      if (newPaginatedUsers) setPaginatedUsers(newPaginatedUsers);
+    });
   };
 
   const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);

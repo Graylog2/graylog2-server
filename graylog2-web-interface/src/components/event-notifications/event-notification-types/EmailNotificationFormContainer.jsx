@@ -2,11 +2,11 @@ import * as React from 'react';
 import Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
+import UsersDomain from 'domainActions/users/UsersDomain';
 import { Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
-import { UsersActions } from 'stores/users/UsersStore';
 
 import EmailNotificationForm from './EmailNotificationForm';
 
@@ -36,8 +36,7 @@ class EmailNotificationFormContainer extends React.Component {
     const { currentUser } = this.props;
 
     if (isPermitted(currentUser.permissions, 'users:list')) {
-      UsersActions.loadUsers()
-        .then((users) => this.setState({ users }));
+      UsersDomain.loadUsers().then((users) => { if (users) this.setState({ users }); });
     } else {
       this.setState({ users: Immutable.List() });
     }

@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import DocsHelper from 'util/DocsHelper';
-import { UsersActions } from 'stores/users/UsersStore';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserDetails from 'components/users/UserDetails';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
@@ -34,7 +34,7 @@ const UserDetailsPage = ({ params }: Props) => {
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username).then(setLoadedUser);
+    UsersDomain.load(username).then(setLoadedUser);
 
     EntityShareActions.loadUserSharesPaginated(username, 1, 10, '').then((response) => {
       setPaginatedUserShares(response);

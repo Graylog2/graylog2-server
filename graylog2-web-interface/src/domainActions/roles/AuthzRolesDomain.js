@@ -15,7 +15,7 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
 const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   action: AuthzRolesActions.delete,
   successNotification: (roleId, roleName) => ({
-    message: `Role ${roleName} was deleted successfully`,
+    message: `Role "${roleName}" was deleted successfully`,
   }),
   errorNotification: (error, roleId, roleName) => ({
     message: `Deleting role "${roleName}" failed with status: ${error}`,
@@ -45,14 +45,14 @@ const removeMember: $PropertyType<ActionsType, 'removeMember'> = notifyingAction
 const loadUsersForRole: $PropertyType<ActionsType, 'loadUsersForRole'> = notifyingAction({
   action: AuthzRolesActions.loadUsersForRole,
   errorNotification: (error, username, roleName) => ({
-    message: `Loading users for role ${roleName} failed with status: ${error}`,
+    message: `Loading users for role "${roleName}" failed with status: ${error}`,
   }),
 });
 
 const loadRolesForUser: $PropertyType<ActionsType, 'loadRolesForUser'> = notifyingAction({
   action: AuthzRolesActions.loadRolesForUser,
   errorNotification: (error, username) => ({
-    message: `Loading roles for user ${username} failed with status: ${error}`,
+    message: `Loading roles for user "${username}" failed with status: ${error}`,
   }),
 });
 

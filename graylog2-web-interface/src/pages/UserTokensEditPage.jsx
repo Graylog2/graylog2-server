@@ -7,7 +7,7 @@ import { Row, Col } from 'components/graylog';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
-import { UsersActions } from 'stores/users/UsersStore';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle } from 'components/common';
 import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
@@ -33,8 +33,8 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const _loadTokens = (username, currentUser, setTokens) => {
   if (isPermitted(currentUser?.permissions, [`users:tokenlist:${username}`])) {
-    UsersActions.loadTokens(username).then((tokens) => {
-      setTokens(tokens);
+    UsersDomain.loadTokens(username).then((tokens) => {
+      if (tokens) { setTokens(tokens); }
     });
   } else {
     setTokens([]);
@@ -42,7 +42,7 @@ const _loadTokens = (username, currentUser, setTokens) => {
 };
 
 const _deleteToken = (tokenId, tokenName, username, loadTokens, setDeletingTokenId) => {
-  const promise = UsersActions.deleteToken(username, tokenId, tokenName);
+  const promise = UsersDomain.deleteToken(username, tokenId, tokenName);
 
   setDeletingTokenId(tokenId);
 
@@ -53,7 +53,7 @@ const _deleteToken = (tokenId, tokenName, username, loadTokens, setDeletingToken
 };
 
 const _createToken = (tokenName, username, loadTokens, setCreatingToken) => {
-  const promise = UsersActions.createToken(username, tokenName);
+  const promise = UsersDomain.createToken(username, tokenName);
 
   setCreatingToken(true);
 
@@ -78,7 +78,10 @@ const UserEditPage = ({ params }: Props) => {
 
   useEffect(() => {
     loadTokens();
-    UsersActions.load(username).then(setLoadedUser);
+
+    UsersDomain.load(username).then((newLoadedUser) => {
+      if (newLoadedUser) { setLoadedUser(newLoadedUser); }
+    });
   }, [currentUser, username]);
 
   return (

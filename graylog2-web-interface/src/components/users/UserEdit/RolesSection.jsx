@@ -4,9 +4,9 @@ import { useState } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
+import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import User from 'logic/users/User';
-import { UsersActions } from 'stores/users/UsersStore';
 import PaginatedItemOverview, {
   defaultPageInfo,
   type PaginationInfo,
@@ -52,7 +52,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
 
   const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
     _onLoad().then((response) => { if (response) setRoles(response); });
-    UsersActions.load(username);
+    UsersDomain.load(username);
   });
 
   const _onAssignRole = (newRole: DescriptiveItem) => {
