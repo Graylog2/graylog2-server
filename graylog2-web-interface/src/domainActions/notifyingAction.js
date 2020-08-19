@@ -9,12 +9,12 @@ type Notification = {
 
 type Props<Args, Result> = {
   action: (...Args) => Promise<Result | void>,
-  successNotification?: (...Args) => Notification,
-  errorNotification: (error: string, ...Args) => Notification,
+  success?: (...Args) => Notification,
+  error: (error: string, ...Args) => Notification,
   notFoundRedirect?: boolean,
 };
 
-const notifyingAction = <T, Args: Array<T>, Result>({ action, successNotification, errorNotification, notFoundRedirect }: Props<Args, Result>): (...Args) => Promise<Result | void> => {
+const notifyingAction = <T, Args: Array<T>, Result>({ action, success: successNotification, error: errorNotification, notFoundRedirect }: Props<Args, Result>): (...Args) => Promise<Result | void> => {
   return (...args: Args): Promise<Result | void> => action(...args).then((result) => {
     if (successNotification) {
       const { message, title } = successNotification(...args);

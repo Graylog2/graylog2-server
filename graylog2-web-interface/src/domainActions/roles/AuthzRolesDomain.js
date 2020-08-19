@@ -6,7 +6,7 @@ import notifyingAction from '../notifyingAction';
 
 const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   action: AuthzRolesActions.load,
-  errorNotification: (error, roleId) => ({
+  error: (error, roleId) => ({
     message: `Loading role with id "${roleId}" failed with status: ${error}`,
   }),
   notFoundRedirect: true,
@@ -14,51 +14,51 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
 
 const deleteAction: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   action: AuthzRolesActions.delete,
-  successNotification: (roleId, roleName) => ({
+  success: (roleId, roleName) => ({
     message: `Role "${roleName}" was deleted successfully`,
   }),
-  errorNotification: (error, roleId, roleName) => ({
+  error: (error, roleId, roleName) => ({
     message: `Deleting role "${roleName}" failed with status: ${error}`,
   }),
 });
 
 const addMember: $PropertyType<ActionsType, 'addMember'> = notifyingAction({
   action: AuthzRolesActions.addMember,
-  successNotification: (roleId, username) => ({
+  success: (roleId, username) => ({
     message: `User "${username}" was assigned successfully`,
   }),
-  errorNotification: (error, roleId, username) => ({
+  error: (error, roleId, username) => ({
     message: `Assigning user "${username}" failed with status: ${error}`,
   }),
 });
 
 const removeMember: $PropertyType<ActionsType, 'removeMember'> = notifyingAction({
   action: AuthzRolesActions.removeMember,
-  successNotification: (roleId, username) => ({
+  success: (roleId, username) => ({
     message: `User "${username}" was unassigned successfully`,
   }),
-  errorNotification: (error, roleId, username) => ({
+  error: (error, roleId, username) => ({
     message: `Unassigning user "${username}" failed with status: ${error}`,
   }),
 });
 
 const loadUsersForRole: $PropertyType<ActionsType, 'loadUsersForRole'> = notifyingAction({
   action: AuthzRolesActions.loadUsersForRole,
-  errorNotification: (error, username, roleName) => ({
+  error: (error, username, roleName) => ({
     message: `Loading users for role "${roleName}" failed with status: ${error}`,
   }),
 });
 
 const loadRolesForUser: $PropertyType<ActionsType, 'loadRolesForUser'> = notifyingAction({
   action: AuthzRolesActions.loadRolesForUser,
-  errorNotification: (error, username) => ({
+  error: (error, username) => ({
     message: `Loading roles for user "${username}" failed with status: ${error}`,
   }),
 });
 
 const loadRolesPaginated: $PropertyType<ActionsType, 'loadRolesPaginated'> = notifyingAction({
   action: AuthzRolesActions.loadRolesPaginated,
-  errorNotification: (error) => ({
+  error: (error) => ({
     message: `Loading roles failed with status: ${error}`,
   }),
 });

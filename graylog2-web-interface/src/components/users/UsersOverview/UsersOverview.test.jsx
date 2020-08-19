@@ -29,7 +29,7 @@ jest.mock('stores/users/UsersStore', () => ({
   },
   UsersActions: {
     loadUsersPaginated: jest.fn(() => mockloadUsersPaginatedPromise),
-    delete: jest.fn(),
+    delete: jest.fn(() => Promise.resolve()),
   },
 }));
 
