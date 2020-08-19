@@ -20,7 +20,6 @@ import {
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
-  CreateUsersPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
@@ -88,7 +87,6 @@ import {
   UserEditPage,
   UserTokensEditPage,
   UsersOverviewPage,
-  UsersPage,
 } from 'pages';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 
@@ -210,9 +208,6 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
               <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
               <Route path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} component={AuthenticationPage}>
-                <IndexRoute component={UsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.LIST} component={UsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.CREATE} component={CreateUsersPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(':username')} component={EditTokensPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.ROLES} component={RolesPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />

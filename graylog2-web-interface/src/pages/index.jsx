@@ -10,7 +10,6 @@ const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitio
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
-const CreateUsersPage = loadAsync(() => import('./CreateUsersPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditAlertConditionPage = loadAsync(() => import('./EditAlertConditionPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
@@ -92,7 +91,6 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
-  CreateUsersPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
