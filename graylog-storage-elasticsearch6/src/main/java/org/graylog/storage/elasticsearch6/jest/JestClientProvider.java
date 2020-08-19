@@ -42,12 +42,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Singleton
 public class JestClientProvider implements Provider<JestClient> {
     private final JestClientFactory factory;
     private final CredentialsProvider credentialsProvider;
+    private final AtomicReference<JestClient> instance = new AtomicReference<>();
 
     @Inject
     public JestClientProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
@@ -119,6 +121,6 @@ public class JestClientProvider implements Provider<JestClient> {
 
     @Override
     public JestClient get() {
-        return factory.getObject();
+        return this.instance.updateAndGet(instance -> instance == null ? factory.getObject() : instance);
     }
 }
