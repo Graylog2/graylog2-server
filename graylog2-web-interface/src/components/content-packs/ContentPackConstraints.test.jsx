@@ -16,7 +16,7 @@ describe('<ContentPackConstraints />', () => {
     }];
     const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with new constraints with forced fulfillment', () => {
@@ -30,7 +30,7 @@ describe('<ContentPackConstraints />', () => {
     }];
     const wrapper = mount(<ContentPackConstraints constraints={constraints} isFulfilled />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with created constraints', () => {
@@ -51,6 +51,6 @@ describe('<ContentPackConstraints />', () => {
       }];
     const wrapper = mount(<ContentPackConstraints constraints={constraints} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 });

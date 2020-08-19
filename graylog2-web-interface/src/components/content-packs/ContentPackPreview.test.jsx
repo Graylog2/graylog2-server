@@ -10,7 +10,7 @@ describe('<ContentPackPreview />', () => {
     const contentPack = ContentPack.builder().id('dead-beef').build();
     const wrapper = mount(<ContentPackPreview contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with filled content pack', () => {
@@ -25,7 +25,7 @@ describe('<ContentPackPreview />', () => {
 
     const wrapper = mount(<ContentPackPreview contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should call onSave when creating a content pack', () => {

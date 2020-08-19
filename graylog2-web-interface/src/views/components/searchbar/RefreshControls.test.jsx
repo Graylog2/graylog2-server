@@ -23,7 +23,7 @@ describe('RefreshControls', () => {
     const verifyRendering = ({ enabled, interval }) => {
       const wrapper = mount(<RefreshControls refreshConfig={{ enabled, interval }} />);
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper).toExist();
     };
 
     it.each`

@@ -36,19 +36,19 @@ describe('<ContentPackInstallations />', () => {
   it('should render without installations', () => {
     const wrapper = mount(<ContentPackInstallations />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with empty installations', () => {
     const wrapper = mount(<ContentPackInstallations installations={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with a installation', () => {
     const wrapper = mount(<ContentPackInstallations installations={installations} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should uninstall a installation', () => {

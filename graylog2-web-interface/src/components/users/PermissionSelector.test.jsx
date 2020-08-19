@@ -21,7 +21,7 @@ describe('<PermissionSelector />', () => {
                                               dashboards={dashboards}
                                               onChange={() => {}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with set permissions', () => {
@@ -35,7 +35,7 @@ describe('<PermissionSelector />', () => {
                                               dashboards={dashboards}
                                               onChange={() => {}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should allow reading when clicked on "Allow reading"', () => {

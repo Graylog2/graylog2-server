@@ -8,7 +8,7 @@ describe('<ContentPackEditParameters />', () => {
   it('should render with empty parameters', () => {
     const wrapper = mount(<ContentPackEditParameter />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render a form for creation', () => {
@@ -21,7 +21,7 @@ describe('<ContentPackEditParameters />', () => {
     }];
     const wrapper = mount(<ContentPackEditParameter parameters={parameters} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render a form for edition', () => {
@@ -43,7 +43,7 @@ describe('<ContentPackEditParameters />', () => {
     const wrapper = mount(<ContentPackEditParameter parameters={parameters}
                                                     parameterToEdit={parameterToEdit} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should create a parameter', () => {

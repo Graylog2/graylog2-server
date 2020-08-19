@@ -50,7 +50,7 @@ describe('<ContentPackEdit />', () => {
   it('should render spinner with no content pack', () => {
     const wrapper = mount(<ContentPackEdit />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.find('Spinner')).toExist();
   });
 
   it('should render empty content pack for create', () => {
@@ -59,7 +59,7 @@ describe('<ContentPackEdit />', () => {
                                            appliedParameter={{}}
                                            entityIndex={{}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with content pack for edit', () => {
@@ -70,7 +70,7 @@ describe('<ContentPackEdit />', () => {
                        selectedEntities={selectedEntities} />,
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should create a new content pack', () => {

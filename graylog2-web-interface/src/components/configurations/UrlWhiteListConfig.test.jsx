@@ -36,7 +36,7 @@ describe('UrlWhiteListConfig', () => {
       const wrapper = mount(<UrlWhiteListConfig config={config}
                                                 updateConfig={onUpdate} />);
 
-      expect(wrapper).toMatchSnapshot();
+      expect(wrapper).toExist();
     });
 
     it('should display Url list table', () => {
