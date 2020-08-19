@@ -50,7 +50,7 @@ const UserCreate = () => {
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
   useEffect(() => {
-    UsersDomain.loadUsers().then((newUsers) => { if (newUsers) setUsers(newUsers); });
+    UsersDomain.loadUsers().then((newUsers) => newUsers && setUsers(newUsers));
   }, []);
 
   const _onAssignRole = (role: DescriptiveItem) => {

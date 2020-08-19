@@ -73,9 +73,8 @@ const UsersOverview = () => {
   const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return UsersDomain.loadUsersPaginated(newPage, newPerPage, newQuery).then((newPaginatedUsers) => {
-      if (newPaginatedUsers) setPaginatedUsers(newPaginatedUsers);
-    });
+    return UsersDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
+      .then((newPaginatedUsers) => newPaginatedUsers && setPaginatedUsers(newPaginatedUsers));
   };
 
   const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);

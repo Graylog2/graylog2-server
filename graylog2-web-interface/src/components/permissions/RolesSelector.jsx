@@ -68,9 +68,7 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
-      .then((paginatedRoles: ?PaginatedListType) => {
-        if (paginatedRoles) { setRoles(paginatedRoles.list); }
-      });
+      .then((paginatedRoles: ?PaginatedListType) => paginatedRoles && setRoles(paginatedRoles.list));
   }, [user]);
 
   return (

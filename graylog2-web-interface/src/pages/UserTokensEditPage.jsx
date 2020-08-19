@@ -33,9 +33,7 @@ const PageTitle = ({ fullName }: {fullName: ?string}) => (
 
 const _loadTokens = (username, currentUser, setTokens) => {
   if (isPermitted(currentUser?.permissions, [`users:tokenlist:${username}`])) {
-    UsersDomain.loadTokens(username).then((tokens) => {
-      if (tokens) { setTokens(tokens); }
-    });
+    UsersDomain.loadTokens(username).then((tokens) => tokens && setTokens(tokens));
   } else {
     setTokens([]);
   }
@@ -79,9 +77,7 @@ const UserEditPage = ({ params }: Props) => {
   useEffect(() => {
     loadTokens();
 
-    UsersDomain.load(username).then((newLoadedUser) => {
-      if (newLoadedUser) { setLoadedUser(newLoadedUser); }
-    });
+    UsersDomain.load(username).then((newLoadedUser) => newLoadedUser && setLoadedUser(newLoadedUser));
   }, [currentUser, username]);
 
   return (
