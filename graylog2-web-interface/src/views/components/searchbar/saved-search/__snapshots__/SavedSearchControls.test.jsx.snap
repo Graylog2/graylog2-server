@@ -1,6 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SavedSearchControls Button handling has "Share search" option which should be hidden if search is unsaved 1`] = `null`;
+exports[`SavedSearchControls Button handling has "Share search" option which should be hidden if search is unsaved 1`] = `
+<MenuItem
+  bsClass="dropdown"
+  disabled={true}
+  divider={false}
+  header={false}
+  onSelect={[Function]}
+  title="Share search"
+>
+  <li
+    className="disabled"
+    role="presentation"
+  >
+    <SafeAnchor
+      componentClass="a"
+      onClick={[Function]}
+      role="menuitem"
+      tabIndex="-1"
+      title="Share search"
+    >
+      <a
+        href="#"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="menuitem"
+        tabIndex="-1"
+        title="Share search"
+      >
+        <Icon
+          name="share-alt"
+          type="solid"
+        >
+          <FontAwesomeIcon
+            icon={
+              Object {
+                "iconName": "share-alt",
+                "prefix": "fas",
+              }
+            }
+          >
+            <svg
+              className="svg-inline--fa fa-share-alt"
+            />
+          </FontAwesomeIcon>
+        </Icon>
+         Share
+      </a>
+    </SafeAnchor>
+  </li>
+</MenuItem>
+`;
 
 exports[`SavedSearchControls render the SavedSearchControls should render dirty 1`] = `
 <button

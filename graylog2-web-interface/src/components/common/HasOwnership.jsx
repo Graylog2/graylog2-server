@@ -46,7 +46,7 @@ HasOwnership.propTypes = {
     PropTypes.func,
   ]).isRequired,
   /** The id string which shows entity */
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
   /** The type of the entity e.g dashboard, stream */
   type: PropTypes.string.isRequired,
   /** Will add disabled=true as a prop to the child in stead of not rendering it */
@@ -55,6 +55,7 @@ HasOwnership.propTypes = {
 
 HasOwnership.defaultProps = {
   hideChildren: false,
+  id: undefined,
 };
 
 export default HasOwnership;
