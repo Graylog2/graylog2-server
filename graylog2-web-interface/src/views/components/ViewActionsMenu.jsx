@@ -8,7 +8,7 @@ import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, HasOwnership } from 'components/common';
 import CSVExportModal from 'views/components/searchbar/csvexport/CSVExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -67,9 +67,13 @@ const ViewActionsMenu = ({ view, isNewView, metadata, router }) => {
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>
           <Icon name="edit" /> Edit metadata
         </MenuItem>
-        <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>
-          <Icon name="share-alt" /> Share
-        </MenuItem>
+        <HasOwnership id={view.id} type="dashboard">
+          {({ disabled }) => (
+            <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit || disabled}>
+              <Icon name="share-alt" /> Share
+            </MenuItem>
+          )}
+        </HasOwnership>
         <MenuItem onSelect={() => setCsvExportOpen(true)}><Icon name="cloud-download-alt" /> Export to CSV</MenuItem>
         {debugOverlay}
         <IfDashboard>

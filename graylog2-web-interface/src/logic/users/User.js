@@ -14,6 +14,7 @@ export type UserJSON = {
   id: string,
   last_activity: ?string,
   permissions: string[],
+  grn_permissions?: string[],
   preferences?: any,
   read_only: boolean,
   roles: string[],

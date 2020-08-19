@@ -10,7 +10,7 @@ import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-import { Icon } from 'components/common';
+import { Icon, HasOwnership } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -264,9 +264,13 @@ class SavedSearchControls extends React.Component<Props, State> {
                         <Icon name="eraser" /> Reset search
                       </MenuItem>
                       <MenuItem divider />
-                      <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit}>
-                        <Icon name="share-alt" /> Share
-                      </MenuItem>
+                      <HasOwnership id={view.id} type="search">
+                        {({ disabled }) => (
+                          <MenuItem onSelect={this.toggleShareSearch} title="Share search" disabled={!isAllowedToEdit || disabled}>
+                            <Icon name="share-alt" /> Share
+                          </MenuItem>
+                        )}
+                      </HasOwnership>
                     </DropdownButton>
                     {showCSVExport && (
                       <CSVExportModal view={view} closeModal={this.toggleCSVExport} />
