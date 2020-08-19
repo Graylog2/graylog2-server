@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { type ThemeInterface } from 'theme';
 import { DataTable, Spinner, PaginatedList } from 'components/common';
@@ -63,7 +64,9 @@ const RolesOverview = () => {
   const { list: roles, pagination: { page, perPage, query, total } } = paginatedRoles;
 
   const _loadRoles = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthzRolesActions.loadRolesPaginated(newPage, newPerPage, newQuery).then(setPaginatedRoles);
+    return AuthzRolesDomain.loadRolesPaginated(newPage, newPerPage, newQuery).then((newPaginatedRoles) => {
+      if (newPaginatedRoles) { setPaginatedRoles(newPaginatedRoles); }
+    });
   };
 
   const _rolesOverviewItem = (role) => <RolesOverviewItem role={role} />;

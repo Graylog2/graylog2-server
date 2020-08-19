@@ -4,7 +4,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import { Button } from 'components/graylog';
@@ -26,14 +26,14 @@ const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<
   const getOneUser = [1, 1, ''];
   setDeleting(true);
 
-  AuthzRolesActions.loadUsersForRole(roleId, ...getOneUser).then((paginatedUsers) => {
+  AuthzRolesDomain.loadUsersForRole(roleId, roleName, ...getOneUser).then((paginatedUsers) => {
     if (paginatedUsers && paginatedUsers.pagination.total >= 1) {
       confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
     }
 
     // eslint-disable-next-line no-alert
     if (window.confirm(confirmMessage)) {
-      AuthzRolesActions.delete(roleId).then(() => {
+      AuthzRolesDomain.delete(roleId, roleName).then(() => {
         setDeleting(false);
       });
     } else {

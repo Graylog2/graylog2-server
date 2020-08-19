@@ -4,8 +4,9 @@ import * as Immutable from 'immutable';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import { type PaginatedListType } from 'stores/roles/AuthzRolesStore';
 import Role from 'logic/roles/Role';
-import { AuthzRolesActions, type PaginatedListType } from 'stores/roles/AuthzRolesStore';
 import { Button } from 'components/graylog';
 import { Select } from 'components/common';
 import User from 'logic/users/User';
@@ -66,8 +67,10 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
-    AuthzRolesActions.loadRolesPaginated(...getUnlimited)
-      .then(({ list }: PaginatedListType) => setRoles(list));
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited)
+      .then((paginatedRoles: ?PaginatedListType) => {
+        if (paginatedRoles) { setRoles(paginatedRoles.list); }
+      });
   }, [user]);
 
   return (

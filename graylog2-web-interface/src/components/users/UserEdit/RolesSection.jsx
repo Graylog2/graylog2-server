@@ -4,9 +4,8 @@ import { useState } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import UserNotification from 'util/UserNotification';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import User from 'logic/users/User';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { UsersActions } from 'stores/users/UsersStore';
 import PaginatedItemOverview, {
   defaultPageInfo,
@@ -23,7 +22,6 @@ type Props = {
   user: User,
   onSubmit: ({ roles: string[] }) => Promise<void>,
 };
-
 const Container = styled.div`
   margin-top 15px;
   margin-bottom 15px;
@@ -34,29 +32,26 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   const [loading, setLoading] = useState(false);
   const [roles, setRoles] = useState();
 
-  const _onLoad = ({ page, perPage, query }: PaginationInfo = defaultPageInfo): Promise<PaginatedListType> => {
+  const _onLoad = ({ page, perPage, query }: PaginationInfo = defaultPageInfo): Promise<?PaginatedListType> => {
     setLoading(true);
 
-    return AuthzRolesActions.loadRolesForUser(username, page, perPage, query)
+    return AuthzRolesDomain.loadRolesForUser(username, page, perPage, query)
       .then((response) => {
         setLoading(false);
 
-        return {
-          pagination: response.pagination,
-          list: response.list.map((item) => (item: DescriptiveItem)),
-        };
-      }, (error) => {
-        if (error.additional.status === 404) {
-          UserNotification.error(`Loading roles for user ${username} failed with status: ${error}`,
-            'Could not load roles for user');
+        if (response) {
+          return {
+            pagination: response.pagination,
+            list: response.list.map((item) => (item: DescriptiveItem)),
+          };
         }
 
-        return error;
+        return undefined;
       });
   };
 
   const onRolesUpdate = (data: {roles: Array<string>}) => onSubmit(data).then(() => {
-    _onLoad().then((response) => setRoles(response));
+    _onLoad().then((response) => { if (response) setRoles(response); });
     UsersActions.load(username);
   });
 
