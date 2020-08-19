@@ -28,7 +28,6 @@ import {
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,
-  EditUsersPage,
   EnterprisePage,
   EventDefinitionsPage,
   EventNotificationsPage,
@@ -214,7 +213,6 @@ const AppRouter = () => {
                 <IndexRoute component={UsersPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.LIST} component={UsersPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.CREATE} component={CreateUsersPage} />
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.edit(':username')} component={EditUsersPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(':username')} component={EditTokensPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.ROLES} component={RolesPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />

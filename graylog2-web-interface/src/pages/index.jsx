@@ -18,7 +18,6 @@ const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificatio
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
 const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
-const EditUsersPage = loadAsync(() => import('./EditUsersPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
 const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
@@ -81,7 +80,6 @@ const UserDetailsPage = loadAsync(() => import('./UserDetailsPage'));
 const UserEditPage = loadAsync(() => import('./UserEditPage'));
 const UserTokensEditPage = loadAsync(() => import('./UserTokensEditPage'));
 const UsersOverviewPage = loadAsync(() => import('./UsersOverviewPage'));
-const UsersPage = loadAsync(() => import('./UsersPage'));
 
 export {
   AlertConditionsPage,
@@ -102,7 +100,6 @@ export {
   EditContentPackPage,
   EditExtractorsPage,
   EditTokensPage,
-  EditUsersPage,
   EnterprisePage,
   EventDefinitionsPage,
   EventNotificationsPage,
@@ -165,5 +162,4 @@ export {
   UserDetailsPage,
   UserEditPage,
   UserTokensEditPage,
-  UsersPage,
 };
