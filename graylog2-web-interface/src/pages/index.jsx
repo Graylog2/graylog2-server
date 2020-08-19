@@ -16,7 +16,6 @@ const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPag
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
 const EditContentPackPage = loadAsync(() => import('pages/EditContentPackPage'));
 const EditExtractorsPage = loadAsync(() => import('./EditExtractorsPage'));
-const EditTokensPage = loadAsync(() => import('./EditTokensPage'));
 const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
 const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
@@ -96,7 +95,6 @@ export {
   EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
-  EditTokensPage,
   EnterprisePage,
   EventDefinitionsPage,
   EventNotificationsPage,

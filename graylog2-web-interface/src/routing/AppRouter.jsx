@@ -26,7 +26,6 @@ import {
   EditEventNotificationPage,
   EditContentPackPage,
   EditExtractorsPage,
-  EditTokensPage,
   EnterprisePage,
   EventDefinitionsPage,
   EventNotificationsPage,
@@ -207,7 +206,6 @@ const AppRouter = () => {
               <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage} />
               <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage} />
               <Route path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} component={AuthenticationPage}>
-                <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(':username')} component={EditTokensPage} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
