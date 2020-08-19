@@ -28,7 +28,7 @@ const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
         return <>{ children({ disabled: false }) } </>;
       }
 
-      return children;
+      return <>children</>;
     }
   }
 
