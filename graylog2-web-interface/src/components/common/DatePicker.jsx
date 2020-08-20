@@ -31,72 +31,69 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => `
  * Component that renders a given children and wraps a date picker around it. The date picker will show when
  * the children is clicked, and hidden when clicking somewhere else.
  */
-class DatePicker extends React.Component {
-  static propTypes = {
-    /** Element id to use in the date picker Popover. */
-    id: PropTypes.string.isRequired,
-    /** Title to use in the date picker Popover.  */
-    title: PropTypes.string.isRequired,
-    /** Initial date to select in the date picker. */
-    date: PropTypes.string,
-    /**
-     * Callback that will be called when user picks a date. It will receive the new selected day,
-     * `react-day-picker`'s modifiers, and the original event as arguments.
-     */
-    onChange: PropTypes.func.isRequired,
-    /** Element that will trigger the date picker Popover. */
-    children: PropTypes.node.isRequired,
+const DatePicker = ({ children, date, id, onChange, title }) => {
+  let selectedDate;
+
+  if (date) {
+    try {
+      selectedDate = DateTime.parseFromString(date);
+    } catch (e) {
+      // don't do anything
+    }
+  }
+
+  const modifiers = {
+    selected: (moddedDate) => {
+      if (!selectedDate) {
+        return false;
+      }
+
+      const dateTime = DateTime.ignoreTZ(moddedDate);
+
+      return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
+    },
   };
 
-  static defaultProps = {
-    date: undefined,
-  }
+  const dayPickerFrom = (
+    <StyledPopover id={id}
+                   placement="bottom"
+                   positionTop={25}
+                   title={title}>
+      <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
+                       onDayClick={onChange}
+                       modifiers={modifiers}
+                       enableOutsideDays />
+    </StyledPopover>
+  );
 
-  render() {
-    const { children, date, id, onChange, title } = this.props;
-    let selectedDate;
+  return (
+    <OverlayTrigger trigger="click"
+                    rootClose
+                    placement="bottom"
+                    overlay={dayPickerFrom}>
+      {children}
+    </OverlayTrigger>
+  );
+};
 
-    if (date) {
-      try {
-        selectedDate = DateTime.parseFromString(date);
-      } catch (e) {
-        // don't do anything
-      }
-    }
+DatePicker.propTypes = {
+  /** Element id to use in the date picker Popover. */
+  id: PropTypes.string.isRequired,
+  /** Title to use in the date picker Popover.  */
+  title: PropTypes.string.isRequired,
+  /** Initial date to select in the date picker. */
+  date: PropTypes.string,
+  /**
+   * Callback that will be called when user picks a date. It will receive the new selected day,
+   * `react-day-picker`'s modifiers, and the original event as arguments.
+   */
+  onChange: PropTypes.func.isRequired,
+  /** Element that will trigger the date picker Popover. */
+  children: PropTypes.node.isRequired,
+};
 
-    const modifiers = {
-      selected: (moddedDate) => {
-        if (!selectedDate) {
-          return false;
-        }
-
-        const dateTime = DateTime.ignoreTZ(moddedDate);
-
-        return (selectedDate.toString(DateTime.Formats.DATE) === dateTime.toString(DateTime.Formats.DATE));
-      },
-    };
-
-    const dayPickerFrom = (
-      <StyledPopover id={id}
-                     placement="bottom"
-                     positionTop={25}
-                     title={title}>
-        <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
-                         onDayClick={onChange}
-                         modifiers={modifiers}
-                         enableOutsideDays />
-      </StyledPopover>
-    );
-
-    return (
-      <OverlayTrigger trigger="click"
-                      rootClose
-                      placement="bottom"
-                      overlay={dayPickerFrom}>
-        {children}
-      </OverlayTrigger>
-    );
-  }
-}
+DatePicker.defaultProps = {
+  date: undefined,
+};
 
 export default DatePicker;
