@@ -4,12 +4,13 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
+import type { PaginatedUsers } from 'actions/users/UsersActions';
 
 import UserQueryHelper from '../UsersQueryHelper';
 
 type Props = {
-  onSearch: (query: string) => Promise<void>,
-  onReset: () => Promise<void>,
+  onSearch: (query: string) => Promise<?PaginatedUsers>,
+  onReset: () => Promise<?PaginatedUsers>,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`

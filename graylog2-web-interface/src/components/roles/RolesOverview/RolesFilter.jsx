@@ -4,12 +4,13 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { SearchForm } from 'components/common';
+import type { PaginatedListType } from 'stores/roles/AuthzRolesStore';
 
 import RolesQueryHelper from '../RolesQueryHelper';
 
 type Props = {
-  onSearch: (query: string) => Promise<void>,
-  onReset: () => Promise<void>,
+  onSearch: (query: string) => Promise<?PaginatedListType>,
+  onReset: () => Promise<?PaginatedListType>,
 };
 
 const Container: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div`
