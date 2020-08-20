@@ -10,7 +10,6 @@ describe('Input', () => {
     const wrapper = mount(<Input id="inputWithButton" type="text" buttonAfter={<Button />} />);
 
     expect(wrapper.find('button')).toExist();
-    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders a addon after the input if addonAfter is passed', () => {
@@ -19,21 +18,18 @@ describe('Input', () => {
 
     expect(addon).toExist();
     expect(addon).toHaveText('.00');
-    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders a checkbox addon after the input if addonAfter is passed', () => {
     const wrapper = mount(<Input id="inputWithCheckboxAddon" type="text" addonAfter={<input id="addonCheckbox" type="checkbox" aria-label="..." />} />);
 
     expect(wrapper.find('input#addonCheckbox')).toExist();
-    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders input w/ `name` attribute w/o setting prop', () => {
     const wrapper = mount(<Input id="inputWithoutNameProp" type="text" />);
 
     expect(wrapper.find('input[name="inputWithoutNameProp"]')).toExist();
-    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders input w/ `name` attribute w/ setting prop', () => {
@@ -42,6 +38,5 @@ describe('Input', () => {
     );
 
     expect(wrapper.find('input[name="inputWithNameProp"]')).toExist();
-    expect(wrapper).toMatchSnapshot();
   });
 });

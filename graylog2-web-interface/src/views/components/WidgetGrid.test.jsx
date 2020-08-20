@@ -42,7 +42,7 @@ describe('<WidgetGrid />', () => {
                   fields={Immutable.List()} />
     ));
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with widgets passed', () => {

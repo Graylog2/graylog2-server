@@ -55,7 +55,7 @@ describe('<ContentPackEntitiesList />', () => {
     const emptyContentPack = { entities: [] };
     const wrapper = mount(<ContentPackEntitiesList contentPack={emptyContentPack} readOnly />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with entities and parameters without readOnly', () => {
@@ -64,7 +64,7 @@ describe('<ContentPackEntitiesList />', () => {
     const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack}
                                                    appliedParameter={appliedParameter} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should filter entities', () => {

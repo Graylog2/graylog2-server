@@ -74,7 +74,7 @@ describe('RequirementsProvided', () => {
       .catch((Component) => {
         const wrapper = mount(<Component />);
 
-        expect(wrapper).toMatchSnapshot();
+        expect(wrapper).toExist();
 
         done();
       });

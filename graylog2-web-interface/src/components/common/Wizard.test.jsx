@@ -7,7 +7,6 @@ import { Nav } from 'components/graylog';
 import Wizard from 'components/common/Wizard';
 
 import 'helpers/mocking/react-dom_mock';
-import 'jest-styled-components';
 
 describe('<Wizard />', () => {
   const steps = [
@@ -19,25 +18,25 @@ describe('<Wizard />', () => {
   it('should render with 3 steps', () => {
     const wrapper = mount(<Wizard steps={steps} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with 3 steps and children', () => {
     const wrapper = mount(<Wizard steps={steps}><span>Preview</span></Wizard>);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render in horizontal mode with 3 steps', () => {
     const wrapper = mount(<Wizard steps={steps} horizontal />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render in horizontal mode with 3 steps and children', () => {
     const wrapper = mount(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   describe('When used in an uncontrolled way', () => {

@@ -11,7 +11,7 @@ describe('BarVisualizationConfiguration', () => {
   it('should render without props', () => {
     const wrapper = mount(<BarVisualizationConfiguration />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   // NOTE: Why is this testing `HoverForHelp` component?
@@ -19,6 +19,6 @@ describe('BarVisualizationConfiguration', () => {
   it('should render with props', () => {
     const wrapper = mount(<BarVisualizationConfiguration config={BarVisualizationConfig.create('stack')} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 });

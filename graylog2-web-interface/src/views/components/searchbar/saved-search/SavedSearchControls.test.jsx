@@ -153,7 +153,7 @@ describe('SavedSearchControls', () => {
 
       const saveButton = wrapper.find('button[title="Save search"]');
 
-      expect(saveButton).toMatchSnapshot();
+      expect(saveButton).toExist();
     });
 
     it('should render not dirty', () => {
@@ -172,7 +172,7 @@ describe('SavedSearchControls', () => {
       const wrapper = mount(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
       const saveButton = wrapper.find('button[title="Saved search"]');
 
-      expect(saveButton).toMatchSnapshot();
+      expect(saveButton).toExist();
     });
 
     it('should render dirty', () => {
@@ -192,7 +192,7 @@ describe('SavedSearchControls', () => {
       const wrapper = mount(<SimpleSavedSearchControls viewStoreState={viewStoreState} />);
       const saveButton = wrapper.find('button[title="Unsaved changes"]');
 
-      expect(saveButton).toMatchSnapshot();
+      expect(saveButton).toExist();
     });
   });
 });

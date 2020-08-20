@@ -68,7 +68,7 @@ describe('WidgetQueryControls', () => {
   it('should do something', () => {
     const { container } = renderSUT();
 
-    expect(container).toMatchSnapshot();
+    expect(container).not.toBeNull();
   });
 
   describe('displays if global override is set', () => {
