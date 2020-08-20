@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { createGRN } from 'logic/permissions/GRN';
@@ -25,6 +25,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
   const { state: entityShareState } = useStore(EntityShareStore);
   const [disableSubmit, setDisableSubmit] = useState(false);
   const entityGRN = createGRN(entityType, entityId);
+  const granteesSelectRef = useRef();
 
   useEffect(() => {
     EntityShareActions.prepare(entityGRN);
@@ -32,11 +33,27 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
 
   const _handleSave = () => {
     setDisableSubmit(true);
+    const granteesSelect = granteesSelectRef?.current;
+    const garnteesSelectValue = granteesSelect?.state?.value;
+    const granteesSelectOptions = granteesSelect?.props?.options;
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: entityShareState.selectedGranteeCapabilities,
     };
 
-    return EntityShareActions.update(entityGRN, payload).then(onClose);
+    if (garnteesSelectValue) {
+      const selectedOption = granteesSelectOptions?.find((option) => option.value === garnteesSelectValue);
+
+      if (!selectedOption) {
+        throw Error(`Can't find ${garnteesSelectValue} in grantees select options on save`);
+      }
+
+      // eslint-disable-next-line no-alert
+      if (!window.confirm(`"${selectedOption.label}" got selected but was never added as a collaborator. Do you want to continue anyway?`)) {
+        return;
+      }
+    }
+
+    EntityShareActions.update(entityGRN, payload).then(onClose);
   };
 
   return (
@@ -53,6 +70,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
                                entityGRN={entityGRN}
                                entityType={entityType}
                                entityShareState={entityShareState}
+                               granteesSelectRef={granteesSelectRef}
                                setDisableSubmit={setDisableSubmit} />
         ) : (
           <Spinner />

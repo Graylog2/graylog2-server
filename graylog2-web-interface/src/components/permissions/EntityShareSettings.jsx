@@ -8,6 +8,7 @@ import EntityShareState from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { Select } from 'components/common';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -20,6 +21,7 @@ type Props = {
   entityType: $PropertyType<SharedEntity, 'type'>,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
+  granteesSelectRef: ?Select,
 };
 
 const Section = styled.div`
@@ -53,6 +55,7 @@ const EntityShareSettings = ({
   entityGRN,
   entityType,
   setDisableSubmit,
+  granteesSelectRef,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
@@ -93,7 +96,8 @@ const EntityShareSettings = ({
         </p>
         <GranteesSelector availableGrantees={filteredGrantees}
                           availableCapabilities={availableCapabilities}
-                          onSubmit={_handleSelection} />
+                          onSubmit={_handleSelection}
+                          granteesSelectRef={granteesSelectRef} />
       </Section>
       <Section>
         <GranteesList activeShares={activeShares}

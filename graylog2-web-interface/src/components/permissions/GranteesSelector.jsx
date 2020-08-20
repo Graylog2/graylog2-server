@@ -23,6 +23,7 @@ type Props = {
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
   className?: string,
+  granteesSelectRef: ?Select,
   onSubmit: SelectionRequest => Promise<EntityShareState>,
 };
 
@@ -90,7 +91,7 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, granteesSelectRef }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
@@ -108,6 +109,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
                                     onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                     optionRenderer={_renderGranteesSelectOption}
                                     options={granteesOptions}
+                                    ref={granteesSelectRef}
                                     placeholder="Search for users and teams"
                                     value={value} />
                   )}
