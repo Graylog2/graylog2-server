@@ -16,7 +16,6 @@
  */
 package org.graylog.security.migrations;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -156,28 +155,20 @@ class V20200811143600_ViewSharingToGrantsMigrationTest {
     @Test
     @DisplayName("migrate all-of-instance shares")
     void migrateAllOfInstanceShares() throws Exception {
-        final User userJane = createUser("jane");
-        final User userJohn = createUser("john");
 
+        final GRN everyone = GRNRegistry.GLOBAL_USER_GRN;
         when(roleService.load(anyString())).thenThrow(new NotFoundException());
-        when(userService.loadAll()).thenReturn(ImmutableList.of(userJane, userJohn));
 
-        final GRN jane = GRNTypes.USER.toGRN(userJane.getName());
-        final GRN john = GRNTypes.USER.toGRN(userJohn.getName());
         final GRN dashboard2 = GRNTypes.DASHBOARD.toGRN("54e3deadbeefdeadbeef0003");
 
-        assertThat(grantService.hasGrantFor(jane, Capability.VIEW, dashboard2)).isFalse();
-        assertThat(grantService.hasGrantFor(john, Capability.VIEW, dashboard2)).isFalse();
+        assertThat(grantService.hasGrantFor(everyone, Capability.VIEW, dashboard2)).isFalse();
 
         migration.upgrade();
 
-        assertThat(grantService.hasGrantFor(jane, Capability.VIEW, dashboard2)).isTrue();
-        assertThat(grantService.hasGrantFor(john, Capability.VIEW, dashboard2)).isTrue();
+        assertThat(grantService.hasGrantFor(everyone, Capability.VIEW, dashboard2)).isTrue();
 
-        assertThat(grantService.hasGrantFor(jane, Capability.OWN, dashboard2)).isFalse();
-        assertThat(grantService.hasGrantFor(jane, Capability.MANAGE, dashboard2)).isFalse();
-        assertThat(grantService.hasGrantFor(john, Capability.OWN, dashboard2)).isFalse();
-        assertThat(grantService.hasGrantFor(john, Capability.MANAGE, dashboard2)).isFalse();
+        assertThat(grantService.hasGrantFor(everyone, Capability.OWN, dashboard2)).isFalse();
+        assertThat(grantService.hasGrantFor(everyone, Capability.MANAGE, dashboard2)).isFalse();
 
         assertDeletedViewSharing("54e3deadbeefdeadbeef0003");
     }

@@ -21,6 +21,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -153,8 +154,14 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
 
         final GRN target = getTarget(viewId);
 
-        for (final User user : userService.loadAll()) {
-            ensureGrant(user.getName(), target);
+        ensureEveryoneGrant(target);
+    }
+
+    private void ensureEveryoneGrant(GRN target) {
+        final GRN grantee = GRNRegistry.GLOBAL_USER_GRN;
+
+        if (!grantService.hasGrantFor(grantee, CAPABILITY, target)) {
+            grantService.create(grantee, CAPABILITY, target, rootUsername);
         }
     }
 
