@@ -95,9 +95,13 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
+  const _handelSubmit = (data, resetForm) => {
+    onSubmit(data).then(() => { resetForm(); });
+  };
+
   return (
     <div className={className}>
-      <Formik onSubmit={(data) => onSubmit(data)}
+      <Formik onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
               initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
