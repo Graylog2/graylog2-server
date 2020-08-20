@@ -20,7 +20,7 @@ const LogoRenderer = ({ children }) => {
                          theme.changeMode(evt.target.checked ? THEME_MODE_DARK : THEME_MODE_LIGHT);
                        }}
                        checked={theme.mode === THEME_MODE_DARK} />
-                Enable Dark Mod
+                Enable Dark Mode
               </label>
             </>
           );
