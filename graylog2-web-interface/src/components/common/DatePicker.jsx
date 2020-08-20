@@ -74,18 +74,13 @@ const DatePicker = ({ children, date, id, onChange, title }) => {
     },
   };
 
-  const handleChange = (wat, was, here) => {
-    console.log('handleChange', wat, was, here);
-    onChange(wat, was, here);
-  };
-
   const dayPickerFrom = (
     <StyledPopover id={id}
                    placement="bottom"
                    positionTop={25}
                    title={title}>
       <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
-                       onDayClick={handleChange}
+                       onDayClick={onChange}
                        modifiers={modifiers}
                        showOutsideDays />
     </StyledPopover>
