@@ -6,7 +6,7 @@ import noop from 'lodash/noop';
 import buttonStyles from 'components/graylog/styles/buttonStyles';
 import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import { breakpoints, colors, fonts, utils } from 'theme/index';
-import { PREFERENCES_THEME_MODE, THEME_MODE_LIGHT } from 'theme/constants';
+import { DEFAULT_THEME_MODE, THEME_MODE_LIGHT } from 'theme/constants';
 import Store from 'logic/local-storage/Store';
 
 const LOCAL_STORE_NAME = 'styleguide-theme-mode';
@@ -166,7 +166,7 @@ const StyleguideThemeProvider = ({ children }) => {
   ) : null), [themeColors]);
 
   useEffect(() => {
-    setMode((Store.get(LOCAL_STORE_NAME) || PREFERENCES_THEME_MODE) || THEME_MODE_LIGHT);
+    setMode((Store.get(LOCAL_STORE_NAME) || DEFAULT_THEME_MODE) || THEME_MODE_LIGHT);
   }, []);
 
   useEffect(() => {
