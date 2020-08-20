@@ -18,6 +18,7 @@ package org.graylog.security;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
@@ -42,6 +43,7 @@ public class BuiltinCapabilities {
                         ImmutableSet.of(
                                 RestPermissions.STREAMS_READ,
                                 RestPermissions.DASHBOARDS_READ,
+                                ViewsRestPermissions.VIEW_READ,
                                 RestPermissions.EVENT_DEFINITIONS_READ
                                 // TODO: Add missing collection permissions
                         )
@@ -55,6 +57,8 @@ public class BuiltinCapabilities {
                                 RestPermissions.STREAMS_CHANGESTATE,
                                 RestPermissions.DASHBOARDS_READ,
                                 RestPermissions.DASHBOARDS_EDIT,
+                                ViewsRestPermissions.VIEW_READ,
+                                ViewsRestPermissions.VIEW_EDIT,
                                 RestPermissions.EVENT_DEFINITIONS_READ,
                                 RestPermissions.EVENT_DEFINITIONS_EDIT
                                 // TODO: Add missing collection permissions
@@ -70,6 +74,8 @@ public class BuiltinCapabilities {
                                 RestPermissions.STREAMS_CHANGESTATE,
                                 RestPermissions.DASHBOARDS_READ,
                                 RestPermissions.DASHBOARDS_EDIT,
+                                ViewsRestPermissions.VIEW_READ,
+                                ViewsRestPermissions.VIEW_EDIT,
                                 RestPermissions.EVENT_DEFINITIONS_READ,
                                 RestPermissions.EVENT_DEFINITIONS_EDIT
                                 // TODO: Add missing collection permissions
