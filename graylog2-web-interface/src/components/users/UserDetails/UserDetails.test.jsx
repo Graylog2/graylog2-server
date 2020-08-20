@@ -51,6 +51,7 @@ describe('<UserDetails />', () => {
 
   it('user profile should display profile information', async () => {
     const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+    await act(() => mockAuthzRolesPromise);
 
     expect(getByText(user.username)).not.toBeNull();
     expect(getByText(user.fullName)).not.toBeNull();
@@ -60,53 +61,46 @@ describe('<UserDetails />', () => {
     if (!user.lastActivity) throw Error('lastActivity must be defined for provided user');
 
     expect(getByText(user.lastActivity)).not.toBeNull();
-
-    await act(() => mockAuthzRolesPromise);
   });
 
   describe('user settings', () => {
     it('should display timezone', async () => {
       const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockAuthzRolesPromise);
 
       if (!user.timezone) throw Error('timezone must be defined for provided user');
 
       expect(getByText(user.timezone)).not.toBeNull();
-
-      await act(() => mockAuthzRolesPromise);
     });
 
     describe('should display session timeout in a readable format', () => {
       it('for seconds', async () => {
         const test = user.toBuilder().sessionTimeoutMs(10000).build();
         const { getByText } = render(<SutComponent user={test} paginatedUserShares={undefined} />);
+        await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Seconds')).not.toBeNull();
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('for minutes', async () => {
         const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(600000).build()} paginatedUserShares={undefined} />);
+        await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Minutes')).not.toBeNull();
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('for hours', async () => {
         const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(36000000).build()} paginatedUserShares={undefined} />);
+        await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Hours')).not.toBeNull();
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('for days', async () => {
         const { getByText } = render(<SutComponent user={user.toBuilder().sessionTimeoutMs(864000000).build()} paginatedUserShares={undefined} />);
+        await act(() => mockAuthzRolesPromise);
 
         expect(getByText('10 Days')).not.toBeNull();
-
-        await act(() => mockAuthzRolesPromise);
       });
     });
 
@@ -121,6 +115,7 @@ describe('<UserDetails />', () => {
 
       it('should fetch paginated user shares when using search', async () => {
         const { getByPlaceholderText, getByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
+        await act(() => mockAuthzRolesPromise);
 
         const searchInput = getByPlaceholderText('Enter search query...');
         const searchSubmitButton = getByText('Search');
@@ -129,34 +124,30 @@ describe('<UserDetails />', () => {
         fireEvent.click(searchSubmitButton);
 
         await waitFor(() => expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 10, 'the username', undefined));
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('should fetch user shares when filtering by entity type', async () => {
-        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 3, perPage: 50, query: 'existing query' } };
+        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 1, perPage: 50, query: 'existing query' } };
         const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
+        await act(() => mockAuthzRolesPromise);
 
         const entityTypeSelect = getByLabelText('Entity Type');
         await selectEvent.openMenu(entityTypeSelect);
         await act(async () => { await selectEvent.select(entityTypeSelect, 'Dashboard'); });
 
         expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { entity_type: 'dashboard' });
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('should fetch user shares when filtering by capability', async () => {
-        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 3, perPage: 50, query: 'existing query' } };
+        const existingPaginatedUserShares = { ...mockPaginatedUserShares, pagination: { ...mockPaginatedUserShares.pagination, page: 1, perPage: 50, query: 'existing query' } };
         const { getByLabelText } = render(<SutComponent user={user} paginatedUserShares={existingPaginatedUserShares} />);
+        await act(() => mockAuthzRolesPromise);
 
         const capabilitySelect = getByLabelText('Capability');
         await selectEvent.openMenu(capabilitySelect);
         await act(async () => { await selectEvent.select(capabilitySelect, 'Manager'); });
 
         expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { capability: 'manage' });
-
-        await act(() => mockAuthzRolesPromise);
       });
     });
   });

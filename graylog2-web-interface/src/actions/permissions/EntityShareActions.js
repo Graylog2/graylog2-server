@@ -20,7 +20,7 @@ export type PaginatedEnititySharesType = {
   list: SharedEntities,
   pagination: EntitySharesPaginationType,
   context: {
-    userCapabilities: { [grn: GRN]: string },
+    granteeCapabilities: { [grn: GRN]: string },
   },
 };
 
