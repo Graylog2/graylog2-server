@@ -373,8 +373,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         final ForceMergeRequest request = new ForceMergeRequest()
                 .indices(index)
                 .maxNumSegments(maxNumSegments)
-                .flush(true)
-                .onlyExpungeDeletes(true);
+                .flush(true);
 
         client.execute((c, requestOptions) -> c.indices().forcemerge(request, requestOptions));
     }
