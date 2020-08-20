@@ -10,6 +10,7 @@ import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvi
 import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import { PREFERENCES_THEME_MODE, THEME_MODE_LIGHT } from 'theme/constants';
 
 import SearchPageLayoutContext from './SearchPageLayoutContext';
 import SearchPageLayoutProvider from './SearchPageLayoutProvider';
@@ -111,9 +112,7 @@ describe('CurrentUserPreferencesProvider', () => {
 
   it('provides search page layout based on local storage for system admin', () => {
     asMock(Store.get).mockImplementationOnce((key) => {
-      if (key === 'searchSidebarIsPinned') return true;
-
-      return false;
+      return (key === 'searchSidebarIsPinned');
     });
 
     asMock(CurrentUserStore.getInitialState).mockReturnValue({
@@ -149,7 +148,7 @@ describe('CurrentUserPreferencesProvider', () => {
         { name: 'updateUnfocussed', value: false },
         { name: 'searchSidebarIsPinned', value: true },
         { name: 'dashboardSidebarIsPinned', value: false },
-        { name: 'themeMode', value: 'teint' },
+        { name: PREFERENCES_THEME_MODE, value: THEME_MODE_LIGHT },
       ],
       undefined,
       false,
