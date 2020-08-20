@@ -37,12 +37,12 @@ describe('HasOwnership', () => {
 
   const type = 'stream';
   const id = '000000000001';
-  const grn = createGRN(id, type);
+  const grn = createGRN(type, id);
   const grnPermission = `entity:own:${grn}`;
 
   const otherType = 'dashboard';
   const otherId = 'beef000011';
-  const otherGrn = createGRN(otherId, otherType);
+  const otherGrn = createGRN(otherType, otherId);
   const otherGrnPermission = `entity:own:${otherGrn}`;
 
   it('should render children enabled if user has ownership', () => {

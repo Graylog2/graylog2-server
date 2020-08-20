@@ -15,7 +15,7 @@ type Props = {
 
 const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
   const currentUser = useContext(CurrentUserContext);
-  const entity = createGRN(id, type);
+  const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
   const adminPermission = '*';
 
