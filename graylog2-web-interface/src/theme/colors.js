@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import teint from './variants/teint';
 import noir from './variants/noir';
+import partyGorillaDark from './variants/party-gorilla-dark';
+import partyGorillaLight from './variants/party-gorilla-light';
 
 export type Colors = {
   brand: {
@@ -251,15 +253,21 @@ export const colorsPropTypes = PropTypes.shape({
 type Modes = {
   teint: Colors,
   noir: Colors,
+  partyGorillaDark: Colors,
+  partyGorillaLight: Colors,
 };
 
 const colors: Modes = {
   teint,
   noir,
+  partyGorillaDark,
+  partyGorillaLight,
 };
 
 export default colors;
 export {
   noir,
   teint,
+  partyGorillaDark,
+  partyGorillaLight,
 };
