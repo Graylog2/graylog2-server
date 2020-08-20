@@ -29,10 +29,5 @@ describe('GRN', () => {
       ${'user'}       | ${'grn::::user:user-id'}            | ${Routes.SYSTEM.USERS.show('user-id')}
       ${'stream'}     | ${'grn::::stream:stream-id'}        | ${Routes.stream_search('stream-id')}
     `('type $type with grn $grn', createsCorrectShowEntityURL);
-
-    // We can test the following cases after we've adjusted the pluginRoute behaviour
-    // ${'team'}       | ${'grn::::team:team-id'}            | ${Routes.pluginRoute('SYSTEM_TEAMS_TEAMID')('team-id')}
-    // ${'dashboard'}  | ${'grn::::dashboard:dashboard-id'}  | ${Routes.pluginRoute('DASHBOARDS_VIEWID')('dashboard-id')}
-    // ${'search'}     | ${'grn::::search:search-id'}        | ${Routes.pluginRoute('SEARCH_VIEWID')('search-id')}
   });
 });

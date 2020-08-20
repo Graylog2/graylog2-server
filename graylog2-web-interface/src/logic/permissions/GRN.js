@@ -20,11 +20,11 @@ export const getShowRouteFromGRN = (grn: string) => {
     case 'user':
       return Routes.SYSTEM.USERS.show(id);
     case 'team':
-      return Routes.pluginRoute('SYSTEM_TEAMS_TEAMID')(id);
+      return Routes.getPluginRoute('SYSTEM_TEAMS_TEAMID')(id);
     case 'dashboard':
       return Routes.dashboard_show(id);
     case 'search':
-      return Routes.pluginRoute('SEARCH_VIEWID')(id);
+      return Routes.getPluginRoute('SEARCH_VIEWID')(id);
     case 'stream':
       return Routes.stream_search(id);
     default:
