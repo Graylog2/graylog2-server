@@ -177,7 +177,7 @@
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^2.1.1",
     "react-select-event": "^4.1.4",
-    "react-styleguidist": "^10.6.1",
+    "react-styleguidist": "^11.0.8",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
     "stylelint": "^13.6.0",
