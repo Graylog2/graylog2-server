@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import DayPicker from 'react-day-picker';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { OverlayTrigger, Popover } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
@@ -14,15 +14,35 @@ const StyledPopover = styled(Popover)`
   }
 `;
 
-const StyledDayPicker = styled(DayPicker)(({ theme }) => `
+const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   .DayPicker-Day {
     min-width: 34px;
     max-width: 34px;
     min-height: 34px;
     max-height: 34px;
     
-    &:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
-      color: ${theme.colors.variant.default};
+    &--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
+      background-color: ${theme.colors.variant.lighter.primary};
+      color: ${theme.colors.variant.darkest.primary};
+    }
+    
+    &--today {
+      color: ${theme.colors.variant.info};
+    }
+    
+    &:focus {
+      outline-color: ${theme.colors.variant.primary};
+    }
+  }
+  
+  &:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside) {
+    &:focus {
+      outline-color: ${theme.colors.variant.primary};
+    }
+    
+    &:hover {
+      background-color: ${theme.colors.variant.lightest.primary};
+      color: ${theme.colors.variant.darker.primary};
     }
   }
 `);
@@ -54,15 +74,20 @@ const DatePicker = ({ children, date, id, onChange, title }) => {
     },
   };
 
+  const handleChange = (wat, was, here) => {
+    console.log('handleChange', wat, was, here);
+    onChange(wat, was, here);
+  };
+
   const dayPickerFrom = (
     <StyledPopover id={id}
                    placement="bottom"
                    positionTop={25}
                    title={title}>
       <StyledDayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
-                       onDayClick={onChange}
+                       onDayClick={handleChange}
                        modifiers={modifiers}
-                       enableOutsideDays />
+                       showOutsideDays />
     </StyledPopover>
   );
 
