@@ -63,7 +63,7 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
       {({ size: { height } }) => (
         <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
                        itemCount={fieldList.size}
-                       itemSize={17}>
+                       itemSize={20}>
           {Row}
         </FixedSizeList>
       )}

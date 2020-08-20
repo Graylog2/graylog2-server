@@ -19,11 +19,11 @@ exports[`<DataAdapterCreate /> should render for types with defined frontend com
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"
@@ -111,11 +111,11 @@ exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"
@@ -195,11 +195,11 @@ exports[`<DataAdapterCreate /> with mocked console.error should render for types
     >
       <Row
         bsClass="row"
-        className="Row-sc-3iisrt-0 gPzTHl content"
+        className="Row-sc-3iisrt-0 iSaIhq content"
         componentClass="div"
       >
         <div
-          className="Row-sc-3iisrt-0 gPzTHl content row"
+          className="Row-sc-3iisrt-0 iSaIhq content row"
         >
           <Col
             bsClass="col"

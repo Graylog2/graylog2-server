@@ -29,11 +29,13 @@ const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
 class ConfigurationsPage extends React.Component {
-  state = {
-    loaded: false,
-  }
-
   checkLoadedTimer = undefined
+
+  constructor(props) {
+    super(props);
+
+    this.state = { loaded: false };
+  }
 
   componentDidMount() {
     style.use();
@@ -156,23 +158,31 @@ class ConfigurationsPage extends React.Component {
 
       Output = (
         <>
+          {searchesConfig && (
           <Col md={6}>
             <SearchesConfig config={searchesConfig}
                             updateConfig={this._onUpdate(SEARCHES_CLUSTER_CONFIG)} />
           </Col>
+          )}
+          {messageProcessorsConfig && (
           <Col md={6}>
             <MessageProcessorsConfig config={messageProcessorsConfig}
                                      updateConfig={this._onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
           </Col>
+          )}
+          {sidecarConfig && (
           <Col md={6}>
             <SidecarConfig config={sidecarConfig}
                            updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
           </Col>
+          )}
+          {eventsConfig && (
           <Col md={6}>
             <EventsConfig config={eventsConfig}
                           updateConfig={this._onUpdate(EVENTS_CONFIG)} />
           </Col>
-          {isPermitted(permissions, ['urlwhitelist:read']) && (
+          )}
+          {isPermitted(permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
           <Col md={6}>
             <UrlWhiteListConfig config={urlWhiteListConfig}
                                 updateConfig={this._onUpdate(URL_WHITELIST_CONFIG)} />

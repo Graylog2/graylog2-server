@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import { act } from 'react-dom/test-utils';
-import { alice } from 'fixtures/users';
+import { alice } from 'fixtures/userOverviews';
 import { rolesList } from 'fixtures/roles';
 
 import { UsersActions } from 'stores/users/UsersStore';
@@ -71,7 +71,7 @@ describe('<UserCreate />', () => {
       username: 'The username',
       full_name: 'The full name',
       timezone: 'Europe/Berlin',
-      roles: [],
+      roles: ['Reader'],
       email: 'username@example.org',
       permissions: [],
       session_timeout_ms: 144000000,

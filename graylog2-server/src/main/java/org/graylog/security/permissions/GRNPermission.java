@@ -33,7 +33,7 @@ public abstract class GRNPermission implements Permission {
 
     @Override
     public boolean implies(Permission p) {
-        // By default only supports comparisons with other GRNPermission
+        // GRNPermissions only supports comparisons with other GRNPermissions
         if (!(p instanceof GRNPermission)) {
             return false;
         }

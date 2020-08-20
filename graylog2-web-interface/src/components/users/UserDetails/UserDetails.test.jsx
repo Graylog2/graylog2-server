@@ -56,6 +56,9 @@ describe('<UserDetails />', () => {
     expect(getByText(user.fullName)).not.toBeNull();
     expect(getByText(user.email)).not.toBeNull();
     expect(getByText(user.clientAddress)).not.toBeNull();
+
+    if (!user.lastActivity) throw Error('lastActivity must be defined for provided user');
+
     expect(getByText(user.lastActivity)).not.toBeNull();
 
     await act(() => mockAuthzRolesPromise);
@@ -64,6 +67,8 @@ describe('<UserDetails />', () => {
   describe('user settings', () => {
     it('should display timezone', async () => {
       const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+
+      if (!user.timezone) throw Error('timezone must be defined for provided user');
 
       expect(getByText(user.timezone)).not.toBeNull();
 

@@ -236,11 +236,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                   <Row>
                                     <Row
                                       bsClass="row"
-                                      className="Row-sc-3iisrt-0 gPzTHl"
+                                      className="Row-sc-3iisrt-0 iSaIhq"
                                       componentClass="div"
                                     >
                                       <div
-                                        className="Row-sc-3iisrt-0 gPzTHl row"
+                                        className="Row-sc-3iisrt-0 iSaIhq row"
                                       >
                                         <Col
                                           bsClass="col"
@@ -977,11 +977,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                   <Row>
                                     <Row
                                       bsClass="row"
-                                      className="Row-sc-3iisrt-0 gPzTHl"
+                                      className="Row-sc-3iisrt-0 iSaIhq"
                                       componentClass="div"
                                     >
                                       <div
-                                        className="Row-sc-3iisrt-0 gPzTHl row"
+                                        className="Row-sc-3iisrt-0 iSaIhq row"
                                       >
                                         <Col
                                           bsClass="col"
@@ -1913,11 +1913,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                   <Row>
                                     <Row
                                       bsClass="row"
-                                      className="Row-sc-3iisrt-0 gPzTHl"
+                                      className="Row-sc-3iisrt-0 iSaIhq"
                                       componentClass="div"
                                     >
                                       <div
-                                        className="Row-sc-3iisrt-0 gPzTHl row"
+                                        className="Row-sc-3iisrt-0 iSaIhq row"
                                       >
                                         <Col
                                           bsClass="col"
@@ -2654,11 +2654,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                   <Row>
                                     <Row
                                       bsClass="row"
-                                      className="Row-sc-3iisrt-0 gPzTHl"
+                                      className="Row-sc-3iisrt-0 iSaIhq"
                                       componentClass="div"
                                     >
                                       <div
-                                        className="Row-sc-3iisrt-0 gPzTHl row"
+                                        className="Row-sc-3iisrt-0 iSaIhq row"
                                       >
                                         <Col
                                           bsClass="col"

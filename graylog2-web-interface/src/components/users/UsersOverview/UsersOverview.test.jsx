@@ -2,7 +2,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, waitFor, fireEvent } from 'wrappedTestingLibrary';
-import { alice, bob, adminUser, admin } from 'fixtures/users';
+import { admin } from 'fixtures/users';
+import { alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -10,7 +11,7 @@ import { UsersActions } from 'stores/users/UsersStore';
 
 import UsersOverview from './UsersOverview';
 
-const mockUsers = Immutable.List([alice, bob, adminUser]);
+const mockUsers = Immutable.List([alice, bob, adminOverview]);
 const searchPaginatedResponse = {
   list: mockUsers,
   pagination: {
@@ -73,7 +74,7 @@ describe('UsersOverview', () => {
       user     | username
       ${alice} | ${alice.username}
       ${bob}   | ${bob.username}
-      ${adminUser} | ${adminUser.username}
+      ${adminOverview} | ${adminOverview.username}
     `('$username', displaysUserAttributes);
   });
 
