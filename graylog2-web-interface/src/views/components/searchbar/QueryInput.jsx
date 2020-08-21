@@ -1,8 +1,10 @@
 // @flow strict
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
+import type { ThemeInterface } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
@@ -12,19 +14,20 @@ import SearchBarAutoCompletions from './SearchBarAutocompletions';
 import type { Completer } from './SearchBarAutocompletions';
 
 type Props = {|
-  disabled: boolean,
-  value: string,
-  completers: Array<Completer>,
   completerFactory: (Array<Completer>) => AutoCompleter,
+  completers: Array<Completer>,
+  disabled: boolean,
   onBlur?: (string) => void,
   onChange: (string) => Promise<string>,
   onExecute: (string) => void,
   placeholder: string,
+  theme: ThemeInterface,
+  value: string,
 |};
 
 const defaultCompleterFactory = (completers) => new SearchBarAutoCompletions(completers);
 
-const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory }: Props) => {
+const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value, completers, completerFactory = defaultCompleterFactory, theme }: Props) => {
   const completer = useMemo(() => completerFactory(completers), [completerFactory, completers]);
   const _onExecute = useCallback((editor: Editor) => {
     if (editor.completer && editor.completer.popup) {
@@ -45,9 +48,6 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
       });
 
       editor.commands.removeCommands(['indent', 'outdent']);
-
-      editor.setFontSize(16);
-
       editor.completers = [completer];
     }
   }, [completer, _onExecute]);
@@ -76,7 +76,7 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
                              $blockScrolling: Infinity,
                              selectionStyle: 'line',
                            }}
-                           fontSize={13}
+                           fontSize={theme.fonts.size.large}
                            placeholder={placeholder} />
         )}
       </UserPreferencesContext.Consumer>
@@ -104,4 +104,4 @@ QueryInput.defaultProps = {
   placeholder: '',
 };
 
-export default withPluginEntities(QueryInput, { completers: 'views.completers' });
+export default withTheme(withPluginEntities(QueryInput, { completers: 'views.completers' }));
