@@ -42,7 +42,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
   };
 
   const handleModeChange = (nextMode) => Promise.resolve().then(() => {
-    if (colors[nextMode]) {
+    if (nextMode && colors[nextMode]) {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
 
       setUserPreferences(nextPreferences);
