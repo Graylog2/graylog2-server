@@ -131,23 +131,6 @@ const AuthenticationComponent = createReactClass({
       authenticators = [<NavItem key="loading" disabled title="Loading...">Loading...</NavItem>];
     }
 
-    // add submenu items based on permissions
-    if (this.isPermitted(currentUser.permissions, ['roles:read'])) {
-      authenticators.unshift(
-        <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
-          <NavItem title="Roles">Roles</NavItem>
-        </LinkContainer>,
-      );
-    }
-
-    if (this.isPermitted(currentUser.permissions, ['users:list'])) {
-      authenticators.unshift(
-        <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
-          <NavItem title="Users">Users</NavItem>
-        </LinkContainer>,
-      );
-    }
-
     if (authenticators.length === 0) {
       // special case, this is a user editing their own profile
       authenticators = [
