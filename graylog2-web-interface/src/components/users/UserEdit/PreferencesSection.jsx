@@ -29,7 +29,6 @@ const PreferencesSection = ({ user }: Props) => {
               initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-
             <Input id="timeout-controls"
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9"
