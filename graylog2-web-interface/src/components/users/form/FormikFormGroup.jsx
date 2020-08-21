@@ -15,7 +15,7 @@ type Props = {
 };
 
 const checkboxProps = (value) => {
-  return { checked: value };
+  return { checked: value ?? false };
 };
 
 const inputProps = (value) => {

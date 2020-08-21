@@ -19,15 +19,8 @@ type Props = {
   user: User,
 };
 
-const _createUserPreferencesArray = (userPreferences) => {
-  return Object.entries(userPreferences).map(([name, value]) => ({
-    name,
-    value,
-  }));
-};
-
 const PreferencesSection = ({ user }: Props) => {
-  const onSubmit = (data) => PreferencesActions.saveUserPreferences(user.username, _createUserPreferencesArray(data));
+  const onSubmit = (data) => PreferencesActions.saveUserPreferences(user.username, data);
 
   return (
     <SectionComponent title="Preferences">
@@ -36,9 +29,6 @@ const PreferencesSection = ({ user }: Props) => {
               initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <ReadOnlyFormGroup label="Theme mode"
-                               value={getPreferenceValueLabel('enum', user.preferences?.[PREFERENCES_THEME_MODE])}
-                               help="Can be changed by using the toggle in the user dropdown" />
 
             <Input id="timeout-controls"
                    labelClassName="col-sm-3"
@@ -81,6 +71,10 @@ const PreferencesSection = ({ user }: Props) => {
                                type="checkbox"
                                help="Can also be changed by using the dashboard sidebar pin icon" />
             </Input>
+
+            <ReadOnlyFormGroup label="Theme mode"
+                               value={getPreferenceValueLabel('enum', user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured')}
+                               help="Can be changed by using the toggle in the user dropdown" />
 
             <Row className="no-bm">
               <Col xs={12}>

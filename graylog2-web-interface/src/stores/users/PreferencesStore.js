@@ -21,41 +21,30 @@ type PreferencesResponse = {
   preferences: PreferencesMap,
 };
 
+const convertPreferences = (preferences: PreferencesMap): PreferencesMap => {
+  const convertedPreferences = {};
+
+  Object.entries(preferences).forEach(([key, value]) => {
+    if (value === 'true') {
+      convertedPreferences[key] = true;
+    } else if (value === 'false') {
+      convertedPreferences[key] = false;
+    } else {
+      convertedPreferences[key] = value;
+    }
+  });
+
+  return convertedPreferences;
+};
+
 const PreferencesStore = Reflux.createStore({
   listenables: [PreferencesActions],
   URL: qualifyUrl('/users/'),
-  convertPreferenceMapToArray(preferencesAsMap: PreferencesMap): Array<Preference> {
-    let preferences = Object.keys(preferencesAsMap)
-      .map((name) => {
-        return {
-          name: name,
-          value: preferencesAsMap[name],
-        };
-      });
 
-    preferences = preferences.sort((t1: Preference, t2: Preference) => t1.name.localeCompare(t2.name));
-
-    return preferences;
-  },
-  convertPreferenceArrayToMap(preferences: Array<Preference>): PreferencesMap {
-    const preferencesAsMap = {};
-
-    preferences.forEach((element) => {
-      if (element.value === 'true') {
-        preferencesAsMap[element.name] = true;
-      } else if (element.value === 'false') {
-        preferencesAsMap[element.name] = false;
-      } else {
-        preferencesAsMap[element.name] = element.value;
-      }
-    });
-
-    return preferencesAsMap;
-  },
-  saveUserPreferences(userName: string, preferences: Array<Preference>, callback: (preferences: Array<any>) => void = () => {}, displaySuccessNotification: boolean = true): void {
-    const preferencesAsMap = this.convertPreferenceArrayToMap(preferences);
+  saveUserPreferences(userName: string, preferences: PreferencesMap, callback: (preferences: PreferencesMap) => void = () => {}, displaySuccessNotification: boolean = true): void {
+    const convertedPreverences = convertPreferences(preferences);
     const url = `${this.URL + userName}/preferences`;
-    const promise = fetch('PUT', url, { preferences: preferencesAsMap })
+    const promise = fetch('PUT', url, { preferences: convertedPreverences })
       .then(() => {
         if (displaySuccessNotification) {
           UserNotification.success('User preferences successfully saved');
@@ -71,14 +60,8 @@ const PreferencesStore = Reflux.createStore({
 
     return promise;
   },
-  loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void = () => {}): void {
+  loadUserPreferences(userName: string, callback: (preferences: PreferencesMap) => void = () => {}): void {
     const url = this.URL + userName;
-
-    const successCallback = (data: PreferencesResponse) => {
-      const sortedArray = this.convertPreferenceMapToArray(data.preferences);
-
-      callback(sortedArray);
-    };
 
     const failCallback = (errorThrown) => {
       UserNotification.error(
@@ -87,8 +70,7 @@ const PreferencesStore = Reflux.createStore({
       );
     };
 
-    const promise = fetch('GET', url)
-      .then(successCallback, failCallback);
+    const promise = fetch('GET', url).then((data: PreferencesResponse) => callback(data?.preferences), failCallback);
 
     PreferencesActions.loadUserPreferences.promise(promise);
 

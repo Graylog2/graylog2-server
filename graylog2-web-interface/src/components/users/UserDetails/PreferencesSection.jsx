@@ -50,9 +50,9 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
     <SectionComponent title="Preferences">
       <ReadOnlyFormGroup label="Enable smart search" value={getPreferenceValueLabel('boolean', enableSmartSearch)} />
       <ReadOnlyFormGroup label="Update unfocused" value={getPreferenceValueLabel('boolean', updateUnfocussed)} />
-      <ReadOnlyFormGroup label="Theme mode" value={getPreferenceValueLabel('enum', preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured')} />
       <ReadOnlyFormGroup label="Pin search sidebar" value={getPreferenceValueLabel('boolean', searchSidebarIsPinned)} />
       <ReadOnlyFormGroup label="Pin dashboard sidebar" value={getPreferenceValueLabel('boolean', dashboardSidebarIsPinned)} />
+      <ReadOnlyFormGroup label="Theme mode" value={getPreferenceValueLabel('enum', preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured')} />
     </SectionComponent>
   );
 };
