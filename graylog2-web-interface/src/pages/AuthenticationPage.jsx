@@ -27,7 +27,7 @@ const AuthenticationPage = createReactClass({
     return (
       <span>
         <PageHeader title="Authentication Management">
-          <span>Configure Graylog's authentication providers and manage the active users of this Graylog cluster.</span>
+          <span>Configure Graylog's authentication providers of this Graylog cluster.</span>
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>
