@@ -2,10 +2,13 @@
 
 import type { ListenableAction } from 'stores/StoreTypes';
 
-const mockAction = <R: function>(fn: R): ListenableAction<R> => {
-  return Object.assign(fn, {
-    listen: jest.fn(() => jest.fn()),
-    completed: { listen: jest.fn(() => jest.fn()) },
+const listenable = () => ({ listen: jest.fn(() => jest.fn()) });
+
+const noop: function = jest.fn();
+
+const mockAction = <R: function>(fn: R = noop): ListenableAction<R> => {
+  return Object.assign(fn, listenable(), {
+    completed: listenable(),
     promise: jest.fn(),
   });
 };
