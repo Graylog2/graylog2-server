@@ -9,7 +9,7 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 import SettingsSection from './SettingsSection';
 import ProfileSection from './ProfileSection';
 import RolesSection from './RolesSection';
-import TeamsSection from './TeamSection';
+import TeamsSection from './TeamsSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
 
 type Props = {
