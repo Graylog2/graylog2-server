@@ -31,12 +31,15 @@ import org.graylog.security.entities.EntityDescriptor;
 import org.graylog.security.shares.EntityShareResponse.ActiveShare;
 import org.graylog.security.shares.EntityShareResponse.AvailableCapability;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.ValidationResult;
 
 import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -94,11 +97,12 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
+                .validationResult(validateRequest(ownedEntity, request, sharingUserGRN))
                 .build();
     }
 
     /**
-     * Share an entity with one or more grantees.
+     * Share / unshare an entity with one or more grantees.
      * The grants in the request are created or, if they already exist, updated.
      *
      * @param ownedEntity the target entity for the updated grants
@@ -116,6 +120,25 @@ public class EntitySharesService {
         final String userName = sharingUser.getName();
         final GRN sharingUserGRN = grnRegistry.newGRN("user", sharingUser.getName());
         final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
+
+        final EntityShareResponse.Builder responseBuilder = EntityShareResponse.builder()
+                .entity(ownedEntity.toString())
+                .sharingUser(sharingUserGRN)
+                .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
+                .availableCapabilities(getAvailableCapabilities())
+                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
+                ;
+
+        // Abort if validation fails, but try to return a complete EntityShareResponse
+        final ValidationResult validationResult = validateRequest(ownedEntity, request, sharingUserGRN);
+        if (validationResult.failed()) {
+            final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
+            return responseBuilder
+                    .activeShares(activeShares)
+                    .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
+                    .validationResult(validationResult)
+                    .build();
+        }
 
         // Update capabilities of existing grants (for a grantee)
         existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
@@ -151,15 +174,50 @@ public class EntitySharesService {
         });
 
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser);
-        return EntityShareResponse.builder()
-                .entity(ownedEntity.toString())
-                .sharingUser(sharingUserGRN)
-                .availableGrantees(granteeService.getAvailableGrantees(sharingUser))
-                .availableCapabilities(getAvailableCapabilities())
+        return responseBuilder
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
-                .missingPermissionsOnDependencies(checkMissingPermissionsOnDependencies(ownedEntity, sharingUserGRN, request))
                 .build();
+    }
+
+    private ValidationResult validateRequest(GRN ownedEntity, EntityShareRequest request, GRN sharingUserGRN) {
+        final ValidationResult validationResult = new ValidationResult();
+
+        final List<GrantDTO> allEntityGrants = grantService.getForTarget(ownedEntity);
+        final List<GrantDTO> existingGrants = grantService.getForTargetExcludingGrantee(ownedEntity, sharingUserGRN);
+        final ImmutableMap<GRN, Capability> selectedGranteeCapabilities = request.selectedGranteeCapabilities()
+                .orElse(ImmutableMap.of());
+
+        // If there is still an owner in the selection, everything is fine
+        if (selectedGranteeCapabilities.containsValue(Capability.OWN)) {
+            return validationResult;
+        }
+        // If this entity is already ownerless, things can't get any worse. Let this request pass.
+        if (allEntityGrants.stream().noneMatch(g -> g.capability().equals(Capability.OWN))) {
+            return validationResult;
+        }
+
+        // Iterate over all existing owner grants and find modifications
+        ArrayList<GRN> removedOwners = new ArrayList<>();
+        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach((g) -> {
+            if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
+                // owner got removed
+                removedOwners.add(g.grantee());
+            } else if (!selectedGranteeCapabilities.get(g.grantee()).equals(Capability.OWN)) {
+                // owner capability got changed
+                removedOwners.add(g.grantee());
+            }
+        });
+
+        // If all removedOwners are applied, is there still at least one owner left?
+        if (allEntityGrants.stream().filter(g -> g.capability().equals(Capability.OWN))
+                .map(GrantDTO::grantee).anyMatch(grantee -> !removedOwners.contains(grantee))) {
+            return validationResult;
+        }
+        validationResult.addError(EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES,
+                String.format(Locale.US, "Removing the following owners <%s> will leave the entity ownerless.", removedOwners));
+
+        return validationResult;
     }
 
     private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, EntityShareRequest shareRequest) {

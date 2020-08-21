@@ -33,7 +33,10 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 public abstract class EntityShareRequest {
-    @JsonProperty("selected_grantee_capabilities")
+
+    public static final String SELECTED_GRANTEE_CAPABILITIES = "selected_grantee_capabilities";
+
+    @JsonProperty(SELECTED_GRANTEE_CAPABILITIES)
     public abstract Optional<ImmutableMap<GRN, Capability>> selectedGranteeCapabilities();
 
     public Set<GRN> grantees() {
