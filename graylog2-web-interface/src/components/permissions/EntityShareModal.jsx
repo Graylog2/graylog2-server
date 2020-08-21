@@ -49,11 +49,16 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
 
       // eslint-disable-next-line no-alert
       if (!window.confirm(`"${selectedOption.label}" got selected but was never added as a collaborator. Do you want to continue anyway?`)) {
+        setDisableSubmit(false);
+
         return;
       }
     }
 
-    EntityShareActions.update(entityGRN, payload).then(onClose);
+    EntityShareActions.update(entityGRN, payload).then(() => {
+      setDisableSubmit(true);
+      onClose();
+    });
   };
 
   return (
