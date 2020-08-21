@@ -13,7 +13,7 @@ export type Preference = {
   value: any,
 };
 
-type PreferencesMap = {
+export type PreferencesMap = {
   [index: string]: any,
 };
 

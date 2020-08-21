@@ -169,7 +169,7 @@ export default class UserOverview {
       email,
       permissions: [],
       timezone: '',
-      preferences: undefined,
+      preferences: {},
       roles: roles.toArray(),
       read_only: readOnly,
       external,

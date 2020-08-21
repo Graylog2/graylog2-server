@@ -13,6 +13,7 @@ import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
 import PasswordSection from './PasswordSection';
 import ProfileSection from './ProfileSection';
+import PreferencesSection from './PreferencesSection';
 import RolesSection from './RolesSection';
 import TeamsSection from './TeamsSection';
 
@@ -61,6 +62,7 @@ const UserEdit = ({ user }: Props) => {
             <IfPermitted permissions={`users:passwordchange:${user.username}`}>
               <PasswordSection user={user} />
             </IfPermitted>
+            <PreferencesSection user={user} />
           </div>
           <div>
             <IfPermitted permissions="users:rolesedit">
