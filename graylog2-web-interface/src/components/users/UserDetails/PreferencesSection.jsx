@@ -11,14 +11,6 @@ type Props = {
   user: User,
 };
 
-export const getPreferenceValueLabel = (preferenceType: string, preferenceValue: mixed): string => {
-  if (preferenceType === 'boolean') {
-    return preferenceValue ? 'yes' : 'no';
-  }
-
-  return String(preferenceValue);
-};
-
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {
   let preferences = databasePreferences || {};
 
@@ -40,11 +32,11 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
 
   return (
     <SectionComponent title="Preferences">
-      <ReadOnlyFormGroup label="Search autocompletion" value={getPreferenceValueLabel('boolean', enableSmartSearch)} />
-      <ReadOnlyFormGroup label="Update unfocused" value={getPreferenceValueLabel('boolean', updateUnfocussed)} />
-      <ReadOnlyFormGroup label="Pin search sidebar" value={getPreferenceValueLabel('boolean', searchSidebarIsPinned)} />
-      <ReadOnlyFormGroup label="Pin dashboard sidebar" value={getPreferenceValueLabel('boolean', dashboardSidebarIsPinned)} />
-      <ReadOnlyFormGroup label="Theme mode" value={getPreferenceValueLabel('enum', preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured')} />
+      <ReadOnlyFormGroup label="Search autocompletion" value={enableSmartSearch ?? false} />
+      <ReadOnlyFormGroup label="Update unfocused" value={updateUnfocussed ?? false} />
+      <ReadOnlyFormGroup label="Pin search sidebar" value={searchSidebarIsPinned ?? false} />
+      <ReadOnlyFormGroup label="Pin dashboard sidebar" value={dashboardSidebarIsPinned ?? false} />
+      <ReadOnlyFormGroup label="Theme mode" value={preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'} />
     </SectionComponent>
   );
 };

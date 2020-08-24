@@ -11,7 +11,6 @@ import User from 'logic/users/User';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import FormikFormGroup from '../form/FormikFormGroup';
-import { getPreferenceValueLabel } from '../UserDetails/PreferencesSection';
 
 const { PreferencesActions } = CombinedProvider.get('Preferences');
 
@@ -72,7 +71,7 @@ const PreferencesSection = ({ user }: Props) => {
             </Input>
 
             <ReadOnlyFormGroup label="Theme mode"
-                               value={getPreferenceValueLabel('enum', user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured')}
+                               value={user.preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'}
                                help="Can be changed by using the toggle in the user dropdown" />
 
             <Row className="no-bm">
