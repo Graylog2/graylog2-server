@@ -5,16 +5,21 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
+import type { ThemeMode } from 'theme/constants';
 
 const PreferencesActions = ActionsProvider.getActions('Preferences');
 
 export type Preference = {
   name: string,
-  value: any,
+  value: boolean | ThemeMode,
 };
 
 export type PreferencesMap = {
-  [index: string]: any,
+  dashboardSidebarIsPinned: boolean,
+  enableSmartSearch: boolean,
+  searchSidebarIsPinned: boolean,
+  themeMode: ThemeMode,
+  updateUnfocussed: boolean,
 };
 
 type PreferencesResponse = {
