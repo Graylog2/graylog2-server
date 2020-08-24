@@ -34,7 +34,8 @@ const StyledTable = styled(Table)(({ theme }) => css`
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;
-    background-color: ${theme.colors.gray[10]};
+    background-color: ${theme.colors.gray[90]};
+    color: ${theme.utils.readableColor(theme.colors.gray[90])};
     white-space: nowrap;
   }
 
