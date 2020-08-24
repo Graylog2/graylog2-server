@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
 import type { Store } from 'stores/StoreTypes';
+import type { UserOverviewJSON } from 'logic/users/UserOverview';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import { singletonStore } from 'views/logic/singleton';
@@ -10,14 +11,14 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
-import User, { type UserJSON } from 'logic/users/User';
+import User from 'logic/users/User';
 import UsersActions, { type ChangePasswordRequest, type Token, type PaginatedUsers } from 'actions/users/UsersActions';
 import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
 type PaginatedResponse = PaginatedResponseType & {
-  users: Array<UserJSON>,
+  users: Array<UserOverviewJSON>,
   context: {
-    admin_user: UserJSON,
+    admin_user: UserOverviewJSON,
   },
 };
 

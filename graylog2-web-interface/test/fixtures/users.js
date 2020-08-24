@@ -13,7 +13,7 @@ export const viewsManager: UserJSON = {
   last_activity: '2020-01-01T10:40:05.376+0000',
   permissions: ['dashboards:edit:view-id', 'view:edit:view-id'],
   grn_permissions: ['entity:own:grn::::dashboard:view-id', 'entity:own:grn::::view:view-id', 'entity:own:grn::::search:some-id'],
-  preferences: {},
+  preferences: { updateUnfocussed: false, enableSmartSearch: true },
   read_only: true,
   roles: ['Views Manager'],
   session_active: true,
@@ -31,7 +31,7 @@ export const admin: UserJSON = {
   id: 'user-id-2',
   last_activity: '2020-01-01T10:40:05.376+0000',
   permissions: ['*'],
-  preferences: {},
+  preferences: { updateUnfocussed: false, enableSmartSearch: true },
   read_only: true,
   roles: ['Admin'],
   session_active: false,
@@ -46,7 +46,7 @@ export const alice = User.builder()
   .fullName('Alice Schwarzer')
   .email('alice@example.org')
   .permissions(Immutable.List(readerPermissions('alice')))
-  .preferences({})
+  .preferences({ updateUnfocussed: false, enableSmartSearch: true })
   .roles(Immutable.List(['Reader']))
   .readOnly(false)
   .external(false)
@@ -61,7 +61,7 @@ export const bob = User.builder()
   .fullName('Bob Bobson')
   .email('bob@example.org')
   .permissions(Immutable.List(readerPermissions('bob')))
-  .preferences({})
+  .preferences({ updateUnfocussed: false, enableSmartSearch: true })
   .roles(Immutable.List(['Reader']))
   .readOnly(false)
   .external(true)

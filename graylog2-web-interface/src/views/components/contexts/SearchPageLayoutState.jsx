@@ -18,7 +18,7 @@ type Props = {
   }) => React.Node,
 };
 
-const _getPinningPreferenceKey = (viewType: ?ViewType): string => {
+const _getPinningPreferenceKey = (viewType: ?ViewType): 'dashboardSidebarIsPinned' | 'searchSidebarIsPinned' => {
   const preferenceKeyMapping = {
     [View.Type.Dashboard]: 'dashboardSidebarIsPinned',
     [View.Type.Search]: 'searchSidebarIsPinned',
@@ -52,7 +52,7 @@ const _createUserPreferencesArray = (userPreferences) => {
 };
 
 const _updateUserSidebarPinningPref = (currentUser, userPreferences, viewType, newIsPinned) => {
-  const sidebarPinningPrefKey = _getPinningPreferenceKey(viewType);
+  const sidebarPinningPrefKey: string = _getPinningPreferenceKey(viewType);
 
   // eslint-disable-next-line camelcase
   if (currentUser?.read_only) {

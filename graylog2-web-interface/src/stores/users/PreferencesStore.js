@@ -1,25 +1,25 @@
 // @flow strict
 import Reflux from 'reflux';
 
+import type { PreferencesThemeMode, ThemeMode } from 'theme/constants';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ActionsProvider from 'injection/ActionsProvider';
-import type { ThemeMode } from 'theme/constants';
 
 const PreferencesActions = ActionsProvider.getActions('Preferences');
 
 export type Preference = {
   name: string,
-  value: boolean | ThemeMode,
+  value: boolean | string,
 };
 
 export type PreferencesMap = {
-  dashboardSidebarIsPinned: boolean,
   enableSmartSearch: boolean,
-  searchSidebarIsPinned: boolean,
-  themeMode: ThemeMode,
   updateUnfocussed: boolean,
+  dashboardSidebarIsPinned?: boolean,
+  searchSidebarIsPinned?: boolean,
+  [PreferencesThemeMode]: ThemeMode,
 };
 
 type PreferencesResponse = {
