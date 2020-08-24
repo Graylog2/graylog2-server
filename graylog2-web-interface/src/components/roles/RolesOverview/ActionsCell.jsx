@@ -23,12 +23,12 @@ const ActtionsWrapper = styled.div`
 
 const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: boolean => void) => {
   let confirmMessage = `Do you really want to delete role "${roleName}?"`;
-  const getUnlimited = [1, 0, ''];
+  const pagination = [1, 1, ''];
   setDeleting(true);
 
-  AuthzRolesActions.loadUsersForRole(roleId, ...getUnlimited).then((paginatedUsers) => {
-    if (paginatedUsers && paginatedUsers.list.size >= 1) {
-      confirmMessage += ` It is still assigned to ${paginatedUsers.list.size} users.`;
+  AuthzRolesActions.loadUsersForRole(roleId, ...pagination).then((paginatedUsers) => {
+    if (paginatedUsers && paginatedUsers.pagination.total >= 1) {
+      confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
     }
 
     // eslint-disable-next-line no-alert
