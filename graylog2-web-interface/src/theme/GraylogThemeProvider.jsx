@@ -28,7 +28,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
   const [theme, setTheme] = useState();
   const [userPreferences, setUserPreferences] = useState();
   const [themeColors, setThemeColors] = useState();
-  const [mode, setMode] = useState();
+  const [mode, setMode] = useState('');
 
   const currentUser = useStore(CurrentUserStore, (userStore) => {
     setUserPreferences(userStore?.currentUser?.preferences);
@@ -42,7 +42,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
   };
 
   const handleModeChange = (nextMode) => Promise.resolve().then(() => {
-    if (nextMode && colors[nextMode]) {
+    if (colors[nextMode]) {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
 
       setUserPreferences(nextPreferences);
