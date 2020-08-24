@@ -41,7 +41,7 @@ const StyledTable = styled(Table)(({ theme }) => css`
   
   > tbody td {
     background-color: ${theme.colors.global.contentBackground};
-    color: ${theme.utils.readableColor(theme.colors.global.contentBackground)};
+    color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
   }
 
   tr {
