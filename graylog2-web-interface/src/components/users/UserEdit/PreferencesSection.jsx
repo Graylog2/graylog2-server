@@ -23,7 +23,6 @@ const PreferencesSection = ({ user }: Props) => {
 
   return (
     <SectionComponent title="Preferences">
-
       <Formik onSubmit={onSubmit}
               initialValues={user.preferences}>
         {({ isSubmitting, isValid }) => (
