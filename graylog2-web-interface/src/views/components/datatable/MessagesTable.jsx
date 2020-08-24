@@ -38,6 +38,11 @@ const StyledTable = styled(Table)(({ theme }) => css`
     color: ${theme.utils.readableColor(theme.colors.gray[90])};
     white-space: nowrap;
   }
+  
+  > tbody td {
+    background-color: ${theme.colors.global.contentBackground};
+    color: ${theme.utils.readableColor(theme.colors.global.contentBackground)};
+  }
 
   tr {
     border: 0 !important;
