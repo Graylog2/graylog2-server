@@ -89,14 +89,8 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
 `);
 
 const ThemeModeToggle = ({ theme }: Props) => {
-  const [currentMode, setCurrentMode] = useState(theme.mode);
+  const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
-
-  useEffect(() => {
-    if (currentMode !== theme.mode) {
-      theme.changeMode(currentMode);
-    }
-  }, [currentMode]);
 
   useEffect(() => {
     if (loadingTheme) {
@@ -104,9 +98,9 @@ const ThemeModeToggle = ({ theme }: Props) => {
     }
   }, [theme]);
 
-  const debouncedThemeMode = debounce((checked) => {
-    setCurrentMode(checked ? THEME_MODE_DARK : THEME_MODE_LIGHT);
-  }, 500);
+  const debouncedThemeMode = (checked) => {
+    theme.changeMode(checked ? THEME_MODE_DARK : THEME_MODE_LIGHT);
+  };
 
   const toggleThemeMode = (event) => {
     event.persist();
