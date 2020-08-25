@@ -1,19 +1,18 @@
 // @flow strict
 import Reflux from 'reflux';
+import * as Immutable from 'immutable';
 
-// import * as Immutable from 'immutable';
+import SharedEntity from 'logic/permissions/SharedEntity';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import permissionsMock from 'logic/permissions/mocked';
-import EntityShareActions, { type EntitySharePayload, type PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
 import EntityShareState, { type EntityShareStateJson } from 'logic/permissions/EntityShareState';
+import EntityShareActions, { type EntitySharePayload, type PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
 import { singletonStore } from 'views/logic/singleton';
-import { type AdditionalQueries } from 'util/PaginationURL';
 import type { Store } from 'stores/StoreTypes';
 import type { GRN } from 'logic/permissions/types';
-// import type { GRN, SharedEntityType, UserSharedEntities } from 'logic/permissions/types';
-// import PaginationURL, { type AdditionalQueries } from 'util/PaginationURL';
+import PaginationURL, { type AdditionalQueries } from 'util/PaginationURL';
 
 const DEFAULT_PREPARE_PAYLOAD = {};
 
@@ -52,35 +51,35 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    searchPaginatedUserShares(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
-      // const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
-      // const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUserSharesResponse) => {
-      //   return {
-      //     list: Immutable.List(response.entities.map((se) => SharedEntity.fromJSON(se))),
-      //     context: {
-      //       userCapabilities: response.context.user_capabilities,
-      //     },
-      //     pagination: {
-      //       count: response.count,
-      //       total: response.total,
-      //       page: response.page,
-      //       perPage: response.per_page,
-      //       query: response.query,
-      //     },
-      //   };
-      // });
+    loadUserSharesPaginated(username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+      const url = PaginationURL(ApiRoutes.EntityShareController.userSharesPaginated(username).url, page, perPage, query, additionalQueries);
+      const promise = fetch('GET', qualifyUrl(url)).then((response) => {
+        return {
+          list: Immutable.List(response.entities.map((se) => SharedEntity.fromJSON(se))),
+          context: {
+            granteeCapabilities: response.context.grantee_capabilities,
+          },
+          pagination: {
+            additionalQueries: response.additional_queries,
+            count: response.count,
+            total: response.total,
+            page: response.page,
+            perPage: response.per_page,
+            query: response.query,
+          },
+        };
+      });
 
-      const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
-      EntityShareActions.searchPaginatedUserShares.promise(promise);
+      EntityShareActions.loadUserSharesPaginated.promise(promise);
 
       return promise;
     },
 
-    searchPaginatedTeamShares(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
-      // Todo implmenet same code like for searchPaginatedUserShares, but with EntityShareController.teamSharesPaginated
+    loadTeamSharesPaginated(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+      // Todo implement same code like for loadUserSharesPaginated, but with EntityShareController.teamSharesPaginated
 
       const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);
-      EntityShareActions.searchPaginatedTeamShares.promise(promise);
+      EntityShareActions.loadTeamSharesPaginated.promise(promise);
 
       return promise;
     },

@@ -16,7 +16,7 @@ describe('SeriesConfiguration', () => {
   it('renders the configuration dialog', () => {
     const wrapper = mount(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('renders an input to change the series name', () => {

@@ -12,7 +12,7 @@ import { UsersActions } from 'stores/users/UsersStore';
 import UsersOverview from './UsersOverview';
 
 const mockUsers = Immutable.List([alice, bob, adminOverview]);
-const searchPaginatedResponse = {
+const loadUsersPaginatedResponse = {
   list: mockUsers,
   pagination: {
     page: 1,
@@ -21,21 +21,21 @@ const searchPaginatedResponse = {
   },
   adminUser: undefined,
 };
-const mockSearchPaginatedPromise = Promise.resolve(searchPaginatedResponse);
+const mockloadUsersPaginatedPromise = Promise.resolve(loadUsersPaginatedResponse);
 
 jest.mock('stores/users/UsersStore', () => ({
   UsersStore: {
     listen: jest.fn(),
   },
   UsersActions: {
-    searchPaginated: jest.fn(() => mockSearchPaginatedPromise),
-    deleteUser: jest.fn(),
+    loadUsersPaginated: jest.fn(() => mockloadUsersPaginatedPromise),
+    delete: jest.fn(),
   },
 }));
 
 describe('UsersOverview', () => {
   beforeEach(() => {
-    UsersActions.deleteUser.completed = { listen: jest.fn(() => jest.fn()) };
+    UsersActions.delete.completed = { listen: jest.fn(() => jest.fn()) };
   });
 
   describe('should display table header', () => {
@@ -61,7 +61,7 @@ describe('UsersOverview', () => {
       const { queryByText } = render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
 
-      await act(() => mockSearchPaginatedPromise);
+      await act(() => mockloadUsersPaginatedPromise);
 
       attributes.forEach(async (attribute) => {
         if (user[attribute]) {
@@ -101,28 +101,28 @@ describe('UsersOverview', () => {
     });
 
     it('be able to delete a modifiable user', async () => {
-      const searchPaginatedPromise = Promise.resolve({ ...searchPaginatedResponse, list: modifiableUsersList });
-      asMock(UsersActions.searchPaginated).mockReturnValueOnce(searchPaginatedPromise);
+      const loadUsersPaginatedPromise = Promise.resolve({ ...loadUsersPaginatedResponse, list: modifiableUsersList });
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
       const { getByTitle } = render(<UsersOverviewAsAdmin />);
-      await act(() => searchPaginatedPromise);
+      await act(() => loadUsersPaginatedPromise);
 
       fireEvent.click(getByTitle(`Delete user ${modifiableUser.username}`));
 
       expect(window.confirm).toHaveBeenCalledTimes(1);
       expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.username}?`);
-      expect(UsersActions.deleteUser).toHaveBeenCalledTimes(1);
-      expect(UsersActions.deleteUser).toHaveBeenCalledWith(alice.username);
+      expect(UsersActions.delete).toHaveBeenCalledTimes(1);
+      expect(UsersActions.delete).toHaveBeenCalledWith(alice.username);
     });
 
     it('not be able to delete a "read only" user', async () => {
-      asMock(UsersActions.searchPaginated).mockReturnValueOnce(Promise.resolve({ ...searchPaginatedResponse, list: readOnlyUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: readOnlyUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => expect(queryByTitle(`Delete user ${readOnlyUser.username}`)).toBeNull());
     });
 
     it('see edit and edit tokens link for a modifiable user ', async () => {
-      asMock(UsersActions.searchPaginated).mockReturnValueOnce(Promise.resolve({ ...searchPaginatedResponse, list: modifiableUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: modifiableUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => {
@@ -132,14 +132,14 @@ describe('UsersOverview', () => {
     });
 
     it('not see edit link for a "read only" user', async () => {
-      asMock(UsersActions.searchPaginated).mockReturnValueOnce(Promise.resolve({ ...searchPaginatedResponse, list: readOnlyUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: readOnlyUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => expect(queryByTitle(`Edit user ${readOnlyUser.username}`)).toBeNull());
     });
 
     it('see edit tokens link for a "read only" user', async () => {
-      asMock(UsersActions.searchPaginated).mockReturnValueOnce(Promise.resolve({ ...searchPaginatedResponse, list: readOnlyUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: readOnlyUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => expect(queryByTitle(`Edit tokens for user ${readOnlyUser.username}`)).toBeNull());

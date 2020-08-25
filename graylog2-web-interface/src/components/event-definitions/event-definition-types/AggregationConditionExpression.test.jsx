@@ -64,7 +64,6 @@ describe('AggregationConditionExpression', () => {
       );
 
       expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
-      expect(wrapper).toMatchSnapshot();
     });
 
     it('should render simple comparison expression', () => {
@@ -78,7 +77,6 @@ describe('AggregationConditionExpression', () => {
       );
 
       expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
-      expect(wrapper).toMatchSnapshot();
     });
 
     it('should render a boolean expression', () => {
@@ -93,7 +91,6 @@ describe('AggregationConditionExpression', () => {
       );
 
       expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
-      expect(wrapper).toMatchSnapshot();
     });
 
     it('should render a group expression with a comparison expression', () => {
@@ -108,7 +105,6 @@ describe('AggregationConditionExpression', () => {
       );
 
       expect(wrapper.find('BooleanOperatorSelector').length).toBe(1);
-      expect(wrapper).toMatchSnapshot();
     });
 
     it('should render a group expression with a boolean expression', () => {
@@ -123,7 +119,6 @@ describe('AggregationConditionExpression', () => {
       );
 
       expect(wrapper.find('BooleanOperatorSelector').length).toBe(2);
-      expect(wrapper).toMatchSnapshot();
     });
   });
 

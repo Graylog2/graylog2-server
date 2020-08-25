@@ -15,7 +15,7 @@ describe('<ContentPackParameters />', () => {
     };
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render a parameter', () => {
@@ -49,6 +49,6 @@ describe('<ContentPackParameters />', () => {
       .build();
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 });

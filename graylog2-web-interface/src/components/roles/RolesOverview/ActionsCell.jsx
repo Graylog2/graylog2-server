@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import UserNotification from 'util/UserNotification';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import Routes from 'routing/Routes';
 import Role from 'logic/roles/Role';
 import { Button } from 'components/graylog';
-import { IfPermitted } from 'components/common';
+import { IfPermitted, Spinner } from 'components/common';
 
 type Props = {
   readOnly: $PropertyType<Role, 'readOnly'>,
@@ -21,29 +21,29 @@ const ActtionsWrapper = styled.div`
   justify-content: flex-end;
 `;
 
-const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
-  const _deleteRole = () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to delete role ${roleName}?`)) {
-      AuthzRolesActions.deleteRole(roleId).then(() => {
-        UserNotification.success(`Role "${roleName}" was deleted successfully`);
-      }, () => {
-        UserNotification.error(`There was an error deleting the role "${roleName}"`);
-      });
+const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: boolean => void) => {
+  let confirmMessage = `Do you really want to delete role "${roleName}?"`;
+  const getOneUser = [1, 1, ''];
+  setDeleting(true);
 
-      // AuthzRolesActions.getMembers(roleName).then((membership) => {
-      //   if (membership.users.length !== 0) {
-      //     UserNotification.error(`Cannot delete role ${roleName}. It is still assigned to ${membership.users.length} users.`);
-      //   } else {
-      //     AuthzRolesActions.deleteRole(roleId).then(() => {
-      //       UserNotification.success(`Role "${roleName}" was deleted successfully`);
-      //     }, () => {
-      //       UserNotification.error(`There was an error deleting the role "${roleName}"`);
-      //     });
-      //   }
-      // });
+  AuthzRolesActions.loadUsersForRole(roleId, ...getOneUser).then((paginatedUsers) => {
+    if (paginatedUsers && paginatedUsers.pagination.total >= 1) {
+      confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
     }
-  };
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm(confirmMessage)) {
+      AuthzRolesActions.delete(roleId).then(() => {
+        setDeleting(false);
+      });
+    } else {
+      setDeleting(false);
+    }
+  });
+};
+
+const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
+  const [deleting, setDeleting] = useState(false);
 
   return (
     <td>
@@ -58,8 +58,8 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
         {!readOnly && (
           <IfPermitted permissions={[`roles:delete:${roleName}`]}>
             &nbsp;
-            <Button id={`delete-role-${roleId}`} bsStyle="danger" bsSize="xs" title={`Delete role ${roleName}`} onClick={_deleteRole} type="button">
-              Delete
+            <Button id={`delete-role-${roleId}`} bsStyle="danger" bsSize="xs" title={`Delete role ${roleName}`} onClick={() => _deleteRole(roleId, roleName, setDeleting)} type="button">
+              {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
             </Button>
           </IfPermitted>
         )}

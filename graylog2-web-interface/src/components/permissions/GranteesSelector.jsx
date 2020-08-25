@@ -23,6 +23,7 @@ type Props = {
   availableGrantees: GranteesList,
   availableCapabilities: CapabilitiesList,
   className?: string,
+  granteesSelectRef: ?Select,
   onSubmit: SelectionRequest => Promise<EntityShareState>,
 };
 
@@ -90,13 +91,17 @@ const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, gra
   </GranteesSelectOption>
 );
 
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, granteesSelectRef }: Props) => {
   const granteesOptions = _granteesOptions(availableGrantees);
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
+  const _handelSubmit = (data, resetForm) => {
+    onSubmit(data).then(() => { resetForm(); });
+  };
+
   return (
     <div className={className}>
-      <Formik onSubmit={(data) => onSubmit(data)}
+      <Formik onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
               initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
@@ -108,6 +113,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
                                     onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                     optionRenderer={_renderGranteesSelectOption}
                                     options={granteesOptions}
+                                    ref={granteesSelectRef}
                                     placeholder="Search for users and teams"
                                     value={value} />
                   )}

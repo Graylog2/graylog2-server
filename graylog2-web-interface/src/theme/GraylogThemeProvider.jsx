@@ -14,7 +14,7 @@ import aceEditorStyles from 'components/graylog/styles/aceEditorStyles';
 import StoreProvider from 'injection/StoreProvider';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE, THEME_MODE_DARK, THEME_MODE_LIGHT } from './constants';
+import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
 
 type Props = {
   children: React.Node,
@@ -38,14 +38,10 @@ const GraylogThemeProvider = ({ children }: Props) => {
 
   const currentUserThemeMode = () => {
     // eslint-disable-next-line camelcase
-    if (currentUser?.read_only) {
-      return Store.get(PREFERENCES_THEME_MODE);
-    }
-
-    return userPreferences && userPreferences[PREFERENCES_THEME_MODE];
+    return currentUser?.read_only ? Store.get(PREFERENCES_THEME_MODE) : (userPreferences && userPreferences[PREFERENCES_THEME_MODE]);
   };
 
-  const handleModeChange = (nextMode) => {
+  const handleModeChange = (nextMode) => Promise.resolve().then(() => {
     if (colors[nextMode]) {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
 
@@ -57,16 +53,20 @@ const GraylogThemeProvider = ({ children }: Props) => {
       } else {
         PreferencesStore.saveUserPreferences(currentUser.username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
       }
+
+      return { [PREFERENCES_THEME_MODE]: nextMode };
     }
-  };
+
+    return null;
+  });
 
   useEffect(() => {
     const hasCurrentThemeMode = currentUserThemeMode();
 
     if (hasCurrentThemeMode) {
       setMode(hasCurrentThemeMode);
-    } else if (colorScheme) {
-      setMode(colorScheme === 'light' ? THEME_MODE_LIGHT : THEME_MODE_DARK);
+    } else if (colorScheme !== mode) {
+      setMode(colorScheme);
     } else {
       setMode(DEFAULT_THEME_MODE);
     }
@@ -79,7 +79,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
   }, [mode]);
 
   useEffect(() => {
-    if (mode && themeColors) {
+    if (themeColors) {
       const formattedUtils = {
         ...utils,
         colorLevel: utils.colorLevel(themeColors),

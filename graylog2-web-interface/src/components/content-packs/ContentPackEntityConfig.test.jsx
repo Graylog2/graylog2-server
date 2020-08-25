@@ -18,6 +18,6 @@ describe('<ContentPackEntityConfig />', () => {
                                                    appliedParameter={appliedParameter}
                                                    parameters={parameter} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 });

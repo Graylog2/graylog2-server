@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class DBGrantService extends PaginatedDbService<GrantDTO> {
     public static final String COLLECTION_NAME = "grants";
@@ -112,8 +113,7 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public GrantDTO create(GrantDTO grantDTO, String creatorUsername) {
-        checkArgument(creatorUsername != null && !creatorUsername.trim().isEmpty(), "creatorUsername cannot be empty");
-
+        checkArgument(isNotBlank(creatorUsername), "creatorUsername cannot be null or empty");
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
         return super.save(grantDTO.toBuilder()

@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.security.Capability;
 import org.graylog.security.entities.EntityDescriptor;
+import org.graylog2.plugin.rest.ValidationResult;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -55,6 +56,9 @@ public abstract class EntityShareResponse {
     @JsonProperty("missing_permissions_on_dependencies")
     public abstract ImmutableMap<GRN, Collection<EntityDescriptor>> missingPermissionsOnDependencies();
 
+    @JsonProperty("validation_result")
+    public abstract ValidationResult validationResult();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -66,7 +70,8 @@ public abstract class EntityShareResponse {
             return new AutoValue_EntityShareResponse.Builder()
                     .activeShares(Collections.emptySet())
                     .selectedGranteeCapabilities(Collections.emptyMap())
-                    .missingPermissionsOnDependencies(Collections.emptyMap());
+                    .missingPermissionsOnDependencies(Collections.emptyMap())
+                    .validationResult(new ValidationResult());
         }
 
         @JsonProperty("entity")
@@ -89,6 +94,9 @@ public abstract class EntityShareResponse {
 
         @JsonProperty("missing_permissions_on_dependencies")
         public abstract Builder missingPermissionsOnDependencies(Map<GRN, Collection<EntityDescriptor>> missingDependencies);
+
+        @JsonProperty("validation_result")
+        public abstract Builder validationResult(ValidationResult validationResult);
 
         public abstract EntityShareResponse build();
     }

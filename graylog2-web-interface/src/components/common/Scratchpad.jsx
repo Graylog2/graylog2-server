@@ -67,10 +67,6 @@ const SavingMessage = styled.span(({ theme, visible }) => css`
   transition: opacity 150ms ease-in-out;
 `);
 
-const StyledTooltip = styled(Tooltip)`
-  transform: translateY(-45px);
-`;
-
 const Scratchpad = () => {
   let clipboard;
   const textareaRef = useRef();
@@ -192,11 +188,11 @@ const Scratchpad = () => {
           <OverlayTrigger placement="right"
                           trigger={['hover', 'focus']}
                           overlay={(
-                            <StyledTooltip id="scratchpad-help">
+                            <Tooltip id="scratchpad-help">
                               You can use this space to store personal notes and other information while interacting with
                               Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP
                               addresses you need in various investigations.
-                            </StyledTooltip>
+                            </Tooltip>
                           )}>
             <Button bsStyle="link">
               <Icon name="question-circle" />

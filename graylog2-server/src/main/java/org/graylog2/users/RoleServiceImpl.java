@@ -67,7 +67,7 @@ public class RoleServiceImpl implements RoleService {
     private final String readerRoleObjectId;
 
     @Inject
-    protected RoleServiceImpl(MongoConnection mongoConnection,
+    public RoleServiceImpl(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
                               Permissions permissions,
                               Validator validator) {
@@ -154,7 +154,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Set<Role> loadAll() throws NotFoundException {
+    public Set<Role> loadAll() {
         try (DBCursor<RoleImpl> rolesCursor = dbCollection.find()) {
             return ImmutableSet.copyOf((Iterable<? extends Role>) rolesCursor);
         }

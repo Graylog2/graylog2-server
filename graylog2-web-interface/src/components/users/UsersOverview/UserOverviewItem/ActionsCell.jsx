@@ -54,7 +54,7 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
   const _deleteUser = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${username}?`)) {
-      UsersActions.deleteUser(username);
+      UsersActions.delete(username);
     }
   };
 

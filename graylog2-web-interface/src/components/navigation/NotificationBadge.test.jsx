@@ -41,7 +41,7 @@ describe('NotificationBadge', () => {
   it('renders count when there are notifications', () => {
     const wrapper = mount(<NotificationBadge total={42} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.find('#notification-badge')).toExist();
   });
 
   it('updates notification count when triggered by store', () => {

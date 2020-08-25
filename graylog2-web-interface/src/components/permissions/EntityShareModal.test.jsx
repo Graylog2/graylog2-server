@@ -118,6 +118,17 @@ describe('EntityShareModal', () => {
   });
 
   describe('grantee selector', () => {
+    let oldConfirm;
+
+    beforeEach(() => {
+      oldConfirm = window.confirm;
+      window.confirm = jest.fn(() => true);
+    });
+
+    afterEach(() => {
+      window.confirm = oldConfirm;
+    });
+
     describe('adds new selected grantee', () => {
       const addGrantee = async ({ newGrantee, capability }) => {
         const { getByText, getByLabelText } = render(<SimpleEntityShareModal />);
@@ -164,6 +175,26 @@ describe('EntityShareModal', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => expect(getByText('The grantee is required.')).not.toBeNull());
+    });
+
+    it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
+      const { getByText, getByLabelText } = render(<SimpleEntityShareModal />);
+
+      // Select a grantee
+      const granteesSelect = getByLabelText('Search for users and teams');
+
+      await selectEvent.openMenu(granteesSelect);
+
+      await selectEvent.select(granteesSelect, john.title);
+
+      const submitButton = getByText('Save');
+
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalledTimes(1);
+        expect(window.confirm).toHaveBeenCalledWith(`"${john.title}" got selected but was never added as a collaborator. Do you want to continue anyway?`);
+      });
     });
   });
 

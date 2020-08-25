@@ -1,7 +1,18 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
-import type { UserJSON } from 'logic/users/User';
+export type UserOverviewJSON = {
+  id: string,
+  username: string,
+  full_name: string,
+  email: string,
+  external_user: ?boolean,
+  roles: Array<string>,
+  read_only: ?boolean,
+  session_active: ?boolean,
+  client_address: string,
+  last_activity: ?string,
+};
 
 type InternalState = {
   id: string,
@@ -148,7 +159,7 @@ export default class UserOverview {
     );
   }
 
-  toJSON(): UserJSON {
+  toJSON(): UserOverviewJSON {
     const {
       id,
       username,
@@ -167,21 +178,16 @@ export default class UserOverview {
       username,
       full_name: fullName,
       email,
-      permissions: [],
-      timezone: '',
-      preferences: undefined,
       roles: roles.toArray(),
       read_only: readOnly,
-      external,
-      session_timeout_ms: 0,
-      startpage: undefined,
+      external_user: external,
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
     };
   }
 
-  static fromJSON(value: UserJSON) {
+  static fromJSON(value: UserOverviewJSON) {
     const {
       id,
       username,
@@ -189,7 +195,7 @@ export default class UserOverview {
       email,
       roles,
       read_only: readOnly,
-      external,
+      external_user: external,
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
@@ -201,9 +207,9 @@ export default class UserOverview {
       fullName,
       email,
       Immutable.List(roles),
-      readOnly,
-      external,
-      sessionActive,
+      readOnly ?? false,
+      external ?? false,
+      sessionActive ?? false,
       clientAddress,
       lastActivity,
     );

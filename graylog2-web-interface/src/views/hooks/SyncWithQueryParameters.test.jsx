@@ -3,6 +3,7 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
+import mockAction from 'helpers/mocking/MockAction';
 
 import history from 'util/History';
 import { ViewStore } from 'views/stores/ViewStore';
@@ -16,11 +17,8 @@ import { syncWithQueryParameters, useSyncWithQueryParameters } from './SyncWithQ
 
 jest.mock('views/actions/QueriesActions', () => ({
   QueriesActions: {
-    update: {
-      completed: {
-        listen: jest.fn(() => () => {}),
-      },
-    },
+    update: mockAction(),
+    query: mockAction(),
   },
 }));
 
@@ -157,6 +155,7 @@ describe('SyncWithQueryParameters', () => {
       render(<TestComponent />);
 
       expect(QueriesActions.update.completed.listen).toHaveBeenCalled();
+      expect(QueriesActions.query.completed.listen).toHaveBeenCalled();
     });
   });
 });

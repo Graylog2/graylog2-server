@@ -61,7 +61,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
   const [options, setOptions] = useState([]);
   const getUnlimited = [1, 0, ''];
 
-  const _loadUsers = () => UsersActions.searchPaginated(...getUnlimited)
+  const _loadUsers = () => UsersActions.loadUsersPaginated(...getUnlimited)
     .then(({ list }) => {
       if (list) {
         const resultUsers = list

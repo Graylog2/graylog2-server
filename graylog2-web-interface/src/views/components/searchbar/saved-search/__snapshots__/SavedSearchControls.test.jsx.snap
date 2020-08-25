@@ -1,118 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SavedSearchControls render the SavedSearchControls should render dirty 1`] = `
-<button
-  className="Button-c9cbmb-0 bNulii btn btn-default"
-  disabled={false}
-  onClick={[Function]}
-  title="Unsaved changes"
-  type="button"
+exports[`SavedSearchControls Button handling has "Share search" option which should be hidden if search is unsaved 1`] = `
+<MenuItem
+  bsClass="dropdown"
+  disabled={true}
+  divider={false}
+  header={false}
+  onSelect={[Function]}
+  title="Share search"
 >
-  <Icon
-    name="star"
-    style={
-      Object {
-        "color": "#ffd200",
-      }
-    }
-    type="solid"
+  <li
+    className="disabled"
+    role="presentation"
   >
-    <FontAwesomeIcon
-      icon={
-        Object {
-          "iconName": "star",
-          "prefix": "fas",
-        }
-      }
-      style={
-        Object {
-          "color": "#ffd200",
-        }
-      }
+    <SafeAnchor
+      componentClass="a"
+      onClick={[Function]}
+      role="menuitem"
+      tabIndex="-1"
+      title="Share search"
     >
-      <svg
-        className="svg-inline--fa fa-star"
-      />
-    </FontAwesomeIcon>
-  </Icon>
-   Save
-</button>
-`;
-
-exports[`SavedSearchControls render the SavedSearchControls should render not dirty 1`] = `
-<button
-  className="Button-c9cbmb-0 bNulii btn btn-default"
-  disabled={false}
-  onClick={[Function]}
-  title="Saved search"
-  type="button"
->
-  <Icon
-    name="star"
-    style={
-      Object {
-        "color": "#0063be",
-      }
-    }
-    type="solid"
-  >
-    <FontAwesomeIcon
-      icon={
-        Object {
-          "iconName": "star",
-          "prefix": "fas",
-        }
-      }
-      style={
-        Object {
-          "color": "#0063be",
-        }
-      }
-    >
-      <svg
-        className="svg-inline--fa fa-star"
-      />
-    </FontAwesomeIcon>
-  </Icon>
-   Save
-</button>
-`;
-
-exports[`SavedSearchControls render the SavedSearchControls should render not dirty with unsaved view 1`] = `
-<button
-  className="Button-c9cbmb-0 bNulii btn btn-default"
-  disabled={false}
-  onClick={[Function]}
-  title="Save search"
-  type="button"
->
-  <Icon
-    name="star"
-    style={
-      Object {
-        "color": "",
-      }
-    }
-    type="regular"
-  >
-    <FontAwesomeIcon
-      icon={
-        Object {
-          "iconName": "star",
-          "prefix": "far",
-        }
-      }
-      style={
-        Object {
-          "color": "",
-        }
-      }
-    >
-      <svg
-        className="svg-inline--fa fa-star"
-      />
-    </FontAwesomeIcon>
-  </Icon>
-   Save
-</button>
+      <a
+        href="#"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        role="menuitem"
+        tabIndex="-1"
+        title="Share search"
+      >
+        <Icon
+          name="share-alt"
+          type="solid"
+        >
+          <FontAwesomeIcon
+            icon={
+              Object {
+                "iconName": "share-alt",
+                "prefix": "fas",
+              }
+            }
+          >
+            <svg
+              className="svg-inline--fa fa-share-alt"
+            />
+          </FontAwesomeIcon>
+        </Icon>
+         Share
+      </a>
+    </SafeAnchor>
+  </li>
+</MenuItem>
 `;

@@ -6,11 +6,12 @@ import User from 'logic/users/User';
 import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
 import SectionGrid from 'components/common/Section/SectionGrid';
 
-import SettingsSection from './SettingsSection';
+import PreferencesSection from './PreferencesSection';
 import ProfileSection from './ProfileSection';
 import RolesSection from './RolesSection';
-import TeamsSection from './TeamSection';
+import SettingsSection from './SettingsSection';
 import SharedEntitiesSection from './SharedEntitiesSection';
+import TeamsSection from './TeamsSection';
 
 type Props = {
   paginatedUserShares: ?PaginatedEnititySharesType,
@@ -31,6 +32,7 @@ const UserDetails = ({ user, paginatedUserShares }: Props) => {
             <IfPermitted permissions="*">
               <SettingsSection user={user} />
             </IfPermitted>
+            <PreferencesSection user={user} />
           </div>
           <div>
             <IfPermitted permissions={`users:rolesedit:${user.username}`}>

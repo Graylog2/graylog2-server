@@ -32,8 +32,8 @@ const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), paginati
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
-    loadForUser: jest.fn(() => mockAuthzRolesPromise),
-    loadPaginated: jest.fn(() => mockAuthzRolesPromise),
+    loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
+    loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
   },
 }));
 

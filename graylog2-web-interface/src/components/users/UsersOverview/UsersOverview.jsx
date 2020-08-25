@@ -72,7 +72,7 @@ const UsersOverview = () => {
   const _userOverviewItem = (user) => <UserOverviewItem user={user} isActive={_isActiveItem(user)} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return UsersActions.searchPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
+    return UsersActions.loadUsersPaginated(newPage, newPerPage, newQuery).then(setPaginatedUsers);
   };
 
   const _handleSearch = (newQuery) => _loadUsers(DEFAULT_PAGINATION.page, undefined, newQuery);
@@ -80,7 +80,7 @@ const UsersOverview = () => {
   useEffect(() => {
     _loadUsers(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query);
 
-    const unlistenDeleteUser = UsersActions.deleteUser.completed.listen(() => {
+    const unlistenDeleteUser = UsersActions.delete.completed.listen(() => {
       _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
     });
 
