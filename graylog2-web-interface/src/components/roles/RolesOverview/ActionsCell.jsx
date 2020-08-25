@@ -23,10 +23,10 @@ const ActtionsWrapper = styled.div`
 
 const _deleteRole = (roleId: $PropertyType<Role, 'id'>, roleName: $PropertyType<Role, 'name'>, setDeleting: boolean => void) => {
   let confirmMessage = `Do you really want to delete role "${roleName}?"`;
-  const pagination = [1, 1, ''];
+  const getOneUser = [1, 1, ''];
   setDeleting(true);
 
-  AuthzRolesActions.loadUsersForRole(roleId, ...pagination).then((paginatedUsers) => {
+  AuthzRolesActions.loadUsersForRole(roleId, ...getOneUser).then((paginatedUsers) => {
     if (paginatedUsers && paginatedUsers.pagination.total >= 1) {
       confirmMessage += `\n\nIt is still assigned to ${paginatedUsers.pagination.total} users.`;
     }
