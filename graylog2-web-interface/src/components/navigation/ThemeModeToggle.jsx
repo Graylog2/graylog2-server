@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css, withTheme, type StyledComponent } from 'styled-components';
+import { defer } from 'lodash';
 
 import { Icon } from 'components/common';
 import { themePropTypes, type ThemeInterface } from 'theme';
@@ -102,7 +103,7 @@ const ThemeModeToggle = ({ theme }: Props) => {
     event.persist();
     setLoadingTheme(true);
     const newMode = checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
-    theme.changeMode(newMode);
+    defer(() => theme.changeMode(newMode));
   };
 
   const loadingLightMode = currentMode === THEME_MODE_DARK && loadingTheme;
