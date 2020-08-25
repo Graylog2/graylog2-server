@@ -26,9 +26,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharing;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -64,7 +61,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -84,18 +80,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
-    private final ViewSharingService viewSharingService;
-    private final IsViewSharedForUser isViewSharedForUser;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         ViewSharingService viewSharingService,
-                         IsViewSharedForUser isViewSharedForUser,
                          ClusterEventBus clusterEventBus) {
         this.dbService = dbService;
-        this.viewSharingService = viewSharingService;
-        this.isViewSharedForUser = isViewSharedForUser;
         this.clusterEventBus = clusterEventBus;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -119,13 +109,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
                     searchQuery,
-                    view -> {
-                        final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
-
-                        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
-                                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))
-                                || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
-                    },
+                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
+                            || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id())),
                     order,
                     sortField,
                     page,
@@ -148,11 +133,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                     .orElseThrow(() -> new NotFoundException("Default view doesn't exist"));
         }
 
-        final Optional<ViewSharing> viewSharing = viewSharingService.forView(id);
         final ViewDTO view = loadView(id);
         if (isPermitted(ViewsRestPermissions.VIEW_READ, id)
-                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))
-                || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false)) {
+                || (view.type().equals(ViewDTO.Type.DASHBOARD) && isPermitted(RestPermissions.DASHBOARDS_READ, view.id()))) {
             return view;
         }
 

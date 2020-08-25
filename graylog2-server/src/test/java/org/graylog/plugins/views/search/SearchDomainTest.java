@@ -84,7 +84,7 @@ public class SearchDomainTest {
         final User user = user("someone");
         final Search search = mockSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(true);
+        when(viewPermissions.isSearchPermitted(eq(search.id()), any())).thenReturn(true);
 
         final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
 
@@ -96,7 +96,7 @@ public class SearchDomainTest {
         final User user = user("someone");
         final Search search = mockSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(false);
+        when(viewPermissions.isSearchPermitted(eq(search.id()), any())).thenReturn(false);
 
         assertThatExceptionOfType(PermissionException.class)
                 .isThrownBy(() -> sut.getForUser(search.id(), user, id -> true));
@@ -121,7 +121,7 @@ public class SearchDomainTest {
         final Search permittedSearch = mockSearchWithOwner("someone else");
         mockSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), eq(user), any())).thenReturn(true);
+        when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), any())).thenReturn(true);
 
         List<Search> result = sut.getAllForUser(user, id -> true);
 

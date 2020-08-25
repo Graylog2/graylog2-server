@@ -57,11 +57,7 @@ public class SearchDomain {
     }
 
     private boolean hasReadPermissionFor(User user, Predicate<ViewDTO> viewReadPermission, Search search) {
-        return isOwned(search, user) || hasPermissionFromViews(search, user, viewReadPermission);
-    }
-
-    private boolean hasPermissionFromViews(Search search, User user, Predicate<ViewDTO> hasViewReadPermission) {
-        return viewPermissions.isSearchPermitted(search.id(), user, hasViewReadPermission);
+        return isOwned(search, user) || viewPermissions.isSearchPermitted(search.id(), viewReadPermission);
     }
 
     private boolean isOwned(Search search, User user) {
