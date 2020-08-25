@@ -32,7 +32,7 @@ export type ActionsType = {
   prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: ?EntitySharePayload) => Promise<?EntityShareState>,
   update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<?EntityShareState>,
   loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
-  loadTeamSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
+  loadTeamSharesPaginated: (teamId: string, teamName: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
 };
 
 type EntityShareActionsType = RefluxActions<ActionsType>;
