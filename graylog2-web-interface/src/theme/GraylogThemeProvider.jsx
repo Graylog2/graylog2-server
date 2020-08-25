@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
@@ -25,7 +25,6 @@ const PreferencesStore = StoreProvider.getStore('Preferences');
 
 const GraylogThemeProvider = ({ children }: Props) => {
   const colorScheme = usePrefersColorScheme();
-  const [theme, setTheme] = useState();
   const [userPreferences, setUserPreferences] = useState();
   const [mode, setMode] = useState(colorScheme);
 
@@ -39,25 +38,6 @@ const GraylogThemeProvider = ({ children }: Props) => {
     // eslint-disable-next-line camelcase
     return currentUser?.read_only ? Store.get(PREFERENCES_THEME_MODE) : (userPreferences && userPreferences[PREFERENCES_THEME_MODE]);
   };
-
-  const handleModeChange = (nextMode) => Promise.resolve().then(() => {
-    if (colors[nextMode]) {
-      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
-
-      setUserPreferences(nextPreferences);
-
-      // eslint-disable-next-line camelcase
-      if (currentUser?.read_only) {
-        Store.set(PREFERENCES_THEME_MODE, nextMode);
-      } else {
-        PreferencesStore.saveUserPreferences(currentUser.username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
-      }
-
-      return { [PREFERENCES_THEME_MODE]: nextMode };
-    }
-
-    return null;
-  });
 
   useEffect(() => {
     const hasCurrentThemeMode = currentUserThemeMode();
@@ -73,8 +53,27 @@ const GraylogThemeProvider = ({ children }: Props) => {
 
   const themeColors = colors[mode];
 
-  useEffect(() => {
+  const theme = useMemo(() => {
     if (themeColors) {
+      const handleModeChange = (nextMode) => Promise.resolve().then(() => {
+        if (colors[nextMode]) {
+          const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: nextMode };
+
+          setUserPreferences(nextPreferences);
+
+          // eslint-disable-next-line camelcase
+          if (currentUser?.read_only) {
+            Store.set(PREFERENCES_THEME_MODE, nextMode);
+          } else {
+            PreferencesStore.saveUserPreferences(currentUser.username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
+          }
+
+          return { [PREFERENCES_THEME_MODE]: nextMode };
+        }
+
+        return null;
+      });
+
       const formattedUtils = {
         ...utils,
         colorLevel: utils.colorLevel(themeColors),
@@ -94,8 +93,10 @@ const GraylogThemeProvider = ({ children }: Props) => {
         utils: formattedUtils,
       };
 
-      setTheme(nextTheme);
+      return nextTheme;
     }
+
+    return undefined;
   }, [themeColors]);
 
   return theme ? (
