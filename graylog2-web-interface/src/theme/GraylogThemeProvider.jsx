@@ -27,7 +27,6 @@ const GraylogThemeProvider = ({ children }: Props) => {
   const colorScheme = usePrefersColorScheme();
   const [theme, setTheme] = useState();
   const [userPreferences, setUserPreferences] = useState();
-  const [themeColors, setThemeColors] = useState();
   const [mode, setMode] = useState(colorScheme);
 
   const currentUser = useStore(CurrentUserStore, (userStore) => {
@@ -72,11 +71,7 @@ const GraylogThemeProvider = ({ children }: Props) => {
     }
   }, [colorScheme, userPreferences]);
 
-  useEffect(() => {
-    if (mode) {
-      setThemeColors(colors[mode]);
-    }
-  }, [mode]);
+  const themeColors = colors[mode];
 
   useEffect(() => {
     if (themeColors) {
