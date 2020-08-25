@@ -122,4 +122,22 @@ public class DBGrantServiceTest {
             assertThat(result).doesNotContainKey(stream1);
         });
     }
+
+    @Test
+    public void createWithUserName() {
+        final GRN john = grnRegistry.parse("grn::::user:john");
+        final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
+        final GrantDTO grantDTO = GrantDTO.builder()
+                .capability(Capability.VIEW)
+                .grantee(john)
+                .target(dashboard1)
+                .build();
+
+        assertThat(dbService.create(grantDTO, "hans")).satisfies(result -> {
+            assertThat(result.grantee()).isEqualTo(john);
+            assertThat(result.createdBy()).isEqualTo("hans");
+            assertThat(result.updatedBy()).isEqualTo("hans");
+            assertThat(result.createdAt()).isNotNull();
+        });
+    }
 }
