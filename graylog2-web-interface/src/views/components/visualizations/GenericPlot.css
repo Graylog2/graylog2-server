@@ -2,6 +2,10 @@ div.plotly-notifier {
     visibility: hidden;
 }
 
+:local(.customPopover)#legend-config {
+    transform: none;
+}
+
 :local(.customPopover) .popover-content {
     padding: 0;
 }
