@@ -2,7 +2,7 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
-import type { UserJSON } from 'logic/users/User';
+import type { UserOverviewJSON } from 'logic/users/UserOverview';
 import type { Store } from 'stores/StoreTypes';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -31,7 +31,7 @@ export type PaginatedUserListType = {
 };
 
 type PaginatedUserResponse = PaginatedResponseType & {
-  users: Array<UserJSON>,
+  users: Array<UserOverviewJSON>,
 };
 
 // eslint-disable-next-line camelcase

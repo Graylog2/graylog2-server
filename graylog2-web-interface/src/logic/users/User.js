@@ -1,6 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
 
+import type { PreferencesMap } from 'stores/users/PreferencesStore';
+
 type StartPage = {
   id: string,
   type: string,
@@ -15,7 +17,7 @@ export type UserJSON = {
   last_activity: ?string,
   permissions: string[],
   grn_permissions?: string[],
-  preferences?: any,
+  preferences: PreferencesMap,
   read_only: boolean,
   roles: string[],
   session_active: boolean,
@@ -32,7 +34,7 @@ type InternalState = {
   email: string,
   permissions: Immutable.List<string>,
   timezone: ?string,
-  preferences?: any,
+  preferences: PreferencesMap,
   roles: Immutable.List<string>,
   readOnly: boolean,
   external: boolean,
@@ -258,7 +260,7 @@ export default class User {
   }
 
   static empty() {
-    return User.create('', '', '', '', Immutable.List(), '', undefined, Immutable.List(), false, false, -1, undefined, false, '', '');
+    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.List(), false, false, -1, undefined, false, '', '');
   }
 
   toJSON(): UserJSON {
