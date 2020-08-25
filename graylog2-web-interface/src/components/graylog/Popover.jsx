@@ -8,9 +8,10 @@ import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
+  const backgroundColor = theme.colors.global.contentBackground;
 
   return css`
-    background-color: ${theme.colors.global.contentBackground};
+    background-color: ${backgroundColor};
     border-color: ${borderColor};
     padding: 0;
 
@@ -39,7 +40,8 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
         border-right-color: ${borderColor};
   
         &::after {
-          border-right-color: ${arrowColor};
+          border-right-color: ${backgroundColor};
+          z-index: 1;
         }
       }
     }
@@ -63,7 +65,7 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
         border-left-color: ${borderColor};
   
         &::after {
-          border-left-color: ${arrowColor};
+          border-left-color: ${backgroundColor};
         }
       }
     }

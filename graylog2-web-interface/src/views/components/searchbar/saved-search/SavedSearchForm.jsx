@@ -43,7 +43,7 @@ const SavedSearchForm = (props: Props) => {
                 placement="left"
                 target={target}>
         <Popover title="Name of search" id="saved-search-popover">
-          <form onSubmit={stopEvent}>
+          <form onSubmit={stopEvent} style={{ width: '210px' }}>
             <FormGroup>
               <ControlLabel>Title</ControlLabel>
               <FormControl type="text"
@@ -56,6 +56,7 @@ const SavedSearchForm = (props: Props) => {
               <Button bsStyle="primary"
                       className={styles.button}
                       type="submit"
+                      bsSize="sm"
                       onClick={saveSearch}>
                 Save
               </Button>
@@ -64,11 +65,13 @@ const SavedSearchForm = (props: Props) => {
                     bsStyle="info"
                     className={styles.button}
                     type="submit"
+                    bsSize="sm"
                     onClick={saveAsSearch}>
               {createNewTitle}
             </Button>
             <Button className={styles.button}
-                    onClick={toggleModal}>
+                    onClick={toggleModal}
+                    bsSize="sm">
               Cancel
             </Button>
           </form>

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
+import styled, { type StyledComponent } from 'styled-components';
 
 import { DatePicker, Icon } from 'components/common';
 import { Button, Tooltip } from 'components/graylog';
@@ -15,6 +16,12 @@ const _onDateSelected = (date) => {
 
   return DateTime.ignoreTZ(midnightDate);
 };
+
+const StyledTooltip: StyledComponent<{}, void, typeof Tooltip> = styled(Tooltip)`
+  && {
+    transform: none;
+  }
+`;
 
 type Props = {
   disabled: ?boolean,
@@ -33,9 +40,9 @@ const DateInputWithPicker = ({ disabled = false, error, value, onBlur = () => {}
   return (
     <div>
       {error && (
-        <Tooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
+        <StyledTooltip placement="top" className="in" id="tooltip-top" positionTop="-30px">
           {error}
-        </Tooltip>
+        </StyledTooltip>
       )}
       <DatePicker id={`date-input-datepicker-${name}`}
                   disabled={disabled}
