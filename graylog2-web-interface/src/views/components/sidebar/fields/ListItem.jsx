@@ -11,11 +11,7 @@ import Field from 'views/components/Field';
 import FieldTypeIcon from './FieldTypeIcon';
 
 export type ListItemStyle = {
-  position: string,
-  left: number,
-  top: number,
-  height: number,
-  width: string,
+  [attribute: string]: string | number,
 };
 
 type Props = {
