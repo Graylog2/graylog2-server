@@ -33,7 +33,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return this._state();
     },
 
-    prepare(entityTitle: string, entityType: string, entityGRN: GRN, payload: EntitySharePayload = DEFAULT_PREPARE_PAYLOAD): Promise<EntityShareState> {
+    prepare(entityType: string, entityTitle: string, entityGRN: GRN, payload: EntitySharePayload = DEFAULT_PREPARE_PAYLOAD): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 
@@ -42,7 +42,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    update(entityTitle: string, entityType: string, entityGRN: GRN, payload: EntitySharePayload): Promise<EntityShareState> {
+    update(entityType: string, entityTitle: string, entityGRN: GRN, payload: EntitySharePayload): Promise<EntityShareState> {
       const url = qualifyUrl(ApiRoutes.EntityShareController.update(entityGRN).url);
       const promise = fetch('POST', url, JSON.stringify(payload)).then(this._handleResponse);
 

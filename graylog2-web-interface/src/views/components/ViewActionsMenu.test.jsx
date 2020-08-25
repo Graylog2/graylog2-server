@@ -109,6 +109,6 @@ describe('ViewActionsMenu', () => {
 
     fireEvent.click(openShareButton);
 
-    expect(getByText(/Sharing:/i)).not.toBeNull();
+    expect(getByText(/Sharing/i)).not.toBeNull();
   });
 });

@@ -29,8 +29,8 @@ export type EntitySharePayload = {
 };
 
 export type ActionsType = {
-  prepare: (entityTitle: string, entityType: string, GRN, ?EntitySharePayload) => Promise<?EntityShareState>,
-  update: (entityTitle: string, entityType: string, GRN, EntitySharePayload) => Promise<?EntityShareState>,
+  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload: ?EntitySharePayload) => Promise<?EntityShareState>,
+  update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<?EntityShareState>,
   loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
   loadTeamSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
 };
