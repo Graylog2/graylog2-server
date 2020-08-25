@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css, withTheme, type StyledComponent } from 'styled-components';
-import debounce from 'lodash/debounce';
 
 import { Icon } from 'components/common';
 import { themePropTypes, type ThemeInterface } from 'theme';
@@ -98,14 +97,12 @@ const ThemeModeToggle = ({ theme }: Props) => {
     }
   }, [theme]);
 
-  const debouncedThemeMode = (checked) => {
-    theme.changeMode(checked ? THEME_MODE_DARK : THEME_MODE_LIGHT);
-  };
-
   const toggleThemeMode = (event) => {
+    const { checked } = event.target;
     event.persist();
     setLoadingTheme(true);
-    debouncedThemeMode(event.target.checked);
+    const newMode = checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+    theme.changeMode(newMode);
   };
 
   const loadingLightMode = currentMode === THEME_MODE_DARK && loadingTheme;
