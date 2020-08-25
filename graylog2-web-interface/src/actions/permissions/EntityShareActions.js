@@ -28,12 +28,14 @@ export type EntitySharePayload = {
   selected_grantee_capabilities: SelectedGranteeCapabilities,
 };
 
-type EntityShareActionsType = RefluxActions<{
-  prepare: (GRN, ?EntitySharePayload) => Promise<EntityShareState>,
-  update: (GRN, EntitySharePayload) => Promise<EntityShareState>,
-  loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
-  loadTeamSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
-}>;
+export type ActionsType = {
+  prepare: (entityTitle: string, entityType: string, GRN, ?EntitySharePayload) => Promise<?EntityShareState>,
+  update: (entityTitle: string, entityType: string, GRN, EntitySharePayload) => Promise<?EntityShareState>,
+  loadUserSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
+  loadTeamSharesPaginated: (username: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
+};
+
+type EntityShareActionsType = RefluxActions<ActionsType>;
 
 const EntityShareActions: EntityShareActionsType = singletonActions(
   'permissions.EntityShare',

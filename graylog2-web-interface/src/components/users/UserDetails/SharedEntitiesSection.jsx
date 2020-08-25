@@ -4,10 +4,10 @@ import { useState } from 'react';
 
 import SharedEntitiesOverview from 'components/permissions/SharedEntitiesOverview';
 import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import User from 'logic/users/User';
 import { Spinner } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
 
 type Props = {
   username: $PropertyType<User, 'username'>,
@@ -16,7 +16,7 @@ type Props = {
 
 const SharedEntitiesSection = ({ paginatedUserShares, username }: Props) => {
   const [loading, setLoading] = useState(false);
-  const _searchPaginated = (newPage, newPerPage, newQuery, additonalQueries) => EntityShareActions.loadUserSharesPaginated(username, newPage, newPerPage, newQuery, additonalQueries);
+  const _searchPaginated = (newPage, newPerPage, newQuery, additonalQueries) => EntityShareDomain.loadUserSharesPaginated(username, newPage, newPerPage, newQuery, additonalQueries);
 
   return (
     <SectionComponent title="Shared Entities" showLoading={loading}>

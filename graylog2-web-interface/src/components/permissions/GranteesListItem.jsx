@@ -68,11 +68,11 @@ type Props = {
   availableCapabilities: CapabilitiesList,
   currentGranteeState: CurrentGranteeState,
   grantee: SelectedGrantee,
-  onDelete: ($PropertyType<Grantee, 'id'>) => Promise<EntityShareState>,
+  onDelete: ($PropertyType<Grantee, 'id'>) => Promise<?EntityShareState>,
   onCapabilityChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
     capabilityId: $PropertyType<Capability, 'id'>,
-  }) => Promise<EntityShareState>,
+  }) => Promise<?EntityShareState>,
 };
 
 const GranteesListItem = ({ availableCapabilities, currentGranteeState, grantee: { id, capabilityId, type, title }, onDelete, onCapabilityChange }: Props) => {
