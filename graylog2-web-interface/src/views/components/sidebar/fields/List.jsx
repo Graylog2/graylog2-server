@@ -60,8 +60,9 @@ const List = ({ viewMetadata: { activeQuery }, filter, activeQueryFields, allFie
 
   return (
     <SizeMe monitorHeight refreshRate={100}>
-      {({ size: { height } }) => (
+      {({ size: { height, width } }) => (
         <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
+                       width={width}
                        itemCount={fieldList.size}
                        itemSize={20}>
           {Row}
