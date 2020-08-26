@@ -114,7 +114,7 @@ const webpackConfig = {
         ],
       },
       {
-        test: /\.lazy\.css$/,
+        test: /(\.lazy|leaflet)\.css$/,
         use: [
           { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
           {
