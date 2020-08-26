@@ -50,25 +50,20 @@ module.exports = {
       content: 'docs/tests.md',
     },
     {
-      name: 'Shared Components',
-      sections: [
-        {
-          name: 'Bootstrap',
-          components: 'src/components/bootstrap/[A-Z]*.jsx',
-        },
-        {
-          name: 'Common',
-          components: 'src/components/common/[A-Z]*.jsx',
-        },
-        {
-          name: 'Themeable',
-          components: 'src/components/graylog/[A-Z]*.jsx',
-        },
-        {
-          name: 'Configuration Forms',
-          components: 'src/components/configurationforms/[A-Z]*.jsx',
-        },
-      ],
+      name: 'Bootstrap',
+      components: 'src/components/bootstrap/[A-Z]*.jsx',
+    },
+    {
+      name: 'Common',
+      components: 'src/components/common/[A-Z]*.jsx',
+    },
+    {
+      name: 'Themeable',
+      components: 'src/components/graylog/[A-Z]*.jsx',
+    },
+    {
+      name: 'Configuration Forms',
+      components: 'src/components/configurationforms/[A-Z]*.jsx',
     },
     {
       name: 'Util objects',
@@ -78,7 +73,7 @@ module.exports = {
   usageMode: 'collapse',
   styleguideComponents: {
     Wrapper: path.join(__dirname, 'src/theme/docs/StyleguideWrapper'),
-    LogoRenderer: path.join(__dirname, 'src/theme/docs/StyleguideLogoRenderer'),
+    StyleGuideRenderer: path.join(__dirname, 'src/theme/docs/StyleGuideRenderer'),
   },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
@@ -96,4 +91,5 @@ module.exports = {
     },
   },
   skipComponentsWithoutExample: true,
+  pagePerSection: true,
 };

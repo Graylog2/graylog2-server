@@ -128,21 +128,21 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 `);
 
-const StyleguideThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState();
-  const [themeColors, setThemeColors] = useState();
-  const [theme, setTheme] = useState();
+const StyleguideThemeProvider = ({ children, defaultMode }) => {
+  const [mode, setMode] = useState(defaultMode);
+  const [themeColors, setThemeColors] = useState(colors[defaultMode]);
 
-  const changeMode = (nextMode) => Promise.resolve().then(() => {
+  const changeMode = (nextMode) => {
     if (colors[nextMode]) {
       Store.set(LOCAL_STORE_NAME, nextMode);
       setMode(nextMode);
+      setThemeColors(colors[nextMode]);
 
       return { [LOCAL_STORE_NAME]: nextMode };
     }
 
     return null;
-  });
+  };
 
   const formattedUtils = {
     ...utils,
@@ -150,30 +150,20 @@ const StyleguideThemeProvider = ({ children }) => {
     readableColor: themeColors ? utils.readableColor(themeColors) : noop,
   };
 
-  const themeMemo = useMemo(() => (themeColors ? (
-    {
-      mode,
-      changeMode,
-      breakpoints,
-      colors: themeColors,
-      fonts,
-      components: {
-        button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
-        aceEditor: aceEditorStyles({ colors: themeColors }),
-      },
-      utils: formattedUtils,
-    }
-  ) : null), [themeColors]);
+  const themeMemo = useMemo(() => ({
+    mode,
+    changeMode,
+    breakpoints,
+    colors: themeColors,
+    fonts,
+    components: {
+      button: buttonStyles({ colors: themeColors, utils: formattedUtils }),
+      aceEditor: aceEditorStyles({ colors: themeColors }),
+    },
+    utils: formattedUtils,
+  }), [mode, themeColors]);
 
-  useEffect(() => {
-    setMode((Store.get(LOCAL_STORE_NAME) || DEFAULT_THEME_MODE) || THEME_MODE_LIGHT);
-  }, []);
-
-  useEffect(() => {
-    if (mode) {
-      setThemeColors(colors[mode]);
-    }
-  }, [mode]);
+  const [theme, setTheme] = useState(themeMemo);
 
   useEffect(() => {
     if (themeColors) {
@@ -182,7 +172,7 @@ const StyleguideThemeProvider = ({ children }) => {
   }, [themeColors]);
 
   return theme ? (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme} key={theme?.mode}>
       <>
         <GlobalThemeStyles />
         {children}
@@ -193,6 +183,11 @@ const StyleguideThemeProvider = ({ children }) => {
 
 StyleguideThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  defaultMode: PropTypes.string,
+};
+
+StyleguideThemeProvider.defaultProps = {
+  defaultMode: Store.get(LOCAL_STORE_NAME) || DEFAULT_THEME_MODE || THEME_MODE_LIGHT,
 };
 
 export default StyleguideThemeProvider;
