@@ -76,7 +76,7 @@ const webpackConfig = {
       { test: /\.js(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
       { test: /\.(svg)(\?.+)?$/, loader: 'file-loader' },
       {
-        test: /\.(woff(2)?|ttf)(\?.+)?$/,
+        test: /\.(woff(2)?|ttf|eot)(\?.+)?$/,
         use: [{
           loader: 'file-loader', options: { esModule: false },
         }],
