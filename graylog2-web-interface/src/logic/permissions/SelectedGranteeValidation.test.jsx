@@ -5,7 +5,7 @@ import SelectedGranteeValidation from './SelectedGranteeValidation';
 
 describe('SelectedGranteeValidation', () => {
   it('should return a valid result if there is at least one owner left', () => {
-    const selectedGranteeCapabilities = Map({ 'grn::::user:someone-id': 'owner' });
+    const selectedGranteeCapabilities = Map({ 'grn::::user:someone-id': 'own' });
     const result = SelectedGranteeValidation(selectedGranteeCapabilities);
 
     expect(result.valid).toBeTruthy();
@@ -13,7 +13,7 @@ describe('SelectedGranteeValidation', () => {
   });
 
   it('should return a valid result if there multiple owner left', () => {
-    const selectedGranteeCapabilities = Map({ 'grn::::user:someone-id': 'owner', 'grn::::user:someone-else': 'owner' });
+    const selectedGranteeCapabilities = Map({ 'grn::::user:someone-id': 'own', 'grn::::user:someone-else': 'own' });
     const result = SelectedGranteeValidation(selectedGranteeCapabilities);
 
     expect(result.valid).toBeTruthy();

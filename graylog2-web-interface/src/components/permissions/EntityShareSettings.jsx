@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -9,10 +10,12 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { Select } from 'components/common';
+import SelectedGranteeValidation from 'logic/permissions/SelectedGranteeValidation';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
+import ValidationError from './ValidationError';
 import ShareableEnityURL from './ShareableEnityURL';
 
 type Props = {
@@ -60,11 +63,16 @@ const EntityShareSettings = ({
   granteesSelectRef,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
+  const [errors, setErrors] = useState(SelectedGranteeValidation(selectedGranteeCapabilities));
 
   const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
+    const newSelectedCapabilities = selectedGranteeCapabilities.merge({ [granteeId]: capabilityId });
+
+    setErrors(SelectedGranteeValidation(newSelectedCapabilities));
     setDisableSubmit(true);
+
     const payload: EntitySharePayload = {
-      selected_grantee_capabilities: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
+      selected_grantee_capabilities: newSelectedCapabilities,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
@@ -75,9 +83,13 @@ const EntityShareSettings = ({
   };
 
   const _handleDeletion = (granteeId: GRN) => {
+    const newSelectedGranteeCapabilities = selectedGranteeCapabilities.remove(granteeId);
+
+    setErrors(SelectedGranteeValidation(newSelectedGranteeCapabilities));
     setDisableSubmit(true);
+
     const payload: EntitySharePayload = {
-      selected_grantee_capabilities: selectedGranteeCapabilities.remove(granteeId),
+      selected_grantee_capabilities: newSelectedGranteeCapabilities,
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
@@ -86,6 +98,8 @@ const EntityShareSettings = ({
       return response;
     });
   };
+
+  useEffect(() => setDisableSubmit(!errors.valid), [errors]);
 
   return (
     <>
@@ -111,6 +125,11 @@ const EntityShareSettings = ({
                       selectedGrantees={selectedGrantees}
                       title="Current collaborators" />
       </Section>
+      {errors && !errors.valid && (
+        <Section>
+          <ValidationError validationResult={errors} />
+        </Section>
+      )}
       {missingDependencies && missingDependencies.size > 0 && (
         <Section>
           <DependenciesWarning missingDependencies={missingDependencies}

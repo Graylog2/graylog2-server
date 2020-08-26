@@ -1,7 +1,7 @@
 // @flow strict
 import type { SelectedGranteeCapabilities } from './EntityShareState';
 
-type ValidationResult = {
+export type ValidationResult = {
   valid: boolean,
   errors?: {
     [string]: string,
@@ -9,7 +9,7 @@ type ValidationResult = {
 };
 
 const SelectedGranteeValidation = (selectedGranteeCapabilities: SelectedGranteeCapabilities): ValidationResult => {
-  const ownerCount = selectedGranteeCapabilities.count((capability) => capability === 'owner');
+  const ownerCount = selectedGranteeCapabilities.count((capability) => capability === 'own');
 
   if (ownerCount >= 1) {
     return { valid: true };
