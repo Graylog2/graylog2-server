@@ -88,14 +88,16 @@ const webpackConfig = {
           {
             loader: 'style-loader',
             options: {
-              insertAt: 'top',
+              insert: 'top',
             },
           },
           'css-loader',
           {
             loader: 'less-loader',
             options: {
-              modifyVars: BOOTSTRAPVARS,
+              lessOptions: {
+                modifyVars: BOOTSTRAPVARS,
+              },
             },
           },
         ],
