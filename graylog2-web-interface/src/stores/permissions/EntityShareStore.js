@@ -75,7 +75,7 @@ const EntityShareStore: EntityShareStoreType = singletonStore(
       return promise;
     },
 
-    loadTeamSharesPaginated(teamId: string, teamName: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
+    loadTeamSharesPaginated(teamId: string, page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries): Promise<PaginatedEnititySharesType> {
       // Todo implement same code like for loadUserSharesPaginated, but with EntityShareController.teamSharesPaginated
 
       const promise = permissionsMock.searchPaginatedEntitySharesResponse(page, perPage, query, additionalQueries);

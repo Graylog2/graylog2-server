@@ -30,8 +30,8 @@ const loadUserSharesPaginated: $PropertyType<ActionsType, 'loadUserSharesPaginat
 
 const loadTeamSharesPaginated: $PropertyType<ActionsType, 'loadTeamSharesPaginated'> = notifyingAction({
   action: EntityShareActions.loadTeamSharesPaginated,
-  error: (error, teamId, teamName) => ({
-    message: `Loading entities which got shared with team "${teamName}" failed with status: ${error}`,
+  error: (error, teamId) => ({
+    message: `Loading entities which got shared with team with id "${teamId}" failed with status: ${error}`,
   }),
 });
 
