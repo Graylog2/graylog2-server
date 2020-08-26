@@ -1,18 +1,20 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
+
+import type { ThemeInterface } from 'theme/types';
 
 import styles from './EditableTitle.css';
 
-const StyledStaticSpan = styled.span(({ theme }) => css`
+const StyledStaticSpan: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
   border: 1px solid ${theme.colors.global.contentBackground};
   padding: 2px 3px;
   font-size: ${theme.fonts.size.large};
   display: inline-block;
 `);
 
-const StyledInput = styled.input(({ theme }) => css`
+const StyledInput: StyledComponent<{}, ThemeInterface, HTMLInputElement> = styled.input(({ theme }) => css`
   border: 1px solid ${theme.colors.input.border};
   background-color: ${theme.colors.input.background};
   color: ${theme.colors.input.color};
