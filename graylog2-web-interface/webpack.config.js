@@ -113,6 +113,16 @@ const webpackConfig = {
           },
         ],
       },
+      {
+        test: /\.lazy\.css$/,
+        use: [
+          { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
+          {
+            loader: 'css-loader',
+            options: getCssLoaderOptions(),
+          },
+        ],
+      },
     ],
   },
   resolve: {
