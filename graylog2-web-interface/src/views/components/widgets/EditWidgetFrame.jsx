@@ -9,11 +9,11 @@ import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
-import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import styles from '!style?insert=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
 
