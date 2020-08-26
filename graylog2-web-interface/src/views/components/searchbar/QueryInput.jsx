@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import type { ThemeInterface } from 'theme';
+import { type ThemeInterface, themePropTypes } from 'theme';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
@@ -85,13 +85,14 @@ const QueryInput = ({ disabled, onBlur, onChange, onExecute, placeholder, value,
 };
 
 QueryInput.propTypes = {
-  completers: PropTypes.array,
   completerFactory: PropTypes.func,
+  completers: PropTypes.array,
   disabled: PropTypes.bool,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
+  theme: themePropTypes.isRequired,
   value: PropTypes.string,
 };
 
