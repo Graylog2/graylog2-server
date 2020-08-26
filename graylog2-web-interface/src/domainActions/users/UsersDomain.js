@@ -27,8 +27,8 @@ const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
   success: (username) => ({
     message: `User "${username}" was updated successfully`,
   }),
-  error: (error, roleId, roleName) => ({
-    message: `Updating user "${roleName}" failed with status: ${error}`,
+  error: (error, username) => ({
+    message: `Updating user "${username}" failed with status: ${error}`,
   }),
 });
 
