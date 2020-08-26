@@ -105,4 +105,6 @@ QueryInput.defaultProps = {
   placeholder: '',
 };
 
-export default withPluginEntities(withTheme<ThemeInterface, Props, typeof undefined>(QueryInput), { completers: 'views.completers' });
+const mapping = { completers: 'views.completers' };
+
+export default withPluginEntities<$Rest<Props, {| theme: ThemeInterface |}>, typeof mapping>(withTheme(QueryInput), mapping);
