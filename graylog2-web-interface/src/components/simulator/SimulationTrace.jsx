@@ -19,7 +19,7 @@ const SimulationTrace = createReactClass({
     this.style.unuse();
   },
 
-  style: require('!style/useable!css!./SimulationTrace.css'),
+  style: require('!css!./SimulationTrace.lazy.css'),
 
   render() {
     const simulationTrace = this.props.simulationResults.simulation_trace;

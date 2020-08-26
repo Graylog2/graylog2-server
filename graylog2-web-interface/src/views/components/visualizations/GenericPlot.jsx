@@ -17,7 +17,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style/useable!css!./GenericPlot.css';
+import styles from '!css!./GenericPlot.lazy.css';
 
 type LegendConfig = {
   name: string,

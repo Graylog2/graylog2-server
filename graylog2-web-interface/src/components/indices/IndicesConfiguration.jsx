@@ -7,7 +7,7 @@ import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenan
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
 
-const style = require('!style/useable!css!components/configurations/ConfigurationStyles.css');
+const style = require('!css!components/configurations/ConfigurationStyles.lazy.css');
 
 class IndicesConfiguration extends React.Component {
   static propTypes = {

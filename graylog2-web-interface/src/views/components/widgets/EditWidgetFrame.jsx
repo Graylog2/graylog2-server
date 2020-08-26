@@ -15,7 +15,7 @@ import WidgetOverrideElements from '../WidgetOverrideElements';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style?insert=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
+import globalStyles from '!css!./EditWidgetFrame.global.lazy.css';
 
 type DialogProps = {
   bsClass: string,

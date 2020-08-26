@@ -11,7 +11,7 @@ import SimulationPreview from './SimulationPreview';
 import SimulationTrace from './SimulationTrace';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!style/useable!css!./SimulationResults.css';
+import style from '!css!./SimulationResults.lazy.css';
 
 const VIEW_OPTIONS = {
   SIMULATION_PREVIEW: 1,
