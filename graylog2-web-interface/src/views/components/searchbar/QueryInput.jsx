@@ -16,11 +16,11 @@ import type { Completer } from './SearchBarAutocompletions';
 type Props = {|
   completerFactory: (Array<Completer>) => AutoCompleter,
   completers: Array<Completer>,
-  disabled: boolean,
+  disabled?: boolean,
   onBlur?: (string) => void,
   onChange: (string) => Promise<string>,
   onExecute: (string) => void,
-  placeholder: string,
+  placeholder?: string,
   theme: ThemeInterface,
   value: string,
 |};
@@ -105,4 +105,4 @@ QueryInput.defaultProps = {
   placeholder: '',
 };
 
-export default withTheme(withPluginEntities(QueryInput, { completers: 'views.completers' }));
+export default withPluginEntities(withTheme<ThemeInterface, Props, typeof undefined>(QueryInput), { completers: 'views.completers' });
