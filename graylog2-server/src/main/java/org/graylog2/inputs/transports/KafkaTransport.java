@@ -297,8 +297,6 @@ public class KafkaTransport extends ThrottleableTransport {
 
         private Optional<ConsumerRecords<byte[], byte[]>> tryPoll() {
             try {
-                // Workaround https://issues.apache.org/jira/browse/KAFKA-4189 by calling wakeup()
-                final ScheduledFuture<?> future = scheduler.schedule(consumer::wakeup, 2000, TimeUnit.MILLISECONDS);
                 final ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(1000);
                 future.cancel(true);
 
