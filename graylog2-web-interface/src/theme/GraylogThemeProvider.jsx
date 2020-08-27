@@ -13,6 +13,7 @@ import useCurrentThemeMode from './UseCurrentThemeMode';
 
 type Props = {
   children: React.Node,
+  defaultMode: ?string,
 };
 
 const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
