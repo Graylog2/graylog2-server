@@ -8,11 +8,13 @@ import Store from 'logic/local-storage/Store';
 import { PREFERENCES_THEME_MODE, DEFAULT_THEME_MODE } from './constants';
 
 import UserPreferencesContext from '../contexts/UserPreferencesContext';
+import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { PreferencesStore } = CombinedProvider.get('Preferences');
 
-const useCurrentThemeMode = (browserPreference: string) => {
+const useCurrentThemeMode = () => {
+  const browserPreference = usePrefersColorScheme();
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
     username: userStore?.currentUser?.username,
     // eslint-disable-next-line camelcase
@@ -29,6 +31,7 @@ const useCurrentThemeMode = (browserPreference: string) => {
       Store.set(PREFERENCES_THEME_MODE, newThemeMode);
     } else {
       const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
+
       PreferencesStore.saveUserPreferences(username, PreferencesStore.convertPreferenceMapToArray(nextPreferences));
     }
   }, [userIsReadOnly, userPreferences, username]);

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import styled, { css, ThemeContext } from 'styled-components';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
@@ -14,8 +14,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 
   &.top {
-    transform: translate(-50%, -100%);
-  
     .tooltip-arrow {
       border-top-color: ${theme.colors.global.contentBackground};
       border-width: ${arrowSize}px ${arrowSize}px 0;
@@ -25,8 +23,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
   
   &.right {
-    transform: translateY(-50%);
-    
     .tooltip-arrow {
       border-right-color: ${theme.colors.global.contentBackground};
       border-width: ${arrowSize}px ${arrowSize}px ${arrowSize}px 0;
@@ -36,8 +32,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
 
   &.bottom {
-    transform: translateX(-50%);
-  
     .tooltip-arrow {
       border-bottom-color: ${theme.colors.global.contentBackground};
       border-width: 0 ${arrowSize}px ${arrowSize}px;
@@ -47,8 +41,6 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
   }
   
   &.left {
-    transform: translate(-100%, -50%);
-    
     .tooltip-arrow {
       border-left-color: ${theme.colors.global.contentBackground};
       border-width: ${arrowSize}px 0 ${arrowSize}px ${arrowSize}px;
@@ -74,8 +66,10 @@ const StyledTooltip = styled(BootstrapTooltip)(({ theme }) => css`
 `);
 
 const Tooltip = ({ children, className, id, placement, positionTop, positionLeft, arrowOffsetTop, arrowOffsetLeft }) => {
+  const theme = useContext(ThemeContext);
+
   return (
-    <GraylogThemeProvider>
+    <GraylogThemeProvider defaultMode={theme?.mode}>
       <StyledTooltip className={className}
                      id={id}
                      placement={placement}

@@ -37,13 +37,13 @@ const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
   };
 };
 
-const GraylogThemeProvider = ({ children }: Props) => {
-  const colorScheme = usePrefersColorScheme();
-  const [mode, setCurrentThemeMode] = useCurrentThemeMode(colorScheme);
+const GraylogThemeProvider = ({ children, defaultMode }: Props) => {
+  const [mode, setCurrentThemeMode] = useCurrentThemeMode();
+  const themeMode = defaultMode ?? mode;
 
-  const themeColors = colors[mode];
+  const themeColors = colors[themeMode];
 
-  const theme = useMemo(() => (themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined), [themeColors]);
+  const theme = useMemo(() => (themeColors ? createTheme(themeMode, themeColors, setCurrentThemeMode) : undefined), [themeMode, themeColors]);
 
   return theme ? (
     <ThemeProvider theme={theme}>
@@ -54,6 +54,11 @@ const GraylogThemeProvider = ({ children }: Props) => {
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.any.isRequired,
+  defaultMode: PropTypes.string,
+};
+
+GraylogThemeProvider.defaultProps = {
+  defaultMode: undefined,
 };
 
 export default GraylogThemeProvider;
