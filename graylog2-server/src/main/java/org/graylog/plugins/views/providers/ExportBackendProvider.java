@@ -18,16 +18,16 @@ package org.graylog.plugins.views.providers;
 
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog2.plugin.Version;
+import org.graylog2.storage.ElasticsearchVersion;
 import org.graylog2.storage.VersionAwareProvider;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.Map;
 
 public class ExportBackendProvider extends VersionAwareProvider<ExportBackend> {
     @Inject
-    public ExportBackendProvider(@Named("elasticsearch_version") Version version, Map<Version, Provider<ExportBackend>> pluginBindings) {
+    public ExportBackendProvider(@ElasticsearchVersion Version version, Map<Version, Provider<ExportBackend>> pluginBindings) {
         super(version, pluginBindings);
     }
 }
