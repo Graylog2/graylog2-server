@@ -44,7 +44,7 @@ import kafka.message.MessageSet;
 import kafka.server.BrokerState;
 import kafka.server.RunningAsBroker;
 import kafka.utils.KafkaScheduler;
-import kafka.utils.Time;
+import org.apache.kafka.common.utils.SystemTime;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
@@ -124,7 +124,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     // This exists so we can use JodaTime's millis provider in tests.
     // Kafka really only cares about the milliseconds() method in here.
-    private static final Time JODA_TIME = new Time() {
+    private static final SystemTime JODA_TIME = new SystemTime() {
         @Override
         public long milliseconds() {
             return DateTimeUtils.currentTimeMillis();
