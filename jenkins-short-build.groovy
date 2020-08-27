@@ -31,7 +31,7 @@ pipeline
      {
        agent
        {
-         label 'linux'
+         label 'nexus'
        }
        when
        {
@@ -50,7 +50,7 @@ always-auth=true'''
 
            writeFile file: '.yarnrc', text: 'registry "http://nexus-internal.ci.torch.sh/repository/graylog-yarn/"'
 
-           sh 'mvn --settings ~/.m2/settings-short-build.xml --show-version --batch-mode -Dstyle.color=always --fail-fast -Pedantic -Dspotbugs.skip -Dit.es clean verify'
+           sh 'mvn --settings ~/.m2/settings-short-build.xml --show-version --batch-mode -Dstyle.color=always --fail-fast -Dspotbugs.skip -Dit.es clean deploy'
          }
      }
    }
