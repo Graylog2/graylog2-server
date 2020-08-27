@@ -6,8 +6,7 @@ import { Row, Col } from 'components/graylog';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import {} from 'components/indices/rotation'; // Load rotation plugin UI plugins from core.
 import {} from 'components/indices/retention'; // Load rotation plugin UI plugins from core.
-
-const style = require('!css!components/configurations/ConfigurationStyles.lazy.css');
+import style from 'components/configurations/ConfigurationStyles.lazy.css';
 
 class IndicesConfiguration extends React.Component {
   static propTypes = {

@@ -31,7 +31,7 @@ const Pipeline = createReactClass({
     this.style.unuse();
   },
 
-  style: require('!css!./Pipeline.lazy.css'),
+  style: require('./Pipeline.lazy.css'),
 
   _connections_warning() {
     if (this.props.connections.length == 0) {

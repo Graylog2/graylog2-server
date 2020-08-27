@@ -4,7 +4,7 @@ import React from 'react';
 import { Row, Col } from 'components/graylog';
 import { IndicesConfiguration } from 'components/indices';
 
-const style = require('!css!./IndexSetDetails.lazy.css');
+import style from './IndexSetDetails.lazy.css';
 
 class IndexSetDetails extends React.Component {
   static propTypes = {

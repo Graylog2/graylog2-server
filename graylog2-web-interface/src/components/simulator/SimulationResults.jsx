@@ -9,9 +9,7 @@ import NumberUtils from 'util/NumberUtils';
 import SimulationChanges from './SimulationChanges';
 import SimulationPreview from './SimulationPreview';
 import SimulationTrace from './SimulationTrace';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import style from '!css!./SimulationResults.lazy.css';
+import style from './SimulationResults.lazy.css';
 
 const VIEW_OPTIONS = {
   SIMULATION_PREVIEW: 1,

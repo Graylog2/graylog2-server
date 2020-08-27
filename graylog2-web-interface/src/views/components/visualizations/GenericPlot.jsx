@@ -11,13 +11,10 @@ import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 
 import ChartColorContext from './ChartColorContext';
+import styles from './GenericPlot.lazy.css';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!css!./GenericPlot.lazy.css';
 
 type LegendConfig = {
   name: string,
