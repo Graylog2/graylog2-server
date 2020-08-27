@@ -43,7 +43,7 @@ pipeline
          steps
          {
            echo "Checking out graylog2-server..."
-           checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'WipeWorkspace']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-access-token2', url: 'https://github.com/Graylog2/graylog2-server.git']]]
+           checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/build-refactoring']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'WipeWorkspace']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-access-token2', url: 'https://github.com/Graylog2/graylog2-server.git']]]
 
            writeFile file: '.npmrc', text: '''registry=http://nexus-internal.ci.torch.sh/repository/graylog-yarn/
 always-auth=true'''
