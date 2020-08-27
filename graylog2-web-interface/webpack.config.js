@@ -90,6 +90,7 @@ const webpackConfig = {
           {
             loader: 'style-loader',
             options: {
+              // implementation to insert at the top of the head tag: https://github.com/webpack-contrib/style-loader#function
               insert: function insertAtTop(element) {
                 const parent = document.querySelector('head');
                 // eslint-disable-next-line no-underscore-dangle
