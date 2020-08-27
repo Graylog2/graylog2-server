@@ -39,7 +39,7 @@ describe('<ContentPackInstall />', () => {
   it('should render a install', () => {
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should call install when called', () => {

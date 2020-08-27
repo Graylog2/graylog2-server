@@ -6,6 +6,8 @@ import URLUtils from 'util/URLUtils';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 
 describe('<ContentPacksList />', () => {
+  // TODO: Should be replaced with call to `jest.mock` instead.
+  // eslint-disable-next-line import/no-named-as-default-member
   URLUtils.areCredentialsInURLSupported = jest.fn(() => { return false; });
 
   const contentPacks = [
@@ -29,7 +31,7 @@ describe('<ContentPacksList />', () => {
   it('should render with empty content packs', () => {
     const wrapper = mount(<ContentPacksList contentPacks={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with content packs', () => {
@@ -39,7 +41,7 @@ describe('<ContentPacksList />', () => {
     };
     const wrapper = mount(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should do pagination', () => {

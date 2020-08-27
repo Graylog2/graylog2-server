@@ -15,13 +15,13 @@ describe('<TokenList />', () => {
   it('should render with empty tokens', () => {
     const wrapper = mount(<TokenList tokens={[]} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with tokens', () => {
     const wrapper = mount(<TokenList tokens={tokens} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should add new token and delete existing ones', () => {

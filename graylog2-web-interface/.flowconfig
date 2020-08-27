@@ -4,11 +4,14 @@ src
 [ignore]
 .*/build/.*
 .*/target/.*
-.*json$
-.*/node_modules/.*
+<PROJECT_ROOT>/node_modules/react-select/.*
+<PROJECT_ROOT>/node_modules/immutable/dist/immutable.js.flow
 
 [libs]
 flow-typed
+
+[declarations]
+<PROJECT_ROOT>/node_modules/.*
 
 [strict]
 untyped-type-import

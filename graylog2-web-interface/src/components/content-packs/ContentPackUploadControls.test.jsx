@@ -8,6 +8,6 @@ describe('<ContentPackUploadControls />', () => {
   it('should render', () => {
     const wrapper = mount(<ContentPackUploadControls />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 });

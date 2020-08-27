@@ -15,7 +15,7 @@ describe('ConfigurableElement', () => {
       </ConfigurableElement>,
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toHaveText('Hello World!');
   });
 
   it('renders the given value', () => {

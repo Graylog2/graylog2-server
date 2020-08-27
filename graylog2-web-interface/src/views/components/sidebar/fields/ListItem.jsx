@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { StyledComponent } from 'styled-components';
+import type { StyledComponent, Styles } from 'styled-components';
 import { List } from 'immutable';
 
 import type { ThemeInterface } from 'theme';
@@ -10,19 +10,11 @@ import Field from 'views/components/Field';
 
 import FieldTypeIcon from './FieldTypeIcon';
 
-export type ListItemStyle = {
-  position: string,
-  left: number,
-  top: number,
-  height: number,
-  width: string,
-};
-
 type Props = {
   activeQueryFields: List<FieldTypeMapping>,
   fieldType: FieldTypeMapping,
   selectedQuery: string,
-  style: ListItemStyle,
+  style: Styles,
 };
 
 const StyledListItem: StyledComponent<{}, ThemeInterface, HTMLLIElement> = styled.li(({ theme }) => css`

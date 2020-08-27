@@ -13,7 +13,7 @@ describe('<ContentPackSelection />', () => {
     const contentPack = new ContentPack.builder().build();
     const wrapper = mount(<ContentPackSelection contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with filled content pack', () => {
@@ -44,7 +44,7 @@ describe('<ContentPackSelection />', () => {
                             selectedEntities={{}} />,
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should update the state when filling out the form', () => {

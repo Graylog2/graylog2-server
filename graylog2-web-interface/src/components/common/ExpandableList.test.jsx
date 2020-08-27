@@ -9,7 +9,7 @@ describe('<ExpandableList />', () => {
   it('should render with no children', () => {
     const wrapper = mount(<ExpandableList />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with a Item', () => {
@@ -23,7 +23,7 @@ describe('<ExpandableList />', () => {
       </ExpandableList>,
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with a nested ExpandableList', () => {
@@ -39,7 +39,7 @@ describe('<ExpandableList />', () => {
       </ExpandableList>,
     );
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should expand a expandable list item', () => {

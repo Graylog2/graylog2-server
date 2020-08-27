@@ -18,7 +18,7 @@ describe('<ContentPackDetails />', () => {
     const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
 
     expect(wrapper.find('[href="http://www.graylog.com"]')).toHaveLength(1);
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render with content pack without a description', () => {
@@ -35,7 +35,7 @@ describe('<ContentPackDetails />', () => {
     };
     const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should not render an anchor if URL protocol is not accepted', () => {

@@ -24,7 +24,7 @@ class Completer {
 describe('QueryInput', () => {
   const SimpleQueryInput = (props) => (
     <QueryInput value="*"
-                onChange={() => {}}
+                onChange={() => Promise.resolve('')}
                 onExecute={() => {}}
                 completerFactory={() => new Completer()}
                 {...props} />

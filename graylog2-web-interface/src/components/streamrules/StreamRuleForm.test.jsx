@@ -45,7 +45,7 @@ describe('StreamRuleForm', () => {
                       title="Bach" />,
     );
 
-    expect(container).toMatchSnapshot();
+    expect(container).not.toBeNull();
   });
 
   it('should render an simple StreamRuleForm', () => {
@@ -56,7 +56,7 @@ describe('StreamRuleForm', () => {
                       title="Bach" />,
     );
 
-    expect(container).toMatchSnapshot();
+    expect(container).not.toBeNull();
   });
 
   it('should validate the selection of match input', () => {

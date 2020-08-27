@@ -1,10 +1,12 @@
 const fs = require('fs');
+
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -35,6 +37,7 @@ const getCssLoaderOptions = () => {
       },
     };
   }
+
   return {};
 };
 
@@ -43,21 +46,27 @@ const chunksSortMode = (c1, c2) => {
   if (c1 === 'polyfill') {
     return -1;
   }
+
   if (c2 === 'polyfill') {
     return 1;
   }
+
   if (c1 === 'builtins') {
     return -1;
   }
+
   if (c2 === 'builtins') {
     return 1;
   }
+
   if (c1 === 'app') {
     return 1;
   }
+
   if (c2 === 'app') {
     return -1;
   }
+
   return 0;
 };
 
@@ -186,6 +195,7 @@ const webpackConfig = {
 if (TARGET === 'start') {
   // eslint-disable-next-line no-console
   console.error('Running in development (no HMR) mode');
+
   module.exports = merge(webpackConfig, {
     mode: 'development',
     devtool: 'cheap-module-source-map',
@@ -209,6 +219,7 @@ if (TARGET === 'build') {
   // eslint-disable-next-line no-console
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
+
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
@@ -228,11 +239,6 @@ if (TARGET === 'build') {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
-      // Looking at https://webpack.js.org/plugins/loader-options-plugin, this plugin seems to not
-      // be needed any longer. We should try deleting it next time we clean up this configuration.
-      new webpack.LoaderOptionsPlugin({
-        minimize: true,
-      }),
     ],
   });
 }
@@ -240,6 +246,7 @@ if (TARGET === 'build') {
 if (TARGET === 'test') {
   // eslint-disable-next-line no-console
   console.error('Running test/ci mode');
+
   module.exports = merge(webpackConfig, {
     module: {
       rules: [

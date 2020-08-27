@@ -10,7 +10,7 @@ describe('<EditPatternModal />', () => {
                                             testPattern={() => {}}
                                             validPatternName={() => {}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 
   it('should render a modal button with as create', () => {
@@ -19,6 +19,6 @@ describe('<EditPatternModal />', () => {
                                             testPattern={() => {}}
                                             validPatternName={() => {}} />);
 
-    expect(wrapper).toMatchSnapshot();
+    expect(wrapper).toExist();
   });
 });

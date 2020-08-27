@@ -11,5 +11,5 @@ export type ThemeInterface = {
   fonts: Fonts,
   utils: Utils,
   mode: string,
-  changeMode: (string) => Promise<{} | null>,
+  changeMode: (string) => void,
 };
