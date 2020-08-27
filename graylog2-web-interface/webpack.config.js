@@ -30,7 +30,9 @@ const getCssLoaderOptions = () => {
   // Development
   if (TARGET === 'start') {
     return {
-      localIdentName: '[name]__[local]--[hash:base64:5]',
+      modules: {
+        localIdentName: '[name]__[local]--[hash:base64:5]',
+      },
     };
   }
   return {};
@@ -88,7 +90,22 @@ const webpackConfig = {
           {
             loader: 'style-loader',
             options: {
-              insert: 'top',
+              insert: function insertAtTop(element) {
+                const parent = document.querySelector('head');
+                // eslint-disable-next-line no-underscore-dangle
+                const lastInsertedElement = window._lastElementInsertedByStyleLoader;
+
+                if (!lastInsertedElement) {
+                  parent.insertBefore(element, parent.firstChild);
+                } else if (lastInsertedElement.nextSibling) {
+                  parent.insertBefore(element, lastInsertedElement.nextSibling);
+                } else {
+                  parent.appendChild(element);
+                }
+
+                // eslint-disable-next-line no-underscore-dangle
+                window._lastElementInsertedByStyleLoader = element;
+              },
             },
           },
           'css-loader',

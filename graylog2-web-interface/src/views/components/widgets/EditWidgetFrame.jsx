@@ -13,7 +13,7 @@ import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!style?insert=bottom!css!./EditWidgetFrame.css';
+import styles from '!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!css!./EditWidgetFrame.global.lazy.css';
 
