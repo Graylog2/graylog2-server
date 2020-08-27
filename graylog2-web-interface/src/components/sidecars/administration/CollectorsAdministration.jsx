@@ -2,7 +2,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { isEqual, union, without, uniq, isEmpty } from 'lodash';
 import { Link } from 'react-router';
 import styled, { css } from 'styled-components';
 
@@ -61,7 +61,7 @@ const CollectorsAdministration = createReactClass({
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { sidecarCollectorPairs } = this.props;
 
-    if (!lodash.isEqual(sidecarCollectorPairs, nextProps.sidecarCollectorPairs)) {
+    if (!isEqual(sidecarCollectorPairs, nextProps.sidecarCollectorPairs)) {
       this.setState({
         enabledCollectors: this.getEnabledCollectors(nextProps.sidecarCollectorPairs),
         selected: this.filterSelectedCollectors(nextProps.sidecarCollectorPairs),
@@ -77,7 +77,7 @@ const CollectorsAdministration = createReactClass({
 
   // Filter out sidecars with no compatible collectors
   getEnabledCollectors(collectors) {
-    return collectors.filter(({ collector }) => !lodash.isEmpty(collector));
+    return collectors.filter(({ collector }) => !isEmpty(collector));
   },
 
   setSelectAllCheckboxState(selectAllInput, collectors, selected) {
@@ -178,8 +178,8 @@ const CollectorsAdministration = createReactClass({
       const { selected } = this.state;
 
       const newSelection = (event.target.checked
-        ? lodash.union(selected, [sidecarCollectorId])
-        : lodash.without(selected, sidecarCollectorId));
+        ? union(selected, [sidecarCollectorId])
+        : without(selected, sidecarCollectorId));
 
       this.setState({ selected: newSelection });
     };
@@ -323,13 +323,13 @@ const CollectorsAdministration = createReactClass({
         </ControlledTableList.Item>
       );
     } else {
-      const sidecars = lodash.uniq(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
+      const sidecars = uniq(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
 
       formattedCollectors = sidecars.map((sidecarToMap) => {
         const sidecarCollectors = sidecarCollectorPairs
           .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
           .map(({ collector }) => collector)
-          .filter((collector) => !lodash.isEmpty(collector));
+          .filter((collector) => !isEmpty(collector));
 
         return this.formatSidecar(sidecarToMap, sidecarCollectors, configurations);
       });

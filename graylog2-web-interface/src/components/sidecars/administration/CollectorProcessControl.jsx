@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { uniq, capitalize } from 'lodash';
 
 import { Button, Panel } from 'components/graylog';
 import { Pluralize, SelectPopover } from 'components/common';
@@ -72,7 +72,7 @@ const CollectorProcessControl = createReactClass({
           Configuration to it and the Sidecar will start the process for you.
         </p>
         <p>
-          {lodash.capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
+          {capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
         </p>
         <Button bsSize="xsmall" bsStyle="primary" onClick={this.hideConfigurationWarning}>Understood, continue
           anyway
@@ -83,7 +83,7 @@ const CollectorProcessControl = createReactClass({
 
   renderProcessActionSummary(selectedSidecarCollectorPairs, selectedAction) {
     const { isConfigurationWarningHidden } = this.state;
-    const selectedSidecars = lodash.uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
+    const selectedSidecars = uniq(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
 
     // Check if all selected collectors have assigned configurations
     const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => {
@@ -112,7 +112,7 @@ const CollectorProcessControl = createReactClass({
     const { selectedSidecarCollectorPairs } = this.props;
     const { selectedAction } = this.state;
 
-    const actionFormatter = (action) => lodash.capitalize(action);
+    const actionFormatter = (action) => capitalize(action);
 
     return (
       <span>

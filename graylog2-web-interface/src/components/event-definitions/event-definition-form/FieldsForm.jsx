@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { cloneDeep, omit, get } from 'lodash';
 
 import { Alert, Col, OverlayTrigger, Row, Button } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -29,7 +29,7 @@ class FieldsForm extends React.Component {
 
   removeCustomField = (fieldName) => {
     const { eventDefinition, onChange } = this.props;
-    const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
+    const nextFieldSpec = omit(eventDefinition.field_spec, fieldName);
 
     onChange('field_spec', nextFieldSpec);
 
@@ -43,8 +43,8 @@ class FieldsForm extends React.Component {
   addCustomField = (prevFieldName, fieldName, config, isKey, keyPosition) => {
     const { eventDefinition, onChange } = this.props;
     const nextFieldSpec = (prevFieldName === fieldName
-      ? lodash.cloneDeep(eventDefinition.field_spec)
-      : lodash.omit(eventDefinition.field_spec, prevFieldName));
+      ? cloneDeep(eventDefinition.field_spec)
+      : omit(eventDefinition.field_spec, prevFieldName));
 
     nextFieldSpec[fieldName] = config;
     onChange('field_spec', nextFieldSpec);
@@ -84,8 +84,8 @@ class FieldsForm extends React.Component {
       );
     }
 
-    const fieldErrors = lodash.get(validation, 'errors.field_spec', []);
-    const keyErrors = lodash.get(validation, 'errors.key_spec', []);
+    const fieldErrors = get(validation, 'errors.field_spec', []);
+    const keyErrors = get(validation, 'errors.key_spec', []);
     const errors = [...fieldErrors, ...keyErrors];
 
     return (

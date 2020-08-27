@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import { concat } from 'lodash';
 import Bluebird from 'bluebird';
 
 import URLUtils from 'util/URLUtils';
@@ -35,7 +35,7 @@ const FilterPreviewStore = Reflux.createStore({
 
   resourceUrl({ segments = [], query = {} }) {
     const uri = new URI(this.sourceUrl);
-    const nextSegments = lodash.concat(uri.segment(), segments);
+    const nextSegments = concat(uri.segment(), segments);
 
     uri.segmentCoded(nextSegments);
     uri.query(query);

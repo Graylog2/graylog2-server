@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import lodash from 'lodash';
+import { capitalize, cloneDeep } from 'lodash';
 import moment from 'moment';
 
 import { Button, FormGroup, HelpBlock } from 'components/graylog';
@@ -75,7 +75,7 @@ const EventsConfig = createReactClass({
 
   _propagateChanges(key, value) {
     const { config } = this.state;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     this.setState({ config: nextConfig });
@@ -126,7 +126,7 @@ const EventsConfig = createReactClass({
   },
 
   _titleCase(str) {
-    return lodash.capitalize(str);
+    return capitalize(str);
   },
 
   render() {

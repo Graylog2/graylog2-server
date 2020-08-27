@@ -1,6 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import {
+  get,
+  defaultTo,
+  debounce,
+  cloneDeep,
+  memoize,
+  merge,
+  max,
+  camelCase,
+  isEmpty,
+  union,
+} from 'lodash';
 import uuid from 'uuid/v4';
 import moment from 'moment';
 
@@ -15,7 +26,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import PermissionsMixin from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -34,7 +45,7 @@ const PREVIEW_PERMISSIONS = [
 ];
 
 class FilterForm extends React.Component {
-  formatStreamIds = lodash.memoize(
+  formatStreamIds = memoize(
     (streamIds) => {
       const { streams } = this.props;
 
@@ -53,10 +64,10 @@ class FilterForm extends React.Component {
     (streamIds) => streamIds.join('-'),
   );
 
-  _parseQuery = lodash.debounce((queryString) => {
+  _parseQuery = debounce((queryString) => {
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
+    if (!isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
       return;
     }
 
@@ -114,7 +125,7 @@ class FilterForm extends React.Component {
   componentDidMount() {
     const { currentUser } = this.props;
 
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+    if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }
 
@@ -123,7 +134,7 @@ class FilterForm extends React.Component {
 
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
+    const config = cloneDeep(eventDefinition.config);
 
     config[key] = value;
     onChange('config', config);
@@ -131,7 +142,7 @@ class FilterForm extends React.Component {
 
   _syncParamsWithQuery = (paramsInQuery) => {
     const { eventDefinition, onChange } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
+    const config = cloneDeep(eventDefinition.config);
     const queryParameters = config.query_parameters;
     const keptParameters = [];
     const staleParameters = {};
@@ -157,7 +168,7 @@ class FilterForm extends React.Component {
       }
     });
 
-    this.setState({ queryParameterStash: lodash.merge(queryParameterStash, staleParameters) });
+    this.setState({ queryParameterStash: merge(queryParameterStash, staleParameters) });
 
     config.query_parameters = keptParameters.concat(newParameters);
     onChange('config', config);
@@ -191,11 +202,11 @@ class FilterForm extends React.Component {
 
   handleTimeRangeChange = (fieldName) => {
     return (nextValue, nextUnit) => {
-      const durationInMs = moment.duration(lodash.max([nextValue, 1]), nextUnit).asMilliseconds();
+      const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
 
       this.propagateChange(fieldName, durationInMs);
 
-      const stateFieldName = lodash.camelCase(fieldName);
+      const stateFieldName = camelCase(fieldName);
 
       this.setState({
         [`${stateFieldName}Duration`]: nextValue,
@@ -218,11 +229,11 @@ class FilterForm extends React.Component {
       );
     });
 
-    if (lodash.isEmpty(parameterButtons)) {
+    if (isEmpty(parameterButtons)) {
       return null;
     }
 
-    const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter((param) => (param.embryonic)));
+    const hasEmbryonicParameters = !isEmpty(queryParameters.filter((param) => (param.embryonic)));
 
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
@@ -235,7 +246,7 @@ class FilterForm extends React.Component {
         {hasEmbryonicParameters && (
           <HelpBlock>
             {validation.errors.query_parameters
-              ? lodash.get(validation, 'errors.query_parameters[0]')
+              ? get(validation, 'errors.query_parameters[0]')
               : 'Please declare missing query parameters by clicking on the buttons above.'}
           </HelpBlock>
         )}
@@ -248,7 +259,7 @@ class FilterForm extends React.Component {
     const { searchWithinMsDuration, searchWithinMsUnit, executeEveryMsDuration, executeEveryMsUnit } = this.state;
 
     // Ensure deleted streams are still displayed in select
-    const allStreamIds = lodash.union(streams.map((s) => s.id), lodash.defaultTo(eventDefinition.config.streams, []));
+    const allStreamIds = union(streams.map((s) => s.id), defaultTo(eventDefinition.config.streams, []));
     const formattedStreams = this.formatStreamIds(allStreamIds);
 
     return (
@@ -265,7 +276,7 @@ class FilterForm extends React.Component {
                    including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
                  </span>
                )}
-               value={lodash.defaultTo(eventDefinition.config.query, '')}
+               value={defaultTo(eventDefinition.config.query, '')}
                onChange={this.handleQueryChange} />
 
         {this.renderQueryParameters()}
@@ -276,7 +287,7 @@ class FilterForm extends React.Component {
                        matchProp="label"
                        onChange={(selected) => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
                        options={formattedStreams}
-                       value={lodash.defaultTo(eventDefinition.config.streams, []).join(',')} />
+                       value={defaultTo(eventDefinition.config.streams, []).join(',')} />
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
 
@@ -289,7 +300,7 @@ class FilterForm extends React.Component {
                          clearable
                          required />
           {validation.errors.search_within_ms && (
-            <HelpBlock>{lodash.get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
+            <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
           )}
         </FormGroup>
 
@@ -302,7 +313,7 @@ class FilterForm extends React.Component {
                          clearable
                          required />
           {validation.errors.execute_every_ms && (
-            <HelpBlock>{lodash.get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+            <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
           )}
         </FormGroup>
         <Input id="schedule-checkbox"
@@ -310,7 +321,7 @@ class FilterForm extends React.Component {
                name="_is_scheduled"
                label="Enable"
                help="Should this event definition be executed automatically?"
-               checked={lodash.defaultTo(eventDefinition.config._is_scheduled, true)}
+               checked={defaultTo(eventDefinition.config._is_scheduled, true)}
                onChange={this.handleConfigChange} />
       </fieldset>
     );

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { upperFirst } from 'lodash';
 
 import { Tooltip, OverlayTrigger } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -25,7 +25,7 @@ class StatusIndicator extends React.Component {
   };
 
   render() {
-    const text = lodash.upperFirst(SidecarStatusEnum.toString(this.props.status));
+    const text = upperFirst(SidecarStatusEnum.toString(this.props.status));
     const lastSeenDateTime = new DateTime(this.props.lastSeen);
 
     let icon;

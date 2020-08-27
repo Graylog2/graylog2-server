@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { defaultTo, cloneDeep, camelCase, max } from 'lodash';
 import moment from 'moment';
 
 import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/graylog';
@@ -26,7 +26,7 @@ class NotificationSettingsForm extends React.Component {
 
     const gracePeriod = extractDurationAndUnit(gracePeriodMs, TIME_UNITS);
     const defaultBacklogSize = props.defaults.default_backlog_size;
-    const effectiveBacklogSize = lodash.defaultTo(backlogSize, defaultBacklogSize);
+    const effectiveBacklogSize = defaultTo(backlogSize, defaultBacklogSize);
 
     this.state = {
       gracePeriodDuration: gracePeriod.duration,
@@ -38,14 +38,14 @@ class NotificationSettingsForm extends React.Component {
 
   propagateChanges = (key, value) => {
     const { eventDefinition, onSettingsChange } = this.props;
-    const nextNotificationSettings = lodash.cloneDeep(eventDefinition.notification_settings);
+    const nextNotificationSettings = cloneDeep(eventDefinition.notification_settings);
 
     nextNotificationSettings[key] = value;
     onSettingsChange('notification_settings', nextNotificationSettings);
   };
 
   handleGracePeriodChange = (nextValue, nextUnit, enabled) => {
-    const durationInMs = enabled ? moment.duration(lodash.max([nextValue, 0]), nextUnit).asMilliseconds() : 0;
+    const durationInMs = enabled ? moment.duration(max([nextValue, 0]), nextUnit).asMilliseconds() : 0;
 
     this.propagateChanges('grace_period_ms', durationInMs);
     this.setState({ gracePeriodDuration: nextValue, gracePeriodUnit: nextUnit });
@@ -55,8 +55,8 @@ class NotificationSettingsForm extends React.Component {
     const { name } = event.target;
     const value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
 
-    this.setState({ [lodash.camelCase(name)]: value });
-    this.propagateChanges(name, lodash.max([Number(value), 0]));
+    this.setState({ [camelCase(name)]: value });
+    this.propagateChanges(name, max([Number(value), 0]));
   };
 
   toggleBacklogSize = () => {

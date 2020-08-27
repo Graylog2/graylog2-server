@@ -2,7 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import lodash from 'lodash';
+import {
+  last,
+  isInteger,
+  defaultTo,
+  isEqual,
+} from 'lodash';
 import moment from 'moment';
 
 import {
@@ -38,7 +43,7 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
   if (duration === undefined) {
     return {
       duration: 1,
-      unit: lodash.last(timeUnits),
+      unit: last(timeUnits),
     };
   }
 
@@ -46,8 +51,8 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
   const timeUnit = timeUnits.find((unit) => {
     const durationInUnit = momentDuration.as(unit);
 
-    return lodash.isInteger(durationInUnit) && durationInUnit !== 0;
-  }) || lodash.last(timeUnits);
+    return isInteger(durationInUnit) && durationInUnit !== 0;
+  }) || last(timeUnits);
   const durationInUnit = momentDuration.as(timeUnit);
 
   return {
@@ -126,7 +131,7 @@ const TimeUnitInput = createReactClass({
     const { defaultEnabled, enabled, units } = this.props;
 
     return {
-      enabled: lodash.defaultTo(enabled, defaultEnabled),
+      enabled: defaultTo(enabled, defaultEnabled),
       unitOptions: this._getUnitOptions(units),
     };
   },
@@ -135,7 +140,7 @@ const TimeUnitInput = createReactClass({
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { units } = this.props;
 
-    if (!lodash.isEqual(units, nextProps.units)) {
+    if (!isEqual(units, nextProps.units)) {
       this.setState({ unitOptions: this._getUnitOptions(nextProps.units) });
     }
   },
@@ -143,7 +148,7 @@ const TimeUnitInput = createReactClass({
   _getEffectiveValue() {
     const { defaultValue, value, clearable } = this.props;
 
-    return clearable ? value : lodash.defaultTo(value, defaultValue);
+    return clearable ? value : defaultTo(value, defaultValue);
   },
 
   _getUnitOptions(units) {
@@ -161,7 +166,7 @@ const TimeUnitInput = createReactClass({
 
     const { enabled: enabledState } = this.state;
 
-    return lodash.defaultTo(enabled, enabledState);
+    return defaultTo(enabled, enabledState);
   },
 
   _propagateInput(update) {
@@ -190,7 +195,7 @@ const TimeUnitInput = createReactClass({
     if (clearable) {
       value = FormsUtils.getValueFromInput(e.target);
     } else {
-      value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
+      value = defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
     }
 
     this._propagateInput({ value: value });
@@ -226,7 +231,7 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={wrapperClassName}>
           <InputGroup>
             {(!required && !hideCheckbox) && checkbox}
-            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={lodash.defaultTo(this._getEffectiveValue(), '')} />
+            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={defaultTo(this._getEffectiveValue(), '')} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             pullRight={pullRight}

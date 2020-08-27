@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { map, upperFirst, toNumber, get, toString } from 'lodash';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select } from 'components/common';
@@ -10,7 +10,7 @@ import FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../common/commonStyles.css';
 
-const priorityOptions = lodash.map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: lodash.upperFirst(value.name) }));
+const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }));
 
 class EventDetailsForm extends React.Component {
   static propTypes = {
@@ -29,7 +29,7 @@ class EventDetailsForm extends React.Component {
   handlePriorityChange = (nextPriority) => {
     const { onChange } = this.props;
 
-    onChange('priority', lodash.toNumber(nextPriority));
+    onChange('priority', toNumber(nextPriority));
   };
 
   render() {
@@ -45,7 +45,7 @@ class EventDetailsForm extends React.Component {
                    label="Title"
                    type="text"
                    bsStyle={validation.errors.title ? 'error' : null}
-                   help={lodash.get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
+                   help={get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
                    value={eventDefinition.title}
                    onChange={this.handleChange}
                    required />
@@ -62,7 +62,7 @@ class EventDetailsForm extends React.Component {
             <FormGroup controlId="event-definition-priority">
               <ControlLabel>Priority</ControlLabel>
               <Select options={priorityOptions}
-                      value={lodash.toString(eventDefinition.priority)}
+                      value={toString(eventDefinition.priority)}
                       onChange={this.handlePriorityChange}
                       clearable={false}
                       required />

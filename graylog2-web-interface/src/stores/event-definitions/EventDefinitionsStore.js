@@ -1,6 +1,12 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import {
+  concat,
+  cloneDeep,
+  pick,
+  omit,
+  defaultTo,
+} from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -44,7 +50,7 @@ const EventDefinitionsStore = Reflux.createStore({
 
   eventDefinitionsUrl({ segments = [], query = {} }) {
     const uri = new URI(this.sourceUrl);
-    const nextSegments = lodash.concat(uri.segment(), segments);
+    const nextSegments = concat(uri.segment(), segments);
 
     uri.segmentCoded(nextSegments);
     uri.query(query);
@@ -132,13 +138,13 @@ const EventDefinitionsStore = Reflux.createStore({
   extractSchedulerInfo(eventDefinition) {
     // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
     // the flag from the form.
-    const clonedEventDefinition = lodash.cloneDeep(eventDefinition);
+    const clonedEventDefinition = cloneDeep(eventDefinition);
     // eslint-disable-next-line camelcase
-    const { _is_scheduled } = lodash.pick(clonedEventDefinition.config, ['_is_scheduled']);
+    const { _is_scheduled } = pick(clonedEventDefinition.config, ['_is_scheduled']);
 
-    clonedEventDefinition.config = lodash.omit(clonedEventDefinition.config, ['_is_scheduled']);
+    clonedEventDefinition.config = omit(clonedEventDefinition.config, ['_is_scheduled']);
 
-    return { eventDefinition: clonedEventDefinition, isScheduled: lodash.defaultTo(_is_scheduled, true) };
+    return { eventDefinition: clonedEventDefinition, isScheduled: defaultTo(_is_scheduled, true) };
   },
 
   create(newEventDefinition) {

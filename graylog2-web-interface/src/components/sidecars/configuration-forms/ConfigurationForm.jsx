@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { debounce, clone, cloneDeep, upperFirst } from 'lodash';
 
 import { Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { ColorPickerPopover, Select, SourceCodeEditor } from 'components/common';
@@ -58,7 +58,7 @@ const ConfigurationForm = createReactClass({
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
-    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+    this._debouncedValidateFormData = debounce(this._validateFormData, 200);
   },
 
   componentDidMount() {
@@ -79,7 +79,7 @@ const ConfigurationForm = createReactClass({
 
   _validateFormData(nextFormData, checkForRequiredFields) {
     CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
-      const nextValidation = lodash.clone(validation);
+      const nextValidation = clone(validation);
 
       if (checkForRequiredFields && !this._isTemplateSet(nextFormData.template)) {
         nextValidation.errors.template = ['Please fill out the configuration field.'];
@@ -113,7 +113,7 @@ const ConfigurationForm = createReactClass({
     const { formData } = this.state;
 
     return (nextValue, _, hideCallback) => {
-      const nextFormData = lodash.cloneDeep(formData);
+      const nextFormData = cloneDeep(formData);
 
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData, false);
@@ -160,7 +160,7 @@ const ConfigurationForm = createReactClass({
     // Start loading the request to get the default template, so it is available asap.
     const defaultTemplatePromise = this._getCollectorDefaultTemplate(nextId);
 
-    const nextFormData = lodash.cloneDeep(formData);
+    const nextFormData = cloneDeep(formData);
 
     nextFormData.collector_id = nextId;
 
@@ -179,7 +179,7 @@ const ConfigurationForm = createReactClass({
   _onTemplateImport(nextTemplate) {
     const { formData } = this.state;
 
-    const nextFormData = lodash.cloneDeep(formData);
+    const nextFormData = cloneDeep(formData);
 
     // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
@@ -209,7 +209,7 @@ const ConfigurationForm = createReactClass({
   },
 
   _formatCollector(collector) {
-    return collector ? `${collector.name} on ${lodash.upperFirst(collector.node_operating_system)}` : 'Unknown collector';
+    return collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector';
   },
 
   _formatCollectorOptions() {

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import lodash from 'lodash';
+import { defaultTo, get } from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
@@ -36,7 +36,7 @@ class EventConditionForm extends React.Component {
       const edt2Order = edt2.sortOrder;
 
       if (edt1Order !== undefined || edt2Order !== undefined) {
-        const sort = lodash.defaultTo(edt1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(edt2Order, Number.MAX_SAFE_INTEGER);
+        const sort = defaultTo(edt1Order, Number.MAX_SAFE_INTEGER) - defaultTo(edt2Order, Number.MAX_SAFE_INTEGER);
 
         if (sort !== 0) {
           return sort;
@@ -104,7 +104,7 @@ class EventConditionForm extends React.Component {
                     clearable={false}
                     required />
             <HelpBlock>
-              {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
+              {get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
             </HelpBlock>
           </FormGroup>
         </Col>

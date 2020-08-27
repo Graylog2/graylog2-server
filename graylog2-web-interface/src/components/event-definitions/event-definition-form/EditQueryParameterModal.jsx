@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { cloneDeep, omit, isEmpty } from 'lodash';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -32,7 +32,7 @@ class EditQueryParameterModal extends React.Component {
     const { queryParameter } = this.props;
 
     this.state = {
-      queryParameter: lodash.cloneDeep(queryParameter),
+      queryParameter: cloneDeep(queryParameter),
       validation: {},
     };
   }
@@ -55,13 +55,13 @@ class EditQueryParameterModal extends React.Component {
   _cleanState = () => {
     const { queryParameter } = this.props;
 
-    this.setState({ queryParameter: lodash.cloneDeep(queryParameter) });
+    this.setState({ queryParameter: cloneDeep(queryParameter) });
   }
 
   propagateChanges = () => {
     const { eventDefinition, onChange, queryParameter: prevQueryParameter } = this.props;
     const { queryParameter } = this.state;
-    const config = lodash.cloneDeep(eventDefinition.config);
+    const config = cloneDeep(eventDefinition.config);
     const { query_parameters: queryParameters } = config;
     const index = queryParameters.findIndex((p) => p.name === prevQueryParameter.name);
 
@@ -69,7 +69,7 @@ class EditQueryParameterModal extends React.Component {
       throw new Error(`Query parameter "${queryParameter.name}" not found`);
     }
 
-    queryParameters[index] = lodash.omit(queryParameter, 'embryonic');
+    queryParameters[index] = omit(queryParameter, 'embryonic');
     onChange('config', config);
   };
 
@@ -106,7 +106,7 @@ class EditQueryParameterModal extends React.Component {
 
     this.setState({ validation: newValidation });
 
-    return lodash.isEmpty(newValidation);
+    return isEmpty(newValidation);
   };
 
   formatLookupTables = (lookupTables) => {

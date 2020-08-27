@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { capitalize, isEmpty } from 'lodash';
 import { Link } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -66,7 +66,7 @@ class EventDetails extends React.Component {
             <dd>{event.id}</dd>
             <dt>Priority</dt>
             <dd>
-              {lodash.capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+              {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
             </dd>
             <dt>Timestamp</dt>
             <dd>
@@ -95,7 +95,7 @@ class EventDetails extends React.Component {
             <dt>Event Key</dt>
             <dd>{event.key || 'No Key set for this Event.'}</dd>
             <dt>Additional Fields</dt>
-            {lodash.isEmpty(event.fields)
+            {isEmpty(event.fields)
               ? <dd>No additional Fields added to this Event.</dd>
               : this.renderEventFields(event.fields)}
           </dl>

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { isEmpty, upperFirst } from 'lodash';
 import { Link } from 'react-router';
 
 import { Alert } from 'components/graylog';
@@ -26,9 +26,9 @@ class FilterAggregationSummary extends React.Component {
   getConditionType = (config) => {
     const { group_by: groupBy, series, conditions } = config;
 
-    return (lodash.isEmpty(groupBy)
-    && (!conditions || lodash.isEmpty(conditions) || conditions.expression === null)
-    && lodash.isEmpty(series)
+    return (isEmpty(groupBy)
+    && (!conditions || isEmpty(conditions) || conditions.expression === null)
+    && isEmpty(series)
       ? 'filter' : 'aggregation');
   };
 
@@ -100,7 +100,7 @@ class FilterAggregationSummary extends React.Component {
     return (
       <dl>
         <dt>Type</dt>
-        <dd>{lodash.upperFirst(conditionType)}</dd>
+        <dd>{upperFirst(conditionType)}</dd>
         <dt>Search Query</dt>
         <dd>{query || '*'}</dd>
         {queryParameters.length > 0 && this.renderQueryParameters(queryParameters)}

@@ -1,6 +1,6 @@
 // @flow strict
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { pull } from 'lodash';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -218,7 +218,7 @@ const StreamsStore = Reflux.createStore({
     this.callbacks.forEach((callback) => callback());
   },
   unregister(callback: Callback) {
-    lodash.pull(this.callbacks, callback);
+    pull(this.callbacks, callback);
   },
 });
 
