@@ -16,6 +16,7 @@ import ActiveShare from './ActiveShare';
 import SharedEntity from './SharedEntity';
 import SelectedGrantee from './SelectedGrantee';
 import type { GranteeInterface } from './GranteeInterface';
+import ValidationResult, { type ValidationResultJSON } from './ValidationResult';
 
 export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;
@@ -43,6 +44,7 @@ type InternalState = {|
   activeShares: ActiveShares,
   selectedGranteeCapabilities: SelectedGranteeCapabilities,
   missingDependencies: MissingDependencies,
+  validationResults: ValidationResult,
 |};
 
 export type EntityShareStateJson = {|
@@ -54,6 +56,7 @@ export type EntityShareStateJson = {|
     [grantee: $PropertyType<Grantee, 'id'>]: $PropertyType<Capability, 'id'>,
   |} | {||},
   missing_permissions_on_dependencies: {[GRN]: Array<SharedEntityType>},
+  validation_result: ValidationResultJSON,
 |};
 
 export default class EntityShareState {
@@ -66,14 +69,16 @@ export default class EntityShareState {
     activeShares: $PropertyType<InternalState, 'activeShares'>,
     selectedGranteeCapabilities: $PropertyType<InternalState, 'selectedGranteeCapabilities'>,
     missingDependencies: $PropertyType<InternalState, 'missingDependencies'>,
+    validationResults: $PropertyType<InternalState, 'validationResults'>,
   ) {
     this._value = {
       entity,
       availableGrantees: _sortAndOrderGrantees<Grantee>(availableGrantees),
-      availableCapabilities: availableCapabilities,
+      availableCapabilities,
       activeShares,
-      selectedGranteeCapabilities: selectedGranteeCapabilities,
-      missingDependencies: missingDependencies,
+      selectedGranteeCapabilities,
+      missingDependencies,
+      validationResults,
     };
   }
 
@@ -101,6 +106,10 @@ export default class EntityShareState {
     return this._value.missingDependencies;
   }
 
+  get validationResults(): $PropertyType<InternalState, 'validationResults'> {
+    return this._value.validationResults;
+  }
+
   get selectedGrantees() {
     const _userLookup = (userId: GRN) => this._value.availableGrantees.find((grantee) => grantee.id === userId);
 
@@ -126,6 +135,7 @@ export default class EntityShareState {
       activeShares,
       selectedGranteeCapabilities,
       missingDependencies,
+      validationResults,
     } = this._value;
 
     // eslint-disable-next-line no-use-before-define
@@ -136,6 +146,7 @@ export default class EntityShareState {
       activeShares,
       selectedGranteeCapabilities: selectedGranteeCapabilities,
       missingDependencies,
+      validationResults,
     }));
   }
 
@@ -147,6 +158,7 @@ export default class EntityShareState {
       activeShares,
       selectedGranteeCapabilities,
       missingDependencies,
+      validationResults,
     } = this._value;
 
     return {
@@ -156,10 +168,12 @@ export default class EntityShareState {
       active_shares: activeShares,
       selected_grantee_capabilities: selectedGranteeCapabilities,
       missing_permissions_on_dependencies: missingDependencies,
+      validation_result: validationResults,
     };
   }
 
   static fromJSON(value: EntityShareStateJson): EntityShareState {
+    console.log('entity share state: fromJson', value);
     /* eslint-disable camelcase */
     const {
       entity,
@@ -168,6 +182,7 @@ export default class EntityShareState {
       active_shares,
       selected_grantee_capabilities,
       missing_permissions_on_dependencies,
+      validation_result,
     } = value;
 
     const availableGrantees = Immutable.fromJS(available_grantees.map((ag) => Grantee.fromJSON(ag)));
@@ -182,6 +197,7 @@ export default class EntityShareState {
         }),
       ),
     );
+    const validationResults = ValidationResult.fromJSON(validation_result);
 
     /* eslint-enable camelcase */
     return new EntityShareState(
@@ -191,6 +207,7 @@ export default class EntityShareState {
       activeShares,
       selectedGranteeCapabilities,
       missingDependencies,
+      validationResults,
     );
   }
 
@@ -234,6 +251,10 @@ class Builder {
     return new Builder(this.value.set('missingDependencies', value));
   }
 
+  validationResults(value: $PropertyType<InternalState, 'validationResults'>): Builder {
+    return new Builder(this.value.set('validationResults', value));
+  }
+
   build(): EntityShareState {
     const {
       entity,
@@ -242,6 +263,7 @@ class Builder {
       activeShares,
       selectedGranteeCapabilities,
       missingDependencies,
+      validationResults,
     } = this.value.toObject();
 
     return new EntityShareState(
@@ -251,6 +273,7 @@ class Builder {
       activeShares,
       selectedGranteeCapabilities,
       missingDependencies,
+      validationResults,
     );
   }
 }

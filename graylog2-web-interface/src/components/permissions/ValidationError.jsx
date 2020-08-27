@@ -2,9 +2,9 @@
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
 
-import { type ValidationResult } from 'logic/permissions/SelectedGranteeValidation';
 import { Alert } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
+import ValidationResult from 'logic/permissions/ValidationResult';
 
 const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
   margin-top: 20px;
@@ -26,8 +26,6 @@ type Props = {
 };
 
 const ValidationError = ({ validationResult }: Props) => {
-  if (validationResult.valid) { return null; }
-
   const errors = validationResult.errors || {};
 
   return (

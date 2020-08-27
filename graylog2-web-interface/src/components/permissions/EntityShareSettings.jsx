@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -10,7 +9,6 @@ import SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { Select } from 'components/common';
-import SelectedGranteeValidation from 'logic/permissions/SelectedGranteeValidation';
 
 import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
@@ -54,6 +52,7 @@ const EntityShareSettings = ({
     missingDependencies,
     selectedGranteeCapabilities,
     selectedGrantees,
+    validationResults,
   },
   description,
   entityGRN,
@@ -63,12 +62,10 @@ const EntityShareSettings = ({
   granteesSelectRef,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
-  const [errors, setErrors] = useState(SelectedGranteeValidation(selectedGranteeCapabilities));
 
   const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
     const newSelectedCapabilities = selectedGranteeCapabilities.merge({ [granteeId]: capabilityId });
 
-    setErrors(SelectedGranteeValidation(newSelectedCapabilities));
     setDisableSubmit(true);
 
     const payload: EntitySharePayload = {
@@ -85,7 +82,6 @@ const EntityShareSettings = ({
   const _handleDeletion = (granteeId: GRN) => {
     const newSelectedGranteeCapabilities = selectedGranteeCapabilities.remove(granteeId);
 
-    setErrors(SelectedGranteeValidation(newSelectedGranteeCapabilities));
     setDisableSubmit(true);
 
     const payload: EntitySharePayload = {
@@ -98,8 +94,6 @@ const EntityShareSettings = ({
       return response;
     });
   };
-
-  useEffect(() => setDisableSubmit(!errors.valid), [errors]);
 
   return (
     <>
@@ -125,9 +119,9 @@ const EntityShareSettings = ({
                       selectedGrantees={selectedGrantees}
                       title="Current collaborators" />
       </Section>
-      {errors && !errors.valid && (
+      {validationResults && validationResults.failed && (
         <Section>
-          <ValidationError validationResult={errors} />
+          <ValidationError validationResult={validationResults} />
         </Section>
       )}
       {missingDependencies && missingDependencies.size > 0 && (
