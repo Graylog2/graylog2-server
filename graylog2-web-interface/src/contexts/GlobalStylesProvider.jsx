@@ -1,6 +1,27 @@
+// @flow strict
+import * as React from 'react';
+import { createContext, useState } from 'react';
+import PropTypes from 'prop-types';
 import { createGlobalStyle, css } from 'styled-components';
 
-const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
+type Props = {
+  children: React.Node,
+};
+
+export const GlobalStylesContext = createContext();
+
+export const GlobalStylesProvider = ({ children }: Props) => {
+  const [additionalStyles, addGlobalStyles] = useState();
+
+  return (
+    <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
+      <ThemeStyles additionalStyles={additionalStyles} />
+      {children}
+    </GlobalStylesContext.Provider>
+  );
+};
+
+const ThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
   #editor {
     height: 256px;
   }
@@ -701,4 +722,8 @@ const GlobalThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css
   ${additionalStyles}
 `);
 
-export default GlobalThemeStyles;
+GlobalStylesProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default GlobalStylesProvider;
