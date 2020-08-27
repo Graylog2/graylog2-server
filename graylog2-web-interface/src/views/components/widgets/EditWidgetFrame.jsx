@@ -6,6 +6,7 @@ import { Modal } from 'components/graylog';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
 
+import styles from './EditWidgetFrame.css';
 import globalStyles from './EditWidgetFrame.global.lazy.css';
 
 import WidgetQueryControls from '../WidgetQueryControls';
@@ -13,8 +14,6 @@ import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import styles from '!css!./EditWidgetFrame.css';
 
 type DialogProps = {
   bsClass: string,
