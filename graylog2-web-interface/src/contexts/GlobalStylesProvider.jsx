@@ -2,16 +2,20 @@
 import * as React from 'react';
 import { createContext, useState } from 'react';
 import PropTypes from 'prop-types';
-import { createGlobalStyle, css } from 'styled-components';
+import { createGlobalStyle, css, type CSSRules } from 'styled-components';
 
 type Props = {
   children: React.Node,
 };
 
-export const GlobalStylesContext = createContext();
+type StyleTypes = {
+  addGlobalStyles: (?CSSRules) => ?string,
+};
 
-export const GlobalStylesProvider = ({ children }: Props) => {
-  const [additionalStyles, addGlobalStyles] = useState();
+export const GlobalStylesContext = createContext<StyleTypes>({ addGlobalStyles: () => {} });
+
+const GlobalStylesProvider = ({ children }: Props) => {
+  const [additionalStyles: string, addGlobalStyles] = useState();
 
   return (
     <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
