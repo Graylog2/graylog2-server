@@ -4,9 +4,24 @@ import * as Immutable from 'immutable';
 
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
-import User from 'logic/users/User';
+import User, { type UserJSON } from 'logic/users/User';
 import UserOverview from 'logic/users/UserOverview';
 import type { PaginationType } from 'stores/PaginationTypes';
+
+export type UserCreate = {
+  email: $PropertyType<UserJSON, 'email'>,
+  full_name: $PropertyType<UserJSON, 'full_name'>,
+  password: string,
+  permissions: $PropertyType<UserJSON, 'permissions'>,
+  roles: $PropertyType<UserJSON, 'roles'>,
+  session_timeout_ms: $PropertyType<UserJSON, 'session_timeout_ms'>,
+  timezone: $PropertyType<UserJSON, 'timezone'>,
+  username: $PropertyType<UserJSON, 'username'>,
+};
+
+export type UserUpdate = $Shape<UserCreate & {
+  old_password: string,
+}>;
 
 export type Token = {
   token_name: string,
@@ -26,9 +41,9 @@ export type PaginatedUsers = {
 };
 
 type UsersActionsType = RefluxActions<{
-  create: (request: any) => Promise<string[]>,
+  create: (user: UserCreate) => Promise<string[]>,
   load: (username: string) => Promise<User>,
-  update: (username: string, request: any) => Promise<void>,
+  update: (username: string, user: UserUpdate) => Promise<void>,
   delete: (username: string) => Promise<string[]>,
   changePassword: (username: string, request: ChangePasswordRequest) => Promise<void>,
   createToken: (username: string, tokenName: string) => Promise<Token>,

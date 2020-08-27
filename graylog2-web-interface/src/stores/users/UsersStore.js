@@ -12,7 +12,8 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import UserOverview from 'logic/users/UserOverview';
 import User from 'logic/users/User';
-import UsersActions, { type ChangePasswordRequest, type Token, type PaginatedUsers } from 'actions/users/UsersActions';
+import UsersActions from 'actions/users/UsersActions';
+import type { ChangePasswordRequest, Token, PaginatedUsers, UserCreate, UserUpdate } from 'actions/users/UsersActions';
 import type { PaginatedResponseType } from 'stores/PaginationTypes';
 
 type PaginatedResponse = PaginatedResponseType & {
@@ -27,9 +28,9 @@ const UsersStore: Store<{}> = singletonStore(
   () => Reflux.createStore({
     listenables: [UsersActions],
 
-    create(request: any): Promise<string[]> {
+    create(user: UserCreate): Promise<string[]> {
       const url = qualifyUrl(ApiRoutes.UsersApiController.create().url);
-      const promise = fetch('POST', url, request);
+      const promise = fetch('POST', url, user);
       UsersActions.create.promise(promise);
 
       return promise;
@@ -49,9 +50,9 @@ const UsersStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    update(username: string, request: any): void {
+    update(username: string, user: UserUpdate): void {
       const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
-      const promise = fetch('PUT', url, request);
+      const promise = fetch('PUT', url, user);
       UsersActions.update.promise(promise);
 
       return promise;

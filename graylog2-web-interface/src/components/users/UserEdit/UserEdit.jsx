@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 
+import type { UserUpdate } from 'actions/users/UsersActions';
 import { UsersActions } from 'stores/users/UsersStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Spinner, IfPermitted } from 'components/common';
@@ -25,7 +26,7 @@ type Props = {
   user: ?User,
 };
 
-const _updateUser = (data, currentUser, user) => {
+const _updateUser = (data: UserUpdate, currentUser, user) => {
   return UsersActions.update(user.username, data).then(() => {
     UserNotification.success('User updated successfully.', 'Success');
 
