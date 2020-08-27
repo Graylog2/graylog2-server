@@ -123,6 +123,7 @@ const webpackConfig = {
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
       {
         test: /\.css$/,
+        exclude: /\.lazy\.css$/,
         use: [
           'style-loader',
           {
