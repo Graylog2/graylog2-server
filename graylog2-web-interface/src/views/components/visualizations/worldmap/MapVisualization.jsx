@@ -4,11 +4,9 @@ import React from 'react';
 import { CircleMarker, Map, Popup, TileLayer } from 'react-leaflet';
 import chroma from 'chroma-js';
 import { flatten } from 'lodash';
+import leafletStyles from 'leaflet/dist/leaflet.css';
 
 import style from './MapVisualization.css';
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import leafletStyles from '!css!leaflet/dist/leaflet.css';
 
 const DEFAULT_VIEWPORT = {
   center: [0, 0],
