@@ -24,7 +24,6 @@ const StyledInput: StyledComponent<{}, ThemeInterface, HTMLInputElement> = style
   
   :focus {
     border-color: ${theme.colors.input.borderFocus};
-    //box-shadow: ${theme.colors.input.boxShadow};
     outline: none;
   }
 `);
