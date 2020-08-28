@@ -3,12 +3,11 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import { UsersActions } from 'stores/users/UsersStore';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { Button, Row, Col } from 'components/graylog';
 import User from 'logic/users/User';
 import { isPermitted } from 'util/PermissionsMixin';
-import UserNotification from 'util/UserNotification';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import FormikFormGroup from '../form/FormikFormGroup';
@@ -30,11 +29,7 @@ const _onSubmit = (formData, username) => {
   const data = { ...formData };
   delete data.password_repeat;
 
-  return UsersActions.changePassword(username, data).then(() => {
-    UserNotification.success('Password updated successfully.', 'Success');
-  }, () => {
-    UserNotification.error('Could not update password. Please verify that your current password is correct.', 'Updating password failed');
-  });
+  return UsersDomain.changePassword(username, data);
 };
 
 const PasswordSection = ({ user: { username } }: Props) => {

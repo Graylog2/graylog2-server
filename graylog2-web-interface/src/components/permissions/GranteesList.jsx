@@ -56,11 +56,11 @@ type Props = {
   className?: string,
   entityGRN: GRN,
   entityType: $PropertyType<SharedEntity, 'type'>,
-  onDelete: (GRN) => Promise<EntityShareState>,
+  onDelete: (GRN) => Promise<?EntityShareState>,
   onCapabilityChange: ({
     granteeId: $PropertyType<Grantee, 'id'>,
     capabilityId: $PropertyType<Capability, 'id'>,
-  }) => Promise<EntityShareState>,
+  }) => Promise<?EntityShareState>,
   selectedGrantees: SelectedGrantees,
   title: string,
 };

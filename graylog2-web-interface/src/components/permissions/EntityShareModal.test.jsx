@@ -50,7 +50,7 @@ describe('EntityShareModal', () => {
 
     expect(EntityShareActions.prepare).toBeCalledTimes(1);
 
-    expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity);
+    expect(EntityShareActions.prepare).toBeCalledWith('dashboard', 'The title', mockEntityShareState.entity);
   });
 
   it('updates entity share state on submit', async () => {
@@ -63,7 +63,7 @@ describe('EntityShareModal', () => {
     await waitFor(() => {
       expect(EntityShareActions.update).toBeCalledTimes(1);
 
-      expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, {
+      expect(EntityShareActions.update).toBeCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
         selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities,
       });
     });
@@ -154,7 +154,7 @@ describe('EntityShareModal', () => {
 
         await waitFor(() => expect(EntityShareActions.prepare).toHaveBeenCalledTimes(1));
 
-        expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
+        expect(EntityShareActions.prepare).toBeCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
           selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
         });
       };
@@ -219,7 +219,7 @@ describe('EntityShareModal', () => {
       await waitFor(() => {
         expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
-        expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
+        expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
           selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
         });
       });
@@ -271,7 +271,7 @@ describe('EntityShareModal', () => {
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
-          expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
             selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
           });
         });

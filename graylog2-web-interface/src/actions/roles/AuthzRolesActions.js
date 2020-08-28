@@ -6,24 +6,24 @@ import type { PaginatedListType, PaginatedUserListType } from 'stores/roles/Auth
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
-type AuthzRolesActionsType = RefluxActions<{
-  load: (roleId: string) => Promise<Role>,
-  delete: (roleId: string) => Promise<void>,
-  addMember: (roleId: string, username: string) => Promise<Role>,
-  removeMember: (roleId: string, username: string) => Promise<Role>,
-  loadUsersForRole: (roleId: string, page: number, perPage: number, query: string) => Promise<PaginatedUserListType>,
+export type ActionsType = {
+  load: (roleId: string) => Promise<?Role>,
+  delete: (roleId: string, roleName: string) => Promise<void>,
+  addMember: (roleId: string, username: string) => Promise<?Role>,
+  removeMember: (roleId: string, username: string) => Promise<?Role>,
+  loadUsersForRole: (roleId: string, roleName: string, page: number, perPage: number, query: string) => Promise<?PaginatedUserListType>,
   loadRolesForUser: (
     username: string,
     page: number,
     perPage: number,
-    query: string) => Promise<PaginatedListType>,
+    query: string) => Promise<?PaginatedListType>,
   loadRolesPaginated: (
     page: number,
     perPage: number,
-    query: string) => Promise<PaginatedListType>,
-}>;
+    query: string) => Promise<?PaginatedListType>,
+};
 
-const AuthzRolesActions: AuthzRolesActionsType = singletonActions(
+const AuthzRolesActions: RefluxActions<ActionsType> = singletonActions(
   'AuthzRoles',
   () => Reflux.createActions({
     load: { asyncResult: true },

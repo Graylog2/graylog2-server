@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import UserOverview from 'logic/users/UserOverview';
-import { UsersActions } from 'stores/users/UsersStore';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
 import { Button, OverlayTrigger, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
 import { IfPermitted } from 'components/common';
@@ -54,7 +54,7 @@ const EditActions = ({ username }: { username: $PropertyType<Props, 'username'> 
   const _deleteUser = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete user ${username}?`)) {
-      UsersActions.delete(username);
+      UsersDomain.delete(username);
     }
   };
 

@@ -40,20 +40,20 @@ export type PaginatedUsers = {
   pagination: PaginationType,
 };
 
-type UsersActionsType = RefluxActions<{
-  create: (user: UserCreate) => Promise<string[]>,
-  load: (username: string) => Promise<User>,
-  update: (username: string, user: UserUpdate) => Promise<void>,
-  delete: (username: string) => Promise<string[]>,
+export type ActionsType = {
+  create: (payload: any) => Promise<?string[]>,
+  load: (username: string) => Promise<?User>,
+  update: (username: string, request: any) => Promise<void>,
+  delete: (username: string) => Promise<void>,
   changePassword: (username: string, request: ChangePasswordRequest) => Promise<void>,
-  createToken: (username: string, tokenName: string) => Promise<Token>,
-  loadTokens: (username: string) => Promise<Token[]>,
-  deleteToken: (username: string, tokenId: string, tokenName: string) => Promise<string[]>,
-  loadUsers: () => Promise<Immutable.List<User>>,
-  loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<PaginatedUsers>,
-}>;
+  createToken: (username: string, tokenName: string) => Promise<?Token>,
+  loadTokens: (username: string) => Promise<?Token[]>,
+  deleteToken: (username: string, tokenId: string, tokenName: string) => Promise<void>,
+  loadUsers: () => Promise<?Immutable.List<User>>,
+  loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedUsers>,
+};
 
-const UsersActions: UsersActionsType = singletonActions(
+const UsersActions: RefluxActions<ActionsType> = singletonActions(
   'Users',
   () => Reflux.createActions({
     create: { asyncResult: true },

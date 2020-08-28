@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import type { GRN } from 'logic/permissions/types';
 import EntityShareState from 'logic/permissions/EntityShareState';
 import SharedEntity from 'logic/permissions/SharedEntity';
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { Select } from 'components/common';
 
@@ -19,6 +19,7 @@ type Props = {
   description: $PropertyType<Props, 'description'>,
   entityGRN: GRN,
   entityType: $PropertyType<SharedEntity, 'type'>,
+  entityTitle: $PropertyType<SharedEntity, 'title'>,
   entityShareState: EntityShareState,
   setDisableSubmit: (boolean) => void,
   granteesSelectRef: ?Select,
@@ -54,6 +55,7 @@ const EntityShareSettings = ({
   description,
   entityGRN,
   entityType,
+  entityTitle,
   setDisableSubmit,
   granteesSelectRef,
 }: Props) => {
@@ -65,7 +67,7 @@ const EntityShareSettings = ({
       selected_grantee_capabilities: selectedGranteeCapabilities.merge({ [granteeId]: capabilityId }),
     };
 
-    return EntityShareActions.prepare(entityGRN, payload).then((response) => {
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
       setDisableSubmit(false);
 
       return response;
@@ -78,7 +80,7 @@ const EntityShareSettings = ({
       selected_grantee_capabilities: selectedGranteeCapabilities.remove(granteeId),
     };
 
-    return EntityShareActions.prepare(entityGRN, payload).then((response) => {
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
       setDisableSubmit(false);
 
       return response;

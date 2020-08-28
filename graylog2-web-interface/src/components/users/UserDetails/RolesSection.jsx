@@ -2,9 +2,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import UserNotification from 'util/UserNotification';
 import User from 'logic/users/User';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import PaginatedItemOverview, {
   type PaginationInfo,
   type PaginatedListType,
@@ -23,7 +23,7 @@ const RolesSection = ({ user: { username } }: Props) => {
   const _onLoad = ({ page, perPage, query }: PaginationInfo, isSubscribed: boolean): Promise<?PaginatedListType> => {
     setLoading(true);
 
-    return AuthzRolesActions.loadRolesForUser(username, page, perPage, query)
+    return AuthzRolesDomain.loadRolesForUser(username, page, perPage, query)
       .then((response) => {
         if (isSubscribed) {
           setLoading(false);
