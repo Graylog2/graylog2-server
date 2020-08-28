@@ -15,7 +15,7 @@ type StyleTypes = {
 export const GlobalStylesContext = createContext<StyleTypes>({ addGlobalStyles: () => {} });
 
 const GlobalStylesProvider = ({ children }: Props) => {
-  const [additionalStyles: string, addGlobalStyles] = useState();
+  const [additionalStyles, addGlobalStyles] = useState<?string>();
 
   return (
     <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
