@@ -4,6 +4,7 @@ import styled, { type StyledComponent } from 'styled-components';
 
 import { Alert } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
+import { type GranteesList } from 'logic/permissions/EntityShareState';
 import ValidationResult from 'logic/permissions/ValidationResult';
 
 const Container: StyledComponent<{}, ThemeInterface, Alert> = styled(Alert)`
@@ -23,17 +24,18 @@ const List = styled.ul`
 
 type Props = {
   validationResult: ValidationResult,
+  availableGrantees: GranteesList,
 };
 
-const ValidationError = ({ validationResult }: Props) => {
-  const errors = validationResult.errors || {};
+const ValidationError = ({ validationResult, availableGrantees }: Props) => {
+  const pastOwners = validationResult.errorContext.selectedGranteeCapabilities.toJS().map(
+    (grn) => availableGrantees.find((grantee) => grantee.id === grn)?.title,
+  ).join(', ');
 
   return (
     <Container bsStyle="danger">
       <List>
-        { Object.keys(errors).map((key) => (
-          <li key={key}>{errors[key]}</li>
-        ))}
+        <li>{`Removing the following owners ${pastOwners} will leave the entity ownerless.`}</li>
       </List>
     </Container>
   );

@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -14,7 +15,7 @@ import GranteesSelector, { type SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import DependenciesWarning from './DependenciesWarning';
 import ValidationError from './ValidationError';
-import ShareableEnityURL from './ShareableEnityURL';
+import ShareableEntityURL from './ShareableEnityURL';
 
 type Props = {
   description: $PropertyType<Props, 'description'>,
@@ -63,6 +64,10 @@ const EntityShareSettings = ({
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
+  useEffect(() => {
+    setDisableSubmit(validationResults?.failed);
+  }, [validationResults]);
+
   const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
     const newSelectedCapabilities = selectedGranteeCapabilities.merge({ [granteeId]: capabilityId });
 
@@ -72,11 +77,7 @@ const EntityShareSettings = ({
       selected_grantee_capabilities: newSelectedCapabilities,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
-      setDisableSubmit(false);
-
-      return response;
-    });
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload);
   };
 
   const _handleDeletion = (granteeId: GRN) => {
@@ -88,11 +89,7 @@ const EntityShareSettings = ({
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
-      setDisableSubmit(false);
-
-      return response;
-    });
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload);
   };
 
   return (
@@ -121,7 +118,8 @@ const EntityShareSettings = ({
       </Section>
       {validationResults && validationResults.failed && (
         <Section>
-          <ValidationError validationResult={validationResults} />
+          <ValidationError validationResult={validationResults}
+                           availableGrantees={availableGrantees} />
         </Section>
       )}
       {missingDependencies && missingDependencies.size > 0 && (
@@ -131,7 +129,7 @@ const EntityShareSettings = ({
         </Section>
       )}
       <Section>
-        <ShareableEnityURL />
+        <ShareableEntityURL />
       </Section>
     </>
   );
