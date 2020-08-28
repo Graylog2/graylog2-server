@@ -1,6 +1,7 @@
 // @flow strict
 import UserNotification from 'util/UserNotification';
 import { createNotFoundError } from 'logic/errors/ReportedErrors';
+import ErrorsActions from 'actions/errors/ErrorsActions';
 
 type Notification = {
   title?: string,
@@ -23,8 +24,8 @@ const notifyingAction = <T, Args: Array<T>, Result>({ action, success: successNo
 
     return result;
   }).catch((error) => {
-    if (notFoundRedirect && error?.status === '404') {
-      createNotFoundError(error);
+    if (notFoundRedirect && error?.status === 404) {
+      ErrorsActions.report(createNotFoundError(error));
 
       return;
     }
