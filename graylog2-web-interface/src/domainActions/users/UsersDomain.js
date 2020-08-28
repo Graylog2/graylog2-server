@@ -6,11 +6,11 @@ import notifyingAction from '../notifyingAction';
 
 const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
   action: UsersActions.create,
-  success: (payload) => ({
-    message: `User "${payload?.username}" was created successfully`,
+  success: (user) => ({
+    message: `User "${user?.username}" was created successfully`,
   }),
-  error: (error, payload) => ({
-    message: `Creating user "${payload?.username}" failed with status: ${error}`,
+  error: (error, user) => ({
+    message: `Creating user "${user?.username}" failed with status: ${error}`,
   }),
 });
 
