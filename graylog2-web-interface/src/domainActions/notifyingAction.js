@@ -24,13 +24,18 @@ const notifyingAction = <T, Args: Array<T>, Result>({ action, success: successNo
 
     return result;
   }).catch((error) => {
+    let readableError = String(error);
+
     if (notFoundRedirect && error?.status === 404) {
       ErrorsActions.report(createNotFoundError(error));
 
       return;
     }
 
-    const readableError = String(error); // Todo format error here correctly
+    if (error?.status === 400 && error?.additional?.body?.message) {
+      readableError = error.additional.body.message;
+    }
+
     const { message, title } = errorNotification(readableError, ...args);
     UserNotification.error(message, title || 'Error');
   });
