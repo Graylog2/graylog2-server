@@ -1,6 +1,6 @@
 package org.graylog.events.notifications.types;
 
-import com.google.common.base.Charsets;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 public class SlackClient {
 
@@ -49,7 +50,7 @@ public class SlackClient {
 			throw new SlackClientException("Could not open connection to Slack API", e);
 		}
 
-		try (final Writer writer = new OutputStreamWriter(conn.getOutputStream(), Charsets.UTF_8)) {
+		try (final Writer writer = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
 			String json = message.getJsonString();
 			writer.write(json);
 			writer.flush();
@@ -59,7 +60,7 @@ public class SlackClient {
 				if(LOG.isDebugEnabled()){
 					try (final InputStream responseStream = conn.getInputStream()) {
 						final byte[] responseBytes = IOUtils.toByteArray(responseStream);
-						final String response = new String(responseBytes, Charsets.UTF_8);
+						final String response = new String(responseBytes, StandardCharsets.UTF_8);
 						LOG.debug("Received HTTP response body:\n{}", response);
 					}
 				}
@@ -72,7 +73,7 @@ public class SlackClient {
 		try (final InputStream responseStream = conn.getInputStream()) {
 			final byte[] responseBytes = IOUtils.toByteArray(responseStream);
 
-			final String response = new String(responseBytes, Charsets.UTF_8);
+			final String response = new String(responseBytes, StandardCharsets.UTF_8);
 			if (response.equals("ok")) {
 				LOG.debug("Successfully sent message to Slack.");
 			} else {
