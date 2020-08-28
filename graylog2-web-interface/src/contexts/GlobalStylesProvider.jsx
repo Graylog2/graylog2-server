@@ -9,13 +9,13 @@ type Props = {
 };
 
 type StyleTypes = {
-  addGlobalStyles: (?CSSRules) => ?string,
+  addGlobalStyles: (?CSSRules) => void,
 };
 
 export const GlobalStylesContext = createContext<StyleTypes>({ addGlobalStyles: () => {} });
 
 const GlobalStylesProvider = ({ children }: Props) => {
-  const [additionalStyles, addGlobalStyles] = useState<?string>();
+  const [additionalStyles, addGlobalStyles] = useState<?CSSRules>();
 
   return (
     <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
