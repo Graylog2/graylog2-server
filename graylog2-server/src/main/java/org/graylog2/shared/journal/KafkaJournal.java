@@ -328,7 +328,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     brokerState,
                     JODA_TIME);
 
-            final TopicAndPartition topicAndPartition = new TopicAndPartition("messagejournal", 0);
+            final TopicPartition topicAndPartition = new TopicPartition("messagejournal", 0);
             final Option<Log> messageLog = logManager.getLog(topicAndPartition);
             if (messageLog.isEmpty()) {
                 kafkaLog = logManager.createLog(topicAndPartition, logManager.defaultConfig());
@@ -678,9 +678,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     protected void flushDirtyLogs() {
         LOG.debug("Checking for dirty logs to flush...");
 
-        final Set<Map.Entry<TopicAndPartition, Log>> entries = JavaConversions.mapAsJavaMap(logManager.logsByTopicPartition()).entrySet();
-        for (final Map.Entry<TopicAndPartition, Log> topicAndPartitionLogEntry : entries) {
-            final TopicAndPartition topicAndPartition = topicAndPartitionLogEntry.getKey();
+        final Set<Map.Entry<TopicPartition, Log>> entries = JavaConversions.mapAsJavaMap(logManager.logsByTopicPartition()).entrySet();
+        for (final Map.Entry<TopicPartition, Log> topicAndPartitionLogEntry : entries) {
+            final TopicPartition topicAndPartition = topicAndPartitionLogEntry.getKey();
             final Log kafkaLog = topicAndPartitionLogEntry.getValue();
             final long timeSinceLastFlush = JODA_TIME.milliseconds() - kafkaLog.lastFlushTime();
             try {
