@@ -10,7 +10,7 @@ const create: $PropertyType<ActionsType, 'create'> = notifyingAction({
     message: `User "${payload?.username}" was created successfully`,
   }),
   error: (error, payload) => ({
-    message: `Updating user "${payload?.username}" failed with status: ${error}`,
+    message: `Creating user "${payload?.username}" failed with status: ${error}`,
   }),
 });
 
@@ -65,7 +65,7 @@ const createToken: $PropertyType<ActionsType, 'createToken'> = notifyingAction({
 const loadTokens: $PropertyType<ActionsType, 'loadTokens'> = notifyingAction({
   action: UsersActions.loadTokens,
   error: (error, username) => ({
-    message: `Loading token for user "${username}" failed with status: ${error}`,
+    message: `Loading tokens for user "${username}" failed with status: ${error}`,
   }),
 });
 
