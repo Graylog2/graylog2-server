@@ -38,12 +38,11 @@ const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
 };
 
 const GraylogThemeProvider = ({ children, defaultMode }: Props) => {
-  const [mode, setCurrentThemeMode] = useCurrentThemeMode();
-  const themeMode = defaultMode ?? mode;
+  const [mode, setCurrentThemeMode] = defaultMode ? [defaultMode, () => {}] : useCurrentThemeMode();
 
-  const themeColors = colors[themeMode];
+  const themeColors = colors[mode];
 
-  const theme = useMemo(() => (themeColors ? createTheme(themeMode, themeColors, setCurrentThemeMode) : undefined), [themeMode, themeColors]);
+  const theme = useMemo(() => (themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined), [mode, themeColors]);
 
   return theme ? (
     <ThemeProvider theme={theme}>
