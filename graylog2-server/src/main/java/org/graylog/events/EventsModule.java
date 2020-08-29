@@ -34,10 +34,7 @@ import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationExecutionMetrics;
 import org.graylog.events.notifications.NotificationGracePeriodService;
-import org.graylog.events.notifications.types.EmailEventNotification;
-import org.graylog.events.notifications.types.EmailEventNotificationConfig;
-import org.graylog.events.notifications.types.HTTPEventNotification;
-import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog.events.notifications.types.*;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -140,6 +137,12 @@ public class EventsModule extends PluginModule {
                 HTTPEventNotificationConfig.class,
                 HTTPEventNotification.class,
                 HTTPEventNotification.Factory.class);
+
+        addNotificationType(SlackEventNotificationConfig.TYPE_NAME,
+                SlackEventNotificationConfig.class,
+                SlackEventNotification.class,
+                SlackEventNotification.Factory.class);
+
         addNotificationType(LegacyAlarmCallbackEventNotificationConfig.TYPE_NAME,
                 LegacyAlarmCallbackEventNotificationConfig.class,
                 LegacyAlarmCallbackEventNotification.class,

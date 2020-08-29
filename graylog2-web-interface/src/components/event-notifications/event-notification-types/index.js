@@ -26,6 +26,13 @@ PluginStore.register(new PluginManifest({}, {
       defaultConfig: HttpNotificationForm.defaultConfig,
     },
     {
+      type: 'slack-notification-v1',
+      displayName: 'Slack Notification',
+      formComponent: HttpNotificationForm,
+      summaryComponent: HttpNotificationSummary,
+      defaultConfig: HttpNotificationForm.defaultConfig,
+    },
+    {
       type: 'legacy-alarm-callback-notification-v1',
       displayName: 'Legacy Alarm Callbacks',
       formComponent: LegacyNotificationFormContainer,
