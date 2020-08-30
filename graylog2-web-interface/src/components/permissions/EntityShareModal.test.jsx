@@ -31,7 +31,7 @@ describe('EntityShareModal', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   const SimpleEntityShareModal = ({ ...props }) => {
@@ -165,16 +165,6 @@ describe('EntityShareModal', () => {
         ${everyone} | ${'everyone'} | ${manager}
         ${security} | ${'team'}     | ${owner}
       `('sends new grantee $granteeType to preparation', addGrantee);
-    });
-
-    it('shows validation error', async () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
-
-      const submitButton = getByText('Add Collaborator');
-
-      fireEvent.click(submitButton);
-
-      await waitFor(() => expect(getByText('The grantee is required.')).not.toBeNull());
     });
 
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
