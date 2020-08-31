@@ -8,6 +8,8 @@ import HttpNotificationSummary from './HttpNotificationSummary';
 import LegacyNotificationForm from './LegacyNotificationForm';
 import LegacyNotificationFormContainer from './LegacyNotificationFormContainer';
 import LegacyNotificationSummaryContainer from './LegacyNotificationSummaryContainer';
+import SlackNotificationForm from './SlackNotificationForm';
+import SlackNotificationSummary from './SlackNotificationSummary';
 
 PluginStore.register(new PluginManifest({}, {
   eventNotificationTypes: [
@@ -28,9 +30,9 @@ PluginStore.register(new PluginManifest({}, {
     {
       type: 'slack-notification-v1',
       displayName: 'Slack Notification',
-      formComponent: HttpNotificationForm,
-      summaryComponent: HttpNotificationSummary,
-      defaultConfig: HttpNotificationForm.defaultConfig,
+      formComponent: SlackNotificationForm,
+      summaryComponent: SlackNotificationSummary,
+      defaultConfig: SlackNotificationForm.defaultConfig,
     },
     {
       type: 'legacy-alarm-callback-notification-v1',
