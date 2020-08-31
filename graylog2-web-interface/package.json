@@ -50,7 +50,7 @@
     ],
     "moduleNameMapper": {
       "^file-loader(\\?esModule=false)?!(.+)$": "$2",
-      "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
+      "(\\.lazy|leaflet)\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
       "\\.(css|less)$": "identity-obj-proxy",
       "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx",
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/fileMock.js"
