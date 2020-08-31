@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import lodash from 'lodash';
 import $ from 'jquery';
-import Typeahead from 'typeahead.js';
+import 'typeahead.js';
 
 import UniversalSearch from 'logic/search/UniversalSearch';
 // eslint-disable-next-line no-unused-vars

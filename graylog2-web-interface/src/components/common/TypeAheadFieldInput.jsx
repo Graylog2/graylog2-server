@@ -3,14 +3,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import $ from 'jquery';
-import Typeahead from 'typeahead.js'; // Need to import this to load typeahead, even if the variable is never used
+import 'typeahead.js';
 
 import { Input } from 'components/bootstrap';
-// eslint-disable-next-line no-unused-vars
-
 import UniversalSearch from 'logic/search/UniversalSearch';
 import ApiRoutes from 'routing/ApiRoutes';
-import URLUtils from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 /**
@@ -41,7 +39,7 @@ class TypeAheadFieldInput extends React.Component {
     if (this.fieldInput) {
       const fieldInput = $(this.fieldInput.getInputDOMNode());
 
-      fetch('GET', URLUtils.qualifyUrl(ApiRoutes.SystemApiController.fields().url))
+      fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url))
         .then(
           (data) => {
             fieldInput.typeahead(
