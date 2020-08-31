@@ -40,3 +40,13 @@ export const admin = UserOverview.builder()
   .build();
 
 export const userList = Immutable.List<UserOverview>([admin, bob, alice]);
+
+export const paginatedUsers = {
+  list: userList,
+  pagination: {
+    page: 1,
+    perPage: 10,
+    total: userList.size,
+  },
+  adminUser: undefined,
+};
