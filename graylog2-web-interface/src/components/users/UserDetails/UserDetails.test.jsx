@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { simplePaginatedUserShares } from 'fixtures/userEntityShares';
+import { paginatedShares } from 'fixtures/sharedEntities';
 import selectEvent from 'react-select-event';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -12,7 +12,7 @@ import User from 'logic/users/User';
 import UserDetails from './UserDetails';
 
 const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), pagination: { total: 0 } });
-const mockPaginatedUserShares = simplePaginatedUserShares(1, 10, '');
+const mockPaginatedUserShares = paginatedShares(1, 10, '');
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
@@ -107,10 +107,9 @@ describe('<UserDetails />', () => {
     describe('shared entities section', () => {
       it('should list provided paginated user shares', async () => {
         const { getAllByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
+        await act(() => mockAuthzRolesPromise);
 
         expect(getAllByText(mockPaginatedUserShares.list.first().title)).not.toBeNull();
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('should fetch paginated user shares when using search', async () => {
