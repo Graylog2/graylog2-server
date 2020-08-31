@@ -36,7 +36,7 @@ class SlackNotificationForm extends React.Component {
     icon_url: '',
     icon_emoji: '',
     graylog_url: '',
-    proxy: ''
+    proxy: '',
   };
 
   propagateChange = (key, value) => {
@@ -55,7 +55,7 @@ class SlackNotificationForm extends React.Component {
     const { config, validation } = this.props;
 
     return (
-      <React.Fragment>
+      <>
         <Input id="notification-color"
                name="color"
                label="Custom Message Color"
@@ -155,7 +155,7 @@ class SlackNotificationForm extends React.Component {
                help={lodash.get(validation, 'errors.proxy[0]', 'Please insert the proxy information in the follwoing format: <ProxyAddress>:<Port>')}
                value={config.proxy || ''}
                onChange={this.handleChange} />
-      </React.Fragment>
+      </>
     );
   }
 }

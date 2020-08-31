@@ -16,9 +16,10 @@ class SlackNotificationSummary extends React.Component {
 
   render() {
     const { notification } = this.props;
+
     return (
       <CommonNotificationSummary {...this.props}>
-        <React.Fragment>
+        <>
           <tr>
             <td>Color</td>
             <td>{notification.config.color}</td>
@@ -67,7 +68,7 @@ class SlackNotificationSummary extends React.Component {
             <td>Proxy</td>
             <td>{notification.config.proxy}</td>
           </tr>
-        </React.Fragment>
+        </>
       </CommonNotificationSummary>
     );
   }
