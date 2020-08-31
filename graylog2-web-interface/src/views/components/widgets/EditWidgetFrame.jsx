@@ -14,7 +14,6 @@ import IfDashboard from '../dashboard/IfDashboard';
 import HeaderElements from '../HeaderElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
-
 type DialogProps = {
   bsClass: string,
   className: string,

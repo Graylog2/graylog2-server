@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { Row, Col, Alert } from 'components/graylog';
@@ -31,10 +32,13 @@ const Pipeline = createReactClass({
     this.style.unuse();
   },
 
+  // eslint-disable-next-line global-require
   style: require('./Pipeline.lazy.css'),
 
   _connections_warning() {
-    if (this.props.connections.length == 0) {
+    const { connections } = this.props;
+
+    if (connections.length === 0) {
       return (
         <Alert bsStyle="danger" className="pipeline-no-connections-warning">
           This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one
@@ -43,30 +47,39 @@ const Pipeline = createReactClass({
         </Alert>
       );
     }
+
+    return null;
   },
 
   _saveStage(stage, callback) {
-    const newStages = this.props.pipeline.stages.slice();
+    const { pipeline, onStagesChange } = this.props;
+
+    const newStages = pipeline.stages.slice();
 
     newStages.push(stage);
-    this.props.onStagesChange(newStages, callback);
+    onStagesChange(newStages, callback);
   },
 
   _updateStage(prevStage) {
+    const { pipeline, onStagesChange } = this.props;
+
     return (stage, callback) => {
-      const newStages = this.props.pipeline.stages.filter((s) => s.stage !== prevStage.stage);
+      const newStages = pipeline.stages.filter((s) => s.stage !== prevStage.stage);
 
       newStages.push(stage);
-      this.props.onStagesChange(newStages, callback);
+      onStagesChange(newStages, callback);
     };
   },
 
   _deleteStage(stage) {
-    return () => {
-      if (confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
-        const newStages = this.props.pipeline.stages.filter((s) => s.stage !== stage.stage);
+    const { pipeline, onStagesChange } = this.props;
 
-        this.props.onStagesChange(newStages);
+    return () => {
+      // eslint-disable-next-line no-restricted-globals
+      if (confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
+        const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
+
+        onStagesChange(newStages);
       }
     };
   },
@@ -85,9 +98,11 @@ const Pipeline = createReactClass({
   },
 
   _formatStage(stage, maxStage) {
+    const { pipeline } = this.props;
+
     return (
       <Stage key={`stage-${stage.stage}`}
-             pipeline={this.props.pipeline}
+             pipeline={pipeline}
              stage={stage}
              isLastStage={stage.stage === maxStage}
              onUpdate={this._updateStage(stage)}
@@ -96,7 +111,7 @@ const Pipeline = createReactClass({
   },
 
   render() {
-    const { pipeline } = this.props;
+    const { pipeline, connections, streams, onPipelineChange, onConnectionsChange } = this.props;
 
     const maxStage = pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
     const formattedStages = pipeline.stages
@@ -106,20 +121,20 @@ const Pipeline = createReactClass({
     return (
       <div>
         {this._connections_warning()}
-        <PipelineDetails pipeline={pipeline} onChange={this.props.onPipelineChange} />
+        <PipelineDetails pipeline={pipeline} onChange={onPipelineChange} />
         <Row className="row-sm row-margin-top">
           <Col md={12}>
             <div className="pull-right">
               <PipelineConnectionsForm pipeline={pipeline}
-                                       connections={this.props.connections}
-                                       streams={this.props.streams}
-                                       save={this.props.onConnectionsChange} />
+                                       connections={connections}
+                                       streams={streams}
+                                       save={onConnectionsChange} />
             </div>
             <h2>Pipeline connections</h2>
             <p className="description-margin-top">
               <PipelineConnectionsList pipeline={pipeline}
-                                       connections={this.props.connections}
-                                       streams={this.props.streams}
+                                       connections={connections}
+                                       streams={streams}
                                        streamsFormatter={this._formatConnectedStreams}
                                        noConnectionsMessage="Select streams that will be processed by this pipeline." />
             </p>
