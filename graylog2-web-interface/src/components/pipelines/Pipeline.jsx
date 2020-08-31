@@ -75,7 +75,7 @@ const Pipeline = createReactClass({
     const { pipeline, onStagesChange } = this.props;
 
     return () => {
-      // eslint-disable-next-line no-restricted-globals
+      // eslint-disable-next-line no-restricted-globals,no-alert
       if (confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
         const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
 
