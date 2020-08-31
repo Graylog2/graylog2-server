@@ -53,6 +53,7 @@ const availabeEntityTypes = {
   stream: 'Stream',
   dashboard: 'Dashboard',
   saved_search: 'Saved Search',
+  event_definition: 'Event Definition',
 };
 
 const availableCapabilities = {
