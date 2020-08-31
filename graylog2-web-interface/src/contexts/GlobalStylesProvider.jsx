@@ -639,7 +639,7 @@ const ThemeStyles = createGlobalStyle(({ additionalStyles, theme }) => css`
     width: auto;
   }
   
-  .tt-menu {
+  .typeahead-wrapper .tt-menu {
     background-color: ${theme.colors.global.contentBackground};
     box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
     color: ${theme.colors.global.textDefault};

@@ -24,6 +24,8 @@ class TypeAheadFieldInput extends React.Component {
      * instead.
      */
     valueLink: PropTypes.object,
+    /** Label of the field input */
+    label: PropTypes.string,
     /** Specifies if the input should have the input focus or not. */
     autoFocus: PropTypes.bool,
     /**
@@ -35,8 +37,16 @@ class TypeAheadFieldInput extends React.Component {
     onChange: PropTypes.func,
   };
 
+  static defaultProps = {
+    valueLink: undefined,
+    autoFocus: false,
+    label: undefined,
+    onChange: () => {},
+  }
+
   componentDidMount() {
     if (this.fieldInput) {
+      const { autoFocus, valueLink, onChange } = this.props;
       const fieldInput = $(this.fieldInput.getInputDOMNode());
 
       fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url))
@@ -55,22 +65,23 @@ class TypeAheadFieldInput extends React.Component {
               },
             );
 
-            if (this.props.autoFocus) {
+            if (autoFocus) {
               fieldInput.focus();
               fieldInput.typeahead('close');
             }
           },
         );
 
+      // eslint-disable-next-line react/no-find-dom-node
       const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
 
       $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
-        if (this.props.onChange) {
-          this.props.onChange(event);
+        if (onChange) {
+          onChange(event);
         }
 
-        if (this.props.valueLink) {
-          this.props.valueLink.requestChange(event.target.value);
+        if (valueLink) {
+          valueLink.requestChange(event.target.value);
         }
       });
     }
@@ -81,6 +92,8 @@ class TypeAheadFieldInput extends React.Component {
       const fieldInput = $(this.fieldInput.getInputDOMNode());
 
       fieldInput.typeahead('destroy');
+
+      // eslint-disable-next-line react/no-find-dom-node
       const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
 
       $(fieldFormGroup).off('typeahead:change typeahead:selected');
@@ -100,12 +113,14 @@ class TypeAheadFieldInput extends React.Component {
   };
 
   render() {
+    const { id, label, valueLink } = this.props;
+
     return (
-      <Input id={this.props.id}
+      <Input id={id}
              ref={(fieldInput) => { this.fieldInput = fieldInput; }}
-             label={this.props.label}
+             label={label}
              wrapperClassName="typeahead-wrapper"
-             defaultValue={this.props.valueLink ? this.props.valueLink.value : null}
+             defaultValue={valueLink ? valueLink.value : null}
              {...this._getFilteredProps()} />
     );
   }
