@@ -52,7 +52,7 @@ describe('<UserDetails />', () => {
   });
 
   it('user profile should display profile information', async () => {
-    const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+    const { getByText, debug } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
     await act(() => mockAuthzRolesPromise);
 
     expect(getByText(user.username)).not.toBeNull();
@@ -160,6 +160,15 @@ describe('<UserDetails />', () => {
 
       expect(queryByRole('heading', { level: 2, name: 'Roles' })).not.toBeNull();
       expect(queryByText(assignedRole.name)).not.toBeNull();
+    });
+  });
+
+  describe('teams section', () => {
+    it('should display info if license is not present', async () => {
+      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockAuthzRolesPromise);
+
+      expect(getByText('No enterprise plugin found')).not.toBeNull();
     });
   });
 });

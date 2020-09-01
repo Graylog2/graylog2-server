@@ -232,4 +232,14 @@ describe('<UserEdit />', () => {
       await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, { roles: [] }));
     });
   });
+
+  describe('teams section', () => {
+    it('should display info if license is not present', async () => {
+      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
+
+      expect(getByText('No enterprise plugin found')).not.toBeNull();
+    });
+  });
 });
