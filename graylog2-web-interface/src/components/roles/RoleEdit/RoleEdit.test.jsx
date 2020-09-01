@@ -26,8 +26,8 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesStore: {},
   AuthzRolesActions: {
     removeMember: mockAction(jest.fn(() => Promise.resolve())),
-    loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
     addMember: mockAction(jest.fn(() => Promise.resolve())),
+    loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
   },
 }));
 
@@ -43,7 +43,6 @@ const paginatedUsers = {
 const mockLoadUsersPromise = Promise.resolve(paginatedUsers);
 
 jest.mock('stores/users/UsersStore', () => ({
-  UsersStore: {},
   UsersActions: {
     loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
   },
