@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.storage.providers;
+package org.graylog2.storage;
 
-import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.ElasticsearchVersion;
-import org.graylog2.storage.VersionAwareProvider;
+import com.google.inject.BindingAnnotation;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class MessagesAdapterProvider extends VersionAwareProvider<MessagesAdapter> {
-    @Inject
-    public MessagesAdapterProvider(@ElasticsearchVersion Version version, Map<Version, Provider<MessagesAdapter>> pluginBindings) {
-        super(version, pluginBindings);
-    }
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@BindingAnnotation
+public @interface ElasticsearchVersion {
 }
