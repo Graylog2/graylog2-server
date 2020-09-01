@@ -58,7 +58,7 @@ const PaginatedList = ({
   const numberPages = Math.ceil(totalItems / pageSize);
 
   useEffect(() => {
-    if (activePage && activePage > 0) {
+    if (activePage > 0) {
       setCurrentPage(activePage);
     }
   }, [activePage]);
