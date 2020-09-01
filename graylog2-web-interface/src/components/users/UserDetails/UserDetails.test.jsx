@@ -52,7 +52,7 @@ describe('<UserDetails />', () => {
   });
 
   it('user profile should display profile information', async () => {
-    const { getByText, debug } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+    const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
     await act(() => mockAuthzRolesPromise);
 
     expect(getByText(user.username)).not.toBeNull();
