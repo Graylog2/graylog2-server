@@ -14,9 +14,6 @@ import UsersOverview from './UsersOverview';
 const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 
 jest.mock('stores/users/UsersStore', () => ({
-  UsersStore: {
-    listen: jest.fn(),
-  },
   UsersActions: {
     loadUsersPaginated: jest.fn(() => mockLoadUsersPaginatedPromise),
     delete: jest.fn(() => Promise.resolve()),
@@ -50,7 +47,6 @@ describe('UsersOverview', () => {
     const displaysUserAttributes = async ({ user }) => {
       const { queryByText } = render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
-
       await act(() => mockLoadUsersPaginatedPromise);
 
       attributes.forEach(async (attribute) => {
@@ -66,6 +62,18 @@ describe('UsersOverview', () => {
       ${bob}   | ${bob.username}
       ${adminOverview} | ${adminOverview.username}
     `('$username', displaysUserAttributes);
+  });
+
+  it('should search users', async () => {
+    const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
+    await act(() => mockLoadUsersPaginatedPromise);
+    const searchInput = getByPlaceholderText('Enter search query...');
+    const searchSubmitButton = getByRole('button', { name: 'Search' });
+
+    fireEvent.change(searchInput, { target: { value: 'username:bob' } });
+    fireEvent.click(searchSubmitButton);
+
+    await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
   });
 
   describe('admin should', () => {
