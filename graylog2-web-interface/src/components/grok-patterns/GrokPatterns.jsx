@@ -1,14 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { PaginatedList, SearchForm } from 'components/common';
-import { Button, Col, Row } from 'components/graylog';
+import { Icon, PaginatedList, SearchForm } from 'components/common';
+import { Button, Col, Row, OverlayTrigger } from 'components/graylog';
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import DataTable from 'components/common/DataTable';
 import IfPermitted from 'components/common/IfPermitted';
 import StoreProvider from 'injection/StoreProvider';
+
+import GrokPatternQueryHelper from './GrokPatternQueryHelper';
 
 const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
@@ -167,6 +169,14 @@ class GrokPatterns extends React.Component {
     const headers = ['Name', 'Pattern', 'Actions'];
     const { pagination, patterns } = this.state;
 
+    const queryHelperComponent = (
+      <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={<GrokPatternQueryHelper />}>
+        <Button bsStyle="link" className="archive-search-help-button">
+          <Icon name="question-circle" fixedWidth />
+        </Button>
+      </OverlayTrigger>
+    );
+
     return (
       <div>
         <PageHeader title="Grok patterns">
@@ -196,7 +206,10 @@ class GrokPatterns extends React.Component {
             <IfPermitted permissions="inputs:read">
               <Row className="row-sm">
                 <Col md={8}>
-                  <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
+                  <SearchForm onSearch={this._onSearch}
+                              onReset={this._onReset}
+                              queryHelpComponent={queryHelperComponent}
+                              useLoadingState />
                 </Col>
               </Row>
               <Row>
