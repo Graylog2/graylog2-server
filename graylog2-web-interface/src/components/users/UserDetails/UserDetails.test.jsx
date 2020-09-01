@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { paginatedShares } from 'fixtures/sharedEntities';
 import selectEvent from 'react-select-event';
+import { reader } from 'fixtures/roles';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
@@ -11,7 +12,8 @@ import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
 
-const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), pagination: { total: 0 } });
+const assignedRole = reader;
+const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1 } });
 const mockPaginatedUserShares = paginatedShares(1, 10, '');
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
@@ -148,6 +150,16 @@ describe('<UserDetails />', () => {
 
         expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { capability: 'manage' });
       });
+    });
+  });
+
+  describe('roles section', () => {
+    it('should display assigned roles', async () => {
+      const { queryByText, queryByRole } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockAuthzRolesPromise);
+
+      expect(queryByRole('heading', { level: 2, name: 'Roles' })).not.toBeNull();
+      expect(queryByText(assignedRole.name)).not.toBeNull();
     });
   });
 });
