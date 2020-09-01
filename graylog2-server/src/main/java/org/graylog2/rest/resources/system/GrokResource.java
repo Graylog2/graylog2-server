@@ -32,9 +32,9 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.PaginatedGrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.system.grokpattern.requests.GrokPatternTestRequest;
 import org.graylog2.rest.models.system.responses.GrokPatternList;
-import org.graylog2.rest.models.system.responses.GrokPatternPageList;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -110,15 +110,15 @@ public class GrokResource extends RestResource {
     @Path("/paginated")
     @ApiOperation("Get existing grok patterns paged")
     @Produces(MediaType.APPLICATION_JSON)
-    public GrokPatternPageList getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                       @ApiParam(name = "sort",
+    public PaginatedResponse<GrokPattern> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                     @ApiParam(name = "sort",
                                                value = "The field to sort the result on",
                                                required = true,
                                                allowableValues = "title,description,id")
                                        @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
-                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                        @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INPUTS_READ);
 
@@ -130,9 +130,8 @@ public class GrokResource extends RestResource {
         }
         final PaginatedList<GrokPattern> result = paginatedGrokPatternService
                 .findPaginated(searchQuery, page, perPage, sort, order);
-        final long total = paginatedGrokPatternService.count();
 
-        return GrokPatternPageList.create(query, result.pagination(), total, sort, order, result);
+        return PaginatedResponse.create("patterns", result);
     }
 
     @GET

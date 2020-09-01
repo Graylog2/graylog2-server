@@ -53,12 +53,13 @@ const GrokPatternsStore = Reflux.createStore({
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: any) => {
         const pagination = {
-          count: response.pagination.count,
-          total: response.pagination.total,
-          page: response.pagination.page,
-          perPage: response.pagination.per_page,
-          query: response.pagination.query,
+          count: response.count,
+          total: response.total,
+          page: response.page,
+          perPage: response.per_page,
+          query: query,
         };
+
         return {
           patterns: response.patterns,
           pagination: pagination,
@@ -68,6 +69,7 @@ const GrokPatternsStore = Reflux.createStore({
         UserNotification.error(`Loading patterns failed with status: ${errorThrown}`,
           'Could not load streams');
       });
+
     return promise;
   },
 
