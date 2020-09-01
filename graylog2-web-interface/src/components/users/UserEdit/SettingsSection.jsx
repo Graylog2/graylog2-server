@@ -11,7 +11,7 @@ import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 
 type Props = {
   user: User,
-  onSubmit: ({timezone: $PropertyType<User, 'timezone'> }) => Promise<void>,
+  onSubmit: ({ timezone: $PropertyType<User, 'timezone'> }) => Promise<void>,
 };
 
 const SettingsSection = ({

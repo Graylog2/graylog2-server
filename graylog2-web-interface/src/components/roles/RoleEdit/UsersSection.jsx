@@ -3,9 +3,8 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import UserOverview from 'logic/users/UserOverview';
-import UserNotification from 'util/UserNotification';
 import {
   defaultPageInfo,
   type PaginationInfo,
@@ -27,33 +26,28 @@ const Container = styled.div`
   margin-bottom 15px;
 `;
 
-const UsersSection = ({ role: { id }, role }: Props) => {
+const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState();
 
   const _onLoad = ({ page, perPage, query }: PaginationInfo): Promise<?PaginatedListType> => {
     setLoading(true);
 
-    return AuthzRolesActions.loadUsersForRole(id, page, perPage, query)
+    return AuthzRolesDomain.loadUsersForRole(id, name, page, perPage, query)
       .then((response) => {
         setLoading(false);
 
         // $FlowFixMe UserOverview is a DescriptiveItem!!!
         return response;
-      }).catch((error) => {
-        if (error.additional.status === 404) {
-          UserNotification.error(`Loading users for role with id ${id} failed with status: ${error}`,
-            'Could not load users for role');
-        }
       });
   };
 
   const _loadUsers = (u) => u && setUsers(u);
-  const _onAssignUser = (user: UserOverview) => AuthzRolesActions.addMember(id, user.username).then(() => _onLoad(defaultPageInfo)
+  const _onAssignUser = (user: UserOverview) => AuthzRolesDomain.addMember(id, user.username).then(() => _onLoad(defaultPageInfo)
     .then(_loadUsers));
 
   const _onUnassignUser = (user: DescriptiveItem) => {
-    AuthzRolesActions.removeMember(id, user.name).then(() => {
+    AuthzRolesDomain.removeMember(id, user.name).then(() => {
       _onLoad(defaultPageInfo).then(_loadUsers);
     });
   };

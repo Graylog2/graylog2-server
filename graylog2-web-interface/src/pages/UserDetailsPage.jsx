@@ -3,10 +3,10 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
-import DocsHelper from 'util/DocsHelper';
-import { UsersActions } from 'stores/users/UsersStore';
 import { PageHeader, DocumentTitle } from 'components/common';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
+import DocsHelper from 'util/DocsHelper';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import UserDetails from 'components/users/UserDetails';
 import UserOverviewLinks from 'components/users/navigation/UserOverviewLinks';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
@@ -34,11 +34,10 @@ const UserDetailsPage = ({ params }: Props) => {
   const username = params?.username;
 
   useEffect(() => {
-    UsersActions.load(username).then(setLoadedUser);
+    UsersDomain.load(username).then(setLoadedUser);
 
-    EntityShareActions.loadUserSharesPaginated(username, 1, 10, '').then((response) => {
-      setPaginatedUserShares(response);
-    });
+    EntityShareDomain.loadUserSharesPaginated(username, 1, 10, '')
+      .then((newPaginatedUserShares) => newPaginatedUserShares && setPaginatedUserShares(newPaginatedUserShares));
   }, [username]);
 
   return (

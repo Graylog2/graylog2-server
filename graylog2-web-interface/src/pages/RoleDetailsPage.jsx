@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import { withRouter } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import RoleDetails from 'components/roles/RoleDetails';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
 import DocsHelper from 'util/DocsHelper';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { PageHeader, DocumentTitle } from 'components/common';
 import { Button } from 'components/graylog';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -34,7 +34,7 @@ const RoleDetailsPage = ({ params }: Props) => {
   const roleId = params?.roleId;
 
   useEffect(() => {
-    AuthzRolesActions.load(roleId).then(setLoadedRole);
+    AuthzRolesDomain.load(roleId).then(setLoadedRole);
   }, [roleId]);
 
   return (

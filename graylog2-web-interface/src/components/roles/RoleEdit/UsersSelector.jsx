@@ -9,7 +9,7 @@ import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import Role from 'logic/roles/Role';
 import { type PaginatedListType } from 'components/common/PaginatedItemOverview';
 import UserOverview from 'logic/users/UserOverview';
-import { UsersActions } from 'stores/users/UsersStore';
+import UsersDomain from 'domainActions/users/UsersDomain';
 import { type ThemeInterface } from 'theme';
 import { Button } from 'components/graylog';
 import { Select } from 'components/common';
@@ -61,15 +61,15 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
   const [options, setOptions] = useState([]);
   const getUnlimited = [1, 0, ''];
 
-  const _loadUsers = () => UsersActions.loadUsersPaginated(...getUnlimited)
-    .then(({ list }) => {
-      if (list) {
-        const resultUsers = list
+  const _loadUsers = () => UsersDomain.loadUsersPaginated(...getUnlimited)
+    .then((newPaginatedUsers) => {
+      if (newPaginatedUsers) {
+        const resultUsers = newPaginatedUsers.list
           .filter((u) => !u.roles.includes(role.name))
           .map((u) => ({ label: u.name, value: u.name }));
 
         setOptions(resultUsers);
-        setUsers(list);
+        setUsers(newPaginatedUsers.list);
       }
     });
 

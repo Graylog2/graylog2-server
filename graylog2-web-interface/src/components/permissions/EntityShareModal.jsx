@@ -3,10 +3,11 @@ import * as React from 'react';
 import { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import { createGRN } from 'logic/permissions/GRN';
 import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
-import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import { type EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
@@ -28,7 +29,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
   const granteesSelectRef = useRef();
 
   useEffect(() => {
-    EntityShareActions.prepare(entityGRN);
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN);
   }, [entityGRN]);
 
   const _handleSave = () => {
@@ -55,7 +56,7 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
       }
     }
 
-    EntityShareActions.update(entityGRN, payload).then(() => {
+    EntityShareDomain.update(entityType, entityTitle, entityGRN, payload).then(() => {
       setDisableSubmit(true);
       onClose();
     });
@@ -68,12 +69,13 @@ const EntityShareModal = ({ description, entityId, entityType, entityTitle, onCl
                            onConfirm={_handleSave}
                            onModalClose={onClose}
                            showModal
-                           title={<>Sharing: {entityType}: <i>{entityTitle}</i></>}>
+                           title={<>Sharing {entityType}: <i>{entityTitle}</i></>}>
       <>
         {(entityShareState && entityShareState.entity === entityGRN) ? (
           <EntityShareSettings description={description}
                                entityGRN={entityGRN}
                                entityType={entityType}
+                               entityTitle={entityTitle}
                                entityShareState={entityShareState}
                                granteesSelectRef={granteesSelectRef}
                                setDisableSubmit={setDisableSubmit} />

@@ -16,7 +16,7 @@ const TABLE_HEADERS = ['Entiy Name', 'Entity Type', 'Owner', 'Capability'];
 type Props = {
   entityType: string,
   paginatedEntityShares: PaginatedEnititySharesType,
-  searchPaginated: (newPage: number, newPerPage: number, newQuery: string, additonalQueries?: AdditionalQueries) => Promise<PaginatedEnititySharesType>,
+  searchPaginated: (newPage: number, newPerPage: number, newQuery: string, additonalQueries?: AdditionalQueries) => Promise<?PaginatedEnititySharesType>,
   setLoading: (loading: boolean) => void,
 };
 
@@ -44,7 +44,8 @@ const SharedEntitiesOverview = ({ paginatedEntityShares: initialPaginatedEntityS
   const { list, pagination: { page, perPage, total, query, additionalQueries }, context } = paginatedEntityShares;
 
   const _loadSharedEntities = (newPage = page, newPerPage = perPage, newQuery = query, newAdditonalQueries = additionalQueries) => {
-    return searchPaginated(newPage, newPerPage, newQuery, newAdditonalQueries).then(setPaginatedEntityShares);
+    return searchPaginated(newPage, newPerPage, newQuery, newAdditonalQueries)
+      .then((newPaginatedEntityShares) => newPaginatedEntityShares && setPaginatedEntityShares(newPaginatedEntityShares));
   };
 
   const _handleSearch = (newQuery: string) => _loadSharedEntities(initialPaginatedEntityShares.pagination.page, undefined, newQuery);

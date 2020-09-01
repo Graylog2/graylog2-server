@@ -24,7 +24,7 @@ type Props = {
   availableCapabilities: CapabilitiesList,
   className?: string,
   granteesSelectRef: ?Select,
-  onSubmit: SelectionRequest => Promise<EntityShareState>,
+  onSubmit: SelectionRequest => Promise<?EntityShareState>,
 };
 
 const FormElements = styled.div`
