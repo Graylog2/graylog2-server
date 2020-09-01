@@ -13,9 +13,6 @@ import ActionsCell from './ActionsCell';
 const mockLoadUsersPromise = Promise.resolve();
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesStore: {
-    listen: jest.fn(),
-  },
   AuthzRolesActions: {
     delete: jest.fn(() => Promise.resolve()),
     loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
@@ -66,13 +63,13 @@ describe('ActionsCell', () => {
       fireEvent.click(deleteButton);
       await act(() => mockLoadUsersPromise);
 
-      expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete role "${customRoleName}?"`);
+      expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete role "${customRoleName}"?`);
 
-      await waitFor(() => expect(AuthzRolesActions.delete).toHaveBeenCalledWith(customRoleId));
+      await waitFor(() => expect(AuthzRolesActions.delete).toHaveBeenCalledWith(customRoleId, customRoleName));
     });
 
     it('should display confirm dialog which includes information about assigned users', async () => {
-      const confirmMessage = `Do you really want to delete role "${customRoleName}?"\n\nIt is still assigned to ${paginatedUsers.list.size} users.`;
+      const confirmMessage = `Do you really want to delete role "${customRoleName}"?\n\nIt is still assigned to ${paginatedUsers.list.size} users.`;
       const mockLoadManyUsersPromise = Promise.resolve(paginatedUsers);
       asMock(AuthzRolesActions.loadUsersForRole).mockReturnValueOnce(mockLoadManyUsersPromise);
       const userPermissions = [
@@ -92,7 +89,7 @@ describe('ActionsCell', () => {
 
       expect(window.confirm).toHaveBeenCalledWith(confirmMessage);
 
-      await waitFor(() => expect(AuthzRolesActions.delete).toHaveBeenCalledWith(customRoleId));
+      await waitFor(() => expect(AuthzRolesActions.delete).toHaveBeenCalledWith(customRoleId, customRoleName));
     });
 
     it('should not be possible for built in roles', async () => {
