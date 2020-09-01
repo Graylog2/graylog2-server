@@ -25,6 +25,7 @@ const GrokPatternsList = styled(DataTable)`
 class GrokPatterns extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       patterns: [],
       pagination: {
@@ -50,6 +51,7 @@ class GrokPatterns extends React.Component {
   loadData = (callback) => {
     const { pagination: pagination1 } = this.state;
     const { page, perPage, query } = pagination1;
+
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
         if (callback) {
@@ -58,6 +60,7 @@ class GrokPatterns extends React.Component {
 
         if (!this.loadPromise.isCancelled()) {
           this.loadPromise = undefined;
+
           this.setState({
             patterns: patterns,
             pagination,
@@ -69,6 +72,7 @@ class GrokPatterns extends React.Component {
   validPatternName = (name) => {
     // Check if patterns already contain a pattern with the given name.
     const { patterns } = this.state;
+
     return !patterns.some((pattern) => pattern.name === name);
   };
 
@@ -131,6 +135,7 @@ class GrokPatterns extends React.Component {
   _patternFormatter = (pattern) => {
     const { patterns: patterns1 } = this.state;
     const patterns = patterns1.filter((p) => p.name !== pattern.name);
+
     return (
       <tr key={pattern.id}>
         <td>{pattern.name}</td>
@@ -161,6 +166,7 @@ class GrokPatterns extends React.Component {
   render() {
     const headers = ['Name', 'Pattern', 'Actions'];
     const { pagination, patterns } = this.state;
+
     return (
       <div>
         <PageHeader title="Grok patterns">
