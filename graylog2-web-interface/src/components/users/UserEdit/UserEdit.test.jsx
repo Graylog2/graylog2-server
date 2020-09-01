@@ -12,18 +12,6 @@ import User from 'logic/users/User';
 
 import UserEdit from './UserEdit';
 
-const user = User
-  .builder()
-  .fullName('The full name')
-  .username('The username')
-  .roles(Immutable.List([]))
-  .email('theemail@example.org')
-  .clientAddress('127.0.0.1')
-  .lastActivity('2020-01-01T10:40:05.376+0000')
-  .sessionTimeoutMs(36000000)
-  .timezone('Europe/Berlin')
-  .build();
-
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     update: jest.fn(() => Promise.resolve()),
@@ -36,6 +24,17 @@ const assignedRole = reader;
 const notAssignedRole = reportCreator;
 const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
 const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
+const user = User
+  .builder()
+  .fullName('The full name')
+  .username('The username')
+  .roles(Immutable.List([assignedRole.name]))
+  .email('theemail@example.org')
+  .clientAddress('127.0.0.1')
+  .lastActivity('2020-01-01T10:40:05.376+0000')
+  .sessionTimeoutMs(36000000)
+  .timezone('Europe/Berlin')
+  .build();
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {

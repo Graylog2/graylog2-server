@@ -91,10 +91,10 @@ describe('RoleEdit', () => {
     const filterInput = getByPlaceholderText('Enter query to filter');
     const filterSubmitButton = getByRole('button', { name: 'Filter' });
 
-    fireEvent.change(filterInput, { target: { value: 'name of an assignd user' } });
+    fireEvent.change(filterInput, { target: { value: 'name of an assigned user' } });
     fireEvent.click(filterSubmitButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(alertsManager.id, alertsManager.name, 1, 10, 'name of an assignd user'));
+    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(alertsManager.id, alertsManager.name, 1, 10, 'name of an assigned user'));
   });
 
   it('should unassigning a user', async () => {
