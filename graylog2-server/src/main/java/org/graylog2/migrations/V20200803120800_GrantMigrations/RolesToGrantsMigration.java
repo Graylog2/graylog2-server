@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.migrations;
+package org.graylog2.migrations.V20200803120800_GrantMigrations;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -34,9 +34,7 @@ import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,30 +50,24 @@ import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
-public class V20200803120800_MigrateRolesToGrants extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20200803120800_MigrateRolesToGrants.class);
+public class RolesToGrantsMigration {
+    private static final Logger LOG = LoggerFactory.getLogger(RolesToGrantsMigration.class);
     private final RoleService roleService;
     private final UserService userService;
     private final DBGrantService dbGrantService;
     private final GRNRegistry grnRegistry;
     private final String rootUsername;
 
-    @Inject
-    public V20200803120800_MigrateRolesToGrants(RoleService roleService,
-                                                UserService userService,
-                                                DBGrantService dbGrantService,
-                                                GRNRegistry grnRegistry,
-                                                @Named("root_username") String rootUsername) {
+    public RolesToGrantsMigration(RoleService roleService,
+                                  UserService userService,
+                                  DBGrantService dbGrantService,
+                                  GRNRegistry grnRegistry,
+                                  @Named("root_username") String rootUsername) {
         this.roleService = roleService;
         this.userService = userService;
         this.dbGrantService = dbGrantService;
         this.grnRegistry = grnRegistry;
         this.rootUsername = rootUsername;
-    }
-
-    @Override
-    public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2020-08-03T12:08:00Z");
     }
 
     private final Map<Set<String>, GRNTypeCapability> MIGRATION_MAP = ImmutableMap.of(
@@ -85,7 +77,6 @@ public class V20200803120800_MigrateRolesToGrants extends Migration {
             ImmutableSet.of(STREAMS_READ), new GRNTypeCapability(STREAM, Capability.VIEW)
             );
 
-    @Override
     public void upgrade() {
         final Set<MigratableRole> migratableRoles = findMigratableRoles();
 

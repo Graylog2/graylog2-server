@@ -18,7 +18,6 @@ package org.graylog.security;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog.security.migrations.V20200811143600_ViewSharingToGrantsMigration;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
@@ -42,6 +41,5 @@ public class SecurityModule extends PluginModule {
         //       we get the path prefix. Do we want this?
         registerRestControllerPackage(getClass().getPackage().getName());
 
-        addMigration(V20200811143600_ViewSharingToGrantsMigration.class);
     }
 }

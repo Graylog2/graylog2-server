@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.migrations;
+package org.graylog2.migrations.V20200803120800_GrantMigrations;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -30,7 +30,6 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
@@ -38,16 +37,14 @@ import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20200811143600_ViewSharingToGrantsMigration.class);
+public class ViewSharingToGrantsMigration {
+    private static final Logger LOG = LoggerFactory.getLogger(ViewSharingToGrantsMigration.class);
 
     // View sharing only allowed to give other users read permissions on searches and dashboards
     private static final Capability CAPABILITY = Capability.VIEW;
@@ -59,13 +56,12 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
     private final String rootUsername;
     private final ViewService viewService;
 
-    @Inject
-    public V20200811143600_ViewSharingToGrantsMigration(MongoConnection mongoConnection,
-                                                        DBGrantService grantService,
-                                                        UserService userService,
-                                                        RoleService roleService,
-                                                        @Named("root_username") String rootUsername,
-                                                        ViewService viewService) {
+    public ViewSharingToGrantsMigration(MongoConnection mongoConnection,
+                                        DBGrantService grantService,
+                                        UserService userService,
+                                        RoleService roleService,
+                                        @Named("root_username") String rootUsername,
+                                        ViewService viewService) {
 
         this.grantService = grantService;
         this.userService = userService;
@@ -75,12 +71,6 @@ public class V20200811143600_ViewSharingToGrantsMigration extends Migration {
         this.collection = mongoConnection.getMongoDatabase().getCollection("view_sharings", Document.class);
     }
 
-    @Override
-    public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2020-08-11T14:36:00Z");
-    }
-
-    @Override
     public void upgrade() {
         for (final Document document : collection.find()) {
             LOG.debug("Migrate view sharing: {}", document);

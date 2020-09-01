@@ -37,6 +37,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.migrations.V20200803120800_GrantMigrations.ViewSharingToGrantsMigration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
@@ -63,8 +64,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(GRNExtension.class)
 @ExtendWith(MockitoExtension.class)
 @MongoDBFixtures("view-sharings.json")
-class V20200811143600_ViewSharingToGrantsMigrationTest {
-    private V20200811143600_ViewSharingToGrantsMigration migration;
+class ViewSharingToGrantsMigrationTest {
+    private ViewSharingToGrantsMigration migration;
     private DBGrantService grantService;
     private UserService userService;
     private RoleService roleService;
@@ -86,7 +87,7 @@ class V20200811143600_ViewSharingToGrantsMigrationTest {
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);
 
-        this.migration = new V20200811143600_ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService);
+        this.migration = new ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService);
     }
 
     private void assertDeletedViewSharing(String id) {
