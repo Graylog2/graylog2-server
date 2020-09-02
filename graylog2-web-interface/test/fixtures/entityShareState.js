@@ -50,14 +50,14 @@ export const jane = Grantee
   .type('user')
   .build();
 
-export const availableGrantees = Immutable.List([everyone, alice, bob, john, jane, security]); // keep this order
+export const availableGrantees = Immutable.List<Grantee>([everyone, alice, bob, john, jane, security]); // keep this order
 
 // capabilities
 export const viewer = Capability.builder().id('viewer-id').title('Viewer').build();
 export const manager = Capability.builder().id('manager-id').title('Manager').build();
 export const owner = Capability.builder().id('owner-id').title('Owner').build();
 
-export const availableCapabilities = Immutable.List([viewer, manager, owner]);
+export const availableCapabilities = Immutable.List<Capability>([viewer, manager, owner]);
 
 // active shares
 const janeIsOwner = ActiveShare
