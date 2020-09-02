@@ -20,8 +20,6 @@ const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" 
 const SERVER_PING_TIMEOUT = 20000;
 
 const AppFacade = ({ currentUser, server, sessionId }) => {
-  let Page;
-
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
 
@@ -29,20 +27,18 @@ const AppFacade = ({ currentUser, server, sessionId }) => {
   }, []);
 
   if (!server.up) {
-    Page = <ServerUnavailablePage server={server} />;
-  } else if (!sessionId) {
-    Page = <LoginPage />;
-  } else if (!currentUser) {
-    Page = <LoadingPage text="We are preparing Graylog for you..." />;
-  } else {
-    Page = <LoggedInPage />;
+    return <ServerUnavailablePage server={server} />;
   }
 
-  return (
-    <>
-      {Page}
-    </>
-  );
+  if (!sessionId) {
+    return <LoginPage />;
+  }
+
+  if (!currentUser) {
+    return <LoadingPage text="We are preparing Graylog for you..." />;
+  }
+
+  return <LoggedInPage />;
 };
 
 AppFacade.propTypes = {

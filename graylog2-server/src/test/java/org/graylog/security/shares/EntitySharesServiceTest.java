@@ -158,4 +158,20 @@ public class EntitySharesServiceTest {
             assertThat(validationResult.getErrors()).isEmpty();
         });
     }
+
+    @DisplayName("Don't run validation on initial empty request")
+    @Test
+    void noValidationOnEmptyRequest() {
+        final GRN entity = grnRegistry.newGRN(GRNTypes.DASHBOARD, "54e3deadbeefdeadbeefaffe");
+        final EntityShareRequest shareRequest = EntityShareRequest.create(null);
+
+        final User user = mock(User.class);
+        final Subject subject = mock(Subject.class);
+        when(user.getName()).thenReturn("hans");
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
+        assertThat(entityShareResponse.validationResult()).satisfies(validationResult -> {
+            assertThat(validationResult.failed()).isFalse();
+            assertThat(validationResult.getErrors()).isEmpty();
+        });
+    }
 }

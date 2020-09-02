@@ -73,5 +73,14 @@ Object {
     "grn::::user:jane": "grn::::capability:54e3deadbeefdeadbeef0001",
     "grn::::team:security": "grn::::capability:54e3deadbeefdeadbeef0000",
   },
+  "validation_result": Object {
+    "error_context": Object {
+      "selected_grantee_capabilities": Immutable.List [],
+    },
+    "errors": Object {
+      "selected_grantee_capabilities": Immutable.List [],
+    },
+    "failed": undefined,
+  },
 }
 `;

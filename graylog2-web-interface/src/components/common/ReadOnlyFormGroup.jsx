@@ -4,7 +4,7 @@ import styled, { css, type StyledComponent } from 'styled-components';
 
 import type { ThemeInterface } from 'theme';
 import { Col, Row, HelpBlock } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 
 type Props = {
   label: React.Node,

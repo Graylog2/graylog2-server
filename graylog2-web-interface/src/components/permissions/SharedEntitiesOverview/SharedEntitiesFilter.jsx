@@ -2,15 +2,16 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import type { PaginatedEnititySharesType } from 'actions/permissions/EntityShareActions';
 import mockedPermissions from 'logic/permissions/mocked';
 import { SearchForm, Select } from 'components/common';
 
 import SharedEntitiesQueryHelper from './SharedEntitiesQueryHelper';
 
 type Props = {
-  onSearch: (query: string) => Promise<void>,
-  onReset: () => Promise<void>,
-  onFilter: (param: string, value: string) => Promise<void>,
+  onSearch: (query: string) => Promise<?PaginatedEnititySharesType>,
+  onReset: () => Promise<?PaginatedEnititySharesType>,
+  onFilter: (param: string, value: string) => Promise<?PaginatedEnititySharesType>,
 };
 
 const StyledSearchForm = styled(SearchForm)`

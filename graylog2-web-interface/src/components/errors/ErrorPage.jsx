@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -7,7 +8,7 @@ import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
-import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
 const errorPageStyles = (backgroundImage) => css`
   body {
@@ -39,23 +40,34 @@ type Props = {
   title: string,
 };
 
-const ErrorPage = ({ children, title, description, backgroundImage }: Props) => (
-  <AppContentGrid>
-    {backgroundImage && <GlobalThemeStyles additionalStyles={errorPageStyles(backgroundImage)} />}
-    <div className="container-fluid">
-      <DocumentTitle title={title}>
-        <ErrorJumbotron title={title}>
-          {description}
-          {children && (
-            <ErrorMessage>
-              {children}
-            </ErrorMessage>
-          )}
-        </ErrorJumbotron>
-      </DocumentTitle>
-    </div>
-  </AppContentGrid>
-);
+const ErrorPage = ({ children, title, description, backgroundImage }: Props) => {
+  const { addGlobalStyles } = useContext(GlobalStylesContext);
+
+  useEffect(() => {
+    addGlobalStyles(errorPageStyles(backgroundImage));
+
+    return () => {
+      addGlobalStyles(null);
+    };
+  }, [backgroundImage]);
+
+  return (
+    <AppContentGrid>
+      <div className="container-fluid">
+        <DocumentTitle title={title}>
+          <ErrorJumbotron title={title}>
+            {description}
+            {children && (
+              <ErrorMessage>
+                {children}
+              </ErrorMessage>
+            )}
+          </ErrorJumbotron>
+        </DocumentTitle>
+      </div>
+    </AppContentGrid>
+  );
+};
 
 ErrorPage.propTypes = {
   children: PropTypes.node,

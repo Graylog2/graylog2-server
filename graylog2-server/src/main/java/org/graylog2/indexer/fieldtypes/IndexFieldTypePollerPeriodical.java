@@ -30,6 +30,8 @@ import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -59,6 +61,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
     private final Indices indices;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Cluster cluster;
+    private final ServerStatus serverStatus;
     private final com.github.joschi.jadconfig.util.Duration periodicalInterval;
     private final ScheduledExecutorService scheduler;
     private final ConcurrentMap<String, ScheduledFuture<?>> futures = new ConcurrentHashMap<>();
@@ -72,6 +75,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
                                           final MongoIndexSet.Factory mongoIndexSetFactory,
                                           final Cluster cluster,
                                           final EventBus eventBus,
+                                          final ServerStatus serverStatus,
                                           @Named("index_field_type_periodical_interval") final com.github.joschi.jadconfig.util.Duration periodicalInterval,
                                           @Named("daemonScheduler") final ScheduledExecutorService scheduler) {
         this.poller = poller;
@@ -80,11 +84,14 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         this.indices = indices;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.cluster = cluster;
+        this.serverStatus = serverStatus;
         this.periodicalInterval = periodicalInterval;
         this.scheduler = scheduler;
 
         eventBus.register(this);
     }
+
+    private static final Set<Lifecycle> skippedLifecycles = ImmutableSet.of(Lifecycle.STARTING, Lifecycle.HALTING, Lifecycle.PAUSED, Lifecycle.FAILED, Lifecycle.UNINITIALIZED);
 
     /**
      * This creates index field type information for each index in each index set and schedules polling jobs to
@@ -95,6 +102,12 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
      */
     @Override
     public void doRun() {
+        final Lifecycle currentLifecycle = serverStatus.getLifecycle();
+        if (skippedLifecycles.contains(currentLifecycle)) {
+            LOG.debug("Server is not running, skipping run.");
+            return;
+        }
+
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying index field type initialization until it is reachable.");
             while (true) {

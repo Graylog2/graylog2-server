@@ -33,6 +33,7 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -214,6 +215,25 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().refreshNode();
 
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
+    }
+
+    @Test
+    public void properlySerializesCustomObjectsInMessageField() throws IOException {
+        final Message message = new Message("Some message", "somesource", now());
+        message.addField("custom_object", new TextNode("foo"));
+        final List<Map.Entry<IndexSet, Message>> messageBatch = ImmutableList.of(
+                Maps.immutableEntry(indexSet, message)
+        );
+
+        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+
+        assertThat(failedItems).isEmpty();
+
+        client().refreshNode();
+
+        final ResultMessage resultMessage = this.messages.get(message.getId(), INDEX_NAME);
+
+        assertThat(resultMessage.getMessage().getField("custom_object")).isEqualTo("foo");
     }
 
     private Future<List<String>> background(Callable<List<String>> task) {

@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
-import mockEntityShareState, { john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
+import mockEntityShareState, { failedEntityShareState, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
 import selectEvent from 'react-select-event';
 
 import ActiveShare from 'logic/permissions/ActiveShare';
@@ -13,6 +13,7 @@ import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityS
 import EntityShareModal from './EntityShareModal';
 
 const mockEmptyStore = { state: undefined };
+const mockFailedStore = { state: failedEntityShareState };
 
 jest.mock('stores/permissions/EntityShareStore', () => ({
   EntityShareActions: {
@@ -24,6 +25,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
     getInitialState: jest.fn(() => ({ state: mockEntityShareState })),
   },
 }));
+
+jest.setTimeout(10000);
 
 describe('EntityShareModal', () => {
   beforeAll(() => {
@@ -50,7 +53,7 @@ describe('EntityShareModal', () => {
 
     expect(EntityShareActions.prepare).toBeCalledTimes(1);
 
-    expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity);
+    expect(EntityShareActions.prepare).toBeCalledWith('dashboard', 'The title', mockEntityShareState.entity);
   });
 
   it('updates entity share state on submit', async () => {
@@ -63,7 +66,7 @@ describe('EntityShareModal', () => {
     await waitFor(() => {
       expect(EntityShareActions.update).toBeCalledTimes(1);
 
-      expect(EntityShareActions.update).toBeCalledWith(mockEntityShareState.entity, {
+      expect(EntityShareActions.update).toBeCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
         selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities,
       });
     });
@@ -92,27 +95,24 @@ describe('EntityShareModal', () => {
       expect(getByText('Loading...')).not.toBeNull();
     });
 
-    it('provided description', () => {
+    it('displays an error if validation failed and disables submit', () => {
+      asMock(EntityShareStore.getInitialState).mockReturnValueOnce(mockFailedStore);
       const { getByText } = render(<SimpleEntityShareModal />);
 
+      expect(getByText('Removing the following owners will leave the entity ownerless:')).not.toBeNull();
+      expect(getByText('Save')).toBeDisabled();
+    });
+
+    it('necessary informations', () => {
+      const { getByText, getByDisplayValue } = render(<SimpleEntityShareModal />);
+
+      // provided description
       expect(getByText('The description')).not.toBeNull();
-    });
-
-    it('provided title', () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
-
+      // Provided title
       expect(getByText('The title')).not.toBeNull();
-    });
-
-    it('shareable url', () => {
-      const { getByDisplayValue } = render(<SimpleEntityShareModal />);
-
+      // sharable urls
       expect(getByDisplayValue('http://localhost/')).not.toBeNull();
-    });
-
-    it('missing dependecies warning', () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
-
+      // missing dependecies warning
       expect(getByText('There are missing dependecies for the current set of collaborators')).not.toBeNull();
     });
   });
@@ -154,7 +154,7 @@ describe('EntityShareModal', () => {
 
         await waitFor(() => expect(EntityShareActions.prepare).toHaveBeenCalledTimes(1));
 
-        expect(EntityShareActions.prepare).toBeCalledWith(mockEntityShareState.entity, {
+        expect(EntityShareActions.prepare).toBeCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
           selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
         });
       };
@@ -165,16 +165,6 @@ describe('EntityShareModal', () => {
         ${everyone} | ${'everyone'} | ${manager}
         ${security} | ${'team'}     | ${owner}
       `('sends new grantee $granteeType to preparation', addGrantee);
-    });
-
-    it('shows validation error', async () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
-
-      const submitButton = getByText('Add Collaborator');
-
-      fireEvent.click(submitButton);
-
-      await waitFor(() => expect(getByText('The grantee is required.')).not.toBeNull());
     });
 
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
@@ -219,7 +209,7 @@ describe('EntityShareModal', () => {
       await waitFor(() => {
         expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
-        expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
+        expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
           selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
         });
       });
@@ -271,7 +261,7 @@ describe('EntityShareModal', () => {
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2);
 
-          expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntityShareState.entity, {
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
             selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
           });
         });
