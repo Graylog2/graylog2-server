@@ -97,9 +97,9 @@ describe('EntityShareModal', () => {
 
     it('displays an error if validation failed and disables submit', () => {
       asMock(EntityShareStore.getInitialState).mockReturnValueOnce(mockFailedStore);
-      const { getByText } = render(<SimpleEntityShareModal />);
+      const { getByText, debug } = render(<SimpleEntityShareModal />);
 
-      expect(getByText('Removing the following owners Alice Muad\'Dib will leave the entity ownerless.')).not.toBeNull();
+      expect(getByText('Removing the following owners will leave the entity ownerless:')).not.toBeNull();
       expect(getByText('Save')).toBeDisabled();
     });
 
