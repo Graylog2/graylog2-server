@@ -2,16 +2,18 @@
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 
+import { availableProvidersOptions } from 'logic/authentication/availableProviders';
+import history from 'util/History';
+import Routes from 'routing/Routes';
 import { Select } from 'components/common';
 import { Button } from 'components/graylog';
 
-const AUTHENTICATION_PROVIDER_OPTIONS = [
-  { label: 'LDAP', value: 'ldap' },
-  { label: 'Active Directory', value: 'active-directory' },
-];
-
 const AuthenticationProviderSelect = () => {
-  const onSubmit = () => {};
+  const onSubmit = ({ authProvider }) => {
+    console.log(Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE);
+    // history.push(Routes.SYSTEM.AUTHENTICATION.CREATE);
+    history.push({ pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE, search: `?type=${authProvider}` });
+  };
 
   return (
     <Formik onSubmit={onSubmit}
@@ -22,7 +24,7 @@ const AuthenticationProviderSelect = () => {
             <Field name="authProvider">
               {({ field: { name, value, onChange } }) => (
                 <Select placeholder="Select input"
-                        options={AUTHENTICATION_PROVIDER_OPTIONS}
+                        options={availableProvidersOptions}
                         matchProp="label"
                         onChange={(authProvider) => onChange({ target: { value: authProvider, name } })}
                         value={value}
