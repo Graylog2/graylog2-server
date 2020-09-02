@@ -6,7 +6,7 @@ import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import ActiveShare from 'logic/permissions/ActiveShare';
-import ValidationResult from "../../src/logic/permissions/ValidationResult";
+import ValidationResult from 'logic/permissions/ValidationResult';
 
 // grantees
 export const everyone = Grantee

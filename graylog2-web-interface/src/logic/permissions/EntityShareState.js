@@ -173,7 +173,6 @@ export default class EntityShareState {
   }
 
   static fromJSON(value: EntityShareStateJson): EntityShareState {
-    console.log('entity share state: fromJson', value);
     /* eslint-disable camelcase */
     const {
       entity,

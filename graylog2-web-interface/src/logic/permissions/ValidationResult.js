@@ -30,7 +30,6 @@ export type ValidationResultJSON = {
 export default class ValidationResult {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(
     errors: $PropertyType<InternalState, 'errors'>,
     errorContext: $PropertyType<InternalState, 'errorContext'>,
@@ -122,17 +121,14 @@ class Builder {
     this.value = value;
   }
 
-  // eslint-disable-next-line no-undef
   errors(value: $PropertyType<InternalState, 'errors'>) {
     return new Builder(this.value.set('errors', value));
   }
 
-  // eslint-disable-next-line no-undef
   errorContext(value: $PropertyType<InternalState, 'errorContext'>) {
     return new Builder(this.value.set('errorContext', value));
   }
 
-  // eslint-disable-next-line no-undef
   failed(value: $PropertyType<InternalState, 'failed'>) {
     return new Builder(this.value.set('failed', value));
   }

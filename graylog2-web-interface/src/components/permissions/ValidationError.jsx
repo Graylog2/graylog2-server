@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import styled, { type StyledComponent } from 'styled-components';
+import { capitalize } from 'lodash';
 
 import { Alert } from 'components/graylog';
 import { type ThemeInterface } from 'theme';
@@ -28,14 +29,22 @@ type Props = {
 };
 
 const ValidationError = ({ validationResult, availableGrantees }: Props) => {
-  const pastOwners = validationResult.errorContext.selectedGranteeCapabilities.toJS().map(
-    (grn) => availableGrantees.find((grantee) => grantee.id === grn)?.title,
-  ).join(', ');
+  const pastOwners = validationResult.errorContext.selectedGranteeCapabilities.map(
+    (grn) => availableGrantees.find((grantee) => grantee.id === grn),
+  );
 
   return (
     <Container bsStyle="danger">
       <List>
-        <li>{`Removing the following owners ${pastOwners} will leave the entity ownerless.`}</li>
+        <li>
+          Removing the following owners will leave the entity ownerless: <br />
+          {pastOwners.map((owner, key) => (
+            <span key={owner.id}>
+              {capitalize(owner.type)} <i>{owner.title}</i>
+              {key !== pastOwners.size - 1 && ', '}
+            </span>
+          ))}
+        </li>
       </List>
     </Container>
   );

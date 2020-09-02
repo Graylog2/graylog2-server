@@ -116,13 +116,13 @@ const EntityShareSettings = ({
                       selectedGrantees={selectedGrantees}
                       title="Current collaborators" />
       </Section>
-      {validationResults && validationResults.failed && (
+      {validationResults?.failed && (
         <Section>
           <ValidationError validationResult={validationResults}
                            availableGrantees={availableGrantees} />
         </Section>
       )}
-      {missingDependencies && missingDependencies.size > 0 && (
+      {missingDependencies?.size > 0 && (
         <Section>
           <DependenciesWarning missingDependencies={missingDependencies}
                                selectedGrantees={selectedGrantees} />
