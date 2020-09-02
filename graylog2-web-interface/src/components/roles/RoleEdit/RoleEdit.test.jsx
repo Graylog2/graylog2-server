@@ -51,6 +51,10 @@ jest.mock('stores/users/UsersStore', () => ({
 jest.useFakeTimers();
 
 describe('RoleEdit', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should display loading indicator, if no role is provided', async () => {
     const { queryByText } = render(<RoleEdit role={undefined} />);
 

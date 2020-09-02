@@ -30,6 +30,10 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('RolesOverview', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('should display table headers', () => {
     const displaysHeader = async ({ header }) => {
       const { queryByText } = render(<RolesOverview />);

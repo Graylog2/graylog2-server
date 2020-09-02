@@ -45,6 +45,7 @@ describe('ActionsCell', () => {
 
     afterEach(() => {
       window.confirm = oldConfirm;
+      jest.clearAllMocks();
     });
 
     it('should be possible if role is not built in', async () => {

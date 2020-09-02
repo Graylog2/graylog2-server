@@ -28,6 +28,10 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 jest.useFakeTimers();
 
 describe('RoleDetails', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should display loading indicator, if no role is provided', async () => {
     const { queryByText } = render(<RoleDetails role={undefined} />);
 

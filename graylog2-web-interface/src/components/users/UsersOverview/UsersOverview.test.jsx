@@ -25,6 +25,10 @@ describe('UsersOverview', () => {
     UsersActions.delete.completed = { listen: jest.fn(() => jest.fn()) };
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('should display table header', () => {
     const displaysHeader = async ({ header }) => {
       const { queryByText } = render(<UsersOverview />);
