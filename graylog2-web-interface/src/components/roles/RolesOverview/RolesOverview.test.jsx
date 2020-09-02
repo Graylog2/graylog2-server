@@ -71,20 +71,20 @@ describe('RolesOverview', () => {
     await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, 'name:manager'));
   });
 
-  it('should reset search', async () => {
-    const { getByPlaceholderText, getByRole } = render(<RolesOverview />);
-    await act(() => mockLoadRolesPaginatedPromise);
-    const searchSubmitButton = getByRole('button', { name: 'Search' });
-    const resetSearchButton = getByRole('button', { name: 'Reset' });
-    const searchInput = getByPlaceholderText('Enter search query...');
+  // it('should reset search', async () => {
+  //   const { getByPlaceholderText, getByRole } = render(<RolesOverview />);
+  //   await act(() => mockLoadRolesPaginatedPromise);
+  //   const searchSubmitButton = getByRole('button', { name: 'Search' });
+  //   const resetSearchButton = getByRole('button', { name: 'Reset' });
+  //   const searchInput = getByPlaceholderText('Enter search query...');
 
-    fireEvent.change(searchInput, { target: { value: 'name:manager' } });
-    fireEvent.click(searchSubmitButton);
+  //   fireEvent.change(searchInput, { target: { value: 'name:manager' } });
+  //   fireEvent.click(searchSubmitButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, 'name:manager'));
+  //   await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, 'name:manager'));
 
-    fireEvent.click(resetSearchButton);
+  //   fireEvent.click(resetSearchButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, ''));
-  });
+  //   await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith(1, 10, ''));
+  // });
 });
