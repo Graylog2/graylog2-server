@@ -157,7 +157,8 @@ describe('<UserEdit />', () => {
     });
 
     it('should require current password when current user is changing his password', async () => {
-      const { getByLabelText, getByText } = render(<SutComponent user={User.fromJSON(currentUser)} />);
+      const newCurrentUser = User.fromJSON(currentUser).toBuilder().readOnly(false).build();
+      const { getByLabelText, getByText } = render(<SutComponent user={newCurrentUser} />);
       await act(() => mockRolesForUserPromise);
       await act(() => mockLoadRolesPromise);
 
@@ -171,7 +172,7 @@ describe('<UserEdit />', () => {
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(currentUser.username, {
+      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(newCurrentUser.username, {
         old_password: 'oldpassword',
         password: 'newpassword',
       }));
