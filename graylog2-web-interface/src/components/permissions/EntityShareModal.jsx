@@ -24,7 +24,7 @@ type Props = {
 
 const EntityShareModal = ({ description, entityId, entityType, entityTitle, onClose }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
-  const [disableSubmit, setDisableSubmit] = useState(false);
+  const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResult?.failed);
   const entityGRN = createGRN(entityType, entityId);
   const granteesSelectRef = useRef();
 

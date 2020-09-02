@@ -32,7 +32,7 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLAnchorElement> = styled.a.
   }
 `);
 
-const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, HTMLLIElement> = styled(Dropdown)(({ left, theme }) => css`
+const StyledSubmenu: StyledComponent<{left: boolean}, ThemeInterface, Dropdown> = styled(Dropdown)(({ left, theme }) => css`
   position: relative;
 
   > .dropdown-menu {

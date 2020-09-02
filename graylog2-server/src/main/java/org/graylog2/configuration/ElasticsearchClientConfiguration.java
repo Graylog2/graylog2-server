@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version", converter = MajorVersionConverter.class, validators = {ElasticsearchVersionValidator.class})
-    Version elasticsearchVersion = Version.from(6, 0, 0);
+    Version elasticsearchVersion;
 
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class})
     List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));

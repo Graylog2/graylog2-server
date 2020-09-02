@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css, withTheme, type StyledComponent } from 'styled-components';
-import debounce from 'lodash/debounce';
+import defer from 'lodash/defer';
 
 import { Icon } from 'components/common';
 import { themePropTypes, type ThemeInterface } from 'theme';
@@ -89,14 +89,8 @@ const Toggle: StyledComponent<{}, ThemeInterface, HTMLLabelElement> = styled.lab
 `);
 
 const ThemeModeToggle = ({ theme }: Props) => {
-  const [currentMode, setCurrentMode] = useState(theme.mode);
+  const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
-
-  useEffect(() => {
-    if (currentMode !== theme.mode) {
-      theme.changeMode(currentMode);
-    }
-  }, [currentMode]);
 
   useEffect(() => {
     if (loadingTheme) {
@@ -104,14 +98,12 @@ const ThemeModeToggle = ({ theme }: Props) => {
     }
   }, [theme]);
 
-  const debouncedThemeMode = debounce((checked) => {
-    setCurrentMode(checked ? THEME_MODE_DARK : THEME_MODE_LIGHT);
-  }, 500);
-
   const toggleThemeMode = (event) => {
+    const { checked } = event.target;
     event.persist();
     setLoadingTheme(true);
-    debouncedThemeMode(event.target.checked);
+    const newMode = checked ? THEME_MODE_DARK : THEME_MODE_LIGHT;
+    defer(() => theme.changeMode(newMode));
   };
 
   const loadingLightMode = currentMode === THEME_MODE_DARK && loadingTheme;

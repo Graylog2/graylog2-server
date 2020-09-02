@@ -19,7 +19,6 @@ package org.graylog2.storage;
 import org.graylog2.plugin.Version;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class VersionAwareProvider<T> implements Provider<T> {
     private final Map<Version, Provider<T>> pluginBindings;
 
     @Inject
-    public VersionAwareProvider(@Named("elasticsearch_version") Version elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
+    public VersionAwareProvider(@ElasticsearchVersion Version elasticsearchMajorVersion, Map<Version, Provider<T>> pluginBindings) {
         this.elasticsearchMajorVersion = elasticsearchMajorVersion;
         this.pluginBindings = pluginBindings;
     }
