@@ -39,8 +39,8 @@ const ValidationError = ({ validationResult, availableGrantees }: Props) => {
         <li>
           Removing the following owners will leave the entity ownerless: <br />
           {pastOwners.map((owner, key) => (
-            <span key={owner.id}>
-              {capitalize(owner.type)} <i>{owner.title}</i>
+            <span key={owner?.id}>
+              {capitalize(owner?.type)} <i>{owner?.title}</i>
               {key !== pastOwners.size - 1 && ', '}
             </span>
           ))}
