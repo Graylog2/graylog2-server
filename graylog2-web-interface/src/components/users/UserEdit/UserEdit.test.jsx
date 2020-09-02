@@ -3,7 +3,8 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import { reader, reportCreator } from 'fixtures/roles';
+import { reader as assignedRole, reportCreator as notAssignedRole } from 'fixtures/roles';
+import { admin as currentUser } from 'fixtures/users';
 
 // import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -20,8 +21,6 @@ jest.mock('stores/users/UsersStore', () => ({
   },
 }));
 
-const assignedRole = reader;
-const notAssignedRole = reportCreator;
 const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
 const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
 const user = User
@@ -45,7 +44,7 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 
 describe('<UserEdit />', () => {
   const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['*'] }}>
+    <CurrentUserContext.Provider value={{ ...currentUser, permissions: ['*'] }}>
       <UserEdit {...props} />
     </CurrentUserContext.Provider>
   );
@@ -158,7 +157,7 @@ describe('<UserEdit />', () => {
     });
 
     it('should require current password when current user is changing his password', async () => {
-      const { getByLabelText, getByText } = render(<SutComponent user={user} />);
+      const { getByLabelText, getByText } = render(<SutComponent user={currentUser} />);
       await act(() => mockRolesForUserPromise);
       await act(() => mockLoadRolesPromise);
 
@@ -172,7 +171,7 @@ describe('<UserEdit />', () => {
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(currentUser.username, {
         old_password: 'oldpassword',
         password: 'newpassword',
       }));

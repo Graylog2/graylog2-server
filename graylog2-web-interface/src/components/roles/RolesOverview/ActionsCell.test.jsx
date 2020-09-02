@@ -20,6 +20,10 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('ActionsCell', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   const customRoleName = 'custom-role-name';
   const customRoleId = 'custom-role-id';
   const currentUser = viewsManager;

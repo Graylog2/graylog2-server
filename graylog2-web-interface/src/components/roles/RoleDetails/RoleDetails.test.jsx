@@ -2,13 +2,13 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act } from 'wrappedTestingLibrary';
-import { alertsManager } from 'fixtures/roles';
-import { alice } from 'fixtures/userOverviews';
+import { alertsManager as exampleRole } from 'fixtures/roles';
+import { alice as assignedUser } from 'fixtures/userOverviews';
 
 import RoleDetails from './RoleDetails';
 
 const paginatedUsers = {
-  list: Immutable.List([alice]),
+  list: Immutable.List([assignedUser]),
   pagination: {
     page: 1,
     perPage: 10,
@@ -43,18 +43,18 @@ describe('RoleDetails', () => {
   });
 
   it('should display role profile', async () => {
-    const { queryByText } = render(<RoleDetails role={alertsManager} />);
+    const { queryByText } = render(<RoleDetails role={exampleRole} />);
     await act(() => mockLoadUsersPromise);
 
-    expect(queryByText(alertsManager.name)).not.toBeNull();
-    expect(queryByText(alertsManager.description)).not.toBeNull();
+    expect(queryByText(exampleRole.name)).not.toBeNull();
+    expect(queryByText(exampleRole.description)).not.toBeNull();
   });
 
   it('should display assigned users', async () => {
-    const { queryByText, queryByRole } = render(<RoleDetails role={alertsManager} />);
+    const { queryByText, queryByRole } = render(<RoleDetails role={exampleRole} />);
     await act(() => mockLoadUsersPromise);
 
     expect(queryByRole('heading', { level: 2, name: 'Users' })).not.toBeNull();
-    expect(queryByText(alice.fullName)).not.toBeNull();
+    expect(queryByText(assignedUser.fullName)).not.toBeNull();
   });
 });

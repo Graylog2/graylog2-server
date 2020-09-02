@@ -4,7 +4,8 @@ import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { paginatedShares } from 'fixtures/sharedEntities';
 import selectEvent from 'react-select-event';
-import { reader } from 'fixtures/roles';
+import { reader as assignedRole } from 'fixtures/roles';
+import { admin as currentUser } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
@@ -12,7 +13,6 @@ import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
 
-const assignedRole = reader;
 const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
 const mockPaginatedUserShares = paginatedShares(1, 10, '');
 
@@ -42,7 +42,7 @@ const user = User
 
 describe('<UserDetails />', () => {
   const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['*'] }}>
+    <CurrentUserContext.Provider value={{ ...currentUser, permissions: ['*'] }}>
       <UserDetails {...props} />
     </CurrentUserContext.Provider>
   );

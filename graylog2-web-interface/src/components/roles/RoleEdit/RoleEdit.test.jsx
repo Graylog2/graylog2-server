@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import { alertsManager } from 'fixtures/roles';
+import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob } from 'fixtures/userOverviews';
 import mockAction from 'helpers/mocking/MockAction';
 
@@ -66,16 +66,16 @@ describe('RoleEdit', () => {
   });
 
   it('should display role profile', async () => {
-    const { queryByText } = render(<RoleEdit role={alertsManager} />);
+    const { queryByText } = render(<RoleEdit role={exampleRole} />);
     await act(() => mockLoadUsersForRolePromise);
     await act(() => mockLoadUsersPromise);
 
-    expect(queryByText(alertsManager.name)).not.toBeNull();
-    expect(queryByText(alertsManager.description)).not.toBeNull();
+    expect(queryByText(exampleRole.name)).not.toBeNull();
+    expect(queryByText(exampleRole.description)).not.toBeNull();
   });
 
   it('should assigning a user', async () => {
-    const { getByLabelText, getByRole } = render(<RoleEdit role={alertsManager} />);
+    const { getByLabelText, getByRole } = render(<RoleEdit role={exampleRole} />);
     await act(() => mockLoadUsersForRolePromise);
     await act(() => mockLoadUsersPromise);
 
@@ -85,11 +85,11 @@ describe('RoleEdit', () => {
     await selectEvent.select(usersSelector, bob.username);
     fireEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.addMember).toHaveBeenCalledWith(alertsManager.id, bob.username));
+    await waitFor(() => expect(AuthzRolesActions.addMember).toHaveBeenCalledWith(exampleRole.id, bob.username));
   });
 
   it('should filter assigned users', async () => {
-    const { getByPlaceholderText, getByRole } = render(<RoleEdit role={alertsManager} />);
+    const { getByPlaceholderText, getByRole } = render(<RoleEdit role={exampleRole} />);
     await act(() => mockLoadUsersForRolePromise);
     await act(() => mockLoadUsersPromise);
     const filterInput = getByPlaceholderText('Enter query to filter');
@@ -98,17 +98,17 @@ describe('RoleEdit', () => {
     fireEvent.change(filterInput, { target: { value: 'name of an assigned user' } });
     fireEvent.click(filterSubmitButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(alertsManager.id, alertsManager.name, 1, 10, 'name of an assigned user'));
+    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, 1, 10, 'name of an assigned user'));
   });
 
   it('should unassigning a user', async () => {
-    const { getByRole } = render(<RoleEdit role={alertsManager} />);
+    const { getByRole } = render(<RoleEdit role={exampleRole} />);
     await act(() => mockLoadUsersForRolePromise);
     await act(() => mockLoadUsersPromise);
 
     const assignUserButton = getByRole('button', { name: `Remove ${alice.username}` });
     fireEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(alertsManager.id, alice.username));
+    await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(exampleRole.id, alice.username));
   });
 });
