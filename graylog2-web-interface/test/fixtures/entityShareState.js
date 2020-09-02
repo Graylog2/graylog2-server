@@ -6,6 +6,7 @@ import Grantee from 'logic/permissions/Grantee';
 import Capability from 'logic/permissions/Capability';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import ActiveShare from 'logic/permissions/ActiveShare';
+import ValidationResult from 'logic/permissions/ValidationResult';
 
 // grantees
 export const everyone = Grantee
@@ -53,9 +54,9 @@ export const jane = Grantee
 export const availableGrantees = Immutable.List<Grantee>([everyone, alice, bob, john, jane, security]); // keep this order
 
 // capabilities
-export const viewer = Capability.builder().id('viewer-id').title('Viewer').build();
-export const manager = Capability.builder().id('manager-id').title('Manager').build();
-export const owner = Capability.builder().id('owner-id').title('Owner').build();
+export const viewer = Capability.builder().id('view').title('Viewer').build();
+export const manager = Capability.builder().id('manage').title('Manager').build();
+export const owner = Capability.builder().id('own').title('Owner').build();
 
 export const availableCapabilities = Immutable.List<Capability>([viewer, manager, owner]);
 
@@ -81,6 +82,26 @@ const missingDependecy = SharedEntity
   .build();
 
 export const missingDependencies: MissingDependencies = Immutable.Map({ [security.id]: Immutable.List([missingDependecy]) });
+
+const validationResult = ValidationResult.builder()
+  .errorContext({
+    selectedGranteeCapabilities: Immutable.List([alice.id]),
+  })
+  .errors({
+    selectedGranteeCapabilities: Immutable.List(['An error occurred']),
+  })
+  .failed(true)
+  .build();
+
+export const failedEntityShareState = EntityShareState
+  .builder()
+  .entity('grn::::dashboard:dashboard-id')
+  .availableGrantees(availableGrantees)
+  .availableCapabilities(availableCapabilities)
+  .activeShares(activeShares)
+  .validationResults(validationResult)
+  .selectedGranteeCapabilities(janeIsSelected)
+  .build();
 
 const entityShareState = EntityShareState
   .builder()

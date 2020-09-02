@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
-import mockEntityShareState, { john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
+import mockEntityShareState, { failedEntityShareState, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
 import selectEvent from 'react-select-event';
 
 import ActiveShare from 'logic/permissions/ActiveShare';
@@ -13,6 +13,7 @@ import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityS
 import EntityShareModal from './EntityShareModal';
 
 const mockEmptyStore = { state: undefined };
+const mockFailedStore = { state: failedEntityShareState };
 
 jest.mock('stores/permissions/EntityShareStore', () => ({
   EntityShareActions: {
@@ -92,6 +93,14 @@ describe('EntityShareModal', () => {
       act(() => jest.advanceTimersByTime(200));
 
       expect(getByText('Loading...')).not.toBeNull();
+    });
+
+    it('displays an error if validation failed and disables submit', () => {
+      asMock(EntityShareStore.getInitialState).mockReturnValueOnce(mockFailedStore);
+      const { getByText } = render(<SimpleEntityShareModal />);
+
+      expect(getByText('Removing the following owners will leave the entity ownerless:')).not.toBeNull();
+      expect(getByText('Save')).toBeDisabled();
     });
 
     it('necessary informations', () => {
