@@ -13,7 +13,7 @@ import usePrefersColorScheme from '../hooks/usePrefersColorScheme';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { PreferencesStore } = CombinedProvider.get('Preferences');
 
-const useCurrentThemeMode = () => {
+const useCurrentThemeMode = (overrideMode: ?string) => {
   const browserPreference = usePrefersColorScheme();
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
     username: userStore?.currentUser?.username,
@@ -21,8 +21,8 @@ const useCurrentThemeMode = () => {
     userIsReadOnly: userStore?.currentUser?.read_only ?? true,
   }));
   const userPreferences = useContext(UserPreferencesContext);
-  const initialThemeMode = (userIsReadOnly ? Store.get(PREFERENCES_THEME_MODE) : userPreferences[PREFERENCES_THEME_MODE]) ?? browserPreference ?? DEFAULT_THEME_MODE;
-  const [currentThemeMode, setCurrentThemeMode] = useState(initialThemeMode);
+  const initialThemeMode = overrideMode ?? (userIsReadOnly ? Store.get(PREFERENCES_THEME_MODE) : userPreferences[PREFERENCES_THEME_MODE]) ?? browserPreference ?? DEFAULT_THEME_MODE;
+  const [currentThemeMode, setCurrentThemeMode] = useState<string>(initialThemeMode);
 
   const changeCurrentThemeMode = useCallback((newThemeMode: string) => {
     setCurrentThemeMode(newThemeMode);

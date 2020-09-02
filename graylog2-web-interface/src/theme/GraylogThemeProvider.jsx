@@ -13,7 +13,7 @@ import useCurrentThemeMode from './UseCurrentThemeMode';
 
 type Props = {
   children: React.Node,
-  defaultMode: ?string,
+  overrideMode: ?string,
 };
 
 const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
@@ -37,12 +37,13 @@ const createTheme = (mode, themeColors, changeMode): ThemeInterface => {
   };
 };
 
-const GraylogThemeProvider = ({ children, defaultMode }: Props) => {
-  const [mode, setCurrentThemeMode] = defaultMode ? [defaultMode, () => {}] : useCurrentThemeMode();
+const GraylogThemeProvider = ({ children, overrideMode }: Props) => {
+  const [mode, setCurrentThemeMode] = useCurrentThemeMode(overrideMode);
 
   const themeColors = colors[mode];
 
-  const theme = useMemo(() => (themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined), [mode, themeColors]);
+  const generatedTheme = themeColors ? createTheme(mode, themeColors, setCurrentThemeMode) : undefined;
+  const theme = useMemo(() => (generatedTheme), [mode, themeColors]);
 
   return theme ? (
     <ThemeProvider theme={theme}>
@@ -53,11 +54,11 @@ const GraylogThemeProvider = ({ children, defaultMode }: Props) => {
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.any.isRequired,
-  defaultMode: PropTypes.string,
+  overrideMode: PropTypes.string,
 };
 
 GraylogThemeProvider.defaultProps = {
-  defaultMode: undefined,
+  overrideMode: undefined,
 };
 
 export default GraylogThemeProvider;

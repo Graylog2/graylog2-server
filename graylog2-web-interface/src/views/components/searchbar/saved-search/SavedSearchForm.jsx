@@ -2,6 +2,7 @@
 import React from 'react';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
+import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
 
@@ -17,6 +18,10 @@ type Props = {
   value: string,
   target: ?Button,
 };
+
+const StyledForm = styled.form`
+  width: 210px;
+`;
 
 const stopEvent = (e) => {
   e.preventDefault();
@@ -43,7 +48,7 @@ const SavedSearchForm = (props: Props) => {
                 placement="left"
                 target={target}>
         <Popover title="Name of search" id="saved-search-popover">
-          <form onSubmit={stopEvent} style={{ width: '210px' }}>
+          <StyledForm onSubmit={stopEvent}>
             <FormGroup>
               <ControlLabel>Title</ControlLabel>
               <FormControl type="text"
@@ -74,7 +79,7 @@ const SavedSearchForm = (props: Props) => {
                     bsSize="sm">
               Cancel
             </Button>
-          </form>
+          </StyledForm>
         </Popover>
       </Position>
     </Portal>

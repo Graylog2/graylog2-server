@@ -68,7 +68,7 @@ const Popover = (props) => {
   const theme = useContext(ThemeContext);
 
   return (
-    <GraylogThemeProvider defaultMode={theme?.mode}>
+    <GraylogThemeProvider overrideMode={theme?.mode}>
       <StyledPopover {...props} />
     </GraylogThemeProvider>
   );

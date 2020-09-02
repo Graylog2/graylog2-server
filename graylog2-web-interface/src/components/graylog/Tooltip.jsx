@@ -69,7 +69,7 @@ const Tooltip = ({ children, className, id, placement, positionTop, positionLeft
   const theme = useContext(ThemeContext);
 
   return (
-    <GraylogThemeProvider defaultMode={theme?.mode}>
+    <GraylogThemeProvider overrideMode={theme?.mode}>
       <StyledTooltip className={className}
                      id={id}
                      placement={placement}
