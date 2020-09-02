@@ -7,9 +7,6 @@ import DocsHelper from 'util/DocsHelper';
 import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
-import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
-import AuthenticationProviderSelect from 'components/authentication/AuthenticationProviderSelect';
-import { EmptyEntity } from 'components/common';
 
 type Props = {
   params: {
@@ -17,7 +14,7 @@ type Props = {
   },
 };
 
-const AuthenticationSetuo = ({ params }: Props) => (
+const AuthenticationCreateLDAP = ({ params }: Props) => (
   <>
     <PageHeader title="Setup Authentication Provider">
       <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
@@ -34,8 +31,8 @@ const AuthenticationSetuo = ({ params }: Props) => (
   </>
 );
 
-AuthenticationSetuo.propTypes = {
+AuthenticationCreateLDAP.propTypes = {
   params: PropTypes.object.isRequired,
 };
 
-export default AuthenticationPage;
+export default AuthenticationCreateLDAP;

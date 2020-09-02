@@ -1,7 +1,10 @@
 // @flow strict
+import Routes from 'routing/Routes';
+
 export const availableProviders = {
-  ldap: 'LDAP',
-  activeDirectory: 'Active Directory',
+  ldap: { name: 'LDAP', route: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_LDAP },
+  activeDirectory: { name: 'Active Directory', route: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_AP },
 };
 
-export const availableProvidersOptions = Object.entries(availableProviders).map(([value, label]) => ({ value, label }));
+export const availableProvidersOptions: Array<{value: string, label: string}> = Object.keys(availableProviders)
+  .map((value) => ({ value, label: availableProviders[value].name }));

@@ -30,7 +30,7 @@ const AuthenticationPage = ({ location, params }: Props) => (
     </PageHeader>
 
     <Row className="content">
-      <Col xs={8} xsOffset={2} md={6} mdOffset={3}>
+      <Col md={6} mdOffset={3}>
         <EmptyEntity>
           <p>
             Beside the builtin authentication mechanisms like its internal user database or LDAP/Active Directory,

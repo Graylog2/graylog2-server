@@ -1,26 +1,41 @@
 // @flow strict
 import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
+import styled from 'styled-components';
 
-import { availableProvidersOptions } from 'logic/authentication/availableProviders';
+import { availableProvidersOptions, availableProviders } from 'logic/authentication/availableProviders';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import { Select } from 'components/common';
 import { Button } from 'components/graylog';
 
-const AuthenticationProviderSelect = () => {
-  const onSubmit = ({ authProvider }) => {
-    console.log(Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE);
-    // history.push(Routes.SYSTEM.AUTHENTICATION.CREATE);
-    history.push({ pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE, search: `?type=${authProvider}` });
-  };
+const ElementsContainer = styled.div`
+  display: flex;
+  align-items: start;
+  width: 100%;
+`;
 
-  return (
-    <Formik onSubmit={onSubmit}
-            initialValues={{ authProvider: 'ldap' }}>
-      {({ isSubmitting, isValid }) => (
-        <Form className="form-inline">
-          <div className="form-group" style={{ width: 300 }}>
+const StyledForm = styled(Form)`
+  max-width: 360px;
+  width: 100%;
+`;
+
+const FormGroup = styled.div`
+  flex: 1;
+`;
+
+const _onSubmit = ({ authProvider }) => {
+  const { route } = availableProviders[authProvider];
+  history.push(route);
+};
+
+const AuthenticationProviderSelect = () => (
+  <Formik onSubmit={_onSubmit}
+          initialValues={{ authProvider: 'ldap' }}>
+    {({ isSubmitting, isValid }) => (
+      <StyledForm>
+        <ElementsContainer>
+          <FormGroup className="form-group">
             <Field name="authProvider">
               {({ field: { name, value, onChange } }) => (
                 <Select placeholder="Select input"
@@ -31,13 +46,13 @@ const AuthenticationProviderSelect = () => {
                         clearable={false} />
               )}
             </Field>
-          </div>
-          &nbsp;
+          </FormGroup>
+            &nbsp;
           <Button bsStyle="success" type="submit" disabled={isSubmitting || !isValid}>Get started</Button>
-        </Form>
-      )}
-    </Formik>
-  );
-};
+        </ElementsContainer>
+      </StyledForm>
+    )}
+  </Formik>
+);
 
 export default AuthenticationProviderSelect;
