@@ -157,7 +157,7 @@ describe('<UserEdit />', () => {
     });
 
     it('should require current password when current user is changing his password', async () => {
-      const { getByLabelText, getByText } = render(<SutComponent user={currentUser} />);
+      const { getByLabelText, getByText } = render(<SutComponent user={User.fromJSON(currentUser)} />);
       await act(() => mockRolesForUserPromise);
       await act(() => mockLoadRolesPromise);
 
