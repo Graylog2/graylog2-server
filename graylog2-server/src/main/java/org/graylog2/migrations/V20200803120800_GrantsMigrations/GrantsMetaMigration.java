@@ -21,8 +21,6 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.security.DBGrantService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
-import org.graylog2.migrations.V20200803120800_GrantMigrations.RolesToGrantsMigration;
-import org.graylog2.migrations.V20200803120800_GrantMigrations.ViewSharingToGrantsMigration;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 
@@ -63,8 +61,9 @@ public class GrantsMetaMigration extends Migration {
 
     @Override
     public void upgrade() {
-        // ViewSharing need to be migrated before empty roles get dropped
+        // ViewSharingToGrantsMigration needs to run first, so empty roles get dropped
         new ViewSharingToGrantsMigration(mongoConnection, dbGrantService, userService, roleService, rootUsername, viewService).upgrade();
         new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, rootUsername).upgrade();
+        new ViewOwnerShipToGrantsMigration(userService, dbGrantService, rootUsername, viewService).upgrade();
     }
 }

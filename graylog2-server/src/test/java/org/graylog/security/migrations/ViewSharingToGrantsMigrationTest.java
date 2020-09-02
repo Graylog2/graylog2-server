@@ -37,7 +37,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.migrations.V20200803120800_GrantMigrations.ViewSharingToGrantsMigration;
+import org.graylog2.migrations.V20200803120800_GrantsMigrations.ViewSharingToGrantsMigration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.Role;
