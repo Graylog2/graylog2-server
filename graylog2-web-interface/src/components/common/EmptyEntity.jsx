@@ -40,8 +40,8 @@ const EmptyEntity = ({ children, title }: Props) => (
 EmptyEntity.propTypes = {
   /** Text or node to be rendered as title. */
   title: PropTypes.oneOfType([
-    PropTypes.string,
     PropTypes.node,
+    PropTypes.string,
   ]),
   /**
    * Any other content the component should display below the title. This may include a description and button
