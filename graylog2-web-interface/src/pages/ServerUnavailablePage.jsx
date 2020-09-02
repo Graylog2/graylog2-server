@@ -1,45 +1,33 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import authStyles from 'theme/styles/authStyles';
-import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import { qualifyUrl } from 'util/URLUtils';
+import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-class ServerUnavailablePage extends React.Component {
-  static propTypes = {
-    server: PropTypes.object,
-  };
+const ServerUnavailablePage = ({ server }) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const { addGlobalStyles } = useContext(GlobalStylesContext);
 
-  static defaultProps = {
-    server: undefined,
-  };
+  useEffect(() => {
+    addGlobalStyles(authStyles);
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showDetails: false,
+    return () => {
+      addGlobalStyles(null);
     };
-  }
+  }, []);
 
-  _toggleDetails = () => {
-    const { showDetails } = this.state;
+  const _toggleDetails = () => setShowDetails(!showDetails);
 
-    this.setState({ showDetails: !showDetails });
-  };
-
-  _formatErrorMessage = () => {
-    const { showDetails } = this.state;
-    const { server } = this.props;
-
+  const _formatErrorMessage = () => {
     if (!showDetails) {
       return null;
     }
@@ -51,7 +39,7 @@ class ServerUnavailablePage extends React.Component {
       </div>
     );
 
-    if (!server || !server.error) {
+    if (!server?.error) {
       return noInformationMessage;
     }
 
@@ -101,43 +89,46 @@ class ServerUnavailablePage extends React.Component {
     );
   };
 
-  render() {
-    const { showDetails } = this.state;
-
-    return (
-      <DocumentTitle title="Server unavailable">
-        <GlobalThemeStyles additionalStyles={authStyles} />
-        <Modal show>
-          <Modal.Header>
-            <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+  return (
+    <DocumentTitle title="Server unavailable">
+      <Modal show>
+        <Modal.Header>
+          <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <p>
+              We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
+              Please verify that the server is healthy and working correctly.
+            </p>
+            <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
+            <p>
+              Do you need a hand?{' '}
+              <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
+            </p>
             <div>
-              <p>
-                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
-                Please verify that the server is healthy and working correctly.
-              </p>
-              <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
-              <p>
-                Do you need a hand?{' '}
-                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
-              </p>
-              <div>
-                <Button bsStyle="primary"
-                        tabIndex={0}
-                        onClick={this._toggleDetails}
-                        bsSize="sm">
-                  {showDetails ? 'Less details' : 'More details'}
-                  <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
-                </Button>
-                {this._formatErrorMessage()}
-              </div>
+              <Button bsStyle="primary"
+                      tabIndex={0}
+                      onClick={_toggleDetails}
+                      bsSize="sm">
+                {showDetails ? 'Less details' : 'More details'}
+                <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
+              </Button>
+              {_formatErrorMessage()}
             </div>
-          </Modal.Body>
-        </Modal>
-      </DocumentTitle>
-    );
-  }
-}
+          </div>
+        </Modal.Body>
+      </Modal>
+    </DocumentTitle>
+  );
+};
+
+ServerUnavailablePage.propTypes = {
+  server: PropTypes.object,
+};
+
+ServerUnavailablePage.defaultProps = {
+  server: undefined,
+};
 
 export default ServerUnavailablePage;

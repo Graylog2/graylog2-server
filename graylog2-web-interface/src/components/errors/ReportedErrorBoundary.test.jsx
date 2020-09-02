@@ -7,6 +7,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import { FetchError } from 'logic/rest/FetchProvider';
+import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
@@ -18,6 +19,16 @@ const router = {
 };
 
 describe('ReportedErrorBoundary', () => {
+  const renderSUT = (children) => {
+    const addGlobalStyles = jest.fn();
+
+    return render(
+      <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
+        {children}
+      </GlobalStylesContext.Provider>,
+    );
+  };
+
   it('registers to router upon mount', () => {
     const mockRouter = {
       listen: jest.fn(() => jest.fn()),
@@ -47,7 +58,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays runtime error page when react error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = renderSUT(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
 
     suppressConsole(() => {
       ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
@@ -60,7 +71,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays not found page when not found error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = renderSUT(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
     const response = { status: 404, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
@@ -74,7 +85,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays reported error with an unkown type', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = renderSUT(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
     const response = { status: 404, body: { message: 'The error message' } };
 
     suppressConsole(() => {
@@ -88,7 +99,7 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('displays unauthorized error page when unauthorized error got reported', async () => {
-    const { getByText, queryByText } = render(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
+    const { getByText, queryByText } = renderSUT(<ReportedErrorBoundary router={router}>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
     suppressConsole(() => {
@@ -106,7 +117,7 @@ describe('ReportedErrorBoundary', () => {
       listen: jest.fn(() => jest.fn()),
     };
 
-    const { getByText } = render(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
+    const { getByText } = renderSUT(<ReportedErrorBoundary router={mockRouter}>Hello World!</ReportedErrorBoundary>);
     const response = { status: 403, body: { message: 'The request error message' } };
 
     expect(getByText('Hello World!')).not.toBeNull();

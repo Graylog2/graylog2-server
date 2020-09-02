@@ -2,6 +2,7 @@ package org.graylog.storage.elasticsearch7;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
@@ -13,6 +14,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.get.GetRespons
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.AnalyzeResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.XContentType;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.rest.RestStatus;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
@@ -210,8 +212,14 @@ public class MessagesAdapterES7 implements MessagesAdapter {
     }
 
     private IndexRequest indexRequestFrom(IndexingRequest request) {
+        final byte[] body;
+        try {
+            body = this.objectMapper.writeValueAsBytes(request.message().toElasticSearchObject(objectMapper, this.invalidTimestampMeter));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return new IndexRequest(request.indexSet().getWriteIndexAlias())
                 .id(request.message().getId())
-                .source(request.message().toElasticSearchObject(objectMapper, this.invalidTimestampMeter));
+                .source(body, XContentType.JSON);
     }
 }

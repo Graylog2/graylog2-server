@@ -1,3 +1,6 @@
+// flow-typed signature: 1f5de1a8acfb1cef787a7062bb304212
+// flow-typed version: 207fb32765/styled-components_v5.x.x/flow_>=v0.104.x
+
 // @flow
 
 declare module 'styled-components' {
@@ -5,13 +8,16 @@ declare module 'styled-components' {
     static +styledComponentId: string;
   }
 
+  declare export type Styles = {
+    [ruleOrSelector: string]: string | number, // | Styles,
+    ...,
+  };
+
   declare export type Interpolation<P> =
-    | ((executionContext: P) =>
-      | ((executionContext: P) => InterpolationBase)
-      | InterpolationBase
-    )
-    | Class<InterpolatableComponent<any>>
-    | InterpolationBase
+    | ((
+        executionContext: P
+      ) => ((executionContext: P) => InterpolationBase) | InterpolationBase)
+    | InterpolationBase;
 
   declare export type InterpolationBase =
     | CSSRules
@@ -21,19 +27,27 @@ declare module 'styled-components' {
     | false // falsy values are OK, true is the only one not allowed, because it renders as "true"
     | null
     | void
-    | {[ruleOrSelector: string]: string | number, ...} // CSS-in-JS object returned by polished are also supported
+    | Styles
+    | Class<InterpolatableComponent<any>>; // eslint-disable-line flowtype/no-weak-types
 
   declare export type TaggedTemplateLiteral<I, R> = {
     [[call]]: (strings: string[], ...interpolations: Interpolation<I>[]) => R,
     [[call]]: ((props: I) => Interpolation<any>) => R,
+    ...
   };
 
   // Should this be `mixed` perhaps?
-  declare export type CSSRules = Interpolation<any>[] // eslint-disable-line flowtype/no-weak-types
+  declare export type CSSRules = Interpolation<any>[]; // eslint-disable-line flowtype/no-weak-types
 
-  declare export type CSSConstructor = TaggedTemplateLiteral<any, CSSRules> // eslint-disable-line flowtype/no-weak-types
-  declare export type KeyFramesConstructor = TaggedTemplateLiteral<any, KeyFrames> // eslint-disable-line flowtype/no-weak-types
-  declare export type CreateGlobalStyleConstructor = TaggedTemplateLiteral<any, React$ComponentType<*>> // eslint-disable-line flowtype/no-weak-types
+  declare export type CSSConstructor = TaggedTemplateLiteral<any, CSSRules>; // eslint-disable-line flowtype/no-weak-types
+  declare export type KeyFramesConstructor = TaggedTemplateLiteral<
+    any, // eslint-disable-line flowtype/no-weak-types
+    KeyFrames
+  >;
+  declare export type CreateGlobalStyleConstructor = TaggedTemplateLiteral<
+    any, // eslint-disable-line flowtype/no-weak-types
+    React$ComponentType<*>
+  >;
 
   declare interface Tag<T> {
     styleTag: HTMLStyleElement | null;
@@ -51,9 +65,9 @@ declare module 'styled-components' {
 
   // The `any`/weak types in here all come from `styled-components` directly, since those definitions were just copied over
   declare export class StyleSheet {
-    static get master() : StyleSheet;
-    static get instance() : StyleSheet;
-    static reset(forceServer?: boolean) : void;
+    static get master(): StyleSheet;
+    static get instance(): StyleSheet;
+    static reset(forceServer?: boolean): void;
 
     id: number;
     forceServer: boolean;
@@ -67,43 +81,69 @@ declare module 'styled-components' {
     capacity: number;
     clones: StyleSheet[];
 
-    constructor(?HTMLElement) : this;
-    rehydrate() : this;
-    clone() : StyleSheet;
-    sealAllTags() : void;
-    makeTag(tag: ?Tag<any>) : Tag<any>; // eslint-disable-line flowtype/no-weak-types
-    getImportRuleTag() : Tag<any>; // eslint-disable-line flowtype/no-weak-types
+    constructor(?HTMLElement): this;
+    rehydrate(): this;
+    clone(): StyleSheet;
+    sealAllTags(): void;
+    makeTag(tag: ?Tag<any>): Tag<any>; // eslint-disable-line flowtype/no-weak-types
+    getImportRuleTag(): Tag<any>; // eslint-disable-line flowtype/no-weak-types
     getTagForId(id: string): Tag<any>; // eslint-disable-line flowtype/no-weak-types
-    hasId(id: string) : boolean;
-    hasNameForId(id: string, name: string) : boolean;
-    deferredInject(id: string, cssRules: string[]) : void;
-    inject(id: string, cssRules: string[], name?: string) : void;
-    remove(id: string) : void;
-    toHtml() : string;
-    toReactElements() : React$ElementType[];
+    hasId(id: string): boolean;
+    hasNameForId(id: string, name: string): boolean;
+    deferredInject(id: string, cssRules: string[]): void;
+    inject(id: string, cssRules: string[], name?: string): void;
+    remove(id: string): void;
+    toHtml(): string;
+    toReactElements(): React$ElementType[];
   }
 
-  declare export function isStyledComponent(target: any): boolean;
+  declare export function isStyledComponent(target: mixed): boolean;
 
   declare type SCMProps = {
-    children?: React$Element<any>,
+    children?: React.Node,
     sheet?: StyleSheet,
     target?: HTMLElement,
     ...
-  }
+  };
 
   declare export var StyleSheetContext: React$Context<StyleSheet>;
-  declare export var StyleSheetConsumer : React$ComponentType<{|
-    children: (value: StyleSheet) => ?React$Node
-  |}>
+  declare export var StyleSheetConsumer: React$ComponentType<{|
+    children: (value: StyleSheet) => ?React$Node,
+  |}>;
   declare var StyleSheetProvider: React$ComponentType<{|
     children?: React$Node,
     value: StyleSheet,
-  |}>
+  |}>;
+
+  /**
+   * plugin
+   *
+   * @param  {number} context
+   * @param  {Array<string>} selector
+   * @param  {Array<string>} parent
+   * @param  {string} content
+   * @param  {number} line
+   * @param  {number} column
+   * @param  {number} length
+   * @return {(string|void)?}
+   */
+
+  declare type StylisPluginSignature = (
+    context: number,
+    selector: string[],
+    parent: string[],
+    content: string,
+    line: number,
+    column: number,
+    length: number
+  ) => string | void;
 
   declare export class StyleSheetManager extends React$Component<SCMProps> {
     getContext(sheet: ?StyleSheet, target: ?HTMLElement): StyleSheet;
-    render(): React$Element<StyleSheetProvider>
+    render(): React$Element<typeof StyleSheetProvider>;
+    stylisPlugins?: StylisPluginSignature[];
+    disableVendorPrefixes?: boolean;
+    disableCSSOMInjection?: boolean;
   }
 
   declare export class ServerStyleSheet {
@@ -112,7 +152,7 @@ declare module 'styled-components' {
     sealed: boolean;
 
     seal(): void;
-    collectStyles(children: any): React$Element<StyleSheetManager>;
+    collectStyles(children: any): React$Element<StyleSheetManager>; // eslint-disable-line flowtype/no-weak-types
     getStyleTags(): string;
     toReactElements(): React$ElementType[];
     // This seems to be use a port of node streams in the Browsers. Not gonna type this for now
@@ -125,24 +165,24 @@ declare module 'styled-components' {
     name: string;
     rules: string[];
 
-    constructor(name: string, rules: string[]) : this;
-    inject(StyleSheet) : void;
-    toString() : string;
-    getName() : string;
+    constructor(name: string, rules: string[]): this;
+    inject(StyleSheet): void;
+    toString(): string;
+    getName(): string;
   }
 
   // I think any is appropriate here?
   // eslint-disable-next-line flowtype/no-weak-types
-  declare export var css : CSSConstructor;
-  declare export var keyframes : KeyFramesConstructor;
-  declare export var createGlobalStyle : CreateGlobalStyleConstructor
-  declare export var ThemeConsumer : React$ComponentType<{|
-    children: (value: mixed) => ?React$Node
-  |}>
+  declare export var css: CSSConstructor;
+  declare export var keyframes: KeyFramesConstructor;
+  declare export var createGlobalStyle: CreateGlobalStyleConstructor;
+  declare export var ThemeConsumer: React$ComponentType<{|
+    children: (value: mixed) => ?React$Node,
+  |}>;
   declare export var ThemeProvider: React$ComponentType<{|
     children?: ?React$Node,
-    theme: mixed | (mixed) => mixed,
-  |}>
+    theme: mixed | (mixed => mixed),
+  |}>;
 
   /**
     Any because the intended use-case is for users to do:
@@ -164,33 +204,72 @@ declare module 'styled-components' {
   declare export var ThemeContext: React$Context<any>;
 
   declare export type ThemeProps<T> = {|
-    theme: T
-  |}
+    theme: T,
+  |};
+
+  declare type CommonSCProps = {|
+    children?: React$Node,
+    className?: ?string,
+    style?: { [string]: string | number, ... },
+    ref?: React$Ref<any>, // eslint-disable-line flowtype/no-weak-types
+  |};
 
   declare export type PropsWithTheme<Props, T> = {|
     ...ThemeProps<T>,
-    ...$Exact<Props>
-  |}
+    ...CommonSCProps, // Not sure how useful this is here, but it's technically correct to have it
+    ...$Exact<Props>,
+  |};
 
-  declare export function withTheme<Theme, Config: {...}, Instance>(Component: React$AbstractComponent<Config, Instance>): React$AbstractComponent<$Diff<Config, ThemeProps<Theme | void>>, Instance>
+  declare export function withTheme<Theme, Config: { ... }, Instance>(
+    Component: React$AbstractComponent<Config, Instance>
+  ): React$AbstractComponent<$Diff<Config, ThemeProps<Theme | void>>, Instance>;
 
-  declare export type StyledComponent<Props, Theme, Instance> = React$AbstractComponent<Props, Instance> & Class<InterpolatableComponent<Props>>
+  declare export function useTheme<Theme>(): Theme;
+
+  declare export type StyledComponent<
+    Props,
+    Theme,
+    Instance,
+    MergedProps = { ...$Exact<Props>, ...CommonSCProps, ... }
+  > = React$AbstractComponent<MergedProps, Instance> &
+    Class<InterpolatableComponent<MergedProps>>;
 
   declare export type StyledFactory<StyleProps, Theme, Instance> = {|
-    [[call]]: TaggedTemplateLiteral<PropsWithTheme<StyleProps, Theme>, StyledComponent<StyleProps, Theme, Instance>>;
-    +attrs: <A: {...}>(((StyleProps) => A) | A) => TaggedTemplateLiteral<
-      PropsWithTheme<{|...$Exact<StyleProps>, ...$Exact<A>|}, Theme>,
-      StyledComponent<React$Config<{|...$Exact<StyleProps>, ...$Exact<A>|}, $Exact<A>>, Theme, Instance>>;
-  |}
+    [[call]]: TaggedTemplateLiteral<
+      PropsWithTheme<StyleProps, Theme>,
+      StyledComponent<StyleProps, Theme, Instance>
+    >,
+    +attrs: <A: { ... }>(
+      (StyleProps => A) | A
+    ) => TaggedTemplateLiteral<
+      PropsWithTheme<{| ...$Exact<StyleProps>, ...$Exact<A> |}, Theme>,
+      StyledComponent<
+        React$Config<{| ...$Exact<StyleProps>, ...$Exact<A> |}, $Exact<A>>,
+        Theme,
+        Instance
+      >
+    >,
+  |};
 
   declare export type StyledShorthandFactory<V> = {|
-    [[call]]: <StyleProps, Theme>(string[], ...Interpolation<PropsWithTheme<StyleProps, Theme>>[]) => StyledComponent<StyleProps, Theme, V>;
-    [[call]]: <StyleProps, Theme>((props: PropsWithTheme<StyleProps, Theme>) => Interpolation<any>) => StyledComponent<StyleProps, Theme, V>;
-    +attrs: <A: {...}, StyleProps = {||}, Theme = {||}>(((StyleProps) => A) | A) => TaggedTemplateLiteral<
-      PropsWithTheme<{|...$Exact<StyleProps>, ...$Exact<A>|}, Theme>,
-      StyledComponent<React$Config<{|...$Exact<StyleProps>, ...$Exact<A>|}, $Exact<A>>, Theme, V>>;
-  |}
-
+    [[call]]: <StyleProps, Theme>(
+      string[],
+      ...Interpolation<PropsWithTheme<StyleProps, Theme>>[]
+    ) => StyledComponent<StyleProps, Theme, V>,
+    [[call]]: <StyleProps, Theme>(
+      (props: PropsWithTheme<StyleProps, Theme>) => Interpolation<any> // eslint-disable-line flowtype/no-weak-types
+    ) => StyledComponent<StyleProps, Theme, V>,
+    +attrs: <A: { ... }, StyleProps = {||}, Theme = {||}>(
+      (StyleProps => A) | A
+    ) => TaggedTemplateLiteral<
+      PropsWithTheme<{| ...$Exact<StyleProps>, ...$Exact<A> |}, Theme>,
+      StyledComponent<
+        React$Config<{| ...$Exact<StyleProps>, ...$Exact<A> |}, $Exact<A>>,
+        Theme,
+        V
+      >
+    >,
+  |};
 
   declare type BuiltinElementInstances = {
     a: React$ElementRef<'a'>,
@@ -328,22 +407,29 @@ declare module 'styled-components' {
     keygen: React$ElementRef<'keygen'>,
     menuitem: React$ElementRef<'menuitem'>,
     ...
-  }
+  };
 
-  declare type BuiltinElementType<ElementName: string> = $ElementType<BuiltinElementInstances, ElementName>
+  declare type BuiltinElementType<ElementName: string> = $ElementType<
+    BuiltinElementInstances,
+    ElementName
+  >;
 
   declare type ConvenientShorthands = $ObjMap<
     BuiltinElementInstances,
-    <V>(V) => StyledShorthandFactory<V>>
+    <V>(V) => StyledShorthandFactory<V>
+  >;
 
   declare interface Styled {
-    <StyleProps, Theme, ElementName: $Keys<BuiltinElementInstances>>(ElementName): StyledFactory<StyleProps, Theme, BuiltinElementType<ElementName>>;
-    <Comp: React$ComponentType<any>, Theme, OwnProps = React$ElementConfig<Comp>>(Comp): StyledFactory<{|...$Exact<OwnProps>|}, Theme, Comp>;
+    <Comp: React$ComponentType<P>, Theme, OwnProps = React$ElementConfig<Comp>>(
+      Comp
+    ): StyledFactory<{| ...$Exact<OwnProps> |}, Theme, Comp>;
+    <StyleProps, Theme, ElementName: $Keys<BuiltinElementInstances>>(
+      ElementName
+    ): StyledFactory<StyleProps, Theme, BuiltinElementType<ElementName>>;
   }
 
-  declare export default Styled & ConvenientShorthands
+  declare export default Styled & ConvenientShorthands;
 }
-
 
 declare module 'styled-components/native' {
   import type {
@@ -363,67 +449,83 @@ declare module 'styled-components/native' {
   } from 'styled-components';
 
   declare type BuiltinElementInstances = {
-    ActivityIndicator: React$ComponentType<{...}>,
-    ActivityIndicatorIOS: React$ComponentType<{...}>,
-    ART: React$ComponentType<{...}>,
-    Button: React$ComponentType<{...}>,
-    DatePickerIOS: React$ComponentType<{...}>,
-    DrawerLayoutAndroid: React$ComponentType<{...}>,
-    Image: React$ComponentType<{...}>,
-    ImageBackground: React$ComponentType<{...}>,
-    ImageEditor: React$ComponentType<{...}>,
-    ImageStore: React$ComponentType<{...}>,
-    KeyboardAvoidingView: React$ComponentType<{...}>,
-    ListView: React$ComponentType<{...}>,
-    MapView: React$ComponentType<{...}>,
-    Modal: React$ComponentType<{...}>,
-    NavigatorIOS: React$ComponentType<{...}>,
-    Picker: React$ComponentType<{...}>,
-    PickerIOS: React$ComponentType<{...}>,
-    ProgressBarAndroid: React$ComponentType<{...}>,
-    ProgressViewIOS: React$ComponentType<{...}>,
-    ScrollView: React$ComponentType<{...}>,
-    SegmentedControlIOS: React$ComponentType<{...}>,
-    Slider: React$ComponentType<{...}>,
-    SliderIOS: React$ComponentType<{...}>,
-    SnapshotViewIOS: React$ComponentType<{...}>,
-    Switch: React$ComponentType<{...}>,
-    RecyclerViewBackedScrollView: React$ComponentType<{...}>,
-    RefreshControl: React$ComponentType<{...}>,
-    SafeAreaView: React$ComponentType<{...}>,
-    StatusBar: React$ComponentType<{...}>,
-    SwipeableListView: React$ComponentType<{...}>,
-    SwitchAndroid: React$ComponentType<{...}>,
-    SwitchIOS: React$ComponentType<{...}>,
-    TabBarIOS: React$ComponentType<{...}>,
-    Text: React$ComponentType<{...}>,
-    TextInput: React$ComponentType<{...}>,
-    ToastAndroid: React$ComponentType<{...}>,
-    ToolbarAndroid: React$ComponentType<{...}>,
-    Touchable: React$ComponentType<{...}>,
-    TouchableHighlight: React$ComponentType<{...}>,
-    TouchableNativeFeedback: React$ComponentType<{...}>,
-    TouchableOpacity: React$ComponentType<{...}>,
-    TouchableWithoutFeedback: React$ComponentType<{...}>,
-    View: React$ComponentType<{...}>,
-    ViewPagerAndroid: React$ComponentType<{...}>,
-    WebView: React$ComponentType<{...}>,
-    FlatList: React$ComponentType<{...}>,
-    SectionList: React$ComponentType<{...}>,
-    VirtualizedList: React$ComponentType<{...}>,
+    ActivityIndicator: React$ComponentType<{ ... }>,
+    ActivityIndicatorIOS: React$ComponentType<{ ... }>,
+    ART: React$ComponentType<{ ... }>,
+    Button: React$ComponentType<{ ... }>,
+    DatePickerIOS: React$ComponentType<{ ... }>,
+    DrawerLayoutAndroid: React$ComponentType<{ ... }>,
+    Image: React$ComponentType<{ ... }>,
+    ImageBackground: React$ComponentType<{ ... }>,
+    ImageEditor: React$ComponentType<{ ... }>,
+    ImageStore: React$ComponentType<{ ... }>,
+    KeyboardAvoidingView: React$ComponentType<{ ... }>,
+    ListView: React$ComponentType<{ ... }>,
+    MapView: React$ComponentType<{ ... }>,
+    Modal: React$ComponentType<{ ... }>,
+    NavigatorIOS: React$ComponentType<{ ... }>,
+    Picker: React$ComponentType<{ ... }>,
+    PickerIOS: React$ComponentType<{ ... }>,
+    ProgressBarAndroid: React$ComponentType<{ ... }>,
+    ProgressViewIOS: React$ComponentType<{ ... }>,
+    ScrollView: React$ComponentType<{ ... }>,
+    SegmentedControlIOS: React$ComponentType<{ ... }>,
+    Slider: React$ComponentType<{ ... }>,
+    SliderIOS: React$ComponentType<{ ... }>,
+    SnapshotViewIOS: React$ComponentType<{ ... }>,
+    Switch: React$ComponentType<{ ... }>,
+    RecyclerViewBackedScrollView: React$ComponentType<{ ... }>,
+    RefreshControl: React$ComponentType<{ ... }>,
+    SafeAreaView: React$ComponentType<{ ... }>,
+    StatusBar: React$ComponentType<{ ... }>,
+    SwipeableListView: React$ComponentType<{ ... }>,
+    SwitchAndroid: React$ComponentType<{ ... }>,
+    SwitchIOS: React$ComponentType<{ ... }>,
+    TabBarIOS: React$ComponentType<{ ... }>,
+    Text: React$ComponentType<{ ... }>,
+    TextInput: React$ComponentType<{ ... }>,
+    ToastAndroid: React$ComponentType<{ ... }>,
+    ToolbarAndroid: React$ComponentType<{ ... }>,
+    Touchable: React$ComponentType<{ ... }>,
+    TouchableHighlight: React$ComponentType<{ ... }>,
+    TouchableNativeFeedback: React$ComponentType<{ ... }>,
+    TouchableOpacity: React$ComponentType<{ ... }>,
+    TouchableWithoutFeedback: React$ComponentType<{ ... }>,
+    View: React$ComponentType<{ ... }>,
+    ViewPagerAndroid: React$ComponentType<{ ... }>,
+    WebView: React$ComponentType<{ ... }>,
+    FlatList: React$ComponentType<{ ... }>,
+    SectionList: React$ComponentType<{ ... }>,
+    VirtualizedList: React$ComponentType<{ ... }>,
     ...
-  }
+  };
 
-  declare type BuiltinElementType<ElementName: string> = $ElementType<BuiltinElementInstances, ElementName>
+  declare type BuiltinElementType<ElementName: string> = $ElementType<
+    BuiltinElementInstances,
+    ElementName
+  >;
 
   declare type ConvenientShorthands = $ObjMap<
     BuiltinElementInstances,
-    <V>(V) => StyledShorthandFactory<V>>
+    <V>(V) => StyledShorthandFactory<V>
+  >;
 
   declare interface Styled {
-    <StyleProps, Theme, ElementName: $Keys<BuiltinElementInstances>>(ElementName): StyledFactory<StyleProps, Theme, BuiltinElementType<ElementName>>;
-    <Comp: React$ComponentType<any>, Theme, OwnProps = React$ElementConfig<Comp>>(Comp): StyledFactory<{|...$Exact<OwnProps>|}, Theme, Comp>;
+    <StyleProps, Theme, ElementName: $Keys<BuiltinElementInstances>>(
+      ElementName
+    ): StyledFactory<StyleProps, Theme, BuiltinElementType<ElementName>>;
+    <
+      Comp: React$ComponentType<any>,
+      Theme,
+      OwnProps = React$ElementConfig<Comp>
+    >(
+      Comp
+    ): StyledFactory<{| ...$Exact<OwnProps> |}, Theme, Comp>;
   }
 
-  declare export default Styled & ConvenientShorthands
+  declare export default Styled & ConvenientShorthands;
+}
+
+declare module 'styled-components/macro' {
+  declare export * from 'styled-components';
 }
