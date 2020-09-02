@@ -74,7 +74,7 @@ const RolesSelector = ({ user, onSubmit }: Props) => {
   return (
     <div>
       <FormElements>
-        <StyledSelect inputProps={{ 'arial-label': 'Search for roles' }}
+        <StyledSelect inputProps={{ 'aria-label': 'Search for roles' }}
                       onChange={setSelectedRoleName}
                       optionRenderer={_renderRoleOption}
                       options={options}

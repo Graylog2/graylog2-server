@@ -3,17 +3,31 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import { render, fireEvent, waitFor, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+import { reader as assignedRole, reportCreator as notAssignedRole } from 'fixtures/roles';
+import { admin as currentUser } from 'fixtures/users';
 
+// import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
 import User from 'logic/users/User';
 
 import UserEdit from './UserEdit';
 
+jest.mock('stores/users/UsersStore', () => ({
+  UsersActions: {
+    update: jest.fn(() => Promise.resolve()),
+    load: jest.fn(() => Promise.resolve()),
+    changePassword: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+const mockRolesForUserPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
+const mockLoadRolesPromise = Promise.resolve({ list: Immutable.List([notAssignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
 const user = User
   .builder()
   .fullName('The full name')
   .username('The username')
+  .roles(Immutable.List([assignedRole.name]))
   .email('theemail@example.org')
   .clientAddress('127.0.0.1')
   .lastActivity('2020-01-01T10:40:05.376+0000')
@@ -21,25 +35,16 @@ const user = User
   .timezone('Europe/Berlin')
   .build();
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    update: jest.fn(() => Promise.resolve()),
-    changePassword: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), pagination: { total: 0 } });
-
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
-    loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
-    loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
+    loadRolesForUser: jest.fn(() => mockRolesForUserPromise),
+    loadRolesPaginated: jest.fn(() => mockLoadRolesPromise),
   },
 }));
 
 describe('<UserEdit />', () => {
   const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['*'] }}>
+    <CurrentUserContext.Provider value={{ ...currentUser, permissions: ['*'] }}>
       <UserEdit {...props} />
     </CurrentUserContext.Provider>
   );
@@ -51,15 +56,16 @@ describe('<UserEdit />', () => {
   describe('profile section', () => {
     it('should display username', async () => {
       const { getByText } = render(<SutComponent user={user} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       expect(getByText(user.username)).not.toBeNull();
-
-      await act(() => mockAuthzRolesPromise);
     });
 
     it('should use user details as initial values', async () => {
       const { getByText } = render(<SutComponent user={user} />);
-
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
       const submitButton = getByText('Update Profile');
 
       fireEvent.click(submitButton);
@@ -72,6 +78,8 @@ describe('<UserEdit />', () => {
 
     it('should allow full name and e-mail address change', async () => {
       const { getByText, getByLabelText } = render(<SutComponent user={user} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       const fullNameInput = getByLabelText('Full Name');
       const emailInput = getByLabelText('E-Mail Address');
@@ -92,6 +100,8 @@ describe('<UserEdit />', () => {
   describe('settings section', () => {
     it('should use user details as initial values', async () => {
       const { getByText } = render(<SutComponent user={user} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       const submitButton = getByText('Update Settings');
 
@@ -105,6 +115,8 @@ describe('<UserEdit />', () => {
 
     it('should allow session timeout name and timezone change', async () => {
       const { getByText, getByLabelText, getByPlaceholderText } = render(<SutComponent user={user} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       const timeoutAmountInput = getByPlaceholderText('Timeout amount');
       // const timeoutUnitSelect = getByLabelText('Timeout unit');
@@ -128,6 +140,8 @@ describe('<UserEdit />', () => {
   describe('password section', () => {
     it('should allow password change', async () => {
       const { getByLabelText, getByText } = render(<SutComponent user={user} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       const newPasswordInput = getByLabelText('New Password');
       const newPasswordRepeatInput = getByLabelText('Repeat Password');
@@ -143,7 +157,10 @@ describe('<UserEdit />', () => {
     });
 
     it('should require current password when current user is changing his password', async () => {
-      const { getByLabelText, getByText } = render(<SutComponent user={user} />);
+      const newCurrentUser = User.fromJSON(currentUser).toBuilder().readOnly(false).build();
+      const { getByLabelText, getByText } = render(<SutComponent user={newCurrentUser} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       const passwordInput = getByLabelText('Old Password');
       const newPasswordInput = getByLabelText('New Password');
@@ -155,7 +172,7 @@ describe('<UserEdit />', () => {
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
       fireEvent.click(submitButton);
 
-      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(user.username, {
+      await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledWith(newCurrentUser.username, {
         old_password: 'oldpassword',
         password: 'newpassword',
       }));
@@ -163,6 +180,8 @@ describe('<UserEdit />', () => {
 
     it('should display warning, if password repeat does not match password', async () => {
       const { getByLabelText, getByText } = render(<SutComponent user={user} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
 
       const newPasswordInput = getByLabelText('New Password');
       const newPasswordRepeatInput = getByLabelText('Repeat Password');
@@ -171,6 +190,56 @@ describe('<UserEdit />', () => {
       fireEvent.change(newPasswordRepeatInput, { target: { value: 'notthepassword' } });
 
       await waitFor(() => expect(getByText('Passwords do not match')).not.toBeNull());
+    });
+  });
+
+  describe('roles section', () => {
+    // it('should assigning a role', async () => {
+    //   const { getByLabelText, getByRole } = render(<SutComponent user={user} />);
+    //   await act(() => mockRolesForUserPromise);
+    //   await act(() => mockLoadRolesPromise);
+
+    //   const assignRoleButton = getByRole('button', { name: 'Assign Role' });
+    //   const rolesSelector = getByLabelText('Search for roles');
+    //   await selectEvent.openMenu(rolesSelector);
+    //   await selectEvent.select(rolesSelector, notAssignedRole.name);
+    //   fireEvent.click(assignRoleButton);
+
+    //   await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, { roles: [assignedRole.name, notAssignedRole.name] }));
+    // });
+
+    // it('should filter assigned roles', async () => {
+    //   const { getByPlaceholderText, getByRole } = render(<SutComponent user={user} />);
+    //   await act(() => mockRolesForUserPromise);
+    //   await act(() => mockLoadRolesPromise);
+    //   const filterInput = getByPlaceholderText('Enter query to filter');
+    //   const filterSubmitButton = getByRole('button', { name: 'Filter' });
+
+    //   fireEvent.change(filterInput, { target: { value: 'name of an assigned role' } });
+    //   fireEvent.click(filterSubmitButton);
+
+    //   await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledWith(user.username, 1, 10, 'name of an assigned role'));
+    // });
+
+    // it('should unassigning a role', async () => {
+    //   const { getByRole } = render(<SutComponent user={user} />);
+    //   await act(() => mockRolesForUserPromise);
+    //   await act(() => mockLoadRolesPromise);
+
+    //   const assignRoleButton = getByRole('button', { name: `Remove ${assignedRole.name}` });
+    //   fireEvent.click(assignRoleButton);
+
+    //   await waitFor(() => expect(UsersActions.update).toHaveBeenCalledWith(user.username, { roles: [] }));
+    // });
+  });
+
+  describe('teams section', () => {
+    it('should display info if license is not present', async () => {
+      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockRolesForUserPromise);
+      await act(() => mockLoadRolesPromise);
+
+      expect(getByText('No enterprise plugin found')).not.toBeNull();
     });
   });
 });

@@ -6,7 +6,7 @@ import Grantee from 'logic/permissions/Grantee';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import { type AdditionalQueries } from 'util/PaginationURL';
 
-export const simplePaginatedUserShares = (page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => {
+export const paginatedShares = (page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => {
   const entityOwner = Grantee
     .builder()
     .id('grn::::user:jane')
