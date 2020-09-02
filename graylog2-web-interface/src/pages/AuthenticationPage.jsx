@@ -8,6 +8,7 @@ import {} from 'components/authentication'; // Make sure to load all auth config
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
+import AuthenticationProviderSelect from 'components/authentication/AuthenticationProviderSelect';
 import { EmptyEntity } from 'components/common';
 
 type Props = {
@@ -32,10 +33,11 @@ const AuthenticationPage = ({ location, params }: Props) => (
       <Col xs={8} xsOffset={2} md={6} mdOffset={3}>
         <EmptyEntity>
           <p>
-            Beside the builtin authentication mechanisms like its internal user database, or LDAP/Active Directory,
-            authentication provider can also be extended by plugins to support other authentication mechanisms, for example Single Sign-On or Two Factor Authentication.
+            Beside the builtin authentication mechanisms like its internal user database or LDAP/Active Directory,
+            authentication provider can also be extended by plugins to support other authentication mechanisms.
             Select an authentication provider to configure a new one.
           </p>
+          <AuthenticationProviderSelect />
         </EmptyEntity>
       </Col>
     </Row>
