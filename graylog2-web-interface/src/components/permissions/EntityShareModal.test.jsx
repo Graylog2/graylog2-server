@@ -25,13 +25,15 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
+jest.setTimeout(10000);
+
 describe('EntityShareModal', () => {
   beforeAll(() => {
     jest.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    jest.clearAllMocks();
   });
 
   const SimpleEntityShareModal = ({ ...props }) => {
@@ -92,27 +94,16 @@ describe('EntityShareModal', () => {
       expect(getByText('Loading...')).not.toBeNull();
     });
 
-    it('provided description', () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
+    it('necessary informations', () => {
+      const { getByText, getByDisplayValue } = render(<SimpleEntityShareModal />);
 
+      // provided description
       expect(getByText('The description')).not.toBeNull();
-    });
-
-    it('provided title', () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
-
+      // Provided title
       expect(getByText('The title')).not.toBeNull();
-    });
-
-    it('shareable url', () => {
-      const { getByDisplayValue } = render(<SimpleEntityShareModal />);
-
+      // sharable urls
       expect(getByDisplayValue('http://localhost/')).not.toBeNull();
-    });
-
-    it('missing dependecies warning', () => {
-      const { getByText } = render(<SimpleEntityShareModal />);
-
+      // missing dependecies warning
       expect(getByText('There are missing dependecies for the current set of collaborators')).not.toBeNull();
     });
   });

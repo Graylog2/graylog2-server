@@ -37,7 +37,13 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   },
 }));
 
+jest.setTimeout(10000);
+
 describe('<UserCreate />', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should create user', async () => {
     const { getByLabelText, getByPlaceholderText, getByText } = render(<UserCreate />);
 
