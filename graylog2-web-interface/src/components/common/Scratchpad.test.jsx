@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
-import { ScratchpadProvider } from 'providers/ScratchpadProvider';
+import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 
 import Scratchpad from './Scratchpad';
 
