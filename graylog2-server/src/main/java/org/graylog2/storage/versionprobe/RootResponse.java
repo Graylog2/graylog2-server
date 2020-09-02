@@ -14,20 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.storage.providers;
+package org.graylog2.storage.versionprobe;
 
-import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.ElasticsearchVersion;
-import org.graylog2.storage.VersionAwareProvider;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
+@AutoValue
+@JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class RootResponse {
+    public abstract VersionResponse version();
 
-public class MessagesAdapterProvider extends VersionAwareProvider<MessagesAdapter> {
-    @Inject
-    public MessagesAdapterProvider(@ElasticsearchVersion Version version, Map<Version, Provider<MessagesAdapter>> pluginBindings) {
-        super(version, pluginBindings);
+    @JsonCreator
+    public static RootResponse create(@JsonProperty("version") VersionResponse versionResponse) {
+        return new AutoValue_RootResponse(versionResponse);
     }
 }

@@ -19,7 +19,7 @@ type Props = {
   fields: FieldTypeMappingsList,
 };
 
-const MessageDetailsDL: StyledComponent<{}, ThemeInterface, HTMLDListElement> = styled(MessageDetailsDefinitionList)(({ theme }) => css`
+const MessageDetailsDL: StyledComponent<{}, ThemeInterface, MessageDetailsDefinitionList> = styled(MessageDetailsDefinitionList)(({ theme }) => css`
   color: ${theme.colors.gray[40]};
 
   dd {

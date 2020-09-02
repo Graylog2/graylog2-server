@@ -28,47 +28,36 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTime
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Answers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ESTimeHandlerTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
+class ESTimeHandlerTest {
     private ESTimeHandler esTimeHandler;
 
-    @Mock
-    private Pivot pivot;
+    private final Pivot pivot = mock(Pivot.class);
 
-    @Mock
-    private Time time;
+    private final Time time = mock(Time.class);
 
-    @Mock
-    private ESPivot esPivot;
+    private final ESPivot esPivot = mock(ESPivot.class);
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private ESGeneratedQueryContext queryContext;
+    private final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class, RETURNS_DEEP_STUBS);
 
-    @Mock
-    private Query query;
+    private final Query query = mock(Query.class);
 
-    @Mock
-    private Interval interval;
+    private final Interval interval = mock(Interval.class, RETURNS_DEEP_STUBS);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.esTimeHandler = new ESTimeHandler();
         when(time.interval()).thenReturn(interval);
@@ -101,5 +90,16 @@ public class ESTimeHandlerTest {
 
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(2323));
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = { "1s", "1M", "4s", "14d" })
+    public void correctIntervalTypeIsUsedForAggregation(String intervalString) throws InvalidRangeParametersException {
+        when(pivot.timerange()).thenReturn(Optional.empty());
+        when(query.timerange()).thenReturn(RelativeRange.create(2323));
+        when(interval.toDateInterval(any(TimeRange.class)).toString()).thenReturn(intervalString);
+
+        this.esTimeHandler.doCreateAggregation("foobar", pivot, time, esPivot, queryContext, query);
     }
 }

@@ -1,20 +1,24 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
-import GlobalThemeStyles from 'theme/GlobalThemeStyles';
+import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
-const LoggedInPage = () => (
-  <CurrentUserProvider>
-    <CurrentUserPreferencesProvider>
-      <GraylogThemeProvider>
-        <GlobalThemeStyles />
+const LoggedInPage = () => {
+  const { addGlobalStyles } = useContext(GlobalStylesContext);
+
+  useEffect(() => {
+    addGlobalStyles(null);
+  }, []);
+
+  return (
+    <CurrentUserProvider>
+      <CurrentUserPreferencesProvider>
         <AppRouter />
-      </GraylogThemeProvider>
-    </CurrentUserPreferencesProvider>
-  </CurrentUserProvider>
-);
+      </CurrentUserPreferencesProvider>
+    </CurrentUserProvider>
+  );
+};
 
 export default LoggedInPage;

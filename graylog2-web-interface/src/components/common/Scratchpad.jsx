@@ -3,9 +3,9 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
 
+import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import { Alert, Button, MenuItem, SplitButton, OverlayTrigger, Tooltip } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
-import { ScratchpadContext } from 'providers/ScratchpadProvider';
 /* NOTE: common components are cyclical dependencies, so they need to be directly imported */
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';

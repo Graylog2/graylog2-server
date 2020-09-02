@@ -46,13 +46,22 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, ParsedDateHist
         final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
         final Optional<BucketOrder> ordering = orderForPivot(pivot, timeSpec, esGeneratedQueryContext);
         final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
-                .fixedInterval(dateHistogramInterval)
                 .field(timeSpec.field())
                 .order(ordering.orElse(BucketOrder.key(true)))
                 .format("date_time");
+
+        setInterval(builder, dateHistogramInterval);
         record(esGeneratedQueryContext, pivot, timeSpec, name, ParsedDateHistogram.class);
 
         return Optional.of(builder);
+    }
+
+    private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {
+        if (DateHistogramAggregationBuilder.DATE_FIELD_UNITS.get(interval.toString()) != null) {
+            builder.calendarInterval(interval);
+        } else {
+            builder.fixedInterval(interval);
+        }
     }
 
 
