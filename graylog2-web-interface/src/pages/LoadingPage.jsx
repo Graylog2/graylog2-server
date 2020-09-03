@@ -1,20 +1,19 @@
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
+import { createGlobalStyle } from 'styled-components';
 
 import { DocumentTitle, Spinner, Icon } from 'components/common';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';
-import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
+
+const LoadingPageStyles = createGlobalStyle`
+  ${authStyles}
+`;
 
 const LoadingPage = ({ text }) => {
-  const { addGlobalStyles } = useContext(GlobalStylesContext);
-
-  useEffect(() => {
-    addGlobalStyles(authStyles);
-  }, []);
-
   return (
     <DocumentTitle title="Loading...">
+      <LoadingPageStyles />
       <LoginBox>
         <legend><Icon name="users" /> Welcome to Graylog</legend>
         <p>

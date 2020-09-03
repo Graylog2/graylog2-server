@@ -1,29 +1,23 @@
 import PropTypes from 'prop-types';
 import React, { useState, useContext, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 import { Button, Modal, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import authStyles from 'theme/styles/authStyles';
 import { qualifyUrl } from 'util/URLUtils';
-import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
+const ServerUnavailableStyles = createGlobalStyle`
+  ${authStyles}
+`;
+
 const ServerUnavailablePage = ({ server }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const { addGlobalStyles } = useContext(GlobalStylesContext);
-
-  useEffect(() => {
-    addGlobalStyles(authStyles);
-
-    return () => {
-      addGlobalStyles(null);
-    };
-  }, []);
 
   const _toggleDetails = () => setShowDetails(!showDetails);
 
@@ -91,6 +85,7 @@ const ServerUnavailablePage = ({ server }) => {
 
   return (
     <DocumentTitle title="Server unavailable">
+      <ServerUnavailableStyles />
       <Modal show>
         <Modal.Header>
           <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
