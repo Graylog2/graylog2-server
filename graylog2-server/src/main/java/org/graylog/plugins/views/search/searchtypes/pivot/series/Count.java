@@ -57,7 +57,7 @@ public abstract class Count implements SeriesSpec {
         }
 
         @JsonProperty
-        public abstract Builder id(@Nullable String id);
+        public abstract Builder id(String id);
 
         @JsonProperty
         public abstract Builder field(@Nullable String field);
