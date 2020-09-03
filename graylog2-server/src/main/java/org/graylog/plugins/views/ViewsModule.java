@@ -30,7 +30,6 @@ import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.sharing.SharingStrategy;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.VersionAwareModule;
@@ -79,14 +78,6 @@ public abstract class ViewsModule extends VersionAwareModule {
     protected void registerPivotAggregationFunction(String name, Class<? extends SeriesSpec> seriesSpecClass) {
         registerJacksonSubtype(seriesSpecClass);
         seriesSpecBinder().addBinding(name).toInstance(SeriesDescription.create(name));
-    }
-
-    protected MapBinder<String, SharingStrategy> sharingStrategyBinder() {
-        return MapBinder.newMapBinder(binder(), String.class, SharingStrategy.class);
-    }
-
-    protected ScopedBindingBuilder registerSharingStrategy(String type, Class<? extends SharingStrategy> sharingStrategy) {
-        return sharingStrategyBinder().addBinding(type).to(sharingStrategy);
     }
 
     protected MapBinder<String, QueryBackend<? extends GeneratedQueryContext>> queryBackendBinder(Version version) {

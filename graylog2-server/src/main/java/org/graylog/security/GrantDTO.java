@@ -79,6 +79,14 @@ public abstract class GrantDTO {
     @JsonProperty(FIELD_EXPIRES_AT)
     public abstract Optional<ZonedDateTime> expiresAt();
 
+    public static GrantDTO of(GRN grantee, Capability capability, GRN target) {
+        return GrantDTO.builder()
+                .grantee(grantee)
+                .capability(capability)
+                .target(target)
+                .build();
+    }
+
     public static Builder builder() {
         return Builder.create();
     }

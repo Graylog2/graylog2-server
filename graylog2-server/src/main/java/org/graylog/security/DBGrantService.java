@@ -108,21 +108,28 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                 DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees))).toArray();
     }
 
-    public GrantDTO create(GrantDTO grantDTO, String userName) {
+    public GrantDTO create(GrantDTO grantDTO, @Nullable User currentUser) {
+        return create(grantDTO, requireNonNull(currentUser, "currentUser cannot be null").getName());
+    }
+
+    public GrantDTO create(GrantDTO grantDTO, String creatorUsername) {
+        checkArgument(isNotBlank(creatorUsername), "creatorUsername cannot be null or empty");
         final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        checkArgument(isNotBlank(userName), "userName cannot be null or empty");
+
         return super.save(grantDTO.toBuilder()
-                .createdBy(userName)
+                .createdBy(creatorUsername)
                 .createdAt(now)
-                .updatedBy(userName)
+                .updatedBy(creatorUsername)
                 .updatedAt(now)
                 .build());
     }
 
-    public GrantDTO create(GrantDTO grantDTO, @Nullable User currentUser) {
-        final String userName = requireNonNull(currentUser, "currentUser cannot be null").getName();
+    public GrantDTO create(GRN grantee, Capability capability, GRN target, String creatorUsername) {
+        checkArgument(grantee != null, "grantee cannot be null");
+        checkArgument(capability != null, "capability cannot be null");
+        checkArgument(target != null, "target cannot be null");
 
-        return create(grantDTO, userName);
+        return create(GrantDTO.of(grantee, capability, target), creatorUsername);
     }
 
     public GrantDTO update(GrantDTO updatedGrant, @Nullable User currentUser) {
@@ -169,5 +176,13 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
                         GrantDTO::target,
                         Collectors.mapping(GrantDTO::grantee, Collectors.toSet())
                 ));
+    }
+
+    public boolean hasGrantFor(GRN grantee, Capability capability, GRN target) {
+        return db.findOne(DBQuery.and(
+                DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee),
+                DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability),
+                DBQuery.is(GrantDTO.FIELD_TARGET, target)
+        )) != null;
     }
 }

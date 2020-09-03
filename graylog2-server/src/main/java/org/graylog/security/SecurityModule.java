@@ -40,5 +40,6 @@ public class SecurityModule extends PluginModule {
         // TODO: Check if we need to use addRestResource() here for the final version to make sure
         //       we get the path prefix. Do we want this?
         registerRestControllerPackage(getClass().getPackage().getName());
+
     }
 }
