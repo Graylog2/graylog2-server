@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Popover as BoostrapPopover } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import { Popover as BootstrapPopover } from 'react-bootstrap';
+import styled, { css, ThemeContext } from 'styled-components';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 
-const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
+const StyledPopover = styled(BootstrapPopover)(({ theme }) => {
   const borderColor = theme.colors.variant.light.default;
   const arrowColor = theme.colors.variant.lightest.default;
+  const backgroundColor = theme.colors.global.contentBackground;
 
   return css`
-    background-color: ${theme.colors.global.contentBackground};
+    background-color: ${backgroundColor};
     border-color: ${borderColor};
     padding: 0;
 
@@ -21,32 +22,27 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.top {
-      transform: translate(-50%, -100%);
-    
       > .arrow {
         border-top-color: ${borderColor};
   
         &::after {
-          border-top-color: ${arrowColor};
+          border-top-color: ${backgroundColor};
         }
       }
     }
 
     &.right {
-      transform: translateY(-50%);
-      
       > .arrow {
         border-right-color: ${borderColor};
   
         &::after {
-          border-right-color: ${arrowColor};
+          border-right-color: ${backgroundColor};
+          z-index: 1;
         }
       }
     }
 
     &.bottom {
-      transform: translateX(-50%);
-      
       > .arrow {
         border-bottom-color: ${borderColor};
   
@@ -57,13 +53,11 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
     }
 
     &.left {
-      transform: translate(-100%, -50%);
-      
       > .arrow {
         border-left-color: ${borderColor};
   
         &::after {
-          border-left-color: ${arrowColor};
+          border-left-color: ${backgroundColor};
         }
       }
     }
@@ -71,8 +65,10 @@ const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
 });
 
 const Popover = (props) => {
+  const theme = useContext(ThemeContext);
+
   return (
-    <GraylogThemeProvider>
+    <GraylogThemeProvider overrideMode={theme?.mode}>
       <StyledPopover {...props} />
     </GraylogThemeProvider>
   );
