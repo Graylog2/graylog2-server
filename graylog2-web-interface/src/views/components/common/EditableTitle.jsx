@@ -1,8 +1,32 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled, { css, type StyledComponent } from 'styled-components';
+
+import type { ThemeInterface } from 'theme/types';
 
 import styles from './EditableTitle.css';
+
+const StyledStaticSpan: StyledComponent<{}, ThemeInterface, HTMLSpanElement> = styled.span(({ theme }) => css`
+  border: 1px solid ${theme.colors.global.contentBackground};
+  padding: 2px 3px;
+  font-size: ${theme.fonts.size.large};
+  display: inline-block;
+`);
+
+const StyledInput: StyledComponent<{}, ThemeInterface, HTMLInputElement> = styled.input(({ theme }) => css`
+  border: 1px solid ${theme.colors.input.border};
+  background-color: ${theme.colors.input.background};
+  color: ${theme.colors.input.color};
+  border-radius: 4px;
+  padding: 2px 3px;
+  font-size: ${theme.fonts.size.large};
+  
+  :focus {
+    border-color: ${theme.colors.input.borderFocus};
+    outline: none;
+  }
+`);
 
 type Props = {
   disabled?: boolean,
@@ -79,13 +103,13 @@ export default class EditableTitle extends React.Component<Props, State> {
       <span>
         <form onSubmit={this._onSubmit} className={styles.inlineForm}>
           {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-          <input autoFocus
-                 type="text"
-                 value={value}
-                 onBlur={this._onBlur}
-                 onChange={this._onChange} />
+          <StyledInput autoFocus
+                       type="text"
+                       value={value}
+                       onBlur={this._onBlur}
+                       onChange={this._onChange} />
         </form>
       </span>
-    ) : <span onDoubleClick={this._toggleEditing} title="Double click the title to edit it.">{value}</span>;
+    ) : <StyledStaticSpan onDoubleClick={this._toggleEditing} title="Double click the title to edit it.">{value}</StyledStaticSpan>;
   }
 }
