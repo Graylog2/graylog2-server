@@ -16,11 +16,10 @@
  */
 package org.graylog2.audit;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.audit.formatter.FormattedAuditEvent;
 import org.graylog2.plugin.PluginModule;
-
-import java.util.Map;
 
 public class AuditBindings extends PluginModule {
     @Override
@@ -36,7 +35,7 @@ public class AuditBindings extends PluginModule {
 
     private static class NullAuditEventFormatter implements AuditEventFormatter {
         @Override
-        public FormattedAuditEvent format(AuditActor actor, AuditEventType type, Map<String, Object> context) {
+        public FormattedAuditEvent format(AuditActor actor, AuditEventType type, JsonNode jsonNodeContext) {
             return null;
         }
     }
