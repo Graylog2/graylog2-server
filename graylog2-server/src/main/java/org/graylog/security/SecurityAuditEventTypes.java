@@ -24,10 +24,14 @@ import java.util.Set;
 public class SecurityAuditEventTypes implements PluginAuditEventTypes {
     public static final String NAMESPACE = "security:";
 
-    public static final String UPDATE_SHARES = NAMESPACE + "shares:update";
+    public static final String SHARE_CREATE = NAMESPACE + "share:create";
+    public static final String SHARE_UPDATE = NAMESPACE + "share:update";
+    public static final String SHARE_DELETE = NAMESPACE + "share:delete";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.of(
-            UPDATE_SHARES
+            SHARE_CREATE,
+            SHARE_UPDATE,
+            SHARE_DELETE
     );
 
     @Override
