@@ -3,6 +3,8 @@ import React from 'react';
 import { render } from 'wrappedTestingLibrary';
 import suppressConsole from 'helpers/suppressConsole';
 
+import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
+
 import RouterErrorBoundary from './RouterErrorBoundary';
 
 jest.mock('react-router', () => ({ withRouter: (x) => x }));
@@ -18,6 +20,16 @@ const ErroneusComponent = () => {
 const WorkingComponent = () => <div>Hello World!</div>;
 
 describe('RouterErrorBoundary', () => {
+  const renderSUT = (children) => {
+    const addGlobalStyles = jest.fn();
+
+    return render(
+      <GlobalStylesContext.Provider value={{ addGlobalStyles }}>
+        {children}
+      </GlobalStylesContext.Provider>,
+    );
+  };
+
   it('displays child component if there is no error', () => {
     const { getByText } = render(
       <RouterErrorBoundary>
@@ -30,7 +42,7 @@ describe('RouterErrorBoundary', () => {
 
   it('displays error after catching', () => {
     suppressConsole(() => {
-      const { getByText } = render(
+      const { getByText } = renderSUT(
         <RouterErrorBoundary>
           <ErroneusComponent />
         </RouterErrorBoundary>,

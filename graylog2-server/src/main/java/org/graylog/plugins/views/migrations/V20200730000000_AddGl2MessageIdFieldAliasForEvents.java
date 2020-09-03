@@ -26,11 +26,11 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.storage.ElasticsearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -47,7 +47,7 @@ public class V20200730000000_AddGl2MessageIdFieldAliasForEvents extends Migratio
 
     @Inject
     public V20200730000000_AddGl2MessageIdFieldAliasForEvents(
-            @Named("elasticsearch_version") Version elasticsearchVersion,
+            @ElasticsearchVersion Version elasticsearchVersion,
             ClusterConfigService clusterConfigService,
             ElasticsearchAdapter elasticsearch,
             ElasticsearchConfiguration elasticsearchConfig) {

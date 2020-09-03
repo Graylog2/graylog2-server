@@ -14,20 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.storage.providers;
+package org.graylog2.storage.versionprobe;
 
-import org.graylog2.indexer.messages.MessagesAdapter;
-import org.graylog2.plugin.Version;
-import org.graylog2.storage.ElasticsearchVersion;
-import org.graylog2.storage.VersionAwareProvider;
+import retrofit2.Call;
+import retrofit2.http.GET;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
-
-public class MessagesAdapterProvider extends VersionAwareProvider<MessagesAdapter> {
-    @Inject
-    public MessagesAdapterProvider(@ElasticsearchVersion Version version, Map<Version, Provider<MessagesAdapter>> pluginBindings) {
-        super(version, pluginBindings);
-    }
+public interface RootRoute {
+    @GET("/")
+    Call<RootResponse> root();
 }
