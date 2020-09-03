@@ -4,6 +4,8 @@ const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
+const AuthenticationCreateLDAP = loadAsync(() => import('./AuthenticationCreateLDAP'));
+const AuthenticationCreateAD = loadAsync(() => import('./AuthenticationCreateAD'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -83,6 +85,8 @@ export {
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
+  AuthenticationCreateLDAP,
+  AuthenticationCreateAD,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,

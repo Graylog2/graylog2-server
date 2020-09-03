@@ -15,7 +15,7 @@ import {
   AlertsPage,
   AuthenticationPage,
   AuthenticationCreateLDAP,
-  AuthenticationCreateLDAP
+  AuthenticationCreateAD,
   ConfigurationsPage,
   ContentPacksPage,
   CreateContentPackPage,
