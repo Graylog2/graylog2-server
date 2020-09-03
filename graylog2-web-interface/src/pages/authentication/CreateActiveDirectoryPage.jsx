@@ -7,7 +7,7 @@ import {} from 'components/authentication'; // Make sure to load all auth config
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-const AuthenticationCreateAD = () => (
+const CreateActiveDirectoryPage = () => (
   <>
     <PageHeader title="Create LDAP Authentication Provider">
       <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
@@ -25,4 +25,4 @@ const AuthenticationCreateAD = () => (
   </>
 );
 
-export default AuthenticationCreateAD;
+export default CreateActiveDirectoryPage;
