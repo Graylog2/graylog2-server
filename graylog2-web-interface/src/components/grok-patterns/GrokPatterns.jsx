@@ -1,13 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Icon, PaginatedList, SearchForm } from 'components/common';
+import {
+  DataTable,
+  Icon,
+  IfPermitted,
+  PageHeader,
+  PaginatedList,
+  SearchForm,
+} from 'components/common';
 import { Button, Col, Row, OverlayTrigger } from 'components/graylog';
-import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
-import DataTable from 'components/common/DataTable';
-import IfPermitted from 'components/common/IfPermitted';
 import StoreProvider from 'injection/StoreProvider';
 
 import GrokPatternQueryHelper from './GrokPatternQueryHelper';
@@ -51,8 +55,7 @@ class GrokPatterns extends React.Component {
   }
 
   loadData = (callback) => {
-    const { pagination: pagination1 } = this.state;
-    const { page, perPage, query } = pagination1;
+    const { pagination: { page, perPage, query } } = this.state;
 
     this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
       .then(({ patterns, pagination }) => {
@@ -63,10 +66,7 @@ class GrokPatterns extends React.Component {
         if (!this.loadPromise.isCancelled()) {
           this.loadPromise = undefined;
 
-          this.setState({
-            patterns: patterns,
-            pagination,
-          });
+          this.setState({ patterns, pagination });
         }
       });
   };
@@ -135,8 +135,8 @@ class GrokPatterns extends React.Component {
   };
 
   _patternFormatter = (pattern) => {
-    const { patterns: patterns1 } = this.state;
-    const patterns = patterns1.filter((p) => p.name !== pattern.name);
+    const { patterns: unfilteredPatterns } = this.state;
+    const patterns = unfilteredPatterns.filter((p) => p.name !== pattern.name);
 
     return (
       <tr key={pattern.id}>
@@ -216,8 +216,6 @@ class GrokPatterns extends React.Component {
                 <Col md={12}>
                   <PaginatedList onChange={this._onPageChange}
                                  totalItems={pagination.total}>
-                    <br />
-                    <br />
                     <GrokPatternsList id="grok-pattern-list"
                                       className="table-striped table-hover"
                                       headers={headers}

@@ -14,6 +14,14 @@ type GrokPattern = {
   content_pack: string,
 };
 
+type PaginatedResponse = {
+  count: number,
+  total: number,
+  page: number,
+  per_page: number,
+  patterns: Array<GrokPattern>,
+};
+
 type GrokPatternTest = {
   name: string,
   pattern: string,
@@ -50,8 +58,9 @@ const GrokPatternsStore = Reflux.createStore({
 
   searchPaginated(page, perPage, query) {
     const url = PaginationURL(ApiRoutes.GrokPatternsController.paginated().url, page, perPage, query);
-    const promise = fetch('GET', qualifyUrl(url))
-      .then((response: any) => {
+
+    return fetch('GET', qualifyUrl(url))
+      .then((response: PaginatedResponse) => {
         const pagination = {
           count: response.count,
           total: response.total,
@@ -69,8 +78,6 @@ const GrokPatternsStore = Reflux.createStore({
         UserNotification.error(`Loading patterns failed with status: ${errorThrown}`,
           'Could not load streams');
       });
-
-    return promise;
   },
 
   testPattern(pattern: GrokPatternTest, callback: (request: any) => void, errCallback: (errorMessage: string) => void) {

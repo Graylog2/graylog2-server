@@ -1,5 +1,5 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 
 import { Popover, Table } from 'components/graylog';
 
