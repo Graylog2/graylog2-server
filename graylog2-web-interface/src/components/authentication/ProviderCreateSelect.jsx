@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import { availableProvidersOptions, availableProviders } from 'logic/authentication/availableProviders';
 import history from 'util/History';
-import Routes from 'routing/Routes';
 import { Select } from 'components/common';
 import { Button } from 'components/graylog';
 
@@ -29,7 +28,7 @@ const _onSubmit = ({ authProvider }) => {
   history.push(route);
 };
 
-const AuthenticationProviderSelect = () => (
+const ProviderCreateSelect = () => (
   <Formik onSubmit={_onSubmit}
           initialValues={{ authProvider: 'ldap' }}>
     {({ isSubmitting, isValid }) => (
@@ -38,7 +37,8 @@ const AuthenticationProviderSelect = () => (
           <FormGroup className="form-group">
             <Field name="authProvider">
               {({ field: { name, value, onChange } }) => (
-                <Select placeholder="Select input"
+                <Select placeholder="Select a provider"
+                        inputProps={{ 'aria-label': 'Select a provider' }}
                         options={availableProvidersOptions}
                         matchProp="label"
                         onChange={(authProvider) => onChange({ target: { value: authProvider, name } })}
@@ -55,4 +55,4 @@ const AuthenticationProviderSelect = () => (
   </Formik>
 );
 
-export default AuthenticationProviderSelect;
+export default ProviderCreateSelect;

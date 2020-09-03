@@ -3,12 +3,12 @@ import * as React from 'react';
 
 import Wizard from 'components/common/Wizard';
 
-import StepServerConfiguration from '../AuthenticationCreateSteps/StepServerConfiguration';
-import StepUserMapping from '../AuthenticationCreateSteps/StepUserMapping';
-import SidebarServerResponse from '../AuthenticationCreateSteps/SidebarServerResponse';
-import StepGroupMapping from '../AuthenticationCreateSteps/StepGroupMapping';
+import StepServerConfiguration from '../ProviderCreateSteps/StepServerConfiguration';
+import StepUserMapping from '../ProviderCreateSteps/StepUserMapping';
+import SidebarServerResponse from '../ProviderCreateSteps/SidebarServerResponse';
+import StepGroupMapping from '../ProviderCreateSteps/StepGroupMapping';
 
-const AuthenticationCreateLDAP = () => {
+const ProviderCreateLDAP = () => {
   const activeStep = 'server-configuration';
   const wizardFormValues = {};
   const handleSubmit = () => {};
@@ -65,4 +65,4 @@ const AuthenticationCreateLDAP = () => {
   );
 };
 
-export default AuthenticationCreateLDAP;
+export default ProviderCreateLDAP;
