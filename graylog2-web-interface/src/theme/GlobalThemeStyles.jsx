@@ -1,7 +1,6 @@
-// @flow strict
-import { createGlobalStyle, css, type CSSRules } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 
-const GlobalThemeStyles: CSSRules<> = createGlobalStyle(({ theme }) => css`
+const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
   }
