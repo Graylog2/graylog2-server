@@ -16,37 +16,27 @@
  */
 package org.graylog.security.idp.provider;
 
-import org.apache.shiro.util.ByteSource;
 import org.graylog.security.idp.IDPAuthCredentials;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
-import org.graylog2.security.realm.PasswordAlgorithmCredentialsMatcher;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Optional;
 
 public class MongoDBIdentityProvider {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBIdentityProvider.class);
 
     private final UserService userService;
-    private final PasswordAlgorithmCredentialsMatcher credentialsMatcher;
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
-    private final ByteSource credentialsSalt;
 
     @Inject
-    public MongoDBIdentityProvider(UserService userService,
-                                   PasswordAlgorithmCredentialsMatcher credentialsMatcher,
-                                   PasswordAlgorithmFactory passwordAlgorithmFactory,
-                                   @Named("password_secret") String passwordSecret) {
+    public MongoDBIdentityProvider(UserService userService, PasswordAlgorithmFactory passwordAlgorithmFactory) {
         this.userService = userService;
-        this.credentialsMatcher = credentialsMatcher;
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
-        this.credentialsSalt = ByteSource.Util.bytes(passwordSecret);
     }
 
     public Optional<String> authenticate(IDPAuthCredentials authCredentials) {
