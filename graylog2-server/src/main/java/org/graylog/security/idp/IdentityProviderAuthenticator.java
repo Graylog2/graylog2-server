@@ -16,7 +16,6 @@
  */
 package org.graylog.security.idp;
 
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
@@ -24,12 +23,15 @@ import java.util.Optional;
 
 public class IdentityProviderAuthenticator {
     private final GlobalIdentityProviderConfig providerConfig;
+    private final UserProfileProvisioner userProfileProvisioner;
     private final UserService userService;
 
     @Inject
     public IdentityProviderAuthenticator(GlobalIdentityProviderConfig providerConfig,
+                                         UserProfileProvisioner userProfileProvisioner,
                                          UserService userService) {
         this.providerConfig = providerConfig;
+        this.userProfileProvisioner = userProfileProvisioner;
         this.userService = userService;
     }
 
@@ -49,18 +51,13 @@ public class IdentityProviderAuthenticator {
     }
 
     private IDPAuthResult authenticate(IDPAuthCredentials authCredentials, IdentityProvider provider) {
-        final Optional<String> optionalIdPUser = provider.authenticate(authCredentials);
+        final Optional<UserProfile> userProfile = provider.authenticateAndProvision(authCredentials, userProfileProvisioner);
 
-        if (optionalIdPUser.isPresent()) {
-            // TODO: Load user profile for the returned IdP user instead of User
-            final User user = userService.load(optionalIdPUser.get());
-            if (user == null) {
-                return failResult(authCredentials, provider);
-            }
-
+        if (userProfile.isPresent()) {
             return IDPAuthResult.builder()
                     .username(authCredentials.username())
-                    .userProfileId(user.getName()) // TODO: We need to return the user profile ID here so it will be stored in the session
+                    //.userProfileId(userProfile.get().uid())
+                    .userProfileId(userProfile.get().username()) // TODO: Switch to uid() once our session implementation can handle it
                     .providerId(provider.providerId())
                     .providerTitle(provider.providerTitle())
                     .build();

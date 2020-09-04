@@ -19,7 +19,8 @@ package org.graylog.security.idp;
 import java.util.Optional;
 
 public interface IdentityProvider {
-    Optional<String> authenticate(IDPAuthCredentials authCredentials);
+    Optional<UserProfile> authenticateAndProvision(IDPAuthCredentials authCredentials,
+                                                   UserProfileProvisioner userProfileProvisioner);
 
     String providerId();
 

@@ -18,6 +18,8 @@ package org.graylog.security.idp.provider;
 
 import org.graylog.security.idp.IDPAuthCredentials;
 import org.graylog.security.idp.IdentityProvider;
+import org.graylog.security.idp.UserProfile;
+import org.graylog.security.idp.UserProfileProvisioner;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -41,7 +43,8 @@ public class MongoDBIdentityProvider implements IdentityProvider {
     }
 
     @Override
-    public Optional<String> authenticate(IDPAuthCredentials authCredentials) {
+    public Optional<UserProfile> authenticateAndProvision(IDPAuthCredentials authCredentials,
+                                                          UserProfileProvisioner userProfileProvisioner) {
         final String username = authCredentials.username();
 
         LOG.info("Trying to load user <{}> from database", username);
@@ -54,12 +57,22 @@ public class MongoDBIdentityProvider implements IdentityProvider {
             throw new IllegalStateException("Local admin user should have been handled earlier and not reach the IdP authenticator");
         }
 
-        if (isValidPassword(user, authCredentials.password())) {
-            LOG.info("Validating password for user <{}> succeeded", username);
-            return Optional.of(user.getName());
+        if (!isValidPassword(user, authCredentials.password())) {
+            LOG.warn("Failed to validate password for user <{}>", username);
+            return Optional.empty();
         }
-        LOG.warn("Validating password for user <{}> failed", username);
-        return Optional.empty();
+
+        LOG.info("Successfully validated password for user <{}>", username);
+
+        final UserProfile userProfile = userProfileProvisioner.provision(userProfileProvisioner.newDetails()
+                .username(user.getName())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .idpBackend(providerId())
+                .idpGuid(user.getId())
+                .build());
+
+        return Optional.of(userProfile);
     }
 
     private boolean isValidPassword(User user, String password) {
