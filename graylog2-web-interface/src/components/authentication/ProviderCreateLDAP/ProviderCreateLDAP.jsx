@@ -1,20 +1,30 @@
 // @flow strict
 import * as React from 'react';
+import { useRef, useState } from 'react';
 
 import Wizard from 'components/common/Wizard';
 
+import ServiceStepsContext from '../contexts/ServiceStepsContext';
 import StepServerConfiguration from '../ProviderCreateSteps/StepServerConfiguration';
 import StepUserMapping from '../ProviderCreateSteps/StepUserMapping';
 import SidebarServerResponse from '../ProviderCreateSteps/SidebarServerResponse';
 import StepGroupMapping from '../ProviderCreateSteps/StepGroupMapping';
 
 const ProviderCreateLDAP = () => {
-  const activeStep = 'server-configuration';
+  const serverConfigForm = useRef();
+  const userMappingForm = useRef();
+  const [stepsState, setStepsState] = useState({
+    activeStepKey: 'server-configuration',
+    formValues: {
+      serverConfiguration: serverConfigForm?.current?.value,
+      userMapping: userMappingForm?.current?.value,
+    },
+  });
+
   const wizardFormValues = {};
   const handleSubmit = () => {};
   const handleStepChange = () => {};
   const handleFieldUpdate = () => {};
-  const isDisabledStep = (string) => !!string;
   const wizardSteps = [
     {
       key: 'server-configuration',
@@ -22,10 +32,9 @@ const ProviderCreateLDAP = () => {
       component: (
         <StepServerConfiguration onSubmit={handleSubmit}
                                  onChange={handleFieldUpdate}
-                                 sidebarComponent={<SidebarServerResponse />}
-                                 wizardFormValues={wizardFormValues} />
+                                 formRef={serverConfigForm} />
       ),
-      disabled: false,
+
     },
     {
       key: 'user-mapping',
@@ -33,10 +42,8 @@ const ProviderCreateLDAP = () => {
       component: (
         <StepUserMapping onSubmit={handleSubmit}
                          onChange={handleFieldUpdate}
-                         sidebarComponent={<SidebarServerResponse />}
-                         wizardFormValues={wizardFormValues} />
+                         formRef={userMappingForm} />
       ),
-      disabled: isDisabledStep('user-mapping'),
     },
     {
       key: 'group-mapping',
@@ -44,24 +51,28 @@ const ProviderCreateLDAP = () => {
       component: (
         <StepGroupMapping onSubmit={handleSubmit}
                           onChange={handleFieldUpdate}
-                          sidebarComponent={<SidebarServerResponse />}
                           wizardFormValues={wizardFormValues} />
       ),
-      disabled: isDisabledStep('group-mapping'),
     },
   ];
 
   return (
-    <Wizard horizontal
-            justified
-            activeStep={activeStep}
-            onStepChange={handleStepChange}
-            hidePreviousNextButtons
-            steps={wizardSteps}>
-
-      Sidebar
-    </Wizard>
-
+    <ServiceStepsContext.Provider value={{ ...stepsState, setStepsState }}>
+      <ServiceStepsContext.Consumer>
+        {({ activeStepKey: activeStep, formValues }) => {
+          return (
+            <Wizard horizontal
+                    justified
+                    activeStep={activeStep}
+                    onStepChange={handleStepChange}
+                    hidePreviousNextButtons
+                    steps={wizardSteps}>
+              <SidebarServerResponse formValues={formValues} />
+            </Wizard>
+          );
+        }}
+      </ServiceStepsContext.Consumer>
+    </ServiceStepsContext.Provider>
   );
 };
 

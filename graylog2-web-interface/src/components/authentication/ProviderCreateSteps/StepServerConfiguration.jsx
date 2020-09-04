@@ -4,11 +4,13 @@ import { Formik, Form } from 'formik';
 
 import { FormikFormGroup, FormikField } from 'components/common';
 import { Input } from 'components/bootstrap';
+import { Button } from 'components/graylog';
 
 type Props = {
+  formRef: any,
   initialValues?: {
     uriHost?: string,
-    uriPort?: string,
+    uriPort?: number,
     sslCheckbox?: boolean,
     systemUsername?: string,
   },
@@ -28,11 +30,11 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const StepServerConfiguration = ({ initialValues, help: propsHelp }: Props) => {
+const StepServerConfiguration = ({ initialValues, help: propsHelp, formRef }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={() => {}}>
+    <Formik initialValues={initialValues} onSubmit={() => {}} innerRef={formRef}>
       {({ isSubmitting, isValid }) => (
         <Form>
           <Input id="uri-host"
@@ -82,6 +84,12 @@ const StepServerConfiguration = ({ initialValues, help: propsHelp }: Props) => {
                            placeholder="System Password"
                            required
                            help={help.systemPassword} />
+
+          <Button bsStyle="primary"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}>
+            Setup User Mapping
+          </Button>
         </Form>
       )}
     </Formik>

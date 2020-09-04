@@ -21,20 +21,29 @@ const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
 
+<<<<<<< HEAD
 type StepKey = number | string;
 
+=======
+type StepKey = StepKey;
+>>>>>>> Implement ServieStepsContext
 export type Step = {
   key: StepKey,
   title: string,
   component: React.Node,
   disabled?: boolean,
 };
+export type Steps = Array<Step>;
 
 export type Steps = Array<Step>;
 
 type Props = {
   steps: Steps,
+<<<<<<< HEAD
   activeStep: ?StepKey,
+=======
+  activeStep: StepKey,
+>>>>>>> Implement ServieStepsContext
   onStepChange: (StepKey) => void,
   children: PropTypes.elementType,
   horizontal: boolean,
