@@ -37,7 +37,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class IdentityProviderAuthenticatingRealm extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(IdentityProviderAuthenticatingRealm.class);
 
-    public static final String NAME = "idp";
+    public static final String NAME = "identity-provider";
 
     private final IdentityProviderAuthenticator authenticator;
 
