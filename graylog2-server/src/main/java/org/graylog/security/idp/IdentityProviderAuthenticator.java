@@ -44,6 +44,7 @@ public class IdentityProviderAuthenticator {
     public IDPAuthResult authenticate(IDPAuthCredentials authCredentials) {
         final Optional<IdentityProvider> activeProvider = providerConfig.getActiveProvider();
 
+        // TODO: Investigate fallback to default provider?
         if (activeProvider.isPresent()) {
             return authenticate(authCredentials, activeProvider.get());
         }
