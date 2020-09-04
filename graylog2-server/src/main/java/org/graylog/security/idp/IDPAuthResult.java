@@ -29,18 +29,24 @@ public abstract class IDPAuthResult {
     @Nullable
     public abstract String userProfileId();
 
-    @Nullable
     public abstract String providerId();
 
-    @Nullable
     public abstract String providerTitle();
 
     public boolean isSuccess() {
-        return !isNullOrEmpty(userProfileId()) && !isNullOrEmpty(providerId()) && !isNullOrEmpty(providerTitle());
+        return !isNullOrEmpty(userProfileId());
     }
 
     public static Builder builder() {
         return new AutoValue_IDPAuthResult.Builder();
+    }
+
+    public static IDPAuthResult failed(String username, String providerId, String providerTitle) {
+        return builder()
+                .username(username)
+                .providerId(providerId)
+                .providerTitle(providerTitle)
+                .build();
     }
 
     @AutoValue.Builder

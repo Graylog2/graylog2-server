@@ -16,22 +16,52 @@
  */
 package org.graylog.security.idp;
 
+import org.graylog.security.idp.provider.MongoDBIdentityProvider;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
+
+import javax.inject.Inject;
+import java.util.Optional;
+
 public class IdentityProviderAuthenticator {
+    private final MongoDBIdentityProvider mongodbProvider;
+    private final UserService userService;
+
+    @Inject
+    public IdentityProviderAuthenticator(MongoDBIdentityProvider mongodbProvider,
+                                         UserService userService) {
+        this.mongodbProvider = mongodbProvider;
+        this.userService = userService;
+    }
+
     /**
      * Tries to authenticate the username with the given password and returns the authenticated username if successful.
      *
-     * @param username the username to authenticate
-     * @param password  the password for the username
+     * @param authCredentials the authentication credentials
      * @return the authenticated username
      */
-    public IDPAuthResult authenticate(String username, char[] password) {
-        // TODO: check username and password against IdP backend(s)
+    public IDPAuthResult authenticate(IDPAuthCredentials authCredentials) {
+        final Optional<String> optionalIdPUser = mongodbProvider.authenticate(authCredentials);
 
-        return IDPAuthResult.builder()
-                .username(username)
-                .userProfileId(username)
-                .providerId("dummy")
-                .providerTitle("Dummy IdP")
-                .build();
+        if (optionalIdPUser.isPresent()) {
+            // TODO: Load user profile for the returned IdP user instead of User
+            final User user = userService.load(optionalIdPUser.get());
+            if (user == null) {
+                return failResult(authCredentials);
+            }
+
+            return IDPAuthResult.builder()
+                    .username(authCredentials.username())
+                    .userProfileId(user.getName()) // TODO: We need to return the user profile ID here so it will be stored in the session
+                    .providerId(mongodbProvider.providerId())
+                    .providerTitle(mongodbProvider.providerTitle())
+                    .build();
+        }
+
+        return failResult(authCredentials);
+    }
+
+    private IDPAuthResult failResult(IDPAuthCredentials authCredentials) {
+        return IDPAuthResult.failed(authCredentials.username(), mongodbProvider.providerId(), mongodbProvider.providerTitle());
     }
 }

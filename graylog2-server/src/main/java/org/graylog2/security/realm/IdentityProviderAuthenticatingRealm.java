@@ -24,6 +24,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog.security.idp.IDPAuthCredentials;
 import org.graylog.security.idp.IDPAuthResult;
 import org.graylog.security.idp.IdentityProviderAuthenticator;
 import org.slf4j.Logger;
@@ -45,45 +46,42 @@ public class IdentityProviderAuthenticatingRealm extends AuthenticatingRealm {
         this.authenticator = authenticator;
         setAuthenticationTokenClass(UsernamePasswordToken.class);
         setCachingEnabled(false);
-        // Credentials will be matched via the identity provider
+        // Credentials will be matched via the identity provider itself so we don't need Shiro to do it
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authToken) throws AuthenticationException {
         if (authToken instanceof UsernamePasswordToken) {
-            final UsernamePasswordToken token = (UsernamePasswordToken) authToken;
-            try {
-                return doGetAuthenticationInfo(token);
-            } finally {
-                // The UsernamePasswordToken documentation tells us to always call clear() after using the token to
-                // perform a login attempt to make sure the password is cleared from memory.
-                // How useful this is, is questionable. Shiro itself is converting the char array into a String object
-                // when using a HashedCredentialsMatcher, for example. But let's do it here anyway.
-                token.clear();
-            }
+            return doGetAuthenticationInfo((UsernamePasswordToken) authToken);
         }
         throw new UnsupportedTokenException("Unsupported authentication token type: " + authToken.getClass());
     }
 
     private AuthenticationInfo doGetAuthenticationInfo(UsernamePasswordToken token) throws AuthenticationException {
         final String username = token.getUsername();
-        final char[] password = token.getPassword();
+        final String password = String.valueOf(token.getPassword());
 
-        if (isNullOrEmpty(username) || (password == null || password.length < 1)) {
+        if (isNullOrEmpty(username) || isNullOrEmpty(password)) {
             LOG.error("Username or password were empty. Not attempting identity provider authentication");
             return null;
         }
 
         LOG.info("Attempting authentication for username <{}>", username);
+        try {
+            final IDPAuthResult result = authenticator.authenticate(IDPAuthCredentials.create(username, password));
 
-        final IDPAuthResult result = authenticator.authenticate(username, password);
-
-        if (result.isSuccess()) {
-            LOG.info("Successfully authenticated username <{}> for user profile <{}>", result.username(), result.userProfileId());
-            return toAuthenticationInfo(result.userProfileId());
-        } else {
-            LOG.warn("Failed to authenticate username <{}>", result.username());
+            if (result.isSuccess()) {
+                LOG.info("Successfully authenticated username <{}> for user profile <{}> with provider <{}/{}>",
+                        result.username(), result.userProfileId(), result.providerTitle(), result.providerId());
+                return toAuthenticationInfo(result.userProfileId());
+            } else {
+                LOG.warn("Failed to authenticate username <{}> with provider <{}/{}>",
+                        result.username(), result.providerTitle(), result.providerId());
+                return null;
+            }
+        } catch (Exception e) {
+            LOG.error("Unhandled authentication error", e);
             return null;
         }
     }
