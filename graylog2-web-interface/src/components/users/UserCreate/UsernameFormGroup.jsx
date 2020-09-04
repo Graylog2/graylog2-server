@@ -2,8 +2,8 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 
-import User from 'logic/users/User';
 import { FormikFormGroup } from 'components/common';
+import User from 'logic/users/User';
 
 type Props = {
   users?: Immutable.List<User>,
