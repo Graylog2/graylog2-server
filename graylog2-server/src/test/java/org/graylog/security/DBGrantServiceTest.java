@@ -19,9 +19,11 @@ package org.graylog.security;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,10 +31,14 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DBGrantServiceTest {
     @Rule
@@ -124,20 +130,78 @@ public class DBGrantServiceTest {
     }
 
     @Test
-    public void createWithUserName() {
-        final GRN john = grnRegistry.parse("grn::::user:john");
+    @MongoDBFixtures("grants.json")
+    public void hasGrantFor() {
+        final GRN jane = grnRegistry.parse("grn::::user:jane");
         final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
-        final GrantDTO grantDTO = GrantDTO.builder()
-                .capability(Capability.VIEW)
-                .grantee(john)
-                .target(dashboard1)
-                .build();
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0000");
+        final GRN stream2 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
 
-        assertThat(dbService.create(grantDTO, "hans")).satisfies(result -> {
-            assertThat(result.grantee()).isEqualTo(john);
-            assertThat(result.createdBy()).isEqualTo("hans");
-            assertThat(result.updatedBy()).isEqualTo("hans");
-            assertThat(result.createdAt()).isNotNull();
-        });
+        assertThat(dbService.hasGrantFor(jane, Capability.VIEW, stream1)).isTrue();
+        assertThat(dbService.hasGrantFor(jane, Capability.MANAGE, stream2)).isTrue();
+        assertThat(dbService.hasGrantFor(jane, Capability.OWN, dashboard1)).isTrue();
+
+        assertThat(dbService.hasGrantFor(jane, Capability.MANAGE, stream1)).isFalse();
+        assertThat(dbService.hasGrantFor(jane, Capability.VIEW, dashboard1)).isFalse();
+    }
+
+    @Test
+    public void createWithGrantDTOAndUserObject() {
+        final ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        final GRN grantee = GRNTypes.USER.toGRN("jane");
+        final GRN target = GRNTypes.DASHBOARD.toGRN("54e3deadbeefdeadbeef0000");
+        final User user = mock(User.class);
+
+        when(user.getName()).thenReturn("john");
+
+        final GrantDTO grantDTO = GrantDTO.of(grantee, Capability.OWN, target).toBuilder()
+                // Ensure that the time tests work
+                .createdAt(now.minusHours(1))
+                .updatedAt(now.minusHours(1))
+                .build();
+        final GrantDTO grant = dbService.create(grantDTO, user);
+
+        assertThat(grant.id()).isNotBlank();
+        assertThat(grant.grantee()).isEqualTo(grantee);
+        assertThat(grant.capability()).isEqualTo(Capability.OWN);
+        assertThat(grant.target()).isEqualTo(target);
+        assertThat(grant.createdBy()).isEqualTo("john");
+        assertThat(grant.createdAt()).isAfter(grantDTO.createdAt());
+        assertThat(grant.updatedBy()).isEqualTo("john");
+        assertThat(grant.updatedAt()).isAfter(grantDTO.updatedAt());
+    }
+
+    @Test
+    public void createWithGrantDTOAndUsernameString() {
+        final GRN grantee = GRNTypes.USER.toGRN("jane");
+        final GRN target = GRNTypes.DASHBOARD.toGRN("54e3deadbeefdeadbeef0000");
+
+        final GrantDTO grant = dbService.create(GrantDTO.of(grantee, Capability.MANAGE, target), "admin");
+
+        assertThat(grant.id()).isNotBlank();
+        assertThat(grant.grantee()).isEqualTo(grantee);
+        assertThat(grant.capability()).isEqualTo(Capability.MANAGE);
+        assertThat(grant.target()).isEqualTo(target);
+        assertThat(grant.createdBy()).isEqualTo("admin");
+        assertThat(grant.createdAt()).isBefore(ZonedDateTime.now(ZoneOffset.UTC));
+        assertThat(grant.updatedBy()).isEqualTo("admin");
+        assertThat(grant.updatedAt()).isBefore(ZonedDateTime.now(ZoneOffset.UTC));
+    }
+
+    @Test
+    public void createWithGranteeCapabilityAndTarget() {
+        final GRN grantee = GRNTypes.USER.toGRN("jane");
+        final GRN target = GRNTypes.DASHBOARD.toGRN("54e3deadbeefdeadbeef0000");
+
+        final GrantDTO grant = dbService.create(grantee, Capability.MANAGE, target, "admin");
+
+        assertThat(grant.id()).isNotBlank();
+        assertThat(grant.grantee()).isEqualTo(grantee);
+        assertThat(grant.capability()).isEqualTo(Capability.MANAGE);
+        assertThat(grant.target()).isEqualTo(target);
+        assertThat(grant.createdBy()).isEqualTo("admin");
+        assertThat(grant.createdAt()).isBefore(ZonedDateTime.now(ZoneOffset.UTC));
+        assertThat(grant.updatedBy()).isEqualTo("admin");
+        assertThat(grant.updatedAt()).isBefore(ZonedDateTime.now(ZoneOffset.UTC));
     }
 }

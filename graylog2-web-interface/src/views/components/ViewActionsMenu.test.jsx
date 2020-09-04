@@ -54,15 +54,6 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
   },
 }));
 
-jest.mock('views/stores/ViewSharingStore', () => ({
-  ViewSharingActions: {
-    create: jest.fn(() => Promise.resolve()),
-    get: jest.fn(() => Promise.resolve()),
-    remove: jest.fn(() => Promise.resolve()),
-    users: jest.fn(() => Promise.resolve()),
-  },
-}));
-
 jest.mock('stores/permissions/EntityShareStore', () => ({
   EntityShareActions: {
     prepare: jest.fn(() => Promise.resolve()),

@@ -2,8 +2,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import { simplePaginatedUserShares } from 'fixtures/userEntityShares';
+import { paginatedShares } from 'fixtures/sharedEntities';
 import selectEvent from 'react-select-event';
+import { reader as assignedRole } from 'fixtures/roles';
+import { admin as currentUser } from 'fixtures/users';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { EntityShareActions } from 'stores/permissions/EntityShareStore';
@@ -11,8 +13,8 @@ import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
 
-const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List(), pagination: { total: 0 } });
-const mockPaginatedUserShares = simplePaginatedUserShares(1, 10, '');
+const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { total: 1, page: 1, perPage: 10 } });
+const mockPaginatedUserShares = paginatedShares(1, 10, '');
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
   AuthzRolesActions: {
@@ -40,7 +42,7 @@ const user = User
 
 describe('<UserDetails />', () => {
   const SutComponent = (props) => (
-    <CurrentUserContext.Provider value={{ ...user.toJSON(), permissions: ['*'] }}>
+    <CurrentUserContext.Provider value={{ ...currentUser, permissions: ['*'] }}>
       <UserDetails {...props} />
     </CurrentUserContext.Provider>
   );
@@ -107,10 +109,9 @@ describe('<UserDetails />', () => {
     describe('shared entities section', () => {
       it('should list provided paginated user shares', async () => {
         const { getAllByText } = render(<SutComponent user={user} paginatedUserShares={mockPaginatedUserShares} />);
+        await act(() => mockAuthzRolesPromise);
 
         expect(getAllByText(mockPaginatedUserShares.list.first().title)).not.toBeNull();
-
-        await act(() => mockAuthzRolesPromise);
       });
 
       it('should fetch paginated user shares when using search', async () => {
@@ -149,6 +150,25 @@ describe('<UserDetails />', () => {
 
         expect(EntityShareActions.loadUserSharesPaginated).toHaveBeenCalledWith(user.username, 1, 50, 'existing query', { capability: 'manage' });
       });
+    });
+  });
+
+  describe('roles section', () => {
+    it('should display assigned roles', async () => {
+      const { queryByText, queryByRole } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockAuthzRolesPromise);
+
+      expect(queryByRole('heading', { level: 2, name: 'Roles' })).not.toBeNull();
+      expect(queryByText(assignedRole.name)).not.toBeNull();
+    });
+  });
+
+  describe('teams section', () => {
+    it('should display info if license is not present', async () => {
+      const { getByText } = render(<SutComponent user={user} paginatedUserShares={undefined} />);
+      await act(() => mockAuthzRolesPromise);
+
+      expect(getByText('No enterprise plugin found')).not.toBeNull();
     });
   });
 });

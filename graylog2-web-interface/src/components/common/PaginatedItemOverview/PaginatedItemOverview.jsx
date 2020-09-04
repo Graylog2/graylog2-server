@@ -78,10 +78,9 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
     return () => { isSubscribed = false; };
   }, []);
 
-  const _onPageChange = (query) => (page, perPage) => {
+  const _onPageChange = (page, perPage) => {
     const pageInfo = {
       ...paginationInfo,
-      query,
       page,
       perPage,
     };
@@ -102,7 +101,7 @@ const PaginatedItemOverview = ({ onLoad, overrideList, onDeleteItem, queryHelper
     : <NotFound>No items found to display</NotFound>;
 
   return (
-    <PaginatedList onChange={_onPageChange(paginationInfo.query)}
+    <PaginatedList onChange={_onPageChange}
                    pageSize={paginationInfo.perPage}
                    totalItems={paginationInfo.total}
                    pageSizes={pageSizes}

@@ -45,10 +45,6 @@ import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
-import ViewSharing from 'views/logic/views/sharing/ViewSharing';
-import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
-import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
-import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
@@ -88,10 +84,6 @@ VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfi
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
 VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
-
-ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
-ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
-ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);

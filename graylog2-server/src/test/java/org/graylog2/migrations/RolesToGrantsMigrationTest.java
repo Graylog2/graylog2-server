@@ -40,6 +40,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.migrations.V20200803120800_GrantsMigrations.RolesToGrantsMigration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
@@ -75,8 +76,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(GRNExtension.class)
 @MongoDBFixtures("V20200803120800_MigrateRolesToGrantsTest.json")
-class V20200803120800_MigrateRolesToGrantsTest {
-    private V20200803120800_MigrateRolesToGrants migration;
+class RolesToGrantsMigrationTest {
+    private RolesToGrantsMigration migration;
     private RoleService roleService;
     private DBGrantService dbGrantService;
 
@@ -103,7 +104,7 @@ class V20200803120800_MigrateRolesToGrantsTest {
         dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         userService = new TestUserService(mongodb.mongoConnection());
         DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
-        migration = new V20200803120800_MigrateRolesToGrants(roleService, userService, dbGrantService, grnRegistry, "admin");
+        migration = new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, "admin");
     }
 
     @Test

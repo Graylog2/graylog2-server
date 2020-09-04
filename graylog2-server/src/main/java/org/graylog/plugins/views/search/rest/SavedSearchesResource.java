@@ -23,9 +23,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharing;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
@@ -41,7 +38,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Optional;
 
 import static java.util.Locale.ENGLISH;
 
@@ -57,15 +53,11 @@ public class SavedSearchesResource extends RestResource {
 
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
-    private final ViewSharingService viewSharingService;
-    private final IsViewSharedForUser isViewSharedForUser;
 
     @Inject
-    public SavedSearchesResource(ViewService dbService, ViewSharingService viewSharingService, IsViewSharedForUser isViewSharedForUser) {
+    public SavedSearchesResource(ViewService dbService) {
         this.dbService = dbService;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
-        this.viewSharingService = viewSharingService;
-        this.isViewSharedForUser = isViewSharedForUser;
     }
 
     @GET
@@ -88,12 +80,7 @@ public class SavedSearchesResource extends RestResource {
             final PaginatedList<ViewDTO> result = dbService.searchPaginatedByType(
                     ViewDTO.Type.SEARCH,
                     searchQuery,
-                    view -> {
-                        final Optional<ViewSharing> viewSharing = viewSharingService.forView(view.id());
-
-                        return isPermitted(ViewsRestPermissions.VIEW_READ, view.id())
-                                || viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(getCurrentUser(), sharing)).orElse(false);
-                    },
+                    view -> isPermitted(ViewsRestPermissions.VIEW_READ, view.id()),
                     order,
                     sortField,
                     page,

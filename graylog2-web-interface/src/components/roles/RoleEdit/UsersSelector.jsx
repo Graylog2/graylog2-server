@@ -66,7 +66,8 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
       if (newPaginatedUsers) {
         const resultUsers = newPaginatedUsers.list
           .filter((u) => !u.roles.includes(role.name))
-          .map((u) => ({ label: u.name, value: u.name }));
+          .map((u) => ({ label: u.name, value: u.name }))
+          .toArray();
 
         setOptions(resultUsers);
         setUsers(newPaginatedUsers.list);
@@ -104,7 +105,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
             <FormElements>
               <Field name="user" validate={_isRequired('user')}>
                 {({ field: { name, value, onChange } }) => (
-                  <StyledSelect inputProps={{ 'arial-label': 'Search for users ' }}
+                  <StyledSelect inputProps={{ 'aria-label': 'Search for users' }}
                                 onChange={(user) => {
                                   onChange({ target: { value: user, name } });
                                 }}

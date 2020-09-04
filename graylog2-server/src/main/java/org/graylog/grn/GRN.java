@@ -55,7 +55,10 @@ public abstract class GRN {
 
     public boolean isPermissionApplicable(String permission) {
         // ENTITY_OWN is applicable to any target
-        return permission.startsWith(RestPermissions.ENTITY_OWN) || permission.startsWith(grnType().permissionPrefix());
+        return permission.startsWith(RestPermissions.ENTITY_OWN) ||
+                permission.startsWith(grnType().permissionPrefix()) ||
+                // TODO Dashboard code still uses `view:` permissions
+                (grnType().equals(GRNTypes.DASHBOARD) && permission.startsWith(GRNTypes.SEARCH.permissionPrefix()));
     }
 
     static GRN parse(String grn, GRNRegistry grnRegistry) {

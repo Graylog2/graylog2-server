@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, act, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { admin } from 'fixtures/users';
-import { alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
+import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -11,24 +11,11 @@ import { UsersActions } from 'stores/users/UsersStore';
 
 import UsersOverview from './UsersOverview';
 
-const mockUsers = Immutable.List([alice, bob, adminOverview]);
-const loadUsersPaginatedResponse = {
-  list: mockUsers,
-  pagination: {
-    page: 1,
-    perPage: 10,
-    total: mockUsers.size,
-  },
-  adminUser: undefined,
-};
-const mockloadUsersPaginatedPromise = Promise.resolve(loadUsersPaginatedResponse);
+const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 
 jest.mock('stores/users/UsersStore', () => ({
-  UsersStore: {
-    listen: jest.fn(),
-  },
   UsersActions: {
-    loadUsersPaginated: jest.fn(() => mockloadUsersPaginatedPromise),
+    loadUsersPaginated: jest.fn(() => mockLoadUsersPaginatedPromise),
     delete: jest.fn(() => Promise.resolve()),
   },
 }));
@@ -36,6 +23,10 @@ jest.mock('stores/users/UsersStore', () => ({
 describe('UsersOverview', () => {
   beforeEach(() => {
     UsersActions.delete.completed = { listen: jest.fn(() => jest.fn()) };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('should display table header', () => {
@@ -60,8 +51,7 @@ describe('UsersOverview', () => {
     const displaysUserAttributes = async ({ user }) => {
       const { queryByText } = render(<UsersOverview />);
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
-
-      await act(() => mockloadUsersPaginatedPromise);
+      await act(() => mockLoadUsersPaginatedPromise);
 
       attributes.forEach(async (attribute) => {
         if (user[attribute]) {
@@ -77,6 +67,18 @@ describe('UsersOverview', () => {
       ${adminOverview} | ${adminOverview.username}
     `('$username', displaysUserAttributes);
   });
+
+  // it('should search users', async () => {
+  //   const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
+  //   await act(() => mockLoadUsersPaginatedPromise);
+  //   const searchInput = getByPlaceholderText('Enter search query...');
+  //   const searchSubmitButton = getByRole('button', { name: 'Search' });
+
+  //   fireEvent.change(searchInput, { target: { value: 'username:bob' } });
+  //   fireEvent.click(searchSubmitButton);
+
+  //   await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
+  // });
 
   describe('admin should', () => {
     const modifiableUser = alice.toBuilder().readOnly(false).build();
@@ -101,7 +103,7 @@ describe('UsersOverview', () => {
     });
 
     it('be able to delete a modifiable user', async () => {
-      const loadUsersPaginatedPromise = Promise.resolve({ ...loadUsersPaginatedResponse, list: modifiableUsersList });
+      const loadUsersPaginatedPromise = Promise.resolve({ ...paginatedUsers, list: modifiableUsersList });
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
       const { getByTitle } = render(<UsersOverviewAsAdmin />);
       await act(() => loadUsersPaginatedPromise);
@@ -115,14 +117,14 @@ describe('UsersOverview', () => {
     });
 
     it('not be able to delete a "read only" user', async () => {
-      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: readOnlyUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => expect(queryByTitle(`Delete user ${readOnlyUser.username}`)).toBeNull());
     });
 
     it('see edit and edit tokens link for a modifiable user ', async () => {
-      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: modifiableUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => {
@@ -132,14 +134,14 @@ describe('UsersOverview', () => {
     });
 
     it('not see edit link for a "read only" user', async () => {
-      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: readOnlyUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => expect(queryByTitle(`Edit user ${readOnlyUser.username}`)).toBeNull());
     });
 
     it('see edit tokens link for a "read only" user', async () => {
-      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...loadUsersPaginatedResponse, list: readOnlyUsersList }));
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
       const { queryByTitle } = render(<UsersOverviewAsAdmin />);
 
       await waitFor(() => expect(queryByTitle(`Edit tokens for user ${readOnlyUser.username}`)).toBeNull());
