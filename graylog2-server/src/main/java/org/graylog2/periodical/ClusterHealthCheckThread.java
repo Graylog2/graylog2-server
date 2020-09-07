@@ -51,7 +51,6 @@ public class ClusterHealthCheckThread extends Periodical {
 
     @Override
     public void doRun() {
-            LOG.info("Running CHCT!.");
         if (isCloud) {
             LOG.info("Skipping run of ClusterHealthCheckThread, since contained checks are not applicable for Cloud.");
             return;
