@@ -20,15 +20,18 @@ const ProviderCreateLDAP = () => {
   });
 
   const wizardFormValues = {};
-  const handleSubmit = () => {};
-  const handleStepChange = () => {};
+
+  const _handleStepChange = (stepKey: string) => setStepsState({ ...stepsState, activeStepKey: stepKey });
+  const _handleSubmitAll = () => {};
   const handleFieldUpdate = () => {};
+
   const wizardSteps = [
     {
       key: 'server-configuration',
       title: 'Server Configuration',
       component: (
-        <StepServerConfiguration onSubmit={handleSubmit}
+        <StepServerConfiguration onSubmit={_handleStepChange}
+                                 onSubmitAll={_handleSubmitAll}
                                  onChange={handleFieldUpdate} />
       ),
 
@@ -37,7 +40,8 @@ const ProviderCreateLDAP = () => {
       key: 'user-mapping',
       title: 'User Mapping',
       component: (
-        <StepUserMapping onSubmit={handleSubmit}
+        <StepUserMapping onSubmit={_handleStepChange}
+                         onSubmitAll={_handleSubmitAll}
                          onChange={handleFieldUpdate} />
       ),
     },
@@ -45,7 +49,8 @@ const ProviderCreateLDAP = () => {
       key: 'group-mapping',
       title: 'Group Mapping',
       component: (
-        <StepGroupMapping onSubmit={handleSubmit}
+        <StepGroupMapping onSubmit={_handleStepChange}
+                          onSubmitAll={_handleSubmitAll}
                           onChange={handleFieldUpdate}
                           wizardFormValues={wizardFormValues} />
       ),
@@ -60,7 +65,7 @@ const ProviderCreateLDAP = () => {
             <Wizard horizontal
                     justified
                     activeStep={activeStep}
-                    onStepChange={handleStepChange}
+                    onStepChange={_handleStepChange}
                     hidePreviousNextButtons
                     steps={wizardSteps}>
               <SidebarServerResponse />

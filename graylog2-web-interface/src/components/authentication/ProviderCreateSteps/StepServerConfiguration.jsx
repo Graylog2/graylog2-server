@@ -20,6 +20,8 @@ type Props = {
     systemUsername?: React.Node,
     systemPassword?: React.Node,
   },
+  onSubmit: (nextStepKey: string) => void,
+  onSubmitAll: () => void,
 };
 
 const defaultHelp = {
@@ -32,7 +34,7 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const StepServerConfiguration = ({ initialValues, help: propsHelp }: Props) => {
+const StepServerConfiguration = ({ initialValues, help: propsHelp, onSubmit, onSubmitAll }: Props) => {
   const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
   const formRef = useRef();
   const help = { ...defaultHelp, ...propsHelp };
@@ -44,7 +46,7 @@ const StepServerConfiguration = ({ initialValues, help: propsHelp }: Props) => {
   }, []);
 
   return (
-    <Formik initialValues={initialValues} onSubmit={() => {}} innerRef={formRef}>
+    <Formik initialValues={initialValues} onSubmit={() => onSubmit('user-mapping')} innerRef={formRef}>
       {({ isSubmitting, isValid }) => (
         <Form>
           <Input id="uri-host"
@@ -95,6 +97,12 @@ const StepServerConfiguration = ({ initialValues, help: propsHelp }: Props) => {
                            required
                            help={help.systemPassword} />
 
+          <Button bsStyle="secondary"
+                  type="button"
+                  onClick={() => onSubmitAll()}
+                  disabled={!isValid || isSubmitting}>
+            Finish & Save Identity Provider
+          </Button>
           <Button bsStyle="primary"
                   type="submit"
                   disabled={!isValid || isSubmitting}>
