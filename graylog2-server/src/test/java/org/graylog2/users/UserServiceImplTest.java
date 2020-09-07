@@ -24,6 +24,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
+import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.GrantPermissionResolver;
@@ -232,13 +233,18 @@ public class UserServiceImplTest {
 
         when(permissionResolver.resolveStringPermission(role.getId())).thenReturn(Collections.singleton("foo:bar"));
         final GRNPermission ownerShipPermission = GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.DASHBOARD, "1234"));
-        when(grantPermissionResolver.resolvePermissionsForPrincipal(grnRegistry.newGRN(GRNTypes.USER, "user")))
+        final GRN userGRN = grnRegistry.newGRN(GRNTypes.USER, "user");
+        when(grantPermissionResolver.resolvePermissionsForPrincipal(userGRN))
                 .thenReturn(ImmutableSet.of(
                         new WildcardPermission("perm:from:grant"),
                         ownerShipPermission));
 
+        final String roleId = "12345";
+        when(grantPermissionResolver.resolveRolesForPrincipal(userGRN)).thenReturn(ImmutableSet.of(roleId));
+        when(permissionResolver.resolveStringPermission(roleId)).thenReturn(ImmutableSet.of("perm:from:role"));
+
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof WildcardPermission ? p.toString() : p ).collect(Collectors.toSet()))
                 .containsExactlyInAnyOrder( "users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
-                        "users:tokencreate:user", "users:tokenremove:user", "perm:from:grant", ownerShipPermission);
+                        "users:tokencreate:user", "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
     }
 }
