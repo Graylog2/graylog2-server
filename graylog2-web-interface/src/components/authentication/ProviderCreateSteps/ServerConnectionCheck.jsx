@@ -13,7 +13,7 @@ const LdapActions = ActionsProvider.getActions('Ldap');
 
 const ServerConnectionCheck = () => {
   const [{ loading, success, error }, setConnectionStatus] = useState({ loading: false, success: false, error: undefined });
-  const { formValues: { serverConfig } } = useContext(ServiceStepsContext);
+  const { formValues: { 'server-configuration': serverConfig } } = useContext(ServiceStepsContext);
 
   const _handleConnectionCheck = () => {
     const {

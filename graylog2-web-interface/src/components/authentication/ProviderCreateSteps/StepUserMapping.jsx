@@ -1,9 +1,12 @@
 // @flow strict
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import { useContext } from 'react';
 
 import { FormikFormGroup } from 'components/common';
 import { Button, ButtonToolbar } from 'components/graylog';
+
+import ServiceStepsContext from '../contexts/ServiceStepsContext';
 
 type Props = {
   help?: {
@@ -38,6 +41,7 @@ const defaultHelp = {
 
 const StepUserMapping = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
+  const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
 
   return (
     <Formik initialValues={stepsState?.formValues?.['user-mapping']} onSubmit={() => onSubmit('group-mapping')}>
@@ -62,8 +66,7 @@ const StepUserMapping = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: P
                            help={help.displayNameAttribute} />
 
           <ButtonToolbar className="pull-right">
-            <Button bsStyle="secondary"
-                    type="button"
+            <Button type="button"
                     onClick={() => onSubmitAll()}
                     disabled={!isValid || isSubmitting}>
               Finish & Save Identity Provider

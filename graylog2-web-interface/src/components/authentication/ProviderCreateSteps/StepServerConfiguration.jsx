@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
@@ -19,10 +20,17 @@ type Props = {
   onChange: (stepKey: string, event: Event, values: any) => void,
 };
 
+const ProtocolOptions = styled.div`
+  display: flex;
+  div + * {
+    margin-left: 10px;
+  }
+`;
+
 const defaultHelp = {
   systemUsername: (
     <span>
-      The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.<br />
+      The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.
       This needs to match the <code>userPrincipalName</code> of that user.
     </span>
   ),
@@ -46,6 +54,7 @@ const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmit
                 <span className="input-group-addon">ldap://</span>
                 <FormikField name="uriHost"
                              placeholder="Hostname"
+                             formGroupClassName=""
                              required />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikField type="number"
@@ -53,24 +62,30 @@ const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmit
                              min="1"
                              max="65535"
                              placeholder="Port"
+                             formGroupClassName=""
                              required />
               </div>
-              <label className="checkbox-inline" htmlFor="useSSL">
-                {/* checked={ldapUri.scheme() === 'ldaps'} ? */}
+
+              {/* checked={ldapUri.scheme() === 'ldaps'} ? */}
+              <ProtocolOptions>
+
                 <FormikField type="checkbox"
                              name="useSSL"
+                             formGroupClassName=""
                              label="SSL" />
-              </label>
-              <label className="checkbox-inline" htmlFor="ldap-uri-starttls">
+
                 <FormikField type="checkbox"
                              name="useStartTLS"
+                             formGroupClassName=""
                              label="StartTLS" />
-              </label>
-              <label className="checkbox-inline" htmlFor="trustAllCertificates">
+
                 <FormikField type="checkbox"
                              name="trustAllCertificates"
+                             formGroupClassName=""
                              label="Allow untrusted certificates" />
-              </label>
+
+              </ProtocolOptions>
+
             </>
           </Input>
           <FormikFormGroup label="System Username"

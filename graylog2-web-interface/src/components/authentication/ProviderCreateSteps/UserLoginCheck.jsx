@@ -5,7 +5,7 @@ import URI from 'urijs';
 import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormikFormGroup, Spinner, Icon } from 'components/common';
+import { FormikField, Spinner, Icon } from 'components/common';
 import { Button, Row, Col, Panel } from 'components/graylog';
 import ActionsProvider from 'injection/ActionsProvider';
 import ObjectUtils from 'util/ObjectUtils';
@@ -141,12 +141,10 @@ const UserLoginCheck = () => {
         },
         () => {
           setLoginStatus({
-            loginStatus: {
-              loading: false,
-              error: true,
-              result: {
-                exception: 'Unable to test login, please try again.',
-              },
+            loading: false,
+            error: true,
+            result: {
+              exception: 'Unable to test login, please try again.',
             },
           });
         },
@@ -160,11 +158,17 @@ const UserLoginCheck = () => {
       </p>
       <Formik onSubmit={_handleLoginCheck} initialValues={{ password: '', username: '' }}>
         {({ isSubmitting, isValid, values }) => (
-          <Form className="form form-horizontal">
-            <FormikFormGroup label="Username"
+          <Form className="form">
+            <Row>
+              <Col sm="6">
+                <FormikField label="Username"
                              name="username" />
-            <FormikFormGroup label="Password"
+              </Col>
+              <Col sm="6">
+                <FormikField label="Password"
                              name="password" />
+              </Col>
+            </Row>
             <Button type="submit" disabled={isSubmitting || !isValid}>
               {loading ? <Spinner delay={0} /> : 'Test Login'}
             </Button>
