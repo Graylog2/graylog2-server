@@ -35,6 +35,8 @@ const StatusIcon = styled(Icon)(({ status, theme }) => `
 `);
 
 const _formatLoginStatus = ({ password }, loading, success, error, result) => {
+  // Temporary until we defined the correct request payload
+
   // Don't show any status if login didn't complete
   if (!error && !success) {
     return null;

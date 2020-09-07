@@ -1,17 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { useRef } from 'react';
 import { Formik, Form } from 'formik';
 
 import { FormikFormGroup } from 'components/common';
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 type Props = {
-  initialValues?: {
-    searchBaseDN?: string,
-    searchPattern?: string,
-    displayNameAttribute?: string,
-  },
   help?: {
     searchBaseDN?: React.Node,
     searchPattern?: React.Node,
@@ -42,11 +36,11 @@ const defaultHelp = {
   ),
 };
 
-const StepUserMapping = ({ initialValues, help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
+const StepUserMapping = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={() => onSubmit('group-mapping')}>
+    <Formik initialValues={stepsState?.formValues?.['user-mapping']} onSubmit={() => onSubmit('group-mapping')}>
       {({ isSubmitting, isValid, values }) => (
         <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
           <FormikFormGroup label="Search Base DN"
@@ -67,17 +61,19 @@ const StepUserMapping = ({ initialValues, help: propsHelp, onSubmit, onSubmitAll
                            required
                            help={help.displayNameAttribute} />
 
-          <Button bsStyle="secondary"
-                  type="button"
-                  onClick={() => onSubmitAll()}
-                  disabled={!isValid || isSubmitting}>
-            Finish & Save Identity Provider
-          </Button>
-          <Button bsStyle="primary"
-                  type="submit"
-                  disabled={!isValid || isSubmitting}>
-            Setup Group Mapping
-          </Button>
+          <ButtonToolbar className="pull-right">
+            <Button bsStyle="secondary"
+                    type="button"
+                    onClick={() => onSubmitAll()}
+                    disabled={!isValid || isSubmitting}>
+              Finish & Save Identity Provider
+            </Button>
+            <Button bsStyle="primary"
+                    type="submit"
+                    disabled={!isValid || isSubmitting}>
+              Setup Group Mapping
+            </Button>
+          </ButtonToolbar>
         </Form>
       )}
     </Formik>
@@ -86,7 +82,6 @@ const StepUserMapping = ({ initialValues, help: propsHelp, onSubmit, onSubmitAll
 
 StepUserMapping.defaultProps = {
   help: {},
-  initialValues: {},
 };
 
 export default StepUserMapping;

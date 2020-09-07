@@ -34,7 +34,7 @@ const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmit
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={stepsState?.formValues?.serverConfig} onSubmit={() => onSubmit('user-mapping')}>
+    <Formik initialValues={stepsState?.formValues?.['server-configuration']} onSubmit={() => onSubmit('user-mapping')}>
       {({ isSubmitting, isValid, values }) => (
         <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
           <Input id="uri-host"
@@ -85,10 +85,8 @@ const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmit
                            required
                            help={help.systemPassword} />
 
-          <ButtonToolbar>
-
-            <Button bsStyle="secondary"
-                    type="button"
+          <ButtonToolbar className="pull-right">
+            <Button type="button"
                     onClick={() => onSubmitAll()}
                     disabled={!isValid || isSubmitting}>
               Finish & Save Identity Provider
