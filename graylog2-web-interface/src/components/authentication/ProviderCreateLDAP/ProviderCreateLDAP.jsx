@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import Wizard from 'components/common/Wizard';
 
@@ -11,13 +11,11 @@ import SidebarServerResponse from '../ProviderCreateSteps/SidebarServerResponse'
 import StepGroupMapping from '../ProviderCreateSteps/StepGroupMapping';
 
 const ProviderCreateLDAP = () => {
-  const serverConfigForm = useRef();
-  const userMappingForm = useRef();
   const [stepsState, setStepsState] = useState({
     activeStepKey: 'server-configuration',
-    formValues: {
-      serverConfiguration: serverConfigForm?.current?.value,
-      userMapping: userMappingForm?.current?.value,
+    forms: {
+      serverConfig: undefined,
+      userMapping: undefined,
     },
   });
 
@@ -31,8 +29,7 @@ const ProviderCreateLDAP = () => {
       title: 'Server Configuration',
       component: (
         <StepServerConfiguration onSubmit={handleSubmit}
-                                 onChange={handleFieldUpdate}
-                                 formRef={serverConfigForm} />
+                                 onChange={handleFieldUpdate} />
       ),
 
     },
@@ -41,8 +38,7 @@ const ProviderCreateLDAP = () => {
       title: 'User Mapping',
       component: (
         <StepUserMapping onSubmit={handleSubmit}
-                         onChange={handleFieldUpdate}
-                         formRef={userMappingForm} />
+                         onChange={handleFieldUpdate} />
       ),
     },
     {
@@ -59,7 +55,7 @@ const ProviderCreateLDAP = () => {
   return (
     <ServiceStepsContext.Provider value={{ ...stepsState, setStepsState }}>
       <ServiceStepsContext.Consumer>
-        {({ activeStepKey: activeStep, formValues }) => {
+        {({ activeStepKey: activeStep }) => {
           return (
             <Wizard horizontal
                     justified
@@ -67,7 +63,7 @@ const ProviderCreateLDAP = () => {
                     onStepChange={handleStepChange}
                     hidePreviousNextButtons
                     steps={wizardSteps}>
-              <SidebarServerResponse formValues={formValues} />
+              <SidebarServerResponse />
             </Wizard>
           );
         }}

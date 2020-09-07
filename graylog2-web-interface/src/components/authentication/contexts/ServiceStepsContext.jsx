@@ -1,24 +1,23 @@
 // @flow strict
 import * as React from 'react';
 
-import type { Steps, Step } from 'components/common/Wizard';
+import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
 export type ServiceSteps = {
   // steps: ?Steps,
-  setStepsState: ?(ServiceSteps) => void,
+  setStepsState: ?(any) => void,
   activeStepKey: $PropertyType<Step, 'key'>,
-  formValues: any,
+  forms: any,
 };
 
 export const defaultServiceSteps = {
   // steps: undefined,
   setStepsState: undefined,
   activeStepKey: undefined,
-  formValues: {
-    serverConfiguration: {},
+  forms: {
+    serverConfig: {},
     userMapping: {},
-    groupMaoing: {},
   },
 };
 

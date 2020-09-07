@@ -1,13 +1,15 @@
 // @flow strict
 import * as React from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { Formik, Form } from 'formik';
 
 import { FormikFormGroup, FormikField } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button } from 'components/graylog';
 
+import ServiceStepsContext from '../contexts/ServiceStepsContext';
+
 type Props = {
-  formRef: any,
   initialValues?: {
     uriHost?: string,
     uriPort?: number,
@@ -30,8 +32,16 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const StepServerConfiguration = ({ initialValues, help: propsHelp, formRef }: Props) => {
+const StepServerConfiguration = ({ initialValues, help: propsHelp }: Props) => {
+  const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
+  const formRef = useRef();
   const help = { ...defaultHelp, ...propsHelp };
+
+  useEffect(() => {
+    if (setStepsState) {
+      setStepsState({ ...stepsState, forms: { ...stepsState.forms, serverConfig: formRef } });
+    }
+  }, []);
 
   return (
     <Formik initialValues={initialValues} onSubmit={() => {}} innerRef={formRef}>

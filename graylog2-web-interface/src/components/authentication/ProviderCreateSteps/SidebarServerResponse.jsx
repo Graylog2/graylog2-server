@@ -1,24 +1,37 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
 
-import { Collapse } from 'components/graylog';
+import { PanelGroup, Panel } from 'components/graylog';
 
-type Props = {
-  children: string,
-};
+import ServerConnectionCheck from './ServerConnectionCheck';
 
-const SidebarConnectionCheck = ({ children }: Props) => (
-  <>
-    <Collapse in={false} timeout={0}>
-      <div>{children}</div>
-    </Collapse>
+const SidebarConnectionCheck = () => {
+  const [activeKey, setActiveKey] = useState();
 
-  </>
-);
+  return (
+    <>
+      <PanelGroup accordion
+                  activeKey={activeKey}
+                  id="sidebar-server-response"
+                  onSelect={setActiveKey}>
+        <Panel eventKey="1">
+          <Panel.Heading>
+            <Panel.Title toggle>Connection Check</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body collapsible>
+            <ServerConnectionCheck />
+          </Panel.Body>
+        </Panel>
+        <Panel eventKey="2">
+          <Panel.Heading>
+            <Panel.Title toggle>User Login Test</Panel.Title>
+          </Panel.Heading>
+        </Panel>
+      </PanelGroup>
 
-SidebarConnectionCheck.propTypes = {
-  children: PropTypes.string,
+    </>
+  );
 };
 
 SidebarConnectionCheck.defaultProps = {

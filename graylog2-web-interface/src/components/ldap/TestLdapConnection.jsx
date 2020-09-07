@@ -26,6 +26,8 @@ class TestLdapConnection extends React.Component {
   }
 
   _testServerConnection = () => {
+    console.log(this.props.ldapSettings);
+
     LdapActions.testServerConnection.triggerPromise(this.props.ldapSettings)
       .then(
         (result) => {
