@@ -168,7 +168,6 @@ class LdapComponent extends React.Component {
   _onLdapSettingsChange = (ldapSettings) => {
     const settings = cloneDeep(ldapSettings);
     const ldapUri = new URI(settings.ldap_uri);
-    console.log(ldapUri);
 
     this.setState({ ldapSettings: settings, ldapUri: ldapUri, hidePasswordInput: settings.system_password_set });
   };
@@ -264,7 +263,6 @@ class LdapComponent extends React.Component {
   _saveSettings = (event) => {
     event.preventDefault();
     const { ldapSettings } = this.state;
-    console.log('ldapSettings', ldapSettings);
 
     LdapActions.update(ldapSettings);
   };

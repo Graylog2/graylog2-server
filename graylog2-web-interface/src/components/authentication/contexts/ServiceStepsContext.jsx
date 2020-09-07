@@ -8,14 +8,14 @@ export type ServiceSteps = {
   // steps: ?Steps,
   setStepsState: ?(any) => void,
   activeStepKey: $PropertyType<Step, 'key'>,
-  forms: any,
+  formValues: any,
 };
 
 export const defaultServiceSteps = {
   // steps: undefined,
   setStepsState: undefined,
   activeStepKey: undefined,
-  forms: {
+  formValues: {
     serverConfig: {},
     userMapping: {},
   },

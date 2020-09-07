@@ -13,7 +13,7 @@ const LdapActions = ActionsProvider.getActions('Ldap');
 
 const ServerConnectionCheck = () => {
   const [{ loading, success, error }, setConnectionStatus] = useState({ loading: false, success: false, error: undefined });
-  const { forms: { serverConfig } } = useContext(ServiceStepsContext);
+  const { formValues: { serverConfig } } = useContext(ServiceStepsContext);
 
   const handleConnectionCheck = () => {
     const {
@@ -23,7 +23,7 @@ const ServerConnectionCheck = () => {
       systemPassword,
       useStartTLS,
       trustAllCertificates,
-    } = serverConfig?.current?.values ?? {};
+    } = serverConfig ?? {};
     const ldapURI = `${new URI('').host(uriHost).port(uriPort).scheme('ldap')}`;
 
     setConnectionStatus({ loading: true, error: undefined, success: false });

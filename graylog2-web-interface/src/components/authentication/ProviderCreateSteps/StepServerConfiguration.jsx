@@ -1,27 +1,22 @@
 // @flow strict
 import * as React from 'react';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
 import { FormikFormGroup, FormikField } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 import ServiceStepsContext from '../contexts/ServiceStepsContext';
 
 type Props = {
-  initialValues?: {
-    uriHost?: string,
-    uriPort?: number,
-    sslCheckbox?: boolean,
-    systemUsername?: string,
-  },
   help?: {
     systemUsername?: React.Node,
     systemPassword?: React.Node,
   },
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
+  onChange: (event: Event, values: any) => void,
 };
 
 const defaultHelp = {
@@ -34,21 +29,14 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const StepServerConfiguration = ({ initialValues, help: propsHelp, onSubmit, onSubmitAll }: Props) => {
+const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll }: Props) => {
   const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
-  const formRef = useRef();
   const help = { ...defaultHelp, ...propsHelp };
 
-  useEffect(() => {
-    if (setStepsState) {
-      setStepsState({ ...stepsState, forms: { ...stepsState.forms, serverConfig: formRef } });
-    }
-  }, []);
-
   return (
-    <Formik initialValues={initialValues} onSubmit={() => onSubmit('user-mapping')} innerRef={formRef}>
-      {({ isSubmitting, isValid }) => (
-        <Form>
+    <Formik initialValues={stepsState?.formValues?.serverConfig} onSubmit={() => onSubmit('user-mapping')}>
+      {({ isSubmitting, isValid, values }) => (
+        <Form onChange={(event) => onChange(event, values)}>
           <Input id="uri-host"
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9"
@@ -97,17 +85,21 @@ const StepServerConfiguration = ({ initialValues, help: propsHelp, onSubmit, onS
                            required
                            help={help.systemPassword} />
 
-          <Button bsStyle="secondary"
-                  type="button"
-                  onClick={() => onSubmitAll()}
-                  disabled={!isValid || isSubmitting}>
-            Finish & Save Identity Provider
-          </Button>
-          <Button bsStyle="primary"
-                  type="submit"
-                  disabled={!isValid || isSubmitting}>
-            Setup User Mapping
-          </Button>
+          <ButtonToolbar>
+
+            <Button bsStyle="secondary"
+                    type="button"
+                    onClick={() => onSubmitAll()}
+                    disabled={!isValid || isSubmitting}>
+              Finish & Save Identity Provider
+            </Button>
+            <Button bsStyle="primary"
+                    type="submit"
+                    disabled={!isValid || isSubmitting}>
+              Setup User Mapping
+            </Button>
+          </ButtonToolbar>
+
         </Form>
       )}
     </Formik>
@@ -116,12 +108,6 @@ const StepServerConfiguration = ({ initialValues, help: propsHelp, onSubmit, onS
 
 StepServerConfiguration.defaultProps = {
   help: {},
-  initialValues: {
-    uriHost: 'localhost',
-    uriPort: 389,
-    useStartTLS: true,
-    trustAllCertificates: false,
-  },
 };
 
 export default StepServerConfiguration;

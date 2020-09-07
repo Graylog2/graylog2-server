@@ -13,8 +13,16 @@ import StepGroupMapping from '../ProviderCreateSteps/StepGroupMapping';
 const ProviderCreateLDAP = () => {
   const [stepsState, setStepsState] = useState({
     activeStepKey: 'server-configuration',
-    forms: {
-      serverConfig: undefined,
+    formValues: {
+      'server-configuration': {
+        uriHost: 'localhost',
+        uriPort: 389,
+        useStartTLS: true,
+        trustAllCertificates: false,
+      },
+      'user-mapping': {
+
+      },
       userMapping: undefined,
     },
   });
@@ -23,7 +31,21 @@ const ProviderCreateLDAP = () => {
 
   const _handleStepChange = (stepKey: string) => setStepsState({ ...stepsState, activeStepKey: stepKey });
   const _handleSubmitAll = () => {};
-  const handleFieldUpdate = () => {};
+
+  const handleFieldUpdate = (stepKey, event, values) => {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+
+    setStepsState({
+      ...stepsState,
+      formValues: {
+        ...stepsState.formValues,
+        [stepKey]: {
+          ...values,
+          [event.target.name]: value,
+        },
+      },
+    });
+  };
 
   const wizardSteps = [
     {
@@ -32,7 +54,7 @@ const ProviderCreateLDAP = () => {
       component: (
         <StepServerConfiguration onSubmit={_handleStepChange}
                                  onSubmitAll={_handleSubmitAll}
-                                 onChange={handleFieldUpdate} />
+                                 onChange={(event, values) => handleFieldUpdate('server-configuration', event, values)} />
       ),
 
     },
@@ -42,7 +64,7 @@ const ProviderCreateLDAP = () => {
       component: (
         <StepUserMapping onSubmit={_handleStepChange}
                          onSubmitAll={_handleSubmitAll}
-                         onChange={handleFieldUpdate} />
+                         onChange={(event, values) => handleFieldUpdate('user-mapping', event, values)} />
       ),
     },
     {
