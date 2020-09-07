@@ -265,6 +265,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         for (String roleId : user.getRoleIds()) {
             permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId));
         }
+        grantPermissionResolver.resolveRolesForPrincipal(grnRegistry.ofUser(user)).forEach(roleId ->
+            permSet.addAll(inMemoryRolePermissionResolver.resolveStringPermission(roleId))
+        );
 
         return permSet.build();
     }

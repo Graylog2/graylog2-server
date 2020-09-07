@@ -98,4 +98,9 @@ public class DefaultGrantPermissionResolver implements GrantPermissionResolver {
 
         return permissionsBuilder.build();
     }
+
+    @Override
+    public Set<String> resolveRolesForPrincipal(GRN principal) {
+        return ImmutableSet.of();
+    }
 }

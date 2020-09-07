@@ -32,4 +32,12 @@ public interface GrantPermissionResolver {
      * @return the resolved permissions
      */
     Set<Permission> resolvePermissionsForPrincipal(GRN principal);
+
+    /**
+     * Returns roles for the given principal.
+     *
+     * @param principal the principal
+     * @return the resolved roleIds
+     */
+    Set<String> resolveRolesForPrincipal(GRN principal);
 }
