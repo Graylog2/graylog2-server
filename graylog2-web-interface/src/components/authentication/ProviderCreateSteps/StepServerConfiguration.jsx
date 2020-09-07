@@ -16,7 +16,7 @@ type Props = {
   },
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
-  onChange: (event: Event, values: any) => void,
+  onChange: (stepKey: string, event: Event, values: any) => void,
 };
 
 const defaultHelp = {
@@ -36,7 +36,7 @@ const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmit
   return (
     <Formik initialValues={stepsState?.formValues?.serverConfig} onSubmit={() => onSubmit('user-mapping')}>
       {({ isSubmitting, isValid, values }) => (
-        <Form onChange={(event) => onChange(event, values)}>
+        <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
           <Input id="uri-host"
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9"

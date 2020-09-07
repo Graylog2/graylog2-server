@@ -43,13 +43,12 @@ const defaultHelp = {
 };
 
 const StepUserMapping = ({ initialValues, help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
-  const formRef = useRef();
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={() => onSubmit('group-mapping')} innerRef={formRef}>
+    <Formik initialValues={initialValues} onSubmit={() => onSubmit('group-mapping')}>
       {({ isSubmitting, isValid, values }) => (
-        <Form onChange={(event) => onChange(event, values)}>
+        <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
           <FormikFormGroup label="Search Base DN"
                            name="searchBaseDN"
                            placeholder="System User DN"

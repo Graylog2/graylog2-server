@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { PanelGroup, Panel } from 'components/graylog';
 
 import ServerConnectionCheck from './ServerConnectionCheck';
+import UserLoginCheck from './UserLoginCheck';
 
 const SidebarConnectionCheck = () => {
   const [activeKey, setActiveKey] = useState();
@@ -27,6 +28,9 @@ const SidebarConnectionCheck = () => {
           <Panel.Heading>
             <Panel.Title toggle>User Login Test</Panel.Title>
           </Panel.Heading>
+          <Panel.Body collapsible>
+            <UserLoginCheck />
+          </Panel.Body>
         </Panel>
       </PanelGroup>
 

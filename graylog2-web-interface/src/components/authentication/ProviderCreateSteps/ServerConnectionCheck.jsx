@@ -15,7 +15,7 @@ const ServerConnectionCheck = () => {
   const [{ loading, success, error }, setConnectionStatus] = useState({ loading: false, success: false, error: undefined });
   const { formValues: { serverConfig } } = useContext(ServiceStepsContext);
 
-  const handleConnectionCheck = () => {
+  const _handleConnectionCheck = () => {
     const {
       uriHost,
       uriPort,
@@ -48,7 +48,7 @@ const ServerConnectionCheck = () => {
       <p>
         Performs a background connection check with the address and credentials above.
       </p>
-      <Button type="button" onClick={() => handleConnectionCheck()}>
+      <Button type="button" onClick={() => _handleConnectionCheck()}>
         {loading ? <Spinner delay={0} /> : 'Start Check'}
       </Button>
       {success && <Alert bsStyle="success">Connection to server was successful</Alert>}

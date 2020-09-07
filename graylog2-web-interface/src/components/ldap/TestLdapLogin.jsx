@@ -70,6 +70,8 @@ class TestLdapLogin extends React.Component {
     const { loginUser, loginPassword } = this.state;
     const { ldapSettings } = this.props;
 
+    console.log(ldapSettings);
+
     LdapActions.testLogin.triggerPromise(ldapSettings, loginUser, loginPassword)
       .then(
         (result) => {
