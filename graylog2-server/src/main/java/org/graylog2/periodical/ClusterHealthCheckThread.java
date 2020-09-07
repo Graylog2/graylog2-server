@@ -52,7 +52,6 @@ public class ClusterHealthCheckThread extends Periodical {
     @Override
     public void doRun() {
         if (isCloud) {
-            LOG.info("Skipping run of ClusterHealthCheckThread, since contained checks are not applicable for Cloud.");
             return;
         }
         try {
@@ -111,7 +110,7 @@ public class ClusterHealthCheckThread extends Periodical {
     public int getInitialDelaySeconds() {
         // Wait some time until all inputs have been started otherwise this will trigger a notification on every
         // startup of the server.
-        return 1;
+        return 120;
     }
 
     @Override
