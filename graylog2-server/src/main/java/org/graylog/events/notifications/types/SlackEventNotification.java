@@ -42,7 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.*;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -87,7 +92,6 @@ public class SlackEventNotification implements EventNotification {
 	@Override
 	public void execute(EventNotificationContext ctx) throws PermanentEventNotificationException {
 		final SlackEventNotificationConfig config = (SlackEventNotificationConfig) ctx.notificationConfig();
-		SlackClient slackClient = new SlackClient(config);
 
 		try {
 			SlackMessage slackMessage = createSlackMessage(ctx, config);
