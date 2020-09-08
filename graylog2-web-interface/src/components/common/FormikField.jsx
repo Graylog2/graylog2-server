@@ -5,6 +5,7 @@ import { Field } from 'formik';
 import { Input } from 'components/bootstrap';
 
 type Props = {
+  component: Field,
   label: string,
   name: string,
   type?: string,
@@ -23,8 +24,8 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
-  <Field name={name} validate={validate}>
+const FormikField = ({ component: Component, label, name, type, help, validate, ...rest }: Props) => (
+  <Component name={name} validate={validate}>
     {({ field: { value, onChange }, meta: { error } }) => {
       const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
 
@@ -40,10 +41,15 @@ const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
                type={type} />
       );
     }}
-  </Field>
+  </Component>
 );
 
+<<<<<<< HEAD
 FormikInput.defaultProps = {
+=======
+FormikField.defaultProps = {
+  component: Field,
+>>>>>>> Implement GroupMapping based on enterprise plugin
   help: undefined,
   labelClassName: undefined,
   type: 'text',

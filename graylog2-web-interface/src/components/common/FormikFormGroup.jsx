@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import { Field } from 'formik';
 
 import FormikInput from './FormikInput';
 
@@ -7,17 +8,16 @@ type Props = {
   label: string,
   name: string,
   type?: string,
-  help?: string,
-  validate?: (string) => ?string,
+  component?: typeof Field,
 };
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ label, name, type, help, ...rest }: Props) => (
+const FormikFormGroup = ({ component, label, name, type, ...rest }: Props) => (
   <FormikInput {...rest}
-               help={help}
                label={label}
                id={name}
                name={name}
+               component={component}
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9"
                type={type} />
@@ -25,8 +25,7 @@ const FormikFormGroup = ({ label, name, type, help, ...rest }: Props) => (
 
 FormikFormGroup.defaultProps = {
   type: 'text',
-  help: undefined,
-  validate: () => {},
+  component: Field,
 };
 
 export default FormikFormGroup;

@@ -1,19 +1,39 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import styled from 'styled-components';
 
 type Props = {
-  children: string,
+  onChange: (event: Event, values: any) => void,
+  onSubmit: (nextStepKey: string) => void,
+  onSubmitAll: () => void,
 };
 
-const StepGroupMapping = ({ children }: Props) => (<>{children}</>);
+const Header = styled.h4`
+  margin-bottom: 5px;
+`;
 
-StepGroupMapping.propTypes = {
-  children: PropTypes.string,
-};
+const NoEnterpriseComponent = () => (
+  <>
+    <Header>No enterprise plugin found</Header>
+    <p>To use the <b>Teams</b> functionality you need to install the Graylog <b>Enterprise</b> plugin.</p>
+  </>
+);
 
-StepGroupMapping.defaultProps = {
-  children: 'Hello World!',
+const StepGroupMapping = ({ onSubmit, onSubmitAll, onChange }: Props) => {
+  const authenticationPlugin = PluginStore.exports('authentication');
+
+  if (!authenticationPlugin || authenticationPlugin.length <= 0) {
+    return <NoEnterpriseComponent />;
+  }
+
+  const { GroupMapping } = authenticationPlugin[0];
+
+  return (
+    <GroupMapping onSubmit={onSubmit}
+                  onSubmitAll={onSubmitAll}
+                  onChange={onChange} />
+  );
 };
 
 export default StepGroupMapping;
