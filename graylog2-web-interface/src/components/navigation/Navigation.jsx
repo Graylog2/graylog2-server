@@ -94,11 +94,9 @@ const Navigation = ({ location }) => {
 
       <Navbar.Collapse>
         <Nav navbar>
-          <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
-            <LinkContainer to={Routes.SEARCH}>
-              <NavItem to="search">Search</NavItem>
-            </LinkContainer>
-          </IfPermitted>
+          <LinkContainer to={Routes.SEARCH}>
+            <NavItem to="search">Search</NavItem>
+          </LinkContainer>
 
           <LinkContainer to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>

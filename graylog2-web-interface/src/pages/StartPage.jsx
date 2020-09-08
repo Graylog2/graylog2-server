@@ -65,12 +65,7 @@ const StartPage = createReactClass({
       return;
     }
 
-    // Show search page if permitted, or streams page in other case
-    if (PermissionsMixin.isAnyPermitted(permissions, ['searches:absolute', 'searches:keyword', 'searches:relative'])) {
-      this._redirect(Routes.SEARCH);
-    } else {
-      this._redirect(Routes.STREAMS);
-    }
+    this._redirect(Routes.SEARCH);
   },
 
   _isLoading() {
