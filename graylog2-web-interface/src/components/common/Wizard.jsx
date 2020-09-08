@@ -20,30 +20,19 @@ const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
-
-<<<<<<< HEAD
 type StepKey = number | string;
 
-=======
-type StepKey = StepKey;
->>>>>>> Implement ServieStepsContext
 export type Step = {
   key: StepKey,
   title: string,
   component: React.Node,
   disabled?: boolean,
 };
-export type Steps = Array<Step>;
 
 export type Steps = Array<Step>;
-
 type Props = {
   steps: Steps,
-<<<<<<< HEAD
   activeStep: ?StepKey,
-=======
-  activeStep: StepKey,
->>>>>>> Implement ServieStepsContext
   onStepChange: (StepKey) => void,
   children: PropTypes.elementType,
   horizontal: boolean,
@@ -123,7 +112,11 @@ class Wizard extends React.Component<Props, State> {
     this._warnOnInvalidActiveStep(activeStep, steps);
   }
 
+<<<<<<< HEAD
   _warnOnInvalidActiveStep = (activeStep: ?StepKey, steps: Steps) => {
+=======
+  _warnOnInvalidActiveStep = (activeStep: ?StepKey, steps: Array<Step>) => {
+>>>>>>> Improve Wizard flow type
     if (activeStep === undefined || activeStep === null) {
       return;
     }
@@ -134,7 +127,11 @@ class Wizard extends React.Component<Props, State> {
     }
   };
 
+<<<<<<< HEAD
   _isValidActiveStep = (activeStep: ?StepKey, steps: Steps) => {
+=======
+  _isValidActiveStep = (activeStep: ?StepKey, steps: Array<Step>) => {
+>>>>>>> Improve Wizard flow type
     if (activeStep === undefined || activeStep === null) {
       return false;
     }
