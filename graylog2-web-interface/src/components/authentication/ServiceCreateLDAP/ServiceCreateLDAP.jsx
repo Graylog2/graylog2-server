@@ -9,10 +9,10 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 
 import ServiceStepsContext from '../contexts/ServiceStepsContext';
-import StepServerConfiguration from '../ServiceCreateSteps/StepServerConfiguration';
-import StepUserMapping from '../ServiceCreateSteps/StepUserMapping';
+import ServerConfiguration from '../ServiceCreateSteps/ServerConfiguration';
+import UserSyncSettings from '../ServiceCreateSteps/UserSyncSettings';
 import SidebarServerResponse from '../ServiceCreateSteps/SidebarServerResponse';
-import StepGroupMapping from '../ServiceCreateSteps/StepGroupMapping';
+import GroupSyncSettings from '../ServiceCreateSteps/GroupSyncSettings';
 
 const LdapActions = ActionsProvider.getActions('Ldap');
 
@@ -87,9 +87,9 @@ const ServiceCreateLDAP = () => {
       key: 'server-configuration',
       title: 'Server Configuration',
       component: (
-        <StepServerConfiguration onSubmit={_handleStepChange}
-                                 onSubmitAll={_handleSubmitAll}
-                                 onChange={(event, values) => _handleFieldUpdate('server-configuration', event, values)} />
+        <ServerConfiguration onSubmit={_handleStepChange}
+                             onSubmitAll={_handleSubmitAll}
+                             onChange={(event, values) => _handleFieldUpdate('server-configuration', event, values)} />
       ),
 
     },
@@ -97,19 +97,19 @@ const ServiceCreateLDAP = () => {
       key: 'user-mapping',
       title: 'User Mapping',
       component: (
-        <StepUserMapping onSubmit={_handleStepChange}
-                         onSubmitAll={_handleSubmitAll}
-                         onChange={(event, values) => _handleFieldUpdate('user-mapping', event, values)} />
+        <UserSyncSettings onSubmit={_handleStepChange}
+                          onSubmitAll={_handleSubmitAll}
+                          onChange={(event, values) => _handleFieldUpdate('user-mapping', event, values)} />
       ),
     },
     {
       key: 'group-mapping',
       title: 'Group Mapping',
       component: (
-        <StepGroupMapping onSubmit={_handleStepChange}
-                          onSubmitAll={_handleSubmitAll}
-                          onChange={_handleFieldUpdate}
-                          wizardFormValues={wizardFormValues} />
+        <GroupSyncSettings onSubmit={_handleStepChange}
+                           onSubmitAll={_handleSubmitAll}
+                           onChange={_handleFieldUpdate}
+                           wizardFormValues={wizardFormValues} />
       ),
     },
   ];

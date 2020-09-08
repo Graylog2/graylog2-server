@@ -39,7 +39,7 @@ const defaultHelp = {
   ),
 };
 
-const StepUserMapping = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
+const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
 
@@ -83,8 +83,8 @@ const StepUserMapping = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: P
   );
 };
 
-StepUserMapping.defaultProps = {
+UserSyncSettings.defaultProps = {
   help: {},
 };
 
-export default StepUserMapping;
+export default UserSyncSettings;

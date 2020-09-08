@@ -20,20 +20,20 @@ const NoEnterpriseComponent = () => (
   </>
 );
 
-const StepGroupMapping = ({ onSubmit, onSubmitAll, onChange }: Props) => {
+const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange }: Props) => {
   const authenticationPlugin = PluginStore.exports('authentication');
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
     return <NoEnterpriseComponent />;
   }
 
-  const { GroupMapping } = authenticationPlugin[0];
+  const { GroupSyncSettings: GroupSyncSettingsForm } = authenticationPlugin[0];
 
   return (
-    <GroupMapping onSubmit={onSubmit}
-                  onSubmitAll={onSubmitAll}
-                  onChange={onChange} />
+    <GroupSyncSettingsForm onSubmit={onSubmit}
+                           onSubmitAll={onSubmitAll}
+                           onChange={onChange} />
   );
 };
 
-export default StepGroupMapping;
+export default GroupSyncSettings;

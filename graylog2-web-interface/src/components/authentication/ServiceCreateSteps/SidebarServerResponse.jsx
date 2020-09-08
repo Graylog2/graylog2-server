@@ -11,30 +11,27 @@ const SidebarConnectionCheck = () => {
   const [activeKey, setActiveKey] = useState();
 
   return (
-    <>
-      <PanelGroup accordion
-                  activeKey={activeKey}
-                  id="sidebar-server-response"
-                  onSelect={setActiveKey}>
-        <Panel eventKey="1">
-          <Panel.Heading>
-            <Panel.Title toggle>Connection Check</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body collapsible>
-            <ServerConnectionCheck />
-          </Panel.Body>
-        </Panel>
-        <Panel eventKey="2">
-          <Panel.Heading>
-            <Panel.Title toggle>User Login Test</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body collapsible>
-            <UserLoginCheck />
-          </Panel.Body>
-        </Panel>
-      </PanelGroup>
-
-    </>
+    <PanelGroup accordion
+                activeKey={activeKey}
+                id="sidebar-server-response"
+                onSelect={setActiveKey}>
+      <Panel eventKey="1">
+        <Panel.Heading>
+          <Panel.Title toggle>Connection Check</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body collapsible>
+          <ServerConnectionCheck />
+        </Panel.Body>
+      </Panel>
+      <Panel eventKey="2">
+        <Panel.Heading>
+          <Panel.Title toggle>User Login Test</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body collapsible>
+          <UserLoginCheck />
+        </Panel.Body>
+      </Panel>
+    </PanelGroup>
   );
 };
 

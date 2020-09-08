@@ -37,7 +37,7 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll }: Props) => {
+const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll }: Props) => {
   const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
   const help = { ...defaultHelp, ...propsHelp };
 
@@ -119,8 +119,8 @@ const StepServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmit
   );
 };
 
-StepServerConfiguration.defaultProps = {
+ServerConfiguration.defaultProps = {
   help: {},
 };
 
-export default StepServerConfiguration;
+export default ServerConfiguration;
