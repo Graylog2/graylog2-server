@@ -64,9 +64,11 @@ public class SlackEventNotification implements EventNotification {
 	private final NotificationService notificationService;
 	private final ObjectMapper objectMapper;
 	private final NodeId nodeId;
+	private final SlackClient slackClient;
 
 	@Inject
 	public SlackEventNotification(EventNotificationService notificationCallbackService,
+                                  SlackClient slackClient,
                                   StreamService streamService,
                                   Engine templateEngine,
                                   NotificationService notificationService,
@@ -78,6 +80,8 @@ public class SlackEventNotification implements EventNotification {
 		this.notificationService = notificationService;
 		this.objectMapper = objectMapper;
 		this.nodeId = nodeId;
+		this.slackClient = slackClient;
+
 	}
 
 	@Override

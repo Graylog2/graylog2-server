@@ -26,7 +26,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.Proxy;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 public class SlackClient {
