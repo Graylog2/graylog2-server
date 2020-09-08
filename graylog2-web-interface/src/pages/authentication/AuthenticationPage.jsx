@@ -8,7 +8,7 @@ import {} from 'components/authentication'; // Make sure to load all auth config
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
-import ProviderCreateGettingStarted from 'components/authentication/ProviderCreateGettingStarted';
+import ServiceCreateGettingStarted from 'components/authentication/ServiceCreateGettingStarted';
 
 type Props = {
   location: {
@@ -28,7 +28,7 @@ const AuthenticationPage = ({ location, params }: Props) => (
       </span>
     </PageHeader>
 
-    <ProviderCreateGettingStarted />
+    <ServiceCreateGettingStarted />
 
     {/* Old authentication management which can be removed soon */}
     <Row className="content">

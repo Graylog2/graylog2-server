@@ -4,9 +4,9 @@ import * as React from 'react';
 import { Row, Col } from 'components/graylog';
 import { EmptyEntity } from 'components/common';
 
-import ProviderCreateSelect from './ProviderCreateSelect';
+import ServiceCreateSelect from './ServiceCreateSelect';
 
-const ProviderCreateGettingStarted = () => (
+const ServiceCreateGettingStarted = () => (
   <Row className="content">
     <Col md={6} mdOffset={3}>
       <EmptyEntity>
@@ -15,10 +15,10 @@ const ProviderCreateGettingStarted = () => (
           authentication provider can also be extended by plugins to support other authentication mechanisms.
           Select an authentication provider to setup a new one.
         </p>
-        <ProviderCreateSelect />
+        <ServiceCreateSelect />
       </EmptyEntity>
     </Col>
   </Row>
 );
 
-export default ProviderCreateGettingStarted;
+export default ServiceCreateGettingStarted;

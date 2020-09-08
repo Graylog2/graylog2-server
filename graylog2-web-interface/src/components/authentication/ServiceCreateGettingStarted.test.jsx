@@ -2,11 +2,11 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
-import ProviderCreateGettingStarted from './ProviderCreateGettingStarted';
+import ServiceCreateGettingStarted from './ServiceCreateGettingStarted';
 
-describe('ProviderCreateGettingStarted', () => {
+describe('ServiceCreateGettingStarted', () => {
   it('should display description and select', () => {
-    const { queryByText, queryByLabelText } = render(<ProviderCreateGettingStarted />);
+    const { queryByText, queryByLabelText } = render(<ServiceCreateGettingStarted />);
 
     expect(queryByText(/Select an authentication provider to setup a new one./)).not.toBeNull();
     expect(queryByLabelText('Select a provider')).not.toBeNull();

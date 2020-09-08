@@ -1,12 +1,13 @@
 // @flow strict
 import * as React from 'react';
 
-import ProviderCreateLDAP from 'components/authentication/ProviderCreateLDAP';
+import { Row, Col } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
+import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import PageHeader from 'components/common/PageHeader';
 import DocumentationLink from 'components/support/DocumentationLink';
 
-const ProviderCreateLDAPPage = () => (
+const ServiceCreateADPage = () => (
   <>
     <PageHeader title="Create LDAP Authentication Provider">
       <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
@@ -16,9 +17,12 @@ const ProviderCreateLDAPPage = () => (
       </span>
     </PageHeader>
 
-    <ProviderCreateLDAP />
-
+    <Row className="content">
+      <Col col={12}>
+        Test
+      </Col>
+    </Row>
   </>
 );
 
-export default ProviderCreateLDAPPage;
+export default ServiceCreateADPage;

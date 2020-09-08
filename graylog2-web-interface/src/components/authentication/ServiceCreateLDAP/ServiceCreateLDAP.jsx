@@ -9,14 +9,14 @@ import Routes from 'routing/Routes';
 import history from 'util/History';
 
 import ServiceStepsContext from '../contexts/ServiceStepsContext';
-import StepServerConfiguration from '../ProviderCreateSteps/StepServerConfiguration';
-import StepUserMapping from '../ProviderCreateSteps/StepUserMapping';
-import SidebarServerResponse from '../ProviderCreateSteps/SidebarServerResponse';
-import StepGroupMapping from '../ProviderCreateSteps/StepGroupMapping';
+import StepServerConfiguration from '../ServiceCreateSteps/StepServerConfiguration';
+import StepUserMapping from '../ServiceCreateSteps/StepUserMapping';
+import SidebarServerResponse from '../ServiceCreateSteps/SidebarServerResponse';
+import StepGroupMapping from '../ServiceCreateSteps/StepGroupMapping';
 
 const LdapActions = ActionsProvider.getActions('Ldap');
 
-const ProviderCreateLDAP = () => {
+const ServiceCreateLDAP = () => {
   const [stepsState, setStepsState] = useState({
     activeStepKey: 'server-configuration',
     formValues: {
@@ -134,4 +134,4 @@ const ProviderCreateLDAP = () => {
   );
 };
 
-export default ProviderCreateLDAP;
+export default ServiceCreateLDAP;
