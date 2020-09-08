@@ -49,11 +49,11 @@ public class AccessTokenServiceImplTest {
     @Before
     public void setupService() {
         // Simple cipher which reverses the cleartext. DB fixtures need to contain the reversed (i.e. encrypted token)
-        final AccessTokenCipher accessTokenCipher = mock(AccessTokenCipher.class);
-        when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
-        when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
+        final AESToolsService AESToolsService = mock(AESToolsService.class);
+        when(AESToolsService.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
+        when(AESToolsService.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), accessTokenCipher);
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), AESToolsService);
     }
 
     @After

@@ -23,7 +23,7 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.security.AccessTokenCipher;
+import org.graylog2.security.AESToolsService;
 import org.graylog2.security.AccessTokenImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +37,11 @@ public class V20200226181600_EncryptAccessTokensMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20200226181600_EncryptAccessTokensMigration.class);
 
     private final MongoConnection mongoConnection;
-    private final AccessTokenCipher accessTokenCipher;
+    private final AESToolsService AESToolsService;
 
     @Inject
-    public V20200226181600_EncryptAccessTokensMigration(AccessTokenCipher accessTokenCipher, MongoConnection mongoConnection) {
-        this.accessTokenCipher = accessTokenCipher;
+    public V20200226181600_EncryptAccessTokensMigration(AESToolsService AESToolsService, MongoConnection mongoConnection) {
+        this.AESToolsService = AESToolsService;
         this.mongoConnection = mongoConnection;
     }
 
@@ -70,7 +70,7 @@ public class V20200226181600_EncryptAccessTokensMigration extends Migration {
             final Bson query = Filters.eq("_id", document.getObjectId("_id"));
             final Bson updates = Updates.combine(
                     Updates.set(AccessTokenImpl.TOKEN_TYPE, AccessTokenImpl.Type.AES_SIV.getIntValue()),
-                    Updates.set(AccessTokenImpl.TOKEN, accessTokenCipher.encrypt(tokenValue))
+                    Updates.set(AccessTokenImpl.TOKEN, AESToolsService.encrypt(tokenValue))
             );
 
             LOG.info("Encrypting access token <{}/{}> for user <{}>", tokenId, tokenName, tokenUsername);

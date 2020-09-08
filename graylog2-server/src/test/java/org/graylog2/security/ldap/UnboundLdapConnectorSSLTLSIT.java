@@ -17,15 +17,17 @@
 package org.graylog2.security.ldap;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPException;
 import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
+import org.graylog2.security.AESToolsService;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -38,6 +40,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -52,7 +55,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Testcontainers
-public class LdapConnectorSSLTLSIT {
+public class UnboundLdapConnectorSSLTLSIT {
     private static final int DEFAULT_TIMEOUT = 60 * 1000;
     private static final Set<String> ENABLED_TLS_PROTOCOLS = ImmutableSet.of("TLSv1.2");
     private static final String NETWORK_ALIAS = "ldapserver";
@@ -78,7 +81,7 @@ public class LdapConnectorSSLTLSIT {
 
     private UnboundLdapConnector.TrustManagerProvider trustManagerProvider;
 
-    private LdapConnector ldapConnector;
+    private UnboundLdapConnector ldapConnector;
 
     @BeforeAll
     static void beforeAll() {
@@ -91,8 +94,11 @@ public class LdapConnectorSSLTLSIT {
         this.trustManagerProvider = mock(UnboundLdapConnector.TrustManagerProvider.class);
 
         mockTrustManagerWithSystemKeystore();
+        final AESToolsService aesToolsService = mock(AESToolsService.class);
+        Mockito.when(aesToolsService.encrypt(anyString())).thenAnswer((s) -> s.getArgument(0));
+        Mockito.when(aesToolsService.decrypt(anyString())).thenAnswer((s) -> s.getArgument(0));
 
-        this.ldapConnector = new LdapConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, ldapSettingsService, trustManagerProvider);
+        this.ldapConnector = new UnboundLdapConnector(DEFAULT_TIMEOUT, ENABLED_TLS_PROTOCOLS, ldapSettingsService, trustManagerProvider, aesToolsService);
     }
 
     @Test
@@ -192,11 +198,16 @@ public class LdapConnectorSSLTLSIT {
         Assertions.assertThatThrownBy(() -> ldapConnector.connect(request)).isNotNull();
     }
 
-    private void assertConnectionSuccess(LdapTestConfigRequest request) throws KeyStoreException, LdapException, NoSuchAlgorithmException, IOException {
-        try (final LdapNetworkConnection connection = ldapConnector.connect(request)) {
-            assertThat(connection.isAuthenticated()).isTrue();
+    private void assertConnectionSuccess(LdapTestConfigRequest request) throws GeneralSecurityException, IOException, LDAPException {
+        try (final LDAPConnection connection = ldapConnector.connect(request)) {
+            assertThat(connection.getLastBindRequest()).isNotNull();
             assertThat(connection.isConnected()).isTrue();
-            assertThat(connection.isSecured()).isTrue();
+            if (request.useStartTls()) {
+                assertThat(connection.getStartTLSRequest()).isNotNull();
+                assertThat(connection.getSSLSession()).isNotNull();
+            } else {
+                assertThat(connection.getSSLSession()).isNotNull();
+            }
         }
     }
 
@@ -225,7 +236,7 @@ public class LdapConnectorSSLTLSIT {
     }
 
     private static String customCerts() {
-        final URL resourceUrl = LdapConnectorSSLTLSIT.class.getResource(LOCAL_CERTS_PATH);
+        final URL resourceUrl = UnboundLdapConnectorSSLTLSIT.class.getResource(LOCAL_CERTS_PATH);
         try {
             final File file = Paths.get(resourceUrl.toURI()).toFile();
             return file.getAbsolutePath();

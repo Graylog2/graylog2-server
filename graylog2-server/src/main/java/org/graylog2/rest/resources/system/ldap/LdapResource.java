@@ -17,13 +17,13 @@
 package org.graylog2.rest.resources.system.ldap;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableSet;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.directory.api.ldap.model.cursor.CursorException;
-import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -35,9 +35,9 @@ import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.models.system.ldap.responses.LdapSettingsResponse;
 import org.graylog2.rest.models.system.ldap.responses.LdapTestConfigResponse;
 import org.graylog2.security.TrustAllX509TrustManager;
-import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.UnboundLdapConnector;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
@@ -59,8 +59,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -83,7 +83,7 @@ public class LdapResource extends RestResource {
     private LdapSettingsImpl.Factory ldapSettingsFactory;
 
     @Inject
-    private LdapConnector ldapConnector;
+    private UnboundLdapConnector ldapConnector;
 
     @GET
     @Timed
@@ -127,7 +127,7 @@ public class LdapResource extends RestResource {
     public LdapTestConfigResponse testLdapConfiguration(@ApiParam(name = "Configuration to test", required = true)
                                                         @Valid @NotNull LdapTestConfigRequest request) {
 
-        LdapNetworkConnection connection = null;
+        LDAPConnection connection = null;
         try {
             try {
                 connection = ldapConnector.connect(request);
@@ -144,7 +144,7 @@ public class LdapResource extends RestResource {
             }
 
             boolean connected = connection.isConnected();
-            boolean systemAuthenticated = connection.isAuthenticated();
+            boolean systemAuthenticated = connection.getLastBindRequest() != null;
 
             // the web interface allows testing the connection only, in that case we can bail out early.
             if (request.testConnectOnly()) {
@@ -172,7 +172,7 @@ public class LdapResource extends RestResource {
                     entryMap = entry.getAttributes();
                     groups = entry.getGroups();
                 }
-            } catch (CursorException | LdapException e) {
+            } catch (LDAPException e) {
                 exception = e.getMessage();
             }
 
@@ -185,11 +185,7 @@ public class LdapResource extends RestResource {
             return LdapTestConfigResponse.create(connected, systemAuthenticated, loginAuthenticated, entryMap, groups, exception);
         } finally {
             if (connection != null) {
-                try {
-                    connection.close();
-                } catch (IOException e) {
-                    LOG.warn("Unable to close LDAP connection.", e);
-                }
+                connection.close();
             }
         }
     }
@@ -271,6 +267,7 @@ public class LdapResource extends RestResource {
     @RequiresPermissions(RestPermissions.LDAPGROUPS_READ)
     @Path("/groups")
     @Produces(MediaType.APPLICATION_JSON)
+    // TODO move this
     public Set<String> readGroups(){
         final LdapSettings ldapSettings = firstNonNull(ldapSettingsService.load(), ldapSettingsFactory.createEmpty());
 
@@ -297,13 +294,9 @@ public class LdapResource extends RestResource {
             config.setCredentials(ldapSettings.getSystemPassword());
         }
 
-        try (LdapNetworkConnection connection = ldapConnector.connect(config)) {
-            return ldapConnector.listGroups(connection,
-                                            ldapSettings.getGroupSearchBase(),
-                                            ldapSettings.getGroupSearchPattern(),
-                                            ldapSettings.getGroupIdAttribute()
-            );
-        } catch (IOException | LdapException e) {
+        try (LDAPConnection connection = ldapConnector.connect(ldapSettings)) {
+            return ImmutableSet.of();
+        } catch (GeneralSecurityException | LDAPException e) {
             LOG.error("Unable to retrieve available LDAP groups", e);
             throw new InternalServerErrorException("Unable to retrieve available LDAP groups", e);
         }

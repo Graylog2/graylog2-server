@@ -63,6 +63,7 @@ import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
+import org.graylog2.security.ldap.UnboundLdapConnector;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
 import org.graylog2.security.realm.LdapUserAuthenticator;
@@ -159,6 +160,7 @@ public class ServerBindings extends Graylog2Module {
 
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(LdapConnector.class).in(Scopes.SINGLETON);
+        bind(UnboundLdapConnector.class).in(Scopes.SINGLETON);
         bind(LdapUserAuthenticator.class).in(Scopes.SINGLETON);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);

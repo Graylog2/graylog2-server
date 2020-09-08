@@ -17,7 +17,7 @@
 package org.graylog2.security.token;
 
 import org.graylog2.Configuration;
-import org.graylog2.security.AccessTokenCipher;
+import org.graylog2.security.AESToolsService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,11 +28,11 @@ import org.mockito.junit.MockitoRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class AccessTokenCipherTest {
+public class AESToolsServiceTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private AccessTokenCipher cipher;
+    private AESToolsService cipher;
 
     @Mock
     Configuration configuration;
@@ -41,7 +41,7 @@ public class AccessTokenCipherTest {
     public void setUp() throws Exception {
         when(configuration.getPasswordSecret()).thenReturn("0123456789ABCDEF");
 
-        cipher = new AccessTokenCipher(configuration);
+        cipher = new AESToolsService(configuration);
     }
 
     @Test

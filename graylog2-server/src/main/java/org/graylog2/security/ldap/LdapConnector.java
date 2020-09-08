@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -76,17 +75,13 @@ public class LdapConnector {
     private final int connectionTimeout;
     private final Set<String> enabledTlsProtocols;
     private final LdapSettingsService ldapSettingsService;
-    private final TrustManagerProvider trustManagerProvider;
-
-    public interface TrustManagerProvider {
-        TrustManager create(String host) throws KeyStoreException, NoSuchAlgorithmException;
-    }
+    private final UnboundLdapConnector.TrustManagerProvider trustManagerProvider;
 
     @Inject
     public LdapConnector(@Named("ldap_connection_timeout") int connectionTimeout,
                          @Named("enabled_tls_protocols") Set<String> enabledTlsProtocols,
                          LdapSettingsService ldapSettingsService,
-                         TrustManagerProvider trustManagerProvider) {
+                         UnboundLdapConnector.TrustManagerProvider trustManagerProvider) {
         this.connectionTimeout = connectionTimeout;
         this.enabledTlsProtocols = enabledTlsProtocols;
         this.ldapSettingsService = ldapSettingsService;

@@ -49,12 +49,12 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
-    private final AccessTokenCipher cipher;
+    private final AESToolsService cipher;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, AESToolsService AESToolsService) {
         super(mongoConnection);
-        this.cipher = accessTokenCipher;
+        this.cipher = AESToolsService;
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
     }
 

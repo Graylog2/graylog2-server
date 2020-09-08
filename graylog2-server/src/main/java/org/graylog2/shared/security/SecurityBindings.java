@@ -23,7 +23,7 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.models.system.sessions.responses.DefaultSessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.security.DefaultX509TrustManager;
-import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.UnboundLdapConnector;
 
 import javax.net.ssl.TrustManager;
 
@@ -36,7 +36,7 @@ public class SecurityBindings extends PluginModule {
 
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
-                .build(LdapConnector.TrustManagerProvider.class));
+                .build(UnboundLdapConnector.TrustManagerProvider.class));
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                       .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);

@@ -23,12 +23,12 @@ import javax.inject.Inject;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class AccessTokenCipher {
+public class AESToolsService {
 
     private final byte[] encryptionKey;
 
     @Inject
-    public AccessTokenCipher(Configuration configuration) {
+    public AESToolsService(Configuration configuration) {
         // The password secret is only required to be at least 16 bytes long. Since the encryptSiv/decryptSiv methods
         // in AESTools require an encryption key that is at least 32 bytes long, we create a hash of the value.
         encryptionKey = Hashing.sha256().hashString(configuration.getPasswordSecret(), UTF_8).asBytes();

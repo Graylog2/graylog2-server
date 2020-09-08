@@ -36,9 +36,10 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.graylog2.ApacheDirectoryTestServiceFactory;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.AESToolsService;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.UnboundLdapConnector;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -49,6 +50,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import java.net.URI;
 import java.util.Collections;
@@ -104,7 +106,7 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
     private static final AuthenticationToken INVALID_TOKEN = new UsernamePasswordToken("john", "__invalid__");
     private static final String PASSWORD_SECRET = "r8Om85b0zgHmiGsK86T3ZFlmSIdMd3hcKmOa4T60MSPEobfRCTLNOK4T91GdHbGx";
 
-    private LdapConnector ldapConnector;
+    private UnboundLdapConnector ldapConnector;
     private LdapServer server;
     private LdapSettingsService ldapSettingsService;
     private LdapSettings ldapSettings;
@@ -124,8 +126,11 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
         configuration = mock(Configuration.class);
         when(configuration.getPasswordSecret()).thenReturn(PASSWORD_SECRET);
 
+        final AESToolsService aesToolsService = mock(AESToolsService.class);
+        Mockito.when(aesToolsService.encrypt(anyString())).thenAnswer((s) -> s.getArgument(0));
+        Mockito.when(aesToolsService.decrypt(anyString())).thenAnswer((s) -> s.getArgument(0));
         ldapSettingsService = mock(LdapSettingsService.class);
-        ldapConnector = new LdapConnector(10000, ENABLED_TLS_PROTOCOLS, ldapSettingsService, (host) -> null);
+        ldapConnector = new UnboundLdapConnector(10000, ENABLED_TLS_PROTOCOLS, ldapSettingsService, (host) -> null, aesToolsService);
         userService = mock(UserService.class);
 
         ldapSettings = new LdapSettingsImpl(configuration, mock(RoleService.class));

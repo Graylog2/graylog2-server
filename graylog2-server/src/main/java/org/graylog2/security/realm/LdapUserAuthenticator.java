@@ -18,9 +18,8 @@ package org.graylog2.security.realm;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.apache.directory.api.ldap.model.cursor.CursorException;
-import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -31,8 +30,8 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.UnboundLdapConnector;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
@@ -47,8 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.security.GeneralSecurityException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +58,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(LdapUserAuthenticator.class);
     public static final String NAME = "legacy-ldap";
 
-    private final LdapConnector ldapConnector;
+    private final UnboundLdapConnector ldapConnector;
 
     private final LdapSettingsService ldapSettingsService;
     private final RoleService roleService;
@@ -68,7 +66,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     private final UserService userService;
 
     @Inject
-    LdapUserAuthenticator(LdapConnector ldapConnector,
+    LdapUserAuthenticator(UnboundLdapConnector ldapConnector,
                           LdapSettingsService ldapSettingsService,
                           UserService userService,
                           RoleService roleService,
@@ -103,10 +101,10 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             LOG.debug("Principal or password were empty. Not trying to look up a token in LDAP.");
             return null;
         }
-        try (final LdapNetworkConnection connection = openLdapConnection(ldapSettings)) {
+        try (final LDAPConnection connection = openLdapConnection(ldapSettings)) {
             if (null == connection) {
                 LOG.error("Couldn't connect to LDAP directory");
-                return null;
+                throw new AuthenticationServiceUnavailableException("Couldn't connect to LDAP directory");
             }
             final LdapEntry userEntry = searchLdapUser(connection, principal, ldapSettings);
             if (userEntry == null) {
@@ -131,23 +129,17 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             }
 
             return new SimpleAccount(principal, null, "ldap realm");
-        } catch (LdapException e) {
-            LOG.error("LDAP error", e);
-            throw new AuthenticationServiceUnavailableException("LDAP error", e);
-        } catch (CursorException e) {
-            LOG.error("Unable to read LDAP entry", e);
-            throw new AuthenticationServiceUnavailableException("Unable to read LDAP entry", e);
         } catch (Exception e) {
             LOG.error("Error during LDAP user account sync. Cannot log in user {}", principal, e);
             return null;
         }
     }
 
-    protected LdapNetworkConnection openLdapConnection(LdapSettings ldapSettings) throws LdapException, KeyStoreException, NoSuchAlgorithmException {
+    protected LDAPConnection openLdapConnection(LdapSettings ldapSettings) throws GeneralSecurityException, LDAPException {
         return ldapConnector.connect(ldapSettings);
     }
 
-    protected LdapEntry searchLdapUser(LdapNetworkConnection connection, String principal, LdapSettings ldapSettings) throws LdapException, CursorException {
+    protected LdapEntry searchLdapUser(LDAPConnection connection, String principal, LdapSettings ldapSettings) throws LDAPException {
         return ldapConnector.search(connection,
                 ldapSettings.getSearchBase(),
                 ldapSettings.getSearchPattern(),
@@ -179,7 +171,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             LOG.debug("Principal was empty. Not trying to sync user with LDAP.");
             return null;
         }
-        try (final LdapNetworkConnection connection = openLdapConnection(ldapSettings)) {
+        try (final LDAPConnection connection = openLdapConnection(ldapSettings)) {
             if (null == connection) {
                 LOG.error("Couldn't connect to LDAP directory");
                 return null;
@@ -199,10 +191,6 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             }
 
             return user;
-        } catch (LdapException e) {
-            LOG.error("LDAP error", e);
-        } catch (CursorException e) {
-            LOG.error("Unable to read LDAP entry", e);
         } catch (Exception e) {
             LOG.error("Error during LDAP user account sync. Cannot sync user {}", principal, e);
         }
