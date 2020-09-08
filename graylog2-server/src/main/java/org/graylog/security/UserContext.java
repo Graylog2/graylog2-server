@@ -18,6 +18,7 @@ package org.graylog.security;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
+import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
@@ -121,6 +122,14 @@ public class UserContext {
 
     protected boolean isOwner(GRN entity) {
         return subject.isPermitted(GRNPermission.create(RestPermissions.ENTITY_OWN, entity));
+    }
+
+    /**
+     * Checks if the user is permitted to do everything
+     * @return The check result
+     */
+    public boolean hasAllPermission() {
+        return subject.isPermitted(new AllPermission());
     }
 
     public boolean isPermitted(String permission, GRN target) {
