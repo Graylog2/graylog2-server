@@ -69,13 +69,13 @@ abstract class Pivot implements SearchType {
     @AutoValue.Builder
     static abstract class Builder {
 
-        abstract Builder id(@Nullable String id);
+        abstract Builder id(String id);
 
         abstract Builder name(@Nullable String name);
 
-        abstract Builder rowGroups(@Nullable List<BucketSpec> rowGroups);
+        abstract Builder rowGroups(List<BucketSpec> rowGroups);
 
-        abstract Builder columnGroups(@Nullable List<BucketSpec> columnGroups);
+        abstract Builder columnGroups(List<BucketSpec> columnGroups);
 
         abstract Builder series(List<SeriesSpec> series);
 

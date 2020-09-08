@@ -118,10 +118,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder name(@Nullable String name);
 
         @JsonProperty("row_groups")
-        public abstract Builder rowGroups(@Nullable List<BucketSpec> rowGroups);
+        public abstract Builder rowGroups(List<BucketSpec> rowGroups);
 
         @JsonProperty("column_groups")
-        public abstract Builder columnGroups(@Nullable List<BucketSpec> columnGroups);
+        public abstract Builder columnGroups(List<BucketSpec> columnGroups);
 
         @JsonProperty
         public abstract Builder series(List<SeriesSpec> series);

@@ -52,7 +52,7 @@ public abstract class Sum implements SeriesSpec {
         public static Builder create() { return Sum.builder(); }
 
         @JsonProperty
-        public abstract Builder id(@Nullable String id);
+        public abstract Builder id(String id);
 
         @JsonProperty
         public abstract Builder field(String field);
