@@ -45,9 +45,16 @@ PluginStore.register(new PluginManifest({}, {
       component: AccessTokenConfig,
     },
   ],
-  authenticationServices: {
-    name: 'ldap',
-    displayName: 'LDAP',
-    setupComponent: ServiceCreateLDAP,
-  },
+  authenticationServices: [
+    {
+      name: 'ldap',
+      displayName: 'LDAP',
+      setupComponent: ServiceCreateLDAP,
+    },
+    {
+      name: 'active-directory',
+      displayName: 'Active Directory',
+      setupComponent: 'Hello world',
+    },
+  ],
 }));

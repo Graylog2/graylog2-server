@@ -28,6 +28,9 @@ const FormUtils = {
 
     input.dispatchEvent(event);
   },
+  validation: {
+    isRequired: (field) => (value) => (!value ? `The ${field} is required` : undefined),
+  },
 };
 
 export default FormUtils;

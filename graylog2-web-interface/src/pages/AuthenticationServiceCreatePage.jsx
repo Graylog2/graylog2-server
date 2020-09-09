@@ -14,8 +14,6 @@ const AuthenticationServiceCreatePage = ({ params: { name } }: Props) => {
   const authServices = PluginStore.exports('authenticationServices') || [];
   const authSerivce = authServices.find((service) => service.name === name);
 
-  console.log(PluginStore.get());
-
   if (!authSerivce) {
     return `No authentication service configrued for "${name}"`;
   }
