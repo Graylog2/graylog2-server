@@ -3,9 +3,8 @@ import loadAsync from 'routing/loadAsync';
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
-const AuthenticationPage = loadAsync(() => import('./authentication/AuthenticationPage'));
-const AuthenticationCreateLDAPPage = loadAsync(() => import('./authentication/ServiceCreateLDAPPage'));
-const AuthenticationCreateADPage = loadAsync(() => import('./authentication/ServiceCreateADPage'));
+const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
+const AuthenticationServiceCreatePage = loadAsync(() => import('./AuthenticationServiceCreatePage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -85,8 +84,7 @@ export {
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
-  AuthenticationCreateLDAPPage,
-  AuthenticationCreateADPage,
+  AuthenticationServiceCreatePage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,

@@ -80,8 +80,7 @@ const Routes = {
         LIST: '/system/authentication/users',
       },
       PROVIDERS: {
-        CREATE_LDAP: '/system/authentication/create/ldap',
-        CREATE_AD: '/system/authentication/create/active-directory',
+        CREATE: (name) => `/system/authentication/create/${name}`,
         edit: (id) => `/system/authentication/edit/${id}`,
         CONFIG: '/system/authentication/config',
         provider: (name) => `/system/authentication/config/${name}`,

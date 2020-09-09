@@ -3,6 +3,9 @@ import * as React from 'react';
 import { useState } from 'react';
 import URI from 'urijs';
 
+import DocsHelper from 'util/DocsHelper';
+import PageHeader from 'components/common/PageHeader';
+import DocumentationLink from 'components/support/DocumentationLink';
 import Wizard, { type Step } from 'components/common/Wizard';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
@@ -40,8 +43,6 @@ const ServiceCreateLDAP = () => {
   const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => setStepsState({ ...stepsState, activeStepKey: stepKey });
 
   const _handleSubmitAll = () => {
-    console.log('test', isServerConfigValid, isUserSyncSettingValid);
-
     if (isServerConfigValid && isUserSyncSettingValid) {
       const { serverConfig, userSync } = stepsState.formValues;
       // Temporary until we defined the correct request payload
@@ -123,20 +124,29 @@ const ServiceCreateLDAP = () => {
   ];
 
   return (
-    <ServiceStepsContext.Provider value={{ ...stepsState, setStepsState }}>
-      <ServiceStepsContext.Consumer>
-        {({ activeStepKey: activeStep }) => (
-          <Wizard horizontal
-                  justified
-                  activeStep={activeStep}
-                  onStepChange={_handleStepChange}
-                  hidePreviousNextButtons
-                  steps={wizardSteps}>
-            <SidebarServerResponse />
-          </Wizard>
-        )}
-      </ServiceStepsContext.Consumer>
-    </ServiceStepsContext.Provider>
+    <>
+      <PageHeader title="Create LDAP Authentication Provider">
+        <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+        <span>
+          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                             text="documentation" />.
+        </span>
+      </PageHeader>
+      <ServiceStepsContext.Provider value={{ ...stepsState, setStepsState }}>
+        <ServiceStepsContext.Consumer>
+          {({ activeStepKey: activeStep }) => (
+            <Wizard horizontal
+                    justified
+                    activeStep={activeStep}
+                    onStepChange={_handleStepChange}
+                    hidePreviousNextButtons
+                    steps={wizardSteps}>
+              <SidebarServerResponse />
+            </Wizard>
+          )}
+        </ServiceStepsContext.Consumer>
+      </ServiceStepsContext.Provider>
+    </>
   );
 };
 

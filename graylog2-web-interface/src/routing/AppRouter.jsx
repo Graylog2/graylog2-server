@@ -14,8 +14,7 @@ import {
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
-  AuthenticationCreateLDAPPage,
-  AuthenticationCreateADPage,
+  AuthenticationServiceCreatePage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateContentPackPage,
@@ -211,8 +210,7 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_LDAP} component={AuthenticationCreateLDAPPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_AD} component={AuthenticationCreateADPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE(':name')} component={AuthenticationServiceCreatePage} />
 
               <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
               <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />

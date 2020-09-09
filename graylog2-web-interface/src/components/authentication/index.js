@@ -5,6 +5,7 @@ import MongoDbSessionConfig from './MongoDbSessionConfig';
 import LegacyLdapConfig from './LegacyLdapConfig';
 import RootUserConfig from './RootUserConfig';
 import AccessTokenConfig from './AccessTokenConfig';
+import ServiceCreateLDAP from './ServiceCreateLDAP';
 
 PluginStore.register(new PluginManifest({}, {
   authenticatorConfigurations: [
@@ -44,4 +45,9 @@ PluginStore.register(new PluginManifest({}, {
       component: AccessTokenConfig,
     },
   ],
+  authenticationServices: {
+    name: 'ldap',
+    displayName: 'LDAP',
+    setupComponent: ServiceCreateLDAP,
+  },
 }));
