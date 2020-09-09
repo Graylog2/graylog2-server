@@ -30,6 +30,7 @@ const inputProps = (value) => {
   return { value: value ?? '' };
 };
 
+/** Wraps the common Input component with a formik Field */
 const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
   <Field name={name} validate={validate}>
     {({ field: { value, onChange }, meta: { error } }) => {

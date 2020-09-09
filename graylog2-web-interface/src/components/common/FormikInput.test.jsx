@@ -10,12 +10,10 @@ type FormValues = { [string]: mixed };
 describe('<FormikInput />', () => {
   const SimpleForm = ({ children, onSubmit, initialValues }: { children: React.Node, onSubmit: (FormValues) => Promise<void>, initialValues?: FormValues}) => (
     <Formik onSubmit={(data) => onSubmit(data)} initialValues={initialValues}>
-      {() => (
-        <Form>
-          {children}
-          <button type="submit">Submit Form</button>
-        </Form>
-      )}
+      <Form>
+        {children}
+        <button type="submit">Submit Form</button>
+      </Form>
     </Formik>
   );
 

@@ -11,6 +11,7 @@ type Props = {
   validate?: (string) => ?string,
 };
 
+/** Displays the FormikInput with a specific layout */
 const FormikFormGroup = ({ label, name, type, help, validate, ...rest }: Props) => (
   <FormikInput {...rest}
                help={help}
