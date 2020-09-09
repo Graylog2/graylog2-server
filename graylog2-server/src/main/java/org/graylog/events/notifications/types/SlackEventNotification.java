@@ -92,6 +92,9 @@ public class SlackEventNotification implements EventNotification {
 	@Override
 	public void execute(EventNotificationContext ctx) throws PermanentEventNotificationException {
 		final SlackEventNotificationConfig config = (SlackEventNotificationConfig) ctx.notificationConfig();
+		// TODO: 9/8/20  - use this.slackClient
+        //
+        SlackClient slackClient = new SlackClient(config);
 
 		try {
 			SlackMessage slackMessage = createSlackMessage(ctx, config);
@@ -198,6 +201,21 @@ public class SlackEventNotification implements EventNotification {
 				.stream()
 				.map(stream -> buildStreamWithUrl(stream, ctx, config))
 				.collect(Collectors.toList());
+
+		// TODO: 9/8/20
+        /**
+         *
+         It looks like we are duplicating a lot of code from EventNotificationModelData in the CustomMessageModelData
+         and BacklogItemModelData value objects to expose some more attributes to the slack message template.
+         Both objects then get converted into a Map<String, Object> immediately. wink
+
+         How about using the regular EventNotificationModelData,
+         convert that into a Map<String, Object> and then manually add the additional attributes we need?
+         That way we would save a lot of duplicated code.
+
+         Also, if we add additional attributes here that would also be useful for all notifications,
+         we can think about extending EventNotificationModelData.
+         */
 
 		CustomMessageModelData modelData = CustomMessageModelData.builder()
 				.eventDefinition(definitionDto)

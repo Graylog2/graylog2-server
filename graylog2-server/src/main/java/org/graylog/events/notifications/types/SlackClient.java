@@ -17,11 +17,13 @@
 package org.graylog.events.notifications.types;
 
 
+import okhttp3.OkHttpClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -41,11 +43,33 @@ public class SlackClient {
 
 	private final String webhookUrl;
 	private final String proxyURL;
+    private final OkHttpClient httpClient;
 
-	public SlackClient(SlackEventNotificationConfig configuration) {
+
+    public SlackClient(SlackEventNotificationConfig configuration) {
+        this.webhookUrl = configuration.webhookUrl();
+        this.proxyURL = configuration.proxy();
+        this.httpClient = null;
+    }
+
+
+    @Inject
+	public SlackClient(SlackEventNotificationConfig configuration,OkHttpClient httpClient) {
 		this.webhookUrl = configuration.webhookUrl();
 		this.proxyURL = configuration.proxy();
+		this.httpClient = httpClient;
 	}
+
+
+
+    // TODO: 9/8/20
+    //We usually use okhttp for all HTTP connections so I think we should inject an OkHttpClient instance here
+    // and use that instead of the Java core HTTP client.
+    //This also has the benefit of automatic proxy configuration based on the settings in graylog.conf so the user
+    // doesn't need to configure the proxy server in the slack notification settings.
+    public void send1(SlackMessage message) throws SlackClientException {
+
+    }
 
 	public void send(SlackMessage message) throws SlackClientException {
 		final URL url;
