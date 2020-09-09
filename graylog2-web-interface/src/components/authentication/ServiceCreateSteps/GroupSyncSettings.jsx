@@ -4,7 +4,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
 type Props = {
-  onChange: (event: Event, values: any) => void,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
 };

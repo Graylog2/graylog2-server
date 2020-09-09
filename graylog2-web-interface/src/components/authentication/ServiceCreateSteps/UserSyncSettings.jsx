@@ -1,10 +1,12 @@
 // @flow strict
 import * as React from 'react';
-import { Formik, Form } from 'formik';
-import { useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { Formik, Form, Field } from 'formik';
 
-import { FormikFormGroup } from 'components/common';
-import { Button, ButtonToolbar } from 'components/graylog';
+import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
+import { FormikFormGroup, Select } from 'components/common';
+import { Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
+import { Input } from 'components/bootstrap';
 
 import ServiceStepsContext from '../contexts/ServiceStepsContext';
 
@@ -13,8 +15,9 @@ type Props = {
     searchBaseDN?: React.Node,
     searchPattern?: React.Node,
     displayNameAttribute?: React.Node,
+    defaultRoles?: React.Node,
   },
-  onChange: (event: Event, values: any) => void,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
 };
@@ -37,14 +40,29 @@ const defaultHelp = {
       Try to load a test user using the form below, if you are unsure which attribute to use.
     </span>
   ),
+  defaultRoles: (
+    'The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.'
+  ),
 };
 
 const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
+  const [rolesOptions, setRolesOptions] = useState([]);
+
+  useEffect(() => {
+    const getUnlimited = [1, 0, ''];
+
+    AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((roles) => {
+      if (roles) {
+        const options = roles.list.map((role) => ({ label: role.name, value: role.name }));
+        setRolesOptions(options);
+      }
+    });
+  }, []);
 
   return (
-    <Formik initialValues={stepsState?.formValues?.['user-mapping']} onSubmit={() => onSubmit('group-mapping')}>
+    <Formik initialValues={stepsState?.formValues?.userSync} onSubmit={() => onSubmit('groupSync')}>
       {({ isSubmitting, isValid, values }) => (
         <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
           <FormikFormGroup label="Search Base DN"
@@ -65,16 +83,41 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
                            required
                            help={help.displayNameAttribute} />
 
+          <Row>
+            <Col sm={9} smOffset={3}>
+              <Panel bsStyle="info">
+                Changing the static role assignment will only affect to new users created via LDAP/Active Directory!<br />
+                Existing user accounts will be updated on their next login, or if you edit their roles manually.
+              </Panel>
+            </Col>
+          </Row>
+
+          <Field name="defaultRoles">
+            {({ field: { name, value, onChange: onFieldChange } }) => (
+              <Input id="default-roles-select"
+                     label="Default Roles"
+                     help={help.defaultRoles}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <Select inputProps={{ 'aria-label': 'Search for roles' }}
+                        onChange={(roleName) => onFieldChange({ target: { value: roleName, name } })}
+                        options={rolesOptions}
+                        placeholder="Search for roles"
+                        multi
+                        value={value} />
+              </Input>
+            )}
+          </Field>
+
           <ButtonToolbar className="pull-right">
             <Button type="button"
-                    onClick={() => onSubmitAll()}
                     disabled={!isValid || isSubmitting}>
               Finish & Save Identity Provider
             </Button>
             <Button bsStyle="primary"
                     type="submit"
                     disabled={!isValid || isSubmitting}>
-              Setup Group Mapping
+              Next: Group Synchronisation
             </Button>
           </ButtonToolbar>
         </Form>

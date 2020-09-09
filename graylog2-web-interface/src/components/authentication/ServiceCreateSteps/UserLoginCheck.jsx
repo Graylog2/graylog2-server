@@ -104,7 +104,7 @@ const _formatLoginStatus = ({ password }, loading, success, error, result) => {
 
 const UserLoginCheck = () => {
   const [{ loading, success, error, result }, setLoginStatus] = useState({ loading: false, success: false, error: undefined, result: undefined });
-  const { formValues: { 'server-configuration': serverConfig, 'user-mapping': userMapping } } = useContext(ServiceStepsContext);
+  const { formValues: { serverConfig, userSync } } = useContext(ServiceStepsContext);
 
   const _handleLoginCheck = ({ username, password }) => {
     setLoginStatus({ loading: true, error: undefined, success: false, result: undefined });
@@ -114,7 +114,7 @@ const UserLoginCheck = () => {
       active_directory: false,
       additional_default_groups: [],
       default_group: 'Reader',
-      display_name_attribute: userMapping.displayNameAttribute,
+      display_name_attribute: userSync.displayNameAttribute,
       enabled: true,
       group_id_attribute: '',
       group_mapping: {},
@@ -160,11 +160,11 @@ const UserLoginCheck = () => {
         {({ isSubmitting, isValid, values }) => (
           <Form className="form">
             <Row>
-              <Col sm="6">
+              <Col sm={6}>
                 <FormikInput label="Username"
                              name="username" />
               </Col>
-              <Col sm="6">
+              <Col sm={6}>
                 <FormikInput label="Password"
                              name="password" />
               </Col>

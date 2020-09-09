@@ -17,7 +17,7 @@ export const defaultServiceSteps = {
   activeStepKey: undefined,
   formValues: {
     serverConfig: {},
-    userMapping: {},
+    userSync: {},
   },
 };
 

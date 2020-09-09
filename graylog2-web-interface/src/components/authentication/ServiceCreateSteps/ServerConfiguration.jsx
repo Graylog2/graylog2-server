@@ -17,7 +17,7 @@ type Props = {
   },
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
-  onChange: (stepKey: string, event: Event, values: any) => void,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
 };
 
 const ProtocolOptions = styled.div`
@@ -42,7 +42,7 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={stepsState?.formValues?.['server-configuration']} onSubmit={() => onSubmit('user-mapping')}>
+    <Formik initialValues={stepsState?.formValues?.serverConfig} onSubmit={() => onSubmit('userSync')}>
       {({ isSubmitting, isValid, values }) => (
         <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
           <Input id="uri-host"
@@ -101,15 +101,10 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
                            help={help.systemPassword} />
 
           <ButtonToolbar className="pull-right">
-            <Button type="button"
-                    onClick={() => onSubmitAll()}
-                    disabled={!isValid || isSubmitting}>
-              Finish & Save Identity Provider
-            </Button>
             <Button bsStyle="primary"
                     type="submit"
                     disabled={!isValid || isSubmitting}>
-              Setup User Mapping
+              Next: User Synchronisation
             </Button>
           </ButtonToolbar>
 

@@ -1,21 +1,28 @@
 // @flow strict
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
 import { PanelGroup, Panel } from 'components/graylog';
 
 import ServerConnectionCheck from './ServerConnectionCheck';
 import UserLoginCheck from './UserLoginCheck';
 
+import ServiceStepsContext from '../contexts/ServiceStepsContext';
+
 const SidebarConnectionCheck = () => {
-  const [activeKey, setActiveKey] = useState();
+  const [activeKey, setActiveKey] = useState('serverConfig');
+  const { setStepsState, ...stepsState } = useContext(ServiceStepsContext);
+
+  useEffect(() => {
+    setActiveKey(stepsState.activeStepKey);
+  }, [stepsState.activeStepKey]);
 
   return (
     <PanelGroup accordion
                 activeKey={activeKey}
                 id="sidebar-server-response"
                 onSelect={setActiveKey}>
-      <Panel eventKey="1">
+      <Panel eventKey="serverConfig">
         <Panel.Heading>
           <Panel.Title toggle>Connection Check</Panel.Title>
         </Panel.Heading>
@@ -23,7 +30,7 @@ const SidebarConnectionCheck = () => {
           <ServerConnectionCheck />
         </Panel.Body>
       </Panel>
-      <Panel eventKey="2">
+      <Panel eventKey="userSync">
         <Panel.Heading>
           <Panel.Title toggle>User Login Test</Panel.Title>
         </Panel.Heading>
