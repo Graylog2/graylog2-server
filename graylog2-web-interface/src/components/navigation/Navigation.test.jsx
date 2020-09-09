@@ -174,5 +174,19 @@ describe('Navigation', () => {
     permissions                    | count | links
     ${[]}                          | ${5}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
+
+    it('should not show `Enterprise` item if user is lacking permissions', () => {
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={[]} />);
+
+      expect(wrapper.find('NavigationLink[description="Enterprise"]')).not.toExist();
+    });
+
+    it('should show `Enterprise` item if user has permission to read license', () => {
+      const wrapper = mount(<SimpleNavigation component={Navigation}
+                                              permissions={['licenseinfos:read']} />);
+
+      expect(wrapper.find('NavigationLink[description="Enterprise"]')).toExist();
+    });
   });
 });
