@@ -4,6 +4,7 @@ import { Field } from 'formik';
 import styled, { type StyledComponent, css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
+import type { ThemeInterface } from 'theme';
 
 const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
   width: 100%;
