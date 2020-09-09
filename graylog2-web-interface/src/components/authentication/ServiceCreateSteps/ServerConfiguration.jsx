@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
-import { FormikFormGroup, FormikField } from 'components/common';
+import { FormikFormGroup, FormikInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
 
@@ -52,12 +52,12 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
             <>
               <div className="input-group">
                 <span className="input-group-addon">ldap://</span>
-                <FormikField name="uriHost"
+                <FormikInput name="uriHost"
                              placeholder="Hostname"
                              formGroupClassName=""
                              required />
                 <span className="input-group-addon input-group-separator">:</span>
-                <FormikField type="number"
+                <FormikInput type="number"
                              name="uriPort"
                              min="1"
                              max="65535"
@@ -69,17 +69,17 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
               {/* checked={ldapUri.scheme() === 'ldaps'} ? */}
               <ProtocolOptions>
 
-                <FormikField type="checkbox"
+                <FormikInput type="checkbox"
                              name="useSSL"
                              formGroupClassName=""
                              label="SSL" />
 
-                <FormikField type="checkbox"
+                <FormikInput type="checkbox"
                              name="useStartTLS"
                              formGroupClassName=""
                              label="StartTLS" />
 
-                <FormikField type="checkbox"
+                <FormikInput type="checkbox"
                              name="trustAllCertificates"
                              formGroupClassName=""
                              label="Allow untrusted certificates" />

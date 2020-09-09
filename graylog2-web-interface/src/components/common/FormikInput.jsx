@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import { Field } from 'formik';
-
 import { Input } from 'components/bootstrap';
+import styled, { type StyledComponent } from 'styled-components';
 
 type Props = {
+  component: Field,
   label: string,
   name: string,
   type?: string,
@@ -23,8 +24,9 @@ const inputProps = (value) => {
 };
 
 /** Wraps the common Input component with a formik Field */
-const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
-  <Field name={name} validate={validate}>
+c
+  const FormikInput = ({ component: Component, label, name, type, help, validate, ...rest }: Props) => (
+  <Component name={name} validate={validate}>
     {({ field: { value, onChange }, meta: { error } }) => {
       const typeSepcificProps = type === 'checkbox' ? checkboxProps(value) : inputProps(value);
 
@@ -44,6 +46,7 @@ const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
 );
 
 FormikInput.defaultProps = {
+  component: Field,
   help: undefined,
   labelClassName: undefined,
   type: 'text',

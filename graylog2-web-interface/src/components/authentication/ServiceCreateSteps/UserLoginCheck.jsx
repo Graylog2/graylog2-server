@@ -5,7 +5,7 @@ import URI from 'urijs';
 import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormikField, Spinner, Icon } from 'components/common';
+import { FormikInput, Spinner, Icon } from 'components/common';
 import { Button, Row, Col, Panel } from 'components/graylog';
 import ActionsProvider from 'injection/ActionsProvider';
 import ObjectUtils from 'util/ObjectUtils';
@@ -161,11 +161,11 @@ const UserLoginCheck = () => {
           <Form className="form">
             <Row>
               <Col sm="6">
-                <FormikField label="Username"
+                <FormikInput label="Username"
                              name="username" />
               </Col>
               <Col sm="6">
-                <FormikField label="Password"
+                <FormikInput label="Password"
                              name="password" />
               </Col>
             </Row>
