@@ -38,6 +38,14 @@ const SidebarConnectionCheck = () => {
           <UserLoginCheck />
         </Panel.Body>
       </Panel>
+      <Panel eventKey="groupSync">
+        <Panel.Heading>
+          <Panel.Title toggle>Grouping Review</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body collapsible>
+          You will find information about grouping here.
+        </Panel.Body>
+      </Panel>
     </PanelGroup>
   );
 };
