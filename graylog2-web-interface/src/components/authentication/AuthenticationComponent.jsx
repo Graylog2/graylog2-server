@@ -50,7 +50,7 @@ const AuthenticationComponent = createReactClass({
   },
 
   componentDidMount() {
-    AuthenticationActions.load();
+    AuthenticationActions.legacyLoad();
 
     PluginStore.exports('authenticatorConfigurations').forEach((authConfig) => {
       this.authenticatorConfigurations[authConfig.name] = authConfig;
@@ -75,7 +75,7 @@ const AuthenticationComponent = createReactClass({
   },
 
   _onUpdateProviders(config) {
-    return AuthenticationActions.update('providers', config);
+    return AuthenticationActions.legacyUpdate('providers', config);
   },
 
   _contentComponent() {
