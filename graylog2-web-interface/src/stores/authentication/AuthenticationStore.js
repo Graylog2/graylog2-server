@@ -69,7 +69,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
         },
       });
 
-      AuthenticationActions.loadUsersPaginated.promise(promise);
+      AuthenticationActions.loadServicesPaginated.promise(promise);
 
       return promise;
     },

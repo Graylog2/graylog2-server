@@ -5,7 +5,8 @@ import MongoDbSessionConfig from './MongoDbSessionConfig';
 import LegacyLdapConfig from './LegacyLdapConfig';
 import RootUserConfig from './RootUserConfig';
 import AccessTokenConfig from './AccessTokenConfig';
-import ServiceCreateLDAP from './ServiceCreateLDAP';
+import ServiceCreateLDAP from './ldap/ServiceCreate';
+import ServiceSettingsLDAP from './ldap/ServiceSettings';
 
 PluginStore.register(new PluginManifest({}, {
   authenticatorConfigurations: [
@@ -50,7 +51,19 @@ PluginStore.register(new PluginManifest({}, {
       name: 'ldap',
       displayName: 'LDAP',
       createComponent: ServiceCreateLDAP,
-      // detailsComponent: ServiceSettingsLDAP,
+      detailsComponent: ServiceSettingsLDAP,
+      configMapJson: ({
+        default_groups: 'defaultGroups',
+        display_name_attribute: 'displayNameAttribute',
+        encrypted_system_password: 'encryptedSystemPassword',
+        server_uri: 'serverUri',
+        system_username: 'systemUsername',
+        trust_all_certificates: 'trustAllCertificates',
+        user_search_base: 'userSearchBase',
+        user_search_pattern: 'userSearchPattern',
+        use_start_tls: 'useStartTls',
+        use_ssl: 'useSsl',
+      }),
     },
     {
       name: 'active-directory',

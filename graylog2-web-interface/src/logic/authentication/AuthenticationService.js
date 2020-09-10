@@ -1,5 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import { invert } from 'lodash';
+
+import { getAuthServicePlugin } from 'util/AuthenticationService';
 
 type InternalState = {|
   id: string,
@@ -7,10 +10,7 @@ type InternalState = {|
   description: string,
   config: {
     type: string,
-    serverUri: string,
-    systemUsername: string,
-    encryptedSystemPassword: string,
-    userSearchPattern: string,
+    ...
   },
 |};
 
@@ -20,12 +20,36 @@ export type AuthenticationServiceJson = {|
   description: string,
   config: {
     type: string,
-    server_uri: string,
-    system_username: string,
-    encrypted_system_password: string,
-    user_search_pattern: string,
+    ...
   },
 |};
+
+const formatConfig = (config, keysMap) => {
+  const formattedConfig = {};
+
+  Object.entries(config).forEach(([key, value]) => {
+    const formattedKey = keysMap[key];
+
+    if (formattedKey) {
+      formattedConfig[formattedKey] = value;
+    } else {
+      formattedConfig[key] = value;
+    }
+  });
+};
+
+const configFromJson = (config: $PropertyType<AuthenticationServiceJson, 'config'>) => {
+  const authService = getAuthServicePlugin(config.type, true);
+
+  return formatConfig(config, authService.configFromJson);
+};
+
+const configToJson = (config: $PropertyType<AuthenticationServiceJson, 'config'>) => {
+  const authService = getAuthServicePlugin(config.type, true);
+  const configToJsonMap = invert(authService.configFromJson);
+
+  return formatConfig(config, configToJsonMap);
+};
 
 export default class AuthenticationService {
   _value: InternalState;
@@ -86,17 +110,13 @@ export default class AuthenticationService {
       config,
     } = this._value;
 
+    const formattedConfig = configToJson(config);
+
     return {
       id,
       title,
       description,
-      config: {
-        type: config.type,
-        server_uri: config.serverUri,
-        system_username: config.systemUsername,
-        encrypted_system_password: config.encryptedSystemPassword,
-        user_search_pattern: config.userSearchPattern,
-      },
+      config: formattedConfig,
     };
   }
 
@@ -109,18 +129,14 @@ export default class AuthenticationService {
       config,
     } = value;
 
+    const formattedConfig = configFromJson(config);
+
     /* eslint-enable camelcase */
     return new AuthenticationService(
       id,
       title,
       description,
-      {
-        type: config.type,
-        serverUri: config.server_uri,
-        systemUsername: config.system_username,
-        encryptedSystemPassword: config.encrypted_system_password,
-        userSearchPattern: config.user_search_pattern,
-      },
+      formattedConfig,
     );
   }
 

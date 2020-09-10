@@ -19,7 +19,7 @@ import GroupSyncSettings from '../ServiceCreateSteps/GroupSyncSettings';
 
 const LdapActions = ActionsProvider.getActions('Ldap');
 
-const ServiceCreateLDAP = () => {
+const ServiceCreate = () => {
   const [stepsState, setStepsState] = useState({
     activeStepKey: 'serverConfig',
     formValues: {
@@ -150,4 +150,4 @@ const ServiceCreateLDAP = () => {
   );
 };
 
-export default ServiceCreateLDAP;
+export default ServiceCreate;

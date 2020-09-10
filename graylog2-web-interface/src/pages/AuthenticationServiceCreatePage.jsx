@@ -15,7 +15,7 @@ const AuthenticationServiceCreatePage = ({ params: { name } }: Props) => {
   const authSerivce = authServices.find((service) => service.name === name);
 
   if (!authSerivce) {
-    return `No authentication service configrued for "${name}"`;
+    return `No authentication service plugin configrued for "${name}"`;
   }
 
   const { createComponent: ServiceCreate } = authSerivce;
