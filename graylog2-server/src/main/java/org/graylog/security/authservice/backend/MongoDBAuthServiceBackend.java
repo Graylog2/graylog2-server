@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp.provider;
+package org.graylog.security.authservice.backend;
 
-import org.graylog.security.idp.IDPAuthCredentials;
-import org.graylog.security.idp.IdentityProvider;
-import org.graylog.security.idp.UserProfile;
-import org.graylog.security.idp.UserProfileProvisioner;
+import org.graylog.security.authservice.AuthServiceBackend;
+import org.graylog.security.authservice.AuthServiceCredentials;
+import org.graylog.security.authservice.UserProfile;
+import org.graylog.security.authservice.UserProfileProvisioner;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -30,20 +30,20 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Optional;
 
-public class MongoDBIdentityProvider implements IdentityProvider {
-    private static final Logger LOG = LoggerFactory.getLogger(MongoDBIdentityProvider.class);
+public class MongoDBAuthServiceBackend implements AuthServiceBackend {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDBAuthServiceBackend.class);
 
     private final UserService userService;
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
 
     @Inject
-    public MongoDBIdentityProvider(UserService userService, PasswordAlgorithmFactory passwordAlgorithmFactory) {
+    public MongoDBAuthServiceBackend(UserService userService, PasswordAlgorithmFactory passwordAlgorithmFactory) {
         this.userService = userService;
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
     }
 
     @Override
-    public Optional<UserProfile> authenticateAndProvision(IDPAuthCredentials authCredentials,
+    public Optional<UserProfile> authenticateAndProvision(AuthServiceCredentials authCredentials,
                                                           UserProfileProvisioner userProfileProvisioner) {
         final String username = authCredentials.username();
 
@@ -54,7 +54,7 @@ public class MongoDBIdentityProvider implements IdentityProvider {
             return Optional.empty();
         }
         if (user.isLocalAdmin()) {
-            throw new IllegalStateException("Local admin user should have been handled earlier and not reach the IdP authenticator");
+            throw new IllegalStateException("Local admin user should have been handled earlier and not reach the authentication service authenticator");
         }
 
         if (!isValidPassword(user, authCredentials.password())) {
@@ -68,8 +68,8 @@ public class MongoDBIdentityProvider implements IdentityProvider {
                 .username(user.getName())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
-                .idpBackend(providerId())
-                .idpGuid(user.getId())
+                .authServiceBackend(backendId())
+                .authServiceGuid(user.getId())
                 .build());
 
         return Optional.of(userProfile);
@@ -84,12 +84,12 @@ public class MongoDBIdentityProvider implements IdentityProvider {
     }
 
     @Override
-    public String providerId() {
+    public String backendId() {
         return "000000000000000000000001";
     }
 
     @Override
-    public String providerTitle() {
+    public String backendTitle() {
         return "Internal MongoDB";
     }
 }

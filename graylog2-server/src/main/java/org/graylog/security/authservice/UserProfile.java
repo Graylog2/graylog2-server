@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,8 +39,8 @@ public abstract class UserProfile {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_UID = "uid";
-    public static final String FIELD_IDP_BACKEND = "idp_backend";
-    public static final String FIELD_IDP_GUID = "idp_guid";
+    public static final String FIELD_AUTH_SERVICE_BACKEND = "auth_service_backend";
+    public static final String FIELD_AUTH_SERVICE_GUID = "auth_service_guid";
     public static final String FIELD_USERNAME = "username";
     public static final String FIELD_EMAIL = "email";
     public static final String FIELD_FULL_NAME = "full_name";
@@ -60,11 +60,11 @@ public abstract class UserProfile {
     @JsonProperty(FIELD_UID)
     public abstract String uid();
 
-    @JsonProperty(FIELD_IDP_BACKEND)
-    public abstract String idpBackend();
+    @JsonProperty(FIELD_AUTH_SERVICE_BACKEND)
+    public abstract String authServiceBackend();
 
-    @JsonProperty(FIELD_IDP_GUID)
-    public abstract String idpGuid();
+    @JsonProperty(FIELD_AUTH_SERVICE_GUID)
+    public abstract String authServiceGuid();
 
     @JsonProperty(FIELD_USERNAME)
     public abstract String username();
@@ -114,11 +114,11 @@ public abstract class UserProfile {
         @JsonProperty(FIELD_UID)
         public abstract Builder uid(String uid);
 
-        @JsonProperty(FIELD_IDP_BACKEND)
-        public abstract Builder idpBackend(String idpBackend);
+        @JsonProperty(FIELD_AUTH_SERVICE_BACKEND)
+        public abstract Builder authServiceBackend(String authServiceBackend);
 
-        @JsonProperty(FIELD_IDP_GUID)
-        public abstract Builder idpGuid(String idpGuid);
+        @JsonProperty(FIELD_AUTH_SERVICE_GUID)
+        public abstract Builder authServiceGuid(String authServiceGuid);
 
         @JsonProperty(FIELD_USERNAME)
         public abstract Builder username(String username);

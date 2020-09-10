@@ -24,9 +24,9 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.graylog.security.idp.IDPAuthCredentials;
-import org.graylog.security.idp.IDPAuthResult;
-import org.graylog.security.idp.IdentityProviderAuthenticator;
+import org.graylog.security.authservice.AuthServiceAuthenticator;
+import org.graylog.security.authservice.AuthServiceCredentials;
+import org.graylog.security.authservice.AuthServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,19 +34,19 @@ import javax.inject.Inject;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class IdentityProviderAuthenticatingRealm extends AuthenticatingRealm {
-    private static final Logger LOG = LoggerFactory.getLogger(IdentityProviderAuthenticatingRealm.class);
+public class AuthServiceRealm extends AuthenticatingRealm {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthServiceRealm.class);
 
-    public static final String NAME = "identity-provider";
+    public static final String NAME = "auth-service";
 
-    private final IdentityProviderAuthenticator authenticator;
+    private final AuthServiceAuthenticator authenticator;
 
     @Inject
-    public IdentityProviderAuthenticatingRealm(IdentityProviderAuthenticator authenticator) {
+    public AuthServiceRealm(AuthServiceAuthenticator authenticator) {
         this.authenticator = authenticator;
         setAuthenticationTokenClass(UsernamePasswordToken.class);
         setCachingEnabled(false);
-        // Credentials will be matched via the identity provider itself so we don't need Shiro to do it
+        // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
     }
 
@@ -63,21 +63,21 @@ public class IdentityProviderAuthenticatingRealm extends AuthenticatingRealm {
         final String password = String.valueOf(token.getPassword());
 
         if (isNullOrEmpty(username) || isNullOrEmpty(password)) {
-            LOG.error("Username or password were empty. Not attempting identity provider authentication");
+            LOG.error("Username or password were empty. Not attempting authentication service authentication");
             return null;
         }
 
         LOG.info("Attempting authentication for username <{}>", username);
         try {
-            final IDPAuthResult result = authenticator.authenticate(IDPAuthCredentials.create(username, password));
+            final AuthServiceResult result = authenticator.authenticate(AuthServiceCredentials.create(username, password));
 
             if (result.isSuccess()) {
-                LOG.info("Successfully authenticated username <{}> for user profile <{}> with provider <{}/{}>",
-                        result.username(), result.userProfileId(), result.providerTitle(), result.providerId());
+                LOG.info("Successfully authenticated username <{}> for user profile <{}> with backend <{}/{}>",
+                        result.username(), result.userProfileId(), result.backendTitle(), result.backendId());
                 return toAuthenticationInfo(result.userProfileId());
             } else {
-                LOG.warn("Failed to authenticate username <{}> with provider <{}/{}>",
-                        result.username(), result.providerTitle(), result.providerId());
+                LOG.warn("Failed to authenticate username <{}> with backend <{}/{}>",
+                        result.username(), result.backendTitle(), result.backendId());
                 return null;
             }
         } catch (Exception e) {
@@ -87,6 +87,6 @@ public class IdentityProviderAuthenticatingRealm extends AuthenticatingRealm {
     }
 
     private AuthenticationInfo toAuthenticationInfo(String principal) {
-        return new SimpleAccount(principal, null, "identity-provider");
+        return new SimpleAccount(principal, null, NAME);
     }
 }

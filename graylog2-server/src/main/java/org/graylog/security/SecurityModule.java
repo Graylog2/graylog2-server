@@ -18,9 +18,9 @@ package org.graylog.security;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog.security.idp.IdentityProvider;
-import org.graylog.security.idp.InternalIdentityProvider;
-import org.graylog.security.idp.provider.MongoDBIdentityProvider;
+import org.graylog.security.authservice.AuthServiceBackend;
+import org.graylog.security.authservice.InternalAuthServiceBackend;
+import org.graylog.security.authservice.backend.MongoDBAuthServiceBackend;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
@@ -39,7 +39,7 @@ public class SecurityModule extends PluginModule {
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
 
-        bind(IdentityProvider.class).annotatedWith(InternalIdentityProvider.class).to(MongoDBIdentityProvider.class);
+        bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 
         // Add all rest resources in this package
         // TODO: Check if we need to use addRestResource() here for the final version to make sure

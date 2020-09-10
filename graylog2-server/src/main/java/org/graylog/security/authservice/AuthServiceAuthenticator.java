@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
-public class IdentityProviderAuthenticator {
-    private final GlobalIdentityProviderConfig providerConfig;
+public class AuthServiceAuthenticator {
+    private final GlobalAuthServiceConfig authServiceConfig;
     private final UserProfileProvisioner userProfileProvisioner;
     private final UserService userService;
 
     @Inject
-    public IdentityProviderAuthenticator(GlobalIdentityProviderConfig providerConfig,
-                                         UserProfileProvisioner userProfileProvisioner,
-                                         UserService userService) {
-        this.providerConfig = providerConfig;
+    public AuthServiceAuthenticator(GlobalAuthServiceConfig authServiceConfig,
+                                    UserProfileProvisioner userProfileProvisioner,
+                                    UserService userService) {
+        this.authServiceConfig = authServiceConfig;
         this.userProfileProvisioner = userProfileProvisioner;
         this.userService = userService;
     }
@@ -41,33 +41,33 @@ public class IdentityProviderAuthenticator {
      * @param authCredentials the authentication credentials
      * @return the authenticated username
      */
-    public IDPAuthResult authenticate(IDPAuthCredentials authCredentials) {
-        final Optional<IdentityProvider> activeProvider = providerConfig.getActiveProvider();
+    public AuthServiceResult authenticate(AuthServiceCredentials authCredentials) {
+        final Optional<AuthServiceBackend> activeBackend = authServiceConfig.getActiveBackend();
 
-        // TODO: Investigate fallback to default provider?
-        if (activeProvider.isPresent()) {
-            return authenticate(authCredentials, activeProvider.get());
+        // TODO: Investigate fallback to default backend?
+        if (activeBackend.isPresent()) {
+            return authenticate(authCredentials, activeBackend.get());
         }
-        return authenticate(authCredentials, providerConfig.getDefaultProvider());
+        return authenticate(authCredentials, authServiceConfig.getDefaultBackend());
     }
 
-    private IDPAuthResult authenticate(IDPAuthCredentials authCredentials, IdentityProvider provider) {
-        final Optional<UserProfile> userProfile = provider.authenticateAndProvision(authCredentials, userProfileProvisioner);
+    private AuthServiceResult authenticate(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
+        final Optional<UserProfile> userProfile = backend.authenticateAndProvision(authCredentials, userProfileProvisioner);
 
         if (userProfile.isPresent()) {
-            return IDPAuthResult.builder()
+            return AuthServiceResult.builder()
                     .username(authCredentials.username())
                     //.userProfileId(userProfile.get().uid())
                     .userProfileId(userProfile.get().username()) // TODO: Switch to uid() once our session implementation can handle it
-                    .providerId(provider.providerId())
-                    .providerTitle(provider.providerTitle())
+                    .backendId(backend.backendId())
+                    .backendTitle(backend.backendTitle())
                     .build();
         }
 
-        return failResult(authCredentials, provider);
+        return failResult(authCredentials, backend);
     }
 
-    private IDPAuthResult failResult(IDPAuthCredentials authCredentials, IdentityProvider provider) {
-        return IDPAuthResult.failed(authCredentials.username(), provider.providerId(), provider.providerTitle());
+    private AuthServiceResult failResult(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
+        return AuthServiceResult.failed(authCredentials.username(), backend.backendId(), backend.backendTitle());
     }
 }

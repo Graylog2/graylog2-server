@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import com.google.auto.value.AutoValue;
 
@@ -23,29 +23,29 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @AutoValue
-public abstract class IDPAuthResult {
+public abstract class AuthServiceResult {
     public abstract String username();
 
     @Nullable
     public abstract String userProfileId();
 
-    public abstract String providerId();
+    public abstract String backendId();
 
-    public abstract String providerTitle();
+    public abstract String backendTitle();
 
     public boolean isSuccess() {
         return !isNullOrEmpty(userProfileId());
     }
 
     public static Builder builder() {
-        return new AutoValue_IDPAuthResult.Builder();
+        return new AutoValue_AuthServiceResult.Builder();
     }
 
-    public static IDPAuthResult failed(String username, String providerId, String providerTitle) {
+    public static AuthServiceResult failed(String username, String backendId, String backendTitle) {
         return builder()
                 .username(username)
-                .providerId(providerId)
-                .providerTitle(providerTitle)
+                .backendId(backendId)
+                .backendTitle(backendTitle)
                 .build();
     }
 
@@ -55,10 +55,10 @@ public abstract class IDPAuthResult {
 
         public abstract Builder userProfileId(String userProfileId);
 
-        public abstract Builder providerId(String providerId);
+        public abstract Builder backendId(String backendId);
 
-        public abstract Builder providerTitle(String providerTitle);
+        public abstract Builder backendTitle(String backendTitle);
 
-        public abstract IDPAuthResult build();
+        public abstract AuthServiceResult build();
     }
 }

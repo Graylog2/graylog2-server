@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import javax.inject.Qualifier;
 import java.lang.annotation.ElementType;
@@ -25,5 +25,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 @Qualifier
-public @interface InternalIdentityProvider {
+public @interface InternalAuthServiceBackend {
 }

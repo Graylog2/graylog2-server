@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import com.google.auto.value.AutoValue;
 import de.huxhorn.sulky.ulid.ULID;
@@ -37,8 +37,8 @@ public class UserProfileProvisioner {
 
         final UserProfile userProfile = UserProfile.builder()
                 .uid(ulid.nextULID()) // TODO: Don't use new ID when profile already exists!
-                .idpBackend(profileDetails.idpBackend())
-                .idpGuid(profileDetails.idpGuid())
+                .authServiceBackend(profileDetails.authServiceBackend())
+                .authServiceGuid(profileDetails.authServiceGuid())
                 .username(profileDetails.username())
                 .email(profileDetails.email())
                 .fullName(profileDetails.fullName())
@@ -61,9 +61,9 @@ public class UserProfileProvisioner {
 
         public abstract String fullName();
 
-        public abstract String idpBackend();
+        public abstract String authServiceBackend();
 
-        public abstract String idpGuid();
+        public abstract String authServiceGuid();
 
         public static Builder builder() {
             return new AutoValue_UserProfileProvisioner_Details.Builder();
@@ -77,9 +77,9 @@ public class UserProfileProvisioner {
 
             public abstract Builder fullName(String fullName);
 
-            public abstract Builder idpBackend(String idpBackend);
+            public abstract Builder authServiceBackend(String authServiceBackend);
 
-            public abstract Builder idpGuid(String idpGuid);
+            public abstract Builder authServiceGuid(String authServiceGuid);
 
             public abstract Details build();
         }

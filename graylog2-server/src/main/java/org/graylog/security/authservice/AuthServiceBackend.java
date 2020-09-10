@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import java.util.Optional;
 
-public interface IdentityProvider {
-    Optional<UserProfile> authenticateAndProvision(IDPAuthCredentials authCredentials,
+public interface AuthServiceBackend {
+    Optional<UserProfile> authenticateAndProvision(AuthServiceCredentials authCredentials,
                                                    UserProfileProvisioner userProfileProvisioner);
 
-    String providerId();
+    String backendId();
 
-    String providerTitle();
+    String backendTitle();
 }

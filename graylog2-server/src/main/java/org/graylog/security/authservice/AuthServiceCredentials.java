@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class IDPAuthCredentials {
+public abstract class AuthServiceCredentials {
     public abstract String username();
 
     public abstract String password();
 
-    public static IDPAuthCredentials create(String username, String password) {
-        return new AutoValue_IDPAuthCredentials(username, password);
+    public static AuthServiceCredentials create(String username, String password) {
+        return new AutoValue_AuthServiceCredentials(username, password);
     }
 }

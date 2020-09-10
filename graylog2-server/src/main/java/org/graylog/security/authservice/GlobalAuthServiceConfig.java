@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.security.idp;
+package org.graylog.security.authservice;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,37 +26,37 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
-public class GlobalIdentityProviderConfig {
+public class GlobalAuthServiceConfig {
     private final ClusterConfigService clusterConfigService;
-    private final IdentityProvider defaultProvider;
+    private final AuthServiceBackend defaultBackend;
 
     @Inject
-    public GlobalIdentityProviderConfig(ClusterConfigService clusterConfigService,
-                                        @InternalIdentityProvider IdentityProvider defaultProvider) {
+    public GlobalAuthServiceConfig(ClusterConfigService clusterConfigService,
+                                   @InternalAuthServiceBackend AuthServiceBackend defaultBackend) {
         this.clusterConfigService = clusterConfigService;
-        this.defaultProvider = requireNonNull(defaultProvider, "defaultProvider cannot be null");
+        this.defaultBackend = requireNonNull(defaultBackend, "defaultBackend cannot be null");
     }
 
-    public IdentityProvider getDefaultProvider() {
-        return defaultProvider;
+    public AuthServiceBackend getDefaultBackend() {
+        return defaultBackend;
     }
 
-    public Optional<IdentityProvider> getActiveProvider() {
+    public Optional<AuthServiceBackend> getActiveBackend() {
         final Data data = clusterConfigService.get(Data.class);
         if (data == null) {
             return Optional.empty();
         }
-        return Optional.empty(); // TODO: Load and return the actual provider
+        return Optional.empty(); // TODO: Load and return the actual backend
     }
 
     @AutoValue
     public static abstract class Data {
-        @JsonProperty("active_provider")
-        public abstract String activeProvider();
+        @JsonProperty("active_backend")
+        public abstract String activeBackend();
 
         @JsonCreator
-        public static GlobalIdentityProviderConfig.Data create(@JsonProperty("active_provider") String activeProvider) {
-            return new AutoValue_GlobalIdentityProviderConfig_Data(activeProvider);
+        public static GlobalAuthServiceConfig.Data create(@JsonProperty("active_backend") String activeBackend) {
+            return new AutoValue_GlobalAuthServiceConfig_Data(activeBackend);
         }
     }
 }
