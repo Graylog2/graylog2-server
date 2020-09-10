@@ -5,7 +5,7 @@ import lodash from 'lodash';
 import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
-const FORM_FIELDS = ['firstName', 'lastName', 'email', 'company'];
+const FORM_FIELDS = ['firstName', 'lastName', 'email', 'phone', 'company'];
 
 export default class EnterpriseFreeLicenseForm extends React.Component {
   static propTypes = {
@@ -20,6 +20,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
         firstName: '',
         lastName: '',
         email: '',
+        phone: '',
         company: '',
       },
       isSubmitting: false,
@@ -73,7 +74,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
   };
 
   render() {
-    const { formFields: { firstName, lastName, company, email } } = this.state;
+    const { formFields: { firstName, lastName, company, email, phone } } = this.state;
 
     return (
       <form onSubmit={this.submitForm}>
@@ -104,6 +105,13 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
                    placeholder="Please provide a valid email address to send the license key to"
                    required
                    onChange={this.handleInput('email')} />
+            <Input type="text"
+                   id="phone"
+                   label="Phone Number"
+                   value={phone}
+                   placeholder="Please provide a valid phone number"
+                   required
+                   onChange={this.handleInput('phone')} />
           </Col>
         </Row>
         <Row>

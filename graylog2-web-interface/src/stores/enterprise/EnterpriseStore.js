@@ -61,6 +61,7 @@ const EnterpriseStore = Reflux.createStore({
       last_name: formValues.lastName,
       company: formValues.company,
       email: formValues.email,
+      phone: formValues.phone,
     };
 
     const promise = fetch('POST', this.enterpriseUrl('license'), requestBody);
