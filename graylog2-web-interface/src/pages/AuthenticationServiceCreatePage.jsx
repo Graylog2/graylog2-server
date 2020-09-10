@@ -18,9 +18,9 @@ const AuthenticationServiceCreatePage = ({ params: { name } }: Props) => {
     return `No authentication service configrued for "${name}"`;
   }
 
-  const { setupComponent: ServiceSetup } = authSerivce;
+  const { createComponent: ServiceCreate } = authSerivce;
 
-  return <ServiceSetup />;
+  return <ServiceCreate />;
 };
 
 export default withRouter(AuthenticationServiceCreatePage);

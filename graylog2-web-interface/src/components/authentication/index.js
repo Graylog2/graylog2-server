@@ -49,12 +49,14 @@ PluginStore.register(new PluginManifest({}, {
     {
       name: 'ldap',
       displayName: 'LDAP',
-      setupComponent: ServiceCreateLDAP,
+      createComponent: ServiceCreateLDAP,
+      // detailsComponent: ServiceSettingsLDAP,
     },
     {
       name: 'active-directory',
       displayName: 'Active Directory',
-      setupComponent: 'Hello world',
+      createComponent: ServiceCreateLDAP,
+      // detailsComponent: ServiceSettingsAD,
     },
   ],
 }));

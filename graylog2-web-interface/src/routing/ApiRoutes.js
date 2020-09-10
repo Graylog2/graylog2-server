@@ -24,6 +24,9 @@ const ApiRoutes = {
     available: () => { return { url: '/alerts/conditions/types' }; },
     list: () => { return { url: '/alerts/conditions' }; },
   },
+  Authentication: {
+    servicesPaginated: () => ({ url: '/system/authentication/backends' }),
+  },
   AuthzRolesController: {
     load: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
     delete: (roleId) => { return { url: `/authzRoles/${roleId}` }; },
