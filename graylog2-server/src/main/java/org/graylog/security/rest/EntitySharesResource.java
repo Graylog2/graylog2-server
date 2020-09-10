@@ -30,8 +30,6 @@ import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntityShareResponse;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog.security.shares.GranteeSharesService;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
@@ -130,8 +128,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @POST
     @ApiOperation(value = "Create / update shares for an entity or collection")
     @Path("entities/{entityGRN}")
-    // TODO add description to GraylogServerEventFormatter
-    @AuditEvent(type = AuditEventTypes.GRANTS_UPDATE)
+    @NoAuditEvent("Audit events are created within EntitySharesService")
     public Response updateEntityShares(@ApiParam(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
                                                   @ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
         final GRN entity = grnRegistry.parse(entityGRN);

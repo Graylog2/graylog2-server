@@ -63,6 +63,11 @@ public class GrantsAuthorizingRealm extends AuthorizingRealm {
             info.setObjectPermissions(permissions);
         }
 
+        final Set<String> roles = grantPermissionResolver.resolveRolesForPrincipal(principal);
+        if (!roles.isEmpty()) {
+            info.setRoles(roles);
+        }
+
         return info;
     }
 

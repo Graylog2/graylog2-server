@@ -16,28 +16,27 @@
  */
 package org.graylog.security;
 
-import org.apache.shiro.authz.Permission;
-import org.graylog.grn.GRN;
+import com.google.common.collect.ImmutableSet;
+import org.graylog2.audit.PluginAuditEventTypes;
 
 import java.util.Set;
 
-/**
- * Resolves a principal to specific permissions based on grants.
- */
-public interface GrantPermissionResolver {
-    /**
-     * Returns resolved permissions for the given principal.
-     *
-     * @param principal the principal
-     * @return the resolved permissions
-     */
-    Set<Permission> resolvePermissionsForPrincipal(GRN principal);
+public class SecurityAuditEventTypes implements PluginAuditEventTypes {
+    public static final String NAMESPACE = "security:";
 
-    /**
-     * Returns roles for the given principal.
-     *
-     * @param principal the principal
-     * @return the resolved roleIds
-     */
-    Set<String> resolveRolesForPrincipal(GRN principal);
+    public static final String SHARE_CREATE = NAMESPACE + "share:create";
+    public static final String SHARE_UPDATE = NAMESPACE + "share:update";
+    public static final String SHARE_DELETE = NAMESPACE + "share:delete";
+
+    private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.of(
+            SHARE_CREATE,
+            SHARE_UPDATE,
+            SHARE_DELETE
+    );
+
+    @Override
+    public Set<String> auditEventTypes() {
+        return EVENT_TYPES;
+    }
 }
+

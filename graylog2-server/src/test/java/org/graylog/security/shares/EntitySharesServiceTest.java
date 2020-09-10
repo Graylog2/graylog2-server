@@ -19,6 +19,7 @@ package org.graylog.security.shares;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -80,7 +81,8 @@ public class EntitySharesServiceTest {
         lenient().when(entityDependencyPermissionChecker.check(any(), any(), any())).thenReturn(ImmutableMultimap.of());
         lenient().when(granteeService.getAvailableGrantees(any())).thenReturn(ImmutableSet.of());
 
-        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService);
+        final EventBus serverEventBus = mock(EventBus.class);
+        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
 
         // TODO this is needed to initialize the CAPABILITIES field
         new BuiltinCapabilities();

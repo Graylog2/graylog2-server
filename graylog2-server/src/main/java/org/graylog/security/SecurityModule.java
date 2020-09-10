@@ -46,5 +46,6 @@ public class SecurityModule extends PluginModule {
         //       we get the path prefix. Do we want this?
         registerRestControllerPackage(getClass().getPackage().getName());
 
+        addAuditEventTypes(SecurityAuditEventTypes.class);
     }
 }
