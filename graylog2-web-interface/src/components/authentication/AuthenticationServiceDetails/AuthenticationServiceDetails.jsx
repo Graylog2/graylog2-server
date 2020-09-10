@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import ServiceUsersSection from 'components/authentication/ServiceUsersSection';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import AuthenticationService from 'logic/authentication/AuthenticationService';
 
@@ -18,7 +19,7 @@ const AuthenticationServiceDetails = ({ authenticationService }: Props) => {
   }
 
   const { detailsComponent: ServiceDetails } = authSerivce;
-  console.log('authenticationService', authenticationService)
+
   return (
     <>
       <SectionGrid>
@@ -26,7 +27,7 @@ const AuthenticationServiceDetails = ({ authenticationService }: Props) => {
           <ServiceDetails authenticationService={authenticationService} />
         </div>
         <div>
-          Users & Teams
+          <ServiceUsersSection authenticationService={authenticationService} />
         </div>
       </SectionGrid>
 
