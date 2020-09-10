@@ -1,17 +1,19 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import styled, { css } from 'styled-components';
+import styled, { css, type StyledComponent } from 'styled-components';
 
+import { type ThemeInterface } from 'theme';
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import Icon from './Icon';
 
-const SubnavigationCol = styled(Col)(({ theme }) => css`
+const SubnavigationCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)(({ theme }) => css`
   border-right: ${theme.colors.gray[80]} solid 1px;
 `);
 
-const HorizontalCol = styled(Col)`
+const HorizontalCol: StyledComponent<{}, ThemeInterface, Col> = styled(Col)`
   margin-bottom: 15px;
 `;
 
@@ -19,13 +21,40 @@ const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
 
+type StepKey = number | string;
+
+export type Step = {
+  key: StepKey,
+  title: string,
+  component: React.Node,
+  disabled?: boolean,
+};
+
+export type Steps = Array<Step>;
+
+type Props = {
+  steps: Steps,
+  activeStep: ?StepKey,
+  onStepChange: (StepKey) => void,
+  children: PropTypes.elementType,
+  horizontal: boolean,
+  justified: boolean,
+  containerClassName: string,
+  NavigationComponent: Nav,
+  hidePreviousNextButtons: boolean,
+};
+
+type State = {
+  selectedStep: StepKey,
+};
+
 /**
  * Component that renders a wizard, letting the consumers of the component
  * manage the state. It will render at least two columns: First column will hold
  * the steps the wizard will take. Second column will render the component of the
  * selected step. In a optional third column the consumer can render a preview.
  */
-class Wizard extends React.Component {
+class Wizard extends React.Component<Props, State> {
   static propTypes = {
     /**
      * Array of objects which will describe the wizard. The object must
@@ -69,7 +98,7 @@ class Wizard extends React.Component {
     hidePreviousNextButtons: false,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     this._warnOnInvalidActiveStep(props.activeStep, props.steps);
@@ -85,7 +114,7 @@ class Wizard extends React.Component {
     this._warnOnInvalidActiveStep(activeStep, steps);
   }
 
-  _warnOnInvalidActiveStep = (activeStep, steps) => {
+  _warnOnInvalidActiveStep = (activeStep: ?StepKey, steps: Steps) => {
     if (activeStep === undefined || activeStep === null) {
       return;
     }
@@ -96,7 +125,7 @@ class Wizard extends React.Component {
     }
   };
 
-  _isValidActiveStep = (activeStep, steps) => {
+  _isValidActiveStep = (activeStep: ?StepKey, steps: Steps) => {
     if (activeStep === undefined || activeStep === null) {
       return false;
     }
@@ -111,7 +140,7 @@ class Wizard extends React.Component {
     return (this._isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
   };
 
-  _wizardChanged = (eventKey) => {
+  _wizardChanged = (eventKey: StepKey) => {
     const { activeStep, onStepChange } = this.props;
 
     onStepChange(eventKey);
@@ -122,7 +151,7 @@ class Wizard extends React.Component {
     }
   };
 
-  _disableButton = (direction) => {
+  _disableButton = (direction: 'previous' | 'next') => {
     const { steps } = this.props;
     const selectedStep = this._getSelectedStep();
     const len = steps.length;
