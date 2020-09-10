@@ -13,7 +13,9 @@ const ldapService = AuthenticationService
     serverUri: 'ldap://localhost:389',
     systemUsername: 'uid=admin,out=system',
     encryptedSystemPassword: 'encrypted-password',
+    userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
+    displayNameAttribute: 'cn'
   })
   .build();
 
@@ -27,7 +29,9 @@ const activeDirectoryService = AuthenticationService
     serverUri: 'ldap://localhost:389',
     systemUsername: 'uid=admin,out=system',
     encryptedSystemPassword: 'encrypted-password',
+    userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
+    displayNameAttribute: 'cn'
   })
   .build();
 

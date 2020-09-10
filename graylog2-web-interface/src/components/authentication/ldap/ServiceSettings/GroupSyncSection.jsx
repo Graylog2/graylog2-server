@@ -27,14 +27,14 @@ const NoEnterpriseComponent = () => (
 const GroupSyncSection = ({ authenticationService }: Props) => {
   const authenticationPlugin = PluginStore.exports('authenticationServices.ldap');
   const editLink = {
-    pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE(authenticationService.config.type),
+    pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationService.id),
     query: {
       step: 'groupSync',
     },
   };
 
   const Section = ({ children }: { children: React.Node }) => (
-    <SectionComponent title="Group Synchronisation" subTitle={<Link to={editLink}>Edit</Link>}>
+    <SectionComponent title="Group Synchronisation" headerActions={<Link to={editLink}>Edit</Link>}>
       {children}
     </SectionComponent>
   );

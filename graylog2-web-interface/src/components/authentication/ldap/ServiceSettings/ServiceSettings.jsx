@@ -19,7 +19,7 @@ const ServiceSettings = ({ authenticationService }: Props) => {
     <>
       <ServerConfiguration authenticationService={authenticationService} />
       <UserSyncSettings authenticationService={authenticationService} />
-      
+      <GroupSyncSettings authenticationService={authenticationService} />
     </>
   );
 };
