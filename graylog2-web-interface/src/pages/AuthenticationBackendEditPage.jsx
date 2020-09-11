@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { Spinner } from 'components/common';
-import AuthenticationActions from 'actions/authentication/AuthenticationActions';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 type Props = {
   params: {
@@ -23,7 +23,7 @@ const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { st
   const [authBackend, setAuthBackend] = useState();
 
   useEffect(() => {
-    AuthenticationActions.load(id).then((newAuthBackend) => newAuthBackend && setAuthBackend(newAuthBackend));
+    AuthenticationDomain.load(id).then((newAuthBackend) => newAuthBackend && setAuthBackend(newAuthBackend));
   }, []);
 
   if (!authBackend) {

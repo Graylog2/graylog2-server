@@ -8,7 +8,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'views/logic/singleton';
-import ActionsProvider from 'injection/ActionsProvider';
+import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 // import PaginationURL from 'util/PaginationURL';
 import type { PaginatedBackends, PaginatedAuthUsers, AuthenticationBackendCreate, ConnectionTestPayload, ConnectionTestResult, LoginTestPayload, LoginTestResult } from 'actions/authentication/AuthenticationActions';
 // import type { PaginatedResponseType } from 'stores/PaginationTypes';
@@ -20,8 +20,6 @@ import { services } from '../../../test/fixtures/authentication';
 import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
 
 const TMP_SOURCE_URL = '/system/authentication/config';
-
-const AuthenticationActions = ActionsProvider.getActions('Authentication');
 // type PaginatedResponse = PaginatedResponseType & {
 //   global_config: {
 //     active_backend: string,
@@ -192,5 +190,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
     },
   }),
 );
+
+export { AuthenticationActions, AuthenticationStore };
 
 export default AuthenticationStore;

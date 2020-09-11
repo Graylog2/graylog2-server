@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
@@ -14,8 +13,8 @@ import BackendCreateGettingStarted from 'components/authentication/BackendCreate
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
 // import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
 import { ButtonToolbar, Button } from 'components/graylog';
-import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import Routes from 'routing/Routes';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 const DEFAULT_PAGINATION = {
   count: undefined,
@@ -25,20 +24,11 @@ const DEFAULT_PAGINATION = {
   query: '',
 };
 
-type Props = {
-  location: {
-    pathname: string,
-  },
-  params: {
-    name: string,
-  },
-};
-
-const AuthenticationPage = ({ location, params }: Props) => {
+const AuthenticationPage = () => {
   const [paginatedAuthBackends, setPaginatedAuthBackends] = useState();
 
   useEffect(() => {
-    AuthenticationActions.loadBackendsPaginated(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query).then((newServices) => newServices && setPaginatedAuthBackends(newServices));
+    AuthenticationDomain.loadBackendsPaginated(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query).then((newServices) => newServices && setPaginatedAuthBackends(newServices));
   }, []);
 
   if (!paginatedAuthBackends) {
@@ -87,11 +77,6 @@ const AuthenticationPage = ({ location, params }: Props) => {
       </Row> */}
     </DocumentTitle>
   );
-};
-
-AuthenticationPage.propTypes = {
-  location: PropTypes.object.isRequired,
-  params: PropTypes.object.isRequired,
 };
 
 export default AuthenticationPage;

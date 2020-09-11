@@ -40,14 +40,14 @@ export type LoginTestPayload = ConnectionTestPayload;
 export type LoginTestResult = ConnectionTestResult;
 
 export type ActionsType = {
-  create: AuthenticationBackendCreate => Promise<void>,
+  create: (AuthenticationBackendCreate) => Promise<void>,
   load: (id: string) => Promise<?AuthenticationBackend>,
   testConnetion: (payload: ConnectionTestPayload) => Promise<?ConnectionTestResult>,
   testLogin: (payload: LoginTestPayload) => Promise<?LoginTestResult>,
   loadBackendsPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedBackends>,
   loadUsersPaginated: (page: number, perPage: number, query: string) => Promise<?PaginatedAuthUsers>,
-  enableUser: (userId: string) => Promise<void>,
-  disableUser: (userId: string) => Promise<void>,
+  enableUser: (userId: string, username: string) => Promise<void>,
+  disableUser: (userId: string, username: string) => Promise<void>,
 };
 
 const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(

@@ -2,7 +2,8 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 
-import AuthenticationActions from 'actions/authentication/AuthenticationActions';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 
@@ -41,7 +42,7 @@ const SyncedUsersSection = () => {
   const _userOverviewItem = (user) => <AuthUsersOverviewItem user={user} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
-    return AuthenticationActions.loadUsersPaginated(newPage, newPerPage, newQuery)
+    return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
       .then((newPaginatedUsers) => newPaginatedUsers && setPaginatedUsers(newPaginatedUsers));
   };
 
