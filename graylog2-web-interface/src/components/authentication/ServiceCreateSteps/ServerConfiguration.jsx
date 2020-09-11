@@ -68,7 +68,6 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
 
               {/* checked={ldapUri.scheme() === 'ldaps'} ? */}
               <ProtocolOptions>
-
                 <FormikInput type="checkbox"
                              name="useSSL"
                              formGroupClassName=""
