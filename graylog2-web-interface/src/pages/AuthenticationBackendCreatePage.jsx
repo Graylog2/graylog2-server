@@ -18,9 +18,9 @@ const AuthenticationBackendCreatePage = ({ params: { name } }: Props) => {
     return `No authentication service plugin configrued for "${name}"`;
   }
 
-  const { createComponent: ServiceCreate } = authSerivce;
+  const { createComponent: BackendCreate } = authSerivce;
 
-  return <ServiceCreate />;
+  return <BackendCreate />;
 };
 
 export default withRouter(AuthenticationBackendCreatePage);

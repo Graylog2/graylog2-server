@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
-import type { LdapService } from '../types';
+import type { LdapService } from '../../ldap/types';
 
 type Props = {
   authenticationBackend: LdapService,

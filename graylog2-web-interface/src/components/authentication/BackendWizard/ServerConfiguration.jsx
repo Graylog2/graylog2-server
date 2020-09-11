@@ -17,7 +17,8 @@ type Props = {
   },
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => void,
+  editing: boolean,
 };
 
 const ProtocolOptions = styled.div`
@@ -37,14 +38,14 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll }: Props) => {
+const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onSubmitAll }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={stepsState?.formValues?.serverConfig} onSubmit={() => onSubmit('userSync')}>
-      {({ isSubmitting, isValid, values }) => (
-        <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
+    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')}>
+      {({ isSubmitting, isValid }) => (
+        <Form onChange={(event) => onChange(event)} className="form form-horizontal">
           <Input id="uri-host"
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9"
@@ -52,13 +53,13 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
             <>
               <div className="input-group">
                 <span className="input-group-addon">ldap://</span>
-                <FormikInput name="uriHost"
+                <FormikInput name="serverUriHost"
                              placeholder="Hostname"
                              formGroupClassName=""
                              required />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput type="number"
-                             name="uriPort"
+                             name="serverUriPort"
                              min="1"
                              max="65535"
                              placeholder="Port"
@@ -98,8 +99,13 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, onSubmitAll 
                            placeholder="System Password"
                            required
                            help={help.systemPassword} />
-
           <ButtonToolbar className="pull-right">
+            {editing && (
+              <Button type="button"
+                      disabled={!isValid || isSubmitting}>
+                Finish & Save Identity Provider
+              </Button>
+            )}
             <Button bsStyle="primary"
                     type="submit"
                     disabled={!isValid || isSubmitting}>

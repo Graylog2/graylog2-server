@@ -12,23 +12,23 @@ import BackendWizardContext from './contexts/BackendWizardContext';
 
 type Props = {
   help?: {
-    searchBaseDN?: React.Node,
-    searchPattern?: React.Node,
+    userSearchBase?: React.Node,
+    userSearchPattern?: React.Node,
     displayNameAttribute?: React.Node,
     defaultRoles?: React.Node,
   },
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>, values: any) => void,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => void,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
 };
 
 const defaultHelp = {
-  searchBaseDN: (
+  userSearchBase: (
     <span>
       The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
     </span>
   ),
-  searchPattern: (
+  userSearchPattern: (
     <span>
       For example <code className="text-nowrap">{'(&(objectClass=user)(sAMAccountName={0}))'}</code>.{' '}
       The string <code>{'{0}'}</code> will be replaced by the entered username.
@@ -49,6 +49,7 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
+  console.log(stepsState.formValues);
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
@@ -62,23 +63,23 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
   }, []);
 
   return (
-    <Formik initialValues={stepsState?.formValues?.userSync} onSubmit={() => onSubmit('groupSync')}>
-      {({ isSubmitting, isValid, values }) => (
-        <Form onChange={(event) => onChange(event, values)} className="form form-horizontal">
+    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')}>
+      {({ isSubmitting, isValid }) => (
+        <Form onChange={(event) => onChange(event)} className="form form-horizontal">
           <FormikFormGroup label="Search Base DN"
-                           name="searchBaseDN"
+                           name="userSearchBase"
                            placeholder="System User DN"
                            required
-                           help={help.searchBaseDN} />
+                           help={help.userSearchBase} />
 
           <FormikFormGroup label="Search Pattern"
-                           name="searchPattern"
+                           name="userSearchPattern"
                            placeholder="Search Pattern"
                            required
-                           help={help.searchPattern} />
+                           help={help.userSearchPattern} />
 
           <FormikFormGroup label="Display Name Attirbute"
-                           name="displayNameAttibute"
+                           name="displayNameAttribute"
                            placeholder="Display Name Attirbute"
                            required
                            help={help.displayNameAttribute} />

@@ -4,22 +4,21 @@ import * as React from 'react';
 import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
-export type ServiceSteps = {
-  // steps: ?Steps,
-  setStepsState: ?(any) => void,
+export type WizardFormValues = { [string]: mixed };
+export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
-  formValues: any,
+  formValues: WizardFormValues,
 };
 
-export const defaultServiceSteps = {
-  // steps: undefined,
-  setStepsState: undefined,
-  activeStepKey: undefined,
-  formValues: {
-    serverConfig: {},
-    userSync: {},
-  },
+export type BackendWizardType = WizardStepsState & {
+  setStepsState: (BackendWizardType) => void,
 };
 
-const BackendWizardContext = React.createContext<ServiceSteps>(defaultServiceSteps);
+const initialState = {
+  setStepsState: () => {},
+  activeStepKey: '',
+  formValues: {},
+};
+
+const BackendWizardContext = React.createContext<BackendWizardType>(initialState);
 export default singleton('contexts.systems.authentication.ServiceSteps.', () => BackendWizardContext);

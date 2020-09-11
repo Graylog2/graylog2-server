@@ -12,9 +12,15 @@ type Props = {
   params: {
     id: string,
   },
+  location: {
+    query: {
+      step?: string,
+    },
+  },
+
 };
 
-const AuthenticationBackendEditPage = ({ params: { id } }: Props) => {
+const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { step } } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
 
   useEffect(() => {
@@ -32,9 +38,9 @@ const AuthenticationBackendEditPage = ({ params: { id } }: Props) => {
     return `No authentication service plugin configrued for "${authBackend.config.type}"`;
   }
 
-  const { editComponent: ServiceEdit } = authSerivce;
+  const { editComponent: BackendEdit } = authSerivce;
 
-  return <ServiceEdit />;
+  return <BackendEdit authenticationBackend={authBackend} initialStep={step} />;
 };
 
 export default withRouter(AuthenticationBackendEditPage);
