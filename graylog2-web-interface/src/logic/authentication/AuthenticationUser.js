@@ -223,8 +223,8 @@ export default class AuthenticationUser {
       session_active: sessionActive,
       client_address: clientAddress,
       last_activity: lastActivity,
-      backedn_id: backendId,
-      backedn_guid: backendGuid,
+      backend_id: backendId,
+      backend_guid: backendGuid,
       enabled,
     };
   }

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Field } from 'formik';
 
+import type { ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
 
 type Props = {

@@ -19,7 +19,7 @@ const BackendCreate = () => {
         </span>
         <BackendOverviewLinks />
       </PageHeader>
-      <BackendWizard />
+      <BackendWizard onSubmitAll={() => Promise.resolve()} />
     </DocumentTitle>
   );
 };
