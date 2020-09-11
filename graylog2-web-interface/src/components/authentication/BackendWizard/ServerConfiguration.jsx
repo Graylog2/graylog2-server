@@ -98,6 +98,7 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
                            name="systemPassword"
                            placeholder="System Password"
                            required
+                           type="password"
                            help={help.systemPassword} />
           <ButtonToolbar className="pull-right">
             {editing && (

@@ -25,7 +25,7 @@ const NoEnterpriseComponent = () => (
 );
 
 const GroupSyncSection = ({ authenticationBackend }: Props) => {
-  const authenticationPlugin = PluginStore.exports('authenticationServices.ldap');
+  const authenticationPlugin = PluginStore.exports('authentication');
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {

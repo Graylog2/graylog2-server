@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { withRouter } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 
 type Props = {
   params: {

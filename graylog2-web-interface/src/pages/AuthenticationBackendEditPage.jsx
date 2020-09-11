@@ -5,7 +5,6 @@ import { withRouter } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Spinner } from 'components/common';
-import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 
 type Props = {

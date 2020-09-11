@@ -1,7 +1,6 @@
 // @flow strict
 import * as React from 'react';
 
-import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';

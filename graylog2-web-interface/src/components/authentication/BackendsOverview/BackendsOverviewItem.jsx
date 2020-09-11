@@ -19,18 +19,18 @@ const ActionsCell = ({ isActive }: { isActive: boolean }) => (
   <td className="limited">
     <StyledButtonToolbar>
       {isActive ? (
+        <Button onClick={() => {}} bsStyle="info" bsSize="xs" type="button">
+          Deactivate
+        </Button>
+      ) : (
         <>
           <Button onClick={() => {}} bsStyle="info" bsSize="xs" type="button">
-            Deactivate
+            Activate
           </Button>
           <Button onClick={() => {}} bsStyle="danger" bsSize="xs" type="button">
             Delete
           </Button>
         </>
-      ) : (
-        <Button onClick={() => {}} bsStyle="info" bsSize="xs" type="button">
-          Activate
-        </Button>
       )}
     </StyledButtonToolbar>
   </td>

@@ -8,12 +8,12 @@ import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
 import BackendsOverview from 'components/authentication/BackendsOverview';
-import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import DocumentationLink from 'components/support/DocumentationLink';
-import AuthenticationComponent from 'components/authentication/legacy/AuthenticationComponent';
+// import AuthenticationComponent from 'components/authentication/legacy/AuthenticationComponent';
 import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
-import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
+// import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
+import { ButtonToolbar, Button } from 'components/graylog';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 import Routes from 'routing/Routes';
 
@@ -80,11 +80,11 @@ const AuthenticationPage = ({ location, params }: Props) => {
       )}
 
       {/* Old authentication management which can be removed soon */}
-      <Row className="content">
+      {/* <Row className="content">
         <Col md={12}>
           <AuthenticationComponent location={location} params={params} />
         </Col>
-      </Row>
+      </Row> */}
     </DocumentTitle>
   );
 };
