@@ -13,6 +13,7 @@ import {
   AlertConditionsPage,
   AlertNotificationsPage,
   AlertsPage,
+  AuthenticationCreatePage,
   AuthenticationPage,
   AuthenticationBackendCreatePage,
   AuthenticationBackendEditPage,
@@ -212,7 +213,8 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
               <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(':backendId')} component={AuthenticationBackendEditPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE(':name')} component={AuthenticationBackendCreatePage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_BACKEND(':name')} component={AuthenticationBackendCreatePage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE} component={AuthenticationCreatePage} />
 
               <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
               <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />

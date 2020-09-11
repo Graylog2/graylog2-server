@@ -3,6 +3,7 @@ import loadAsync from 'routing/loadAsync';
 const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
+const AuthenticationCreatePage = loadAsync(() => import('./AuthenticationCreatePage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticationBackendCreatePage = loadAsync(() => import('./AuthenticationBackendCreatePage'));
 const AuthenticationBackendEditPage = loadAsync(() => import('./AuthenticationBackendEditPage'));
@@ -84,6 +85,7 @@ export {
   AlertConditionsPage,
   AlertNotificationsPage,
   AlertsPage,
+  AuthenticationCreatePage,
   AuthenticationPage,
   AuthenticationBackendCreatePage,
   AuthenticationBackendEditPage,

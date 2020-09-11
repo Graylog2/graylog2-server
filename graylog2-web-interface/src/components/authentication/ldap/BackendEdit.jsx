@@ -4,6 +4,7 @@ import * as React from 'react';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
+import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 
 import BackendWizard from '../BackendWizard';
 
@@ -16,6 +17,7 @@ const BackendEdit = () => {
           Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                              text="documentation" />.
         </span>
+        <BackendOverviewLinks />
       </PageHeader>
       <BackendWizard />
     </DocumentTitle>

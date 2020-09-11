@@ -2,17 +2,20 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { LinkContainer } from 'react-router-bootstrap';
 
+import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import DocumentationLink from 'components/support/DocumentationLink';
-import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
+import AuthenticationComponent from 'components/authentication/legacy/AuthenticationComponent';
 import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
-import { PageHeader, Spinner } from 'components/common';
-import { Row, Col } from 'components/graylog';
+import { PageHeader, Spinner, DocumentTitle } from 'components/common';
+import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
+import Routes from 'routing/Routes';
 
 const DEFAULT_PAGINATION = {
   count: undefined,
@@ -45,15 +48,30 @@ const AuthenticationPage = ({ location, params }: Props) => {
   const activeBackend = paginatedAuthBackends.list.find((backend) => backend.id === paginatedAuthBackends.globalConfig.activeBackend);
 
   return (
-    <>
-      <PageHeader title="Authentication Management">
+    <DocumentTitle title="Authentication Management">
+      <PageHeader title="Authentication Management"
+                  subactions={(activeBackend && (
+                    <ButtonToolbar>
+                      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend.id)}>
+                        <Button bsStyle="success">
+                          Edit Active Backend
+                        </Button>
+                      </LinkContainer>
+                      <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE}>
+                        <Button bsStyle="success">
+                          Create Backend
+                        </Button>
+                      </LinkContainer>
+                    </ButtonToolbar>
+                  ))}>
         <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
         <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                  text="documentation" />.
         </span>
+        <BackendOverviewLinks />
       </PageHeader>
 
-      <BackendCreateGettingStarted />
+      {!activeBackend && <BackendCreateGettingStarted />}
 
       {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
 
@@ -67,7 +85,7 @@ const AuthenticationPage = ({ location, params }: Props) => {
           <AuthenticationComponent location={location} params={params} />
         </Col>
       </Row>
-    </>
+    </DocumentTitle>
   );
 };
 

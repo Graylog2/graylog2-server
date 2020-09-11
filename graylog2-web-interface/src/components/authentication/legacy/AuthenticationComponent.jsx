@@ -14,7 +14,7 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 
-import AuthProvidersConfig from './legacy/AuthProvidersConfig';
+import AuthProvidersConfig from './AuthProvidersConfig';
 
 const AuthenticationActions = ActionsProvider.getActions('Authentication');
 const AuthenticationStore = StoreProvider.getStore('Authentication');

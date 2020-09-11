@@ -27,7 +27,7 @@ const FormGroup = styled.div`
 `;
 
 const _onSubmit = ({ authenticationService }) => {
-  const createRoute = Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE(authenticationService);
+  const createRoute = Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE_BACKEND(authenticationService);
   history.push(createRoute);
 };
 
