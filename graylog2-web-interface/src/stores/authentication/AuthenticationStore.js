@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 
 // import * as Immutable from 'immutable';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -9,10 +10,9 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'views/logic/singleton';
 import ActionsProvider from 'injection/ActionsProvider';
 // import PaginationURL from 'util/PaginationURL';
-import type { PaginatedServices, PaginatedAuthUsers, AuthenticationServiceCreate, ConnectionTestPayload, ConnectionTestResult, LoginTestPayload, LoginTestResult } from 'actions/authentication/AuthenticationActions';
+import type { PaginatedBackends, PaginatedAuthUsers, AuthenticationBackendCreate, ConnectionTestPayload, ConnectionTestResult, LoginTestPayload, LoginTestResult } from 'actions/authentication/AuthenticationActions';
 // import type { PaginatedResponseType } from 'stores/PaginationTypes';
-import AuthenticationService from 'logic/authentication/AuthenticationService';
-// import type { AuthenticationServiceJson } from 'logic/authentication/AuthenticationService';
+// import type { AuthenticationBackendJson } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
 // import AuthenticationUser from 'logic/authentication/AuthenticationUser';
 
@@ -26,7 +26,7 @@ const AuthenticationActions = ActionsProvider.getActions('Authentication');
 //   global_config: {
 //     active_backend: string,
 //   },
-//   backends: Array<AuthenticationServiceJson>,
+//   backends: Array<AuthenticationBackendJson>,
 // };
 
 const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
@@ -40,17 +40,17 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       };
     },
 
-    create(authService: AuthenticationServiceCreate): Promise<void> {
+    create(authBackend: AuthenticationBackendCreate): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.create().url);
-      const promise = fetch('POST', url, authService).then;
+      const promise = fetch('POST', url, authBackend).then;
       AuthenticationActions.create.promise(promise);
 
       return promise;
     },
 
-    load(id: string): Promise<?AuthenticationService> {
+    load(id: string): Promise<?AuthenticationBackend> {
       // const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(id)).url);
-      // const promise = fetch('GET', url).then(AuthenticationService.fromJSON);
+      // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
       const promise = Promise.resolve(services.first());
 
       AuthenticationActions.load.promise(promise);
@@ -74,14 +74,14 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    loadServicesPaginated(page: number, perPage: number, query: string): Promise<?PaginatedServices> {
+    loadBackendsPaginated(page: number, perPage: number, query: string): Promise<?PaginatedBackends> {
       // const url = PaginationURL(ApiRoutes.Authentication.servicesPaginated().url, page, perPage, query);
       // const promise = fetch('GET', qualifyUrl(url))
       //   .then((response: PaginatedResponse) => ({
       //     globalConfig: {
       //       activeBackend: response.global_config.active_backend,
       //     },
-      //     list: Immutable.List(response.backends.map((backend) => AuthenticationService.fromJSON(backend))),
+      //     list: Immutable.List(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
       //     pagination: {
       //       count: response.count,
       //       total: response.total,
@@ -105,7 +105,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
         },
       });
 
-      AuthenticationActions.loadServicesPaginated.promise(promise);
+      AuthenticationActions.loadBackendsPaginated.promise(promise);
 
       return promise;
     },

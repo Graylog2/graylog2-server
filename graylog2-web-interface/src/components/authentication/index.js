@@ -5,9 +5,9 @@ import MongoDbSessionConfig from './MongoDbSessionConfig';
 import LegacyLdapConfig from './LegacyLdapConfig';
 import RootUserConfig from './RootUserConfig';
 import AccessTokenConfig from './AccessTokenConfig';
-import ServiceCreateLDAP from './ldap/ServiceCreate';
-import ServiceEditLDAP from './ldap/ServiceEdit';
-import ServiceSettingsLDAP from './ldap/ServiceSettings';
+import BackendCreateLDAP from './ldap/BackendCreate';
+import BackendEditLDAP from './ldap/BackendEdit';
+import BackendSettingsLDAP from './BackendDetails/BackendSettings';
 
 PluginStore.register(new PluginManifest({}, {
   authenticatorConfigurations: [
@@ -51,9 +51,9 @@ PluginStore.register(new PluginManifest({}, {
     {
       name: 'ldap',
       displayName: 'LDAP',
-      createComponent: ServiceCreateLDAP,
-      editComponent: ServiceEditLDAP,
-      detailsComponent: ServiceSettingsLDAP,
+      createComponent: BackendCreateLDAP,
+      editComponent: BackendEditLDAP,
+      detailsComponent: BackendSettingsLDAP,
       configMapJson: ({
         default_groups: 'defaultGroups',
         display_name_attribute: 'displayNameAttribute',
@@ -70,8 +70,8 @@ PluginStore.register(new PluginManifest({}, {
     {
       name: 'active-directory',
       displayName: 'Active Directory',
-      createComponent: ServiceCreateLDAP,
-      // detailsComponent: ServiceSettingsAD,
+      createComponent: BackendCreateLDAP,
+      // detailsComponent: BackendSettingsAD,
     },
   ],
 }));

@@ -1,9 +1,8 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
-import AuthenticationService from 'logic/authentication/AuthenticationService';
-
-const ldapService = AuthenticationService
+const ldapService = AuthenticationBackend
   .builder()
   .id('ldap-service-id')
   .title('LDAP Service')
@@ -15,11 +14,11 @@ const ldapService = AuthenticationService
     encryptedSystemPassword: 'encrypted-password',
     userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
-    displayNameAttribute: 'cn'
+    displayNameAttribute: 'cn',
   })
   .build();
 
-const activeDirectoryService = AuthenticationService
+const activeDirectoryService = AuthenticationBackend
   .builder()
   .id('ad-service-id')
   .title('Active Directory Service')
@@ -31,10 +30,10 @@ const activeDirectoryService = AuthenticationService
     encryptedSystemPassword: 'encrypted-password',
     userSearchBase: 'dc=example,dc=com',
     userSearchPattern: '(&(|(objectClass=inetOrgPerson))(uid={0}))',
-    displayNameAttribute: 'cn'
+    displayNameAttribute: 'cn',
   })
   .build();
 
-const services = Immutable.List<AuthenticationService>([ldapService, activeDirectoryService]);
+const services = Immutable.List<AuthenticationBackend>([ldapService, activeDirectoryService]);
 
 export { ldapService, activeDirectoryService, services };

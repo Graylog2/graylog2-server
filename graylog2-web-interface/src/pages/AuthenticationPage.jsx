@@ -3,13 +3,13 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
+import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
-import AuthenticationServiceDetails from 'components/authentication/AuthenticationServiceDetails';
-import AuthenticationServicesOverview from 'components/authentication/AuthenticationServicesOverview';
+import BackendsOverview from 'components/authentication/BackendsOverview';
 import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 import DocumentationLink from 'components/support/DocumentationLink';
 import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
-import ServiceCreateGettingStarted from 'components/authentication/ServiceCreateGettingStarted';
+import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import { PageHeader, Spinner } from 'components/common';
 import { Row, Col } from 'components/graylog';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
@@ -32,17 +32,17 @@ type Props = {
 };
 
 const AuthenticationPage = ({ location, params }: Props) => {
-  const [paginatedAuthServices, setPaginatedAuthServices] = useState();
+  const [paginatedAuthBackends, setPaginatedAuthBackends] = useState();
 
   useEffect(() => {
-    AuthenticationActions.loadServicesPaginated(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query).then((newServices) => newServices && setPaginatedAuthServices(newServices));
+    AuthenticationActions.loadBackendsPaginated(DEFAULT_PAGINATION.page, DEFAULT_PAGINATION.perPage, DEFAULT_PAGINATION.query).then((newServices) => newServices && setPaginatedAuthBackends(newServices));
   }, []);
 
-  if (!paginatedAuthServices) {
+  if (!paginatedAuthBackends) {
     return <Spinner />;
   }
 
-  const activeService = paginatedAuthServices.list.find((service) => service.id === paginatedAuthServices.globalConfig.activeBackend);
+  const activeBackend = paginatedAuthBackends.list.find((backend) => backend.id === paginatedAuthBackends.globalConfig.activeBackend);
 
   return (
     <>
@@ -53,12 +53,12 @@ const AuthenticationPage = ({ location, params }: Props) => {
         </span>
       </PageHeader>
 
-      <ServiceCreateGettingStarted />
+      <BackendCreateGettingStarted />
 
-      {activeService && <AuthenticationServiceDetails authenticationService={activeService} />}
+      {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
 
-      {paginatedAuthServices.list.size >= 1 && (
-        <AuthenticationServicesOverview paginatedAuthServices={paginatedAuthServices} />
+      {paginatedAuthBackends.list.size >= 1 && (
+        <BackendsOverview paginatedAuthBackends={paginatedAuthBackends} />
       )}
 
       {/* Old authentication management which can be removed soon */}

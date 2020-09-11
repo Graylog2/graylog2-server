@@ -1,7 +1,7 @@
 // @flow strict
-import AuthenticationService from 'logic/authentication/AuthenticationService';
+import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
-export type LdapService = AuthenticationService & {
+export type LdapService = AuthenticationBackend & {
   config: {
     defaultRoles: Array<string>,
     displayNameAttribute: string,

@@ -14,8 +14,8 @@ import {
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
-  AuthenticationServiceCreatePage,
-  AuthenticationServiceEditPage,
+  AuthenticationBackendCreatePage,
+  AuthenticationBackendEditPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateContentPackPage,
@@ -211,8 +211,8 @@ const AppRouter = () => {
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG} />
                 <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
               </Route>
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(':backendId')} component={AuthenticationServiceEditPage} />
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE(':name')} component={AuthenticationServiceCreatePage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(':backendId')} component={AuthenticationBackendEditPage} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE(':name')} component={AuthenticationBackendCreatePage} />
 
               <Route path={Routes.SYSTEM.USERS.OVERVIEW} component={UsersOverviewPage} />
               <Route path={Routes.SYSTEM.USERS.CREATE} component={UserCreatePage} />

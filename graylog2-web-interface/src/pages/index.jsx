@@ -4,8 +4,8 @@ const AlertConditionsPage = loadAsync(() => import('./AlertConditionsPage'));
 const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'));
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
-const AuthenticationServiceCreatePage = loadAsync(() => import('./AuthenticationServiceCreatePage'));
-const AuthenticationServiceEditPage = loadAsync(() => import('./AuthenticationServiceEditPage'));
+const AuthenticationBackendCreatePage = loadAsync(() => import('./AuthenticationBackendCreatePage'));
+const AuthenticationBackendEditPage = loadAsync(() => import('./AuthenticationBackendEditPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -85,8 +85,8 @@ export {
   AlertNotificationsPage,
   AlertsPage,
   AuthenticationPage,
-  AuthenticationServiceCreatePage,
-  AuthenticationServiceEditPage,
+  AuthenticationBackendCreatePage,
+  AuthenticationBackendEditPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
