@@ -1,10 +1,10 @@
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import MongoDbPasswordConfig from './MongoDbPasswordConfig';
-import MongoDbSessionConfig from './MongoDbSessionConfig';
-import LegacyLdapConfig from './LegacyLdapConfig';
-import RootUserConfig from './RootUserConfig';
-import AccessTokenConfig from './AccessTokenConfig';
+import MongoDbPasswordConfig from './legacy/MongoDbPasswordConfig';
+import MongoDbSessionConfig from './legacy/MongoDbSessionConfig';
+import LegacyLdapConfig from './legacy/LegacyLdapConfig';
+import RootUserConfig from './legacy/RootUserConfig';
+import AccessTokenConfig from './legacy/AccessTokenConfig';
 import BackendCreateLDAP from './ldap/BackendCreate';
 import BackendEditLDAP from './ldap/BackendEdit';
 import BackendSettingsLDAP from './BackendDetails/BackendSettings';
