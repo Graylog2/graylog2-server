@@ -1,7 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { withRouter } from 'react-router';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import { getAuthServicePlugin } from 'util/AuthenticationService';
 
 type Props = {
   params: {
@@ -10,14 +11,13 @@ type Props = {
 };
 
 const AuthenticationBackendCreatePage = ({ params: { name } }: Props) => {
-  const authServices = PluginStore.exports('authenticationServices') || [];
-  const authSerivce = authServices.find((service) => service.name === name);
+  const authService = getAuthServicePlugin(name);
 
-  if (!authSerivce) {
+  if (!authService) {
     return `No authentication service plugin configrued for "${name}"`;
   }
 
-  const { createComponent: BackendCreate } = authSerivce;
+  const { createComponent: BackendCreate } = authService;
 
   return <BackendCreate />;
 };

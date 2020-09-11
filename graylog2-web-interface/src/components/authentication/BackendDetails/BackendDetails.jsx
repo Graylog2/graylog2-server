@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { getAuthServicePlugin } from 'util/AuthenticationService';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import SectionGrid from 'components/common/Section/SectionGrid';
 
@@ -12,14 +12,13 @@ type Props = {
 };
 
 const BackendDetails = ({ authenticationBackend }: Props) => {
-  const authServices = PluginStore.exports('authenticationServices') || [];
-  const authSerivce = authServices.find((service) => service.name === authenticationBackend.config.type);
+  const authService = getAuthServicePlugin(authenticationBackend.config.type);
 
-  if (!authSerivce) {
+  if (!authService) {
     return `No authentication service plugin configrued for active type "${authenticationBackend.config.type}"`;
   }
 
-  const { detailsComponent: BackendSettings } = authSerivce;
+  const { detailsComponent: BackendSettings } = authService;
 
   return (
     <>

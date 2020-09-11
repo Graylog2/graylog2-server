@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { withRouter } from 'react-router';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { getAuthServicePlugin } from 'util/AuthenticationService';
 import { Spinner } from 'components/common';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 
@@ -30,14 +30,13 @@ const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { st
     return <Spinner />;
   }
 
-  const authServices = PluginStore.exports('authenticationServices') || [];
-  const authSerivce = authServices.find((service) => service.name === authBackend.config.type);
+  const authService = getAuthServicePlugin(authBackend.config.type);
 
-  if (!authSerivce) {
+  if (!authService) {
     return `No authentication service plugin configrued for "${authBackend.config.type}"`;
   }
 
-  const { editComponent: BackendEdit } = authSerivce;
+  const { editComponent: BackendEdit } = authService;
 
   return <BackendEdit authenticationBackend={authBackend} initialStep={step} />;
 };
