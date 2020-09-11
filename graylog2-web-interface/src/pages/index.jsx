@@ -5,6 +5,7 @@ const AlertNotificationsPage = loadAsync(() => import('./AlertNotificationsPage'
 const AlertsPage = loadAsync(() => import('./AlertsPage'));
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticationServiceCreatePage = loadAsync(() => import('./AuthenticationServiceCreatePage'));
+const AuthenticationServiceEditPage = loadAsync(() => import('./AuthenticationServiceEditPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -85,6 +86,7 @@ export {
   AlertsPage,
   AuthenticationPage,
   AuthenticationServiceCreatePage,
+  AuthenticationServiceEditPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,

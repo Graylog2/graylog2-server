@@ -98,7 +98,6 @@ const ServiceCreate = () => {
                              onSubmitAll={_handleSubmitAll}
                              onChange={(event, values) => _handleFieldUpdate('serverConfig', event, values)} />
       ),
-
     },
     {
       key: 'userSync',

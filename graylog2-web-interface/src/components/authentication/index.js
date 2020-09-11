@@ -6,6 +6,7 @@ import LegacyLdapConfig from './LegacyLdapConfig';
 import RootUserConfig from './RootUserConfig';
 import AccessTokenConfig from './AccessTokenConfig';
 import ServiceCreateLDAP from './ldap/ServiceCreate';
+import ServiceEditLDAP from './ldap/ServiceEdit';
 import ServiceSettingsLDAP from './ldap/ServiceSettings';
 
 PluginStore.register(new PluginManifest({}, {
@@ -51,6 +52,7 @@ PluginStore.register(new PluginManifest({}, {
       name: 'ldap',
       displayName: 'LDAP',
       createComponent: ServiceCreateLDAP,
+      editComponent: ServiceEditLDAP,
       detailsComponent: ServiceSettingsLDAP,
       configMapJson: ({
         default_groups: 'defaultGroups',
