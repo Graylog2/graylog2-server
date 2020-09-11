@@ -71,6 +71,9 @@ const ServiceUsersSection = () => {
 
   return (
     <SectionComponent title="Synced Users" showLoading={loading}>
+      <p className="description">
+        Found {total} synced users.
+      </p>
       <PaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
         <DataTable id="auth-users-overview"
                    className="table-hover"
