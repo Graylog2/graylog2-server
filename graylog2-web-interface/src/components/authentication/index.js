@@ -47,7 +47,7 @@ PluginStore.register(new PluginManifest({}, {
       component: AccessTokenConfig,
     },
   ],
-  authenticationServices: [
+  'authentication.services': [
     {
       name: 'ldap',
       displayName: 'LDAP',

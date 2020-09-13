@@ -25,7 +25,7 @@ const NoEnterpriseComponent = () => (
 );
 
 const GroupSyncSection = ({ authenticationBackend }: Props) => {
-  const authenticationPlugin = PluginStore.exports('authentication');
+  const authDetailsPlugins = PluginStore.exports('authentication.details');
   const editLink = {
     pathname: Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(authenticationBackend.id),
     query: {
@@ -39,7 +39,7 @@ const GroupSyncSection = ({ authenticationBackend }: Props) => {
     </SectionComponent>
   );
 
-  if (!authenticationPlugin || authenticationPlugin.length <= 0) {
+  if (!authDetailsPlugins || authDetailsPlugins.length <= 0) {
     return (
       <Section>
         <NoEnterpriseComponent />
@@ -47,7 +47,7 @@ const GroupSyncSection = ({ authenticationBackend }: Props) => {
     );
   }
 
-  const { GroupSyncDetails } = authenticationPlugin[0];
+  const { GroupSyncDetails } = authDetailsPlugins[0];
 
   return (
     <Section>

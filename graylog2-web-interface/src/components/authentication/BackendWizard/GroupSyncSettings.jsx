@@ -21,18 +21,18 @@ const NoEnterpriseComponent = () => (
 );
 
 const GroupSyncSettings = ({ onSubmit, onSubmitAll, onChange }: Props) => {
-  const authenticationPlugin = PluginStore.exports('authentication');
+  const authenticationPlugin = PluginStore.exports('authentication.groupSync');
 
   if (!authenticationPlugin || authenticationPlugin.length <= 0) {
     return <NoEnterpriseComponent />;
   }
 
-  const { GroupSyncSettings: GroupSyncSettingsForm } = authenticationPlugin[0];
+  const { GroupSyncForm } = authenticationPlugin[0];
 
   return (
-    <GroupSyncSettingsForm onSubmit={onSubmit}
-                           onSubmitAll={onSubmitAll}
-                           onChange={onChange} />
+    <GroupSyncForm onSubmit={onSubmit}
+                   onSubmitAll={onSubmitAll}
+                   onChange={onChange} />
   );
 };
 

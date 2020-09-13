@@ -32,7 +32,7 @@ const _onSubmit = ({ authenticationService }) => {
 };
 
 const BackendCreateSelect = () => {
-  const authServices = PluginStore.exports('authenticationServices');
+  const authServices = PluginStore.exports('authentication.services');
   const sortedAuthServices = authServices.sort((s1, s2) => defaultCompare(s1.displayName, s2.displayName));
   const authServicesOptions = sortedAuthServices.map((service) => ({ label: service.displayName, value: service.name }));
 
