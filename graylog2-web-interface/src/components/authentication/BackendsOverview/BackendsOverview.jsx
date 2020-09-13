@@ -3,8 +3,9 @@ import * as React from 'react';
 
 import type { PaginatedBackends } from 'actions/authentication/AuthenticationActions';
 import { Col, Row } from 'components/graylog';
-import { DataTable } from 'components/common';
+import { DataTable, PaginatedList } from 'components/common';
 
+import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
 
 const TABLE_HEADERS = ['Title', 'Description', 'Actions'];
@@ -33,20 +34,21 @@ const BackendsOverview = ({ paginatedAuthBackends }: Props) => {
         <p className="description">
           Found {backends.size} configured authentication services on the system.
         </p>
-
-        <DataTable id="auth-backends-overview"
-                   className="table-hover"
-                   rowClassName="no-bm"
-                   headers={TABLE_HEADERS}
-                   headerCellFormatter={_headerCellFormatter}
-                   sortByKey="title"
-                   rows={backends.toJS()}
-                   dataRowFormatter={(authBackend) => (
-                     <BackendsOverviewItem authenticationBackend={authBackend} isActive={_isActive(authBackend)} />
-                   )}
-                   filterKeys={[]}
-                   filterLabel="Filter configured services" />
-
+        <PaginatedList onChange={() => {}} totalItems={5} activePage={1}>
+          <DataTable id="auth-backends-overview"
+                     className="table-hover"
+                     rowClassName="no-bm"
+                     headers={TABLE_HEADERS}
+                     headerCellFormatter={_headerCellFormatter}
+                     sortByKey="title"
+                     rows={backends.toJS()}
+                     dataRowFormatter={(authBackend) => (
+                       <BackendsOverviewItem authenticationBackend={authBackend} isActive={_isActive(authBackend)} />
+                     )}
+                     customFilter={<BackendsFilter onSearch={() => Promise.resolve()} onReset={() => Promise.resolve()} />}
+                     filterKeys={[]}
+                     filterLabel="Filter configured services" />
+        </PaginatedList>
       </Col>
     </Row>
   );
