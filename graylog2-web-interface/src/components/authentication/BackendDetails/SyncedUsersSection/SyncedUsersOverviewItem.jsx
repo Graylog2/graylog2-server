@@ -2,7 +2,9 @@
 import * as React from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
+import { LinkContainer } from 'react-router-bootstrap';
 
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import RolesCell from 'components/users/UsersOverview/UserOverviewItem/RolesCell';
 import { Button, ButtonToolbar } from 'components/graylog';
 import Routes from 'routing/Routes';
@@ -17,8 +19,9 @@ const ActtionsWrapper = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
-const AuthUsersOverviewItem = ({
+const SyncedUsersOverviewItem = ({
   user: {
+    id,
     fullName,
     username,
     roles,
@@ -38,21 +41,23 @@ const AuthUsersOverviewItem = ({
         <ActtionsWrapper>
           {enabled
             ? (
-              <Button type="button" bsStyle="info" bsSize="xs" onClick={() => {}}>
+              <Button type="button" bsStyle="info" bsSize="xs" onClick={AuthenticationDomain.disableUser(id, username)}>
                 Disable
               </Button>
             ) : (
-              <Button type="button" bsStyle="info" bsSize="xs" onClick={() => {}}>
+              <Button type="button" bsStyle="info" bsSize="xs" onClick={AuthenticationDomain.enableUser(id, username)}>
                 Enable
               </Button>
             )}
-          <Button type="button" bsStyle="danger" bsSize="xs" onClick={() => {}}>
-            Delete
-          </Button>
+          <LinkContainer to={Routes.SYSTEM.USERS.edit(encodeURIComponent(username))}>
+            <Button type="button" bsStyle="info" bsSize="xs" onClick={() => {}}>
+              Edit
+            </Button>
+          </LinkContainer>
         </ActtionsWrapper>
       </td>
     </tr>
   );
 };
 
-export default AuthUsersOverviewItem;
+export default SyncedUsersOverviewItem;

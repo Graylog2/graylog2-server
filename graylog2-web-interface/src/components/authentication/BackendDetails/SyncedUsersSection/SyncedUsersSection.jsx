@@ -7,7 +7,7 @@ import { AuthenticationActions } from 'stores/authentication/AuthenticationStore
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { DataTable, PaginatedList, Spinner } from 'components/common';
 
-import AuthUsersOverviewItem from './SyncedUserstem';
+import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import ServiceUsersFilter from './SyncedUsersFilter';
 
 const DEFAULT_PAGINATION = {
@@ -39,7 +39,7 @@ const SyncedUsersSection = () => {
   const [paginatedUsers, setPaginatedUsers] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
   const { list: users, pagination: { page, perPage, query, total } } = paginatedUsers;
   const [loading, setLoading] = useState(false);
-  const _userOverviewItem = (user) => <AuthUsersOverviewItem user={user} />;
+  const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} />;
 
   const _loadUsers = (newPage = page, newPerPage = perPage, newQuery = query) => {
     return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
