@@ -75,7 +75,7 @@ const SyncedUsersSection = () => {
         Found {total} synced users.
       </p>
       <PaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
-        <DataTable id="auth-users-overview"
+        <DataTable id="synced-users-overview"
                    className="table-hover"
                    rowClassName="no-bm"
                    headers={TABLE_HEADERS}

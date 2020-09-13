@@ -1,7 +1,9 @@
 // @flow strict
 import * as React from 'react';
+import { useEffect } from 'react';
 
-import type { PaginatedBackends } from 'actions/authentication/AuthenticationActions';
+// import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+import AuthenticationActions, { type PaginatedBackends } from 'actions/authentication/AuthenticationActions';
 import { Col, Row } from 'components/graylog';
 import { DataTable, PaginatedList } from 'components/common';
 
@@ -9,6 +11,13 @@ import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
 
 const TABLE_HEADERS = ['Title', 'Description', 'Actions'];
+const DEFAULT_PAGINATION = {
+  count: undefined,
+  total: undefined,
+  page: 1,
+  perPage: 10,
+  query: '',
+};
 
 type Props = {
   paginatedAuthBackends: PaginatedBackends,
@@ -24,8 +33,36 @@ const _headerCellFormatter = (header) => {
 };
 
 const BackendsOverview = ({ paginatedAuthBackends }: Props) => {
+  // const [paginatedBackends, setPaginatedBackends] = useState({ adminUser: undefined, list: undefined, pagination: DEFAULT_PAGINATION });
+  // const { list: users, pagination: { page, perPage, query, total } } = paginatedBackends;
+
   const backends = paginatedAuthBackends.list;
   const _isActive = (authBackend) => authBackend.id === paginatedAuthBackends.globalConfig.activeBackend;
+
+  // const _loadUsers = () => {
+  // return AuthenticationDomain.loadUsersPaginated(newPage, newPerPage, newQuery)
+  //   .then((newPaginatedBackends) => newPaginatedBackends && setPaginatedBackends(newPaginatedBackends));
+  // };
+
+  useEffect(() => {
+    const unlistenDisableBackend = AuthenticationActions.disableUser.completed.listen(() => {
+      // _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
+    });
+
+    const unlistenEnableBackend = AuthenticationActions.enableUser.completed.listen(() => {
+      // _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
+    });
+
+    const unlistenDeleteBackend = AuthenticationActions.enableUser.completed.listen(() => {
+      // _loadUsers(DEFAULT_PAGINATION.page, undefined, DEFAULT_PAGINATION.query);
+    });
+
+    return () => {
+      unlistenDisableBackend();
+      unlistenEnableBackend();
+      unlistenDeleteBackend();
+    };
+  }, []);
 
   return (
     <Row className="content">

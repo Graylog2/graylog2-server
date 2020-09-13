@@ -46,6 +46,14 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
+    delete(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.Authentication.delete(backendId).url);
+      const promise = fetch('DELETE', url).then;
+      AuthenticationActions.delete.promise(promise);
+
+      return promise;
+    },
+
     load(id: string): Promise<?AuthenticationBackend> {
       // const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(id)).url);
       // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
@@ -68,6 +76,30 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       const url = qualifyUrl(ApiRoutes.Authentication.testLogin().url);
       const promise = fetch('POST', url, payload).then;
       AuthenticationActions.testLogin.promise(promise);
+
+      return promise;
+    },
+
+    enableUser(userId: string): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.Authentication.enableUser(userId).url);
+      const promise = fetch('POST', url).then;
+      AuthenticationActions.enableUser.promise(promise);
+
+      return promise;
+    },
+
+    disableUser(userId: string): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.Authentication.disableUser(userId).url);
+      const promise = fetch('POST', url).then;
+      AuthenticationActions.disableUser.promise(promise);
+
+      return promise;
+    },
+
+    setActiveBackend(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.Authentication.updateConfiguration.url);
+      const promise = fetch('POST', url, { active_backend: backendId }).then;
+      AuthenticationActions.setActiveBackend.promise(promise);
 
       return promise;
     },
@@ -135,22 +167,6 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       });
 
       AuthenticationActions.loadUsersPaginated.promise(promise);
-
-      return promise;
-    },
-
-    enableUser(userId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.Authentication.enableUser(userId).url);
-      const promise = fetch('POST', url).then;
-      AuthenticationActions.enableUser.promise(promise);
-
-      return promise;
-    },
-
-    disableUser(userId: string): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.Authentication.disableUser(userId).url);
-      const promise = fetch('POST', url).then;
-      AuthenticationActions.disableUser.promise(promise);
 
       return promise;
     },

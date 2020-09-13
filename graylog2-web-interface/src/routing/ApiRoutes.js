@@ -28,11 +28,13 @@ const ApiRoutes = {
     servicesPaginated: () => ({ url: '/system/authentication/backends' }),
     load: (serviceId) => ({ url: `/system/authentication/backends/${serviceId}` }),
     create: () => ({ url: '/system/authentication/backends' }),
+    delete: (backendId) => ({ url: `/system/authentication/backends/${backendId}` }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
     testLogin: () => ({ url: '/system/authentication/services/test/backend/login' }),
     loadUsersPaginated: () => ({ url: '/api/system/authentication/users' }),
     enableUser: (userId) => ({ url: `/api/system/authentication/users/${userId}/enable` }),
     disableUser: (userId) => ({ url: `/api/system/authentication/users/${userId}/disable` }),
+    updateConfiguration: () => ({ url: '/api/system/authentication/configuration' }),
 
   },
   AuthzRolesController: {
