@@ -39,8 +39,9 @@ const AuthenticationPage = () => {
 
   return (
     <DocumentTitle title="Authentication Management">
-      <PageHeader title="Authentication Management"
-                  subactions={(activeBackend && (
+      <>
+        <PageHeader title="Authentication Management"
+                    subactions={(activeBackend && (
                     <ButtonToolbar>
                       <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend.id)}>
                         <Button bsStyle="success">
@@ -53,28 +54,29 @@ const AuthenticationPage = () => {
                         </Button>
                       </LinkContainer>
                     </ButtonToolbar>
-                  ))}>
-        <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
-        <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                 text="documentation" />.
-        </span>
-        <BackendOverviewLinks />
-      </PageHeader>
+                    ))}>
+          <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+          <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
+                                                                   text="documentation" />.
+          </span>
+          <BackendOverviewLinks />
+        </PageHeader>
 
-      {!activeBackend && <BackendCreateGettingStarted />}
+        {!activeBackend && <BackendCreateGettingStarted />}
 
-      {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
+        {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
 
-      {paginatedAuthBackends.list.size >= 1 && (
+        {paginatedAuthBackends.list.size >= 1 && (
         <BackendsOverview paginatedAuthBackends={paginatedAuthBackends} />
-      )}
+        )}
 
-      {/* Old authentication management which can be removed soon */}
-      {/* <Row className="content">
-        <Col md={12}>
-          <AuthenticationComponent location={location} params={params} />
-        </Col>
-      </Row> */}
+        {/* Old authentication management which can be removed soon */}
+        {/* <Row className="content">
+          <Col md={12}>
+            <AuthenticationComponent location={location} params={params} />
+          </Col>
+        </Row> */}
+      </>
     </DocumentTitle>
   );
 };

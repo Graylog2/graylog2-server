@@ -49,14 +49,13 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
-  console.log(stepsState.formValues);
 
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
     AuthzRolesDomain.loadRolesPaginated(...getUnlimited).then((roles) => {
       if (roles) {
-        const options = roles.list.map((role) => ({ label: role.name, value: role.name }));
+        const options = roles.list.map((role) => ({ label: role.name, value: role.name })).toArray();
         setRolesOptions(options);
       }
     });
