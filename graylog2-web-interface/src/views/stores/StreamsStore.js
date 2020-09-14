@@ -24,10 +24,7 @@ export const StreamsStore = singletonStore(
     init() {
       this.refresh();
 
-      SessionActions.logout.completed.listen(() => {
-        this.clear();
-        this.refresh();
-      });
+      SessionActions.logout.completed.listen(() => this.clear());
     },
     getInitialState() {
       return this._state();
