@@ -54,8 +54,8 @@ public abstract class LdapConfig {
     public enum EncryptionSetting {
         @JsonProperty("none")
         NONE,
-        @JsonProperty("ssl")
-        SSL,
+        @JsonProperty("tls")
+        TLS,
         @JsonProperty("start_tls")
         START_TLS
     }

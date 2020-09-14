@@ -130,7 +130,7 @@ public class UnboundLdapConnector {
                 SSLContext sslContext = sslUtil.createSSLContext();
                 // Use the StartTLS extended operation to secure the connection.
                 startTLSRequest = new StartTLSExtendedRequest(sslContext);
-            } else if (ldapConfig.encyrption() == LdapConfig.EncryptionSetting.SSL) {
+            } else if (ldapConfig.encyrption() == LdapConfig.EncryptionSetting.TLS) {
                 socketFactory = sslUtil.createSSLSocketFactory();
             }
         }
@@ -175,7 +175,7 @@ public class UnboundLdapConnector {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Search {} for {}, starting at {}",
-                      activeDirectory ? "ActiveDirectory" : "LDAP", filterString, searchBase);
+                    activeDirectory ? "ActiveDirectory" : "LDAP", filterString, searchBase);
         }
 
         final SearchResult searchResult = connection.search(searchRequest);
@@ -269,7 +269,7 @@ public class UnboundLdapConnector {
         config.serverList(ImmutableList.of(LdapConfig.LdapServer.create(ldapUri.getHost(), ldapUri.getPort())));
 
         if (ldapUri.getScheme().startsWith("ldaps")) {
-            config.encyrption(LdapConfig.EncryptionSetting.SSL);
+            config.encyrption(LdapConfig.EncryptionSetting.TLS);
         } else if (settings.isUseStartTls()) {
             config.encyrption(LdapConfig.EncryptionSetting.START_TLS);
         } else {
@@ -293,7 +293,7 @@ public class UnboundLdapConnector {
         final URI ldapUri = request.ldapUri();
         config.serverList(ImmutableList.of(LdapConfig.LdapServer.create(ldapUri.getHost(), ldapUri.getPort())));
         if (ldapUri.getScheme().startsWith("ldaps")) {
-            config.encyrption(LdapConfig.EncryptionSetting.SSL);
+            config.encyrption(LdapConfig.EncryptionSetting.TLS);
         } else if (request.useStartTls()) {
             config.encyrption(LdapConfig.EncryptionSetting.START_TLS);
         } else {
