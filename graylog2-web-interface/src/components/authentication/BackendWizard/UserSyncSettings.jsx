@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field } from 'formik';
 
+import FormUtils from 'util/FormsUtils';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { FormikFormGroup, Select } from 'components/common';
 import { Button, ButtonToolbar, Row, Col, Panel } from 'components/graylog';
@@ -69,17 +70,20 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
                            name="userSearchBase"
                            placeholder="System User DN"
                            required
+                           validate={FormUtils.validation.isRequired('System Username')}
                            help={help.userSearchBase} />
 
           <FormikFormGroup label="Search Pattern"
                            name="userSearchPattern"
                            placeholder="Search Pattern"
                            required
+                           validate={FormUtils.validation.isRequired('Search Pattern')}
                            help={help.userSearchPattern} />
 
           <FormikFormGroup label="Display Name Attirbute"
                            name="displayNameAttribute"
                            placeholder="Display Name Attirbute"
+                           validate={FormUtils.validation.isRequired('Display Name Attribute')}
                            required
                            help={help.displayNameAttribute} />
 
@@ -92,7 +96,7 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
             </Col>
           </Row>
 
-          <Field name="defaultRoles">
+          <Field name="defaultRoles" validate={FormUtils.validation.isRequired('Default Roles')}>
             {({ field: { name, value, onChange: onFieldChange } }) => (
               <Input id="default-roles-select"
                      label="Default Roles"

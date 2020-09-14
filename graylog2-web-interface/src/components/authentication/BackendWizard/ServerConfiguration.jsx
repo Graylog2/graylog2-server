@@ -1,9 +1,11 @@
 // @flow strict
+
 import * as React from 'react';
 import styled from 'styled-components';
 import { useContext } from 'react';
 import { Formik, Form } from 'formik';
 
+import FormUtils from 'util/FormsUtils';
 import { FormikFormGroup, FormikInput } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { Button, ButtonToolbar } from 'components/graylog';
@@ -56,10 +58,12 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
                 <FormikInput name="serverUriHost"
                              placeholder="Hostname"
                              formGroupClassName=""
+                             validate={FormUtils.validation.isRequired('server host')}
                              required />
                 <span className="input-group-addon input-group-separator">:</span>
                 <FormikInput type="number"
                              name="serverUriPort"
+                             validate={FormUtils.validation.isRequired('server port')}
                              min="1"
                              max="65535"
                              placeholder="Port"
@@ -92,12 +96,12 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
                            name="systemUsername"
                            placeholder="System User DN"
                            required
+                           validate={FormUtils.validation.isRequired('System Username')}
                            help={help.systemUsername} />
 
           <FormikFormGroup label="System Password"
                            name="systemPassword"
                            placeholder="System Password"
-                           required
                            type="password"
                            help={help.systemPassword} />
           <ButtonToolbar className="pull-right">

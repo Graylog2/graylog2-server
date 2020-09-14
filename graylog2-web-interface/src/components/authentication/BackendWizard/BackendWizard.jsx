@@ -29,7 +29,6 @@ const _prepareSubmitPayload = (authServiceType) => ({
   serverUriHost,
   serverUriPort,
   systemUsername,
-  systemPassword,
   userSearchBase,
   userSearchPattern,
   displayNameAttribute,
@@ -74,9 +73,8 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
     displayNameAttribute,
   } = stepsState.formValues;
 
-  const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername && systemPassword);
+  const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername);
   const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && displayNameAttribute);
-  const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => setStepsState({ ...stepsState, activeStepKey: stepKey });
 
   const _handleSubmitAll = () => {
     if (isServerConfigValid && isUserSyncSettingValid) {
@@ -87,6 +85,8 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
       });
     }
   };
+
+  const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => setStepsState({ ...stepsState, activeStepKey: stepKey });
 
   const _handleFieldUpdate = (event: SyntheticInputEvent<HTMLInputElement>) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
