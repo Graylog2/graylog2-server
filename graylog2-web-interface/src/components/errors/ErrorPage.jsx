@@ -8,7 +8,7 @@ import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
 
-const errorPageStyles = (backgroundImage) => css`
+const generateStyles = (backgroundImage) => css`
   body {
     background: url(${backgroundImage}) no-repeat center center fixed;
     background-size: cover;
@@ -39,13 +39,13 @@ type Props = {
 };
 
 const ErrorPage = ({ children, title, description, backgroundImage }: Props) => {
-  const LoadingPageStyles = createGlobalStyle`
-    ${errorPageStyles(backgroundImage)}
+  const ErrorPageStyles = createGlobalStyle`
+    ${generateStyles(backgroundImage)}
   `;
 
   return (
     <AppContentGrid>
-      <LoadingPageStyles />
+      <ErrorPageStyles />
       <div className="container-fluid">
         <DocumentTitle title={title}>
           <ErrorJumbotron title={title}>
