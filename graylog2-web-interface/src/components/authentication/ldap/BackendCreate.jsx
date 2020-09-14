@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -19,7 +20,7 @@ const BackendCreate = () => {
         </span>
         <BackendOverviewLinks />
       </PageHeader>
-      <BackendWizard onSubmitAll={() => Promise.resolve()} />
+      <BackendWizard onSubmit={AuthenticationDomain.create} authServiceType="ldap" />
     </DocumentTitle>
   );
 };

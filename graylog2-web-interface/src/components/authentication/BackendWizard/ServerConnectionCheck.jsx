@@ -21,7 +21,7 @@ const ServerConnectionCheck = () => {
       uriPort,
       systemUsername,
       systemPassword,
-      useStartTLS,
+      useStartTls,
       trustAllCertificates,
     } = serverConfig ?? {};
     const ldapURI = `${new URI('').host(uriHost).port(uriPort).scheme('ldap')}`;
@@ -32,7 +32,7 @@ const ServerConnectionCheck = () => {
       ldap_uri: ldapURI,
       system_username: systemUsername,
       system_password: systemPassword,
-      use_start_tls: useStartTLS,
+      use_start_tls: useStartTls,
       trust_all_certificates: trustAllCertificates,
     }).then((result) => {
       if (result.connected) {

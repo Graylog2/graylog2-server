@@ -126,7 +126,7 @@ const UserLoginCheck = () => {
       system_password_set: !!serverConfig.systemPassword,
       system_username: serverConfig.systemUsername,
       trust_all_certificates: serverConfig.trustAllCertificates,
-      use_start_tls: serverConfig.useStartTLS,
+      use_start_tls: serverConfig.useStartTls,
 
     };
 

@@ -7,6 +7,9 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
+
+import type { LdapService, LdapCreate } from './types';
 
 import BackendWizard from '../BackendWizard';
 
@@ -15,24 +18,20 @@ type Props = {
   initialStep: ?string,
 };
 
-const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
-  console.log(authenticationBackend.config);
-  const {
-    defaultRoles,
-    displayNameAttribute,
-    encryptedSystemPassword,
-    serverUri,
-    systemUsername,
-    trustAllCertificates,
-    userSearchBase,
-    userSearchPattern,
-    useStartTls,
-    useSsl,
-  } = authenticationBackend.config;
-
+const _initialValues = ({
+  defaultRoles,
+  displayNameAttribute,
+  serverUri,
+  systemUsername,
+  trustAllCertificates,
+  userSearchBase,
+  userSearchPattern,
+  useStartTls,
+  useSsl,
+}: $PropertyType<LdapService, 'config'>) => {
   const serverUriObj = new URI(serverUri);
 
-  const formValues = {
+  return {
     defaultRoles,
     displayNameAttribute,
     systemUsername,
@@ -41,10 +40,18 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
     userSearchPattern,
     useStartTls,
     useSsl,
-    systemPassword: encryptedSystemPassword, // TMP
     serverUriHost: serverUriObj.hostname(),
     serverUriPort: serverUriObj.port(),
   };
+};
+
+const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
+  const initialValues = _initialValues(authenticationBackend.config);
+  const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
+    {
+      ...payload,
+      id: authenticationBackend.id,
+    });
 
   return (
     <DocumentTitle title="Edit LDAP Authentication Provider">
@@ -56,7 +63,11 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
         </span>
         <BackendOverviewLinks />
       </PageHeader>
-      <BackendWizard onSubmitAll={() => {}} initialValues={formValues} initialStep={initialStep} editing />
+      <BackendWizard initialValues={initialValues}
+                     initialStep={initialStep}
+                     onSubmit={_handleSubmit}
+                     authServiceType="ldap"
+                     editing />
     </DocumentTitle>
   );
 };

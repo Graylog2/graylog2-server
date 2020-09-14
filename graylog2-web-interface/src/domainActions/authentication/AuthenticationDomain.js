@@ -21,12 +21,22 @@ const load: $PropertyType<ActionsType, 'load'> = notifyingAction({
   }),
 });
 
+const update: $PropertyType<ActionsType, 'update'> = notifyingAction({
+  action: AuthenticationActions.update,
+  success: (authBackendId, authBackend) => ({
+    message: `Authentication backend "${authBackend.title} was updated successfully"`,
+  }),
+  error: (error, authBackendId, authBackend) => ({
+    message: `Updating authentication backend "${authBackend.title}" failed with status: ${error}`,
+  }),
+});
+
 const deleteBackend: $PropertyType<ActionsType, 'delete'> = notifyingAction({
   action: AuthenticationActions.delete,
   success: (authBackendId, authBackendTitle) => ({
     message: `Authentication backend "${authBackendTitle} was deleted successfully"`,
   }),
-  error: (error, authBackendTitle) => ({
+  error: (error, authBackendId, authBackendTitle) => ({
     message: `Deleting authentication backend "${authBackendTitle}" failed with status: ${error}`,
   }),
 });
@@ -91,6 +101,7 @@ const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = not
 
 export default {
   create,
+  update,
   load,
   delete: deleteBackend,
   testConnection,

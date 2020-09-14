@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import URI from 'urijs';
 
 import Wizard, { type Step } from 'components/common/Wizard';
-import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
@@ -15,22 +14,35 @@ import UserSyncSettings from './UserSyncSettings';
 import Sidebar from './Sidebar';
 import GroupSyncSettings from './GroupSyncSettings';
 
-const LdapActions = ActionsProvider.getActions('Ldap');
+import type { LdapCreate } from '../ldap/types';
 
 type Props = {
   initialValues: WizardFormValues,
   initialStep: $PropertyType<Step, 'key'>,
-  onSubmitAll: (WizardFormValues) => Promise<void>,
-  editing?: boolean,
+  onSubmit: (LdapCreate) => Promise<void>,
+  editing: boolean,
+  authServiceType: string,
 };
 
-const BackendWizard = ({ initialValues, initialStep, onSubmitAll, editing }: Props) => {
+const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, editing }: Props) => {
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStep,
     formValues: initialValues,
   });
 
-  const { serverUriHost, serverUriPort, systemUsername, systemPassword, userSearchBase, userSearchPattern, displayNameAttribute, trustAllCertificates, useStartTLS } = stepsState.formValues;
+  const {
+    defaultRoles,
+    serverUriHost,
+    serverUriPort,
+    systemUsername,
+    systemPassword,
+    userSearchBase,
+    userSearchPattern,
+    displayNameAttribute,
+    trustAllCertificates,
+    useStartTls,
+    useSsl,
+  } = stepsState.formValues;
 
   const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername && systemPassword);
   const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && displayNameAttribute);
@@ -39,34 +51,27 @@ const BackendWizard = ({ initialValues, initialStep, onSubmitAll, editing }: Pro
 
   const _handleSubmitAll = () => {
     if (isServerConfigValid && isUserSyncSettingValid) {
-      // Temporary until we defined the correct request payload
-      const ldapURI = `${new URI('').host(serverUriHost).port(serverUriPort).scheme('ldap')}`;
-      const ldapSettings = {
-        active_directory: false,
-        additional_default_groups: [],
-        default_group: 'Reader',
-        display_name_attribute: displayNameAttribute,
-        enabled: true,
-        group_id_attribute: '',
-        group_mapping: {},
-        group_search_base: '',
-        group_search_pattern: '',
-        ldap_uri: ldapURI,
-        search_base: userSearchBase,
-        search_pattern: userSearchPattern,
-        system_password_set: !!systemPassword,
-        system_username: systemUsername,
-        trust_all_certificates: trustAllCertificates,
-        use_start_tls: useStartTLS,
+      const serverUri = `${new URI('').host(serverUriHost).port(serverUriPort).scheme('ldap')}`;
+      const payload = {
+        title: 'Example Title',
+        description: 'Example description',
+        config: {
+          type: authServiceType,
+          default_roles: defaultRoles,
+          display_name_attribute: displayNameAttribute,
+          server_uri: serverUri,
+          system_username: systemUsername,
+          trust_all_certificates: trustAllCertificates,
+          user_search_base: userSearchBase,
+          user_search_pattern: userSearchPattern,
+          use_start_tls: useStartTls,
+          use_ssl: useSsl,
+        },
       };
 
-      LdapActions.update(ldapSettings).then((response) => {
-        if (response) {
-          history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
-        }
+      onSubmit(payload).then(() => {
+        history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
       });
-
-      onSubmitAll({});
     }
   };
 
@@ -139,7 +144,7 @@ BackendWizard.defaultProps = {
   initialValues: {
     serverUriHost: 'localhost',
     serverUriPort: 389,
-    useStartTLS: true,
+    useStartTls: true,
     trustAllCertificates: false,
   },
 };

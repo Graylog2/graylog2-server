@@ -75,7 +75,7 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
                              label="SSL" />
 
                 <FormikInput type="checkbox"
-                             name="useStartTLS"
+                             name="useStartTls"
                              formGroupClassName=""
                              label="StartTLS" />
 

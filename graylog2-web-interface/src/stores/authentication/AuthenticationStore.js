@@ -10,7 +10,16 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'views/logic/singleton';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 // import PaginationURL from 'util/PaginationURL';
-import type { PaginatedBackends, PaginatedAuthUsers, AuthenticationBackendCreate, ConnectionTestPayload, ConnectionTestResult, LoginTestPayload, LoginTestResult } from 'actions/authentication/AuthenticationActions';
+import type {
+  PaginatedBackends,
+  PaginatedAuthUsers,
+  AuthenticationBackendCreate,
+  ConnectionTestPayload,
+  ConnectionTestResult,
+  LoginTestPayload,
+  LoginTestResult,
+  AuthenticationBackendUpdate,
+} from 'actions/authentication/AuthenticationActions';
 // import type { PaginatedResponseType } from 'stores/PaginationTypes';
 // import type { AuthenticationBackendJson } from 'logic/authentication/AuthenticationBackend';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -46,20 +55,28 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       return promise;
     },
 
-    delete(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
-      const url = qualifyUrl(ApiRoutes.Authentication.delete(backendId).url);
-      const promise = fetch('DELETE', url).then;
-      AuthenticationActions.delete.promise(promise);
-
-      return promise;
-    },
-
     load(id: string): Promise<?AuthenticationBackend> {
       // const url = qualifyUrl(ApiRoutes.Authentication.load(encodeURIComponent(id)).url);
       // const promise = fetch('GET', url).then(AuthenticationBackend.fromJSON);
       const promise = Promise.resolve(services.first());
 
       AuthenticationActions.load.promise(promise);
+
+      return promise;
+    },
+
+    update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.Authentication.update(backendId).url);
+      const promise = fetch('DELETE', url, payload).then;
+      AuthenticationActions.update.promise(promise);
+
+      return promise;
+    },
+
+    delete(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
+      const url = qualifyUrl(ApiRoutes.Authentication.delete(backendId).url);
+      const promise = fetch('DELETE', url).then;
+      AuthenticationActions.delete.promise(promise);
 
       return promise;
     },

@@ -4,7 +4,7 @@ import * as React from 'react';
 import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
-export type WizardFormValues = { [string]: mixed };
+export type WizardFormValues = any;
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
   formValues: WizardFormValues,

@@ -9,11 +9,16 @@ import AuthenticationUser from 'logic/authentication/AuthenticationUser';
 import type { PaginationType } from 'stores/PaginationTypes';
 
 export type AuthenticationBackendCreate = {
-  title: string,
-  description: string,
-  config: {
-    [string]: mixed,
-  },
+  title: $PropertyType<AuthenticationBackend, 'title'>,
+  description: $PropertyType<AuthenticationBackend, 'description'>,
+  config: any,
+};
+
+export type AuthenticationBackendUpdate = {
+  id: $PropertyType<AuthenticationBackend, 'id'>,
+  title: $PropertyType<AuthenticationBackend, 'title'>,
+  description: $PropertyType<AuthenticationBackend, 'decription'>,
+  config: any,
 };
 
 export type PaginatedBackends = {
@@ -41,6 +46,7 @@ export type LoginTestResult = ConnectionTestResult;
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<void>,
+  update: (id: string, AuthenticationBackendUpdate) => Promise<void>,
   load: (id: string) => Promise<?AuthenticationBackend>,
   delete: (authBackendId: ?$PropertyType<AuthenticationBackend, 'id'>, authBackendTitle: $PropertyType<AuthenticationBackend, 'title'>) => Promise<void>,
   testConnection: (payload: ConnectionTestPayload) => Promise<?ConnectionTestResult>,
@@ -58,6 +64,7 @@ const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(
     legacyLoad: { asyncResult: true },
     legacyUpdate: { asyncResult: true },
     create: { asyncResult: true },
+    update: { asyncResult: true },
     load: { asyncResult: true },
     delete: { asyncResult: true },
     testConnection: { asyncResult: true },
