@@ -16,6 +16,8 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { ExtendedSearchPage } from 'views/pages';
 import { syncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
 
+import IfUserHasAccessToAnyStream from '../components/IfUserHasAccessToAnyStream';
+
 type URLQuery = { [string]: any };
 
 type Props = {
@@ -134,7 +136,9 @@ class NewSearchPage extends React.Component<Props, State> {
       return (
         <ViewLoaderContext.Provider value={this.loadView}>
           <NewViewLoaderContext.Provider value={this.loadEmptyView}>
-            <ExtendedSearchPage route={route} location={location} />
+            <IfUserHasAccessToAnyStream>
+              <ExtendedSearchPage route={route} location={location} />
+            </IfUserHasAccessToAnyStream>
           </NewViewLoaderContext.Provider>
         </ViewLoaderContext.Provider>
       );

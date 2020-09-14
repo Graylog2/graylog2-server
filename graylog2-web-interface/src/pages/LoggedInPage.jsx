@@ -5,6 +5,8 @@ import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
+import StreamsProvider from '../contexts/StreamsProvider';
+
 const LoggedInPage = () => {
   const { addGlobalStyles } = useContext(GlobalStylesContext);
 
@@ -15,7 +17,9 @@ const LoggedInPage = () => {
   return (
     <CurrentUserProvider>
       <CurrentUserPreferencesProvider>
-        <AppRouter />
+        <StreamsProvider>
+          <AppRouter />
+        </StreamsProvider>
       </CurrentUserPreferencesProvider>
     </CurrentUserProvider>
   );
