@@ -7,6 +7,16 @@ import { Input } from 'components/bootstrap';
 
 const FORM_FIELDS = ['firstName', 'lastName', 'email', 'phone', 'company'];
 
+const PHONE_PATTERN = /^[0-9+]+[0-9\-.\s]+$/;
+
+const PHONE_VALIDATOR = (key, value) => {
+  if (lodash.isEmpty(lodash.trim(value))) {
+    return 'Phone number required';
+  }
+
+  return PHONE_PATTERN.test(value) ? null : 'Invalid phone number';
+};
+
 export default class EnterpriseFreeLicenseForm extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
@@ -23,6 +33,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
         phone: '',
         company: '',
       },
+      errors: {},
       isSubmitting: false,
     };
   }
@@ -33,19 +44,42 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
     this.setState({ formFields: clearedFields }, callback);
   };
 
-  handleInput = (key) => {
+  handleInput = (key, validator) => {
     return (event) => {
-      const { formFields } = this.state;
+      const { formFields, errors } = this.state;
       const newFormFields = Object.assign(formFields, { [key]: event.target.value });
+      const newErrors = { ...errors };
 
-      this.setState({ formFields: newFormFields });
+      if (validator && (typeof validator === 'function')) {
+        const errorMessage = validator(key, newFormFields[key]);
+
+        if (errorMessage) {
+          newErrors[key] = errorMessage;
+        } else {
+          delete newErrors[key];
+        }
+      }
+
+      this.setState({ formFields: newFormFields, errors: newErrors });
     };
   };
 
-  formIsInvalid = () => {
-    const { isSubmitting, formFields } = this.state;
+  validationState = (key) => {
+    const { errors } = this.state;
 
-    return isSubmitting || !lodash.isEmpty(FORM_FIELDS.filter((key) => lodash.isEmpty(lodash.trim(formFields[key]))));
+    return errors[key] ? 'error' : null;
+  };
+
+  validationMessage = (key) => {
+    const { errors } = this.state;
+
+    return errors[key];
+  };
+
+  formIsInvalid = () => {
+    const { isSubmitting, formFields, errors } = this.state;
+
+    return isSubmitting || !lodash.isEmpty(errors) || !lodash.isEmpty(FORM_FIELDS.filter((key) => lodash.isEmpty(lodash.trim(formFields[key]))));
   };
 
   submitForm = (event) => {
@@ -110,8 +144,10 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
                    label="Phone Number"
                    value={phone}
                    placeholder="Please provide a valid phone number"
+                   help={this.validationMessage('phone')}
+                   bsStyle={this.validationState('phone')}
                    required
-                   onChange={this.handleInput('phone')} />
+                   onChange={this.handleInput('phone', PHONE_VALIDATOR)} />
           </Col>
         </Row>
         <Row>
