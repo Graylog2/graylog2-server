@@ -49,7 +49,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     create(authBackend: AuthenticationBackendCreate): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.create().url);
-      const promise = fetch('POST', url, authBackend).then;
+      const promise = fetch('POST', url, authBackend);
       AuthenticationActions.create.promise(promise);
 
       return promise;
@@ -67,7 +67,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     update(backendId: ?$PropertyType<AuthenticationBackend, 'id'>, payload: AuthenticationBackendUpdate): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.update(backendId).url);
-      const promise = fetch('DELETE', url, payload).then;
+      const promise = fetch('DELETE', url, payload);
       AuthenticationActions.update.promise(promise);
 
       return promise;
@@ -75,7 +75,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     delete(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.delete(backendId).url);
-      const promise = fetch('DELETE', url).then;
+      const promise = fetch('DELETE', url);
       AuthenticationActions.delete.promise(promise);
 
       return promise;
@@ -83,7 +83,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     testConnection(payload: ConnectionTestPayload): ConnectionTestResult {
       const url = qualifyUrl(ApiRoutes.Authentication.testConnection().url);
-      const promise = fetch('POST', url, payload).then;
+      const promise = fetch('POST', url, payload);
       AuthenticationActions.testConnection.promise(promise);
 
       return promise;
@@ -91,7 +91,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     testLogin(payload: LoginTestPayload): LoginTestResult {
       const url = qualifyUrl(ApiRoutes.Authentication.testLogin().url);
-      const promise = fetch('POST', url, payload).then;
+      const promise = fetch('POST', url, payload);
       AuthenticationActions.testLogin.promise(promise);
 
       return promise;
@@ -99,7 +99,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     enableUser(userId: string): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.enableUser(userId).url);
-      const promise = fetch('POST', url).then;
+      const promise = fetch('POST', url);
       AuthenticationActions.enableUser.promise(promise);
 
       return promise;
@@ -107,7 +107,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     disableUser(userId: string): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.disableUser(userId).url);
-      const promise = fetch('POST', url).then;
+      const promise = fetch('POST', url);
       AuthenticationActions.disableUser.promise(promise);
 
       return promise;
@@ -115,7 +115,7 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
 
     setActiveBackend(backendId: ?$PropertyType<AuthenticationBackend, 'id'>): Promise<void> {
       const url = qualifyUrl(ApiRoutes.Authentication.updateConfiguration.url);
-      const promise = fetch('POST', url, { active_backend: backendId }).then;
+      const promise = fetch('POST', url, { active_backend: backendId });
       AuthenticationActions.setActiveBackend.promise(promise);
 
       return promise;

@@ -34,15 +34,40 @@ export type PaginatedAuthUsers = {
   pagination: PaginationType,
 };
 
-export type ConnectionTestPayload = { backend_configuration: AuthenticationBackendCreate } | { backend_id: string };
+export type ConnectionTestPayload = {
+  backend_configuration: AuthenticationBackendCreate,
+} | {
+  backend_id: string,
+};
 export type ConnectionTestResult = {
   success: boolean,
   message: string,
-  error: Array<string>,
+  errors: Array<string>,
 };
 
-export type LoginTestPayload = ConnectionTestPayload;
-export type LoginTestResult = ConnectionTestResult;
+export type LoginTestPayload = {
+  backend_id: ?string,
+  backend_configuration: AuthenticationBackendCreate,
+  username: string,
+  password: string,
+};
+
+export type LoginTestResult = {
+  success: boolean,
+  message: string,
+  result: {
+    type: string,
+    user_exists: boolean,
+    login_success: boolean,
+    user_details: {
+      uid: string,
+      uidNumber: number,
+      gidNumber: number,
+      cn: string,
+      objectClass: Array<string>,
+    },
+  },
+};
 
 export type ActionsType = {
   create: (AuthenticationBackendCreate) => Promise<void>,

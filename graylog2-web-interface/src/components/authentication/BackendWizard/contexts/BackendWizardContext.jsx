@@ -8,6 +8,11 @@ export type WizardFormValues = any;
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
   formValues: WizardFormValues,
+  prepareSubmitPayload: WizardFormValues => ({
+    title: string,
+    description: string,
+    config: any,
+  }),
 };
 
 export type BackendWizardType = WizardStepsState & {
@@ -18,6 +23,7 @@ const initialState = {
   setStepsState: () => {},
   activeStepKey: '',
   formValues: {},
+  prepareSubmitPayload: () => {},
 };
 
 const BackendWizardContext = React.createContext<BackendWizardType>(initialState);

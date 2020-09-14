@@ -24,14 +24,47 @@ type Props = {
   authServiceType: string,
 };
 
+const _prepareSubmitPayload = (authServiceType) => ({
+  defaultRoles,
+  serverUriHost,
+  serverUriPort,
+  systemUsername,
+  systemPassword,
+  userSearchBase,
+  userSearchPattern,
+  displayNameAttribute,
+  trustAllCertificates,
+  useStartTls,
+  useSsl,
+}: WizardFormValues) => {
+  const serverUri = `${new URI('').host(serverUriHost).port(serverUriPort).scheme('ldap')}`;
+
+  return {
+    title: 'Example Title',
+    description: 'Example description',
+    config: {
+      type: authServiceType,
+      default_roles: defaultRoles,
+      display_name_attribute: displayNameAttribute,
+      server_uri: serverUri,
+      system_username: systemUsername,
+      trust_all_certificates: trustAllCertificates,
+      user_search_base: userSearchBase,
+      user_search_pattern: userSearchPattern,
+      use_start_tls: useStartTls,
+      use_ssl: useSsl,
+    },
+  };
+};
+
 const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, editing }: Props) => {
   const [stepsState, setStepsState] = useState<WizardStepsState>({
     activeStepKey: initialStep,
     formValues: initialValues,
+    prepareSubmitPayload: _prepareSubmitPayload(authServiceType),
   });
 
   const {
-    defaultRoles,
     serverUriHost,
     serverUriPort,
     systemUsername,
@@ -39,35 +72,15 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
     userSearchBase,
     userSearchPattern,
     displayNameAttribute,
-    trustAllCertificates,
-    useStartTls,
-    useSsl,
   } = stepsState.formValues;
 
   const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername && systemPassword);
   const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && displayNameAttribute);
-
   const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => setStepsState({ ...stepsState, activeStepKey: stepKey });
 
   const _handleSubmitAll = () => {
     if (isServerConfigValid && isUserSyncSettingValid) {
-      const serverUri = `${new URI('').host(serverUriHost).port(serverUriPort).scheme('ldap')}`;
-      const payload = {
-        title: 'Example Title',
-        description: 'Example description',
-        config: {
-          type: authServiceType,
-          default_roles: defaultRoles,
-          display_name_attribute: displayNameAttribute,
-          server_uri: serverUri,
-          system_username: systemUsername,
-          trust_all_certificates: trustAllCertificates,
-          user_search_base: userSearchBase,
-          user_search_pattern: userSearchPattern,
-          use_start_tls: useStartTls,
-          use_ssl: useSsl,
-        },
-      };
+      const payload = stepsState.prepareSubmitPayload(stepsState.formValues);
 
       onSubmit(payload).then(() => {
         history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
