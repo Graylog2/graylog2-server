@@ -41,11 +41,11 @@ const SyncedUsersOverviewItem = ({
         <ActtionsWrapper>
           {enabled
             ? (
-              <Button type="button" bsStyle="info" bsSize="xs" onClick={AuthenticationDomain.disableUser(id, username)}>
+              <Button type="button" bsStyle="info" bsSize="xs" onClick={() => AuthenticationDomain.disableUser(id, username)}>
                 Disable
               </Button>
             ) : (
-              <Button type="button" bsStyle="info" bsSize="xs" onClick={AuthenticationDomain.enableUser(id, username)}>
+              <Button type="button" bsStyle="info" bsSize="xs" onClick={() => AuthenticationDomain.enableUser(id, username)}>
                 Enable
               </Button>
             )}

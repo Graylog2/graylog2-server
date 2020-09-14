@@ -19,7 +19,7 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
 const ActionsCell = ({ isActive, authenticationBackend }: Props) => {
   const { title, id } = authenticationBackend;
   const _setActiveBackend = (backendId: ?$PropertyType<AuthenticationBackend, 'id'>) => AuthenticationDomain.setActiveBackend(backendId, title);
-  const _deleteBackend = AuthenticationDomain.delete(id, title);
+  const _deleteBackend = () => AuthenticationDomain.delete(id, title);
 
   return (
     <td className="limited">
