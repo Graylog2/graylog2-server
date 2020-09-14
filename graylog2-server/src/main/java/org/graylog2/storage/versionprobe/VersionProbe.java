@@ -112,7 +112,7 @@ public class VersionProbe {
 
             return Optional.of(version);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Unable to parse version retrieved from Elasticsearch node: " + versionString, e);
+            throw new ElasticsearchProbeException("Unable to parse version retrieved from Elasticsearch node: " + versionString, e);
         }
     }
 
