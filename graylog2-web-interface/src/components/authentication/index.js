@@ -7,7 +7,9 @@ import RootUserConfig from './legacy/RootUserConfig';
 import AccessTokenConfig from './legacy/AccessTokenConfig';
 import BackendCreateLDAP from './ldap/BackendCreate';
 import BackendEditLDAP from './ldap/BackendEdit';
-import BackendSettingsLDAP from './BackendDetails/BackendSettings';
+import BackendSettings from './BackendDetails/BackendSettings';
+import BackendCreateAD from './activeDirectory/BackendCreate';
+import BackendEditAD from './activeDirectory/BackendEdit';
 
 PluginStore.register(new PluginManifest({}, {
   authenticatorConfigurations: [
@@ -53,7 +55,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'LDAP',
       createComponent: BackendCreateLDAP,
       editComponent: BackendEditLDAP,
-      detailsComponent: BackendSettingsLDAP,
+      detailsComponent: BackendSettings,
       configMapJson: ({
         default_groups: 'defaultGroups',
         display_name_attribute: 'displayNameAttribute',
@@ -70,8 +72,21 @@ PluginStore.register(new PluginManifest({}, {
     {
       name: 'active-directory',
       displayName: 'Active Directory',
-      createComponent: BackendCreateLDAP,
-      // detailsComponent: BackendSettingsAD,
+      createComponent: BackendCreateAD,
+      editComponent: BackendEditAD,
+      detailsComponent: BackendSettings,
+      configMapJson: ({
+        default_groups: 'defaultGroups',
+        display_name_attribute: 'displayNameAttribute',
+        encrypted_system_password: 'encryptedSystemPassword',
+        server_uri: 'serverUri',
+        system_username: 'systemUsername',
+        trust_all_certificates: 'trustAllCertificates',
+        user_search_base: 'userSearchBase',
+        user_search_pattern: 'userSearchPattern',
+        use_start_tls: 'useStartTls',
+        use_ssl: 'useSsl',
+      }),
     },
   ],
 }));
