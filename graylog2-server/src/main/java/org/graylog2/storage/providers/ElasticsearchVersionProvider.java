@@ -17,6 +17,7 @@
 package org.graylog2.storage.providers;
 
 import org.graylog2.plugin.Version;
+import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 @Singleton
 public class ElasticsearchVersionProvider implements Provider<Version> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchVersionProvider.class);
+    public static final String NO_HOST_REACHABLE_ERROR = "Unable to probe any host for Elasticsearch version";
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<Version> versionOverride;
@@ -64,9 +66,9 @@ public class ElasticsearchVersionProvider implements Provider<Version> {
         try {
             return this.cachedVersion.get(() -> this.versionProbe.probe(this.elasticsearchHosts))
                     .map(this::majorVersionFrom)
-                    .orElseThrow(() -> new RuntimeException("Unable to probe for Elasticsearch version!"));
+                    .orElseThrow(() -> new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + "!"));
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException("Unable to probe for Elasticsearch version: ", e);
+            throw new ElasticsearchProbeException(NO_HOST_REACHABLE_ERROR + ": ", e);
         }
     }
 
