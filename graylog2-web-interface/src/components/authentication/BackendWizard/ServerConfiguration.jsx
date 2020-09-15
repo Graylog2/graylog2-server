@@ -26,6 +26,7 @@ type Props = {
 
 const ProtocolOptions = styled.div`
   display: flex;
+
   div + * {
     margin-left: 10px;
   }

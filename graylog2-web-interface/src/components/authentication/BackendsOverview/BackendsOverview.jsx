@@ -11,13 +11,13 @@ import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
 
 const TABLE_HEADERS = ['Title', 'Description', 'Actions'];
-const DEFAULT_PAGINATION = {
-  count: undefined,
-  total: undefined,
-  page: 1,
-  perPage: 10,
-  query: '',
-};
+// const DEFAULT_PAGINATION = {
+//   count: undefined,
+//   total: undefined,
+//   page: 1,
+//   perPage: 10,
+//   query: '',
+// };
 
 type Props = {
   paginatedAuthBackends: PaginatedBackends,

@@ -75,7 +75,6 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
   const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername);
   const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && displayNameAttribute);
   const disableSubmitAll = !isServerConfigValid || !isUserSyncSettingValid;
-  console.log('disableSubmitAll', disableSubmitAll);
 
   const _handleSubmitAll = () => {
     if (isServerConfigValid && isUserSyncSettingValid) {

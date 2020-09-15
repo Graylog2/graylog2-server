@@ -2,7 +2,6 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import MongoDbPasswordConfig from './legacy/MongoDbPasswordConfig';
 import MongoDbSessionConfig from './legacy/MongoDbSessionConfig';
-import LegacyLdapConfig from './legacy/LegacyLdapConfig';
 import RootUserConfig from './legacy/RootUserConfig';
 import AccessTokenConfig from './legacy/AccessTokenConfig';
 import BackendCreateLDAP from './ldap/BackendCreate';
@@ -12,43 +11,6 @@ import BackendCreateAD from './activeDirectory/BackendCreate';
 import BackendEditAD from './activeDirectory/BackendEdit';
 
 PluginStore.register(new PluginManifest({}, {
-  authenticatorConfigurations: [
-    {
-      name: 'mongodb-password',
-      displayName: 'Passwords',
-      description: 'Graylog managed account passwords (from MongoDB)',
-      canBeDisabled: true,
-      component: MongoDbPasswordConfig,
-    },
-    {
-      name: 'mongodb-session',
-      displayName: 'Sessions',
-      description: 'Established session authenticator',
-      canBeDisabled: false,
-      component: MongoDbSessionConfig,
-    },
-    {
-      name: 'legacy-ldap',
-      displayName: 'LDAP/Active Directory',
-      description: 'Authenticates against external system and creates accounts in Graylog',
-      canBeDisabled: true,
-      component: LegacyLdapConfig,
-    },
-    {
-      name: 'root-user',
-      displayName: 'Admin user',
-      description: 'Static account configured in the server configuration file',
-      canBeDisabled: false,
-      component: RootUserConfig,
-    },
-    {
-      name: 'access-token',
-      displayName: 'API Tokens',
-      description: 'Per user tokens which do not establish sessions',
-      canBeDisabled: true,
-      component: AccessTokenConfig,
-    },
-  ],
   'authentication.services': [
     {
       name: 'ldap',
