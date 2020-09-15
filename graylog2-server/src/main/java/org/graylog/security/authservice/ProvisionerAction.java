@@ -16,15 +16,6 @@
  */
 package org.graylog.security.authservice;
 
-import java.util.Optional;
-
-public interface AuthServiceBackend {
-    Optional<UserProfile> authenticateAndProvision(AuthServiceCredentials authCredentials,
-                                                   ProvisionerService provisionerService);
-
-    String backendType();
-
-    String backendId();
-
-    String backendTitle();
+public interface ProvisionerAction {
+    void provision(UserProfile userProfile);
 }

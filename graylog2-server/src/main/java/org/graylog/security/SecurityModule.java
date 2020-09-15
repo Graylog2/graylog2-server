@@ -17,9 +17,11 @@
 package org.graylog.security;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
+import org.graylog.security.authservice.ProvisionerAction;
 import org.graylog.security.authservice.backend.MongoDBAuthServiceBackend;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
@@ -28,6 +30,7 @@ import org.graylog2.plugin.PluginModule;
 public class SecurityModule extends PluginModule {
     @Override
     protected void configure() {
+        final Multibinder<ProvisionerAction> provisionerActions = Multibinder.newSetBinder(binder(), ProvisionerAction.class);
 
         bind(BuiltinCapabilities.class).asEagerSingleton();
 

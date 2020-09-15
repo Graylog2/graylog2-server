@@ -22,27 +22,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Set;
 
-public class UserProfileProvisioner {
-    private static final Logger LOG = LoggerFactory.getLogger(UserProfileProvisioner.class);
+public class ProvisionerService {
+    private static final Logger LOG = LoggerFactory.getLogger(ProvisionerService.class);
+
     private final ULID ulid;
+    private final Set<ProvisionerAction> provisionerActions;
 
     @Inject
-    public UserProfileProvisioner(ULID ulid) {
+    public ProvisionerService(ULID ulid, Set<ProvisionerAction> provisionerActions) {
         this.ulid = ulid;
+        this.provisionerActions = provisionerActions;
     }
 
-    public UserProfile provision(Details profileDetails) {
-        // TODO: Add real implementation to create or update the user profile based on the given details
-
+    public UserProfile provision(Details provisionDetails) {
         final UserProfile userProfile = UserProfile.builder()
                 .uid(ulid.nextULID()) // TODO: Don't use new ID when profile already exists!
-                .authServiceId(profileDetails.authServiceId())
-                .authServiceUid(profileDetails.authServiceUid())
-                .username(profileDetails.username())
-                .email(profileDetails.email())
-                .fullName(profileDetails.fullName())
+                .authServiceId(provisionDetails.authServiceId())
+                .authServiceUid(provisionDetails.authServiceUid())
+                .username(provisionDetails.username())
+                .email(provisionDetails.email())
+                .fullName(provisionDetails.fullName())
                 .build();
+
+        // TODO: Add real implementation to create or update the user profile based on the given details
+
+        LOG.info("Running {} provisioner actions", provisionerActions.size());
+        for (final ProvisionerAction action : provisionerActions) {
+            try {
+                action.provision(userProfile);
+            } catch (Exception e) {
+                LOG.error("Error running provisioner action <{}>", action.getClass().getCanonicalName());
+                // TODO: Should we fail here or just continue?
+            }
+        }
 
         LOG.info("Provisioning user profile: {}", userProfile);
 
@@ -61,12 +75,14 @@ public class UserProfileProvisioner {
 
         public abstract String fullName();
 
+        public abstract String authServiceType();
+
         public abstract String authServiceId();
 
         public abstract String authServiceUid();
 
         public static Builder builder() {
-            return new AutoValue_UserProfileProvisioner_Details.Builder();
+            return new AutoValue_ProvisionerService_Details.Builder();
         }
 
         @AutoValue.Builder
@@ -76,6 +92,8 @@ public class UserProfileProvisioner {
             public abstract Builder email(String email);
 
             public abstract Builder fullName(String fullName);
+
+            public abstract Builder authServiceType(String authServiceType);
 
             public abstract Builder authServiceId(String authServiceId);
 

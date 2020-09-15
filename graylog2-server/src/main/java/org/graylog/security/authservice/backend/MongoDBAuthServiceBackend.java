@@ -19,7 +19,7 @@ package org.graylog.security.authservice.backend;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceCredentials;
 import org.graylog.security.authservice.UserProfile;
-import org.graylog.security.authservice.UserProfileProvisioner;
+import org.graylog.security.authservice.ProvisionerService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -45,7 +45,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
 
     @Override
     public Optional<UserProfile> authenticateAndProvision(AuthServiceCredentials authCredentials,
-                                                          UserProfileProvisioner userProfileProvisioner) {
+                                                          ProvisionerService provisionerService) {
         final String username = authCredentials.username();
 
         LOG.info("Trying to load user <{}> from database", username);
@@ -65,10 +65,11 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
 
         LOG.info("Successfully validated password for user <{}>", username);
 
-        final UserProfile userProfile = userProfileProvisioner.provision(userProfileProvisioner.newDetails()
+        final UserProfile userProfile = provisionerService.provision(provisionerService.newDetails()
                 .username(user.getName())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                .authServiceType(backendType())
                 .authServiceId(backendId())
                 .authServiceUid(user.getId())
                 .build());

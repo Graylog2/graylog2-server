@@ -23,15 +23,15 @@ import java.util.Optional;
 
 public class AuthServiceAuthenticator {
     private final GlobalAuthServiceConfig authServiceConfig;
-    private final UserProfileProvisioner userProfileProvisioner;
+    private final ProvisionerService provisionerService;
     private final UserService userService;
 
     @Inject
     public AuthServiceAuthenticator(GlobalAuthServiceConfig authServiceConfig,
-                                    UserProfileProvisioner userProfileProvisioner,
+                                    ProvisionerService provisionerService,
                                     UserService userService) {
         this.authServiceConfig = authServiceConfig;
-        this.userProfileProvisioner = userProfileProvisioner;
+        this.provisionerService = provisionerService;
         this.userService = userService;
     }
 
@@ -52,7 +52,7 @@ public class AuthServiceAuthenticator {
     }
 
     private AuthServiceResult authenticate(AuthServiceCredentials authCredentials, AuthServiceBackend backend) {
-        final Optional<UserProfile> userProfile = backend.authenticateAndProvision(authCredentials, userProfileProvisioner);
+        final Optional<UserProfile> userProfile = backend.authenticateAndProvision(authCredentials, provisionerService);
 
         if (userProfile.isPresent()) {
             return AuthServiceResult.builder()
