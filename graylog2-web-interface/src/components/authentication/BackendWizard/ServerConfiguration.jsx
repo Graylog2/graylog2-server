@@ -13,6 +13,7 @@ import { Button, ButtonToolbar } from 'components/graylog';
 import BackendWizardContext from './contexts/BackendWizardContext';
 
 type Props = {
+  disableSubmitAll: boolean,
   help?: {
     systemUsername?: React.Node,
     systemPassword?: React.Node,
@@ -40,12 +41,12 @@ const defaultHelp = {
   systemPassword: 'The password for the initial connection to the Active Directory server.',
 };
 
-const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onSubmitAll }: Props) => {
+const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onSubmitAll, disableSubmitAll }: Props) => {
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const help = { ...defaultHelp, ...propsHelp };
 
   return (
-    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')}>
+    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')} validateOnMount>
       {({ isSubmitting, isValid }) => (
         <Form onChange={(event) => onChange(event)} className="form form-horizontal">
           <Input id="uri-host"
@@ -107,7 +108,8 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
           <ButtonToolbar className="pull-right">
             {editing && (
               <Button type="button"
-                      disabled={!isValid || isSubmitting}>
+                      onClick={onSubmitAll}
+                      disabled={!isValid || isSubmitting || disableSubmitAll}>
                 Finish & Save Identity Provider
               </Button>
             )}

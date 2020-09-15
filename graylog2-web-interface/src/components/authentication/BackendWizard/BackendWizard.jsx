@@ -74,6 +74,8 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
 
   const isServerConfigValid = !!(serverUriHost && !!serverUriPort && systemUsername);
   const isUserSyncSettingValid = !!(userSearchBase && userSearchPattern && displayNameAttribute);
+  const disableSubmitAll = !isServerConfigValid || !isUserSyncSettingValid;
+  console.log('disableSubmitAll', disableSubmitAll);
 
   const _handleSubmitAll = () => {
     if (isServerConfigValid && isUserSyncSettingValid) {
@@ -107,6 +109,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
         <ServerConfiguration onSubmit={_handleStepChange}
                              onSubmitAll={_handleSubmitAll}
                              onChange={_handleFieldUpdate}
+                             disableSubmitAll={disableSubmitAll}
                              editing={editing} />
       ),
     },
@@ -116,6 +119,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
       component: (
         <UserSyncSettings onSubmit={_handleStepChange}
                           onSubmitAll={_handleSubmitAll}
+                          disableSubmitAll={disableSubmitAll}
                           onChange={_handleFieldUpdate} />
       ),
       disabled: !isServerConfigValid,
@@ -126,6 +130,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
       component: (
         <GroupSyncSettings onSubmit={_handleStepChange}
                            onSubmitAll={_handleSubmitAll}
+                           disableSubmitAll={disableSubmitAll}
                            onChange={_handleFieldUpdate} />
       ),
       disabled: !isUserSyncSettingValid,

@@ -65,7 +65,7 @@ const AuthenticationPage = () => {
         {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
 
         {paginatedAuthBackends.list.size >= 1 && (
-        <BackendsOverview paginatedAuthBackends={paginatedAuthBackends} />
+          <BackendsOverview paginatedAuthBackends={paginatedAuthBackends} />
         )}
       </>
     </DocumentTitle>

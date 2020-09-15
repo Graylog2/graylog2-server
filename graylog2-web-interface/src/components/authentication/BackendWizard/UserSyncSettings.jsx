@@ -18,6 +18,7 @@ type Props = {
     displayNameAttribute?: React.Node,
     defaultRoles?: React.Node,
   },
+  disableSubmitAll: boolean,
   onChange: (SyntheticInputEvent<HTMLInputElement> | { target: { value: string, name: string, checked?: boolean } }) => void,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
@@ -46,7 +47,7 @@ const defaultHelp = {
   ),
 };
 
-const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: Props) => {
+const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmitAll, onChange }: Props) => {
   const help = { ...defaultHelp, ...propsHelp };
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
@@ -63,8 +64,8 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
   }, []);
 
   return (
-    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')}>
-      {({ isSubmitting, isValid }) => (
+    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')} validateOnMount>
+      {({ isSubmitting, isValid, values }) => (
         <Form onChange={(event) => onChange(event)} className="form form-horizontal">
           <FormikFormGroup label="Search Base DN"
                            name="userSearchBase"
@@ -97,7 +98,7 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
           </Row>
 
           <Field name="defaultRoles" validate={FormUtils.validation.isRequired('Default Roles')}>
-            {({ field: { name, value } }) => {
+            {({ field: { name, value, onChange: onFieldChange } }) => {
               return (
                 <Input id="default-roles-select"
                        label="Default Roles"
@@ -106,6 +107,7 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
                        wrapperClassName="col-sm-9">
                   <Select inputProps={{ 'aria-label': 'Search for roles' }}
                           onChange={(roleName) => {
+                            onFieldChange({ target: { value: roleName, name } });
                             onChange({ target: { value: roleName, name } });
                           }}
                           options={rolesOptions}
@@ -119,7 +121,8 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
 
           <ButtonToolbar className="pull-right">
             <Button type="button"
-                    disabled={!isValid || isSubmitting}>
+                    onClick={onSubmitAll}
+                    disabled={!isValid || isSubmitting || disableSubmitAll}>
               Finish & Save Identity Provider
             </Button>
             <Button bsStyle="primary"
