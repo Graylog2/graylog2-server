@@ -25,7 +25,7 @@ export type AuthenticationBackendJson = {|
   },
 |};
 
-const formatConfig = (config, keysMap) => {
+const formatConfig = (config: $PropertyType<AuthenticationBackendJson, 'config'>, keysMap: {[string]: ?string}) => {
   const formattedConfig = {};
 
   Object.entries(config).forEach(([key, value]) => {
@@ -37,6 +37,8 @@ const formatConfig = (config, keysMap) => {
       formattedConfig[key] = value;
     }
   });
+
+  return formatConfig;
 };
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJson, 'config'>) => {

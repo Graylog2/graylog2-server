@@ -1,12 +1,12 @@
 // @flow strict
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { Field } from 'formik';
 
-import type { ThemeInterface } from 'theme';
 import { Input } from 'components/bootstrap';
 
 type Props = {
-  component?: typeof Field,
+  component: typeof Field,
   label: string,
   name: string,
   type?: string,
@@ -44,6 +44,17 @@ const FormikInput = ({ component: Component, label, name, type, help, validate, 
     }}
   </Component>
 );
+
+FormikInput.propTypes = {
+  component: PropTypes.element,
+  help: PropTypes.object,
+  labelClassName: PropTypes.string,
+  type: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  wrapperClassName: PropTypes.string,
+  validate: PropTypes.func,
+};
 
 FormikInput.defaultProps = {
   component: Field,

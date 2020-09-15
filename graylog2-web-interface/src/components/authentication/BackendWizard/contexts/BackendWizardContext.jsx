@@ -4,14 +4,16 @@ import * as React from 'react';
 import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
 
+import type { LdapCreate } from '../../ldap/types';
+
 export type WizardFormValues = any;
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
   formValues: WizardFormValues,
-  prepareSubmitPayload: WizardFormValues => ({
+  prepareSubmitPayload: (WizardFormValues) => ({
     title: string,
     description: string,
-    config: any,
+    config: $PropertyType<LdapCreate, 'config'>,
   }),
 };
 
@@ -23,7 +25,7 @@ const initialState = {
   setStepsState: () => {},
   activeStepKey: '',
   formValues: {},
-  prepareSubmitPayload: () => {},
+  prepareSubmitPayload: () => ({}),
 };
 
 const BackendWizardContext = React.createContext<BackendWizardType>(initialState);

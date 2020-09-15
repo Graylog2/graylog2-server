@@ -17,7 +17,7 @@ export type AuthenticationBackendCreate = {
 export type AuthenticationBackendUpdate = {
   id: $PropertyType<AuthenticationBackend, 'id'>,
   title: $PropertyType<AuthenticationBackend, 'title'>,
-  description: $PropertyType<AuthenticationBackend, 'decription'>,
+  description: $PropertyType<AuthenticationBackend, 'description'>,
   config: any,
 };
 
