@@ -68,8 +68,8 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
                 .username(user.getName())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
-                .authServiceBackend(backendId())
-                .authServiceGuid(user.getId())
+                .authServiceId(backendId())
+                .authServiceUid(user.getId())
                 .build());
 
         return Optional.of(userProfile);

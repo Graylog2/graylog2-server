@@ -37,8 +37,8 @@ public class UserProfileProvisioner {
 
         final UserProfile userProfile = UserProfile.builder()
                 .uid(ulid.nextULID()) // TODO: Don't use new ID when profile already exists!
-                .authServiceBackend(profileDetails.authServiceBackend())
-                .authServiceGuid(profileDetails.authServiceGuid())
+                .authServiceId(profileDetails.authServiceId())
+                .authServiceUid(profileDetails.authServiceUid())
                 .username(profileDetails.username())
                 .email(profileDetails.email())
                 .fullName(profileDetails.fullName())
@@ -61,9 +61,9 @@ public class UserProfileProvisioner {
 
         public abstract String fullName();
 
-        public abstract String authServiceBackend();
+        public abstract String authServiceId();
 
-        public abstract String authServiceGuid();
+        public abstract String authServiceUid();
 
         public static Builder builder() {
             return new AutoValue_UserProfileProvisioner_Details.Builder();
@@ -77,9 +77,9 @@ public class UserProfileProvisioner {
 
             public abstract Builder fullName(String fullName);
 
-            public abstract Builder authServiceBackend(String authServiceBackend);
+            public abstract Builder authServiceId(String authServiceId);
 
-            public abstract Builder authServiceGuid(String authServiceGuid);
+            public abstract Builder authServiceUid(String authServiceUid);
 
             public abstract Details build();
         }

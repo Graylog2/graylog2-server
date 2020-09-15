@@ -39,8 +39,8 @@ public abstract class UserProfile {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_UID = "uid";
-    public static final String FIELD_AUTH_SERVICE_BACKEND = "auth_service_backend";
-    public static final String FIELD_AUTH_SERVICE_GUID = "auth_service_guid";
+    public static final String FIELD_AUTH_SERVICE_ID = "auth_service_id";
+    public static final String FIELD_AUTH_SERVICE_UID = "auth_service_uid";
     public static final String FIELD_USERNAME = "username";
     public static final String FIELD_EMAIL = "email";
     public static final String FIELD_FULL_NAME = "full_name";
@@ -60,11 +60,11 @@ public abstract class UserProfile {
     @JsonProperty(FIELD_UID)
     public abstract String uid();
 
-    @JsonProperty(FIELD_AUTH_SERVICE_BACKEND)
-    public abstract String authServiceBackend();
+    @JsonProperty(FIELD_AUTH_SERVICE_ID)
+    public abstract String authServiceId();
 
-    @JsonProperty(FIELD_AUTH_SERVICE_GUID)
-    public abstract String authServiceGuid();
+    @JsonProperty(FIELD_AUTH_SERVICE_UID)
+    public abstract String authServiceUid();
 
     @JsonProperty(FIELD_USERNAME)
     public abstract String username();
@@ -114,11 +114,11 @@ public abstract class UserProfile {
         @JsonProperty(FIELD_UID)
         public abstract Builder uid(String uid);
 
-        @JsonProperty(FIELD_AUTH_SERVICE_BACKEND)
-        public abstract Builder authServiceBackend(String authServiceBackend);
+        @JsonProperty(FIELD_AUTH_SERVICE_ID)
+        public abstract Builder authServiceId(String authServiceId);
 
-        @JsonProperty(FIELD_AUTH_SERVICE_GUID)
-        public abstract Builder authServiceGuid(String authServiceGuid);
+        @JsonProperty(FIELD_AUTH_SERVICE_UID)
+        public abstract Builder authServiceUid(String authServiceUid);
 
         @JsonProperty(FIELD_USERNAME)
         public abstract Builder username(String username);
