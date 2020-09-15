@@ -30,6 +30,7 @@ const FormUtils = {
   },
   validation: {
     isRequired: (field) => (value) => (!value ? `The ${field} is required` : undefined),
+    hasErrors: (errorMap = {}) => Object.keys(errorMap).length > 0,
   },
 };
 

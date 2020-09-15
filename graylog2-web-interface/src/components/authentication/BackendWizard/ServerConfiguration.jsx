@@ -46,9 +46,17 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const help = { ...defaultHelp, ...propsHelp };
 
+  const _onSubmitAll = (validateForm) => {
+    validateForm().then((errors) => {
+      if (!FormUtils.validate.hasErrors(errors)) {
+        onSubmitAll();
+      }
+    });
+  };
+
   return (
-    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')} validateOnMount>
-      {({ isSubmitting, isValid }) => (
+    <Formik initialValues={stepsState?.formValues} onSubmit={() => onSubmit('userSync')}>
+      {({ isSubmitting, isValid, validateForm }) => (
         <Form onChange={(event) => onChange(event)} className="form form-horizontal">
           <Input id="uri-host"
                  labelClassName="col-sm-3"
@@ -109,7 +117,7 @@ const ServerConfiguration = ({ help: propsHelp, onChange, onSubmit, editing, onS
           <ButtonToolbar className="pull-right">
             {editing && (
               <Button type="button"
-                      onClick={onSubmitAll}
+                      onClick={() => _onSubmitAll(validateForm)}
                       disabled={!isValid || isSubmitting || disableSubmitAll}>
                 Finish & Save Identity Provider
               </Button>

@@ -13,8 +13,7 @@ jest.mock('stores/tools/ToolsStore', () => ({}));
 
 const KeywordTimeRangeSelector = ({ value, ...props }: { value: string }) => (
   <Formik initialValues={{ timerange: { type: 'keyword', keyword: value } }}
-          onSubmit={() => {}}
-          validateOnMount>
+          onSubmit={() => {}}>
     <Form>
       <OriginalKeywordTimeRangeSelector {...props} />
     </Form>

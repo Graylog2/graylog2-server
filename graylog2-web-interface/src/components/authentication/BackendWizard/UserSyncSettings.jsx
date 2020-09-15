@@ -52,6 +52,14 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
   const [rolesOptions, setRolesOptions] = useState([]);
 
+  const _onSubmitAll = (validateForm) => {
+    validateForm().then((errors) => {
+      if (!FormUtils.validate.hasErrors(errors)) {
+        onSubmitAll();
+      }
+    });
+  };
+
   useEffect(() => {
     const getUnlimited = [1, 0, ''];
 
@@ -64,27 +72,27 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
   }, []);
 
   return (
-    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')} validateOnMount>
-      {({ isSubmitting, isValid }) => (
+    <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')}>
+      {({ isSubmitting, isValid, validateForm }) => (
         <Form onChange={(event) => onChange(event)} className="form form-horizontal">
           <FormikFormGroup label="Search Base DN"
                            name="userSearchBase"
                            placeholder="System User DN"
                            required
-                           validate={FormUtils.validation.isRequired('System Username')}
+                           validate={FormUtils.validation.isRequired('system username')}
                            help={help.userSearchBase} />
 
           <FormikFormGroup label="Search Pattern"
                            name="userSearchPattern"
                            placeholder="Search Pattern"
                            required
-                           validate={FormUtils.validation.isRequired('Search Pattern')}
+                           validate={FormUtils.validation.isRequired('search pattern')}
                            help={help.userSearchPattern} />
 
           <FormikFormGroup label="Display Name Attirbute"
                            name="displayNameAttribute"
                            placeholder="Display Name Attirbute"
-                           validate={FormUtils.validation.isRequired('Display Name Attribute')}
+                           validate={FormUtils.validation.isRequired('display name attribute')}
                            required
                            help={help.displayNameAttribute} />
 
@@ -97,12 +105,13 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
             </Col>
           </Row>
 
-          <Field name="defaultRoles" validate={FormUtils.validation.isRequired('Default Roles')}>
-            {({ field: { name, value, onChange: onFieldChange } }) => {
+          <Field name="defaultRoles" validate={FormUtils.validation.isRequired('default role')}>
+            {({ field: { name, value, onChange: onFieldChange }, meta: { error } }) => {
               return (
                 <Input id="default-roles-select"
                        label="Default Roles"
-                       help={help.defaultRoles}
+                       help={error ?? help.defaultRoles}
+                       bsStyle={error ? 'error' : undefined}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9">
                   <Select inputProps={{ 'aria-label': 'Search for roles' }}
@@ -121,7 +130,7 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
 
           <ButtonToolbar className="pull-right">
             <Button type="button"
-                    onClick={onSubmitAll}
+                    onClick={() => _onSubmitAll(validateForm)}
                     disabled={!isValid || isSubmitting || disableSubmitAll}>
               Finish & Save Identity Provider
             </Button>

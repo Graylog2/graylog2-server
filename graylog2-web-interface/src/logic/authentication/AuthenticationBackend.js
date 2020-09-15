@@ -1,7 +1,6 @@
 // @flow strict
 
 import * as Immutable from 'immutable';
-import { invert } from 'lodash';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 
