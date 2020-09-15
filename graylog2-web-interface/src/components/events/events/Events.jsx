@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { without, capitalize } from 'lodash';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 import styled, { css } from 'styled-components';
@@ -99,14 +99,14 @@ class Events extends React.Component {
   expandRow = (eventId) => {
     return () => {
       const { expanded } = this.state;
-      const nextExpanded = expanded.includes(eventId) ? lodash.without(expanded, eventId) : expanded.concat([eventId]);
+      const nextExpanded = expanded.includes(eventId) ? without(expanded, eventId) : expanded.concat([eventId]);
 
       this.setState({ expanded: nextExpanded });
     };
   };
 
   priorityFormatter = (eventId, priority) => {
-    const priorityName = lodash.capitalize(EventDefinitionPriorityEnum.properties[priority].name);
+    const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
     let icon;
     let style;
 

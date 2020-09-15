@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import { merge } from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -262,7 +262,7 @@ const CollectorConfigurationsStore = Reflux.createStore({
       template: ' ',
     };
 
-    lodash.merge(payload, configuration);
+    merge(payload, configuration);
 
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
 

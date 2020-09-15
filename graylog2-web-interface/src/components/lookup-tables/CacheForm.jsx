@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/graylog';
@@ -64,7 +64,7 @@ class CacheForm extends React.Component {
 
     const { cache } = this.props;
 
-    if (_.isEqual(cache, prevProps.cache)) {
+    if (isEqual(cache, prevProps.cache)) {
       // props haven't change, don't update our state from them
       return;
     }

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import lodash from 'lodash';
+import { escape } from 'lodash';
 import $ from 'jquery';
 import 'typeahead.js';
 
@@ -113,10 +113,10 @@ class TypeAheadInput extends React.Component {
         suggestion: (value) => {
           // Escape all text here that may be user-generated, since this is not automatically escaped by React.
           if (suggestionText) {
-            return `<div><strong>${lodash.escape(suggestionText)}</strong> ${lodash.escape(value[displayKey])}</div>`;
+            return `<div><strong>${escape(suggestionText)}</strong> ${escape(value[displayKey])}</div>`;
           }
 
-          return `<div>${lodash.escape(value[displayKey])}</div>`;
+          return `<div>${escape(value[displayKey])}</div>`;
         },
       },
     });

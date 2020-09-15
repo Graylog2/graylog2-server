@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import { map, mapKeys, mapValues } from 'lodash';
 import moment from 'moment';
 import crossfilter from 'crossfilter';
 
@@ -18,12 +18,12 @@ const TrafficGraph = ({ width, traffic }: Props) => {
     return <Spinner />;
   }
 
-  const ndx = crossfilter(_.map(traffic, (value, key) => ({ ts: key, bytes: value })));
+  const ndx = crossfilter(map(traffic, (value, key) => ({ ts: key, bytes: value })));
   const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
 
   const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
-  const t = _.mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').unix() * 1000);
-  const unixTraffic = _.mapValues(t, (val) => val.value);
+  const t = mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').unix() * 1000);
+  const unixTraffic = mapValues(t, (val) => val.value);
   const chartData = [{
     type: 'bar',
     x: Object.keys(unixTraffic),

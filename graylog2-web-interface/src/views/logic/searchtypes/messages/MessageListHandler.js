@@ -1,11 +1,11 @@
-import _ from 'lodash';
+import { forEach, forOwn } from 'lodash';
 import Immutable from 'immutable';
 
 export default {
   convert(result) {
     const fieldNames = Immutable.Map().withMutations((map) => {
-      _.forEach(result.messages, (msg) => {
-        _.forOwn(msg.message, (value, field) => {
+      forEach(result.messages, (msg) => {
+        forOwn(msg.message, (value, field) => {
           // add occurrences
           map.mergeWith((oldVal, newVal) => oldVal + newVal, Immutable.Map([[field, 1]]));
         });

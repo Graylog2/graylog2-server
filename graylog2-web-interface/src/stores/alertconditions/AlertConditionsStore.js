@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import _ from 'lodash';
+import { clone } from 'lodash';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
@@ -77,7 +77,7 @@ const AlertConditionsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.list(streamId).url);
     const promise = fetch('GET', url).then((response) => {
       const conditions = response.conditions.map((condition) => {
-        const cond = _.clone(condition);
+        const cond = clone(condition);
 
         cond.stream_id = streamId;
 

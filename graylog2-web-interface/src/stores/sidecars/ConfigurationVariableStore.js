@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { merge } from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -96,7 +96,7 @@ const ConfigurationVariableStore = Reflux.createStore({
       content: ' ',
     };
 
-    lodash.merge(payload, configurationVariable);
+    merge(payload, configurationVariable);
 
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/validate`), payload);
 

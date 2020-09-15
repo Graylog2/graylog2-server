@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import uuid from 'uuid/v4';
 
 import Query from 'views/logic/queries/Query';
@@ -26,7 +26,7 @@ class FilterPreviewContainer extends React.Component {
     searchTypeId: uuid(),
   };
 
-  fetchSearch = lodash.debounce((config) => {
+  fetchSearch = debounce((config) => {
     const { currentUser } = this.props;
 
     if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
@@ -77,7 +77,7 @@ class FilterPreviewContainer extends React.Component {
     const { query: prevQuery, query_parameters: prevQueryParameters, streams: prevStreams, search_within_ms: prevSearchWithin } = prevProps.eventDefinition.config;
     const { query, query_parameters: queryParameters, streams, search_within_ms: searchWithin } = eventDefinition.config;
 
-    if (query !== prevQuery || queryParameters !== prevQueryParameters || !lodash.isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
+    if (query !== prevQuery || queryParameters !== prevQueryParameters || !isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
       this.fetchSearch(eventDefinition.config);
     }
   }

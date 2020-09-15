@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import lodash from 'lodash';
+import { get } from 'lodash';
 
 import { Button, Col, DropdownButton, Label, MenuItem, Row } from 'components/graylog';
 import Routes from 'routing/Routes';
@@ -75,7 +75,7 @@ class EventDefinitions extends React.Component {
     }
 
     const items = eventDefinitions.map((definition) => {
-      const isScheduled = lodash.get(context, `scheduler.${definition.id}.is_scheduled`, true);
+      const isScheduled = get(context, `scheduler.${definition.id}.is_scheduled`, true);
 
       let toggle = <MenuItem onClick={onDisable(definition)}>Disable</MenuItem>;
 

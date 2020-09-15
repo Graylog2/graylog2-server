@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { get, cloneDeep } from 'lodash';
 
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -62,7 +62,7 @@ class AggregationConditionExpression extends React.Component {
 
     const key = expression.expr === 'group' ? 'operator' : 'expr';
 
-    return lodash.get(expression, key, defaultOperator) === '&&' ? '&&' : '||';
+    return get(expression, key, defaultOperator) === '&&' ? '&&' : '||';
   };
 
   handleAddExpression = () => {
@@ -118,7 +118,7 @@ class AggregationConditionExpression extends React.Component {
         nextUpdate = update;
       } else {
         // Propagate the update in the expression tree.
-        const nextExpression = lodash.cloneDeep(expression);
+        const nextExpression = cloneDeep(expression);
 
         nextExpression[branch] = update;
         nextUpdate = nextExpression;

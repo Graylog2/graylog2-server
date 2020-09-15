@@ -1,11 +1,10 @@
 /* eslint-disable react/no-find-dom-node */
-/* global window */
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
-import _ from 'lodash';
+import { reduce } from 'lodash';
 
 import { Col, Row } from 'components/graylog';
 import { Spinner } from 'components/common';
@@ -91,7 +90,7 @@ const GraylogClusterOverview = createReactClass({
     let trafficGraph = <Spinner />;
 
     if (traffic) {
-      const bytesOut = _.reduce(traffic.output, (result, value) => result + value);
+      const bytesOut = reduce(traffic.output, (result, value) => result + value);
 
       sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
 

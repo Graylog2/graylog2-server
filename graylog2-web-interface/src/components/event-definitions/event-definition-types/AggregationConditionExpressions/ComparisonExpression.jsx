@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
@@ -13,7 +13,7 @@ const ComparisonExpression = (props) => {
   const { expression, level, onChildChange, onChange, renderLabel, validation } = props;
 
   const handleExpressionOperatorChange = (nextOperator) => {
-    const nextExpression = lodash.cloneDeep(expression);
+    const nextExpression = cloneDeep(expression);
 
     nextExpression.expr = nextOperator;
     onChange({ conditions: nextExpression });

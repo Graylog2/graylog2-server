@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row, Button } from 'components/graylog';
@@ -68,7 +68,7 @@ class DataAdapterForm extends React.Component {
 
     const { dataAdapter } = this.props;
 
-    if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
+    if (isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }

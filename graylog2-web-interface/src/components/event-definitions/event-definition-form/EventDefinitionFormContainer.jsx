@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { cloneDeep } from 'lodash';
 import { withRouter } from 'react-router';
 
 import history from 'util/History';
@@ -81,7 +81,7 @@ class EventDefinitionFormContainer extends React.Component {
 
   handleChange = (key, value) => {
     this.setState((state) => {
-      const nextEventDefinition = lodash.cloneDeep(state.eventDefinition);
+      const nextEventDefinition = cloneDeep(state.eventDefinition);
 
       nextEventDefinition[key] = value;
       const { onEventDefinitionChange } = this.props;

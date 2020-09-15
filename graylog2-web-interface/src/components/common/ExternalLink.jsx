@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import { trim } from 'lodash';
 
 import Icon from './Icon';
 
@@ -39,7 +39,7 @@ class ExternalLink extends React.Component {
     );
 
     // This makes the component usable as child element of a component that already renders a link (e.g. MenuItem)
-    if (_.trim(href) === '') {
+    if (trim(href) === '') {
       return content;
     }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import _ from 'lodash';
+import { capitalize, isEmpty } from 'lodash';
 import styled, { css } from 'styled-components';
 import { SizeMe } from 'react-sizeme';
 
@@ -31,7 +31,7 @@ const WidgetContainer = styled.div`
   ${RowContentStyles}
 `;
 
-const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
+const defaultTitleGenerator = (w) => `Untitled ${w.type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
 
 class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
@@ -80,7 +80,7 @@ class WidgetGrid extends React.Component {
   _renderWidgets = (widgets, positions, data, errors) => {
     const returnedWidgets = { positions: {}, widgets: [] };
 
-    if (!widgets || _.isEmpty(widgets) || !data) {
+    if (!widgets || isEmpty(widgets) || !data) {
       return returnedWidgets;
     }
 

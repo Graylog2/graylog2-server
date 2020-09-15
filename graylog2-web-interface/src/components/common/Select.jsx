@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import lodash from 'lodash';
+import { find } from 'lodash';
 import PropTypes from 'prop-types';
 import { withTheme } from 'styled-components';
 import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
@@ -379,7 +379,7 @@ class Select extends React.Component<Props, State> {
         [valueKey]: v,
         [displayKey]: v,
       };
-      const option = lodash.find(options, predicate);
+      const option = find(options, predicate);
 
       return option || predicate;
     });

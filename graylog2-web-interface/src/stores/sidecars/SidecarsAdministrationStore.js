@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { upperFirst } from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -85,7 +85,7 @@ const SidecarsAdministrationStore = Reflux.createStore({
 
     promise.then(
       (response) => {
-        UserNotification.success('', `${lodash.upperFirst(action)} for ${formattedCollectors.length} collectors requested`);
+        UserNotification.success('', `${upperFirst(action)} for ${formattedCollectors.length} collectors requested`);
 
         return response;
       },

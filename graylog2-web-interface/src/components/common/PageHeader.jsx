@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import { upperFirst } from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
@@ -64,7 +64,7 @@ class PageHeader extends React.Component {
       return null;
     }
 
-    const label = lodash.upperFirst(lifecycle);
+    const label = upperFirst(lifecycle);
     const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
     const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 

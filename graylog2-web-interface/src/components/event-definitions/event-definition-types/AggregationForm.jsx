@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { defaultTo, memoize } from 'lodash';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
@@ -14,7 +14,7 @@ import commonStyles from '../common/commonStyles.css';
 
 class AggregationForm extends React.Component {
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
-  formatFields = lodash.memoize(
+  formatFields = memoize(
     (fieldTypes) => {
       return fieldTypes
         .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))
@@ -67,7 +67,7 @@ class AggregationForm extends React.Component {
                            onChange={(selected) => this.handleGroupByChange(selected === '' ? [] : selected.split(','))}
                            options={formattedFields}
                            ignoreAccents={false}
-                           value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
+                           value={defaultTo(eventDefinition.config.group_by, []).join(',')}
                            allowCreate />
               <HelpBlock>
                 Select Fields that Graylog should use to group Filter results when they have identical values.

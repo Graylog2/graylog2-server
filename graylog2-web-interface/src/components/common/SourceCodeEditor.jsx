@@ -1,5 +1,5 @@
 import React from 'react';
-import lodash from 'lodash';
+import { isFinite } from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
@@ -222,7 +222,7 @@ class SourceCodeEditor extends React.Component {
       readOnly,
       value,
     } = this.props;
-    const validCssWidth = lodash.isFinite(width) ? width : '100%';
+    const validCssWidth = isFinite(width) ? width : '100%';
     const overlay = <Tooltip id="paste-button-tooltip">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
 
     return (

@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { find } from 'lodash';
 import styled, { css, type StyledComponent } from 'styled-components';
 
 import { type ThemeInterface } from 'theme';
@@ -130,7 +130,7 @@ class Wizard extends React.Component<Props, State> {
       return false;
     }
 
-    return lodash.find(steps, { key: activeStep });
+    return find(steps, { key: activeStep });
   };
 
   _getSelectedStep = () => {

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 
 import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -48,7 +48,7 @@ class LookupTableForm extends React.Component {
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (_.isEqual(this.props.table, nextProps.table)) {
+    if (isEqual(this.props.table, nextProps.table)) {
       // props haven't change, don't update our state from them
       return;
     }
