@@ -3,8 +3,7 @@ import * as React from 'react';
 
 import type { Step } from 'components/common/Wizard';
 import { singleton } from 'views/logic/singleton';
-
-import type { LdapCreate } from '../../ldap/types';
+import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 export type WizardFormValues = any;
 export type WizardStepsState = {

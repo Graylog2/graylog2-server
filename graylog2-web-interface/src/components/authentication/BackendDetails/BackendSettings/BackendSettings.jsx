@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
 
+import type { LdapBackend } from 'logic/authentication/ldap/types';
+
 import ServerConfigSection from './ServerConfigSection';
 import UserSyncSection from './UserSyncSection';
 import GroupSyncSection from './GroupSyncSection';
 
-import type { LdapService } from '../../ldap/types';
-
 type Props = {
-  authenticationBackend: LdapService,
+  authenticationBackend: LdapBackend,
 };
 
 const SettingsSection = ({ authenticationBackend }: Props) => (

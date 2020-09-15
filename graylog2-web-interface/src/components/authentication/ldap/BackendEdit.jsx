@@ -7,13 +7,12 @@ import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-
-import type { LdapService, LdapCreate } from './types';
+import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizard from '../BackendWizard';
 
 type Props = {
-  authenticationBackend: LdapService,
+  authenticationBackend: LdapBackend,
   initialStep: ?string,
 };
 
@@ -27,7 +26,7 @@ const _initialValues = ({
   userSearchPattern,
   useStartTls,
   useSsl,
-}: $PropertyType<LdapService, 'config'>) => {
+}: $PropertyType<LdapBackend, 'config'>) => {
   const serverUriObj = new URI(serverUri);
 
   return {

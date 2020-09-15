@@ -25,33 +25,24 @@ export type AuthenticationBackendJson = {|
   },
 |};
 
-const formatConfig = (config: $PropertyType<AuthenticationBackendJson, 'config'>, keysMap: {[string]: ?string}) => {
-  const formattedConfig = {};
-
-  Object.entries(config).forEach(([key, value]) => {
-    const formattedKey = keysMap[key];
-
-    if (formattedKey) {
-      formattedConfig[formattedKey] = value;
-    } else {
-      formattedConfig[key] = value;
-    }
-  });
-
-  return formatConfig;
-};
-
 const configFromJson = (config: $PropertyType<AuthenticationBackendJson, 'config'>) => {
   const authService = getAuthServicePlugin(config.type, true);
 
-  return formatConfig(config, authService.configFromJson);
+  if (authService && typeof authService.configFromJson === 'function') {
+    return authService.configFromJson(config);
+  }
+
+  return config;
 };
 
 const configToJson = (config: $PropertyType<AuthenticationBackendJson, 'config'>) => {
   const authService = getAuthServicePlugin(config.type, true);
-  const configToJsonMap = invert(authService.configFromJson);
 
-  return formatConfig(config, configToJsonMap);
+  if (authService && typeof authService.configToJson === 'function') {
+    return authService.configToJson(config);
+  }
+
+  return config;
 };
 
 export default class AuthenticationBackend {

@@ -7,14 +7,13 @@ import URI from 'urijs';
 import Wizard, { type Step } from 'components/common/Wizard';
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import type { LdapCreate } from 'logic/authentication/ldap/types';
 
 import BackendWizardContext, { type WizardStepsState, type WizardFormValues } from './contexts/BackendWizardContext';
 import ServerConfiguration from './ServerConfiguration';
 import UserSyncSettings from './UserSyncSettings';
 import Sidebar from './Sidebar';
 import GroupSyncSettings from './GroupSyncSettings';
-
-import type { LdapCreate } from '../ldap/types';
 
 type Props = {
   initialValues: WizardFormValues,
@@ -77,7 +76,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
   const disableSubmitAll = !isServerConfigValid || !isUserSyncSettingValid;
 
   const _handleSubmitAll = () => {
-    if (isServerConfigValid && isUserSyncSettingValid) {
+    if (!disableSubmitAll) {
       const payload = stepsState.prepareSubmitPayload(stepsState.formValues);
 
       onSubmit(payload).then(() => {

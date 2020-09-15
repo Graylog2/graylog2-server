@@ -6,11 +6,10 @@ import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 import SectionComponent from 'components/common/Section/SectionComponent';
-
-import type { LdapService } from '../../ldap/types';
+import type { LdapBackend } from 'logic/authentication/ldap/types';
 
 type Props = {
-  authenticationBackend: LdapService,
+  authenticationBackend: LdapBackend,
 };
 
 const Header = styled.h4`
