@@ -86,8 +86,6 @@ export type ActionsType = {
 const AuthenticationActions: RefluxActions<ActionsType> = singletonActions(
   'Authentication',
   () => Reflux.createActions({
-    legacyLoad: { asyncResult: true },
-    legacyUpdate: { asyncResult: true },
     create: { asyncResult: true },
     update: { asyncResult: true },
     load: { asyncResult: true },

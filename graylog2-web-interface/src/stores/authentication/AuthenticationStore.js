@@ -6,7 +6,6 @@ import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'views/logic/singleton';
 import AuthenticationActions from 'actions/authentication/AuthenticationActions';
 // import PaginationURL from 'util/PaginationURL';
@@ -28,7 +27,6 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { services } from '../../../test/fixtures/authentication';
 import { userList as authUsers } from '../../../test/fixtures/authenticaionUsers';
 
-const TMP_SOURCE_URL = '/system/authentication/config';
 // type PaginatedResponse = PaginatedResponseType & {
 //   global_config: {
 //     active_backend: string,
@@ -186,40 +184,6 @@ const AuthenticationStore: Store<{ authenticators: any }> = singletonStore(
       AuthenticationActions.loadUsersPaginated.promise(promise);
 
       return promise;
-    },
-
-    legacyLoad() {
-      const url = qualifyUrl(TMP_SOURCE_URL);
-      const promise = fetch('GET', url)
-        .then(
-          (response) => {
-            this.trigger({ authenticators: response });
-
-            return response;
-          },
-          (error) => UserNotification.error(`Unable to load authentication configuration: ${error}`, 'Could not load authenticators'),
-        );
-
-      AuthenticationActions.legacyLoad.promise(promise);
-    },
-
-    legacyUpdate(type, config) {
-      const url = qualifyUrl(TMP_SOURCE_URL);
-
-      if (type === 'providers') {
-        const promise = fetch('PUT', url, config)
-          .then(
-            (response) => {
-              this.trigger({ authenticators: response });
-              UserNotification.success('Configuration updated successfully');
-
-              return response;
-            },
-            (error) => UserNotification.error(`Unable to save authentication provider configuration: ${error}`, 'Could not save configuration'),
-          );
-
-        AuthenticationActions.legacyUpdate.promise(promise);
-      }
     },
   }),
 );

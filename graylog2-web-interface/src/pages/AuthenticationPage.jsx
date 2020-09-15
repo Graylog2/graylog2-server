@@ -8,10 +8,8 @@ import BackendDetails from 'components/authentication/BackendDetails';
 import DocsHelper from 'util/DocsHelper';
 import BackendsOverview from 'components/authentication/BackendsOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
-// import AuthenticationComponent from 'components/authentication/legacy/AuthenticationComponent';
 import BackendCreateGettingStarted from 'components/authentication/BackendCreateGettingStarted';
 import { PageHeader, Spinner, DocumentTitle } from 'components/common';
-// import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
 import { ButtonToolbar, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
@@ -69,13 +67,6 @@ const AuthenticationPage = () => {
         {paginatedAuthBackends.list.size >= 1 && (
         <BackendsOverview paginatedAuthBackends={paginatedAuthBackends} />
         )}
-
-        {/* Old authentication management which can be removed soon */}
-        {/* <Row className="content">
-          <Col md={12}>
-            <AuthenticationComponent location={location} params={params} />
-          </Col>
-        </Row> */}
       </>
     </DocumentTitle>
   );
