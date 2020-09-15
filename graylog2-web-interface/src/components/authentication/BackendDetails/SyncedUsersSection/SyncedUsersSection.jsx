@@ -70,9 +70,9 @@ const SyncedUsersSection = () => {
   }
 
   return (
-    <SectionComponent title="Synced Users" showLoading={loading}>
+    <SectionComponent title="Synchronized Users" showLoading={loading}>
       <p className="description">
-        Found {total} synced users.
+        Found {total} synchronized users.
       </p>
       <PaginatedList onChange={_onPageChange(_loadUsers, setLoading)} totalItems={total} activePage={page}>
         <DataTable id="synced-users-overview"

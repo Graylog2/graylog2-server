@@ -95,7 +95,7 @@ const loadBackendsPaginated: $PropertyType<ActionsType, 'loadBackendsPaginated'>
 const loadUsersPaginated: $PropertyType<ActionsType, 'loadUsersPaginated'> = notifyingAction({
   action: AuthenticationActions.loadUsersPaginated,
   error: (error) => ({
-    message: `Loading synchronised users failed with status: ${error}`,
+    message: `Loading synchronized users failed with status: ${error}`,
   }),
 });
 
