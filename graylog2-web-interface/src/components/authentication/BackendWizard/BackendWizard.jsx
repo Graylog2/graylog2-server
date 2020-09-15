@@ -87,7 +87,7 @@ const BackendWizard = ({ authServiceType, initialValues, initialStep, onSubmit, 
 
   const _handleStepChange = (stepKey: $PropertyType<Step, 'key'>) => setStepsState({ ...stepsState, activeStepKey: stepKey });
 
-  const _handleFieldUpdate = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  const _handleFieldUpdate = (event: SyntheticInputEvent<HTMLInputElement> | { target: { value: string, name: string, checked?: boolean } }) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
 
     setStepsState({

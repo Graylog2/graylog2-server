@@ -18,7 +18,7 @@ type Props = {
     displayNameAttribute?: React.Node,
     defaultRoles?: React.Node,
   },
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => void,
+  onChange: (SyntheticInputEvent<HTMLInputElement> | { target: { value: string, name: string, checked?: boolean } }) => void,
   onSubmit: (nextStepKey: string) => void,
   onSubmitAll: () => void,
 };
@@ -97,20 +97,24 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, onChange }: 
           </Row>
 
           <Field name="defaultRoles" validate={FormUtils.validation.isRequired('Default Roles')}>
-            {({ field: { name, value, onChange: onFieldChange } }) => (
-              <Input id="default-roles-select"
-                     label="Default Roles"
-                     help={help.defaultRoles}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select inputProps={{ 'aria-label': 'Search for roles' }}
-                        onChange={(roleName) => onFieldChange({ target: { value: roleName, name } })}
-                        options={rolesOptions}
-                        placeholder="Search for roles"
-                        multi
-                        value={value} />
-              </Input>
-            )}
+            {({ field: { name, value } }) => {
+              return (
+                <Input id="default-roles-select"
+                       label="Default Roles"
+                       help={help.defaultRoles}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9">
+                  <Select inputProps={{ 'aria-label': 'Search for roles' }}
+                          onChange={(roleName) => {
+                            onChange({ target: { value: roleName, name } });
+                          }}
+                          options={rolesOptions}
+                          placeholder="Search for roles"
+                          multi
+                          value={value} />
+                </Input>
+              );
+            }}
           </Field>
 
           <ButtonToolbar className="pull-right">
