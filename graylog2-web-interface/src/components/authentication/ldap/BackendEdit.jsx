@@ -44,8 +44,19 @@ const _initialValues = ({
   };
 };
 
+const _optionalWizzardProps = (initialStep: ?string) => {
+  const props = {};
+
+  if (initialStep) {
+    props.initialStep = initialStep;
+  }
+
+  return props;
+};
+
 const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
   const initialValues = _initialValues(authenticationBackend.config);
+  const optionalProps = _optionalWizzardProps(initialStep);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
     {
       ...payload,
@@ -62,8 +73,8 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
         </span>
         <BackendOverviewLinks />
       </PageHeader>
-      <BackendWizard initialValues={initialValues}
-                     initialStep={initialStep}
+      <BackendWizard {...optionalProps}
+                     initialValues={initialValues}
                      onSubmit={_handleSubmit}
                      authServiceType="ldap"
                      editing />
