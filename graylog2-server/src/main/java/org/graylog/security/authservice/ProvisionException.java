@@ -16,6 +16,8 @@
  */
 package org.graylog.security.authservice;
 
-public interface ProvisionerAction {
-    void provision(UserProfile userProfile) throws ProvisionException;
+public class ProvisionException extends Exception {
+    public ProvisionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

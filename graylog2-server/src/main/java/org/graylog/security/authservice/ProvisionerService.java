@@ -53,7 +53,7 @@ public class ProvisionerService {
             try {
                 action.provision(userProfile);
             } catch (Exception e) {
-                LOG.error("Error running provisioner action <{}>", action.getClass().getCanonicalName());
+                LOG.error("Error running provisioner action <{}>", action.getClass().getCanonicalName(), e);
                 // TODO: Should we fail here or just continue?
             }
         }
