@@ -53,9 +53,9 @@ export const HELP = {
 
 const BackendCreate = () => {
   return (
-    <DocumentTitle title="Create Active Directory Authentication Provider">
-      <PageHeader title="Create Active Directory Provider">
-        <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+    <DocumentTitle title="Create Active Directory Authentication Services">
+      <PageHeader title="Create Active Directory Services">
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
         <span>
           Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                              text="documentation"

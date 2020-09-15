@@ -11,9 +11,9 @@ import BackendWizard from '../BackendWizard';
 
 const BackendCreate = () => {
   return (
-    <DocumentTitle title="Create LDAP Authentication Provider">
-      <PageHeader title="Create LDAP Authentication Provider">
-        <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+    <DocumentTitle title="Create LDAP Authentication Service">
+      <PageHeader title="Create LDAP Authentication Service">
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
         <span>
           Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                              text="documentation" />.

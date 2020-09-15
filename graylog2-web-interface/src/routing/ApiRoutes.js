@@ -36,7 +36,6 @@ const ApiRoutes = {
     enableUser: (userId) => ({ url: `/api/system/authentication/users/${userId}/enable` }),
     disableUser: (userId) => ({ url: `/api/system/authentication/users/${userId}/disable` }),
     updateConfiguration: () => ({ url: '/api/system/authentication/configuration' }),
-
   },
   AuthzRolesController: {
     load: (roleId) => { return { url: `/authzRoles/${roleId}` }; },

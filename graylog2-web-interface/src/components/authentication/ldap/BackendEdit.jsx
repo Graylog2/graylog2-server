@@ -16,7 +16,7 @@ type Props = {
   initialStep: ?string,
 };
 
-const _initialValues = ({
+export const prepareInitialValues = ({
   defaultRoles,
   displayNameAttribute,
   serverUri,
@@ -43,7 +43,7 @@ const _initialValues = ({
   };
 };
 
-const _optionalWizzardProps = (initialStep: ?string) => {
+const _optionalWizardProps = (initialStep: ?string) => {
   const props = {};
 
   if (initialStep) {
@@ -54,8 +54,8 @@ const _optionalWizzardProps = (initialStep: ?string) => {
 };
 
 const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
-  const initialValues = _initialValues(authenticationBackend.config);
-  const optionalProps = _optionalWizzardProps(initialStep);
+  const initialValues = prepareInitialValues(authenticationBackend.config);
+  const optionalProps = _optionalWizardProps(initialStep);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
     {
       ...payload,
@@ -63,9 +63,9 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
     });
 
   return (
-    <DocumentTitle title="Edit LDAP Authentication Provider">
-      <PageHeader title="Edit LDAP Authentication Provider">
-        <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+    <DocumentTitle title="Edit LDAP Authentication Service">
+      <PageHeader title="Edit LDAP Authentication Service">
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
         <span>
           Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                              text="documentation" />.

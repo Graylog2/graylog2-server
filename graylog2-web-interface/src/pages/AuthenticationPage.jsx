@@ -43,17 +43,17 @@ const AuthenticationPage = () => {
                     <ButtonToolbar>
                       <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.edit(activeBackend.id)}>
                         <Button bsStyle="success">
-                          Edit Active Backend
+                          Edit Active Service
                         </Button>
                       </LinkContainer>
                       <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CREATE}>
                         <Button bsStyle="success">
-                          Create Backend
+                          Create Service
                         </Button>
                       </LinkContainer>
                     </ButtonToolbar>
                     ))}>
-          <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+          <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                                    text="documentation" />.
           </span>

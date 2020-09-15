@@ -67,7 +67,7 @@ const BackendsOverview = ({ paginatedAuthBackends }: Props) => {
   return (
     <Row className="content">
       <Col xs={12}>
-        <h2>Authentication Services</h2>
+        <h2>Configured Authentication Services</h2>
         <p className="description">
           Found {backends.size} configured authentication services on the system.
         </p>

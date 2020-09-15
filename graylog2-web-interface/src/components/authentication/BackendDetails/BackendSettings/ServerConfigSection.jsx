@@ -23,8 +23,8 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
   return (
     <SectionComponent title="Server Configuration" headerActions={<Link to={editLink}>Edit</Link>}>
       <ReadOnlyFormGroup label="Server Address" value={serverUri} />
-      <ReadOnlyFormGroup label="Server Username" value={systemUsername} />
-      <ReadOnlyFormGroup label="Server Password" value="******" />
+      <ReadOnlyFormGroup label="System Username" value={systemUsername} />
+      <ReadOnlyFormGroup label="System Password" value="******" />
     </SectionComponent>
   );
 };

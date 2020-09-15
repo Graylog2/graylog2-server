@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import URI from 'urijs';
 
 import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
@@ -11,6 +10,7 @@ import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
 
 import { HELP } from './BackendCreate';
 
+import { prepareInitialValues } from '../ldap/BackendEdit';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
@@ -18,34 +18,7 @@ type Props = {
   initialStep: ?string,
 };
 
-const _initialValues = ({
-  defaultRoles,
-  displayNameAttribute,
-  serverUri,
-  systemUsername,
-  trustAllCertificates,
-  userSearchBase,
-  userSearchPattern,
-  useStartTls,
-  useSsl,
-}: $PropertyType<LdapBackend, 'config'>) => {
-  const serverUriObj = new URI(serverUri);
-
-  return {
-    defaultRoles,
-    displayNameAttribute,
-    systemUsername,
-    trustAllCertificates,
-    userSearchBase,
-    userSearchPattern,
-    useStartTls,
-    useSsl,
-    serverUriHost: serverUriObj.hostname(),
-    serverUriPort: serverUriObj.port(),
-  };
-};
-
-const _optionalWizzardProps = (initialStep: ?string) => {
+const _optionalWizardProps = (initialStep: ?string) => {
   const props = {};
 
   if (initialStep) {
@@ -56,8 +29,8 @@ const _optionalWizzardProps = (initialStep: ?string) => {
 };
 
 const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
-  const initialValues = _initialValues(authenticationBackend.config);
-  const optionalProps = _optionalWizzardProps(initialStep);
+  const initialValues = prepareInitialValues(authenticationBackend.config);
+  const optionalProps = _optionalWizardProps(initialStep);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
     {
       ...payload,
@@ -65,9 +38,9 @@ const BackendEdit = ({ authenticationBackend, initialStep }: Props) => {
     });
 
   return (
-    <DocumentTitle title="Edit Active Directory Authentication Provider">
-      <PageHeader title="Edit Active Directory Authentication Provider">
-        <span>Configure Graylog&apos;s authentication providers of this Graylog cluster.</span>
+    <DocumentTitle title="Edit Active Directory Authentication Service">
+      <PageHeader title="Edit Active Directory Authentication Service">
+        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
         <span>
           Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
                                                              text="documentation" />.
