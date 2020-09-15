@@ -1890,7 +1890,7 @@
     remark "^12.0.0"
     unist-util-find-all-after "^3.0.1"
 
-"@testing-library/dom@7.20.2":
+"@testing-library/dom@7.20.2", "@testing-library/dom@>=5", "@testing-library/dom@^7.17.1":
   version "7.20.2"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.20.2.tgz#d598265248a6e16a2fe0aff6b96b858ca5f1a71b"
   integrity sha512-9KOD0fFCTVFsT1EgB8C5qKs1nV7KdIGe0YIANAKeIDWWC0vwkiLXA/8HlrM2+w7YXiRXIeeHh0LxTYQpvaoGgA==
@@ -1899,16 +1899,6 @@
     "@types/aria-query" "^4.2.0"
     aria-query "^4.2.2"
     dom-accessibility-api "^0.4.6"
-    pretty-format "^25.5.0"
-
-"@testing-library/dom@>=5", "@testing-library/dom@^7.17.1":
-  version "7.18.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.18.0.tgz#fc883ba993f35cd00c863099cfcf314395f0a9eb"
-  integrity sha512-OD6jgGc4nwM4GNXZJlVcI6wwP5hcJ4T8g752wbtK/Ub7jdATvAdnVSauODdoBMsEZejb1VoWNQsTDc4C9bgrsw==
-  dependencies:
-    "@babel/runtime" "^7.10.3"
-    aria-query "^4.2.2"
-    dom-accessibility-api "^0.4.5"
     pretty-format "^25.5.0"
 
 "@testing-library/jest-dom@5.11.0":
@@ -5254,11 +5244,6 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-dom-accessibility-api@^0.4.5:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.4.5.tgz#d9c1cefa89f509d8cf132ab5d250004d755e76e3"
-  integrity sha512-HcPDilI95nKztbVikaN2vzwvmv0sE8Y2ZJFODy/m15n7mGXLeOKGiys9qWVbFbh+aq/KYj2lqMLybBOkYAEXqg==
-
 dom-accessibility-api@^0.4.6:
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.4.6.tgz#f3f2af68aee01b1c862f37918d41841bb1aaf92a"
@@ -5822,7 +5807,7 @@ eslint-config-airbnb@18.2.0:
     eslint-plugin-jest-formatting "2.0.0"
     eslint-plugin-jsx-a11y "6.3.1"
     eslint-plugin-react "7.20.6"
-    eslint-plugin-react-hooks "4.1.0"
+    eslint-plugin-react-hooks "4.1.2"
 
 eslint-import-resolver-node@^0.3.3:
   version "0.3.4"
@@ -5916,10 +5901,10 @@ eslint-plugin-jsx-a11y@6.3.1:
     jsx-ast-utils "^2.4.1"
     language-tags "^1.0.5"
 
-eslint-plugin-react-hooks@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.1.0.tgz#6323fbd5e650e84b2987ba76370523a60f4e7925"
-  integrity sha512-36zilUcDwDReiORXmcmTc6rRumu9JIM3WjSvV0nclHoUQ0CNrX866EwONvLR/UqaeqFutbAnVu8PEmctdo2SRQ==
+eslint-plugin-react-hooks@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.1.2.tgz#2eb53731d11c95826ef7a7272303eabb5c9a271e"
+  integrity sha512-ykUeqkGyUGgwTtk78C0o8UG2fzwmgJ0qxBGPp2WqRKsTwcLuVf01kTDRAtOsd4u6whX2XOC8749n2vPydP82fg==
 
 eslint-plugin-react@7.20.6:
   version "7.20.6"
@@ -12814,10 +12799,10 @@ react-router@3.2.6:
     react-is "^16.13.0"
     warning "^3.0.0"
 
-react-select-event@^4.1.4:
-  version "4.1.4"
-  resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-4.1.4.tgz#e0aedcf54d1152ce7742b06d81c4cc27d65e1e32"
-  integrity sha512-GDoyzB/oTEOy/DC2OhSAlcxcys4ULn3W4Rp/H0EypsPFhVe82gO7RUBRZHN3CarqeUdhhLVU0ko2k0eZyhD51A==
+react-select-event@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-5.0.0.tgz#e16d1dd240b5e1f41f31cb74a50baaa89aa6406c"
+  integrity sha512-bESECffhi//x1nlMoRJtwI0nGl5n6OKaVYeIEcPTV8flVPycvUoBGank/1RIoxVc6WtoQ4QbPbU8xMvX0xAiOA==
   dependencies:
     "@testing-library/dom" ">=5"
 
