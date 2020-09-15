@@ -67,7 +67,7 @@ const BackendsOverview = ({ paginatedAuthBackends }: Props) => {
   return (
     <Row className="content">
       <Col xs={12}>
-        <h2>Users</h2>
+        <h2>Authentication Services</h2>
         <p className="description">
           Found {backends.size} configured authentication services on the system.
         </p>
@@ -84,7 +84,7 @@ const BackendsOverview = ({ paginatedAuthBackends }: Props) => {
                      )}
                      customFilter={<BackendsFilter onSearch={() => Promise.resolve()} onReset={() => Promise.resolve()} />}
                      filterKeys={[]}
-                     filterLabel="Filter configured services" />
+                     filterLabel="Filter services" />
         </PaginatedList>
       </Col>
     </Row>

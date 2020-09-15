@@ -6,7 +6,6 @@ import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
-import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 
 import type { LdapService, LdapCreate } from './types';
@@ -14,7 +13,7 @@ import type { LdapService, LdapCreate } from './types';
 import BackendWizard from '../BackendWizard';
 
 type Props = {
-  authenticationBackend: AuthenticationBackend,
+  authenticationBackend: LdapService,
   initialStep: ?string,
 };
 
