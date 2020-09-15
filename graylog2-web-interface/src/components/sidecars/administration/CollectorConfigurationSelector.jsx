@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { uniq } from 'lodash';
 
 import { Button } from 'components/graylog';
 import { SelectPopover } from 'components/common';
@@ -109,7 +109,7 @@ class CollectorConfigurationSelector extends React.Component {
     const { configurations, selectedSidecarCollectorPairs } = this.props;
 
     // Do not allow configuration changes when more than one log collector type is selected
-    const selectedLogCollectors = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector));
+    const selectedLogCollectors = uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector));
 
     if (selectedLogCollectors.length > 1) {
       return (

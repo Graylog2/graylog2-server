@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import { Col, Row } from 'components/graylog';
-
-import lodash from 'lodash';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { upperFirst } from 'lodash';
 import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Col, Row } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -51,7 +49,7 @@ class EventDefinitionSummary extends React.Component {
           <dt>Description</dt>
           <dd>{eventDefinition.description || 'No description given'}</dd>
           <dt>Priority</dt>
-          <dd>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+          <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         </dl>
       </>
     );

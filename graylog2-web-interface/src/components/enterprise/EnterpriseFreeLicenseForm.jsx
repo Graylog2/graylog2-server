@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { isEmpty, trim } from 'lodash';
 
 import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -44,7 +44,7 @@ export default class EnterpriseFreeLicenseForm extends React.Component {
   formIsInvalid = () => {
     const { isSubmitting, formFields } = this.state;
 
-    return isSubmitting || !lodash.isEmpty(FORM_FIELDS.filter((key) => lodash.isEmpty(lodash.trim(formFields[key]))));
+    return isSubmitting || !isEmpty(FORM_FIELDS.filter((key) => isEmpty(trim(formFields[key]))));
   };
 
   submitForm = (event) => {

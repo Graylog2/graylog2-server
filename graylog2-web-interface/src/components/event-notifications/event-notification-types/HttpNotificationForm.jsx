@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { cloneDeep, get } from 'lodash';
 
 import { URLWhiteListInput } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
@@ -14,7 +14,7 @@ class HttpNotificationForm extends React.Component {
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     onChange(nextConfig);
@@ -38,7 +38,7 @@ class HttpNotificationForm extends React.Component {
         <URLWhiteListInput label="URL"
                            onChange={this.handleChange}
                            validationState={validation.errors.url ? 'error' : null}
-                           validationMessage={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+                           validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                            url={config.url} />
       </>
     );

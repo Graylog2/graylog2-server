@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import lodash from 'lodash';
+import { kebabCase } from 'lodash';
 
 import { Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
@@ -210,7 +210,7 @@ class TableList extends React.Component {
         <Row>
           <Col md={12}>
             <TypeAheadDataFilter ref={(c) => { this.filter = c; }}
-                                 id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
+                                 id={`${kebabCase(this.props.filterLabel)}-data-filter`}
                                  label={this.props.filterLabel}
                                  data={this.props.items.toJS()}
                                  displayKey="value"

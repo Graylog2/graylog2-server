@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { get } from 'lodash';
 
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -46,7 +46,7 @@ const EnterpriseStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+        const errorMessage = get(error, 'additional.body.message', error.message);
 
         UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
       },
@@ -73,7 +73,7 @@ const EnterpriseStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        const errorMessage = lodash.get(error, 'additional.body.message', error.message);
+        const errorMessage = get(error, 'additional.body.message', error.message);
 
         UserNotification.error(`Requesting a free Graylog Enterprise license failed: ${errorMessage}`, 'Error');
       },

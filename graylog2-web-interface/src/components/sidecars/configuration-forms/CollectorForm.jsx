@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select, SourceCodeEditor } from 'components/common';
@@ -54,7 +54,7 @@ const CollectorForm = createReactClass({
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
-    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+    this._debouncedValidateFormData = debounce(this._validateFormData, 200);
   },
 
   componentDidMount() {
@@ -86,7 +86,7 @@ const CollectorForm = createReactClass({
     const { formData } = this.state;
 
     return (nextValue) => {
-      const nextFormData = lodash.cloneDeep(formData);
+      const nextFormData = cloneDeep(formData);
 
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import { capitalize } from 'lodash';
 
 import { ButtonGroup, Col } from 'components/graylog';
 import { LogLevelDropdown } from 'components/loggers';
@@ -17,7 +17,7 @@ class LoggingSubsystem extends React.Component {
       <div className="subsystem-row">
         <Col md={6} className="subsystem" style={{ marginBottom: '10px' }}>
           <h3 className="u-light">
-            Subsystem: {lodash.capitalize(this.props.name)}
+            Subsystem: {capitalize(this.props.name)}
             <ButtonGroup className="pull-right">
               <LogLevelDropdown nodeId={this.props.nodeId} name={this.props.name} subsystem={this.props.subsystem} />
             </ButtonGroup>

@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { upperFirst } from 'lodash';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/graylog';
@@ -42,7 +42,7 @@ const CollectorRow = createReactClass({
           {collector.name}
         </td>
         <td>
-          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {lodash.upperFirst(collector.node_operating_system)}
+          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {upperFirst(collector.node_operating_system)}
         </td>
         <td>
           <ButtonToolbar>

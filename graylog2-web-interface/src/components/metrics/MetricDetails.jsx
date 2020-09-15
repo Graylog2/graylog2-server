@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { capitalize } from 'lodash';
 
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -48,7 +48,7 @@ const MetricDetails = createReactClass({
     const { nodeId } = this.props;
     const metric = this.state.metrics && this.state.metrics[nodeId] && this.state.metrics[nodeId][metricName]
       ? this.state.metrics[nodeId][metricName] : this.props.metric;
-    const type = lodash.capitalize(metric.type);
+    const type = capitalize(metric.type);
     const details = this._formatDetailsForType(type, metric);
 
     return (

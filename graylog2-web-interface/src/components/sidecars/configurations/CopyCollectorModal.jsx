@@ -1,6 +1,6 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import CloneMenuItem from '../common/CloneMenuItem';
 
@@ -57,7 +57,7 @@ class CopyCollectorModal extends React.Component {
 
     this.setState({ name, errorMessage: undefined });
 
-    const nextCollector = lodash.cloneDeep(collector);
+    const nextCollector = cloneDeep(collector);
 
     nextCollector.name = name;
     nextCollector.id = '';

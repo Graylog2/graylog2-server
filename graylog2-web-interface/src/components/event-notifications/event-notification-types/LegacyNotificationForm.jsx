@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { get } from 'lodash';
 
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { Select } from 'components/common';
@@ -117,7 +117,7 @@ class LegacyNotificationForm extends React.Component {
                     options={this.formatLegacyTypes(legacyTypes)}
                     value={callbackType} />
             <HelpBlock>
-              {lodash.get(validation, 'errors.callback_type[0]', 'Select a Legacy Notification to use on this Event Definition.')}
+              {get(validation, 'errors.callback_type[0]', 'Select a Legacy Notification to use on this Event Definition.')}
             </HelpBlock>
           </FormGroup>
         </fieldset>

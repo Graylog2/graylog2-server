@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { groupBy } from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -16,7 +16,7 @@ const CatalogStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
     const promise = fetch('GET', url)
       .then((result) => {
-        const entityIndex = lodash.groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
+        const entityIndex = groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
 
         this.trigger({ entityIndex: entityIndex });
 
