@@ -22,6 +22,8 @@ public interface AuthServiceBackend {
     Optional<UserProfile> authenticateAndProvision(AuthServiceCredentials authCredentials,
                                                    UserProfileProvisioner userProfileProvisioner);
 
+    String backendType();
+
     String backendId();
 
     String backendTitle();

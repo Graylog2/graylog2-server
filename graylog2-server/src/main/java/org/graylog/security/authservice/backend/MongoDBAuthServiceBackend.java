@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 public class MongoDBAuthServiceBackend implements AuthServiceBackend {
+    public static final String NAME = "internal-mongodb";
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBAuthServiceBackend.class);
 
     private final UserService userService;
@@ -81,6 +82,11 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
             return false;
         }
         return passwordAlgorithm.matches(user.getHashedPassword(), password);
+    }
+
+    @Override
+    public String backendType() {
+        return NAME;
     }
 
     @Override
