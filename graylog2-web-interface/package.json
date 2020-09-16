@@ -23,7 +23,9 @@
     "lint:styles:path": "stylelint --syntax css-in-js --",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
-    "check-production-build": "node checkProductionBuild.js"
+    "check-production-build": "node checkProductionBuild.js",
+    "serve": "node runProductionLocal.js",
+    "serve:build": "npm run build && npm run serve"
   },
   "jest": {
     "collectCoverageFrom": [
