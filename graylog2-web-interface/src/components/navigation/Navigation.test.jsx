@@ -151,7 +151,7 @@ describe('Navigation', () => {
     };
     it.each`
     permissions                    | count | links
-    ${[]}                          | ${5}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
+    ${[]}                          | ${4}  | ${['Search', 'Streams', 'Alerts', 'Dashboards']}
   `('shows $links for user with $permissions permissions', verifyPermissions);
   });
 });
