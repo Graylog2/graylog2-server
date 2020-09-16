@@ -146,7 +146,7 @@ public abstract class ParameterDescriptor<T, R> {
             return autoBuild();
         }
 
-        public abstract Builder<T, R> transform(@Nullable java.util.function.Function<T, R> transform);
+        public abstract Builder<T, R> transform(java.util.function.Function<T, R> transform);
         @Nullable
         public abstract java.util.function.Function<T, R> transform();
 

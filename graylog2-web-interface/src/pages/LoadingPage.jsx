@@ -1,20 +1,24 @@
+// @flow strict
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import React, { useContext, useEffect } from 'react';
+import { createGlobalStyle } from 'styled-components';
 
 import { DocumentTitle, Spinner, Icon } from 'components/common';
 import LoginBox from 'components/login/LoginBox';
 import authStyles from 'theme/styles/authStyles';
-import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
-const LoadingPage = ({ text }) => {
-  const { addGlobalStyles } = useContext(GlobalStylesContext);
+type Props = {
+  text: string,
+};
 
-  useEffect(() => {
-    addGlobalStyles(authStyles);
-  }, []);
+const LoadingPageStyles = createGlobalStyle`
+  ${authStyles}
+`;
 
+const LoadingPage = ({ text }: Props) => {
   return (
     <DocumentTitle title="Loading...">
+      <LoadingPageStyles />
       <LoginBox>
         <legend><Icon name="users" /> Welcome to Graylog</legend>
         <p>

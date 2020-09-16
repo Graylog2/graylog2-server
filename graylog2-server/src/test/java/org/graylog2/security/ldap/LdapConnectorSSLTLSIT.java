@@ -161,7 +161,7 @@ public class LdapConnectorSSLTLSIT {
 
     @NotNull
     private LdapTestConfigRequest createTLSTestRequest(boolean trustAllCertificates) {
-        return createRequest(internalSSLUri(), true, trustAllCertificates);
+        return createRequest(internalUri(), true, trustAllCertificates);
     }
 
     @NotNull

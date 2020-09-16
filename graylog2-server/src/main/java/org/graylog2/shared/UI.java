@@ -41,21 +41,20 @@ public class UI {
 
         sb.append("\n").append(wall("#")).append("\n");
 
-        sb.append("ERROR: ").append(msg).append("\n\n");
-
-        sb.append("Need help?").append("\n\n");
-        sb.append("* Official documentation: ").append(HELP_DOCS).append("\n");
-        sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
-        sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
+        sb.append("ERROR: ").append(msg).append("\n");
 
         if (docLinks != null && docLinks.length > 0) {
-            sb.append("\n").append("But we also got some specific help " +
-                                           "pages that might help you in this case:").append("\n\n");
+            sb.append("\n").append("Please see the following link(s) to help you with this error:").append("\n\n");
 
             for (final String docLink : docLinks) {
                 sb.append("* ").append(docLink).append("\n");
             }
         }
+
+        sb.append("\nNeed further help?").append("\n\n");
+        sb.append("* Official documentation: ").append(HELP_DOCS).append("\n");
+        sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
+        sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
 
         sb.append("\n").append("Terminating. :(").append("\n\n");
         sb.append(wall("#"));

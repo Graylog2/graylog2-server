@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { ListGroup } from 'components/graylog';
 
@@ -110,11 +110,13 @@ class SortableList extends React.Component {
     });
 
     return (
-      <SortableListGroup disableDragging={disableDragging}>
-        {formattedItems}
-      </SortableListGroup>
+      <DndProvider backend={HTML5Backend}>
+        <SortableListGroup disableDragging={disableDragging}>
+          {formattedItems}
+        </SortableListGroup>
+      </DndProvider>
     );
   }
 }
 
-export default DragDropContext(HTML5Backend)(SortableList);
+export default SortableList;

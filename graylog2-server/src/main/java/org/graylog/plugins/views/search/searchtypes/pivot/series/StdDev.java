@@ -24,7 +24,6 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
@@ -51,7 +50,7 @@ public abstract class StdDev implements SeriesSpec {
         public static Builder create() { return builder(); }
 
         @JsonProperty
-        public abstract Builder id(@Nullable String id);
+        public abstract Builder id(String id);
 
         @JsonProperty
         public abstract Builder field(String field);

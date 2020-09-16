@@ -1,16 +1,14 @@
 // @flow strict
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 import AppContentGrid from 'components/layout/AppContentGrid';
 import DocumentTitle from 'components/common/DocumentTitle';
 import ErrorJumbotron from 'components/errors/ErrorJumbotron';
-import { GlobalStylesContext } from 'contexts/GlobalStylesProvider';
 
-const errorPageStyles = (backgroundImage) => css`
+const generateStyles = (backgroundImage) => css`
   body {
     background: url(${backgroundImage}) no-repeat center center fixed;
     background-size: cover;
@@ -41,18 +39,13 @@ type Props = {
 };
 
 const ErrorPage = ({ children, title, description, backgroundImage }: Props) => {
-  const { addGlobalStyles } = useContext(GlobalStylesContext);
-
-  useEffect(() => {
-    addGlobalStyles(errorPageStyles(backgroundImage));
-
-    return () => {
-      addGlobalStyles(null);
-    };
-  }, [backgroundImage]);
+  const ErrorPageStyles = createGlobalStyle`
+    ${generateStyles(backgroundImage)}
+  `;
 
   return (
     <AppContentGrid>
+      <ErrorPageStyles />
       <div className="container-fluid">
         <DocumentTitle title={title}>
           <ErrorJumbotron title={title}>
