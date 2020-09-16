@@ -188,6 +188,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @PUT
     @Path("{definitionId}/schedule")
+    @Consumes(MediaType.WILDCARD)
     @ApiOperation("Enable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public void schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
@@ -197,6 +198,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
     @PUT
     @Path("{definitionId}/unschedule")
+    @Consumes(MediaType.WILDCARD)
     @ApiOperation("Disable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public void unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
