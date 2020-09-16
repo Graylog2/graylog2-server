@@ -1,12 +1,11 @@
 /* eslint-disable no-console */
 const fs = require('fs');
-const path = require('path');
+
 const puppeteer = require('puppeteer');
 const express = require('express');
 const cors = require('cors');
 
-const VENDORMODULE = 'vendor-module.json';
-const BUILDMODULE = 'module.json';
+const productionHelpers = require('./productionHelpers');
 
 const HEADLESS_SHELL = 'test/bin/headless_shell';
 
@@ -17,17 +16,21 @@ const isExecutable = (filename) => {
   } catch (e) {
     return false;
   }
+
   return true;
 };
 
 const useHeadlessShell = (filename = HEADLESS_SHELL) => {
   const isLinux = process.platform === 'linux';
+
   if (!isLinux) {
     return false;
   }
+
   if (!fs.existsSync(filename)) {
     return false;
   }
+
   if (!isExecutable(filename)) {
     try {
       fs.chmodSync(filename, 0o755);
@@ -35,36 +38,13 @@ const useHeadlessShell = (filename = HEADLESS_SHELL) => {
       return false;
     }
   }
+
   return true;
 };
 
 function fatal(throwable) {
   console.error(throwable);
   process.exit(128);
-}
-
-function generateIndexHtml(assets) {
-  return `
-    <html>
-      <head>
-      </head>
-      <body>
-        ${assets.map((asset) => `<script src="${asset}"></script>`).join('\n')}
-      </body>
-    <html>
-  `;
-}
-function bootstrapExpress(buildDir, config, pluginMounts, indexHtml = '<html><body></body></html>') {
-  const app = express();
-  app.get('/', (req, res) => res.send(indexHtml));
-  app.get('/assets/config.js', (req, res) => res.send(config));
-  app.use('/assets', express.static(buildDir));
-  Object.entries(pluginMounts)
-    .forEach(([name, pluginPath]) => app.use(`/assets/${name}`, express.static(pluginPath)));
-  const server = app.listen();
-  const { port } = server.address();
-
-  return { url: `http://localhost:${port}`, server };
 }
 
 function bootstrapApi(prefix = '/api/') {
@@ -90,9 +70,11 @@ async function loadPage(url, handleError, handleConsole) {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     };
+
     if (useHeadlessShell()) {
       options.executablePath = HEADLESS_SHELL;
     }
+
     const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     page.on('console', handleConsole);
@@ -109,41 +91,17 @@ async function loadPage(url, handleError, handleConsole) {
 const buildDir = process.argv[2] || 'target/web/build';
 const plugins = process.argv.slice(3);
 
-const config = (url) => `
-window.appConfig = {
-  gl2ServerUrl: '${url}',
-  gl2AppPathPrefix: '/',
-  rootTimeZone: 'UTC',
-};
-`;
-
-function collectMounts(pluginModuleNames) {
-  return pluginModuleNames.map((pluginModuleName) => {
-    const pluginModule = JSON.parse(fs.readFileSync(pluginModuleName));
-    const name = Object.keys(pluginModule.files.chunks)[0];
-    return { [name]: path.dirname(pluginModuleName) };
-  }).reduce((prev, cur) => ({ ...prev, ...cur }), {});
-}
-
-function collectAssets(pluginModules) {
-  const vendorModule = JSON.parse(fs.readFileSync(`${buildDir}/${VENDORMODULE}`));
-  const buildModule = JSON.parse(fs.readFileSync(`${buildDir}/${BUILDMODULE}`));
-  const pluginAssets = pluginModules.flatMap((pluginModule) => pluginModule.files.js);
-
-  return [
-    'config.js',
-    ...vendorModule.files.js,
-    ...buildModule.files.js,
-    ...pluginAssets,
-  ].map((asset) => `/assets/${asset}`);
-}
-
 const pluginModules = plugins.map((plugin) => JSON.parse(fs.readFileSync(plugin)));
-const assets = collectAssets(pluginModules);
-const pluginMounts = collectMounts(plugins);
+const assets = productionHelpers.collectAssets(pluginModules);
+const pluginMounts = productionHelpers.collectMounts(plugins);
 
 const api = bootstrapApi();
-const { url, server } = bootstrapExpress(buildDir, config(api.url), pluginMounts, generateIndexHtml(assets));
+const { url, server } = productionHelpers.bootstrapExpress(
+  buildDir,
+  productionHelpers.config(api.url),
+  pluginMounts,
+  productionHelpers.generateIndexHtml(assets),
+);
 
 const pageErrors = [];
 const consoleLogs = [];
@@ -154,6 +112,7 @@ const trackEvent = (evt, arr) => {
 };
 
 const pagePromise = loadPage(url, (msg) => trackEvent(msg, pageErrors), (msg) => trackEvent(msg, consoleLogs));
+
 pagePromise
   .catch((err) => {
     console.error('Error: ', err.toString());
@@ -161,6 +120,7 @@ pagePromise
   })
   .finally(() => {
     const isSuccess = pageErrors.length === 0 && consoleLogs.length === 0;
+
     if (pageErrors.length > 0) {
       console.log('Errors:');
       console.log(pageErrors);
