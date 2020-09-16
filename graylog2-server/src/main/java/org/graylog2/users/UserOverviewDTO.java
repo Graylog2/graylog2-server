@@ -121,7 +121,7 @@ public abstract class UserOverviewDTO {
 
         @ObjectId
         @JsonProperty(FIELD_ROLES)
-        public abstract Builder roles(@Nullable Set<String> roles);
+        public abstract Builder roles(Set<String> roles);
 
         @JsonProperty(FIELD_READ_ONLY)
         public abstract Builder readOnly(@Nullable Boolean readOnly);
