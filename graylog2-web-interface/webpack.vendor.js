@@ -41,19 +41,23 @@ const webpackConfig = {
         const jsfiles = [];
         const cssfiles = [];
         const chunks = {};
+
         Object.keys(assets).forEach((chunk) => {
           if (assets[chunk].js) {
             jsfiles.push(assets[chunk].js);
           }
+
           if (assets[chunk].css) {
             jsfiles.push(assets[chunk].css);
           }
+
           chunks[chunk] = {
             size: 0,
             entry: assets[chunk].js,
             css: assets[chunk].css || [],
           };
         });
+
         return JSON.stringify({
           files: {
             js: jsfiles,
