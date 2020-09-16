@@ -111,10 +111,10 @@ public abstract class AggregationWidget implements ViewWidget {
         public abstract Builder filter(String filter);
 
         @JsonProperty(FIELD_TIMERANGE)
-        public abstract Builder timerange(@Nullable TimeRange timerange);
+        public abstract Builder timerange(TimeRange timerange);
 
         @JsonProperty(FIELD_QUERY)
-        abstract Builder query(@Nullable ElasticsearchQueryString query);
+        abstract Builder query(ElasticsearchQueryString query);
         public Builder query(String query) {
             return query(ElasticsearchQueryString.create(query));
         }

@@ -44,6 +44,7 @@ const readableValue = (value: $PropertyType<Props, 'value'>) => {
   return '-';
 };
 
+/** Displays the provided label and value with the same layout like the FormikFormGroup */
 const ReadOnlyFormGroup = ({ label, value, help }: Props) => (
   <Row>
     <LabelCol sm={3}>

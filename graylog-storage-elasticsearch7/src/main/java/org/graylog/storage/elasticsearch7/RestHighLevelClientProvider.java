@@ -6,6 +6,9 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvi
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClient;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestClientBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.NodesSniffer;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.sniff.Sniffer;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +21,8 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class RestHighLevelClientProvider implements Provider<RestHighLevelClient> {
@@ -25,6 +30,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
     private static final Logger LOG = LoggerFactory.getLogger(RestHighLevelClientProvider.class);
 
     private final RestHighLevelClient client;
+    private final Sniffer sniffer;
 
     @SuppressWarnings("unused")
     @Inject
@@ -53,7 +59,36 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 useExpectContinue,
                 credentialsProvider);
 
+        sniffer = discoveryEnabled
+                ? createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter)
+                : null;
+
         registerShutdownHook(shutdownService);
+
+        if (discoveryEnabled) {
+            registerSnifferShutdownHook(shutdownService);
+        }
+    }
+
+    private Sniffer createNodeDiscoverySniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes, String discoveryFilter) {
+        final NodesSniffer nodesSniffer = FilteredElasticsearchNodesSniffer.create(
+                restClient,
+                TimeUnit.SECONDS.toMillis(5),
+                mapDefaultScheme(defaultSchemeForDiscoveredNodes),
+                discoveryFilter
+        );
+        return Sniffer.builder(restClient)
+                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
+                .setNodesSniffer(nodesSniffer)
+                .build();
+    }
+
+    private ElasticsearchNodesSniffer.Scheme mapDefaultScheme(String defaultSchemeForDiscoveredNodes) {
+        switch (defaultSchemeForDiscoveredNodes.toUpperCase(Locale.ENGLISH)) {
+            case "HTTP": return ElasticsearchNodesSniffer.Scheme.HTTP;
+            case "HTTPS": return ElasticsearchNodesSniffer.Scheme.HTTPS;
+            default: throw new IllegalArgumentException("Invalid default scheme for discovered ES nodes: " + defaultSchemeForDiscoveredNodes);
+        }
     }
 
     @Override
@@ -95,5 +130,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 LOG.warn("Failed to close Elasticsearch RestHighLevelClient", e);
             }
         });
+    }
+
+    private void registerSnifferShutdownHook(GracefulShutdownService shutdownService) {
+        shutdownService.register(sniffer::close);
     }
 }

@@ -5,6 +5,7 @@ import { render, act, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import { admin } from 'fixtures/users';
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
+import mockAction from 'helpers/mocking/MockAction';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { UsersActions } from 'stores/users/UsersStore';
@@ -16,35 +17,42 @@ const mockLoadUsersPaginatedPromise = Promise.resolve(paginatedUsers);
 jest.mock('stores/users/UsersStore', () => ({
   UsersActions: {
     loadUsersPaginated: jest.fn(() => mockLoadUsersPaginatedPromise),
-    delete: jest.fn(() => Promise.resolve()),
+    delete: mockAction(jest.fn(() => Promise.resolve())),
   },
 }));
 
 describe('UsersOverview', () => {
-  beforeEach(() => {
-    UsersActions.delete.completed = { listen: jest.fn(() => jest.fn()) };
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('should display table header', () => {
-    const displaysHeader = async ({ header }) => {
-      const { queryByText } = render(<UsersOverview />);
+  it('should display table header', async () => {
+    const { queryByText } = render(<UsersOverview />);
+    const headers = [
+      'Username',
+      'Full name',
+      'E-Mail Address',
+      'Client Address',
+      'Role',
+      'Actions',
+    ];
+    await act(() => mockLoadUsersPaginatedPromise);
 
-      await waitFor(() => expect(queryByText(header)).not.toBeNull());
-    };
+    headers.forEach((header) => {
+      expect(queryByText(header)).not.toBeNull();
+    });
+  });
 
-    it.each`
-      header
-      ${'Username'}
-      ${'Full name'}
-      ${'E-Mail Address'}
-      ${'Client Address'}
-      ${'Role'}
-      ${'Actions'}
-    `('$header', displaysHeader);
+  it('should search users', async () => {
+    const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
+    await act(() => mockLoadUsersPaginatedPromise);
+    const searchInput = getByPlaceholderText('Enter search query...');
+    const searchSubmitButton = getByRole('button', { name: 'Search' });
+
+    fireEvent.change(searchInput, { target: { value: 'username:bob' } });
+    fireEvent.click(searchSubmitButton);
+
+    await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
   });
 
   describe('should display user', () => {
@@ -67,18 +75,6 @@ describe('UsersOverview', () => {
       ${adminOverview} | ${adminOverview.username}
     `('$username', displaysUserAttributes);
   });
-
-  // it('should search users', async () => {
-  //   const { getByPlaceholderText, getByRole } = render(<UsersOverview />);
-  //   await act(() => mockLoadUsersPaginatedPromise);
-  //   const searchInput = getByPlaceholderText('Enter search query...');
-  //   const searchSubmitButton = getByRole('button', { name: 'Search' });
-
-  //   fireEvent.change(searchInput, { target: { value: 'username:bob' } });
-  //   fireEvent.click(searchSubmitButton);
-
-  //   await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith(1, 10, 'username:bob'));
-  // });
 
   describe('admin should', () => {
     const modifiableUser = alice.toBuilder().readOnly(false).build();

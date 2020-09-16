@@ -88,9 +88,9 @@ public abstract class Pivot implements SearchType {
     @AutoValue.Builder
     public static abstract class Builder {
 
-        public abstract Builder id(@Nullable String id);
+        public abstract Builder id(String id);
 
-        public abstract Builder rowGroups(@Nullable List<Time> rowGroups);
+        public abstract Builder rowGroups(List<Time> rowGroups);
 
         public abstract Builder series(List<SeriesSpec> series);
 
