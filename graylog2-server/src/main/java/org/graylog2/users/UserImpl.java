@@ -96,6 +96,8 @@ public class UserImpl extends PersistedImpl implements User {
     public static final int MAX_EMAIL_LENGTH = 254;
     public static final int MAX_FULL_NAME_LENGTH = 200;
 
+    public static final long DEFAULT_SESSION_TIMEOUT_MS = TimeUnit.HOURS.toMillis(8);
+
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
@@ -233,7 +235,7 @@ public class UserImpl extends PersistedImpl implements User {
         if (o != null && o instanceof Long) {
             return (Long) o;
         }
-        return TimeUnit.HOURS.toMillis(8);
+        return DEFAULT_SESSION_TIMEOUT_MS;
     }
 
     @Override
@@ -406,7 +408,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public long getSessionTimeoutMs() {
-            return TimeUnit.HOURS.toMillis(8);
+            return DEFAULT_SESSION_TIMEOUT_MS;
         }
 
         @Override
