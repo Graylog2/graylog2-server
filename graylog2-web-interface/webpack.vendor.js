@@ -12,7 +12,7 @@ const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
 
-const TARGET = process.env.npm_lifecycle_event;
+const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
 // eslint-disable-next-line no-console
@@ -67,7 +67,7 @@ const webpackConfig = {
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
-if (TARGET === 'build') {
+if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
