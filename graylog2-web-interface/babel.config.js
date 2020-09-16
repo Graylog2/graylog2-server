@@ -5,6 +5,7 @@ module.exports = {
     '@babel/plugin-proposal-class-properties',
     'add-module-exports',
     'babel-plugin-styled-components',
+    'lodash',
   ],
   env: {
     test: {
