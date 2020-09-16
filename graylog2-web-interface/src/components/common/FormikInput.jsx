@@ -1,16 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { Field } from 'formik';
-import styled, { type StyledComponent, css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
-import type { ThemeInterface } from 'theme';
-
-const ErrorMessage: StyledComponent<{}, ThemeInterface, HTMLDivElement> = styled.div(({ theme }) => css`
-  width: 100%;
-  margin-top: 3px;
-  color: ${theme.colors.variant.danger};
-`);
 
 type Props = {
   label: string,
@@ -45,15 +37,11 @@ const FormikInput = ({ label, name, type, help, validate, ...rest }: Props) => (
                label={label}
                name={name}
                onChange={onChange}
-               type={type}>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-        </Input>
+               type={type} />
       );
     }}
   </Field>
 );
-
-FormikInput.ErrorMessage = ErrorMessage;
 
 FormikInput.defaultProps = {
   help: undefined,
