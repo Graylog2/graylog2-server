@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,6 +81,8 @@ public class UserImpl extends PersistedImpl implements User {
             .build();
 
     public static final String COLLECTION_NAME = "users";
+    public static final String AUTH_SERVICE_ID = "auth_service_id";
+    public static final String AUTH_SERVICE_UID = "auth_service_uid";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
@@ -346,6 +349,28 @@ public class UserImpl extends PersistedImpl implements User {
             startpageMap.put("id", startpage.id());
         }
         this.fields.put(STARTPAGE, startpageMap);
+    }
+
+    @Nullable
+    @Override
+    public String getAuthServiceId() {
+        return (String) fields.get(AUTH_SERVICE_ID);
+    }
+
+    @Nullable
+    @Override
+    public String getAuthServiceUid() {
+        return (String) fields.get(AUTH_SERVICE_UID);
+    }
+
+    @Override
+    public void setAuthServiceId(@Nullable String id) {
+        fields.put(AUTH_SERVICE_ID, id);
+    }
+
+    @Override
+    public void setAuthServiceUid(@Nullable String uid) {
+        fields.put(AUTH_SERVICE_UID, id);
     }
 
     public static class LocalAdminUser extends UserImpl {
