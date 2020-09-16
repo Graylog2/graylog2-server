@@ -16,90 +16,103 @@
  */
 package org.graylog.security.authservice;
 
-import com.google.auto.value.AutoValue;
-import de.huxhorn.sulky.ulid.ULID;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.UserImpl;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Collections;
 import java.util.Set;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ProvisionerService {
     private static final Logger LOG = LoggerFactory.getLogger(ProvisionerService.class);
 
-    private final ULID ulid;
+    private final UserService userService;
+    private final DateTimeZone rootTimeZone;
     private final Set<ProvisionerAction> provisionerActions;
 
     @Inject
-    public ProvisionerService(ULID ulid, Set<ProvisionerAction> provisionerActions) {
-        this.ulid = ulid;
+    public ProvisionerService(UserService userService,
+                              @Named("root_timezone") DateTimeZone rootTimeZone,
+                              Set<ProvisionerAction> provisionerActions) {
+        this.userService = userService;
+        this.rootTimeZone = rootTimeZone;
         this.provisionerActions = provisionerActions;
     }
 
-    public UserProfile provision(Details provisionDetails) {
-        final UserProfile userProfile = UserProfile.builder()
-                .uid(ulid.nextULID()) // TODO: Don't use new ID when profile already exists!
-                .authServiceId(provisionDetails.authServiceId())
-                .authServiceUid(provisionDetails.authServiceUid())
-                .username(provisionDetails.username())
-                .email(provisionDetails.email())
-                .fullName(provisionDetails.fullName())
-                .build();
+    public UserDetails.Builder newDetails() {
+        return UserDetails.builder();
+    }
 
-        // TODO: Add real implementation to create or update the user profile based on the given details
+    public UserDetails provision(UserDetails userDetails) {
+        // We don't provision anything for our internal MongoDB authentication service because the user profile
+        // database collection ("users") is used for the user profile AND as source for the MongoDB authentication
+        // service. This might change in the future once we separate the user profile and the MongoDB authentication
+        // service user sources.
+        if (AuthServiceBackend.INTERNAL_BACKEND_ID.equals(userDetails.authServiceId())) {
+            LOG.debug("Skip provisioning for internal authentication service");
+            return userDetails;
+        }
+
+        LOG.info("Provisioning user profile: {}", userDetails);
+
+        final String userId;
+        try {
+            userId = userService.save(provisionUser(userDetails));
+        } catch (ValidationException e) {
+            LOG.error("Cannot update profile for user <{}>", userDetails.username());
+            // TODO: What to do? Throw an error and fail the login or just continue?
+            return userDetails;
+        }
+
+        // Provision actions might need the user's database ID, so make sure it's included
+        final UserDetails userDetailsWithId = userDetails.withDatabaseId(userId);
 
         LOG.info("Running {} provisioner actions", provisionerActions.size());
         for (final ProvisionerAction action : provisionerActions) {
             try {
-                action.provision(userProfile);
+                action.provision(userDetailsWithId);
             } catch (Exception e) {
                 LOG.error("Error running provisioner action <{}>", action.getClass().getCanonicalName(), e);
-                // TODO: Should we fail here or just continue?
+                // TODO: Should we fail the login here or just continue?
             }
         }
 
-        LOG.info("Provisioning user profile: {}", userProfile);
-
-        return userProfile;
+        return userDetails;
     }
 
-    public Details.Builder newDetails() {
-        return Details.builder();
+    private User provisionUser(UserDetails userDetails) {
+        final User user = firstNonNull(userService.load(userDetails.username()), createUser(userDetails));
+
+        // Only set fields that are okay to override by the authentication service here!
+        user.setExternal(true);
+        user.setAuthServiceId(userDetails.authServiceId());
+        user.setAuthServiceUid(userDetails.authServiceUid());
+        user.setName(userDetails.username());
+        user.setFullName(userDetails.fullName());
+        user.setEmail(userDetails.email());
+
+        return user;
     }
 
-    @AutoValue
-    public static abstract class Details {
-        public abstract String username();
+    private User createUser(UserDetails userDetails) {
+        final User user = userService.create();
 
-        public abstract String email();
+        // Set fields there that should not be overridden by the authentication service provisioning
+        user.setRoleIds(userDetails.defaultRoles());
+        user.setPermissions(Collections.emptyList());
+        // TODO: Does the timezone need to be configurable per auth service backend?
+        user.setTimeZone(rootTimeZone);
+        // TODO: Does the session timeout need to be configurable per auth service backend?
+        user.setSessionTimeoutMs(UserImpl.DEFAULT_SESSION_TIMEOUT_MS);
 
-        public abstract String fullName();
-
-        public abstract String authServiceType();
-
-        public abstract String authServiceId();
-
-        public abstract String authServiceUid();
-
-        public static Builder builder() {
-            return new AutoValue_ProvisionerService_Details.Builder();
-        }
-
-        @AutoValue.Builder
-        public abstract static class Builder {
-            public abstract Builder username(String username);
-
-            public abstract Builder email(String email);
-
-            public abstract Builder fullName(String fullName);
-
-            public abstract Builder authServiceType(String authServiceType);
-
-            public abstract Builder authServiceId(String authServiceId);
-
-            public abstract Builder authServiceUid(String authServiceUid);
-
-            public abstract Details build();
-        }
+        return user;
     }
 }

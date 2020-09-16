@@ -18,8 +18,8 @@ package org.graylog.security.authservice.backend;
 
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceCredentials;
-import org.graylog.security.authservice.UserProfile;
 import org.graylog.security.authservice.ProvisionerService;
+import org.graylog.security.authservice.UserDetails;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Optional;
 
 public class MongoDBAuthServiceBackend implements AuthServiceBackend {
@@ -44,7 +45,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
     }
 
     @Override
-    public Optional<UserProfile> authenticateAndProvision(AuthServiceCredentials authCredentials,
+    public Optional<UserDetails> authenticateAndProvision(AuthServiceCredentials authCredentials,
                                                           ProvisionerService provisionerService) {
         final String username = authCredentials.username();
 
@@ -57,6 +58,11 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
         if (user.isLocalAdmin()) {
             throw new IllegalStateException("Local admin user should have been handled earlier and not reach the authentication service authenticator");
         }
+        if (user.isExternalUser()) {
+            // We don't store passwords for users synced from an authentication service, so we can't handle them here.
+            LOG.trace("Skipping mongodb-based password check for external user {}", authCredentials.username());
+            return Optional.empty();
+        }
 
         if (!isValidPassword(user, authCredentials.password())) {
             LOG.warn("Failed to validate password for user <{}>", username);
@@ -65,16 +71,19 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
 
         LOG.info("Successfully validated password for user <{}>", username);
 
-        final UserProfile userProfile = provisionerService.provision(provisionerService.newDetails()
+        final UserDetails userDetails = provisionerService.provision(provisionerService.newDetails()
+                .databaseId(user.getId())
                 .username(user.getName())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                // No need to set default roles because MongoDB users will not be provisioned by the provisioner
+                .defaultRoles(Collections.emptySet())
                 .authServiceType(backendType())
                 .authServiceId(backendId())
                 .authServiceUid(user.getId())
                 .build());
 
-        return Optional.of(userProfile);
+        return Optional.of(userDetails);
     }
 
     private boolean isValidPassword(User user, String password) {
@@ -92,7 +101,7 @@ public class MongoDBAuthServiceBackend implements AuthServiceBackend {
 
     @Override
     public String backendId() {
-        return "000000000000000000000001";
+        return AuthServiceBackend.INTERNAL_BACKEND_ID;
     }
 
     @Override
