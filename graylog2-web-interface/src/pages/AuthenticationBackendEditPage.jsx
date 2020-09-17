@@ -22,6 +22,7 @@ type Props = {
 
 const AuthenticationBackendEditPage = ({ params: { id }, location: { query: { initialStepKey } } }: Props) => {
   const [authBackend, setAuthBackend] = useState();
+  console.log('BackendEditPage render');
 
   useEffect(() => {
     AuthenticationDomain.load(id).then((newAuthBackend) => newAuthBackend && setAuthBackend(newAuthBackend));

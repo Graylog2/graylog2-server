@@ -43,7 +43,6 @@ const _prepareSubmitPayload = (authServiceType) => ({
     description: 'Example description',
     default_roles: defaultRoles,
     config: {
-      default_roles: defaultRoles,
       server_urls: [serverUrl],
       system_user_dn: systemUserDn,
       system_user_password: systemUserPassword,
@@ -64,6 +63,8 @@ const BackendWizard = ({ authServiceType, initialValues, initialStepKey, onSubmi
     formValues: initialValues,
     prepareSubmitPayload: _prepareSubmitPayload(authServiceType),
   });
+
+  console.log('BackednWizard render');
 
   const {
     serverUrlHost,

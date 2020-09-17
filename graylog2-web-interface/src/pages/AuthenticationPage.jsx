@@ -54,7 +54,6 @@ const AuthenticationPage = () => {
             {activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
           </>
         )}
-
       </>
     </DocumentTitle>
   );

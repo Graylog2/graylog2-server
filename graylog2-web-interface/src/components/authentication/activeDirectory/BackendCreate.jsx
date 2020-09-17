@@ -1,14 +1,11 @@
 // @flow strict
 import * as React from 'react';
 
+import { DocumentTitle } from 'components/common';
+import BackendWizard from 'components/authentication/BackendWizard';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
-import DocsHelper from 'util/DocsHelper';
-import { PageHeader, DocumentTitle } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
-import { useActiveBackend } from 'components/authentication/hooks';
 
-import BackendWizard from '../BackendWizard';
+import WizardPageHeader from './WizardPageHeader';
 
 export const HELP = {
   systemUserDn: (
@@ -52,26 +49,12 @@ export const HELP = {
   ),
 };
 
-const BackendCreate = () => {
-  const { finishedLoading, activeBackend } = useActiveBackend();
-
-  return (
-    <DocumentTitle title="Create Active Directory Authentication Services">
-      <PageHeader title="Create Active Directory Services">
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>
-          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                             text="documentation"
-                                                             help="HELP" />.
-        </span>
-        <BackendOverviewLinks activeBackend={activeBackend}
-                              finishedLoading={finishedLoading} />
-      </PageHeader>
-
-      <BackendWizard onSubmit={AuthenticationDomain.create}
-                     authServiceType="active-directory" />
-    </DocumentTitle>
-  );
-};
+const BackendCreate = () => (
+  <DocumentTitle title="Create Active Directory Authentication Services">
+    <WizardPageHeader />
+    <BackendWizard onSubmit={AuthenticationDomain.create}
+                   authServiceType="active-directory" />
+  </DocumentTitle>
+);
 
 export default BackendCreate;

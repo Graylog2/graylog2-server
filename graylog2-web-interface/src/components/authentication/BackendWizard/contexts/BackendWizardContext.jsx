@@ -9,11 +9,7 @@ export type WizardFormValues = any;
 export type WizardStepsState = {
   activeStepKey: $PropertyType<Step, 'key'>,
   formValues: WizardFormValues,
-  prepareSubmitPayload: (WizardFormValues) => ({
-    title: string,
-    description: string,
-    config: $PropertyType<LdapCreate, 'config'>,
-  }),
+  prepareSubmitPayload: (WizardFormValues) => LdapCreate,
 };
 
 export type BackendWizardType = WizardStepsState & {

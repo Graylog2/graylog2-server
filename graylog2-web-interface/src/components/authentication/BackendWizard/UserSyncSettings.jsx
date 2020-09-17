@@ -74,7 +74,7 @@ const UserSyncSettings = ({ help: propsHelp, onSubmit, onSubmitAll, disableSubmi
   return (
     <Formik initialValues={stepsState.formValues} onSubmit={() => onSubmit('groupSync')}>
       {({ isSubmitting, isValid, validateForm }) => (
-        <Form onChange={(event) => onChange(event)} className="form form-horizontal">
+        <Form onChange={(event) => onChange(event)} className="form form-horizontal" onBlur={(werwer) => console.log('handleBlur', werwer)}>
           <FormikFormGroup label="Search Base DN"
                            name="userSearchBase"
                            placeholder="System User DN"

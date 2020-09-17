@@ -3,13 +3,11 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
 
-import DocsHelper from 'util/DocsHelper';
-import { PageHeader, DocumentTitle } from 'components/common';
-import { useActiveBackend } from 'components/authentication/hooks';
-import DocumentationLink from 'components/support/DocumentationLink';
-import BackendOverviewLinks from 'components/authentication/BackendOverviewLinks';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import type { LdapBackend, LdapCreate } from 'logic/authentication/ldap/types';
+import { DocumentTitle } from 'components/common';
+
+import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
 
@@ -60,7 +58,6 @@ const _optionalWizardProps = (initialStepKey: ?string) => {
 };
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
-  const { finishedLoading, activeBackend } = useActiveBackend();
   const initialValues = prepareInitialValues(authenticationBackend);
   const optionalProps = _optionalWizardProps(initialStepKey);
   const _handleSubmit = (payload: LdapCreate) => AuthenticationDomain.update(authenticationBackend.id,
@@ -71,17 +68,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
 
   return (
     <DocumentTitle title="Edit LDAP Authentication Service">
-      <PageHeader title="Edit LDAP Authentication Service">
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
-        <span>
-          Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                             text="documentation" />.
-        </span>
-
-        <BackendOverviewLinks activeBackend={activeBackend}
-                              finishedLoading={finishedLoading} />
-      </PageHeader>
-
+      <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard {...optionalProps}
                      initialValues={initialValues}
                      onSubmit={_handleSubmit}

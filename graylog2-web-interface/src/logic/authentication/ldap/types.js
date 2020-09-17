@@ -40,7 +40,7 @@ export type LdapBackend = {
 export type LdapCreate = {
   title: $PropertyType<AuthenticationBackendJson, 'title'>,
   description: $PropertyType<AuthenticationBackendJson, 'description'>,
-  default_roles: $PropertyType<AuthenticationBackendJson, 'defaultRoles'>,
+  default_roles: $PropertyType<AuthenticationBackendJson, 'default_roles'>,
   config: LdapConfigJson,
 };
 
