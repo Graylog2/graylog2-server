@@ -11,9 +11,9 @@ type Props = {
 };
 
 const SaveOrCancelButtons = ({ onFinish, onCancel }: Props) => {
-  const { handleSubmit } = useFormikContext();
+  const { handleSubmit, dirty } = useFormikContext();
   const _onFinish = useCallback((...args) => {
-    if (handleSubmit) {
+    if (handleSubmit && dirty) {
       handleSubmit();
     }
 
