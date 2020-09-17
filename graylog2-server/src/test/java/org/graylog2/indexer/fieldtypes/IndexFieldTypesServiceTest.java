@@ -95,6 +95,7 @@ public class IndexFieldTypesServiceTest {
                 .as("check that get by index_name works")
                 .isNotNull()
                 .extracting("indexName")
+                .asList()
                 .containsOnly("graylog_1");
 
         assertThat(dbService.findAll().size())

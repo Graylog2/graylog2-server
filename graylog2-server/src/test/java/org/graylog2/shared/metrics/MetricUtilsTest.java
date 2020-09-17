@@ -84,6 +84,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "counter")
                 .extracting("metric")
                 .extracting("count")
+                .asList()
                 .containsExactly(23L);
     }
 
@@ -101,6 +102,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "gauge")
                 .extracting("metric")
                 .extracting("value")
+                .asList()
                 .containsExactly(23);
     }
 
@@ -113,6 +115,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "gauge")
                 .extracting("metric")
                 .extracting("value")
+                .asList()
                 .containsExactly(23);
     }
 
@@ -126,6 +129,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "histogram")
                 .extracting("metric")
                 .extracting("count")
+                .asList()
                 .containsExactly(1L);
     }
 
@@ -139,6 +143,7 @@ public class MetricUtilsTest {
                 .containsEntry("type", "histogram")
                 .extracting("metric")
                 .extracting("count")
+                .asList()
                 .containsExactly(1L);
     }
 
@@ -153,6 +158,7 @@ public class MetricUtilsTest {
                 .extracting("metric")
                 .extracting("rate")
                 .extracting("total")
+                .asList()
                 .containsExactly(1L);
     }
 
@@ -170,6 +176,7 @@ public class MetricUtilsTest {
                 .extracting("metric")
                 .extracting("rate")
                 .extracting("total")
+                .asList()
                 .containsExactly(1.0D);
     }
 
